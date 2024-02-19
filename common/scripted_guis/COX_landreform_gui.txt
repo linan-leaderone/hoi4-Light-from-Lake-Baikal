@@ -1,0 +1,1166 @@
+scripted_gui = {
+
+	COX_land_reform_GUI_Opener = {
+		context_type = decision_category
+		window_name = "COX_land_reform_GUI_Opener"
+		visible = {
+			tag = COX
+		}
+		effects = {
+			COX_land_reform_GUI_Open_Button_click = {
+				set_country_flag = COX_gui_alert_invisible
+				if = {
+					limit = { 
+						has_country_flag = COX_land_reform_GUI_visible_flag
+					}
+					clr_country_flag = COX_land_reform_GUI_visible_flag
+				}
+				else = {
+					set_country_flag = COX_land_reform_GUI_visible_flag
+				}
+				COX_land_reform_gui_reflesh = yes
+			}
+		}
+		triggers = {
+			gui_alert_visible = {
+				NOT = { has_country_flag = COX_gui_alert_invisible }
+			}
+		}
+	}
+	
+	COX_land_reform_GUI = {
+		context_type = player_context
+		window_name = "COX_land_reform_GUI"
+
+		visible = {
+			tag = COX
+			has_country_flag = COX_land_reform_GUI_visible_flag
+		}
+
+		######地图######
+
+			dynamic_lists = {
+				COX_landreform_map = {
+					array = COX_landreform_target_array
+					index = COX_landreform_states_i
+					value = COX_landreform_state_id
+					change_scope = yes
+					entry_container = COX_landreform_map_gui
+				}
+
+			}
+
+			effects = {
+				COX_map_key_button_active_click = {
+					if = {
+						limit = { 
+							has_country_flag = COX_map_key_container_visible_flag
+						}
+						clr_country_flag = COX_map_key_container_visible_flag
+					}
+					else = {
+						set_country_flag = COX_map_key_container_visible_flag
+					}
+				}
+				COX_close_button_click = {
+					clr_country_flag = COX_land_reform_GUI_visible_flag
+				}
+				COX_landreform_map_button_click = {
+					COX = {
+						set_variable = { COX_acted_state = PREV.id }
+						set_variable = { COX_line_chart_mode_global = 1 }
+						set_variable = { COX_line_chart_mode_local = 2 }
+						COX_land_reform_gui_reflesh = yes
+					}
+					save_global_event_target_as = COX_landreform_state_event_target
+				}
+			}
+
+			properties = {
+				COX_landreform_map_button = {
+					frame = COX_landreform_gui_frame
+					image = [COX_landreform_map_icon]
+					x = COX_landreform_gui_x
+					y = COX_landreform_gui_y
+				}
+				COX_lr_province_picture = {
+					image = [COX_landreform_city_picture]
+				}
+				province_name = {
+					image = [COX_landreform_map_name]
+				}
+				COX_landreform_map_cover = {
+					image = [COX_landreform_map_cover_icon]
+					x = COX_landreform_gui_x
+					y = COX_landreform_gui_y
+				}
+				COX_landreform_map_cover_blue = {
+					image = [COX_landreform_map_cover_blue_icon]
+					x = COX_landreform_gui_x
+					y = COX_landreform_gui_y
+				}
+			}
+
+			triggers = {
+
+				COX_map_key_container_Background_visible = {
+					has_country_flag = COX_map_key_container_visible_flag
+				}
+
+				COX_map_key_visible = {
+					has_country_flag = COX_map_key_container_visible_flag
+				}
+
+				province_name_visible = {
+					This = {
+						COX = {
+							check_variable = {
+								COX_acted_state = PREV.id
+							}
+						}
+					}
+				}
+
+				COX_landreform_map_cover_visible = {
+					This = {
+						COX = {
+							check_variable = {
+								COX_acted_state = PREV.id
+							}
+						}
+					}
+				}
+
+				COX_lr_format_two_visible = {
+					This = {
+						COX = {
+							check_variable = {
+								COX_acted_state = PREV.id
+							}
+						}
+					}
+				}
+
+				province_population_visible = {
+					This = {
+						COX = {
+							check_variable = {
+								COX_acted_state = PREV.id
+							}
+						}
+					}
+				}
+
+				province_mil_visible = {
+					This = {
+						COX = {
+							check_variable = {
+								COX_acted_state = PREV.id
+							}
+						}
+					}
+				}
+
+				province_introduction_visible = {
+					This = {
+						COX = {
+							check_variable = {
+								COX_acted_state = PREV.id
+							}
+						}
+					}
+					COX = {
+						has_completed_focus = COX_Account_The_Water_Conservancy
+					}
+				}
+
+				COX_introduction_cover_visible = {
+					NOT = {
+						COX = {
+							has_completed_focus = COX_Account_The_Water_Conservancy
+						}
+					}
+				}
+
+				COX_uncontrolled_cover_visible = {
+					var:COX_acted_state = { 
+						has_state_flag = COX_we_have_lost_this_state
+					}
+				}
+
+				COX_landreform_map_cover_blue_visible = {
+					This = {
+						has_state_flag = COX_reli_Establishment_of_the_Bureau_of_Religious_Affairs_already
+						has_state_flag = COX_land_Reform_through_labor_already
+						check_variable = { COX_landreform_local_unrest = 0 }
+					}
+				}
+			}
+
+
+		#####农民支持度折线图#####
+
+			dynamic_lists = {
+				COX_fs_line_segments = {
+					array = cox_landreform_fs_graph_frames
+					entry_container = COX_fs_line_segment
+					value = segment_frame
+					index = segment_idx
+				}
+			}
+
+			effects = {
+				COX_line_chart_mode_global_click = {
+					set_variable = { COX_line_chart_mode_global = 2 }
+					set_variable = { COX_line_chart_mode_local = 1 }
+					COX_land_reform_gui_reflesh = yes
+				}
+				COX_line_chart_mode_local_click = {
+					set_variable = { COX_line_chart_mode_global = 1 }
+					set_variable = { COX_line_chart_mode_local = 2 }
+					COX_land_reform_gui_reflesh = yes
+				}	
+			}
+
+			triggers = {
+				COX_line_chart_mode_global_click_enabled = {
+					check_variable = { COX_line_chart_mode_global = 1 }
+				}
+				COX_line_chart_mode_local_click_enabled = {
+					check_variable = { COX_line_chart_mode_local = 1 }
+					has_variable = COX_acted_state
+				}
+			}
+
+			properties = {
+				line_segment = { frame = segment_frame }
+				COX_line_chart_mode_global = { frame = COX_line_chart_mode_global }
+				COX_line_chart_mode_local = { frame = COX_line_chart_mode_local }
+			}
+		
+		#####水利界面#####
+			effects = {
+				COX_water_constration_button_click = {
+					clear_array = COX_operation_area_cato
+					resize_array = { array = COX_operation_area_cato value = 1 size = 5 }
+					set_variable = { COX_operation_area_cato^0 = 2 }
+				}
+			}
+
+			triggers = {
+				GFX_cox_wc_bg_visible = {
+					check_variable = { COX_operation_area_cato^0 = 2 }
+				}
+				COX_wc_socialization_button_visible = {
+					check_variable = { COX_operation_area_cato^0 = 2 }
+				}
+				COX_wc_build_Karez_button_visible = {
+					check_variable = { COX_operation_area_cato^0 = 2 }
+				}
+				COX_wc_crack_down_on_bullies_button_visible = {
+					check_variable = { COX_operation_area_cato^0 = 2 }
+				}
+				COX_wc_socialization_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_wc_socialization_already } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+					}
+					has_completed_focus = COX_Public_Water
+				}
+				COX_wc_build_Karez_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_wc_build_Karez_cooldown } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+					}
+					has_completed_focus = COX_Popularize_The_Karez
+				}
+				COX_wc_crack_down_on_bullies_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_wc_crack_down_on_bullies_cooldown } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						check_variable = { COX_landreform_local_unrest = 0 }
+						check_variable = { COX_landreform_local_wc_retake_enabled_times > 0 }
+					}
+					has_completed_focus = COX_Account_The_Water_Conservancy
+				}
+				GFX_COX_water_icon_visible = {
+					check_variable = { COX_operation_area_cato^0 = 2 }
+					has_variable = COX_acted_state
+				}
+			}
+
+			effects = {
+				COX_wc_socialization_button_click = {
+					var:COX_acted_state = { 
+						set_state_flag = COX_wc_socialization_already
+						add_to_variable = { COX_landreform_water_conservancy_progress = COX_landreform_water_conservancy_progress_backup }
+						add_to_variable = { COX_landreform_landlord_resistance = 20 }
+						clamp_variable = {
+							var = COX_landreform_landlord_resistance
+							min = 0
+							max = COX_landreform_landlord_resistance_sup
+						}
+						clamp_variable = {
+							var = COX_landreform_water_conservancy_progress
+							min = 0
+							max = 100
+						}
+					}
+				}
+				COX_wc_build_Karez_button_click = {
+					var:COX_acted_state = { 
+						set_state_flag = {
+							flag = COX_wc_build_Karez_cooldown
+							days = 30
+							value = 1
+						}
+						set_variable = { COX_wc_build_Karez_cooldown = 30 }
+						add_to_variable = { COX_landreform_water_conservancy_progress = 5 }
+						clamp_variable = {
+							var = COX_landreform_water_conservancy_progress
+							min = 0
+							max = 100
+						}
+					}
+				}
+				COX_wc_build_Karez_button_shift_click = {
+					every_owned_state = { 
+						limit = {
+							NOT = { has_state_flag = COX_wc_build_Karez_cooldown } 
+							NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						}
+						set_state_flag = {
+							flag = COX_wc_build_Karez_cooldown
+							days = 30
+							value = 1
+						}
+						add_to_variable = { COX_landreform_water_conservancy_progress = 5 }
+						clamp_variable = {
+							var = COX_landreform_water_conservancy_progress
+							min = 0
+							max = 100
+						}
+					}
+				}
+				COX_wc_crack_down_on_bullies_button_click = {
+					var:COX_acted_state = {
+						set_state_flag = {
+							flag = COX_wc_crack_down_on_bullies_cooldown
+							days = 30
+							value = 1
+						}
+						add_to_variable = { COX_landreform_water_conservancy_progress = 2 }
+						add_to_variable = { COX_landreform_landlord_resistance = 1 }
+						add_to_variable = { COX_landreform_lmam_resistance = 1 }
+						clamp_variable = {
+							var = COX_landreform_landlord_resistance
+							min = 0
+							max = COX_landreform_landlord_resistance_sup
+						}
+						clamp_variable = {
+							var = COX_landreform_lmam_resistance
+							min = 0
+							max = COX_landreform_lmam_resistance_sup
+						}
+						clamp_variable = {
+							var = COX_landreform_water_conservancy_progress
+							min = 0
+							max = 100
+						}
+					}
+				}
+			}
+
+			properties = {
+				COX_water_constration_button = { frame = COX_operation_area_cato^0 }
+			}
+		
+		#####水利折线图#####
+			dynamic_lists = {
+				COX_wc_line_segments = {
+					array = COX_acted_state:cox_landreform_wc_graph_frames
+					entry_container = COX_wc_line_segment
+					value = wc_segment_frame
+					index = wc_segment_idx
+				}
+			}
+
+			triggers = {
+				wc_line_segment_visible = {
+					check_variable = { COX.COX_operation_area_cato^0 = 2 }
+					has_completed_focus = COX_Account_The_Water_Conservancy
+				}
+				COX_landreform_wc_line_chart_bg_visible = {
+					check_variable = { COX.COX_operation_area_cato^0 = 2 }
+				}
+				COX_landreform_wc_line_chart_bg2_visible = {
+					check_variable = { COX_operation_area_cato^0 = 2 }
+				}
+				wc_label_y1_visible = {
+					check_variable = { COX.COX_operation_area_cato^0 = 2 }
+				}
+				wc_label_y2_visible = {
+					check_variable = { COX.COX_operation_area_cato^0 = 2 }
+				}
+				wc_label_y3_visible = {
+					check_variable = { COX.COX_operation_area_cato^0 = 2 }
+				}
+				wc_label_y4_visible = {
+					check_variable = { COX.COX_operation_area_cato^0 = 2 }
+				}
+			}
+
+			properties = {
+				wc_line_segment = { frame = wc_segment_frame }
+			}
+
+		#####民兵界面#####
+			effects = {
+				COX_mil_button_click = {
+					clear_array = COX_operation_area_cato
+					resize_array = { array = COX_operation_area_cato value = 1 size = 5 }
+					set_variable = { COX_operation_area_cato^1 = 2 }
+				}
+			}
+
+			triggers = {
+				COX_mil_collect_the_militia_button_visible = {
+					check_variable = { COX_operation_area_cato^1 = 2 }
+				}
+				GFX_cox_mil_bg_visible = {
+					check_variable = { COX_operation_area_cato^1 = 2 }
+				}
+				COX_mil_safety_patrol_button_visible = {
+					check_variable = { COX_operation_area_cato^1 = 2 }
+				}
+				COX_mil_mobilization_militia_to_centre_minus_button_visible = {
+					check_variable = { COX_operation_area_cato^1 = 2 }
+				}
+				COX_mil_mobilization_militia_to_centre_button_visible = {
+					check_variable = { COX_operation_area_cato^1 = 2 }
+				}
+				COX_mil_mobilization_militia_to_centre_plus_button_visible = {
+					check_variable = { COX_operation_area_cato^1 = 2 }
+				}
+				COX_mil_collect_the_militia_button_click_enabled = {
+					has_completed_focus = COX_Training_The_Militia
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_mil_collect_the_militia_cooldown } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						check_variable = { COX_landreform_local_mil < COX_landreform_sup_mil }
+						check_variable = { COX_landreform_famer_support > 40 }
+					}
+				}
+				COX_mil_safety_patrol_button_click_enabled = {
+					has_completed_focus = COX_Training_The_Militia
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_mil_safety_patrol_cooldown } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						check_variable = { COX_landreform_local_mil > 0 }
+					}
+				}
+				COX_mil_mobilization_militia_to_centre_minus_button_click_enabled = {
+					has_variable = COX_acted_state
+				}
+				COX_mil_mobilization_militia_to_centre_button_click_enabled = {
+					has_completed_focus = COX_Training_The_Militia
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_mil_mobilization_militia_to_centre_cooldown } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						check_variable = { COX_militia_num_to_centre > 0 }
+					}
+				}
+				COX_mil_mobilization_militia_to_centre_plus_button_click_enabled = {
+					has_variable = COX_acted_state
+				}
+				COX_mil_num_visible = {
+					check_variable = { COX_operation_area_cato^1 = 2 }
+				}
+				COX_sec_bar_local_mil_visible = {
+					check_variable = { COX_operation_area_cato^1 = 2 }
+				}
+				COX_sec_local_mil_icon_visible = {
+					check_variable = { COX_operation_area_cato^1 = 2 }
+				}
+				COX_sec_global_mil_text_visible = {
+					check_variable = { COX_operation_area_cato^1 = 2 }
+				}
+			}
+
+			effects = { 
+				COX_mil_collect_the_militia_button_click = {
+					var:COX_acted_state = {
+						set_temp_variable = { COX_landreform_local_mil_temp = COX_landreform_sup_mil }
+						divide_temp_variable = { COX_landreform_local_mil_temp = 4 }
+						add_to_variable = { COX_landreform_local_mil = COX_landreform_local_mil_temp }
+						set_state_flag = {
+							flag = COX_mil_collect_the_militia_cooldown
+							days = 30
+							value = 1
+						}
+						set_variable = { COX_mil_collect_the_militia_cooldown = 30 }
+					}
+					COX_land_reform_gui_reflesh = yes
+				}
+				COX_mil_collect_the_militia_button_shift_click = {
+					every_owned_state = {
+						limit ={
+							NOT = { has_state_flag = COX_mil_collect_the_militia_cooldown } 
+							NOT = { has_state_flag = COX_we_have_lost_this_state } 
+							check_variable = { COX_landreform_local_mil < COX_landreform_sup_mil }
+							check_variable = { COX_landreform_famer_support > 40 }
+						}
+						set_temp_variable = { COX_landreform_local_mil_temp = COX_landreform_sup_mil }
+						divide_temp_variable = { COX_landreform_local_mil_temp = 4 }
+						add_to_variable = { COX_landreform_local_mil = COX_landreform_local_mil_temp }
+						set_state_flag = {
+							flag = COX_mil_collect_the_militia_cooldown
+							days = 30
+							value = 1
+						}
+					}
+				}
+				COX_mil_safety_patrol_button_click = {
+					var:COX_acted_state = { 
+						set_state_flag = {
+							flag = COX_mil_safety_patrol_cooldown
+							days = 30
+							value = 1
+						}
+						COX_landreform_mil_cost_effect = yes
+					}
+					COX_land_reform_gui_reflesh = yes
+				}
+				COX_mil_mobilization_militia_to_centre_minus_button_click = {
+					var:COX_acted_state = {
+						add_to_variable = { COX_militia_num_to_centre = -0.1 }
+						clamp_variable = {
+							var = COX_militia_num_to_centre
+							min = 0
+							max = COX_landreform_local_mil
+						}
+					}
+				}
+				COX_mil_mobilization_militia_to_centre_plus_button_click = {
+					var:COX_acted_state = {
+						add_to_variable = { COX_militia_num_to_centre = 0.1 }
+						clamp_variable = {
+							var = COX_militia_num_to_centre
+							min = 0
+							max = COX_landreform_local_mil
+						}
+					}
+				}
+				COX_mil_mobilization_militia_to_centre_minus_button_shift_click = {
+					var:COX_acted_state = {
+						add_to_variable = { COX_militia_num_to_centre = -1 }
+						clamp_variable = {
+							var = COX_militia_num_to_centre
+							min = 0
+							max = COX_landreform_local_mil
+						}
+					}
+				}
+				COX_mil_mobilization_militia_to_centre_plus_button_shift_click = {
+					var:COX_acted_state = {
+						add_to_variable = { COX_militia_num_to_centre = 1 }
+						clamp_variable = {
+							var = COX_militia_num_to_centre
+							min = 0
+							max = COX_landreform_local_mil
+						}
+					}
+				}
+				COX_mil_mobilization_militia_to_centre_button_click = {
+					var:COX_acted_state = {
+						COX = {
+							add_to_variable = { COX_landreform_centre_militia = PREV.COX_militia_num_to_centre }
+						}
+						subtract_from_variable = { COX_landreform_local_mil = COX_militia_num_to_centre }
+						clamp_variable = {
+							var = COX_militia_num_to_centre
+							min = 0
+							max = COX_landreform_local_mil
+						}
+						set_state_flag = {
+							flag = COX_mil_mobilization_militia_to_centre_cooldown
+							days = 30
+							value = 1
+						}
+						set_variable = { COX_mil_mobilization_militia_to_centre_cooldown = 30 }
+					}
+					COX_land_reform_gui_reflesh = yes
+				}
+			}
+
+			properties = {
+				COX_mil_button = { frame = COX_operation_area_cato^1 }
+				COX_sec_bar_local_mil = { frame = COX_acted_state:COX_landreform_local_mil_rate_display }
+			}
+		#####土地界面#####
+
+			effects = {
+				COX_land_button_click = {
+					clear_array = COX_operation_area_cato
+					resize_array = { array = COX_operation_area_cato value = 1 size = 5 }
+					set_variable = { COX_operation_area_cato^2 = 2 }
+				}
+			}
+
+			triggers = {
+				GFX_cox_land_bg_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+				}
+				COX_land_Crack_down_on_high_land_rent_button_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+				}
+				COX_land_Crack_down_on_high_land_rent_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_land_Crack_down_on_high_land_rent_already
+					}
+				}
+				COX_land_Thoroughly_investigate_Lynching_button_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+				}
+				COX_land_Thoroughly_investigate_Lynching_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_land_Thoroughly_investigate_Lynching_already
+					}
+				}
+				COX_land_Abolish_personal_attachment_button_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+				}
+				COX_land_Abolish_personal_attachment_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_land_Abolish_personal_attachment_already
+					}
+				}
+				COX_land_Organizing_peasant_associations_button_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+				}
+				COX_land_Organizing_peasant_associations_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_land_Organizing_peasant_associations_already
+					}
+				}
+				COX_land_Confiscation_of_private_land_button_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+				}
+				COX_land_Confiscation_of_private_land_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_land_Confiscation_of_private_land_already
+					}
+				}
+				COX_land_Reform_through_labor_button_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+				}
+				COX_land_Reform_through_labor_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^2 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_land_Reform_through_labor_already
+					}
+				}
+				COX_land_Crack_down_on_high_land_rent_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_land_Crack_down_on_high_land_rent_already } 
+						NOT = { has_state_flag = COX_landreform_land_ongoing } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+					}
+					has_completed_focus = COX_Lower_The_Rent_And_Fight_The_Local_Bully
+				}
+				COX_land_Thoroughly_investigate_Lynching_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_land_Thoroughly_investigate_Lynching_already } 
+						NOT = { has_state_flag = COX_landreform_land_ongoing } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						has_state_flag = COX_land_Crack_down_on_high_land_rent_already
+					}
+					has_completed_focus = COX_Liberate_The_Serf
+				}
+				COX_land_Abolish_personal_attachment_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_land_Abolish_personal_attachment_already } 
+						NOT = { has_state_flag = COX_landreform_land_ongoing } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						has_state_flag = COX_land_Thoroughly_investigate_Lynching_already
+					}
+					has_completed_focus = COX_Liberate_The_Serf
+				}
+				COX_land_Organizing_peasant_associations_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_land_Organizing_peasant_associations_already } 
+						NOT = { has_state_flag = COX_landreform_land_ongoing } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						has_state_flag = COX_land_Thoroughly_investigate_Lynching_already
+					}
+					has_completed_focus = COX_Liberate_The_Serf
+				}
+				COX_land_Confiscation_of_private_land_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_land_Confiscation_of_private_land_already } 
+						NOT = { has_state_flag = COX_landreform_land_ongoing } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						has_state_flag = COX_land_Organizing_peasant_associations_already
+						has_state_flag = COX_land_Abolish_personal_attachment_already
+					}
+					has_completed_focus = COX_Redistribution_Of_The_Means_Of_Production
+				}
+				COX_land_Reform_through_labor_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_land_Reform_through_labor_already } 
+						NOT = { has_state_flag = COX_landreform_land_ongoing } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						check_variable = { COX_landreform_landlord_resistance < 20 }
+						has_state_flag = COX_land_Confiscation_of_private_land_already
+					}
+					has_completed_focus = COX_Redistribution_Of_The_Means_Of_Production
+				}
+			}
+
+			effects = {
+				COX_land_Crack_down_on_high_land_rent_button_click = {
+					country_event = COX.41
+					var:COX_acted_state = { 
+						COX_landreform_land_effect = yes
+						set_state_flag = COX_land_Crack_down_on_high_land_rent_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_land_Crack_down_on_high_land_rent_half_effect } }
+							COX_landreform_land_half_effect = yes
+						}
+					}
+				}
+				COX_land_Thoroughly_investigate_Lynching_button_click = {
+					country_event = COX.43
+					var:COX_acted_state = { 
+						COX_landreform_land_effect = yes
+						set_state_flag = COX_land_Thoroughly_investigate_Lynching_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_land_Thoroughly_investigate_Lynching_half_effect } }
+							COX_landreform_land_half_effect = yes
+						}
+					}
+				}
+				COX_land_Abolish_personal_attachment_button_click = {
+					country_event = COX.45
+					var:COX_acted_state = { 
+						COX_landreform_land_effect = yes
+						set_state_flag = COX_land_Abolish_personal_attachment_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_land_Abolish_personal_attachment_half_effect } }
+							COX_landreform_land_half_effect = yes
+						}
+					}
+				}
+				COX_land_Organizing_peasant_associations_button_click = {
+					country_event = COX.49
+					var:COX_acted_state = { 
+						COX_landreform_land_effect = yes
+						set_state_flag = COX_land_Organizing_peasant_associations_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_land_Organizing_peasant_associations_half_effect } }
+							COX_landreform_land_half_effect = yes
+						}
+					}
+				}
+				COX_land_Confiscation_of_private_land_button_click = {
+					country_event = COX.47
+					var:COX_acted_state = { 
+						COX_landreform_land_effect = yes
+						set_state_flag = COX_land_Confiscation_of_private_land_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_land_Confiscation_of_private_land_half_effect } }
+							COX_landreform_land_half_effect = yes
+						}
+					}
+				}
+				COX_land_Reform_through_labor_button_click = {
+					country_event = COX.51
+					var:COX_acted_state = { 
+						set_variable = { COX_landreform_landlord_resistance_sup = 0 }
+						COX_landreform_land_effect = yes
+						set_state_flag = COX_land_Reform_through_labor_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_land_Reform_through_labor_half_effect } }
+							COX_landreform_land_half_effect = yes
+						}
+					}
+				}
+			}
+
+			properties = {
+				COX_land_button = { frame = COX_operation_area_cato^2 }
+			}
+		
+		#####宗教#####
+
+			effects = {
+				cox_reli_button_click = {
+					clear_array = COX_operation_area_cato
+					resize_array = { array = COX_operation_area_cato value = 1 size = 5 }
+					set_variable = { COX_operation_area_cato^3 = 2 }
+				}
+			}
+
+			triggers = {
+				GFX_cox_reli_bg_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+				}
+				COX_reli_Cut_religious_taxes_button_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+				}
+				COX_reli_Disclosure_of_interest_relationship_button_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+				}
+				COX_reli_Fight_for_impoverished_Imam_button_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+				}
+				COX_reli_Public_redundant_religious_sites_socialization_button_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+				}
+				COX_reli_Establishment_of_the_Bureau_of_Religious_Affairs_button_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+				}
+				COX_reli_Cut_religious_taxes_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_reli_Cut_religious_taxes_already 
+					} 
+				}
+				COX_reli_Disclosure_of_interest_relationship_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_reli_Disclosure_of_interest_relationship_already 
+					} 
+				}
+				COX_reli_Fight_for_impoverished_Imam_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_reli_Fight_for_impoverished_Imam_already 
+					} 
+				}
+				COX_reli_Public_redundant_religious_sites_socialization_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_reli_Public_redundant_religious_sites_socialization_already 
+					} 
+				}
+				COX_reli_Establishment_of_the_Bureau_of_Religious_Affairs_button_cover_visible = {
+					check_variable = { COX_operation_area_cato^3 = 2 }
+					var:COX_acted_state = { 
+						has_state_flag = COX_reli_Establishment_of_the_Bureau_of_Religious_Affairs_already 
+					} 
+				}
+				COX_reli_Cut_religious_taxes_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_reli_Cut_religious_taxes_already } 
+						NOT = { has_state_flag = COX_landreform_reli_ongoing } 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+					}
+					has_completed_focus = COX_Lower_The_Rent_And_Fight_The_Local_Bully
+				}
+				COX_reli_Disclosure_of_interest_relationship_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_reli_Disclosure_of_interest_relationship_already } 
+						NOT = { has_state_flag = COX_landreform_reli_ongoing }
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						has_state_flag = COX_reli_Cut_religious_taxes_already
+					}
+					has_completed_focus = COX_Abolish_The_Privilege_Of_Religion
+				}
+				COX_reli_Fight_for_impoverished_Imam_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_reli_Fight_for_impoverished_Imam_already } 
+						NOT = { has_state_flag = COX_landreform_reli_ongoing }
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						has_state_flag = COX_reli_Disclosure_of_interest_relationship_already
+					}
+					has_completed_focus = COX_Abolish_The_Privilege_Of_Religion
+				}
+				COX_reli_Public_redundant_religious_sites_socialization_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_reli_Public_redundant_religious_sites_socialization_already } 
+						NOT = { has_state_flag = COX_landreform_reli_ongoing }
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						has_state_flag = COX_reli_Fight_for_impoverished_Imam_already
+					}
+					has_completed_focus = COX_Redistribution_Of_The_Means_Of_Production
+				}
+				COX_reli_Establishment_of_the_Bureau_of_Religious_Affairs_button_click_enabled = {
+					has_variable = COX_acted_state
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_reli_Establishment_of_the_Bureau_of_Religious_Affairs_already } 
+						NOT = { has_state_flag = COX_landreform_reli_ongoing }
+						NOT = { has_state_flag = COX_we_have_lost_this_state }
+						check_variable = { COX_landreform_lmam_resistance < 20 }
+						has_state_flag = COX_reli_Public_redundant_religious_sites_socialization_already
+					}
+					has_completed_focus = COX_Redistribution_Of_The_Means_Of_Production
+				}
+			}
+
+			effects = {
+				COX_reli_Cut_religious_taxes_button_click = {
+					country_event = { id = COX.42 }
+					var:COX_acted_state = { 
+						COX_landreform_reli_effect = yes
+						set_state_flag = COX_reli_Cut_religious_taxes_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_reli_Cut_religious_taxes_half_effect } }
+							COX_landreform_reli_half_effect = yes
+						}
+					}
+				}
+				COX_reli_Disclosure_of_interest_relationship_button_click = {
+					country_event = { id = COX.44 }
+					var:COX_acted_state = { 						
+						COX_landreform_reli_effect = yes
+						set_state_flag = COX_reli_Disclosure_of_interest_relationship_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_reli_Disclosure_of_interest_relationship_half_effect } }
+							COX_landreform_reli_half_effect = yes
+						}
+					}
+				}
+				COX_reli_Fight_for_impoverished_Imam_button_click = {
+					country_event = { id = COX.46 }
+					var:COX_acted_state = { 
+						COX_landreform_reli_effect = yes
+						set_state_flag = COX_reli_Fight_for_impoverished_Imam_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_reli_Fight_for_impoverished_Imam_half_effect } }
+							COX_landreform_reli_half_effect = yes
+						}
+					}
+				}
+				COX_reli_Public_redundant_religious_sites_socialization_button_click = {
+					country_event = { id = COX.48 }
+					var:COX_acted_state = { 
+						COX_landreform_reli_effect = yes
+						set_state_flag = COX_reli_Public_redundant_religious_sites_socialization_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_reli_Public_redundant_religious_sites_socialization_half_effect } }
+							COX_landreform_reli_half_effect = yes
+						}
+					}
+				}
+				COX_reli_Establishment_of_the_Bureau_of_Religious_Affairs_button_click = {
+					country_event = { id = COX.50 }
+					var:COX_acted_state = { 
+						set_variable = { COX_landreform_lmam_resistance_sup = 0 }
+						COX_landreform_reli_effect = yes
+						set_state_flag = COX_reli_Establishment_of_the_Bureau_of_Religious_Affairs_already
+						if = { 
+							limit = { COX = { has_country_flag = COX_reli_Establishment_of_the_Bureau_of_Religious_Affairs_half_effect } }
+							COX_landreform_reli_half_effect = yes
+						}
+					}
+				}
+			}
+
+			properties = {
+				cox_reli_button = { frame = COX_operation_area_cato^3 }
+			}
+		
+		#####治安#####
+
+			dynamic_lists = {
+				COX_landreform_unrest_level_grid1 = {
+					array = COX_acted_state:COX_landreform_unrest_level_array
+					entry_container = COX_landreform_unrest_level_entry
+				}
+				COX_landreform_unrest_level_grid2 = {
+					array = COX_acted_state:COX_landreform_unrest_level_array
+					entry_container = COX_landreform_unrest_level_entry
+				}
+			}
+
+			effects = {
+				cox_sec_button_click = {
+					clear_array = COX_operation_area_cato
+					resize_array = { array = COX_operation_area_cato value = 1 size = 5 }
+					set_variable = { COX_operation_area_cato^4 = 2 }
+					
+				}
+			}
+
+			triggers = {
+				GFX_cox_poli_bg_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+				}
+				COX_landreform_unrest_level_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+				}
+				COX_dealing_with_local_unrest_button_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+				}
+				COX_sec_Conduct_recapture_operations_button_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+				}
+				COX_sec_Combat_potential_hostile_forces_landlord_button_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+				}
+				COX_sec_Combat_potential_hostile_forces_lmam_button_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+				}
+				COX_sec_num_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+				}
+				COX_sec_bar_landlord_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+					has_variable = COX_acted_state
+				}
+				COX_sec_landlord_icon_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+					has_variable = COX_acted_state
+				}
+				COX_sec_bar_lmam_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+					has_variable = COX_acted_state
+				}
+				COX_sec_lmam_icon_visible = {
+					check_variable = { COX_operation_area_cato^4 = 2 }
+					has_variable = COX_acted_state
+				}
+				COX_dealing_with_local_unrest_button_click_enabled = {
+					has_variable = COX_acted_state
+					has_completed_focus = COX_Battle_The_Landlord_Troops
+					has_completed_focus = COX_Battle_The_Religious_Force
+					var:COX_acted_state = { 
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						check_variable = { COX_landreform_local_unrest > 0 }
+						check_variable = { COX_landreform_local_mil > COX_landreform_local_mil_demand }
+					}
+				}
+				COX_sec_Conduct_recapture_operations_button_click_enabled = {
+					has_variable = COX_acted_state
+					has_completed_focus = COX_Battle_The_Landlord_Troops
+					has_completed_focus = COX_Battle_The_Religious_Force
+					var:COX_acted_state = {
+						has_state_flag = COX_we_have_lost_this_state
+					}
+					check_variable = { COX_landreform_centre_militia > 2 }
+				}
+				COX_sec_Combat_potential_hostile_forces_landlord_button_click_enabled = {
+					has_variable = COX_acted_state
+					has_completed_focus = COX_Battle_The_Landlord_Troops
+					has_completed_focus = COX_Battle_The_Religious_Force
+					var:COX_acted_state = {
+						NOT = { has_state_flag = COX_we_have_lost_this_state } 
+						NOT = { has_state_flag = COX_sec_Combat_potential_hostile_landlord_cooldown }
+						check_variable = { COX_landreform_local_mil_available > COX_landreform_local_mil_deal_demand }
+					}
+				}
+				COX_sec_Combat_potential_hostile_forces_lmam_button_click_enabled = {
+					has_variable = COX_acted_state
+					has_completed_focus = COX_Battle_The_Landlord_Troops
+					has_completed_focus = COX_Battle_The_Religious_Force
+					var:COX_acted_state = {
+						NOT = { has_state_flag = COX_we_have_lost_this_state }
+						NOT = { has_state_flag = COX_sec_Combat_potential_hostile_lmam_cooldown }
+						check_variable = { COX_landreform_local_mil_available > COX_landreform_local_mil_deal_demand }
+					}
+				}
+			}
+
+			effects = {
+				COX_dealing_with_local_unrest_button_click = {
+					var:COX_acted_state = { 
+						COX_landreform_mil_cost_effect = yes
+						set_state_flag = COX_dealing_with_local_unrest
+					}
+					COX_land_reform_gui_reflesh = yes
+				}
+				COX_sec_Conduct_recapture_operations_button_click = {
+					var:COX_acted_state = {
+						set_state_flag = {
+							flag = COX_sec_Conduct_recapture_operations_active
+							days = 30
+							value = 1
+						}
+					}
+					COX_land_reform_gui_reflesh = yes
+					add_to_variable = { COX_landreform_centre_militia = -2 }
+				}
+				COX_sec_Combat_potential_hostile_forces_landlord_button_click = {
+					var:COX_acted_state = {
+						set_state_flag = {
+							flag = COX_sec_Combat_potential_hostile_landlord_cooldown
+							days = 30
+							value = 1
+						}
+						set_state_flag = {
+							flag = COX_sec_Combat_potential_hostile_cooldown
+							days = 30
+							value = 1
+						}
+						if = {
+							limit = { check_variable = { COX_landreform_local_mil > COX_landreform_local_mil_deal_demand } }
+							subtract_from_variable = { COX_landreform_local_mil = COX_landreform_local_mil_deal_demand }
+						}
+						else = {
+							set_variable = { COX_landreform_local_mil_deal_demand_temp = COX_landreform_local_mil_deal_demand }
+							subtract_from_variable = { COX_landreform_local_mil_deal_demand_temp = COX_landreform_local_mil }
+							set_variable = { COX_landreform_local_mil = 0 }
+							subtract_from_variable = { COX.COX_landreform_centre_militia = COX_landreform_local_mil_deal_demand_temp }
+						}
+						set_state_flag = COX_sec_Combat_potential_hostile_forces_landlord
+					}
+					COX_land_reform_gui_reflesh = yes
+				}
+				COX_sec_Combat_potential_hostile_forces_lmam_button_click = {
+					var:COX_acted_state = {
+						set_state_flag = {
+							flag = COX_sec_Combat_potential_hostile_lmam_cooldown
+							days = 30
+							value = 1
+						}
+						set_state_flag = {
+							flag = COX_sec_Combat_potential_hostile_cooldown
+							days = 30
+							value = 1
+						}
+						if = {
+							limit = { check_variable = { COX_landreform_local_mil > COX_landreform_local_mil_deal_demand } }
+							subtract_from_variable = { COX_landreform_local_mil = COX_landreform_local_mil_deal_demand }
+						}
+						else = {
+							set_variable = { COX_landreform_local_mil_deal_demand_temp = COX_landreform_local_mil_deal_demand }
+							subtract_from_variable = { COX_landreform_local_mil_deal_demand_temp = COX_landreform_local_mil }
+							set_variable = { COX_landreform_local_mil = 0 }
+							subtract_from_variable = { COX.COX_landreform_centre_militia = COX_landreform_local_mil_deal_demand_temp }
+						}
+						set_state_flag = COX_sec_Combat_potential_hostile_forces_lmam
+					}
+					COX_land_reform_gui_reflesh = yes
+				}
+			}
+
+			properties = {
+				COX_landreform_unrest_level = { frame = v }
+				cox_sec_button = { frame = COX_operation_area_cato^4 }
+				COX_sec_bar_lmam = { frame = COX_acted_state:COX_landreform_lmam_resistance }
+				COX_sec_bar_landlord = { frame = COX_acted_state:COX_landreform_landlord_resistance }
+			}
+	}
+}

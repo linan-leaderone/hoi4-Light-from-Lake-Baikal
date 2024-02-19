@@ -1,0 +1,217 @@
+scripted_gui = {
+
+	XBJ_northwest_crisis_pic = {
+		context_type = decision_category
+		window_name = "XBJ_northwest_crisis_pic"
+		visible = {
+			always = yes
+		}
+		}
+
+	XBJ_Northwest_crisis_enter = {
+		context_type = player_context
+		window_name = "XBJ_Northwest_crisis_enter"
+		parent_window_token = politics_tab
+
+		visible = {
+			has_completed_focus = XBJ_Infiltrate_Powder_Keg
+		}
+
+		triggers = {
+
+			gui_alert_visible = {
+				NOT = {
+					has_country_flag = XBJ_Northwest_crisis_gui_alert_invisible
+				}
+			}
+
+		}
+
+		
+		effects = {
+			XBJ_Northwest_crisis_enter_click = {
+				if = {
+					limit = {
+						has_country_flag = XBJ_Northwest_crisis_gui_visible
+					}
+					clr_country_flag = XBJ_Northwest_crisis_gui_visible
+				}
+				else = {
+					set_country_flag = XBJ_Northwest_crisis_gui_visible
+				}
+
+				if = {
+					limit = {
+						NOT = {
+							has_country_flag = XBJ_Northwest_crisis_gui_alert_invisible
+						}
+					}
+					set_country_flag = XBJ_Northwest_crisis_gui_alert_invisible
+				}
+			}
+		}
+
+	}
+	
+	XBJ_Northwest_crisis_gui = {
+		context_type = player_context
+		window_name = "XBJ_Northwest_crisis_gui"
+
+		visible = {
+			has_country_flag = XBJ_Northwest_crisis_gui_visible
+		}
+
+		dynamic_lists = {
+			XBJ_Northwest_crisis_map_button_grid = {
+				array = XBJ_northwest_crisis_target
+				index = XBJ_Northwest_crisis_map_button_i
+				value = XBJ_Northwest_crisis_map_button_id
+				change_scope = yes
+				entry_container = XBJ_Northwest_crisis_map_entry
+			}
+			XBJ_Northwest_crisis_task_button_grid = {
+				array = XBJ_northwest_crisis_this_state_task
+				value = XBJ_northwest_crisis_this_state_task_id
+				entry_container = XBJ_Northwest_crisis_task_button_entry
+			}
+			XBJ_Northwest_crisis_taskforce_grid = {
+				array = XBJ_Northwest_crisis_working_group_status_frame
+				value = XBJ_Northwest_crisis_working_group_status
+				index = XBJ_Northwest_crisis_working_group_id
+				entry_container = XBJ_Northwest_crisis_taskforce_entry
+			}
+		}
+
+		properties = {
+			XBJ_Northwest_crisis_map_button = {
+				image = GFX_XBJ_Northwest_crisis_[?XBJ_Northwest_crisis_map_button_i]
+				x = XBJ_Northwest_crisis_map_button_x
+				y = XBJ_Northwest_crisis_map_button_y
+			}
+			XBJ_Northwest_crisis_state_pic = {
+				image = GFX_XBJ_Northwest_crisis_[?XBJ_northwest_crisis_acted_state]_pic
+			}
+			XBJ_Northwest_crisis_state_controller = {
+				image = GFX_XBJ_Northwest_crisis_controller_[?XBJ_Northwest_crisis_controller]
+			}
+			XBJ_Northwest_crisis_disorder_bar = {
+				frame = XBJ_Northwest_crisis_chaos_bar
+			}
+			XBJ_Northwest_crisis_intelligence_bar = {
+				frame = XBJ_Northwest_crisis_visible_bar
+			}
+			XBJ_Northwest_crisis_sign_1 = {
+				frame = XBJ_Northwest_crisis_sign_1_f
+			}
+			XBJ_Northwest_crisis_sign_2 = {
+				frame = XBJ_Northwest_crisis_sign_2_f
+			}
+			XBJ_Northwest_crisis_sign_3 = {
+				frame = XBJ_Northwest_crisis_sign_3_f
+			}
+			XBJ_Northwest_crisis_number1 = {
+				image = GFX_XBJ_Northwest_crisis_number_[?XBJ_Northwest_crisis_food_num_1]
+			}
+			XBJ_Northwest_crisis_number2 = {
+				image = GFX_XBJ_Northwest_crisis_number_[?XBJ_Northwest_crisis_food_num_2]
+			}
+			XBJ_Northwest_crisis_taskforce_red = {
+				frame = XBJ_Northwest_crisis_working_group_status
+			}
+		}
+
+		effects = {
+			XBJ_Northwest_crisis_exit_click = {
+				clr_country_flag = XBJ_Northwest_crisis_gui_visible
+			}
+			XBJ_Northwest_crisis_map_button_click = {
+				set_variable = { ROOT.XBJ_northwest_crisis_acted_state = XBJ_Northwest_crisis_map_button_i }
+				ROOT = {
+					XBJ_northwest_crisis_gui_update_visual_value = yes
+				}
+			}
+			XBJ_Northwest_crisis_task_button_click = {
+				custom_effect_tooltip = XBJ_Northwest_crisis_task_button_click_complete_effect
+				XBJ_northwest_crisis_gui_working_group_task_complete_effect = yes
+				set_temp_variable = {
+					task_id = XBJ_northwest_crisis_this_state_task_id
+				}
+				set_temp_variable = {
+					task_target = XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state
+				}
+				set_temp_variable = {
+					task_time = XBJ_Northwest_crisis_working_group_task_cost_time^XBJ_northwest_crisis_this_state_task_id
+				}
+				custom_effect_tooltip = XBJ_Northwest_crisis_task_button_click_time
+				XBJ_northwest_crisis_gui_working_group_task_setup = yes
+				custom_effect_tooltip = XBJ_Northwest_crisis_task_button_click_timeout_effect
+				effect_tooltip = {
+					XBJ_northwest_crisis_gui_working_group_task_timeout_effect_tt = yes
+				}
+				XBJ_northwest_crisis_gui_update_visual_value = yes
+			}
+		}
+
+		triggers = {
+
+			XBJ_Northwest_crisis_unexplored_visible = {
+				check_variable = {
+					XBJ_Northwest_crisis_visible = 0
+				}
+			}
+			XBJ_Northwest_crisis_sign_1_visible = {
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 7 } }
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 3 } }
+				var:XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = {
+					check_variable = { XBJ_Northwest_crisis_visible > 0 }
+				}
+			}
+			XBJ_Northwest_crisis_sign_2_visible = {
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 7 } }
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 3 } }
+				var:XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = {
+					check_variable = { XBJ_Northwest_crisis_visible > 0 }
+				}
+			}
+			XBJ_Northwest_crisis_sign_3_visible = {
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 7 } }
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 3 } }
+				var:XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = {
+					check_variable = { XBJ_Northwest_crisis_visible > 0 }
+				}
+			}
+			XBJ_Northwest_crisis_intelligence_bar_visible = {
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 7 } }
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 3 } }
+				var:XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = {
+					check_variable = { XBJ_Northwest_crisis_visible > 0 }
+				}
+			}
+			XBJ_Northwest_crisis_intelligence_visible = {
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 7 } }
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 3 } }
+				var:XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = {
+					check_variable = { XBJ_Northwest_crisis_visible > 0 }
+				}
+			}
+			XBJ_Northwest_crisis_disorder_bar_visible = {
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 7 } }
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 3 } }
+				var:XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = {
+					check_variable = { XBJ_Northwest_crisis_visible > 0 }
+				}
+			}
+			XBJ_Northwest_crisis_disorder_visible = {
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 7 } }
+				NOT = { check_variable = { XBJ_northwest_crisis_acted_state = 3 } }
+				var:XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = {
+					check_variable = { XBJ_Northwest_crisis_visible > 0 }
+				}
+			}
+
+			XBJ_Northwest_crisis_task_button_click_enabled = {
+				XBJ_Northwest_crisis_task_button_click_enabled_trigger_tt = yes
+			}
+		}
+	}
+}

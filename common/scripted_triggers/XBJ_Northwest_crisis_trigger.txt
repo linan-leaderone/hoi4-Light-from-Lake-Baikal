@@ -1,0 +1,230 @@
+XBJ_northwest_crisis_has_enough_food = {
+	custom_trigger_tooltip = {
+		tooltip = XBJ_northwest_crisis_has_enough_food
+		NOT = { check_variable = { XBJ_Northwest_crisis_food < temp_x } }
+	}
+}
+
+XBJ_northwest_crisis_has_available_work_group = {
+	custom_trigger_tooltip = {
+		tooltip = XBJ_northwest_crisis_has_available_work_group
+		OR = {
+			check_variable = { XBJ_Northwest_crisis_working_group^0 = 1 }
+			check_variable = { XBJ_Northwest_crisis_working_group^1 = 1 }
+			check_variable = { XBJ_Northwest_crisis_working_group^2 = 1 }
+			check_variable = { XBJ_Northwest_crisis_working_group^3 = 1 }
+			check_variable = { XBJ_Northwest_crisis_working_group^4 = 1 }
+		}
+	}
+}
+
+XBJ_northwest_crisis_has_enough_chaos = {
+	custom_trigger_tooltip = {
+		tooltip = XBJ_northwest_crisis_has_enough_chaos
+		NOT = { check_variable = { XBJ_Northwest_crisis_chaos > temp_x } }
+	}
+}
+
+XBJ_northwest_crisis_NOT_has_enough_chaos = {
+	custom_trigger_tooltip = {
+		tooltip = XBJ_northwest_crisis_NOT_has_enough_chaos
+		check_variable = { XBJ_Northwest_crisis_chaos > temp_x }
+	}
+}
+
+XBJ_Northwest_crisis_task_button_click_enabled_trigger = {
+	XBJ_northwest_crisis_has_available_work_group = yes
+	if = { 
+		limit = { 
+			has_war_with = GAN
+		}
+		NOT = {
+			has_war_with = GAN
+		}
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 1 }
+			NOT = {
+				764 = {
+					check_variable = { XBJ_Northwest_crisis_controller = 4 }
+				}
+				604 = {
+					check_variable = { XBJ_Northwest_crisis_controller = 4 }
+				}
+			}
+			NOT = {
+				check_variable = { XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = 764 }
+				check_variable = { XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = 604 }
+			}
+		}
+		always = no
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 1 }
+		}
+		has_completed_focus = XBJ_Infiltrate_Powder_Keg
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 2 }
+			check_variable = { XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = 906 }
+		}
+		has_completed_focus = XBJ_We_Carried_Enough_Food
+		set_temp_variable = { temp_x = 2 }
+		XBJ_northwest_crisis_has_enough_food = yes
+		set_temp_variable = { temp_x = 0 }
+		XBJ_northwest_crisis_NOT_has_enough_chaos = yes
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 2 }
+			NOT = {
+				check_variable = { XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = 906 }
+			}
+		}
+		has_completed_focus = XBJ_We_Carried_Enough_Food
+		set_temp_variable = { temp_x = 1 }
+		XBJ_northwest_crisis_has_enough_food = yes
+		set_temp_variable = { temp_x = 0 }
+		XBJ_northwest_crisis_NOT_has_enough_chaos = yes
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 3 }
+			check_variable = { XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = 906 }
+		}
+		has_completed_focus = XBJ_We_Protect_The_Poor
+		set_temp_variable = { temp_x = 4 }
+		XBJ_northwest_crisis_has_enough_food = yes
+		set_temp_variable = { temp_x = 0 }
+		XBJ_northwest_crisis_NOT_has_enough_chaos = yes
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 3 }
+			NOT = {
+				check_variable = { XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = 906 }
+			}
+		}
+		has_completed_focus = XBJ_We_Protect_The_Poor
+		set_temp_variable = { temp_x = 2 }
+		XBJ_northwest_crisis_has_enough_food = yes
+		set_temp_variable = { temp_x = 0 }
+		XBJ_northwest_crisis_NOT_has_enough_chaos = yes
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 4 }
+			NOT = {
+				check_variable = { XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = 906 }
+			}
+		}
+		has_completed_focus = XBJ_We_Bring_Peace_And_Security
+		has_manpower > 1000
+		has_equipment = {
+			infantry_equipment > 200
+		}
+		set_temp_variable = { temp_x = 0 }
+		XBJ_northwest_crisis_NOT_has_enough_chaos = yes
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 4 }
+			check_variable = { XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = 906 }
+		}
+		has_completed_focus = XBJ_We_Bring_Peace_And_Security
+		has_manpower > 2000
+		has_equipment = {
+			infantry_equipment > 200
+		}
+		set_temp_variable = { temp_x = 0 }
+		XBJ_northwest_crisis_NOT_has_enough_chaos = yes
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 5 }
+		}
+		var:XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = {
+			set_temp_variable = { temp_x = 5 }
+			XBJ_northwest_crisis_has_enough_chaos = yes
+		}
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 6 }
+		}
+		has_completed_focus = XBJ_The_Dust_Settles
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 7 }
+		}
+		has_completed_focus = XBJ_Experience_Of_Xinjiang_Land_Reform
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 8 }
+		}
+		has_completed_focus = XBJ_Crack_Down_On_Iman_System
+		has_political_power > 50
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 9 }
+		}
+		has_completed_focus = XBJ_Pursue_The_Aggressors
+		has_manpower > 500
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 10 }
+		}
+		var:XBJ_northwest_crisis_target^XBJ_northwest_crisis_acted_state = {
+			has_state_flag = XBJ_northwest_crisis_this_state_task_7_complete
+			has_state_flag = XBJ_northwest_crisis_this_state_task_8_complete
+			has_state_flag = XBJ_northwest_crisis_this_state_task_9_complete
+		}
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 11 }
+		}
+		has_army_experience > 10
+		has_war = yes
+		has_completed_focus = XBJ_Support_Madunjing
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 12 }
+		}
+		command_power > 40
+		has_war = yes
+		has_completed_focus = XBJ_Support_Madunjing
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 13 }
+		}
+		has_completed_focus = XBJ_Guard_Against_Enemies_In_The_East
+		has_manpower > 500
+	}
+	if = { 
+		limit = { 
+			check_variable = { XBJ_northwest_crisis_this_state_task_id = 14 }
+		}
+		has_country_flag = XBJ_northwest_crisis_invaded_Jap_los
+	}
+}
+
+XBJ_Northwest_crisis_task_button_click_enabled_trigger_tt = {
+	if = {
+		limit = {
+			NOT = {
+				XBJ_Northwest_crisis_task_button_click_enabled_trigger = yes
+			}
+		}
+		XBJ_Northwest_crisis_task_button_click_enabled_trigger = yes
+	}
+}

@@ -1,0 +1,54 @@
+COX_eid_startup = {
+	hidden_effect = {
+		set_variable = { COX_eid_worker_proficiency = 0.8 }
+		set_variable = { COX_eid_machine_tool = 0 }
+		set_variable = { COX_eid_machine_tool_display = 0 }
+		set_variable = { COX_eid_machine_tool_effect_display = 0 }
+		set_variable = { COX_eid_exchange_mode = 1 }
+		COX_eid_gui_reflesh = yes
+	}
+}
+
+COX_eid_worker_proficiency_increase = {
+	add_to_variable = { COX_eid_worker_proficiency = 0.1 }
+	clamp_variable = { var = COX_eid_worker_proficiency max = 2 min = 0 }
+	custom_effect_tooltip = COX_eid_worker_proficiency_increase	
+}
+
+COX_eid_COX_eid_machine_tool_change = {
+	add_to_variable = { COX_eid_machine_tool = temp_COX_eid_machine_tool }
+	custom_effect_tooltip = COX_eid_COX_eid_machine_tool_change
+	clamp_variable = {
+		var = COX_eid_machine_tool
+		min = 0
+		max = 10000
+	}
+	clamp_variable = {
+		var = COX_eid_machine_tool_display
+		min = 0
+		max = COX_eid_machine_tool
+	}
+}
+
+COX_eid_gui_reflesh = {
+	clamp_variable = {
+		var = COX_eid_machine_tool_display
+		min = 0
+		max = COX_eid_machine_tool
+	}
+	set_variable = { COX_eid_machine_tool_effect_display = COX_eid_machine_tool_display }
+	if = {
+		limit = {
+			check_variable = { COX_eid_exchange_mode = 1 }
+		}
+		multiply_variable = { COX_eid_machine_tool_effect_display = 5 }
+		multiply_variable = { COX_eid_machine_tool_effect_display = COX_eid_worker_proficiency }
+	}
+	else_if = {
+		limit = {
+			check_variable = { COX_eid_exchange_mode = 2 }
+		}
+		multiply_variable = { COX_eid_machine_tool_effect_display = COX_eid_worker_proficiency }
+		round_variable = COX_eid_machine_tool_effect_display
+	}
+}
