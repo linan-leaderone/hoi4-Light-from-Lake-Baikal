@@ -1,7 +1,4 @@
-# hoi4-
-钢铁雄心4mod
-GAN 的history文件里面
-#econtype
-set variable = ( TNO economy subtype = token:Econ Subtype Military Directed
-set variable = { TNO economy type = token:Econ Type Planned ]
-部分已经修改
+# HOI4-The_New_Order_Light_Fron_Lake_Baikal
+钢铁雄心4新秩序欧洲末日的子模组
+history文件里面GAN的econtype部分已经跟进现版本写法
+*目前需要跟进原版TNO的ideology文件（24.2.22）
