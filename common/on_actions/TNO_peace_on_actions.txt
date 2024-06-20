@@ -64,7 +64,10 @@ on_actions = {
 						ROOT = {
 							all_allied_country = {
 								if = {
-									limit = { has_war_with = FROM }
+									limit = {
+										has_war_with = FROM
+										is_major = yes
+									}
 									has_capitulated = yes
 								}
 							}
@@ -91,6 +94,10 @@ on_actions = {
 					limit = {
 						FROM = {
 							is_russian_nation = yes
+							NOT = {
+								tag = ONG
+								is_in_faction_with = ONG
+							}
 						}
 						ROOT = {
 							is_russian_nation = yes
@@ -98,9 +105,199 @@ on_actions = {
 					}
 					RUS_capitulation_effect = yes
 				}
+
+				else_if = { # WAC, when it feels like running through this block
+					limit = {
+						is_in_array = { global.WAC_contender = FROM.id }
+						is_in_array = { global.WAC_contender = ROOT.id }
+						has_global_flag = west_african_war_ongoing
+					}
+
+					if = { # Removes ongoing flag, if war is already ending
+						limit = {
+							OR = {
+								has_global_flag = WAC_scenario_1
+								has_global_flag = WAC_scenario_3
+								AND = {
+									has_global_flag = WAC_scenario_2
+									OR = {
+										has_global_flag = WAC_scen2_WAA_fell
+										has_global_flag = WAC_scen2_FMA_fell
+										has_global_flag = WAC_scen2_PALF_fell
+									}
+								}
+							}
+						}
+						clr_global_flag = west_african_war_ongoing
+					}
+
+					FROM = {
+						every_enemy_country = {
+							limit = {
+								OR = {
+									original_tag = ROOT
+									is_in_faction_with = ROOT
+									is_subject_of = ROOT
+								}
+							}
+							FROM = {
+								white_peace = PREV
+								annex_country = {
+									target = PREV
+									transfer_troops = no
+								}
+							}
+						}
+					}
+					log = "[GetDateText]: FROM: [From.GetName] ROOT: [Root.GetName] on_capitulation WAC"
+
+					if = { # SCENARIO 1 / WAA vs. PALF
+						limit = { has_global_flag = WAC_scenario_1 }
+						if = { # WAA victory
+							limit = { is_in_array = { global.WAC_WAA_faction = FROM.id } }
+							ZZZ = {
+								WAC_1_WAA_VICTORY = yes
+							}
+						}
+						else_if = { # PALF victory
+							limit = { is_in_array = { global.WAC_PALF_faction = FROM.id } }
+							ZZZ = {
+								WAC_1_PALF_VICTORY = yes
+							}
+						}
+					}
+
+					else_if = { # SCENARIO 2 / WAA vs. FMA vs. PALF
+						limit = { has_global_flag = WAC_scenario_2 }
+
+						if = { # WAA fell
+							limit = {
+								NOT = { has_global_flag = WAC_scen2_WAA_fell }
+								all_of_scopes = {
+									array = global.WAC_WAA_faction
+									exists = no
+								}
+							}
+							set_global_flag = WAC_scen2_WAA_fell
+						}
+						if = { # FMA fell
+							limit = {
+								NOT = { has_global_flag = WAC_scen2_FMA_fell }
+								all_of_scopes = {
+									array = global.WAC_FMA_faction
+									exists = no
+								}
+							}
+							set_global_flag = WAC_scen2_FMA_fell
+							TNO_WAC_clear_decision_categories_scenario2usa = yes
+						}
+						if = { # PALF fell
+							limit = {
+								NOT = { has_global_flag = WAC_scen2_PALF_fell }
+								all_of_scopes = {
+									array = global.WAC_PALF_faction
+									exists = no
+								}
+							}
+							ZZZ = {
+								WAC_2_PALF_BEATEN = yes
+							}
+						}
+
+						if = { # WAA victory royale
+							limit = {
+								is_in_array = { global.WAC_WAA_faction = FROM.id }
+								has_global_flag = WAC_scen2_FMA_fell
+								has_global_flag = WAC_scen2_PALF_fell
+							}
+							ZZZ = {
+								WAC_2_WAA_VICTORY = yes
+							}
+						}
+						else_if = { # FMA victory royale
+							limit = {
+								is_in_array = { global.WAC_FMA_faction = FROM.id }
+								has_global_flag = WAC_scen2_WAA_fell
+								has_global_flag = WAC_scen2_PALF_fell
+							}
+							ZZZ = {
+								WAC_2_FFR_VICTORY = yes
+							}
+						}
+						else_if = { # PALF victory royale
+							limit = {
+								is_in_array = { global.WAC_PALF_faction = FROM.id }
+								has_global_flag = WAC_scen2_WAA_fell
+								has_global_flag = WAC_scen2_FMA_fell
+							}
+							ZZZ = {
+								WAC_2_PALF_VICTORY = yes
+							}
+						}
+					}
+
+					else_if = { # SCENARIO 3 / FMA vs. PALF
+						limit = { has_global_flag = WAC_scenario_3 }
+						if = { # FMA victory
+							limit = { is_in_array = { global.WAC_FMA_faction = FROM.id } }
+							ZZZ = {
+								WAC_3_FMA_VICTORY = yes
+							}
+						}
+						else_if = { # PALF victory
+							limit = { is_in_array = { global.WAC_PALF_faction = FROM.id } }
+							ZZZ = {
+								WAC_3_PALF_VICTORY = yes
+							}
+						}
+					}
+
+					set_global_flag = skip_default_capitulation
+				}
+
+				else_if = { # Mano, when it feels like running through this block
+					limit = {
+						is_in_array = { global.mano_campaign_contender = ROOT.id }
+						has_global_flag = mano_campaign_ongoing
+						NOT = { has_global_flag = mano_campaign_MRP_victory }
+					}
+
+					clr_global_flag = mano_campaign_ongoing
+
+					FROM = {
+						every_enemy_country = {
+							limit = {
+								OR = {
+									original_tag = ROOT
+									is_in_faction_with = ROOT
+									is_subject_of = ROOT
+								}
+							}
+							FROM = {
+								white_peace = PREV
+							}
+						}
+					}
+
+					if = { # Mano Pact wins
+						limit = {
+							ROOT = {
+								OR = {
+									tag = LIB
+									tag = MDI
+								}
+							}
+						}
+						ZZZ = {
+							MANO_PALF_VICTORY = yes
+						}
+					}
+
+					set_global_flag = skip_default_capitulation
+				}
 				
 				#Second Triple Alliance War, Paraguay must accept its destiny.
-				if = {
+				else_if = {
 					limit = {
 						ROOT = {
 							original_tag = PAR
@@ -192,6 +389,16 @@ on_actions = {
 							add_state_core = 1616
 							transfer_state = 1616
 							TNO_startup_nation = yes
+
+							if = {
+								limit = {
+									URG = { has_country_leader = { character = URG_Gabriel_Terra_Ilarraz ruling_only = yes } }
+								}
+								econ_join_sphere_GER = yes
+							}
+							else = {
+								econ_join_sphere_USA = yes
+							}
 						}
 						ARG = {
 							set_autonomy = {
@@ -242,6 +449,56 @@ on_actions = {
 							set_politics = { ruling_party = paternalism }
 							set_popularities = { paternalism = 100 }
 						}
+					}
+					set_global_flag = skip_default_capitulation
+				}
+				#Second Triple Alliance War, a little easter egg + we have the loc :)
+				else_if = {
+					limit = {
+						ROOT = {
+							OR = {
+								original_tag = ARG
+								original_tag = BRA
+								original_tag = URG
+							}
+						}
+						FROM = {
+							original_tag = PAR
+						}
+					}
+
+					clr_global_flag = PAR_invasion_ongoing
+
+					every_country = {
+						limit = { has_war_with = PAR }
+						white_peace = PAR
+					}
+
+					FROM = {
+						every_country = {
+							limit = { is_ai = no }
+							news_event = {
+								id = LATAM_news.113
+								hours = 4
+							}
+						}
+						add_popularity = {
+							ideology = socialist
+							popularity = 0.1
+						}
+						add_popularity = {
+							ideology = communist
+							popularity = 0.1
+						}
+					}
+					BRA = {
+						set_capital = { state = 1489 remember_old_capital = no }
+					}
+					ARG = {
+						set_capital = { state = 1511 remember_old_capital = no }
+					}
+					URG = {
+						set_capital = { state = 1629 remember_old_capital = no }
 					}
 					set_global_flag = skip_default_capitulation
 				}
@@ -324,7 +581,6 @@ on_actions = {
 					}
 					set_global_flag = skip_default_capitulation
 				}
-
 
 				#Serbian civil war
 				else_if = {
@@ -788,20 +1044,6 @@ on_actions = {
 							ROOT = { original_tag = FRD }
 						}
 
-						set_global_flag = FFR_reclamation_defeated
-						FROM = { # Take Kerguelen
-							add_state_core = 713
-							transfer_state = 713
-						}
-						every_state = { # Transfer whatever states FFR gobbled up
-							limit = {
-								is_owned_by = FFR
-								is_core_of = FROM
-							}
-
-							FROM = { transfer_state = PREV }
-						}
-
 						FFR_reclamation_defeat = yes
 					}
 
@@ -896,6 +1138,20 @@ on_actions = {
 									ITA = { add_to_faction = FRA }
 									ITA = { set_temp_variable = { target = FRA }
 										TNO_clear_and_recall_volunteers = yes
+									}
+									FRA = {
+										if = {
+											limit = { ITA = { has_idea = ITA_Mediterranean_Bloc_Leader } }
+											add_ideas = ITA_Mediterranean_Bloc_Member
+										}
+										if = {
+											limit = { ITA = { has_idea = ITA_Imperial_Alliance_Leader } }
+											add_ideas = ITA_Imperial_Alliance_Member
+										}
+										if = {
+											limit = { ITA = { has_idea = ITA_Rome_Pact_Leader } }
+											add_ideas = ITA_Rome_Pact_Member
+										}
 									}
 								}
 								else_if = {
@@ -1171,6 +1427,44 @@ on_actions = {
 					set_global_flag = skip_default_capitulation
 				}
 
+				#OSTLAND
+				else_if = {
+					limit = {
+						FROM = {
+							OR = {
+								original_tag = OST
+								original_tag = MST
+								original_tag = DST
+								original_tag = JST
+								original_tag = UPO
+								original_tag = BLR
+							}
+						}
+						ROOT = {
+							OR = {
+								original_tag = OST
+								original_tag = MST
+								original_tag = DST
+								original_tag = JST
+								original_tag = UPO
+								original_tag = BLR
+							}
+						}
+					}
+
+					OST_off_a_fucker = yes
+					OST_check_victor = yes
+
+					FROM = {
+						white_peace = ROOT
+						annex_country = {
+							target = ROOT
+							transfer_troops = no
+						}
+					}
+					set_global_flag = skip_default_capitulation
+				}
+
 				# UKRAINIAN CIVIL WAR
 				else_if = {
 					limit = {
@@ -1198,6 +1492,27 @@ on_actions = {
 					UKR_UCW_someone_dead = yes
 					UKR_UCW_check_victor = yes
 					UKR_UCW_fire_capitulation_event = yes
+
+					if = {
+						limit = {
+							FROM = { is_in_faction_with = GER}
+						}
+						ROOT = {
+							if = {
+								limit = { country_exists = POL }
+								every_owned_state = {
+									limit = { is_core_of = POL }
+									POL = { transfer_state = PREV }
+								}
+							}
+							else = {
+								every_owned_state = {
+									limit = { is_core_of = GGN }
+									GGN = { transfer_state = PREV }
+								}
+							}
+						}
+					}
 
 					FROM = {
 						white_peace = ROOT
@@ -1227,7 +1542,31 @@ on_actions = {
 						}
 					}
 
-					UKR_Victory_GalicianWar = yes
+					clr_global_flag = UKS_POL_GalicianWar
+					clr_global_flag = BOV_POL_GalicianWar_Klyachkivsky
+					clr_global_flag = BOV_POL_GalicianWar_Stetsko
+					clr_global_flag = BOV_POL_GalicianWar_Shukhevych
+					FROM = {
+						white_peace = ROOT
+					}
+					ROOT = {
+						every_owned_state = {
+							limit = {
+								OR = {
+									check_variable = { nationality = 164 }
+									check_variable = { nationality = 380 }
+								}
+							}
+							FROM = { transfer_state = PREV }
+							if = {
+								limit = { check_variable = { nationality = 164 } }
+								add_core_of = BOV
+							}
+							else = {
+								set_compliance = 50
+							}
+						}
+					}
 					
 					set_global_flag = skip_default_capitulation
 				}
@@ -1281,6 +1620,7 @@ on_actions = {
 							original_tag = CRI
 						}
 					}
+					CRI = { transfer_navy = { target = GER } }
 				}
 				#Legion defeats everyone
 				else_if = {
@@ -1510,6 +1850,9 @@ on_actions = {
 							target = ROOT
 							transfer_troops = no
 						}
+						every_owned_state = {
+							remove_core_of = ROOT
+						}
 						YEM = { country_event = { id = YEM.6 } }
 					}
 					set_global_flag = OC_Yemen_CW_over
@@ -1582,6 +1925,9 @@ on_actions = {
 							target = ROOT
 							transfer_troops = no
 						}
+						every_owned_state = {
+							remove_core_of = YEM
+						}
 						NYM = { country_event = { id = YEM.10 } }
 					}
 					set_global_flag = OC_Yemen_CW_over
@@ -1606,7 +1952,9 @@ on_actions = {
 							target = ROOT
 							transfer_troops = no
 						}
-
+						every_owned_state = {
+							remove_core_of = NYM
+						}
 						SAU = { country_event = { id = YEM.9 } }
 					}
 					set_global_flag = OC_Yemen_CW_over
@@ -1662,6 +2010,10 @@ on_actions = {
 								owns_state = 913 #NOT = { country_exists = OMB }
 								owns_state = 914 #NOT = { country_exists = OMI }
 							}
+							every_owned_state = {
+								remove_core_of = OMB
+								remove_core_of = OMI
+							}
 							OMA = { country_event = { id = OMA.6 } }
 							set_global_flag = OC_Oman_CW_over
 							OIL_OMA_win_oman = yes
@@ -1676,6 +2028,10 @@ on_actions = {
 								owns_state = 294 #NOT = { country_exists = OMA }
 								owns_state = 914 #NOT = { country_exists = OMI }
 							}
+							every_owned_state = {
+								remove_core_of = OMA
+								remove_core_of = OMI
+							}
 							OMB = { country_event = { id = OMA.8 } }
 							set_global_flag = OC_Oman_CW_over
 							OIL_OMB_win_oman = yes
@@ -1686,6 +2042,10 @@ on_actions = {
 								tag = OMI
 								owns_state = 294 #NOT = { country_exists = OMA }
 								owns_state = 913 #NOT = { country_exists = OMB }
+							}
+							every_owned_state = {
+								remove_core_of = OMA
+								remove_core_of = OMB
 							}
 							OMI = { country_event = { id = OMA.7 } }
 							set_global_flag = OC_Oman_CW_over
@@ -1745,7 +2105,7 @@ on_actions = {
 								owns_state = 446 #NOT = { country_exists = EGY }
 								owns_state = 457 #NOT = { country_exists = EGQ }
 							}
-							EGB = { country_event = { id = egy.12 } }
+							EGB = { country_event = { id = EGY.12 } }
 							set_global_flag = OC_Egypt_CW_over
 							OIL_EGB_win_egypt = yes
 							OIL_check_remove_forpol_tab = yes
@@ -1757,7 +2117,7 @@ on_actions = {
 								owns_state = 457 #NOT = { country_exists = EGQ }
 								EGQ = { has_country_flag = EGQ_has_spawned }
 							}
-							EGY = { country_event = { id = egy.11 } }
+							EGY = { country_event = { id = EGY.11 } }
 							set_global_flag = OC_Egypt_CW_over
 							OIL_EGY_win_egypt = yes
 							OIL_check_remove_forpol_tab = yes
@@ -1771,7 +2131,7 @@ on_actions = {
 								owns_state = 446 #NOT = { country_exists = EGY }
 								owns_state = 456 #NOT = { country_exists = EGB }
 							}
-							EGQ = { country_event = { id = egy.13 } }
+							EGQ = { country_event = { id = EGY.13 } }
 							set_global_flag = OC_Egypt_CW_over
 							OIL_EGQ_win_egypt = yes
 							OIL_check_remove_forpol_tab = yes
@@ -2090,6 +2450,7 @@ on_actions = {
 
 							if = {
 								limit = { country_exists = PER }
+								GER = { country_event = { id = reich_shared.20 days = 2 } }
 								news_event = { id = WORLD.18009 days = 1 }
 								JAP = {
 									set_temp_variable = { Victory_ID = 12 }
@@ -2102,6 +2463,8 @@ on_actions = {
 									set_temp_variable = { Victory_Outcome = 4 }
 									set_temp_variable = { Victory_Points = 150 }
 									Cold_War_GUI_ManipulateVictory = yes
+									set_temp_variable = { SeaZone_ID = 6 } # 6; Indian Ocean
+									Cold_War_GUI_PowerProjection_AddSeaZone = yes
 								}
 								USA = {
 									set_temp_variable = { Victory_ID = 12 }
@@ -2109,9 +2472,18 @@ on_actions = {
 									set_temp_variable = { Victory_Points = -150 }
 									Cold_War_GUI_ManipulateVictory = yes
 								}
+								every_owned_state = {
+									add_core_of = FROM
+									remove_core_of = IRL
+									remove_core_of = IRI
+									remove_core_of = IRC
+									remove_core_of = IRB
+									remove_core_of = IRA
+								}
 							}
 							else_if = {
 								limit = { country_exists = IRL }
+								USA = { country_event = USA_IR.7 }
 								news_event = { id = WORLD.18010 days = 1 }
 								GER = {
 									set_temp_variable = { Victory_ID = 12 }
@@ -2131,9 +2503,18 @@ on_actions = {
 									set_temp_variable = { Victory_Points = -150 }
 									Cold_War_GUI_ManipulateVictory = yes
 								}
+								every_owned_state = {
+									add_core_of = FROM
+									remove_core_of = PER
+									remove_core_of = IRI
+									remove_core_of = IRC
+									remove_core_of = IRB
+									remove_core_of = IRA
+								}
 							}
 							else_if = {
 								limit = { country_exists = IRI }
+								JAP = { country_event = jap_fopo.3 }
 								news_event = { id = WORLD.18014 days = 1 }
 								GER = {
 									set_temp_variable = { Victory_ID = 12 }
@@ -2152,6 +2533,14 @@ on_actions = {
 									set_temp_variable = { Victory_Outcome = 2 }
 									set_temp_variable = { Victory_Points = -150 }
 									Cold_War_GUI_ManipulateVictory = yes
+								}
+								every_owned_state = {
+									add_core_of = FROM
+									remove_core_of = PER
+									remove_core_of = IRL
+									remove_core_of = IRC
+									remove_core_of = IRB
+									remove_core_of = IRA
 								}
 							}
 							else_if = {
@@ -2175,6 +2564,14 @@ on_actions = {
 									set_temp_variable = { Victory_Points = -100 }
 									Cold_War_GUI_ManipulateVictory = yes
 								}
+								every_owned_state = {
+									add_core_of = FROM
+									remove_core_of = PER
+									remove_core_of = IRL
+									remove_core_of = IRI
+									remove_core_of = IRB
+									remove_core_of = IRA
+								}
 							}
 							else_if = {
 								limit = { country_exists = IRA }
@@ -2196,6 +2593,14 @@ on_actions = {
 									set_temp_variable = { Victory_Outcome = 2 }
 									set_temp_variable = { Victory_Points = -100 }
 									Cold_War_GUI_ManipulateVictory = yes
+								}
+								every_owned_state = {
+									add_core_of = FROM
+									remove_core_of = PER
+									remove_core_of = IRL
+									remove_core_of = IRI
+									remove_core_of = IRC
+									remove_core_of = IRB
 								}
 							}
 							else_if = {
@@ -2218,10 +2623,15 @@ on_actions = {
 									set_temp_variable = { Victory_Outcome = 2 }
 									set_temp_variable = { Victory_Points = -100 }
 									Cold_War_GUI_ManipulateVictory = yes
-								}
 							}
 							every_owned_state = {
 								add_core_of = FROM
+									remove_core_of = PER
+									remove_core_of = IRL
+									remove_core_of = IRI
+									remove_core_of = IRC
+									remove_core_of = IRA
+								}
 							}
 							remove_ideas = PER_The_Iranian_Civil_War
 							FROM = {
@@ -2241,6 +2651,7 @@ on_actions = {
 
 							if = {
 								limit = { country_exists = IRL }
+								USA = { country_event = USA_IR.7 }
 								news_event = { id = WORLD.18010 days = 1 }
 								GER = {
 									set_temp_variable = { Victory_ID = 12 }
@@ -2259,6 +2670,14 @@ on_actions = {
 									set_temp_variable = { Victory_Outcome = 2 }
 									set_temp_variable = { Victory_Points = -150 }
 									Cold_War_GUI_ManipulateVictory = yes
+								}
+								every_owned_state = {
+									add_core_of = FROM
+									remove_core_of = PER
+									remove_core_of = IRI
+									remove_core_of = IRC
+									remove_core_of = IRB
+									remove_core_of = IRA
 								}
 							}
 							else_if = {
@@ -2282,6 +2701,14 @@ on_actions = {
 									set_temp_variable = { Victory_Points = -100 }
 									Cold_War_GUI_ManipulateVictory = yes
 								}
+								every_owned_state = {
+									add_core_of = FROM
+									remove_core_of = PER
+									remove_core_of = IRL
+									remove_core_of = IRI
+									remove_core_of = IRB
+									remove_core_of = IRA
+								}
 							}
 							else_if = {
 								limit = { country_exists = IRA }
@@ -2304,9 +2731,18 @@ on_actions = {
 									set_temp_variable = { Victory_Points = -100 }
 									Cold_War_GUI_ManipulateVictory = yes
 								}
+								every_owned_state = {
+									add_core_of = FROM
+									remove_core_of = PER
+									remove_core_of = IRL
+									remove_core_of = IRI
+									remove_core_of = IRC
+									remove_core_of = IRB
+								}
 							}
 							else_if = {
 								limit = { country_exists = IRI }
+								JAP = { country_event = jap_fopo.3 }
 								news_event = { id = WORLD.18014 days = 1 }
 								GER = {
 									set_temp_variable = { Victory_ID = 12 }
@@ -2326,60 +2762,40 @@ on_actions = {
 									set_temp_variable = { Victory_Points = -150 }
 									Cold_War_GUI_ManipulateVictory = yes
 								}
+								every_owned_state = {
+									add_core_of = FROM
+									remove_core_of = PER
+									remove_core_of = IRL
+									remove_core_of = IRC
+									remove_core_of = IRB
+									remove_core_of = IRA
+								}
 							}
 							every_owned_state = {
 								add_core_of = FROM
 							}
 							remove_ideas = PER_The_Iranian_Civil_War
+							IRB = { remove_ideas = PER_The_Iranian_Civil_War }
 							FROM = {
 								set_capital = { state = 266 remember_old_capital = no }
 							}
 						}
 					}
-					#Iranian Civil War (Walker added this so he could get a Burgundy thing working)
+
+					# Loss events for superpowers, all fire_only_once, country exists triggers for if Persia crushes RILF before faction collapses
 					if = { # USA Loses
-						limit = { ROOT = { tag = IRL } }
+						limit = { NOT = { country_exists = IRL } }
 						USA = { country_event = USA_IR.6 }
 					}
-					else_if = { # USA Wins
-						limit = {
-							FROM = {
-								tag = IRL
-								has_war = no
-							}
-							has_global_flag = TNO_IRA_collapsed_coalition
-						}
-						USA = { country_event = USA_IR.7 }
-					}
-					#Iranian Civil War (Thanks walker for the code - zero)
 					if = { # JAP Loses
-						limit = { ROOT = { tag = IRI } }
+						limit = { NOT = { country_exists = IRI } }
 						JAP = { country_event = jap_fopo.2 }
 					}
-					else_if = { # JAP Wins
-						limit = {
-							FROM = {
-								tag = IRI
-								has_war = no
-							}
-							has_global_flag = TNO_IRA_collapsed_coalition
-						}
-						JAP = { country_event = jap_fopo.3 }
+					if = { # GER Loses
+						limit = { NOT = { country_exists = PER } }
+						GER = { country_event = { id = reich_shared.21 } }
 					}
 
-					if = { # GER Loses
-						limit = { ROOT = { tag = PER } }
-						GER = { country_event = { id = reich_shared.21 days = 2 } }
-					}
-					else_if = { # GER Wins
-						limit = {
-							FROM = {
-								tag = PER
-								has_war = no
-							}
-						}
-						GER = { country_event = { id = reich_shared.20 days = 2 } }
-					}
 					set_global_flag = skip_default_capitulation
 				}
 				#War with Croatia
@@ -3680,6 +4096,11 @@ on_actions = {
 							fascism = 29
 							national_socialism = 14
 						}
+						set_party_name = {
+							ideology = fascism
+							long_name = SER_fascism_party_jonic_long
+							name = SER_fascism_party_jonic
+						}
 						promote_character = {
 							character = SER_Borivoje_Jonic
 							ideology = fascism_eccliastical_nationalism_subtype
@@ -3698,6 +4119,11 @@ on_actions = {
 						}
 						set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Gelenkte_Wirtschaft }
 						econ_subtype_change = yes
+						if = {
+							limit = { has_global_flag = german_civil_war_speervic }
+							join_zollverein = yes
+						}
+						econ_join_sphere_GER = yes
 					}
 					GER = {
 						country_event = { id = serbia.104 days = 3 }
@@ -3722,13 +4148,11 @@ on_actions = {
 							target = CZE
 							transfer_troops = no
 						}
-						if = { # Bormann
-							limit = { has_global_flag = german_civil_war_bormannvic }
-							country_event = { id = bormann.611 days = 5 }
-						}
-						else_if = { # Speer
-							limit = { has_global_flag = german_civil_war_speervic }
-							country_event = { id = speerbohemia.6 days = 150 }
+						add_state_core = 9
+						add_state_core = 75
+						CZE = {
+							remove_state_core = 9
+							remove_state_core = 75
 						}
 					}
 					set_global_flag = skip_default_capitulation
@@ -3871,6 +4295,11 @@ on_actions = {
 							econ_join_sphere_GER = yes
 							remove_all_ministers = yes
 							fill_empty_minister_nochecks = yes
+							remove_ideas = {
+								SLO_Social_Liberalization
+								SLO_Political_Liberalization
+								SLO_Economical_Liberalization
+							}
 						}
 					}
 					set_global_flag = skip_default_capitulation
@@ -3916,7 +4345,7 @@ on_actions = {
 							}
 							set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Gelenkte_Wirtschaft }
 							econ_subtype_change = yes
-							GER_apply_embargos = yes
+							GER_apply_embargoes = yes
 							set_cosmetic_tag = NOR_GER
 							remove_ideas = {
 								NOR_collab_purge
@@ -3928,7 +4357,7 @@ on_actions = {
 								NOR_american_advisors_idea
 								NOR_coup_aftermath
 							}
-							load_focus_tree = GER_blankfocus
+							load_focus_tree = ZZZ_blank_focus
 							econ_join_sphere_GER = yes
 							set_politics = {
 								ruling_party = national_socialism
@@ -3968,7 +4397,7 @@ on_actions = {
 							}
 							set_autonomy = {
 								target = GGN
-								autonomy_state = autonomy_reichsprotektorat
+								autonomy_state = autonomy_integrated_reichskommissariat
 							}
 							GGN = {
 								set_popularities = {
@@ -4065,6 +4494,14 @@ on_actions = {
 									GGN = { transfer_state = PREV }
 								}
 							}
+							every_owned_state = { # If Gotenland has already been crushed
+								limit = {
+									is_core_of = CRI
+								}
+								remove_core_of = CRI
+								add_core_of = GER
+								GER = { transfer_state = PREV }
+							}
 						}
 						if = {
 							limit = { NOT = { country_exists = UKR } }
@@ -4102,7 +4539,14 @@ on_actions = {
 										set_cosmetic_tag = Speer_UKR_rejoined_peacefully
 										join_zollverein = yes
 									}
-									load_focus_tree = GER_blankfocus
+									load_focus_tree = ZZZ_blank_focus
+									}
+								remove_ideas = {
+									UKR_indecisive_council
+									UKR_UCW_war_within
+									UKR_UCW_all_alone
+									UKR_the_ukrainian_civil_war
+									UKR_the_ukrainian_civil_war_2
 								}
 							}
 						}
@@ -4127,6 +4571,26 @@ on_actions = {
 								}
 								clr_global_flag = Kyiv_Nuked
 							}
+						}
+						if = { # Integrates CRI if invasion happens w/o RK
+							limit = {
+								NOT = {
+									country_exists = FUK
+									country_exists = UKS
+									country_exists = BOV
+								}
+								country_exists = CRI
+							}
+							CRI = {
+								transfer_navy = { target = GER }
+								remove_state_core = 137
+								remove_state_core = 196
+								remove_state_core = 1532
+							}
+							add_state_core = 137
+							add_state_core = 196
+							add_state_core = 1532
+							annex_country = { target = CRI transfer_troops = yes }
 						}
 					}
 					set_global_flag = skip_default_capitulation
@@ -4158,29 +4622,32 @@ on_actions = {
 						if = { # Bormann
 							limit = { has_global_flag = german_civil_war_bormannvic }
 							OST = { annex_country = { target = ROOT transfer_troops = no } }
-							set_autonomy = {
-								target = OST
-								autonomy_state = autonomy_integrated_reichskommissariat
-							}
-							OST = {
-								set_popularities = { national_socialism = 100 }
-								promote_character = OST_friedrich_karl_vialon
-								econ_join_sphere_GER = yes
-								remove_ideas = {
-									OST_model_colony
-									OST_model_colony2
-									OST_unusual_quiet
-									OST_No_head
-									OST_crippled_military
-									OST_stabbed_in_the_back
-									OST_broken_nation
-									OST_harsh_economic_integration
-									OST_United_for_Ostland
-									OST_Defend_Riga_idea
-									OST_Haste_Makes_Waste
-									OST_Prussian_Values
+							if = {
+								limit = { NOT = { has_subject = OST } }
+								set_autonomy = {
+									target = OST
+									autonomy_state = autonomy_integrated_reichskommissariat
 								}
-								load_focus_tree = OST_empty
+								OST = {
+									set_popularities = { national_socialism = 100 }
+									promote_character = OST_friedrich_karl_vialon
+									econ_join_sphere_GER = yes
+									remove_ideas = {
+										OST_model_colony
+										OST_model_colony2
+										OST_unusual_quiet
+										OST_No_head
+										OST_crippled_military
+										OST_stabbed_in_the_back
+										OST_broken_nation
+										OST_harsh_economic_integration
+										OST_United_for_Ostland
+										OST_Defend_Riga_idea
+										OST_Haste_Makes_Waste
+										OST_Prussian_Values
+									}
+									load_focus_tree = ZZZ_blank_focus
+								}
 							}
 						}
 						else_if = { # Speer
@@ -4235,7 +4702,7 @@ on_actions = {
 											}
 										}
 										join_zollverein = yes
-										load_focus_tree = OST_empty
+										load_focus_tree = ZZZ_blank_focus
 										set_variable = { national_debt = 0 }
 										remove_ideas = {
 											OST_model_colony
@@ -4300,7 +4767,7 @@ on_actions = {
 								}
 								OST = {
 									join_zollverein = yes
-									load_focus_tree = OST_empty
+									load_focus_tree = ZZZ_blank_focus
 									set_variable = { national_debt = 0 }
 									remove_ideas = {
 										OST_model_colony
@@ -4368,7 +4835,6 @@ on_actions = {
 							}
 						}
 						ROOT = { original_tag = CAU }
-						has_global_flag = german_civil_war_bormannvic
 					}
 					GER = {
 						white_peace = CAU
@@ -4499,7 +4965,7 @@ on_actions = {
 							elections_allowed = no
 						}
 						GER_alexis_von_roenne = {
-							promote_character = { ideology = despotism_interim_government_subtype}
+							promote_character = { ideology = despotism_interim_government_subtype }
 						}
 						GER_alexis_von_roenne = {
 							promote_character = { ideology = national_socialism_reformed_national_socialism_subtype }
@@ -4626,12 +5092,12 @@ on_actions = {
 						}
 						#Baltikum
 						every_controlled_state = {
-							limit = { is_core_of = OST NOT = {is_core_of = BLR} }
+							limit = { is_core_of = OST NOT = { is_core_of = BLR } }
 							OST = { transfer_state = PREV }
 						}
 						#Belarus
 						every_controlled_state = {
-							limit = { is_core_of = BLR NOT = {is_core_of = OST} }
+							limit = { is_core_of = BLR NOT = { is_core_of = OST } }
 							BLR = { transfer_state = PREV }
 						}
 						#Poland
@@ -4652,10 +5118,6 @@ on_actions = {
 						}
 					}
 					GER = {
-						puppet = UKR
-						puppet = POL
-						puppet = BLR
-						puppet = CAU
 						if = {
 							limit = {
 								has_country_flag = SGR_collab_regimes
@@ -4687,7 +5149,7 @@ on_actions = {
 								}
 								GER_albert_speer = {
 									set_portraits = {
-										civilian = { large = "gfx/leaders/GER/Portrait_Germany_Albert_Speer_natsoc.dds" }
+										civilian = { large = "gfx/leaders/GER/Portrait_GER_Albert_Speer_natsoc.dds" }
 									}
 									add_country_leader_role = {
 										country_leader = {
@@ -4729,6 +5191,19 @@ on_actions = {
 								reload_GER_speer_post_cw_tree = yes
 								TNO_fopo_remove_saw_tab = yes
 								set_country_flag = SGR_schorner_takeover
+								MCW = {
+									save_party_popularities = yes
+									get_current_government_type = yes
+								}
+								set_autonomy = {
+									target = MCW
+									autonomy_state = autonomy_military_government
+								}
+								MCW = {
+									apply_party_popularities = yes
+									restore_previous_government_type = yes
+									join_zollverein = yes
+								}
 							}
 						}
 					}
@@ -4996,7 +5471,7 @@ on_actions = {
 						if = {
 							limit = {
 								check_variable = {
-									global.IBR_COL_faction_support = CLC
+									global.IBR_COL_faction_support = CLC.id
 								}
 							}
 							IBR = {
@@ -5021,7 +5496,7 @@ on_actions = {
 						if = {
 							limit = {
 								check_variable = {
-									global.IBR_COL_faction_support = COL
+									global.IBR_COL_faction_support = COL.id
 								}
 							}
 							IBR = {
@@ -5058,13 +5533,14 @@ on_actions = {
 						}
 						USA = {
 							if = {
-								limit = { FROM = { tag = CLL } }
+								limit = { FROM = { tag = CLC } }
 								country_event = { id = USA_colombia.9 }
 							}
 							else = { country_event = { id = USA_colombia.8 } }
 							TNO_fopo_remove_colombian_civil_war_tab = yes
 							set_temp_variable = { target = CLL }
 							TNO_clear_num_volunteers = yes
+							clear_variable = USA_manpower_depletion_COLCW
 						}
 						if = {
 							limit = {
@@ -5153,7 +5629,7 @@ on_actions = {
 						if = {
 							limit = {
 								check_variable = {
-									global.IBR_COL_faction_support = CLC
+									global.IBR_COL_faction_support = CLC.id
 								}
 							}
 							IBR = {
@@ -5369,7 +5845,7 @@ on_actions = {
 						if = {
 							limit = {
 								check_variable = {
-									global.IBR_COL_faction_support = COL
+									global.IBR_COL_faction_support = COL.id
 								}
 							}
 							IBR = {
@@ -5440,7 +5916,7 @@ on_actions = {
 						clr_global_flag = COL_civil_war_ongoing
 					}
 					set_global_flag = skip_default_capitulation
-					set_variable = {test_var = 1}
+					set_variable = { test_var = 1 }
 					log = "[GetDateText]: [Root.GetName] peaced out [From.GetName]"
 				}
 
@@ -5555,7 +6031,7 @@ on_actions = {
 						}
 					}
 					set_global_flag = skip_default_capitulation
-					set_variable = {test_var = 1}
+					set_variable = { test_var = 1 }
 					log="[GetDateText]: [Root.GetName] peaced out [From.GetName]"
 				}
 
@@ -5661,7 +6137,7 @@ on_actions = {
 						}
 					}
 					set_global_flag = skip_default_capitulation
-					set_variable = {test_var = 1}
+					set_variable = { test_var = 1 }
 					log="[GetDateText]: [Root.GetName] peaced out [From.GetName]"
 				}
 
@@ -5780,7 +6256,7 @@ on_actions = {
 						}
 					}
 					ENG = {
-						load_focus_tree = ENG_blankfocus
+						load_focus_tree = ZZZ_blank_focus
 						hidden_effect = {
 							set_temp_variable = { temp_poverty_change = 10 }
 							TNO_worsen_poverty_rate_direct = yes
@@ -5796,8 +6272,8 @@ on_actions = {
 								ENG_new_model_army_2
 								ENG_holding_out
 								ENG_pushing_forward
-								ENG_desparate_measures
-								ENG_desparate_measures_2
+								ENG_desperate_measures
+								ENG_desperate_measures_2
 								ENG_a_dirty_war
 								ENG_anti_terrorist_actions_idea
 								TNO_ParliamentMechanic_Monarch_Edward_VIII
@@ -5903,32 +6379,12 @@ on_actions = {
 					set_global_flag = FEN_GF_WonEcw
 					set_global_flag = ECW_Finished
 					ENG = {
-						load_focus_tree = ENG_blankfocus
+						load_focus_tree = ZZZ_blank_focus
 						set_cosmetic_tag = ENG_transitional_govt
 						hidden_effect = {
 							set_temp_variable = { temp_poverty_change = 10 }
 							TNO_worsen_poverty_rate_direct = yes
-							remove_ideas = {
-								ENG_Big_Bad_Buff
-								ENG_Brutal_War
-								ENG_Brutal_War_AI
-								ENG_the_legitimate_government
-								ENG_promises_of_change
-								ENG_a_force_of_darkness
-								ENG_a_force_of_darkness_2
-								ENG_a_force_of_darkness_3
-								ENG_new_model_army
-								ENG_new_model_army_2
-								ENG_holding_out
-								ENG_pushing_forward
-								ENG_desparate_measures
-								ENG_desparate_measures_2
-								ENG_a_dirty_war
-								ENG_anti_terrorist_actions_idea
-								TNO_ParliamentMechanic_Monarch_Edward_VIII
-								TNO_ParliamentMechanic_OppLeader_Harold_Macmillan
-								TNO_ParliamentMechanic_Speaker_Alec_Douglas_Home
-							}
+							BRI_Party_Disable = yes
 							BRI_Mann_Disable = yes
 							BRI_Midnight_Disable = yes
 						}
@@ -5958,7 +6414,7 @@ on_actions = {
 							meta_effect = { #sets up next election date in country ui
 								text = {
 									set_politics = {
-										ruling_party = ROOT
+										ruling_party = despotism
 										last_election = "[current_election_date]"
 										elections_allowed = yes
 										election_frequency = 5
@@ -6049,7 +6505,7 @@ on_actions = {
 						remove_core_of = FEN
 					}
 					ENG = {
-						load_focus_tree = ENG_blankfocus
+						load_focus_tree = ZZZ_blank_focus
 						hidden_effect = {
 							set_temp_variable = { temp_poverty_change = 10 }
 							TNO_worsen_poverty_rate_direct = yes
@@ -6065,8 +6521,8 @@ on_actions = {
 								ENG_new_model_army_2
 								ENG_holding_out
 								ENG_pushing_forward
-								ENG_desparate_measures
-								ENG_desparate_measures_2
+								ENG_desperate_measures
+								ENG_desperate_measures_2
 								ENG_a_dirty_war
 								ENG_anti_terrorist_actions_idea
 							}
@@ -6221,7 +6677,14 @@ on_actions = {
 								limit = { has_global_flag = german_civil_war_speervic }
 								join_zollverein = yes
 							}
-							econ_join_sphere_GER = yes
+							if = {
+								limit = {
+									NOT = {
+										has_global_flag = german_civil_war_heydrichvic
+									}
+								}
+								econ_join_sphere_GER = yes
+							}
 							add_ideas = Pakt_Mitstreiter
 						}
 					}
@@ -6459,12 +6922,12 @@ on_actions = {
 								text = {
 									ENG = {
 										set_cosmetic_tag = ENG_[SCO_Party]_UoB_start
-										load_focus_tree = ENG_blankfocus
+										load_focus_tree = ZZZ_blank_focus
 										set_country_flag = ENG_Parliament_Disabled
 									}
 									WAL = {
 										set_cosmetic_tag = WAL_[SCO_Party]_UoB_start
-										load_focus_tree = ENG_blankfocus
+										load_focus_tree = ZZZ_blank_focus
 									}
 								}
 								SCO_Party = "[GetScoParty]"
@@ -6840,8 +7303,8 @@ on_actions = {
 							transfer_troops = no
 						}
 					}
-					MAD_clear_proxy = yes
 					MAD_Rebel_Victory = yes
+					MAD_clear_proxy = yes
 					set_global_flag = MAD_rebels_won
 				}
 				else_if = { # Colonial Victory
@@ -6855,8 +7318,8 @@ on_actions = {
 							transfer_troops = no
 						}
 					}
-					MAD_clear_proxy = yes
 					MAD_Colonial_Victory = yes
+					MAD_clear_proxy = yes
 					set_global_flag = MAD_colony_won
 				}
 
@@ -6877,11 +7340,11 @@ on_actions = {
 								original_tag = CHI
 								is_in_faction_with = CHI
 							}
-							NOT = {has_war_together_with = JAP}
+							NOT = { has_war_together_with = JAP }
 						}
 					}
 					set_global_flag = YUN_WI_thx_paradox
-		set_global_flag = COX_Occupy_Nanjing
+					set_global_flag = COX_Occupy_Nanjing
 
 					COX = {
 						country_event = {id = COX.204}
@@ -6894,7 +7357,7 @@ on_actions = {
 					}
 
 					YUN = {
-						country_event = {id = yun_wi.30}
+						country_event = { id = yun_wi.30 }
 						white_peace = CHI
 						annex_country = {
 							target = CHI
@@ -7766,6 +8229,7 @@ on_actions = {
 							}
 						}
 					}
+					# GNS
 					else_if = {
 						limit = {
 							FROM = { tag = GNS }
@@ -7779,6 +8243,7 @@ on_actions = {
 							}
 						}
 					}
+					# Everyone Else
 					else = {
 						# The winner could take states controlled by the capitulated country / them
 						every_state = {
@@ -7853,6 +8318,14 @@ on_actions = {
 					if = {
 						limit = {
 							FROM = { tag = SPS }
+							ROOT = {
+								OR = {
+									tag = POR
+									tag = GNS
+									tag = PPR
+									tag = RPP
+								}
+							}
 						}
 						every_state = {
 							limit = {
@@ -7864,7 +8337,7 @@ on_actions = {
 								transfer_state = PREV
 							}
 						}
-						SPR = {
+						SPS = {
 							country_event = {
 								id = iberiawars.35
 							}
@@ -7873,6 +8346,14 @@ on_actions = {
 					else_if = {
 						limit = {
 							FROM = { tag = SPR }
+							ROOT = {
+								OR = {
+									tag = POR
+									tag = GNS
+									tag = PPR
+									tag = RPP
+								}
+							}
 						}
 						every_state = {
 							limit = {
@@ -7893,6 +8374,16 @@ on_actions = {
 					else_if = {
 						limit = {
 							FROM = { tag = PPR }
+							ROOT = {
+								OR = {
+									tag = IBR
+									tag = FSR
+									tag = FZL
+									tag = SPR
+									tag = SPA
+									tag = SPS
+								}
+							}
 						}
 						every_state = {
 							limit = {
@@ -7913,6 +8404,16 @@ on_actions = {
 					else_if = {
 						limit = {
 							FROM = { tag = RPP }
+							ROOT = {
+								OR = {
+									tag = IBR
+									tag = FSR
+									tag = FZL
+									tag = SPR
+									tag = SPA
+									tag = SPS
+								}
+							}
 						}
 						every_state = {
 							limit = {
@@ -7933,6 +8434,16 @@ on_actions = {
 					else_if = {
 						limit = {
 							FROM = { tag = POR }
+							ROOT = {
+								OR = {
+									tag = IBR
+									tag = FSR
+									tag = FZL
+									tag = SPR
+									tag = SPA
+									tag = SPS
+								}
+							}
 						}
 						every_state = {
 							limit = {
@@ -8087,6 +8598,7 @@ on_actions = {
 						white_peace = ROOT
 						add_state_core = 213
 						add_state_core = 1359
+						add_state_core = 1724
 						transfer_state = 216
 						transfer_state = 215
 						transfer_state = 1359
@@ -8292,48 +8804,6 @@ on_actions = {
 					set_global_flag = skip_default_capitulation
 				}
 
-				#Oil Crisis stuff
-				else_if = {
-					limit = {
-						FROM = { original_tag = UAR }
-						ROOT = { original_tag = TUR }
-					}
-					FROM = {
-						white_peace = ROOT
-						transfer_state = 782
-						transfer_state = 554
-						transfer_state = 680
-						transfer_state = 1315
-						transfer_state = 677
-						transfer_state = 1313
-						transfer_state = 1312
-						transfer_state = 553
-						transfer_state = 781
-					}
-					set_global_flag = skip_default_capitulation
-				}
-
-				#Oil Crisis stuff
-				else_if = {
-					limit = {
-						FROM = { original_tag = ITA }
-						ROOT = { original_tag = UAR }
-					}
-					FROM = {
-						white_peace = ROOT
-						annex_country = {
-							target = ROOT
-						}
-					}
-					ITA = {
-						country_event = {
-							id = UAR.101
-							days = 5
-						}
-					}
-					set_global_flag = skip_default_capitulation
-				}
-
 				else_if = {
 					limit = {
 						FROM = { original_tag = IME }
@@ -8351,101 +8821,6 @@ on_actions = {
 					set_global_flag = skip_default_capitulation
 				}
 
-				#Great Asian War
-				else_if = { #JAP VS CHI: China falls last
-					limit = {
-						has_global_flag = GAW_in_progress
-						FROM = {
-							OR = {
-								original_tag = JAP
-								has_war_together_with = JAP
-							}
-						}
-						ROOT = { original_tag = CHI }
-					}
-					JAP = {
-						country_event = {id = gaw.101 hours = 3}
-						annex_country = {
-							target = ROOT
-							transfer_troops = no
-						}
-					}
-					set_global_flag = skip_default_capitulation
-				}
-
-				else_if = { #Last NLF warlord falls
-					limit = {
-						has_global_flag = GAW_in_progress
-						FROM = {
-							OR = {
-								original_tag = JAP
-								has_war_together_with = JAP
-							}
-						}
-						ROOT = {
-							OR = {
-								original_tag = MEN
-								original_tag = GAN
-								original_tag = QIN
-								original_tag = XIN
-								original_tag = ETR
-								original_tag = TIB
-								original_tag = XIK
-								original_tag = YUN
-								original_tag = GUZ
-								original_tag = SIC
-								original_tag = SHX
-								original_tag = GUX
-							}
-						}
-					}
-
-					JAP = {
-						annex_country = {
-							target = ROOT
-							transfer_troops = no
-						}
-						country_event = {id = gaw.103 hours = 3}
-					}
-					set_global_flag = skip_default_capitulation
-				}
-
-				else_if = { #Last rebellious warlord falls
-					limit = {
-						has_global_flag = GAW_in_progress
-						FROM = {
-							OR = {
-								original_tag = CHI
-								has_war_together_with = CHI
-							}
-						}
-						ROOT = {
-							OR = {
-								original_tag = MEN
-								original_tag = GAN
-								original_tag = QIN
-								original_tag = XIN
-								original_tag = ETR
-								original_tag = TIB
-								original_tag = XIK
-								original_tag = YUN
-								original_tag = GUZ
-								original_tag = SIC
-								original_tag = SHX
-								original_tag = GUX
-							}
-						}
-					}
-
-					CHI = {
-						annex_country = {
-							target = ROOT
-							transfer_troops = no
-						}
-						country_event = {id = gaw.205 hours = 3}
-					}
-					set_global_flag = skip_default_capitulation
-				}
 				else_if = { # Nukes
 					limit = {
 						NOT = { has_global_flag = nukes_disabled }
@@ -8488,6 +8863,15 @@ on_actions = {
 						}
 						STC = {
 							STC_Hugo_Banzer = { set_nationality = BOL }
+							if = {
+								limit = {
+									has_game_rule = {
+										rule = BOL_STC_WAR_OUTCOME
+										option =  BOL_STC_WAR_OUTCOME_STC
+									}
+								}
+								remove_war_buff = yes
+							}
 						}
 						BOL = {
 							annex_country = { target = STC }
@@ -8567,6 +8951,15 @@ on_actions = {
 								relation = military_access
 								active = no
 							}
+							if = {
+								limit = {
+									has_game_rule = {
+										rule = BOL_STC_WAR_OUTCOME
+										option =  BOL_STC_WAR_OUTCOME_STC
+									}
+								}
+								remove_war_buff = yes
+							}
 						}
 						PAC = {
 							diplomatic_relation = {
@@ -8606,6 +8999,15 @@ on_actions = {
 						every_owned_state = {
 							remove_core_of = STC
 							remove_core_of = PAC
+						}
+						if = {
+							limit = {
+								has_game_rule = {
+									rule = BOL_STC_WAR_OUTCOME
+									option =  BOL_STC_WAR_OUTCOME_BOL
+								}
+							}
+							remove_war_buff = yes
 						}
 					}
 
@@ -8911,13 +9313,15 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = FRI
+							FRI = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
 									AND = {
 										OR = {
 											has_war_with = INS
@@ -8926,15 +9330,13 @@ on_actions = {
 											has_war_with = MKS
 										}
 										is_faction_leader = yes
-									}
 								}
 							}
 							add_to_faction = FRI
 						}
 					}
 				}
-				
-				if = {
+				else_if = {
 					limit = {
 						OR = {
 							FROM = {
@@ -8989,13 +9391,15 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = DMP
+							DMP = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
 									AND = {
 										OR = {
 											has_war_with = INS
@@ -9004,14 +9408,13 @@ on_actions = {
 											has_war_with = MKS
 										}
 										is_faction_leader = yes
-									}
 								}
 							}
 							add_to_faction = DMP
 						}
 					}
 				}
-				if = {
+				else_if = {
 					limit = {
 						OR = {
 							FROM = {
@@ -9066,13 +9469,15 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = FRI
+							FRI = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
 									AND = {
 										OR = {
 											has_war_with = INS
@@ -9081,15 +9486,13 @@ on_actions = {
 											has_war_with = MKS
 										}
 										is_faction_leader = yes
-									}
 								}
 							}
 							add_to_faction = FRI
 						}
 					}
 				}
-				
-				if = {
+				else_if = {
 					limit = {
 						OR = {
 							FROM = {
@@ -9144,30 +9547,30 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = PMT
+							PMT = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
-									AND = {
-										OR = {
-											has_war_with = INS
-											has_war_with = SRB
-											has_war_with = BKB
-											has_war_with = MKS
-										}
-										is_faction_leader = yes
+								AND = {
+									OR = {
+										has_war_with = INS
+										has_war_with = SRB
+										has_war_with = BKB
+										has_war_with = MKS
 									}
+									is_faction_leader = yes
 								}
 							}
 							add_to_faction = PMT
 						}
 					}
 				}
-				
-				if = {
+				else_if = {
 					limit = {
 						OR = {
 							FROM = {
@@ -9213,13 +9616,15 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = INS
+							INS = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
 									AND = {
 										OR = {
 											has_war_with = DMP
@@ -9231,15 +9636,13 @@ on_actions = {
 											has_war_with = DMS
 										}
 										is_faction_leader = yes
-									}
 								}
 							}
 							add_to_faction = INS
 						}
 					}
 				}
-				
-				if = {
+				else_if = {
 					limit = {
 						OR = {
 							FROM = {
@@ -9285,33 +9688,33 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = BKB
+							BKB = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
-									AND = {
-										OR = {
-											has_war_with = DMP
-											has_war_with = FRI
-											has_war_with = NII
-											has_war_with = ABD
-											has_war_with = SLS
-											has_war_with = PMT
-											has_war_with = DMS
-										}
-										is_faction_leader = yes
+								AND = {
+									OR = {
+										has_war_with = DMP
+										has_war_with = FRI
+										has_war_with = NII
+										has_war_with = ABD
+										has_war_with = SLS
+										has_war_with = PMT
+										has_war_with = DMS
 									}
+									is_faction_leader = yes
 								}
 							}
 							add_to_faction = BKB
 						}
 					}
 				}
-				
-				if = {
+				else_if = {
 					limit = {
 						OR = {
 							FROM = {
@@ -9357,33 +9760,33 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = BKB
+							BKB = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
-									AND = {
-										OR = {
-											has_war_with = DMP
-											has_war_with = FRI
-											has_war_with = NII
-											has_war_with = ABD
-											has_war_with = SLS
-											has_war_with = PMT
-											has_war_with = DMS
-										}
-										is_faction_leader = yes
+								AND = {
+									OR = {
+										has_war_with = DMP
+										has_war_with = FRI
+										has_war_with = NII
+										has_war_with = ABD
+										has_war_with = SLS
+										has_war_with = PMT
+										has_war_with = DMS
 									}
+									is_faction_leader = yes
 								}
 							}
 							add_to_faction = BKB
 						}
 					}
 				}
-				
-				if = {
+				else_if = {
 					limit = {
 						OR = {
 							FROM = {
@@ -9429,33 +9832,33 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = INS
+							INS = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
-									AND = {
-										OR = {
-											has_war_with = DMP
-											has_war_with = FRI
-											has_war_with = NII
-											has_war_with = ABD
-											has_war_with = SLS
-											has_war_with = PMT
-											has_war_with = DMS
-										}
-										is_faction_leader = yes
+								AND = {
+									OR = {
+										has_war_with = DMP
+										has_war_with = FRI
+										has_war_with = NII
+										has_war_with = ABD
+										has_war_with = SLS
+										has_war_with = PMT
+										has_war_with = DMS
 									}
+									is_faction_leader = yes
 								}
 							}
 							add_to_faction = INS
 						}
 					}
 				}
-				
-				if = {
+				else_if = {
 					limit = {
 						OR = {
 							FROM = {
@@ -9501,13 +9904,15 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = SRB
+							SRB = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
 									AND = {
 										OR = {
 											has_war_with = DMP
@@ -9519,15 +9924,13 @@ on_actions = {
 											has_war_with = DMS
 										}
 										is_faction_leader = yes
-									}
 								}
 							}
 							add_to_faction = SRB
 						}
 					}
 				}
-				
-				if = {
+				else_if = {
 					limit = {
 						OR = {
 							FROM = {
@@ -9573,13 +9976,15 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = MKS
+							MKS = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
 									AND = {
 										OR = {
 											has_war_with = DMP
@@ -9591,15 +9996,13 @@ on_actions = {
 											has_war_with = DMS
 										}
 										is_faction_leader = yes
-									}
 								}
 							}
 							add_to_faction = MKS
 						}
 					}
 				}
-				
-				if = {
+				else_if = {
 					limit = {
 						OR = {
 							FROM = {
@@ -9645,81 +10048,33 @@ on_actions = {
 					}
 					if = {
 						limit = {
-							NOT = {
-								country_exists = INS
+							INS = {
+								NOT = {
+									is_in_faction_with = FROM
+									original_tag = FROM
+								}
 							}
 						}
 						every_country = {
 							limit = {
-								PREV = {
-									AND = {
-										OR = {
-											has_war_with = DMP
-											has_war_with = FRI
-											has_war_with = NII
-											has_war_with = ABD
-											has_war_with = SLS
-											has_war_with = PMT
-											has_war_with = DMS
-										}
-										is_faction_leader = yes
+								AND = {
+									OR = {
+										has_war_with = DMP
+										has_war_with = FRI
+										has_war_with = NII
+										has_war_with = ABD
+										has_war_with = SLS
+										has_war_with = PMT
+										has_war_with = DMS
 									}
+									is_faction_leader = yes
 								}
 							}
 							add_to_faction = INS
 						}
-					}
-					
+					}				
 				}
-				
-				###Ostland Civil War
-				if = {
-					limit = {
-						FROM = {
-							OR = {
-								original_tag = OST
-								original_tag = MST
-								original_tag = DST
-								original_tag = JST
-								original_tag = UPO
-								original_tag = BLR
-								# original_tag = GER
-							}
-						}
-						ROOT = {
-							OR = {
-								original_tag = OST
-								original_tag = MST
-								original_tag = DST
-								original_tag = JST
-								original_tag = UPO
-								original_tag = BLR
-							}
-						}
-					}
 
-					OST_off_a_fucker = yes
-					OST_check_victor = yes
-
-					FROM = {
-						white_peace = ROOT
-						annex_country = {
-							target = ROOT
-							transfer_troops = no
-						}
-					}
-					if = {
-						limit = {
-							check_variable = { global.OST_contenders^num = 2 }
-							country_exists = BLR
-							country_exists = UPO
-						}
-						UPO = {
-							country_event = { id = OST.49 days = 3 }
-						}
-					}
-					set_global_flag = skip_default_capitulation
-				}
 				#Western Insurrection
 				else_if = { #China-aligned warlord falls
 					limit = {
@@ -9817,7 +10172,7 @@ on_actions = {
 					}
 
 					YUN = {
-						country_event = {id = yun_wi.30}
+						country_event = { id = yun_wi.30 }
 						white_peace = CHI
 						annex_country = {
 							target = CHI
@@ -10147,163 +10502,6 @@ on_actions = {
 					clr_global_flag = YUN_WI_thx_paradox
 					set_global_flag = skip_default_capitulation
 				}
-				else_if = { #Japanese-aligned warlord falls
-					limit = {
-						has_global_flag = GAW_in_progress
-						FROM = {
-							OR = {
-								original_tag = CHI
-								has_war_together_with = CHI
-							}
-						}
-						ROOT = {
-							OR = {
-								original_tag = GAN
-								original_tag = QIN
-								original_tag = XIN
-								original_tag = ETR
-								original_tag = TIB
-								original_tag = XIK
-								original_tag = YUN
-								original_tag = GUZ
-								original_tag = SIC
-								original_tag = SHX
-								original_tag = GUX
-							}
-						}
-					}
-
-					CHI = {
-						annex_country = {
-							target = ROOT
-							transfer_troops = no
-						}
-					}
-					set_global_flag = skip_default_capitulation
-				}
-				else_if = {#Manchukuo falls
-					limit = {
-						has_global_flag = GAW_in_progress
-						FROM = {
-							OR = {
-								original_tag = CHI
-								has_war_together_with = CHI
-							}
-						}
-						ROOT = {
-							original_tag = MAN
-						}
-					}
-
-					every_country = {
-						limit = {
-							OR = {
-								original_tag = CHI
-								original_tag = JAP
-								has_country_flag = GAW_chi_ally
-								has_country_flag = GAW_jap_ally
-								has_country_flag = GAW_neutral
-							}
-						}
-						country_event = {id = gaw.300}
-					}
-					CHI = {
-						annex_country = {
-							target = ROOT
-							transfer_troops = no
-						}
-					}
-					set_global_flag = skip_default_capitulation
-				}
-				else_if = {#GNG falls
-					limit = {
-						has_global_flag = GAW_in_progress
-						FROM = {
-							OR = {
-								original_tag = CHI
-								has_war_together_with = CHI
-							}
-						}
-						ROOT = {
-							original_tag = GNG
-						}
-					}
-					CHI = {
-						annex_country = {
-							target = GNG
-							transfer_troops = no
-						}
-					}
-					every_country = {
-						limit = {
-							OR = {
-								original_tag = CHI
-								original_tag = JAP
-								has_country_flag = GAW_chi_ally
-								has_country_flag = GAW_jap_ally
-								has_country_flag = GAW_neutral
-							}
-						}
-						country_event = {id = gaw.301}
-					}
-					set_global_flag = skip_default_capitulation
-				}
-				else_if = {#MEN
-					limit = {
-						has_global_flag = GAW_in_progress
-						FROM = {
-							OR = {
-								original_tag = CHI
-								has_war_together_with = CHI
-							}
-						}
-						ROOT = {
-							original_tag = MEN
-						}
-					}
-					CHI = {
-						annex_country = {
-							target = MEN
-							transfer_troops = no
-						}
-					}
-					every_country = {
-						limit = {
-							OR = {
-								original_tag = CHI
-								original_tag = JAP
-								has_country_flag = GAW_chi_ally
-								has_country_flag = GAW_jap_ally
-								has_country_flag = GAW_neutral
-							}
-						}
-						country_event = {id = gaw.302}
-					}
-					set_global_flag = skip_default_capitulation
-				}
-				else_if = {
-					limit = {
-						FROM = {
-							OR = {
-								original_tag = USA
-								is_in_faction_with = USA
-							}
-						}
-						ROOT = { original_tag = ENG }
-						has_global_flag = FEN_GF_WonEcw
-					}
-					USA = {
-						white_peace = ENG
-						country_event = { id = fenauthsoc.26 } #No event with this ID exists? Investigate post-release -Lavo
-					}
-					every_country = {
-						limit = {
-							is_in_faction_with = USA
-						}
-						white_peace = ENG
-					}
-					set_global_flag = skip_default_capitulation
-				}
 				else_if = {
 					limit = {
 						has_global_flag = anti_heydrich_pact_formed
@@ -10365,6 +10563,15 @@ on_actions = {
 						}
 						STC = {
 							STC_Hugo_Banzer = { set_nationality = BOL }
+							if = {
+								limit = {
+									has_game_rule = {
+										rule = BOL_STC_WAR_OUTCOME
+										option =  BOL_STC_WAR_OUTCOME_STC
+									}
+								}
+								remove_war_buff = yes
+							}
 						}
 						BOL = {
 							annex_country = { target = STC }
@@ -10441,6 +10648,15 @@ on_actions = {
 								relation = military_access
 								active = no
 							}
+							if = {
+								limit = {
+									has_game_rule = {
+										rule = BOL_STC_WAR_OUTCOME
+										option =  BOL_STC_WAR_OUTCOME_STC
+									}
+								}
+								remove_war_buff = yes
+							}
 						}
 						PAC = {
 							diplomatic_relation = {
@@ -10480,6 +10696,15 @@ on_actions = {
 						every_owned_state = {
 							remove_core_of = STC
 							remove_core_of = PAC
+						}
+						if = {
+							limit = {
+								has_game_rule = {
+									rule = BOL_STC_WAR_OUTCOME
+									option =  BOL_STC_WAR_OUTCOME_BOL
+								}
+							}
+							remove_war_buff = yes
 						}
 					}
 

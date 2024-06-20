@@ -19,7 +19,7 @@ YUN_Xinan_Insurgency_initialize = {
 	add_to_variable = { YUN.YUN_insurgency_dirty = 1 }
 	country_event = { id = yun_insurgency.1 days = 250 }
 	country_event = { id = yun_insurgency.6 days = 255 }
-	country_event = {id = yun_insurgency.11 days = 260 }
+	country_event = { id = yun_insurgency.11 days = 260 }
 	country_event = { id = yun_insurgency.15 days = 210 }
 	set_country_flag = YUN_Lu_Han_great_game
 }
@@ -268,7 +268,7 @@ YUN_Update_Insurgency_Modifier = {#Updates the dynamic modifier for Xinan Insurg
 	set_temp_variable = { YUNNRA_Power_Burma_Road_debuff = YUNNRA_Power }
 	multiply_temp_variable = { YUNNRA_Power_Burma_Road_debuff = 0.2 }
 	subtract_from_temp_variable = { YUNNRA_Power_Burma_Road_debuff = 10 }
-	add_to_variable = { YUN_bur_road_const_duration = YUNNRA_Power_Burma_Road_debuff}
+	add_to_variable = { YUN_bur_road_const_duration = YUNNRA_Power_Burma_Road_debuff }
 	force_update_dynamic_modifier = yes
 	add_to_variable = { YUN.YUN_insurgency_dirty = 1 }
 }
@@ -1301,7 +1301,7 @@ YUN_update_warbuff_effects = {
 
 	for_each_loop = {
 		array = YUN_npabuff
-		multiply_variable = { YUN_npabuff^i = 1 }
+		multiply_variable = { YUN_npabuff^i = YUN_warbuff_calc }
 	}
 	force_update_dynamic_modifier = yes
 	add_to_variable = { YUN_NPA_Crusade_dirty = 1 }
@@ -1456,20 +1456,19 @@ YUN_Long_Yun_Coup_effects = {
 			modifier = YUN_xinan_insurgency_dynamic_modifier
 		}
 
-		set_variable = {YUN_fail_counter = 0}
+		set_variable = { YUN_fail_counter = 0 }
 
 		set_variable = { YUN_legitimacy = 0 }
 		set_variable = { YUN_WI_warbuff = 0 }
 		YUN_update_legitimacy_effects = yes
 		YUN_update_warbuff_effects = yes
 
-		load_oob = "YUN_NPA_player_start_army"
 		load_oob = "YUN_NPA_army"
 		
 		leave_faction = yes
 		econ_leave_sphere = yes
 		remove_faction_status = yes
-		create_faction = National_Liberation_Front
+		create_faction = CHI_THE_NATIONAL_LIBERATION_FRONT
 
 		add_dynamic_modifier = { modifier = YUN_NPA_legitimacy_dynamic_modifier }
 		add_dynamic_modifier = { modifier = YUN_NPA_war_buff_dynamic_modifier }
@@ -1515,10 +1514,10 @@ YUN_Long_Yun_Coup_effects = {
 			}
 			set_country_flag = WI_preparation
 		}
-		country_event = {id = yun_wi.4 days = 7 }
+		country_event = { id = yun_wi.4 days = 7 }
 		CHI = {
 			end_puppet = YUN
-			country_event = {id = yun_wi.4 days = 7 }
+			country_event = { id = yun_wi.4 days = 7 }
 		}
 	}
 }
@@ -1957,10 +1956,15 @@ YUN_WI_Victory_ROC = {
 		dismantle_faction = yes
 		remove_ideas = {
 			YUN_Generic_Vacant_hog
+			YUN_army_of_the_southwest_two_brothers
 		}
 		add_ideas = {
 			YUN_Jiang_Jingguo_hog
 		}
+		remove_dynamic_modifier = { modifier = YUN_xinan_development_dynamic_modifier }
+		remove_dynamic_modifier = { modifier = YUN_unite_southwest_diplo_dynamic_modifier }
+		remove_dynamic_modifier = { modifier = YUN_burma_road_reward_dynamic_modifier }
+		country_lock_all_division_template = no
 		clr_country_flag = YUN_long_yun_crusade
 		clr_global_flag = YUN_NPA_GAW_Crisis
 		set_global_flag = YUN_ROC_reborn
@@ -1977,7 +1981,7 @@ YUN_WI_Victory_ROC = {
 		econ_set_min_credit_rating = yes
 		econ_set_max_credit_rating = yes
 		country_event = { id = yun_zhengtong.59 days = 2 }
-		load_focus_tree = generic_focus
+		load_focus_tree = ZZZ_blank_focus
 	}
 	JAP = {
 		set_temp_variable = { gdp_growth_temp = -10.0 }
@@ -1999,7 +2003,6 @@ YUN_WI_Victory_ROC = {
 		1024 = { set_demilitarized_zone = no }
 		1820 = { set_demilitarized_zone = no }
 	}
-	set_global_flag = JAP_GAW_total_defeat
 	every_country = { news_event = WORLD.1911 }
 }
 
@@ -3916,7 +3919,7 @@ WI_calc_momentum_tick = {
 		set_variable = { global.WI_momentum_tick = WI_momentum_tick_calc }
 		add_to_variable = { global.WI_momentum_tick = WI_momentum_tick_calc_2 }
 	}
-	add_to_variable = { global.WI_momentum_tick_bonus_true = WI_momentum_tick_bonus}
+	add_to_variable = { global.WI_momentum_tick_bonus_true = WI_momentum_tick_bonus }
 	add_to_variable = { global.WI_momentum_tick = global.WI_momentum_tick_bonus_true }
 	add_to_variable = { YUN_NPA_Crusade_dirty = 1 }
 }
@@ -4075,7 +4078,7 @@ YUN_WI_state_mil_level_calc = {
 		}
 		set_temp_variable = { WI_state_mil_level_calc_false = WI_state_mil_level_confirmed }
 		set_temp_variable = { WI_state_mil_level_calc_true = 50 }
-		subtract_from_temp_variable = { WI_state_mil_level_calc_true = WI_state_mil_level_calc_false}
+		subtract_from_temp_variable = { WI_state_mil_level_calc_true = WI_state_mil_level_calc_false }
 		multiply_temp_variable = { WI_state_mil_level_calc_true = 0.02 }
 		set_variable = { YUN_legitimacy_state_modifier = WI_state_mil_level_calc_true }
 
@@ -4283,8 +4286,8 @@ YUN_NPA_fails_effects = {
 	retire_character = YUN_jiang_weiguo
 	retire_character = YUN_NPA_military_council
 	retire_character = YUN_collapsed_authority
-	remove_dynamic_modifier = {modifier = YUN_NPA_legitimacy_dynamic_modifier}
-	remove_dynamic_modifier = {modifier = YUN_NPA_war_buff_dynamic_modifier}
+	remove_dynamic_modifier = { modifier = YUN_NPA_legitimacy_dynamic_modifier }
+	remove_dynamic_modifier = { modifier = YUN_NPA_war_buff_dynamic_modifier }
 	remove_ideas = {
 		YUN_the_mad_king
 		YUN_the_mad_king_tenacity
