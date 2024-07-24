@@ -68,8 +68,7 @@ LFB_alternative_YUN_Long_Yun_Coup_effects = {
 			long_name = YUN_fascism_LuHanDead_party_long
 		}
 
-		clr_country_flag = YUN_Lu_Han_great_game
-		clr_country_flag = YUN_main_tree_flag
+		set_country_flag = YUN_long_yun_crusade_alter
 		load_focus_tree = lfb_blank_focus
 
 		remove_ideas = {
@@ -102,12 +101,6 @@ LFB_alternative_YUN_Long_Yun_Coup_effects = {
 			modifier = YUN_xinan_insurgency_dynamic_modifier
 		}
 
-		set_variable = { YUN_fail_counter = 0 }
-
-		set_variable = { YUN_legitimacy = 0 }
-		set_variable = { YUN_WI_warbuff = 0 }
-		YUN_update_legitimacy_effects = yes
-		YUN_update_warbuff_effects = yes
 
 		load_oob = "YUN_NPA_army"
 		
@@ -142,7 +135,6 @@ LFB_alternative_YUN_Long_Yun_Coup_effects = {
 		every_other_country = {
 			limit = {
 				is_in_faction_with = JAP
-				NOT = { has_idea = Sphere_Chinese_Warlord }
 			}
 			YUN = { set_embargo_PREV = yes }
 			YUN = { PREV = { set_embargo_PREV = yes } }
@@ -158,7 +150,14 @@ LFB_alternative_YUN_Long_Yun_Coup_effects = {
 			}
 			set_country_flag = WI_preparation
 		}
-		country_event = { id = LFB_yun_wi.1 days = 7 }
+		country_event = { 
+			id = LFB_yun_wi.1 
+			days = 7 
+		}
+		country_event = {
+            id = LFB_yun_wi.2
+            days = 119
+        }
 		CHI = {
 			load_focus_tree = lfb_blank_focus
 			end_puppet = YUN
@@ -166,11 +165,12 @@ LFB_alternative_YUN_Long_Yun_Coup_effects = {
 		}
 	}
 }
+
 LFB_WI_Start_effects = {
 	log = "LFB alternative version of Western Insurrection started in [GetDateText]"
 	hidden_effect = {
 		set_global_flag = LFB_WI_ongoing
-		set_global_flag = lfb_wi_stage_0
+		set_global_flag = LFB_WI_stage_0#起始阶段
 		every_country = { limit = { is_ai = no } news_event = WORLD.2062 }
 		every_country = {
 			limit = {
@@ -286,8 +286,8 @@ LFB_WI_stage_1_effects = {
 	log = "LFB alternative western insurgency has went into statemale in [GetDateText]"
 
 	#切换全局状态
-	clr_global_flag = lfb_wi_stage_0
-	set_global_flag = lfb_wi_stage_1
+	clr_global_flag = LFB_WI_stage_0 #起始阶段
+	set_global_flag = LFB_WI_stage_1 #僵持阶段
 
 	#让CHI和YUN陷入僵持
 	every_state = {
@@ -306,7 +306,11 @@ LFB_WI_stage_1_effects = {
 		}
 	}
 	#生成NCC
-
+	YUN = {
+		annex_country = {
+			target = GUX
+		}
+	}
 
 	NCC = {
 		load_oob = "NCC_GAW"
@@ -331,9 +335,35 @@ LFB_WI_stage_1_effects = {
 			add_core_of = NCC
 		}
 
+		every_other_country = {
+			limit = {
+				OR = {
+					is_in_faction_with = YUN
+					tag = COX
+					tag = XBJ
+				}
+				
+			}
+			NCC = {
+				set_embargo_PREV = yes
+			}
+			NCC = {
+				PREV = {
+					set_embargo_PREV = yes
+				}
+			}
+		}
+
 	}
 	JAP = {
 		add_to_faction = NCC
+	}
+
+	XBJ = {
+		country_event = {
+			id = LFB_COX_wi.1
+			hours = 6
+		}
 	}
 }
 
@@ -410,5 +440,159 @@ LFB_WI_GAW_Start_Effects = {
 	}
 	GNG = { #Guangdong GAW events
 		country_event = { id = GNG_Western_Insurrection.8 days = 1 }
+	}
+}
+
+LFB_COX_NC_initialize = {
+	COX = {
+		set_cosmetic_tag = COX_XBJ
+		set_global_flag = LFB_NC_stage_0 #初始阶段
+		load_focus_tree = Long_Yun_take_over_Nanjing
+		add_dynamic_modifier = {
+			modifier = unite_like_a_fortress
+		}
+	}
+	add_to_variable = {
+		unite_like_a_fortress_pp = 0.1
+	}
+}
+
+LFB_COX_NC_stage_1_initialize = {、
+	#切换阶段
+	clr_global_flag = LFB_NC_stage_0 #初始阶段
+	set_global_flag = LFB_NC_stage_1 #兰州阶段
+
+	#
+	set_variable = {
+		GAN_infiltrated_atk = 0
+	}
+	set_variable = {
+		GAN_infiltrated_def = 0
+	}
+	set_variable = {
+		GAN_infiltrated_org = 0
+	}
+	set_variable = {
+		GAN_infiltrated_org_regen = 0
+	}
+	GAN = {
+		add_dynamic_modifier = {
+			modifier = GAN_infiltrated
+		}
+	}
+	#初始化变量
+	set_variable = {
+		Lanzhou_infiltration_index = 45
+	}
+	clamp_variable = {
+		var = Lanzhou_infiltration_index
+		min = 0
+		max = 100
+	}
+	calc_GAN_infiltration = yes
+	set_variable = {
+		Lanzhou_integration_index = 0
+	}
+	clamp_variable = {
+		var = Lanzhou_integration_index
+		min = 0
+		max = 100
+	}
+	set_variable = {
+		COX_Liberation_of_Lanzhou_days = 60
+	}
+	set_variable = {
+		Lanzhou_infiltration_decay = 2
+	}
+	
+	
+}
+
+calc_GAN_infiltration = {
+	#士气最大-10%
+	#攻防最大-20%
+	set_temp_variable = { GAN_debuff_calc = Lanzhou_infiltration_index }
+	divide_temp_variable = { GAN_debuff_calc = -100 }
+	set_variable = { GAN_infiltrated_org = GAN_debuff_calc }
+	multiply_temp_variable = { GAN_debuff_calc = 2 }
+	set_variable = { GAN_infiltrated_atk = GAN_debuff_calc }
+	set_variable = { GAN_infiltrated_def = GAN_debuff_calc }
+}
+
+LFB_COX_GAN_war_start_effects = {
+	set_global_flag = COX_GAN_war
+	COX = {
+		declare_war_on = {
+			target = GAN
+			type = annex_everything
+		}
+	}
+	GAN = {
+		leave_faction = yes
+	}
+
+}
+
+LFB_COX_GAN_war_win_effects = {
+	clr_global_flag = COX_GAN_war
+	clr_global_flag = LFB_NC_stage_1
+	set_global_flag = LFB_NC_stage_2
+	COX = {
+		set_country_flag = coring_Lanzhou
+		set_country_flag = Shaanxi_gui_hidden
+		transfer_state = 283
+		transfer_state = 1302
+	}
+	GAN = {
+		clr_country_flag = supply_lines_broken
+	}
+	set_temp_variable = { COX_Lanzhou_integration_calc = Lanzhou_infiltration_index }
+	divide_temp_variable = { COX_Lanzhou_integration_calc = 5 }
+	round_temp_variable = { COX_Lanzhou_integration_calc }
+	add_to_variable = {
+		var = Lanzhou_integration_index
+		value = COX_Lanzhou_integration_calc
+	}
+	clamp_variable = {
+		var = Lanzhou_integration_index
+		min = 0
+		max = 100
+	}
+}
+
+LFB_COX_GAN_war_lose_effects = {
+	clr_global_flag = COX_GAN_war
+	clr_global_flag = LFB_NC_stage_1
+	set_global_flag = LFB_NC_stage_2
+	COX = {
+		set_country_flag = coring_Lanzhou
+		set_country_flag = Shaanxi_gui_hidden
+		transfer_state = 283
+		transfer_state = 1302
+	}
+	GAN = {
+		clr_country_flag = supply_lines_broken
+	}
+	add_to_variable = {
+		Lanzhou_integration_index = -20
+	}
+	clamp_variable = {
+		var = Lanzhou_integration_index
+		min = 0
+		max = 100
+	}
+}
+
+LFB_COX_core_Lanzhou_effets = {
+	COX = {
+		clr_country_flag = coring_Lanzhou
+	}
+	283 = {
+		add_core_of = COX
+		remove_core_of = GAN
+	}
+	1302 = {
+		add_core_of = COX
+		remove_core_of = GAN
 	}
 }

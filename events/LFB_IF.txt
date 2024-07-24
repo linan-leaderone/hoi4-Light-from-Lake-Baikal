@@ -1,0 +1,306 @@
+add_namespace = LFB_yun_wi
+add_namespace = LFB_COX_wi
+add_namespace = LFB_COX_nc
+
+
+#云南事件
+country_event = {#争夺四川
+    id = LFB_yun_wi.1
+	title = yun_wi.4.t
+	desc = yun_wi.4.desc
+
+	picture = GFX_report_event_generic_escape
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event LFB_yun_wi.1"
+	}
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = yun_wi.4.a
+		hidden_effect = {
+			1537 = { set_demilitarized_zone = yes }
+			1538 = { set_demilitarized_zone = yes }
+		}
+		custom_effect_tooltip = yun_wi.4.a.tt
+	}
+}
+
+country_event = {#妈的跟高宗武爆了
+    id = LFB_yun_wi.2
+    title = LFB_yun_wi.2.t
+    desc = LFB_yun_wi.2.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+    option = {
+		name = LFB_yun_wi.2.a
+		add_equipment_to_stockpile = {
+			type = infantry_equipment_2
+			amount = 40000
+			producer = YUN
+		}
+		LFB_WI_Start_effects = yes
+    }
+}
+
+#COX/XBJ事件，放一块了
+country_event = { #西北局-切换至新疆
+	id = LFB_COX_wi.1
+	title = LFB_COX_wi.1.t
+	desc = LFB_COX_wi.1.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		hidden_effect ={
+			COX = {
+				inherit_technology = XBJ
+			}
+		}
+	}
+	
+	option = {
+		name = LFB_COX_wi.1.a
+
+		COX = {
+			country_event = {
+				id = LFB_COX_wi.2
+				days = 2
+			}
+		}
+
+		hidden_effect = {
+			COX = {
+				change_tag_from = ROOT
+			}
+		}
+	}
+}
+
+country_event = { #COX-IF线初始化
+	id = LFB_COX_wi.2
+	title = LFB_COX_wi.2.t
+	desc = LFB_COX_wi.2.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	
+	option = {
+		name = LFB_COX_wi.2
+		hidden_effect = {
+			#吞并XBJ
+			annex_country = {
+				target = XBJ
+				transfer_troops = yes
+			}
+			every_state = {
+				limit = {
+					is_core_of = XBJ
+				}
+				add_core_of = COX
+				remove_core_of = XBJ
+			}
+			country_event = {
+				id = LFB_COX_wi.3 
+				days = 30 
+			}
+			#IF线大倒计时
+			country_event = {
+				id = LFB_COX_wi.4 
+				days = 2 
+			}
+			#启动甘肃局势
+			country_event = {
+				id = LFB_COX_wi.5 
+				days = 5 
+			}
+		}
+	}
+}
+
+country_event = { #COX-获得西北的全部核心
+	id = LFB_COX_wi.3
+	title = LFB_COX_wi.3.t
+	desc = LFB_COX_wi.3.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = LFB_COX_wi.3.a
+
+		every_state = {
+			limit = {
+				AND = {
+					is_core_of = QIN 
+					is_controlled_by = COX
+					NOT = {
+						is_core_of = COX
+					}
+				}
+			}
+			add_core_of = COX
+		}
+		add_political_power = -50
+		add_command_power = -25
+	}
+}
+
+country_event = {#机不可失
+	id = LFB_COX_wi.4
+	title = LFB_COX_wi.4.t
+	desc = LFB_COX_wi.4.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		hidden_effect = {
+			LFB_COX_NC_initialize = yes
+		}
+	}
+
+	option = {
+		name = LFB_COX_wi.4
+
+		hidden_effect = {
+			complete_national_focus = COX_The_Last_Fight_Against_Japanese_Invader
+		}
+	}
+}
+
+country_event = { #重返甘肃
+	id = LFB_COX_wi.5
+	title = LFB_COX_wi.5.t
+	desc = LFB_COX_wi.5.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		LFB_COX_NC_stage_1_initialize = yes
+	}
+
+	option = {
+		name = LFB_COX_wi.5
+	}
+}
+
+#正式进入IF线后
+##第一阶段事件
+
+country_event = {#向西北军宣战
+	id = LFB_COX_nc.1
+	title = LFB_COX_nc.1.t
+	desc = LFB_COX_nc.1.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	immediate = {
+		hidden_effect = {
+			LFB_COX_GAN_war_start_effects = yes
+		}
+		
+	}
+
+	option = {
+		name = LFB_COX_nc.1.a
+		custom_effect_tooltip = COX_GAN_war_start_tt
+	}
+}
+
+
+country_event = {#我军胜了
+	id = LFB_COX_nc.2
+	title = LFB_COX_nc.2.t
+	desc = LFB_COX_nc.2.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		hidden_effect = {
+			LFB_COX_GAN_war_win_effects = yes
+		}
+	}
+	
+	option = {
+		name = LFB_COX_nc.2.a
+		add_stability = 0.05
+		custom_effect_tooltip = COX_GAN_war_win_tt
+		hidden_effect = {
+			country_event = {
+				id = LFB_COX_nc.4
+				days = 2
+			}
+		}
+	}
+}
+
+
+country_event = {#我军败了
+	id = LFB_COX_nc.3
+	title = LFB_COX_nc.3.t
+	desc = LFB_COX_nc.3.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		hidden_effect = {
+			LFB_COX_GAN_war_lose_effects = yes
+		}
+	}
+
+	option = {
+		name = LFB_COX_nc.3.a
+		add_stability = -0.05
+		custom_effect_tooltip = COX_GAN_war_lose_tt
+		hidden_effect = {
+			country_event = {
+				id = LFB_COX_nc.5
+				days = 2
+			}
+		}
+	}
+}
+
+
+country_event = {#疯狗之死
+	id = LFB_COX_nc.4
+	title = LFB_COX_nc.4.t
+	desc = LFB_COX_nc.4.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = LFB_COX_nc.4.a
+		add_political_power = 50
+		custom_effect_tooltip = COX_tsuji_masanobu_death_tt
+	}
+}
+
+
+country_event = {#西北军成功撤离
+	id = LFB_COX_nc.5
+	title = LFB_COX_nc.5.t
+	desc = LFB_COX_nc.5.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = LFB_COX_nc.5.a
+		custom_effect_tooltip = COX_GAN_extraction_tt
+	}
+}
+
+#NCC接收西北军
