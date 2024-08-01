@@ -298,6 +298,8 @@ LFB_WI_stage_1_effects = {
 				state = 620
 				state = 1016
 				state = 600
+				state = 595
+				state = 1019
 			}
 		}
 		add_province_modifier = {
@@ -457,28 +459,20 @@ LFB_COX_NC_initialize = {
 	}
 }
 
-LFB_COX_NC_stage_1_initialize = {、
+LFB_COX_NC_stage_1_initialize = {
 	#切换阶段
 	clr_global_flag = LFB_NC_stage_0 #初始阶段
 	set_global_flag = LFB_NC_stage_1 #兰州阶段
 
 	#
-	set_variable = {
-		GAN_infiltrated_atk = 0
-	}
-	set_variable = {
-		GAN_infiltrated_def = 0
-	}
-	set_variable = {
-		GAN_infiltrated_org = 0
-	}
-	set_variable = {
-		GAN_infiltrated_org_regen = 0
-	}
 	GAN = {
 		add_dynamic_modifier = {
 			modifier = GAN_infiltrated
 		}
+		set_variable = { GAN_infiltrated_org_regen = 0 }
+		set_variable = { GAN_infiltrated_atk = 0}
+		set_variable = { GAN_infiltrated_def = 0}
+		set_variable = { GAN_infiltrated_org = 0}
 	}
 	#初始化变量
 	set_variable = {
@@ -489,7 +483,6 @@ LFB_COX_NC_stage_1_initialize = {、
 		min = 0
 		max = 100
 	}
-	calc_GAN_infiltration = yes
 	set_variable = {
 		Lanzhou_integration_index = 0
 	}
@@ -512,11 +505,13 @@ calc_GAN_infiltration = {
 	#士气最大-10%
 	#攻防最大-20%
 	set_temp_variable = { GAN_debuff_calc = Lanzhou_infiltration_index }
-	divide_temp_variable = { GAN_debuff_calc = -100 }
-	set_variable = { GAN_infiltrated_org = GAN_debuff_calc }
-	multiply_temp_variable = { GAN_debuff_calc = 2 }
-	set_variable = { GAN_infiltrated_atk = GAN_debuff_calc }
-	set_variable = { GAN_infiltrated_def = GAN_debuff_calc }
+	GAN = {
+		divide_temp_variable = { GAN_debuff_calc = -1000 }
+		set_variable = { GAN_infiltrated_org = GAN_debuff_calc }
+		multiply_temp_variable = { GAN_debuff_calc = 2 }
+		set_variable = { GAN_infiltrated_def = GAN_debuff_calc }
+		set_variable = { GAN_infiltrated_atk = GAN_debuff_calc }
+	}
 }
 
 LFB_COX_GAN_war_start_effects = {
