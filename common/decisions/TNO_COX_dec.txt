@@ -2464,6 +2464,27 @@ COX_Liberation_of_Lanzhou = {
 			custom_effect_tooltip = COX_rebuild_Lanzhou_industry_tt
 		}
 	}
+	complete_lanzhou_rebuild = {#完成兰州重建
+		visible = {
+			OR = {
+				has_global_flag = LFB_NC_stage_1 #兰州阶段
+				has_country_flag = coring_Lanzhou 
+			}
+			tag = COX
+		}
+		available = {
+			has_political_power > 99
+			check_variable = {
+				Lanzhou_integration_index > 99
+			}
+			fire_only_once = yes
+		}
+		complete_effect = {
+			add_political_power = -100
+			set_temp_variable = { temp_econ_spending_amount = 0.6 }
+			LFB_COX_core_Lanzhou_effets = yes
+		}
+	}
 	#倒计时
 	COX_Liberation_of_Lanzhou_countdown = {
 		activation = {
@@ -2581,6 +2602,11 @@ COX_Liberate_Shaanxi = {
 			has_war = yes
 		}
 		days_mission_timeout = 240
+		timeout_effect = {
+			country_event = {
+					id = LFB_COX_nc.16
+			}
+		}
 	}
 
 	COX_occupying_Shaanxi = {
@@ -2588,7 +2614,12 @@ COX_Liberate_Shaanxi = {
 			has_global_flag = LFB_NC_stage_2
 		}
 		available = {
-			has_war = yes
+			or = {
+				has_war = yes
+				not = {
+					has_global_flag = LFB_NC_stage_2
+				}
+			}
 		}
 		selectable_mission = no
 		cancel_trigger = {
@@ -2659,7 +2690,7 @@ COX_Liberate_Shaanxi = {
 					id = LFB_COX_nc.11
 				}
 			}
-			if = {
+			else_if = {
 				limit = {
 					check_variable = {
 						Shaanxi_occupied_index > 20
@@ -2671,6 +2702,18 @@ COX_Liberate_Shaanxi = {
 					random_days = 10
 				}
 			}
+
+			else_if = {
+				limit = {
+					check_variable = {
+						Shaanxi_occupied_index > 20
+					}
+				}
+				country_event = {
+					id = LFB_COX_nc.15
+				}
+			}
+
 		}
 	}
 
