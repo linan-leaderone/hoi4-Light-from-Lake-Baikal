@@ -914,13 +914,80 @@ COX_NC_MEN_revolution = {
 			add_to_variable = {
 				COX_MEN_logistics_support_time = -1
 			}
+
 		}
 
 		days_remove = 28
 
 		remove_effect = {
 			add_to_variable = {
-				LFB_NC_MEN_readiness = 0.5
+				LFB_NC_MEN_readiness_increase = 0.1
+			}
+		}
+	}
+
+	COX_MEN_countdown = {
+		activation = {
+			has_global_flag = LFB_NC_MEN_buildup_stage
+			tag = COX
+		}
+		
+		available = {
+			always = no
+		}
+
+		selectable_mission = no
+		cancel_trigger = {
+			OR = {
+				has_war = yes
+
+				NOT = {
+					has_global_flag = LFB_NC_MEN_buildup_stage
+				}
+			}
+		}
+
+		days_mission_timeout = 30
+
+		timeout_effect = {
+			if = {
+				limit = {
+					check_variable = {
+						LFB_NC_MEN_readiness < 7
+					}
+				}
+
+				add_to_variable = {
+					LFB_NC_MEN_readiness = 0.5
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						LFB_NC_MEN_readiness > 6.99
+					}
+					check_variable = {
+						LFB_NC_MEN_readiness < 11
+					}
+				}
+				add_to_variable = {
+					LFB_NC_MEN_readiness = -0.1
+				}
+			}
+
+			else_if = {
+				limit = {
+					check_variable = {
+						LFB_NC_MEN_readiness > 10.99
+					}
+				}
+				add_to_variable = {
+					LFB_NC_MEN_readiness = -0.5
+				}
+			}
+			add_to_variable = {
+				var = LFB_NC_MEN_readiness
+				value = LFB_NC_MEN_readiness_increase
 			}
 		}
 	}
