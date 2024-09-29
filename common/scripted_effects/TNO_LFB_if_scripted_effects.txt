@@ -378,81 +378,7 @@ LFB_WI_stage_1_effects = {
 	}
 }
 
-LFB_WI_GAW_Start_Effects = {
-	log = "Great Asian War started in [GetDateText]"
-	clr_global_flag = CHI_Western_Insurrection_Crisis
-	clr_global_flag = WI_Warlord_Struggle_begin
-	set_global_flag = YUN_NPA_GAW_Crisis
 
-	if = {
-		limit = {
-			has_global_flag = QIN_helps_NPA
-		}
-		YUN = {
-			add_to_faction = QIN
-			country_event = { id = yun_wi.34 days = 2 }
-		}
-		QIN = { add_ideas = NLF_Member }
-		every_other_country = {
-			limit = {
-				is_in_faction_with = JAP
-			}
-			QIN = { set_embargo_PREV = yes }
-			QIN = { PREV = { set_embargo_PREV = yes } }
-		}
-	}
-	if = {
-		limit = {
-			has_global_flag = XIN_helps_NPA
-		}
-		YUN = {
-			add_to_faction = XIN
-			country_event = { id = yun_wi.35 days = 3 }
-		}
-		XIN = { add_ideas = NLF_Member }
-		every_other_country = {
-			limit = {
-				is_in_faction_with = JAP
-			}
-			XIN = { set_embargo_PREV = yes }
-			XIN = { PREV = { set_embargo_PREV = yes } }
-		}
-	}
-	every_other_country = {
-		limit = { is_in_faction_with = YUN }
-		add_to_war = {
-			targeted_alliance = YUN
-			enemy = JAP
-		}
-	}
-	527 = { set_demilitarized_zone = yes }
-	1024 = { set_demilitarized_zone = yes }
-	1820 = { set_demilitarized_zone = yes }
-	country_event = { id = yun.2024 days = 1 }
-	every_other_country = {
-		limit = {
-			OR = {
-				original_tag = JAP
-				original_tag = MAN
-				original_tag = MEN
-				original_tag = GNG
-				original_tag = NCC
-				original_tag = GAN
-			}
-		}
-		add_ideas = JAP_hakko_ichiu
-	}
-	every_country = { news_event = WORLD.2069 }
-	YUN = {
-		set_temp_variable = { gdp_growth_temp = -3.0 }
-		econ_gdp_growth_change = yes
-		set_temp_variable = { inflation_temp = 3.0 }
-		econ_inflation_change = yes
-	}
-	GNG = { #Guangdong GAW events
-		country_event = { id = GNG_Western_Insurrection.8 days = 1 }
-	}
-}
 ###华北
 
 ##华北，初始化
@@ -701,6 +627,11 @@ LFB_NC_stage_2_victory_effects = {
 		clr_country_flag = COX_GAN_remenants
 		transfer_state = 622
 		transfer_state = 956
+
+		country_event = {
+			id = LFB_COX_nc.18
+			days = 7
+		}
 	}
 	NCC = {
 		annex_country = {
@@ -954,6 +885,109 @@ LFB_NC_MEN_civ_war_start_effects = {
 		}
 	}
 
+}
+
+#华北，阶段3(GAW)
+LFB_NC_GAW_Start_Effects = {
+	log = "LFB Great Asian War started in [GetDateText]"
+	clr_global_flag = CHI_Western_Insurrection_Crisis
+	clr_global_flag = WI_Warlord_Struggle_begin
+
+	COX = {
+		huabei_attack_start_effects = yes
+		set_country_flag = COX_huabei_attack
+		declare_war_on = JAP
+	}
+	YUN = {
+		declare_war_on = JAP
+	}
+
+	JAP = {
+		add_to_faction = CHI
+	}
+
+	CHI = {
+		dismantle_faction - yes
+	}
+
+	if = {
+		limit = {
+			NOT = {
+				has_global_flag = LFB_NC_MEN_war_stage
+			}
+		}
+		LFB_NC_MEN_civ_war_start_effects = yes
+	}
+
+	every_country = {
+		limit = {
+			AND = {
+				is_in_faction_with = JAP
+				NOT = {
+					OR = {
+						original_tag = JAP
+						original_tag = MAN
+						original_tag = MEN
+						original_tag = GNG
+						original_tag = NCC
+						original_tag = CHI
+					}
+				}
+			}
+		}
+
+		add_ideas = JAP_sphere_no_war
+	}
+
+	every_country = {
+		limit = {
+			OR = {
+				original_tag = JAP
+				original_tag = MAN
+				original_tag = MEN
+				original_tag = GNG
+				original_tag = NCC
+				original_tag = CHI
+			}
+		}
+		add_ideas = JAP_puppet_no_war
+		add_to_war = {
+			targeted_alliance = JAP
+			enemy = YUN
+		}
+		add_to_war = {
+			targeted_alliance = JAP
+			enemy = CHI
+		}
+	}
+	
+
+	
+	#country_event = { id = yun.2024 days = 1 }
+	#every_other_country = {
+		#limit = {
+			#OR = {
+				#original_tag = JAP
+				#original_tag = MAN
+				#original_tag = MEN
+				#original_tag = GNG
+				#original_tag = NCC
+				#original_tag = GAN
+			#}
+		#}
+		#add_ideas = JAP_hakko_ichiu
+	#}
+	#every_country = { news_event = WORLD.2069 }
+	#YUN = {
+		#set_temp_variable = { gdp_growth_temp = -3.0 }
+		#econ_gdp_growth_change = yes
+		#set_temp_variable = { inflation_temp = 3.0 }
+		#econ_inflation_change = yes
+	#}
+
+	GNG = { #Guangdong GAW events
+		country_event = { id = GNG_Western_Insurrection.8 days = 1 }
+	}
 }
 
 
