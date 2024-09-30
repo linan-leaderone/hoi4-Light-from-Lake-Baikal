@@ -11,11 +11,41 @@ scripted_gui = {
 		
 		effects = {
 			COX_eid_gui_plus_Button_click = {
-				add_to_variable = { COX_eid_machine_tool_display = 1 }
+				if = {
+					limit = {
+						check_variable = {
+							COX_eid_exchange_mode = 1
+						}
+					}
+					add_to_variable = { COX_eid_machine_tool_display = 4 }
+				}
+				if = {
+					limit = {
+						check_variable = {
+							COX_eid_exchange_mode = 2
+						}
+					}
+					add_to_variable = { COX_eid_machine_tool_display = 1 }
+				}
 				COX_eid_gui_reflesh = yes
 			}
 			COX_eid_gui_minus_Button_click = {
-				add_to_variable = { COX_eid_machine_tool_display = -1 }
+				if = {
+					limit = {
+						check_variable = {
+							COX_eid_exchange_mode = 1
+						}
+					}
+					add_to_variable = { COX_eid_machine_tool_display = -4 }
+				}
+				if = {
+					limit = {
+						check_variable = {
+							COX_eid_exchange_mode = 2
+						}
+					}
+					add_to_variable = { COX_eid_machine_tool_display = -1 }
+				}
 				COX_eid_gui_reflesh = yes
 			}
 			COX_eid_gui_Region_button_click = {
@@ -23,19 +53,26 @@ scripted_gui = {
 					limit = {
 						check_variable = { COX_eid_exchange_mode = 1 }
 					}
-					set_temp_variable = { temp_econ_GDP_boost_flat = COX_eid_machine_tool_effect_display }
+					set_temp_variable = { pus_temp = COX_eid_machine_tool_effect_display }
+					
 					divide_temp_variable = {
-						temp_econ_GDP_boost_flat = 1000
+						pus_temp = 4
 					}
-					econ_GDP_boost_once_flat = yes
+					multiply_temp_variable = { pus_temp = COX_eid_worker_proficiency }
+					round_temp_variable = { pus_temp }
+					econ_pus_change = yes
 				}
 				else_if = {
 					limit = {
 						check_variable = { COX_eid_exchange_mode = 2 }
 					}
+					set_temp_variable = { electricity_temp = COX_eid_machine_tool_effect_display }
+					
+					multiply_temp_variable = { electricity_temp = COX_eid_worker_proficiency }
+					round_temp_variable = { electricity_temp }
 					for_loop_effect = {
 						start = 0 
-						end = COX_eid_machine_tool_effect_display
+						end = electricity_temp
 						random_owned_controlled_state = {
 							add_resource = {
 								type = power
@@ -49,10 +86,12 @@ scripted_gui = {
 			}
 			COX_eid_gui_production_units_Button_click = {
 				set_variable = { COX_eid_exchange_mode = 1 }
+				set_variable = { COX_eid_machine_tool_effect_display = 0 }
 				COX_eid_gui_reflesh = yes
 			}
 			COX_eid_gui_power_Button_click = {
 				set_variable = { COX_eid_exchange_mode = 2 }
+				set_variable = { COX_eid_machine_tool_effect_display = 0 }
 				COX_eid_gui_reflesh = yes
 			}
 		}
@@ -65,10 +104,22 @@ scripted_gui = {
 				check_variable = { COX_eid_machine_tool_display > 0 }
 			}
 			COX_eid_gui_Region_button_click_enabled = {
-				check_variable = { COX_eid_machine_tool_effect_display > 0 }
+				OR = {
+					AND = {
+						check_variable = { COX_eid_exchange_mode = 2 }
+						check_variable = { COX_eid_machine_tool_effect_display > 0 }
+					}
+					AND = {
+						check_variable = { COX_eid_exchange_mode = 1 }
+						check_variable = { COX_eid_machine_tool_effect_display > 3 }
+					}
+				}
+				
 			}
 		}
 		
 	}
 
 }
+
+
