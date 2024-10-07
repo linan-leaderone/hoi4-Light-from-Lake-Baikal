@@ -1,0 +1,385 @@
+# █████╗ ██╗     ███████╗██████╗ ████████╗███████╗#
+#██╔══██╗██║     ██╔════╝██╔══██╗╚══██╔══╝██╔════╝#
+#███████║██║     █████╗  ██████╔╝   ██║   ███████╗#
+#██╔══██║██║     ██╔══╝  ██╔══██╗   ██║   ╚════██║#
+#██║  ██║███████╗███████╗██║  ██║   ██║   ███████║#
+#╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝#
+#Scripted Effects
+
+# Scripted effects for the custom alert system
+# These are the top-bar alerts that show up below the decision, research, diplomacy, trade etc. buttons
+
+#################################################
+##=|    TNO Alert System Scripted Effects    |=##
+##======================| |====================##
+#################################################
+
+#Index; Search for these names using ctrl+f and you'll find the section they entitle.
+#	TNO_initialize_alerts
+#	add_TNO_alert_unless_exists
+#	add_TNO_alert
+#	remove_TNO_alert
+#	remove_TNO_alert_data
+#	TNO_alert_click
+#		TNO_alert_click_General (0-999)
+#		TNO_alert_click_Reich (1000-1999)
+#		TNO_alert_click_OFN (2000-2999)
+#		TNO_alert_click_Asia (3000-3999)
+#		TNO_alert_click_Triumvirate (4000-4999)
+#		TNO_alert_click_Russia (5000-5999)
+#		TNO_alert_click_LatAm (6000-6999)
+#		TNO_alert_click_Africa (7000-7999)
+#	TNO_alert_right_click
+#	suppress_TNO_alert
+#	TNO_alert_suppression_weekly_tick
+#	TNO_alert_suppression_expired
+
+TNO_initialize_alerts = {
+	clear_array = TNO_alerts
+	clear_array = TNO_alert_data
+
+	add_to_array = { TNO_alerts = 0 }
+	resize_array = { array = TNO_alerts size = 1 value = 0 }
+	resize_array = { array = TNO_alert_data size = 1 value = 0 }
+
+	clear_array = TNO_alert_types_suppression
+	
+	TNO_alert_update_gui = yes
+}
+
+
+# Adds an alert with id `alert_id` and data `alert_data` to the list of alerts, if an alert with the same id does not exist
+add_TNO_alert_unless_exists = {
+	if = {
+		limit = {
+			NOT = { is_in_array = { TNO_alerts = alert_id } }
+		}
+
+		add_TNO_alert = yes
+	}
+}
+
+# Adds an alert with id `alert_id` and data `alert_data` to the list of alerts unconditionally
+add_TNO_alert = {
+	if = {
+		limit = {
+			NOT = { is_in_array = { TNO_alert_types_suppression = alert_id } }
+		}
+
+		add_to_array = { array = TNO_alerts value = alert_id index = 0 }
+		add_to_array = { array = TNO_alert_data value = alert_data index = 0 }
+
+		# sound_effect = "crabrave"
+	}
+	
+	TNO_alert_update_gui = yes
+}
+
+# Removes all alerts with id `alert_id`
+remove_TNO_alert = {
+	set_temp_variable = { idx = 0 }
+
+	while_loop_effect = {
+		limit = { check_variable = { idx < TNO_alerts^num } }
+
+		if = { 
+			limit = { check_variable = { TNO_alerts^idx = alert_id } }
+
+			remove_from_array = { array = TNO_alerts index = idx }
+			remove_from_array = { array = TNO_alert_data index = idx }
+
+			subtract_from_temp_variable = { idx = 1 }
+		}
+		add_to_temp_variable = { idx = 1 }
+	}
+	
+	TNO_alert_update_gui = yes
+}
+
+# Removes all alerts with id `alert_id` and data `alert_data`
+remove_TNO_alert_data = {
+	set_temp_variable = { idx = 0 }
+
+	while_loop_effect = {
+		limit = { check_variable = { idx < TNO_alerts^num } }
+
+		if = { 
+			limit = {
+				check_variable = { TNO_alerts^idx = alert_id }
+				check_variable = { TNO_alert_data^idx = alert_data }
+			}
+
+			remove_from_array = { array = TNO_alerts index = idx }
+			remove_from_array = { array = TNO_alert_data index = idx }
+
+			subtract_from_temp_variable = { idx = 1 }
+		}
+		add_to_temp_variable = { idx = 1 }
+	}	
+	
+	TNO_alert_update_gui = yes
+}
+
+# Alert click effect
+TNO_alert_click = {
+
+	#|=====[ GENERAL ]=====|#
+	if = {
+		# Fiscal Crisis Alert
+		limit = { check_variable = { alert_id = token:Alert_FiscalCrisis } }
+		set_country_flag = Econ_Graphs_Actions_Tab_Open
+	}
+	else_if = {
+		# Tension Alert
+		limit = { check_variable = { alert_id = token:Alert_HighTension } }
+	}
+	else_if = { # used for credit rating effects
+		limit = {
+			OR = {
+				check_variable = { alert_id = token:Alert_CreditRating_Improved }
+				check_variable = { alert_id = token:Alert_CreditRating_Degraded }
+			}
+		}
+
+		set_country_flag = Credit_Ladder_Tab_Open
+		set_country_flag = econ_view_visible
+	}
+
+	#|=====[ REICH ]=====|#
+	else_if = {
+		# Bormann Kartenhaus alert
+		limit = { check_variable = { alert_id = token:Alert_KartenhausAction } }
+		set_country_flag = GER_Bormann_SIG_GUI_Open
+		BOR_Kartenhaus_Open = yes
+
+		remove_TNO_alert = yes
+	}
+	else_if = { # Britain Chaos threshold alert
+		limit = { check_variable = { alert_id = token:Alert_BRI_ChaosThreshold } }
+		set_temp_variable = { ThresholdID = TNO_alert_data^alert_idx }
+		effect_tooltip = { BRI_Party_ThresholdEffect = yes }
+	}
+
+	else_if = {
+		# Ukraine Breadbasket Alert - Goverment Control
+		limit = { check_variable = { alert_id = token:Alert_UKR_BreadBasket_GovControl } }
+		set_country_flag = Ukraine_GUI_Visible_Flag
+		set_variable = { opened_tab = 2 }
+		add_to_variable = { UKR_BB_DIRTY = 0.01 }
+		effect_tooltip = {
+			set_temp_variable = { temp_govcontrol_idx = 0 }
+			UKR_bb_alerts_check_GovControl_entries = yes
+		}
+	}
+
+	else_if = {
+		# Ukraine Breadbasket Alert - Consumption Cycle
+		limit = { check_variable = { alert_id = token:Alert_UKR_BreadBasket_ConsCycle } }
+		set_country_flag = Ukraine_GUI_Visible_Flag
+		set_variable = { opened_tab = 1 }
+		add_to_variable = { UKR_BB_DIRTY = 0.01 }
+	}
+
+	else_if = {
+		# Ukraine Breadbasket Alert - Action Available
+		limit = { check_variable = { alert_id = token:Alert_UKR_BreadBasket_ActionAvailable } }
+		set_country_flag = Ukraine_GUI_Visible_Flag
+	}
+
+	else_if = {
+		# Ukraine Breadbasket Alert - Decisive Region
+		limit = { check_variable = { alert_id = token:Alert_UKR_BreadBasket_DecisiveRegionWarning } }
+		set_country_flag = Ukraine_GUI_Visible_Flag
+		set_variable = { opened_tab = 2 }
+		add_to_variable = { UKR_BB_DIRTY = 0.01 }
+	}
+
+	#|=====[ OFN ]=====|#
+	else_if = {
+		limit = {
+			check_variable = { alert_id = token:Alert_US_Election }
+			NOT = {
+				has_country_flag = US_voting_gui_open
+			}
+		}
+		USA_GUI_opening_effect = yes
+	}
+
+	#|=====[ LATIN AMERICA ]=====|#
+	else_if = {
+		# Brazil Senado voting alert
+		limit = { check_variable = { alert_id = token:Alert_BRA_SenadoVoting } }
+
+		set_country_flag = BRA_map_window_open
+
+		clear_array = BRA_map_selected_tab
+		add_to_array = { BRA_map_selected_tab = 1 }
+		set_variable = { BRA_map_election_type_frames^0 = 1 }
+		set_variable = { BRA_map_election_type_frames^1 = 2 }
+
+		clear_array = BRA_map_tab_frames
+		add_to_array = { BRA_map_tab_frames = 1 }
+		add_to_array = { BRA_map_tab_frames = 2 }
+		add_to_array = { BRA_map_tab_frames = 1 }
+
+		BRA_senate_select_state = yes
+	}
+	else_if = {
+		# Brazil Presidential voting alert
+		limit = { check_variable = { alert_id = token:Alert_BRA_PresVoting } }
+
+		set_country_flag = BRA_map_window_open
+
+		clear_array = BRA_map_selected_tab
+		add_to_array = { BRA_map_selected_tab = 3 }
+		set_variable = { BRA_map_election_type_frames^0 = 2 }
+		set_variable = { BRA_map_election_type_frames^1 = 1 }
+
+		clear_array = BRA_map_tab_frames
+		add_to_array = { BRA_map_tab_frames = 1 }
+		add_to_array = { BRA_map_tab_frames = 2 }
+		add_to_array = { BRA_map_tab_frames = 1 }
+
+		BRA_senate_select_state = yes
+	}
+	else_if = {
+		# Brazil Development edict alert
+		limit = { check_variable = { alert_id = token:Alert_BRA_Development } }
+
+		set_country_flag = BRA_map_window_open
+
+		clear_array = BRA_map_selected_tab
+		add_to_array = { BRA_map_selected_tab = 0 }
+
+		clear_array = BRA_map_tab_frames
+		add_to_array = { BRA_map_tab_frames = 2 }
+		add_to_array = { BRA_map_tab_frames = 1 }
+		add_to_array = { BRA_map_tab_frames = 1 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { alert_id = token:Alert_MEX_Project }
+			NOT = { check_variable = { MEX_region_project_alert_array^num = 0 } }
+		}
+		effect_tooltip = {
+			set_temp_variable = { temp_region_project_num = 0 }
+			MEX_project_alert_entries = yes
+		}
+	}
+
+	#|=====[ MEDITERRANEAN ]=====|#
+	
+
+	#|=====[ MIDDLE EAST ]=====|#
+	
+
+	#|=====[ AFRICA ]=====|#
+	
+
+	#|=====[ RUSSIA ]=====|#
+	
+
+	#|=====[ ASIA ]=====|#
+	else_if = {
+		limit = {
+			check_variable = { alert_id = token:Alert_GNG_LegCo_Bill }
+			NOT = {
+				has_country_flag = TNO_GNG_LegCo_GUI_Open
+			}
+		}
+		set_country_flag = TNO_GNG_LegCo_GUI_Open
+	}
+	#|=====[ LFB ]=====|#
+	else_if = {
+		limit = {
+			check_variable = { alert_id = token:Alert_XBJ_Work_Group_Avaliable }
+			NOT = {
+				has_country_flag = XBJ_Northwest_crisis_gui_visible
+			}
+		}
+		set_country_flag = XBJ_Northwest_crisis_gui_visible
+	}
+	
+	TNO_alert_update_gui = yes
+}
+
+# Alert cancel effect
+TNO_alert_right_click = {
+	remove_from_array = { array = TNO_alerts index = alert_idx }
+	remove_from_array = { array = TNO_alert_data index = alert_idx }
+
+	suppress_TNO_alert = yes
+}
+
+# Suppresses the given `alert_id`, stopping it from appearing again for a fixed duration
+# the duration is 2 weeks
+suppress_TNO_alert = {
+	if = {
+		limit = {
+			NOT = { is_in_array = { TNO_alert_types_suppression = alert_id } }
+		}
+
+		set_temp_variable = { suppression_weeks = 2 }
+
+		# if statements to change time here
+		if = {
+			limit = { check_variable = { alert_id = token:Alert_ENG_Election } }
+			set_temp_variable = { suppression_weeks = 0 }
+		}
+		else_if = {
+			limit = { check_variable = { alert_id = token:Alert_RUS_Smuta_Chaos } }
+			set_temp_variable = { suppression_weeks = 0 }
+		}
+		else_if = {
+			limit = { check_variable = { alert_id = token:Alert_RUS_Smuta_Supplies } }
+			set_temp_variable = { suppression_weeks = 0 }
+		}
+		else_if = {
+			limit = { check_variable = { alert_id = token:Alert_RUS_Smuta_War } }
+			set_temp_variable = { suppression_weeks = 0 }
+		}
+
+		if = {
+			limit = { check_variable = { suppression_weeks > 0 } }
+			
+			add_to_array = { TNO_alert_types_suppression = alert_id }
+			add_to_array = { TNO_alert_types_suppression_time = suppression_weeks }
+		}
+	}
+	TNO_alert_update_gui = yes
+}
+
+TNO_alert_suppression_weekly_tick = {
+	set_temp_variable = { idx = 0 }
+
+	while_loop_effect = {
+		limit = { check_variable = { idx < TNO_alert_types_suppression^num } }
+
+		subtract_from_variable = { TNO_alert_types_suppression_time^idx = 1 }
+		if = { 
+			limit = { check_variable = { TNO_alert_types_suppression_time^idx = 0 } }
+
+			set_temp_variable = { alert_id = TNO_alert_types_suppression^idx }
+			TNO_alert_suppression_expired = yes
+
+			remove_from_array = { array = TNO_alert_types_suppression index = idx }
+			remove_from_array = { array = TNO_alert_types_suppression_time index = idx }
+
+			subtract_from_temp_variable = { idx = 1 }
+		}
+		add_to_temp_variable = { idx = 1 }
+	}
+	TNO_alert_update_gui = yes
+}
+
+TNO_alert_suppression_expired = {
+}
+
+TNO_alert_update_gui = {
+	if = {
+		limit = {
+			is_ai = no
+		}
+		add_to_variable = { TNO_alertbar_dirty = 0.001 }
+	}
+}
