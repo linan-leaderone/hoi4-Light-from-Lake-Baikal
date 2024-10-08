@@ -454,8 +454,6 @@ LFB_COX_NC_stage_1_initialize = {
 	set_variable = {
 		Lanzhou_infiltration_decay = 2
 	}
-	
-	
 }
 
 calc_GAN_infiltration = {
@@ -1037,6 +1035,7 @@ LFB_NC_GAW_Start_Effects = {
 						original_tag = GNG
 						original_tag = NCC
 						original_tag = CHI
+						original_tag = HNA
 					}
 				}
 			}
@@ -1053,6 +1052,7 @@ LFB_NC_GAW_Start_Effects = {
 				original_tag = GNG
 				original_tag = NCC
 				original_tag = CHI
+				original_tag = HNA
 			}
 		}
 		
@@ -1107,9 +1107,459 @@ LFB_NC_GAW_Start_Effects = {
 	}
 }
 
+LFB_IF_DCG_YUN_Defeat_Effects = {
+	#触发战败结语
+	YUN = { save_global_event_target_as = losing_country }
+	JAP = { save_global_event_target_as = winning_country }
+	log = "GAW lost by YUN"
+	set_global_flag = war_won
+	set_global_flag = show_peace_popup_alert
+	add_to_variable = { global.peace_popup_dirty = 1 }
+
+	every_country = {
+		limit = {
+			has_war_with = YUN
+		}
+		white_peace = YUN
+	}
+	SIC = {
+		set_cosmetic_tag = SIC_IJA
+		transfer_state = 605
+		transfer_state = 905
+		transfer_state = 1537
+		transfer_state = 1538
+		set_party_name = {
+			ideology = paternalism
+			long_name = CHI_JAP_PUP_paternalism_party_long
+			name = CHI_JAP_PUP_paternalism_party
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			long_name = CHI_JAP_PUP_ultranationalism_party_long
+			name = CHI_JAP_PUP_ultranationalism_party
+		}
+		set_party_name = {
+			ideology = communist
+			long_name = CHI_communist_party_long
+			name = CHI_communist_party
+		}
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Military_Directed }
+		econ_subtype_change = yes
+		remove_ideas = Sphere_Chinese_Warlord
+		add_ideas = Sphere_Imp_Protectorate
+		econ_join_sphere_JAP = yes
+		every_owned_state = {
+			add_core_of = SIC
+			remove_core_of = YUN
+		}
+	}
+	YUN = {
+		transfer_state = 325
+		transfer_state = 603
+		transfer_state = 960
+		every_state = {
+			limit = { is_core_of = GUX }
+			YUN = { transfer_state = PREV }
+		}
+		every_owned_state = {
+			limit = { NOT = { is_core_of = YUN } }
+			add_core_of = PREV
+		}
+		CHI = {
+			puppet = YUN
+		}
+		set_cosmetic_tag = YUN_JAP
+		promote_character = YUN_Zhang_Zhongzhi
+		set_party_name = {
+			ideology = fascism
+			long_name = YUN_JAP_fascism_party_long
+			name = YUN_JAP_fascism_party
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			long_name = CHI_JAP_PUP_ultranationalism_party_long
+			name = CHI_JAP_PUP_ultranationalism_party
+		}
+		set_politics = {
+			ruling_party = fascism
+			last_election = "1960.11.11"
+			election_frequency = 36
+			elections_allowed = no
+		}
+		set_popularities = {
+			communist = 15
+			ultranationalism = 12
+			socialist = 0
+			progressivism = 0
+			liberalism = 0
+			conservatism = 0
+			paternalism = 8
+			despotism = 10
+			fascism = 55
+			national_socialism = 0
+		}
+		remove_ideas = Sphere_Chinese_Warlord
+		add_ideas = Sphere_Fully_Dependent
+		econ_join_sphere_JAP = yes
+		load_focus_tree = ZZZ_blank_focus
+		TNO_startup_nation = yes
+	}
+	NCC = {
+		if = {
+			limit = {
+				956 = {
+					is_owned_by = YUN
+				}
+			}
+			transfer_state = 956
+		}
+		every_owned_state = {
+			remove_core_of = YUN
+		}
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = GNG } #GNG is Guangdong
+		}
+		every_state = {
+			limit = { is_core_of = GNG }
+			GNG = { transfer_state = PREV }
+		}
+		GNG = { #Guangdong spawns again
+			add_ideas = Sphere_Corporate_Dependency
+			econ_join_sphere_JAP = yes
+			TNO_startup_nation = yes #Why is this here?
+			every_owned_state = {
+				remove_core_of = YUN
+			}
+		}
+	}
+	HNA = { #Hainan spawns again
+		add_ideas = Sphere_Imp_Protectorate
+		econ_join_sphere_JAP = yes
+		TNO_startup_nation = yes #Why is this here?
+		transfer_state = 1464
+		transfer_state = 591
+		every_owned_state = {
+			remove_core_of = YUN
+		}
+	}
+
+	if = {#收尾判定条件
+		limit = {
+			NOT = {
+				COX = {
+					has_war = yes
+				}
+			}
+		}
+		LFB_IF_DCG_Cleanup_Effects = yes
+	}
+	JAP = {
+		add_to_faction = SIC
+		add_to_faction = HNA
+		add_to_faction = YUN
+	}
+}
+
+LFB_IF_DCG_COX_Defeat_Effects = {
+	every_country = {
+		limit = {
+			has_war_with = COX 
+		}
+		white_peace = COX
+	}
+	#触发战败结语
+	COX = { save_global_event_target_as = losing_country }
+	JAP = { save_global_event_target_as = winning_country }
+	log = "GAW lost by COX"
+	set_global_flag = war_won
+	set_global_flag = show_peace_popup_alert
+	add_to_variable = { global.peace_popup_dirty = 1 }
+	COX = {
+		clr_country_flag = COX_huabei_attack_start
+		clr_country_flag = country_has_gui
+	}
+	MEN = {
+		add_ideas = Sphere_Fully_Dependent
+		every_state = {
+			limit = { is_core_of = MEN }
+			MEN = { transfer_state = PREV }
+		}
+	}
+	NCC = {
+		transfer_state = 622
+		if = {
+			limit = {
+				956 = {
+					is_owned_by = COX
+				}
+			}
+			transfer_state = 956
+		}
+		every_owned_state = {
+			remove_core_of = COX
+		}
+	}
+	JAP = {
+		add_to_faction = MEN
+	}
+	if = {#收尾判定条件
+		limit = {
+			NOT = {
+				YUN = {
+					has_war = yes
+				}
+			}
+		}
+		LFB_IF_DCG_Cleanup_Effects = yes
+	}
+}
+LFB_IF_DCG_Northwest_Effects = {
+	COX = {
+		set_cosmetic_tag = COX_failed
+		COX_Wang_Zhen = {
+			add_country_leader_role = {
+				country_leader = {
+					desc = "COX_Wang_Zhen_desc"
+					ideology = communist_stratocratic_communism_subtype
+					traits = {  }
+					expire = "1999.1.1.1"
+					id = -1
+				}
+				promote_leader = yes
+			}
+			set_portraits = {
+				civilian = { large = "gfx/leaders/COX/Wang_Zhen_unhappy.png" }
+				army = { large = "gfx/leaders/COX/Wang_Zhen_unhappy.png" }
+			}
+		}
+		set_party_name = { 
+			ideology = communist
+			name = COX_union_communist_party
+			long_name = COX_union_communist_party_long
+		}
+		set_politics = {
+			ruling_party = communist
+		}
+		set_popularities = {
+			communist = 100
+		}
+	}
+	TIB = {
+		add_state_core = 601
+		transfer_state = 601
+	}
+	GAN = {
+		set_cosmetic_tag = GAN_win
+		remove_dynamic_modifier = {
+			modifier = GAN_infiltrated
+		}
+		GAN_Fujita_Shigeru = {
+			add_country_leader_role = {
+				country_leader = {
+					desc = "GAN_Fujita_Shigeru_desc"
+					ideology = ultranationalism_ultramilitarism_subtype
+					traits = {  }
+					expire = "1999.1.1.1"
+					id = -1
+				}
+				promote_leader = yes
+			}
+		}
+		add_state_core = 283
+		transfer_state = 283
+		add_state_core = 616
+		transfer_state = 616
+		add_state_core = 764
+		transfer_state = 764
+		add_state_core = 906
+		transfer_state = 906
+		add_state_core = 1302
+		transfer_state = 1302
+		add_state_core = 2025
+		transfer_state = 2025
+		transfer_state = 604
+		add_state_core = 604
+	}
+	JAP = {
+		add_to_faction = GAN
+	}
+}
+LFB_IF_DCG_QIN_Spawn_Effects = {
+	QIN = {
+		set_cosmetic_tag = QIN_partisan
+		QIN_Ma_Dunjing = {
+			set_nationality = QIN
+			add_country_leader_role = {
+				country_leader = {
+					desc = "QIN_Ma_Dunjing_desc"
+					ideology = despotism_partisan_movement_subtype
+					traits = {  }
+					expire = "1999.1.1.1"
+					id = -1
+				}
+				promote_leader = yes
+			}
+		}
+		add_state_core = 604
+		transfer_state = 604
+	}
+	604 = {
+		remove_core_of =
+	}
+}
+LFB_IF_DCG_ETR_Spawn_Effects = {
+	ETR = {
+		ETR_Elihan_Tore = {
+			add_country_leader_role = {
+				country_leader = {
+					desc = "ETR_Elihan_Tore_desc"
+					ideology = ultranationalism_fundamentalism_subtype
+					traits = {  }
+					expire = "1999.1.1.1"
+					id = -1
+				}
+			}
+		}
+		add_state_core = 619
+		add_state_core = 958
+		add_state_core = 1734
+		add_state_core = 1964
+		add_state_core = 2016
+		add_state_core = 2017
+		add_state_core = 2022
+		add_state_core = 2023
+		add_state_core = 2024
+		transfer_state = 619
+		transfer_state = 958
+		transfer_state = 1734
+		transfer_state = 1964
+		transfer_state = 2016
+		transfer_state = 2017
+		transfer_state = 2022
+		transfer_state = 2023
+		transfer_state = 2024
+	}
+}
+
+LFB_IF_DCG_Cleanup_Effects = {
+	JAP = {
+		transfer_state = 810
+		transfer_state = 811
+		transfer_state = 812
+		every_owned_state = {
+			remove_core_of = COX
+			remove_core_of = YUN
+		}
+		add_to_faction = NCC
+		add_to_faction = CHI
+	}
+	NCC = {
+		transfer_state = 597
+		transfer_state = 598
+		transfer_state = 606
+		transfer_state = 607
+		transfer_state = 608
+		transfer_state = 609
+		transfer_state = 614
+		transfer_state = 615
+		transfer_state = 622
+		transfer_state = 956
+		transfer_state = 1014
+		transfer_state = 1015
+		transfer_state = 1020
+		transfer_state = 1021
+		transfer_state = 1022
+		transfer_state = 1023
+		set_party_name = {
+			ideology = fascism
+			name = NCC_dog_fascism_party
+			long_name = NCC_dog_fascism_party_long
+		}
+		remove_ideas = Sphere_Imp_Protectorate
+		add_ideas = Sphere_Fully_Dependent
+		econ_join_sphere_JAP = yes
+	}
+	CHI = {
+		transfer_state = 595
+		transfer_state = 596
+		transfer_state = 600
+		transfer_state = 602
+		transfer_state = 613
+		transfer_state = 620
+		transfer_state = 813
+		transfer_state = 959
+		transfer_state = 961
+		transfer_state = 1016
+		transfer_state = 1019
+		CHI_zhou_fohai = {
+			add_country_leader_role = {
+				country_leader = {
+					desc = " "
+					ideology = despotism_civilian_dictatorship_subtype
+					traits = {  }
+					expire = "1999.1.1.1"
+					id = -1
+				}
+			}
+			promote_character = despotism_civilian_dictatorship_subtype
+		}
+		set_politics = {
+			ruling_party = despotism
+			last_election = "1960.11.11"
+			election_frequency = 36
+			elections_allowed = no
+		}
+		set_party_name = {
+			ideology = despotism
+			name = CHI_dog_despotism_party
+			long_name = CHI_dog_despotism_party_long
+		}
+		econ_join_sphere_JAP = yes
+	}
+	TIB = {
+		add_ideas = Sphere_Observer
+		econ_join_sphere_JAP = yes
+		TNO_startup_nation = yes
+	}
+	every_country = {
+		limit = {
+			AND = {
+				is_in_faction_with = JAP
+				NOT = {
+					OR = {
+						original_tag = JAP
+						original_tag = MAN
+						original_tag = GNG
+						original_tag = NCC
+						original_tag = CHI
+						original_tag = HNA
+					}
+				}
+			}
+		}
+
+		remove_ideas = JAP_sphere_no_war
+	}
+
+	every_country = {
+		limit = {
+			OR = {
+				original_tag = JAP
+				original_tag = MAN
+				original_tag = GNG
+				original_tag = NCC
+				original_tag = CHI
+				original_tag = HNA
+			}
+		}
+		remove_ideas = JAP_puppet_no_war
+	}
+}
+
 NC_debug_effect = {
-	set_temp_variable = { alert_id = token:Alert_XBJ_Work_Group_Avaliable }
-	add_TNO_alert = yes
+	set_global_flag = LFB_IF_GAW
 }
 
 
