@@ -472,7 +472,7 @@ calc_GAN_infiltration = {
 }
 
 LFB_COX_GAN_war_start_effects = {
-	set_global_flag = COX_GAN_war
+	set_global_flag = LFB_COX_GAN_war
 	COX = {
 		declare_war_on = {
 			target = GAN
@@ -486,14 +486,23 @@ LFB_COX_GAN_war_start_effects = {
 }
 
 LFB_COX_GAN_war_win_effects = {
-	clr_global_flag = COX_GAN_war
 	clr_global_flag = LFB_NC_stage_1
 	set_global_flag = LFB_NC_stage_2
+
+	#触发战败结语
+	GAN = { save_global_event_target_as = losing_country }
+	COX = { save_global_event_target_as = winning_country }
+	log = "GAN killed by COX"
+	set_global_flag = war_won
+	set_global_flag = show_peace_popup_alert
+	add_to_variable = { global.peace_popup_dirty = 1 }
+
 	COX = {
 		set_country_flag = coring_Lanzhou
 		set_country_flag = Shaanxi_gui_hidden
-		transfer_state = 283
-		transfer_state = 1302
+		annex_country = {
+			target = GAN
+		}
 
 		country_event = {
 			id = LFB_COX_nc.20
@@ -518,7 +527,15 @@ LFB_COX_GAN_war_win_effects = {
 }
 
 LFB_COX_GAN_war_lose_effects = {
-	clr_global_flag = COX_GAN_war
+	#触发战败结语
+	GAN = { save_global_event_target_as = losing_country }
+	COX = { save_global_event_target_as = winning_country }
+	log = "GAN killed by COX"
+	set_global_flag = war_won
+	set_global_flag = show_peace_popup_alert
+	add_to_variable = { global.peace_popup_dirty = 1 }
+
+	
 	clr_global_flag = LFB_NC_stage_1
 	set_global_flag = LFB_NC_stage_2
 	COX = {
@@ -526,8 +543,9 @@ LFB_COX_GAN_war_lose_effects = {
 		set_country_flag = Shaanxi_gui_hidden
 		clr_country_flag = complete_Aid_the_guerrillas
 		clr_country_flag = complete_Contact_the_remnants_of_Ma
-		transfer_state = 283
-		transfer_state = 1302
+		annex_country = {
+			target = GAN
+		}
 
 		country_event = {
 			id = LFB_COX_nc.20
@@ -968,6 +986,9 @@ LFB_GAW_go_eat_dirt_paradox_ai = {
 #华北，阶段3(GAW)
 LFB_NC_GAW_Start_Effects = {
 	log = "LFB Great Asian War started in [GetDateText]"
+	set_global_flag = LFB_IF_GAW
+	clr_global_flag = LFB_WI_ongoing
+	clr_global_flag = LFB_WI_stage_1
 	clr_global_flag = CHI_Western_Insurrection_Crisis
 	clr_global_flag = WI_Warlord_Struggle_begin
 	LFB_GAW_go_eat_dirt_paradox_ai = yes
