@@ -1,0 +1,596 @@
+#### COMINTERN EFFECTS ####
+TNO_run_socintern_script = {	
+	##用这个方法干掉了共产国际
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = LFB_SocIntern_status
+				option = LFB_SOCINTERN_ENABLED
+			}
+		}
+		# If SocIntern already exists
+		if = {
+			limit = {
+				has_global_flag = SOCINTERN_FOUNDED
+			}
+			custom_effect_tooltip = SOCINTERN_JOIN_TT
+			if = {
+				limit = {
+					has_government = communist
+				}
+				if = {
+					limit = {
+						has_global_flag = SOCINTERN_COMMUNIST
+					}
+					random_country = {
+						limit = {
+							has_country_flag = SOCINTERN_LEADER
+						}
+						country_event = {
+							id = socintern.8
+							days = 1
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						has_global_flag = SOCINTERN_SOCIALIST
+					}
+					random_country = {
+						limit = {
+							has_country_flag = SOCINTERN_LEADER
+						}
+						country_event = {
+							id = socintern.11
+							days = 1
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					has_government = socialist
+				}
+				if = {
+					limit = {
+						has_global_flag = SOCINTERN_COMMUNIST
+					}
+					random_country = {
+						limit = {
+							has_country_flag = SOCINTERN_LEADER
+						}
+						country_event = {
+							id = socintern.11
+							days = 1
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						has_global_flag = SOCINTERN_SOCIALIST
+					}
+					random_country = {
+						limit = {
+							has_country_flag = SOCINTERN_LEADER
+						}
+						country_event = {
+							id = socintern.8
+							days = 1
+						}
+					}
+				}
+			}
+		}
+		#Founding the SocIntern
+		if = {
+			limit = {
+				NOT = {
+					has_global_flag = SOCINTERN_FOUNDED
+				}
+			}
+			custom_effect_tooltip = KOM_suslov_propose_the_socintern_tt
+			hidden_effect = {
+				add_ideas = KOM_socintern_member
+				set_country_flag = SOCINTERN_LEADER
+				THIS = {
+					save_global_event_target_as = SOCINTERN_LEADER_NATION
+				}
+				set_global_flag = SOCINTERN_FOUNDED
+				country_event = {
+					id = socintern.0
+					days = 14
+				}
+				if = {
+					limit = {
+						has_government = communist
+					}
+					set_global_flag = SOCINTERN_COMMUNIST
+					every_other_country = {
+						limit = {
+							comintern_disabled = no
+							OR = {
+								has_government = communist
+								has_government = socialist
+							}
+							NOT = {
+								has_idea = ZZZ_anarchy
+							}
+						}
+						if = {
+							limit = {
+								is_russian_nation = no
+							}
+							country_event = {
+								id = socintern.1
+								days = 3
+								random_hours = 36
+							}
+						}
+						else = {
+							country_event = {
+								id = socintern.2
+								days = 3
+								random_hours = 36
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						has_government = socialist
+					}
+					set_global_flag = SOCINTERN_SOCIALIST
+					every_other_country = {
+						limit = {
+							comintern_disabled = no
+							OR = {
+								has_government = communist
+								has_government = socialist
+							}
+							NOT = {
+								has_idea = ZZZ_anarchy
+							}
+						}
+						if = {
+							limit = {
+								is_russian_nation = no
+							}
+							country_event = {
+								id = socintern.1
+								days = 3
+								random_hours = 36
+							}
+						}
+						else = {
+							country_event = {
+								id = socintern.2
+								days = 3
+								random_hours = 36
+							}
+						}
+					}
+				}
+				every_country = {
+					limit = { is_ai = no }
+					news_event = {
+						id = WORLD.1918
+						days = 3
+					}
+				}
+			}
+		}
+	}
+}
+
+SocIntern_Tabulate_Votes = {
+	if = {
+		limit = {
+			check_variable = { global.SocIntern_yes_votes > global.SocIntern_no_votes }
+		}
+		SocIntern_Vote_Pass_Effects = yes
+	}
+	else = {
+		SocIntern_Vote_Fail_Effects = yes
+	}
+}
+
+SocIntern_Vote_Pass_Effects = {
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_COMECON
+		}
+		### Effects for passed COMECON
+		set_global_flag = COMECON_FOUNDED
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.17
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_NON_AGGRESSION_PACT
+		}
+		### Effects for passed NAP
+		set_global_flag = COM_SOCINTERN_NAP
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.19
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_COMECON_SCIENCE
+		}
+		### Effects for passed COMECON Science Bureau
+		set_global_flag = COMECON_SCIENCE_FOUNDED
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.21
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_INVITATION
+		}
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.23
+				days = 1
+			}
+		}
+		event_target:SOCINTERN_INVITED = {
+			country_event = {
+				id = socintern.1
+				days = 1
+			}
+			set_country_flag = { flag = COM_invited_country value = 1 days = 365 }
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_ASSOCIATESHIP
+		}
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.25
+				days = 1
+			}
+		}
+		event_target:SOCINTERN_INVITED = {
+			country_event = {
+				id = socintern.2
+				days = 1
+			}
+			set_country_flag = { flag = COM_invited_country value = 1 days = 365 }
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_SPHERIFICATION
+		}
+		### Effects for passed COMECON Sphere
+		set_global_flag = COMECON_CENTRALIZED
+		CME = { set_country_flag = HAS_ECON_SPHERE }
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+				NOT = { has_variable = ECON_SPHERE_LEADER }
+			}
+			country_event = {
+				id = socintern.27
+				days = 1
+			}
+		}	
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_SPHERE_INVITATION
+		}
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.33
+				days = 1
+			}
+		}
+		event_target:COMECON_INVITED = {
+			country_event = {
+				id = socintern.35
+				days = 1
+			}
+			set_country_flag = { flag = COM_econ_invited_country value = 1 days = 365 }
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_INTERNATIONAL_BRIGADES
+		}
+		### Effects for passed International Brigades
+		set_global_flag = COM_SOCINTERN_ILD
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.29
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_VOLUNTEERS
+		}
+		event_target:SOCINTERN_VOLUNTEERS = {
+			set_country_flag = COMECON_ASSISTANCE_AVAILABLE
+			clear_global_event_target = SOCINTERN_VOLUNTEERS_PREV
+			save_global_event_target_as = SOCINTERN_VOLUNTEERS_PREV
+		}
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.31
+				days = 1
+			}
+		}
+	}
+	SocIntern_Clear_Vote_Effects = yes
+}
+
+SocIntern_Vote_Fail_Effects = {
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_COMECON
+		}
+		### Effects for failed COMECON
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.18
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_NON_AGGRESSION_PACT
+		}
+		### Effects for failed NAP
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.20
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_COMECON_SCIENCE
+		}
+		### Effects for failed COMECON Science
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.22
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_INVITATION
+		}
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.24
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_ASSOCIATESHIP
+		}
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.26
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_SPHERIFICATION
+		}
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.28
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_SPHERE_INVITATION
+		}
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.34
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_INTERNATIONAL_BRIGADES
+		}
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.30
+				days = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = SOCINTERN_VOTE_VOLUNTEERS
+		}
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			country_event = {
+				id = socintern.32
+				days = 1
+			}
+		}
+	}
+	SocIntern_Clear_Vote_Effects = yes
+}
+
+SocIntern_Clear_Vote_Effects = {
+	set_global_flag = COM_cooldown
+	hidden_effect = {
+		ZZZ = {
+			country_event = {
+				id = socintern.300
+				days = 30
+			}
+		}
+		ZZZ = {
+			set_country_flag = {
+				flag = COM_AI_cooldown
+				days = 50
+				value = 1
+			}
+		}
+	}
+	clr_global_flag = SOCINTERN_VOTE_IN_PROGRESS
+	clr_global_flag = SOCINTERN_VOTE_NON_AGGRESSION_PACT
+	clr_global_flag = SOCINTERN_VOTE_COMECON
+	clr_global_flag = SOCINTERN_VOTE_COMECON_SCIENCE
+	clr_global_flag = SOCINTERN_VOTE_INVITATION
+	clr_global_flag = SOCINTERN_VOTE_INTERNATIONAL_BRIGADES
+	clr_global_flag = SOCINTERN_VOTE_ASSOCIATESHIP
+	clr_global_flag = SOCINTERN_VOTE_SPHERIFICATION
+	clr_global_flag = SOCINTERN_VOTE_SPHERE_INVITATION
+	clr_global_flag = SOCINTERN_VOTE_VOLUNTEERS
+	set_variable = { global.SocIntern_yes_votes = 0 }
+	set_variable = { global.SocIntern_abs_votes = 0 }
+	set_variable = { global.SocIntern_no_votes = 0 }
+	set_variable = { global.SocIntern_total_votes = 0 }
+	every_country = {
+		limit = {
+			has_idea = KOM_socintern_member
+		}
+		set_variable = { socintern_current_vote = 0 }
+	}
+}
+
+SocIntern_Refresh_Arrays = {
+	hidden_effect = {
+		ZZZ = {
+			clear_array = global.COMECON_MEMBERS
+			set_variable = { global.COMINTERNCOUNT = 0 }
+			every_country = {
+				limit = {
+					has_idea = KOM_socintern_member
+					NOT = {
+						tag = ZZZ
+					}
+					exists = yes
+				}
+				add_to_array = { global.COMECON_MEMBERS = THIS }
+				add_to_variable = { global.COMINTERNCOUNT = 1 }
+			}
+			clear_array = global.COMECON_MEMBERS_NO_LEADER
+			every_country = {
+				limit = {
+					has_idea = KOM_socintern_member
+					NOT = {
+						tag = ZZZ
+						has_country_flag = SOCINTERN_LEADER
+					}
+					exists = yes
+				}
+				add_to_array = { global.COMECON_MEMBERS_NO_LEADER = THIS }
+			}
+			clear_array = global.COMECON_ELIGIBLE
+			every_other_country = {
+				limit = {
+					NOT = {
+						has_idea = KOM_socintern_member
+					}
+					OR = {
+						has_government = communist
+						has_government = socialist
+					}
+					NOT = {
+						tag = ZZZ
+					}
+					exists = yes
+				}
+				add_to_array = { global.COMECON_ELIGIBLE = THIS }
+			}
+		}
+	}
+}
+
+SocIntern_Change_Leader = {
+	get_sorted_scored_countries = {
+		scorer = comintern_member_scorer
+		array = global.COMECON_MEMBERS
+	}
+	for_each_scope_loop = {
+		array = global.COMECON_MEMBERS
+		country_event = socintern.400
+	}
+	SocIntern_Refresh_Arrays = yes
+}

@@ -422,6 +422,7 @@ LFB_COX_NC_stage_1_initialize = {
 	set_global_flag = LFB_NC_stage_1 #兰州阶段
 
 	#
+	activate_mission = COX_Liberation_of_Lanzhou_countdown
 	GAN = {
 		add_dynamic_modifier = {
 			modifier = GAN_infiltrated
@@ -510,12 +511,15 @@ LFB_IF_COX_GAN_war_win_effects = {
 	GAN = {
 		clr_country_flag = supply_lines_broken
 	}
-	set_temp_variable = { COX_Lanzhou_integration_calc = Lanzhou_infiltration_index }
-	divide_temp_variable = { COX_Lanzhou_integration_calc = 5 }
-	round_temp_variable = { COX_Lanzhou_integration_calc }
+	set_temp_variable = { 
+		var = temp_integration_calc 
+		value = Lanzhou_infiltration_index 
+	}
+	divide_temp_variable = { temp_integration_calc = 5 }
+	round_temp_variable = temp_integration_calc 
 	add_to_variable = {
 		var = Lanzhou_integration_index
-		value = COX_Lanzhou_integration_calc
+		value = temp_integration_calc
 	}
 	clamp_variable = {
 		var = Lanzhou_integration_index
@@ -595,7 +599,7 @@ LFB_COX_NC_stage_2_initialize = {
 		
 	}
 	set_variable = {
-			Shaanxi_occupied_index = 0
+		Shaanxi_occupied_index = 0
 	}
 	clamp_variable = {
 		var = Shaanxi_occupied_index
@@ -872,7 +876,9 @@ LFB_NC_MEN_civ_war_start_effects = {
 	else_if = {
 		limit = {
 			check_variable = {
-				LFB_NC_MEN_readiness > 6.99
+				var = LFB_NC_MEN_readiness
+				value = 7
+				compare = greater_than_or_equals
 			}
 			check_variable = {
 				LFB_NC_MEN_readiness < 11
@@ -912,7 +918,9 @@ LFB_NC_MEN_civ_war_start_effects = {
 	else_if = {
 		limit = {
 			check_variable = {
-				LFB_NC_MEN_readiness > 10.99
+				var = LFB_NC_MEN_readiness
+				value = 11
+				compare = greater_than_or_equals
 			}
 		}
 		MEA = {
@@ -991,8 +999,8 @@ LFB_NC_GAW_Start_Effects = {
 	clr_global_flag = WI_Warlord_Struggle_begin
 	LFB_GAW_go_eat_dirt_paradox_ai = yes
 	COX = {
-		huabei_attack_start_effects = yes
-		set_country_flag = COX_huabei_attack
+		COX_GAW_GUI_stage_3_initialize = yes
+		set_country_flag = COX_GAW_GUI_Avaliable
 		declare_war_on = { 
 			target = JAP
 			type = annex_everything 
@@ -1277,7 +1285,7 @@ LFB_IF_DCG_COX_Defeat_Effects = {
 	set_global_flag = show_peace_popup_alert
 	add_to_variable = { global.peace_popup_dirty = 1 }
 	COX = {
-		clr_country_flag = COX_huabei_attack_start
+		clr_country_flag = COX_GAW_GUI_Avaliable
 		clr_country_flag = country_has_gui
 	}
 	MEN = {
@@ -1406,7 +1414,7 @@ LFB_IF_DCG_QIN_Spawn_Effects = {
 		transfer_state = 604
 	}
 	604 = {
-		remove_core_of =
+		remove_core_of = GAN
 	}
 }
 LFB_IF_DCG_ETR_Spawn_Effects = {
@@ -1559,9 +1567,36 @@ LFB_IF_DCG_Cleanup_Effects = {
 }
 
 NC_debug_effect = {
-	set_global_flag = LFB_IF_GAW
+	COX = {
+		set_variable = {
+			COX_GAW_GUI_Region_1_Chaos_Increase = 2
+		}
+		set_variable = {
+			COX_GAW_GUI_Region_2_Chaos_Increase = 0
+		}
+		set_variable = {
+			COX_GAW_GUI_Region_1_Chaos = 49
+		}
+		set_variable = {
+			COX_GAW_GUI_Region_2_Chaos = 15
+		}
+		set_variable = {
+			COX_GAW_GUI_Region_1_Advantage = 40
+		}
+		set_variable = {
+			COX_GAW_GUI_Region_2_Advantage = 15
+		}
+		set_variable = {
+			COX_GAW_GUI_Area_Selected = 1
+		}
+	
+		COX_GAW_GUI_update_calc = yes
+		set_country_flag = COX_GAW_GUI_visible
+	}
 }
-
+NC_debug2_effect = {
+	activate_mission = COX_GAW_GUI_MAN_Fort_timer
+}
 
 
 
