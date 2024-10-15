@@ -1,0 +1,627 @@
+###VARIABLE DEFINITIONS
+
+on_actions = {
+	on_startup = {
+		effect = {
+			ZZZ = {
+				country_event = economy.0
+				country_event = { id = economy.2 days = 1 }
+				# Set up month counter for economy graph
+				set_variable = { econ_graph_month = 25 }
+
+				#Alex's inflation cycling
+				set_variable = { xcycling = 0 }
+				set_variable = { ycycling = 0.125 }
+
+				Global_Conflicts_Initalize = yes
+				Espionage_Initialize_Global_Vars = yes
+
+				set_variable = { month_counter = 1 }
+				set_variable = { global.TNO_World_Tension = 0 }
+
+				#TNO_endo_exo_startup = yes
+				TNO_active_endonyms = yes
+				TNO_universal_renamings = yes
+			}
+			
+			## Cold War GUI Stuff
+			# Starting superpowers
+			set_global_flag = skip_super_sorting
+			ZZZ = { econ_recompile_all_spheres = yes }
+			USA = {
+				set_superpower = yes
+				add_dynamic_modifier = { modifier = superpower_jap_usa_tension_modifier }
+				add_dynamic_modifier = { modifier = superpower_ger_usa_tension_modifier }
+			}
+			JAP = {
+				set_superpower = yes
+				add_dynamic_modifier = { modifier = superpower_jap_usa_tension_modifier }
+				add_dynamic_modifier = { modifier = superpower_ger_jap_tension_modifier }
+			}
+			GER = {
+				set_superpower = yes
+				add_dynamic_modifier = { modifier = superpower_ger_usa_tension_modifier }
+				add_dynamic_modifier = { modifier = superpower_ger_jap_tension_modifier }
+			}
+			ZZZ = { Cold_War_GUI_Sort_Superpowers = yes }
+			clr_global_flag = skip_super_sorting
+
+			var:global.TNO_Superpowers^0 = {
+				add_to_variable = { TNO_Cold_War_GUI_Rankings_Tab_Superpower_Entries_Array_Frame = 1 }
+				save_global_event_target_as = Cold_War_GUI_Selected_Superpower
+			}
+			
+			# Sea Zone setup
+			GER = {
+				add_to_array = { CW_SeaZone_Status = 0 } # 0; East Pacific
+				add_to_array = { CW_SeaZone_Status = 0 } # 1; West Pacific
+				add_to_array = { CW_SeaZone_Status = 1 } # 2; South Atlantic
+				add_to_array = { CW_SeaZone_Status = 1 } # 3; North Atlantic
+				add_to_array = { CW_SeaZone_Status = 1 } # 4; North Sea
+				add_to_array = { CW_SeaZone_Status = 0 } # 5; Mediterranean
+				add_to_array = { CW_SeaZone_Status = 1 } # 6; Indian Ocean
+				Cold_War_GUI_PowerProjection_CalculateBonuses = yes
+
+				# This only exists because scripted loc is a fuck
+				add_to_array = { global.PowerProjection_Tags = THIS.id }
+				add_to_array = { global.PowerProjection_X = 277 }
+				add_to_array = { global.PowerProjection_Y = 47 }
+			}
+			USA = {
+				add_to_array = { CW_SeaZone_Status = 1 } # 0; East Pacific
+				add_to_array = { CW_SeaZone_Status = 0 } # 1; West Pacific
+				add_to_array = { CW_SeaZone_Status = 1 } # 2; South Atlantic
+				add_to_array = { CW_SeaZone_Status = 1 } # 3; North Atlantic
+				add_to_array = { CW_SeaZone_Status = 0 } # 4; North Sea
+				add_to_array = { CW_SeaZone_Status = 0 } # 5; Mediterranean
+				add_to_array = { CW_SeaZone_Status = 1 } # 6; Indian Ocean
+				Cold_War_GUI_PowerProjection_CalculateBonuses = yes
+
+				# This only exists because scripted loc is a fuck
+				add_to_array = { global.PowerProjection_Tags = THIS.id }
+				add_to_array = { global.PowerProjection_X = 9 }
+				add_to_array = { global.PowerProjection_Y = 8 }
+
+				set_variable = { USA_GUI_selected_tab = 1 }
+				set_variable = { USA_GUI_selected_tab_sub = 1 }
+				set_variable = { USA_GUI_selected_prev_year = 1960 }
+				USA_GUI_voting_setup = yes
+			}
+			JAP = {
+				add_to_array = { CW_SeaZone_Status = 1 } # 0; East Pacific
+				add_to_array = { CW_SeaZone_Status = 1 } # 1; West Pacific
+				add_to_array = { CW_SeaZone_Status = 0 } # 2; South Atlantic
+				add_to_array = { CW_SeaZone_Status = 0 } # 3; North Atlantic
+				add_to_array = { CW_SeaZone_Status = 0 } # 4; North Sea
+				add_to_array = { CW_SeaZone_Status = 0 } # 5; Mediterranean
+				add_to_array = { CW_SeaZone_Status = 1 } # 6; Indian Ocean
+				Cold_War_GUI_PowerProjection_CalculateBonuses = yes
+
+				# This only exists because scripted loc is a fuck
+				add_to_array = { global.PowerProjection_Tags = THIS.id }
+				add_to_array = { global.PowerProjection_X = 447 }
+				add_to_array = { global.PowerProjection_Y = 49 }
+			}
+			ITA = {
+				add_to_array = { CW_SeaZone_Status = 0 } # 0; East Pacific
+				add_to_array = { CW_SeaZone_Status = 0 } # 1; West Pacific
+				add_to_array = { CW_SeaZone_Status = 0 } # 2; South Atlantic
+				add_to_array = { CW_SeaZone_Status = 0 } # 3; North Atlantic
+				add_to_array = { CW_SeaZone_Status = 0 } # 4; North Sea
+				add_to_array = { CW_SeaZone_Status = 1 } # 5; Mediterranean
+				add_to_array = { CW_SeaZone_Status = 0 } # 6; Indian Ocean
+
+				# This only exists because scripted loc is a fuck
+				add_to_array = { global.PowerProjection_Tags = THIS.id }
+				add_to_array = { global.PowerProjection_X = 278 }
+				add_to_array = { global.PowerProjection_Y = 64 }
+			}
+			every_country = {
+				set_variable = { Cold_War_GUI_SeaZone_SelectedSuperpower = var:global.TNO_Superpowers^0 }
+				set_rule = {
+					desc = rule_blank
+					can_create_collaboration_government = no
+				}
+				set_rule = {
+					desc = rule_blank
+					can_force_government = no
+				}
+				set_rule = {
+					desc = rule_blank
+					can_puppet = no
+				}
+				set_rule = {
+					desc = rule_blank
+					can_join_factions = no
+				}
+				set_rule = {
+					desc = rule_blank
+					can_send_volunteers = yes
+				}
+				set_country_flag = TNO_Cold_War_Display
+			}
+			
+			# The Aleutians Crisis victory section for the Cold War GUI
+			USA = {
+				set_temp_variable = { Victory_ID = 1 }
+				Cold_War_GUI_AddVictory = yes
+			}
+			JAP = {
+				set_temp_variable = { Victory_ID = 1 }
+				Cold_War_GUI_AddVictory = yes
+			}
+
+			# Starting nuclear stockpiles for each of the three superpowers
+			USA = {
+				set_variable = { nuclear_stockpile = 12382 }
+				set_variable = { nuclear_stockpile_min_cap = 3500 }
+				set_variable = { nuclear_stockpile_k = nuclear_stockpile }
+				divide_variable = { nuclear_stockpile_k = 1000 }
+				set_variable = { nuclear_global_coverage = 0.33 }
+				calculate_strike_capability = yes
+			}
+			GER = {
+				set_variable = { nuclear_stockpile = 20102 }
+				set_variable = { nuclear_stockpile_min_cap = 3500 }
+				set_variable = { nuclear_stockpile_k = nuclear_stockpile }
+				divide_variable = { nuclear_stockpile_k = 1000 }
+				set_variable = { nuclear_global_coverage = 0.33 }
+				calculate_strike_capability = yes
+			}
+			JAP = {
+				set_variable = { nuclear_stockpile = 8147 }
+				set_variable = { nuclear_stockpile_min_cap = 3500 }
+				set_variable = { nuclear_stockpile_k = nuclear_stockpile }
+				divide_variable = { nuclear_stockpile_k = 1000 }
+				set_variable = { nuclear_global_coverage = 0.33 }
+				calculate_strike_capability = yes
+			}
+
+			#every_country = {
+			#	if = {
+			#		limit = { check_variable = { modifier@research_speed_factor < 0 } }
+			#		adjust_research_modifier = yes
+			#	}
+			#	if = {
+			#		limit = { check_variable = { modifier@industrial_capacity_factory < 0 } }
+			#		adjust_factory_output_modifier = yes
+			#	}
+			#	if = {
+			#		limit = { check_variable = { modifier@industrial_capacity_dockyard < 0 } }
+			#		adjust_dockyard_output_modifier = yes
+			#	}
+			#	if = {
+			#		limit = { check_variable = { modifier@production_speed_buildings_factor < 0 } }
+			#		adjust_construction_speed_modifier = yes
+			#	}
+			#	if = {
+			#		limit = { check_variable = { modifier@production_factory_max_efficiency_factor < 0.05 } }
+			#		adjust_efficiency_cap_modifier = yes
+			#	}
+			#}
+
+			BUL = {
+				country_event = { id = BUL.1000 days = 2555 random_hours = 30 }
+			}
+
+			AFG = {
+				country_event = { id = AFG.1 days = 424 }
+			}
+
+			ARG = {
+				country_event = { id = ARG.148 days = 178 }
+				country_event = { id = ARG.168 days = 1204 } #date > 1965.04.19
+			}
+
+			URG = {
+				country_event = { id = URG_scripted.1 days = 59 }# 1962 HoG Rotation
+				country_event = { id = URG_scripted.2 days = 328 }# 1962 General Election
+				country_event = { id = URG_scripted.3 days = 424 }# 1962 Governments Taking Power
+				country_event = { id = URG_scripted.4 days = 1427 }# 1965 Lista 15 Primary
+				country_event = { id = URG_scripted.5 days = 1791 }# 1966 Presidential Election
+				country_event = { id = URG_scripted.6 days = 1039 }# 1964 Coup
+				country_event = { id = URG_scripted.11 days = 185 }# Antisemitic Campaign
+			}
+
+			ELS = {
+				country_event = { id = ELS_scripted.1 days = 256 }
+				country_event = { id = ELS_scripted.2 days = 1850 }
+				country_event = { id = ELS_scripted.8 days = 3660 }
+			}
+
+			HON = {
+				country_event = { id = HON_scripted.1 days = 1983 }
+			}
+
+			GUA = {
+				country_event = { id = GUA_scripted.1 days = 438 }
+			}
+
+
+			MCW = {
+				MCW_dynamic_modifiers_setup = yes
+			}
+			# Faction embargoes
+			set_global_flag = ofn_cps_embargo
+			set_global_flag = ofn_pakt_embargo
+			set_global_flag = pakt_cps_embargo
+			set_global_flag = pakt_italy_embargo
+			ZZZ = {
+				# needed for the bellow effect
+				resize_array = { 
+					array = current_superpower_embargoes
+					value = 0
+					size = 6
+				}
+				resize_array = { 
+					array = current_faction_size_1
+					value = 0
+					size = 6
+				}
+				resize_array = { 
+					array = current_faction_size_2
+					value = 0
+					size = 6
+				}
+				update_superpower_embargoes = yes
+			}
+			
+			# foreign policy startup
+			every_country = {
+				resize_array = { world_conflict_guis = 1 }
+			}
+
+			#EVENTS
+			###WORLD EVENTS
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { # TOKYO OLYMPICS
+					id = WORLD.581
+					days = 1027
+				}
+			}
+
+			BRG = {
+				country_event = {
+					id = BRG_Debug.2
+					days = 1
+				}
+			}
+
+			# Tension Tab Setup
+			ZZZ = {
+				TNO_tension_setup = yes
+			}
+
+			USA = {
+				country_event = { # WIF not doing great
+					id = wif_crisis.4
+					days = 440
+					random_days = 3
+				}
+				country_event = { # WIF crisis
+					id = wif_crisis.1
+					days = 1981
+					random_days = 3
+				}
+				country_event = { # Potential Trinidad BPR
+					id = wif_crisis.24
+					days = 3310
+					random_days = 3
+				}
+
+				country_event = { # Runt WIF Collapse
+					id = wif_crisis.37
+					days = 3500
+					random_days = 10
+				}
+
+
+				country_event = { #introduction event to proxies
+					id = USA.49
+					days = 15
+				}
+				country_event = { #introduction event to diplo crises
+					id = USA.50
+					days = 20
+				}
+				country_event = { #introduction event to CIA-FBI rivalry
+					id = USA.131
+					days = 45
+				}
+				country_event = { #Intro to Romney, early '62.
+					id = USA.flavor.28
+					days = 80
+					random_days = 14
+				}
+				country_event = { #Intro to Romney-Mexico chain, May '63.
+					id = USA.flavor.34
+					days = 485
+					random_days = 15
+				}
+				
+				country_event = { # Hoover dies , FBI Vacant
+					id = USA.132
+					days = 3774 
+				}
+				add_dynamic_modifier = { modifier = USA_military_advisors_dynmod }
+				add_dynamic_modifier = { modifier = USA_technician_aid_dynmod }
+				add_dynamic_modifier = { modifier = USA_sabotage_effort_dynmod }
+			}
+			
+			JAP = {
+				country_event = { #First Aleutian Crisis Event
+					id = jap_aleutian.1
+					days = 2
+				}
+				country_event = { #Second Aleutian Crisis Event
+					id = jap_aleutian.2
+					days = 6
+				}
+				country_event = { #Third Aleutian Crisis Event
+					id = jap_aleutian.3
+					days = 9
+				}
+				country_event = { #introduction event to proxies
+					id = USA.49
+					days = 15
+				}
+				country_event = { #introduction event to diplo crises
+					id = USA.50
+					days = 20
+				}
+				country_event = { id = jap_newflavour.1 days = 10 }
+				add_dynamic_modifier = { modifier = JAP_military_advisors_dynmod }
+				add_dynamic_modifier = { modifier = JAP_technician_aid_dynmod }
+				add_dynamic_modifier = { modifier = JAP_sabotage_effort_dynmod }
+			}
+			
+			GER = {
+				country_event = { #intro event to proxies
+					id = USA.49
+					days = 50
+				}
+				country_event = { #introduction event to diplo crises
+					id = USA.50
+					days = 20
+				}
+				add_dynamic_modifier = { modifier = GER_military_advisors_dynmod }
+				add_dynamic_modifier = { modifier = GER_technician_aid_dynmod }
+				add_dynamic_modifier = { modifier = GER_sabotage_effort_dynmod }
+			}
+
+
+			ZZZ = {
+				# NOVELS IN 6 YEARS
+				random_list = {
+					1 = {
+						country_event = { id = novel.1 days = 2191 }
+					}
+					1 = {
+						country_event = { id = novel.2 days = 2191 }
+					}
+					1 = {
+						country_event = { id = novel.3 days = 2191 }
+					}
+					1 = {
+						country_event = { id = novel.4 days = 2191 }
+					}
+					1 = {
+						country_event = { id = novel.5 days = 2191 }
+					}
+				}
+				# NOVELS IN 12 YEARS
+				random_list = {
+					1 = {
+						country_event = { id = novel.10 days = 4383 }
+					}
+					1 = {
+						country_event = { id = novel.11 days = 4383 }
+					}
+					1 = {
+						country_event = { id = novel.12 days = 4383 }
+					}
+					1 = {
+						country_event = { id = novel.13 days = 4383 }
+					}
+				}
+			}
+			# Finland
+			FIN = {
+				diplomatic_relation = {
+					country = ONG
+					relation = guarantee
+					active = yes
+				}
+				add_political_power = 70
+				country_event = { id = FIN_SKELETON.1 days = 551 }
+				country_event = { id = FIN_SKELETON.3 days = 1649 }
+				country_event = { id = FIN_SKELETON.4 days = 1841 }
+				country_event = { id = FIN_SKELETON.5 days = 2743 }
+				country_event = { id = FIN_SKELETON.6 days = 3841 }
+			}
+
+			# Brazil
+			BRA = {
+				country_event = { id = brazil.20 days = 4 }		# Lott
+				country_event = { id = brazil.21 days = 22 }	# Japanese Tourists
+				country_event = { id = brazil.22 days = 40 random = 8 }	# de Barros
+				country_event = { id = brazil.23 days = 48 random = 8 }	# Goulart
+				country_event = { id = brazil.24 days = 78 random = 8 }	# Lacerda
+			
+				country_event = { id = brazil.282 days = 116 random = 8 }	# Kubitschek Intro event
+				
+				
+				#country_event = { id = brazil.415 days = 158 random = 8 }	# Panda Diplomacy
+				country_event = { id = brazil.328 days = 170 random = 5 }	# Kubitschek Followup event
+				country_event = { id = brazil.421 days = 190 random = 5 }	#Brizola and Goulart meet
+				country_event = { id = brazil.26 days = 196 random = 15 }	# Communist party splits
+				country_event = { id = brazil.329 days = 223 random = 10 }	# Kubitschek talks to Brazilian Historians
+			
+				country_event = { id = brazil.502 days = 246 }	#Lott goes to America
+				country_event = { id = brazil.422 days = 253 random = 5 }	#Adhemar campaigning in Guanabara
+				country_event = { id = brazil.27 days = 258 random = 15 }	# Salgado
+				country_event = { id = brazil.424 days = 275 random = 2 }	#Petrobras meeting with Lott
+				country_event = { id = brazil.423 days = 282 random = 2 }	#Andrade confirmation
+				country_event = { id = brazil.330 days = 323 random = 2 }	#Lacerda hunting spider event time
+			
+				country_event = { id = brazil.425 days = 350 random = 3 }	#Wilson talking with German agent
+				country_event = { id = brazil.426 days = 374 random = 4 }	#Lacerda clears the slums
+				country_event = { id = brazil.427 days = 401 random = 3 }	#Papers, please
+				country_event = { id = brazil.428 days = 431 random = 3 }	#Homeless man murdered
+				country_event = { id = brazil.331 days = 456 random = 3 }	#Followup to Homeless man murdered event
+				country_event = { id = brazil.261 days = 463 random = 3 }	#Edna Lott elected
+				country_event = { id = brazil.253 days = 481 random = 2 }	#Start of strikes
+			
+				country_event = { id = brazil.429 days = 529 random = 4 }	#Corruption on trans-amazonian railway
+				country_event = { id = brazil.432 days = 552 random = 2 }	#11th parallel massacre
+				country_event = { id = brazil.262 days = 589 random = 3 }	#Right-wing PSD meeting
+			
+				country_event = { id = brazil.263 days = 656 random = 4 }	#Hitler's Death reaction
+				country_event = { id = brazil.265 days = 677 random = 3 }	#Adhemar vibing, what will he do
+				#country_event = { id = brazil.267 days = 677 random = 3 }	#Followup to Petrobras
+				country_event = { id = brazil.33 days = 764 random = 3 }	# Quadros' Scheme Begins
+				
+				country_event = { id = brazil.11 days = 1010 random = 4 }	# Ancora dies and Frota rises
+				#country_event = { id = brazil.269 days = 1039 random = 3 }	#Followup to sushi getting popular
+				#country_event = { id = brazil.383 days = 1175 random = 3 }	#Dirty Hearts
+				country_event = { id = brazil.270 days = 1211 random = 3 }	#Rede Globo
+				country_event = { id = brazil.1201 days = 1455 random = 4 }	# Denys retires and Figueiredo rises
+
+				country_event = { id = brazil.17 days = 31 }	# Begin '62 elections
+				country_event = { id = brazil.18 days = 280 }	# End '62 elections
+			
+				country_event = { id = brazil.237 days = 1091 }	# Begin '65 presidential election candidate selection
+				country_event = { id = brazil.231 days = 1378 }	# End '65 presidential elections
+			
+				country_event = { id = brazil.323 days = 1430 }
+				country_event = { id = brazil.324 days = 1460 }
+				
+				country_event = { id = brazil.443 days = 1155 } # Communist Attack
+			}
+			# Chile
+			CHL = { add_political_power = 69 }
+
+			# Malaya
+
+			ZZZ = {
+				country_event = { id = sho.21 days = 2920 } # Johor reunification
+			}
+		
+			# Mexico
+			MEX = { 
+				country_event = { id = MEX_Flavor.2 days = 287 } # Radioactive Child
+				country_event = { id = MEX_Flavor.3 days = 121 } # Jaramillos manifesto
+				#country_event = { id = MEX_Flavor.5 days = 10 } # Symbolic ban on nukes
+				country_event = { id = MEX_GPG.2 days = 316 } # Arturo arrives in Dolores, start of GPG chain
+				country_event = { id = MEX_GPG.12 days = 1352 } # Raid on Ciudad Madera planning
+				#country_event = { id = MEX_Ordaz.51 days = 1111 } # check for Ordaz automotive chain event
+			}
+
+			# Central Asia set up
+			###LFB-覆盖中亚框架内容###
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = LFB_Central_Asia_status
+						option = LFB_CA_FRAMEWORK_ENABLED
+					}
+				}
+				USA = {
+					country_event = { id = CA_US.5 days = 1040 }
+				}
+				TRK = {
+					set_country_flag = IS_CA_NATION
+					#country_event = { id = central_asia.1 days = 1040 }
+					country_event = { id = central_asia.100 days = 3291 }
+				}
+				UTL = {
+					country_event = { id = central_asia.7 days = 2344 }
+				}
+				KYR = {
+					set_country_flag = IS_CA_NATION
+					country_event = { id = central_asia.2 days = 860 }
+				}
+				KRK = {
+					set_country_flag = IS_CA_NATION
+					country_event = { id = central_asia.4 days = 580 }
+				}
+				UZB = {
+					set_country_flag = IS_CA_NATION
+					country_event = { id = central_asia.5 days = 710 }
+				}
+				TAJ = {
+					set_country_flag = IS_CA_NATION
+					country_event = { id = central_asia.9 days = 1000 }
+				}
+			}
+			
+
+			#Paradox broke equipment_bonus modifiers for starting ideas
+			#Solution: Add then through on_action
+			FRS = {
+				remove_ideas = FRA_the_treaty_of_vichy
+				add_ideas = FRA_the_treaty_of_vichy
+			}
+			845 = { OWNER = { set_variable = { base_conversion_rate = 5 } } }
+
+			CUB = {
+				country_event = { id = CUB_scripted.1 }
+			}
+
+			#Fixing synth rubber tech bug; effect can only applied when research is completed
+			#This on action 're-researches' the techs in question to properly grant the effect
+			#Fires 1 week into the game so people don't see RUBBER PROCESSING at game start
+			every_country = {
+				limit = { has_tech = rubber_processing }
+				country_event = { id = misc.1 days = 7 }
+			}
+			every_country = {
+				limit = { has_tech = improved_rubber_processing }
+				country_event = { id = misc.2 days = 7 }
+			}
+			every_country = {
+				limit = { has_tech = advanced_rubber_processing }
+				country_event = { id = misc.3 days = 7 }
+			}
+			every_country = {
+				limit = { has_tech = modern_rubber_processing }
+				country_event = { id = misc.4 days = 7 }
+			}
+			every_country = {
+				limit = {
+					TNO_has_content = yes
+					NOT = { is_russian_nation = yes }
+					NOT = { tag = CHL }
+				}
+				random_owned_controlled_state = {
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = thermoelectric_plant
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+
+			for_each_scope_loop = {
+				array = global.countries
+				
+				for_each_scope_loop = {
+					array = global.countries
+					
+					meta_effect = {
+						text = {
+							add_ai_strategy = {
+								id = "[Target_tag]"
+								type = send_volunteers_desire
+								value = 500
+							}
+						}
+						Target_tag = "[PREV.GetTag]"
+					}
+				}
+			}
+		}
+	}
+}
