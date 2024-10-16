@@ -1,0 +1,444 @@
+scripted_gui = {
+	TNO_Country_Info_Screen_Topbar_Opener = {
+		context_type = player_context
+		parent_window_token = top_bar
+		window_name = "TNO_Country_Info_Screen_Topbar_Opener"
+
+		visible = {
+			NOT = { has_global_flag = TNO_my_world_is_on_fire_how_about_yours }
+		}
+
+		effects = {
+			topbar_opening_button_click = {
+				if = {
+					limit = {
+						has_country_flag = TNO_Country_Info_Screen_Visible
+					}
+					clr_country_flag = TNO_Country_Info_Screen_Visible
+				}
+				else = { set_country_flag = TNO_Country_Info_Screen_Visible }
+			}
+		}
+		
+		triggers = {
+			topbar_opening_button_click_enabled = {
+				check_variable = { CountryInfo_array_main^num > 0 }
+			}
+		}
+	}
+	
+	TNO_Country_Info_Screen = {
+		context_type = player_context
+		window_name = "TNO_Country_Info_Screen"
+		visible = { has_country_flag = TNO_Country_Info_Screen_Visible }
+		dynamic_lists = {
+			top_tabs = {
+				array = CountryInfo_top_tab_array
+				entry_container = "CountryInfo_top_tabs_entry"
+				value = d
+			}
+			entry_gridbox = {
+				array = CountryInfo_array_main
+				entry_container = "[CountryInfo_GET_entry_container]"
+				value = f
+				index = g
+			}
+		}
+		
+		### top_tabs shit ###
+		
+		effects = {
+			tab_button_click = {
+				if = {
+					limit = {
+						check_variable = { d = 1 }
+					}
+					clear_array = CountryInfo_array_main
+					for_each_loop = {
+						array = CountryInfo_storage_array
+						add_to_array = { CountryInfo_array_main = v }
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { d = 2 }
+					}
+					clear_array = CountryInfo_array_main
+					for_each_loop = {
+						array = CountryInfo_economic_store
+						add_to_array = { CountryInfo_array_main = v }
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { d = 3 }
+					}
+					clear_array = CountryInfo_array_main
+					for_each_loop = {
+						array = CountryInfo_tutorial_store
+						add_to_array = { CountryInfo_array_main = v }
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { d = 4 }
+					}
+					clear_array = CountryInfo_array_main
+					for_each_loop = {
+						array = CountryInfo_development_store
+						add_to_array = { CountryInfo_array_main = v }
+					}
+					
+					
+				}
+				if = {
+					limit = {
+						NOT = {
+							check_variable = { d = CountryInfo_tab }
+						}
+					}
+					set_variable = { CountryInfo_Selected = 1 }
+					if = {
+						limit = {
+							tag = COX
+							check_variable = { d = 4 }
+							
+						}
+						set_variable = { CountryInfo_Selected = 11 }
+					}
+				}
+				set_variable = { CountryInfo_tab = d }
+				#---LFB fix---#
+				
+				#---end of LFB fix---#
+			}
+			
+		}
+		
+		### top_tabs end ###
+		
+		### entry_gridbox shit ###
+		effects = {
+			Folder_button_click = {
+				## EXPANDS
+				if = {
+					limit = {
+						set_temp_variable = { check = g }
+						add_to_temp_variable = { check = 1 }
+						OR = {
+							check_variable = { CountryInfo_array_main^check > 100 }
+							check_variable = { CountryInfo_array_main^check = 0 }
+						}
+					}
+					
+					# Removes entries after the folder
+					for_each_loop = {
+						array = CountryInfo_array_main
+						if = {
+							limit = {
+								check_variable = { i > g }
+							}
+							add_to_array = { removed = v }
+						}
+					}
+					for_each_loop = {
+						array = removed
+						if = {
+							limit = {
+								is_in_array = { array = CountryInfo_array_main value = v }
+							}
+							remove_from_array = { array = CountryInfo_array_main value = v }
+						}
+					}
+					
+					# Adds all entries inside the folder
+					
+					if = {
+						limit = {
+							check_variable = { CountryInfo_tab = 1 }
+						}
+						meta_effect = {
+							text = {
+								for_each_loop = {
+									array = CountryInfo_folder_country_[FOLDER]
+									add_to_array = { CountryInfo_array_main = v }
+								}
+							}
+							FOLDER = "[?f]"
+						}
+					}
+					else_if = {
+						limit = {
+							check_variable = { CountryInfo_tab = 3 }
+						}
+						meta_effect = {
+							text = {
+								for_each_loop = {
+									array = CountryInfo_folder_tutorial_[FOLDER]
+									add_to_array = { CountryInfo_array_main = v }
+								}
+							}
+							FOLDER = "[?f]"
+						}
+					}
+					else_if = {
+						limit = {
+							check_variable = { CountryInfo_tab = 4 }
+						}
+						meta_effect = {
+							text = {
+								for_each_loop = {
+									array = CountryInfo_folder_development_[FOLDER]
+									add_to_array = { CountryInfo_array_main = v }
+								}
+							}
+							FOLDER = "[?f]"
+						}
+					}
+					
+					# Readds previously removed entries
+					for_each_loop = {
+						array = removed
+						add_to_array = { CountryInfo_array_main = v }
+					}
+					clear_array = removed
+				}
+				# COLLAPSES
+				else = {
+					if = {
+						limit = {
+							check_variable = { CountryInfo_tab = 1 }
+						}
+						meta_effect = {
+							text = {
+								for_each_loop = {
+									array = CountryInfo_folder_country_[FOLDER]
+									if = {
+										limit = {
+											is_in_array = { array = CountryInfo_array_main value = v }
+										}
+										remove_from_array = { array = CountryInfo_array_main value = v }
+									}
+								}
+							}
+							FOLDER = "[?f]"
+						}
+					}
+					else_if = {
+						limit = {
+							check_variable = { CountryInfo_tab = 3 }
+						}
+						meta_effect = {
+							text = {
+								for_each_loop = {
+									array = CountryInfo_folder_tutorial_[FOLDER]
+									if = {
+										limit = {
+											is_in_array = { array = CountryInfo_array_main value = v }
+										}
+										remove_from_array = { array = CountryInfo_array_main value = v }
+									}
+								}
+							}
+							FOLDER = "[?f]"
+						}
+					}
+					else_if = {
+						limit = {
+							check_variable = { CountryInfo_tab = 4 }
+						}
+						meta_effect = {
+							text = {
+								for_each_loop = {
+									array = CountryInfo_folder_development_[FOLDER]
+									if = {
+										limit = {
+											is_in_array = { array = CountryInfo_array_main value = v }
+										}
+										remove_from_array = { array = CountryInfo_array_main value = v }
+									}
+								}
+							}
+							FOLDER = "[?f]"
+						}
+					}
+				}
+			}
+			Content_button_click = {
+				set_variable = { CountryInfo_Selected = f }
+			}
+		}
+		
+		### entry_gridbox end ###
+		
+		## Frame control
+		
+		triggers = {
+			Content_button_visible = {
+				if = {
+					limit = {
+						check_variable = { CountryInfo_Selected = f }
+					}
+					set_temp_variable = { content_frame = 2 }
+				}
+				else = {
+					set_temp_variable = { content_frame = 1 }
+				}
+			}
+			Folder_button_visible = {
+				if = {
+					limit = {
+						set_temp_variable = { f_check = g }
+						add_to_temp_variable = { f_check = 1 }
+						OR = {
+							check_variable = { CountryInfo_array_main^f_check > 100 }
+							check_variable = { CountryInfo_array_main^f_check = 0 }
+						}
+					}
+					set_temp_variable = { folder_frame = 1 }
+				}
+				else = {
+					set_temp_variable = { folder_frame = 2 }
+				}
+			}
+			tab_button_visible = {
+				if = {
+					limit = {
+						check_variable = { CountryInfo_tab = d }
+					}
+					set_temp_variable = { tab_frame = 1 }
+					set_temp_variable = { tab_icon_y = 9 }
+				}
+				else = {
+					set_temp_variable = { tab_frame = 2 }
+					set_temp_variable = { tab_icon_y = 14 }
+				}
+			}
+		}
+		
+		triggers = {
+			Content_glow_visible = {
+				NOT = { has_variable = CountryInfo_Selected }
+			}
+		}
+		
+		## Gridboxes end ###
+		
+		effects = {
+			close_button_click = {
+				clr_country_flag = TNO_Country_Info_Screen_Visible
+			}
+		}
+		
+		triggers = {
+			center_title_visible = {
+				has_variable = CountryInfo_Selected
+				NOT = {
+					AND = {
+						check_variable = { CountryInfo_Selected = 1 }
+						check_variable = { CountryInfo_tab = 2 }
+					}
+				}
+			}
+			center_desc_visible = {
+				has_variable = CountryInfo_Selected
+				NOT = {
+					AND = {
+						check_variable = { CountryInfo_Selected = 1 }
+						check_variable = { CountryInfo_tab = 2 }
+					}
+				}
+			}
+			
+			TNO_discord_button_visible = {
+				check_variable = { CountryInfo_Selected = 1 }
+				check_variable = { CountryInfo_tab = 4 }
+			}
+			TNO_reddit_button_visible = {
+				check_variable = { CountryInfo_Selected = 1 }
+				check_variable = { CountryInfo_tab = 4 }
+			}
+			TNO_youtube_button_visible = {
+				check_variable = { CountryInfo_Selected = 1 }
+				check_variable = { CountryInfo_tab = 4 }
+			}
+			TNO_twitter_button_visible = {
+				check_variable = { CountryInfo_Selected = 1 }
+				check_variable = { CountryInfo_tab = 4 }
+			}
+			TNO_twitch_button_visible = {
+				check_variable = { CountryInfo_Selected = 1 }
+				check_variable = { CountryInfo_tab = 4 }
+			}
+			TNO_tvtropes_button_visible = {
+				check_variable = { CountryInfo_Selected = 1 }
+				check_variable = { CountryInfo_tab = 4 }
+			}
+		}
+		#-------------LFB社交媒体-------------#
+		triggers = {
+			TNO_LFB_Discord_Botton_visible = {
+				check_variable = { CountryInfo_Selected = 11 }
+				check_variable = { CountryInfo_tab = 4 }
+			}
+			TNO_LFB_Bilibili_button_visible = {
+				check_variable = { CountryInfo_Selected = 11 }
+				check_variable = { CountryInfo_tab = 4 }
+			}
+			TNO_LFB_Zhihu_button_visible = {
+				check_variable = { CountryInfo_Selected = 11 }
+				check_variable = { CountryInfo_tab = 4 }
+			}
+		}
+		
+		properties = {
+			flag = 				{ image = "[ROOT.GetFlag]" }
+			poster = 			{ image = "[GET_POSTER]" }
+			
+			# Left folder
+			Folder_button = 	{ frame = folder_frame }
+			Content_button = 	{ frame = content_frame }
+			
+			# Top tabs
+			tab_button = {
+				frame = tab_frame
+			}
+			tab_icon = {
+				image = "GFX_CountryInfo_top_tabs_icon_[?d]"
+				y = tab_icon_y
+				frame = tab_frame
+			}
+			tab_text= {
+				y = tab_icon_y
+			}
+		}
+	}
+	
+	TNO_Country_Info_Screen_Signal_Lost = {
+		window_name = TNO_Country_Info_Screen_Signal_Lost
+		context_type = player_context
+		parent_window_name = TNO_Country_Info_Screen
+		visible = {
+			NOT = { has_country_flag = TNO_Country_Info_Screen_Visible }
+		}
+	}
+	
+	TNO_Country_Info_Screen_Opening_Logo = {
+		window_name = TNO_Country_Info_Screen_Opening_Logo
+		context_type = player_context
+		parent_window_name = TNO_Country_Info_Screen
+		visible = {
+			NOT = { has_variable = CountryInfo_Selected }
+		}
+	}
+	
+	TNO_Country_Info_Screen_Economic_Data = {
+		parent_window_name = TNO_Country_Info_Screen
+		window_name = "TNO_Country_Info_Screen_Economic_Data"
+		context_type = player_context
+		visible = {
+			check_variable = { CountryInfo_Selected = 1 }
+			check_variable = { CountryInfo_tab = 2 }
+		}
+	}
+}
