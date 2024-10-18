@@ -6,5 +6,5 @@ dependencies={
 	"The New Order: Last Days of Europe"
             "The New Order: Last Days of Europe(CN.Ver)"
 }
-name="lfb_dev"
+name="Light from Lake Baikal"
 supported_version="1.14.*"
