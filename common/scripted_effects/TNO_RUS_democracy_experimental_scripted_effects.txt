@@ -1,0 +1,2974 @@
+RUS_initialize_regional_election_system = { #Fires at game start.
+
+	#GLOBAL BONUS POPULARITIES
+	set_variable = { RUS_socdem_global_bonus_pop = 0 }
+	set_variable = { RUS_auth_global_bonus_pop = 0 }
+	set_variable = { RUS_liberal_global_bonus_pop = 0 }
+	set_variable = { RUS_conservative_global_bonus_pop = 0 }
+	set_variable = { RUS_libcon_global_bonus_pop = 0 }
+
+	every_owned_state = {
+		set_variable = { RUS_general_state_turnout = 1 }
+		set_variable = { RUS_socdem_state_turnout = 1 }
+		set_variable = { RUS_auth_state_turnout = 1 }
+		set_variable = { RUS_liberal_state_turnout = 1 }
+		set_variable = { RUS_conservative_state_turnout = 1 }
+		set_variable = { RUS_libcon_state_turnout = 1 }
+	}
+}
+
+RUS_generate_state_party_pops = { #Fires at game start, and when a democratic warlord absorbs another warlord.
+	set_variable = { RUS_state_conservative_pop = PREV.party_popularity@conservatism }
+	set_variable = { RUS_state_liberal_pop = PREV.party_popularity@liberalism }
+	set_variable = { RUS_state_socdem_pop = PREV.party_popularity@progressivism }
+	set_variable = { RUS_state_libcon_pop = PREV.party_popularity@liberal_conservatism }
+	set_variable = { RUS_state_auth_pop = 0 }
+	set_temp_variable = { RUS_state_socialist_temp_pop = PREV.party_popularity@socialist }
+	set_temp_variable = { RUS_state_communist_temp_pop = PREV.party_popularity@communist }
+	set_temp_variable = { RUS_state_despotism_temp_pop = PREV.party_popularity@despotism }
+	set_temp_variable = { RUS_state_auth_temp_pop = PREV.party_popularity@paternalism }
+	set_temp_variable = { RUS_state_fascism_temp_pop = PREV.party_popularity@fascism }
+	set_temp_variable = { RUS_state_natsoc_temp_pop = PREV.party_popularity@national_socialism }
+	set_temp_variable = { RUS_state_ultranat_temp_pop = PREV.party_popularity@ultranationalism }
+
+	#Calculations for Party Fracturing
+	set_temp_variable = { RUS_state_socialist_socdem_fraction = RUS_state_socialist_temp_pop }
+	set_temp_variable = { RUS_state_socialist_liberal_fraction = RUS_state_socialist_temp_pop }
+	set_temp_variable = { RUS_state_communist_socdem_fraction = RUS_state_communist_temp_pop }
+	set_temp_variable = { RUS_state_communist_auth_fraction = RUS_state_communist_temp_pop }
+	set_temp_variable = { RUS_state_communist_liberal_fraction = RUS_state_communist_temp_pop }
+	set_temp_variable = { RUS_state_fascism_conservative_fraction = RUS_state_fascism_temp_pop }
+	set_temp_variable = { RUS_state_fascism_auth_fraction = RUS_state_fascism_temp_pop }
+	set_temp_variable = { RUS_state_natsoc_conservative_fraction = RUS_state_natsoc_temp_pop }
+	set_temp_variable = { RUS_state_natsoc_auth_fraction = RUS_state_natsoc_temp_pop }
+	set_temp_variable = { RUS_state_ultranat_conservative_fraction = RUS_state_ultranat_temp_pop }
+	set_temp_variable = { RUS_state_ultranat_auth_fraction = RUS_state_ultranat_temp_pop }
+	set_temp_variable = { RUS_state_despotism_socdem_fraction = RUS_state_despotism_temp_pop }
+	set_temp_variable = { RUS_state_despotism_conservative_fraction = RUS_state_despotism_temp_pop }
+	set_temp_variable = { RUS_state_despotism_auth_fraction = RUS_state_despotism_temp_pop }
+	set_temp_variable = { RUS_state_auth_socdem_fraction = RUS_state_auth_temp_pop }
+	set_temp_variable = { RUS_state_auth_conservative_fraction = RUS_state_auth_temp_pop }
+	set_temp_variable = { RUS_state_auth_auth_fraction = RUS_state_auth_temp_pop }
+	set_temp_variable = { RUS_state_auth_liberal_fraction = RUS_state_auth_temp_pop }
+	set_temp_variable = { RUS_state_burgsys_conservative_fraction = RUS_state_burgsys_temp_pop }
+	set_temp_variable = { RUS_state_burgsys_auth_fraction = RUS_state_burgsys_temp_pop }
+
+	#Breakdowns for Party Fracturing
+	multiply_temp_variable = { RUS_state_socialist_socdem_fraction = 0.75 }
+	multiply_temp_variable = { RUS_state_socialist_liberal_fraction = 0.25 }
+	multiply_temp_variable = { RUS_state_communist_socdem_fraction = 0.75 }
+	multiply_temp_variable = { RUS_state_communist_auth_fraction = 0.15 }
+	multiply_temp_variable = { RUS_state_communist_liberal_fraction = 0.10 }
+	multiply_temp_variable = { RUS_state_fascism_conservative_fraction = 0.7 }
+	multiply_temp_variable = { RUS_state_fascism_auth_fraction = 0.3 }
+	multiply_temp_variable = { RUS_state_natsoc_conservative_fraction = 0.7 }
+	multiply_temp_variable = { RUS_state_natsoc_auth_fraction = 0.3 }
+	multiply_temp_variable = { RUS_state_ultranat_conservative_fraction = 0.65 }
+	multiply_temp_variable = { RUS_state_ultranat_auth_fraction = 0.35 }
+	multiply_temp_variable = { RUS_state_despotism_socdem_fraction = 0.2 }
+	multiply_temp_variable = { RUS_state_despotism_conservative_fraction = 0.2 }
+	multiply_temp_variable = { RUS_state_despotism_liberal_fraction = 0.2 }
+	multiply_temp_variable = { RUS_state_despotism_auth_fraction = 0.4 }
+	multiply_temp_variable = { RUS_state_auth_socdem_fraction = 0.1 }
+	multiply_temp_variable = { RUS_state_auth_conservative_fraction = 0.2 }
+	multiply_temp_variable = { RUS_state_auth_liberal_fraction = 0.2 }
+	multiply_temp_variable = { RUS_state_auth_auth_fraction = 0.5 }
+	multiply_temp_variable = { RUS_state_burgsys_conservative_fraction = 0.8 }
+	multiply_temp_variable = { RUS_state_burgsys_auth_fraction = 0.2 }
+
+	#Adding fractured parties to democratic parties
+	add_to_variable = { RUS_state_conservative_pop = RUS_state_fascism_conservative_fraction }
+	add_to_variable = { RUS_state_conservative_pop = RUS_state_natsoc_conservative_fraction }
+	add_to_variable = { RUS_state_conservative_pop = RUS_state_ultranat_conservative_fraction }
+	add_to_variable = { RUS_state_conservative_pop = RUS_state_despotism_conservative_fraction }
+	add_to_variable = { RUS_state_liberal_pop = RUS_state_socialist_liberal_fraction }
+	add_to_variable = { RUS_state_liberal_pop = RUS_state_communist_liberal_fraction }
+	add_to_variable = { RUS_state_liberal_pop = RUS_state_despotism_liberal_fraction }
+	add_to_variable = { RUS_state_auth_pop = RUS_state_communist_auth_fraction }
+	add_to_variable = { RUS_state_auth_pop = RUS_state_fascism_auth_fraction }
+	add_to_variable = { RUS_state_auth_pop = RUS_state_ultranat_auth_fraction }
+	add_to_variable = { RUS_state_auth_pop = RUS_state_despotism_auth_fraction }
+	add_to_variable = { RUS_state_auth_pop = RUS_state_auth_socdem_fraction }
+	add_to_variable = { RUS_state_auth_pop = RUS_state_auth_conservative_fraction }
+	add_to_variable = { RUS_state_auth_pop = RUS_state_auth_liberal_fraction }
+	add_to_variable = { RUS_state_auth_pop = RUS_state_auth_liberal_fraction }
+	add_to_variable = { RUS_state_socdem_pop = RUS_state_socialist_socdem_fraction }
+	add_to_variable = { RUS_state_socdem_pop = RUS_state_communist_socdem_fraction }
+	add_to_variable = { RUS_state_socdem_pop = RUS_state_despotism_socdem_fraction }
+
+	#Defining temporary state pop variables (to be reset by election)
+	set_variable = { RUS_state_socdem_temp_pop = 0 }
+	set_variable = { RUS_state_auth_temp_pop = 0 }
+	set_variable = { RUS_state_liberal_temp_pop = 0 }
+	set_variable = { RUS_state_conservative_temp_pop = 0 }
+	set_variable = { RUS_state_libcon_temp_pop = 0 }
+
+	if = {
+		limit = {
+			OWNER = {
+				has_government = communist
+				has_government = socialist
+			}
+		}
+		multiply_variable = { RUS_state_socdem_pop = 1.1 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = progressivism
+			}
+		}
+		multiply_variable = { RUS_state_socdem_pop = 1.15 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberalism
+			}
+		}
+		multiply_variable = { RUS_state_liberal_pop = 1.15 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = conservatism
+			}
+		}
+		multiply_variable = { RUS_state_conservative_pop = 1.15 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberal_conservatism
+			}
+		}
+		multiply_variable = { RUS_state_libcon_pop = 1.15 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = paternalism
+			}
+		}
+		multiply_variable = { RUS_state_conservative_pop = 1.05 }
+		multiply_variable = { RUS_state_libcon_pop = 1.05 }
+		multiply_variable = { RUS_state_auth_pop = 1.05 }
+		multiply_variable = { RUS_state_socdem_pop = 1.05 }
+		multiply_variable = { RUS_state_liberal_pop = 1.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = despotism
+			}
+		}
+		multiply_variable = { RUS_state_conservative_pop = 1.05 }
+		multiply_variable = { RUS_state_libcon_pop = 1.05 }
+		multiply_variable = { RUS_state_auth_pop = 1.05 }
+		multiply_variable = { RUS_state_socdem_pop = 1.05 }
+		multiply_variable = { RUS_state_liberal_pop = 1.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				OR = {
+					has_government = fascism
+					has_government = ultranationalism
+					has_government = national_socialism
+				}
+			}
+		}
+		multiply_variable = { RUS_state_conservative_pop = 1.1 }
+		multiply_variable = { RUS_state_libcon_pop = 1.05 }
+	}
+
+	#It's the 1960s.
+	if = {
+		limit = {
+			OR = {
+				has_state_category = town
+				has_state_category = rural
+				has_state_category = pastoral
+				has_state_category = wasteland
+			}
+		}
+		multiply_variable = { RUS_state_conservative_pop = 1.3 }
+		multiply_variable = { RUS_state_libcon_pop = 1.15 }
+	}
+	else = {
+		multiply_variable = { RUS_state_conservative_pop = 1.15 }
+		multiply_variable = { RUS_state_libcon_pop = 1.10 }
+	}
+
+	#Compensating for half of Russia being AuthDem
+	if = {
+		limit = {
+			check_variable = { RUS_state_auth_pop > 0 }
+		}
+		multiply_variable = { RUS_state_auth_pop = 0.8 }
+	}
+
+	RUS_get_state_special_party_pop = yes
+}
+
+RUS_adjust_state_party_pops = {
+	if = {
+		limit = {
+			OWNER = {
+				has_government = communist
+				has_government = socialist
+			}
+		}
+		add_to_variable = { RUS_state_socdem_pop = 0.07 }
+		multiply_variable = { RUS_state_socdem_pop = 1.1 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = progressivism
+			}
+		}
+		add_to_variable = { RUS_state_socdem_pop = 0.07 }
+		multiply_variable = { RUS_state_socdem_pop = 1.15 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberalism
+			}
+		}
+		add_to_variable = { RUS_state_liberal_pop = 0.07 }
+		multiply_variable = { RUS_state_liberal_pop = 1.15 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = conservatism
+			}
+		}
+		add_to_variable = { RUS_state_conservative_pop = 0.07 }
+		multiply_variable = { RUS_state_conservative_pop = 1.15 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberal_conservatism
+			}
+		}
+		add_to_variable = { RUS_state_libcon_pop = 0.07 }
+		multiply_variable = { RUS_state_libcon_pop = 1.15 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = paternalism
+			}
+		}
+		multiply_variable = { RUS_state_conservative_pop = 1.05 }
+		multiply_variable = { RUS_state_libcon_pop = 1.05 }
+		multiply_variable = { RUS_state_auth_pop = 1.05 }
+		multiply_variable = { RUS_state_socdem_pop = 1.05 }
+		multiply_variable = { RUS_state_liberal_pop = 1.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = despotism
+			}
+		}
+		multiply_variable = { RUS_state_conservative_pop = 1.05 }
+		multiply_variable = { RUS_state_libcon_pop = 1.05 }
+		multiply_variable = { RUS_state_auth_pop = 1.05 }
+		multiply_variable = { RUS_state_socdem_pop = 1.05 }
+		multiply_variable = { RUS_state_liberal_pop = 1.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				OR = {
+					has_government = fascism
+					has_government = ultranationalism
+					has_government = national_socialism
+				}
+			}
+		}
+		add_to_variable = { RUS_state_conservative_pop = 0.07 }
+		multiply_variable = { RUS_state_conservative_pop = 1.1 }
+	}
+}
+
+RUS_get_state_special_party_pop = { #Fired every month, to update pops with material conditions
+	set_variable = { RUS_state_socdem_condition_pop = 0 }
+	set_variable = { RUS_state_auth_condition_pop = 0 }
+	set_variable = { RUS_state_liberal_condition_pop = 0 }
+	set_variable = { RUS_state_conservative_condition_pop = 0 }
+	set_variable = { RUS_state_libcon_condition_pop = 0 }
+
+	#Capitals should usually vote for the ruling party
+	if = {
+		limit = {
+			is_capital = yes
+		}
+		if = {
+			limit = {
+				OWNER = {
+					OR = {
+						has_government = communist
+						has_government = socialist
+						has_government = progressivism
+					}
+				}
+			}
+			add_to_variable = { RUS_state_socdem_condition_pop = 0.15 }
+			multiply_variable = { RUS_state_socdem_condition_pop = 1.5 }
+		}
+		if = {
+			limit = {
+				OWNER = {
+					OR = {
+						has_government = liberalism
+					}
+				}
+			}
+			add_to_variable = { RUS_state_liberal_condition_pop = 0.15 }
+			multiply_variable = { RUS_state_liberal_condition_pop = 1.5 }
+		}
+		if = {
+			limit = {
+				OWNER = {
+					OR = {
+						has_government = conservatism
+						has_government = fascism
+						has_government = ultranationalism
+						has_government = national_socialism
+					}
+				}
+			}
+			add_to_variable = { RUS_state_conservative_condition_pop = 0.15 }
+			multiply_variable = { RUS_state_conservative_condition_pop = 1.5 }
+		}
+		if = {
+			limit = {
+				OWNER = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+			}
+			add_to_variable = { RUS_state_auth_condition_pop = 0.15 }
+			multiply_variable = { RUS_state_auth_condition_pop = 1.5 }
+			add_to_variable = { RUS_state_libcon_condition_pop = 0.15 }
+			multiply_variable = { RUS_state_libcon_condition_pop = 1.5 }
+		}
+	}
+
+	#State categories - rural states are more rightist
+	if = {
+		limit = {
+			has_state_category = wasteland
+		}
+		add_to_variable = { RUS_state_conservative_condition_pop = 0.2 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 1.4 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 0.6 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 0.8 }
+	}
+	if = {
+		limit = {
+			has_state_category = pastoral
+		}
+		add_to_variable = { RUS_state_conservative_condition_pop = 0.15 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 1.3 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 0.7 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 0.85 }
+	}
+	if = {
+		limit = {
+			has_state_category = rural
+		}
+		add_to_variable = { RUS_state_conservative_condition_pop = 0.1 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 1.2 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 0.8 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 0.9 }
+	}
+	if = {
+		limit = {
+			has_state_category = town
+		}
+		add_to_variable = { RUS_state_conservative_condition_pop = 0.05 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 1.1 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 0.9 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 0.95 }
+	}
+	if = {
+		limit = {
+			has_state_category = large_town
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.05 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 0.9 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1.1 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 1.05 }
+	}
+	if = {
+		limit = {
+			has_state_category = city
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.1 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 0.8 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1.2 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 1.1 }
+	}
+	if = {
+		limit = {
+			has_state_category = large_city
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.15 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 0.7 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1.3 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 1.15 }
+	}
+	if = {
+		limit = {
+			has_state_category = metropolis
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.20 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 0.6 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1.4 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 1.2 }
+	}
+	if = {
+		limit = {
+			has_state_category = megalopolis
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.25 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 0.5 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1.5 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 0.10 }
+	}
+
+	#Education makes states more leftist or rightist, depending
+	if = {
+		limit = {
+			OWNER = {
+				has_idea = tno_academic_base_mass_illiteracy
+			}
+		}
+		multiply_variable = { RUS_state_conservative_condition_pop = 1.5 }
+		multiply_variable = { RUS_state_auth_condition_pop = 1.25 }
+		multiply_variable = { RUS_state_libcon_condition_pop = 1.25 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 0.5 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 0.75 }
+	}
+	else_if = {
+		limit = {
+			OWNER = {
+				has_idea = tno_academic_base_basic_literacy
+			}
+		}
+		multiply_variable = { RUS_state_conservative_condition_pop = 1.25 }
+		multiply_variable = { RUS_state_auth_condition_pop = 1.1 }
+		multiply_variable = { RUS_state_libcon_condition_pop = 1.1 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 0.75 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 0.9 }
+	}
+	else_if = {
+		limit = {
+			OWNER = {
+				has_idea = tno_academic_base_primary_schooling
+			}
+		}
+		multiply_variable = { RUS_state_conservative_condition_pop = 1 }
+		multiply_variable = { RUS_state_auth_condition_pop = 1 }
+		multiply_variable = { RUS_state_libcon_condition_pop = 1 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 1 }
+	}
+	else_if = {
+		limit = {
+			OWNER = {
+				has_idea = tno_academic_base_secondary_schooling
+			}
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.05 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 0.75 }
+		multiply_variable = { RUS_state_auth_condition_pop = 0.9 }
+		multiply_variable = { RUS_state_libcon_condition_pop = 0.9 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1.25 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 1.1 }
+	}
+	else_if = {
+		limit = {
+			OWNER = {
+				has_idea = tno_academic_base_tertiary_schooling
+			}
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.075 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 0.5 }
+		multiply_variable = { RUS_state_auth_condition_pop = 0.75 }
+		multiply_variable = { RUS_state_libcon_condition_pop = 0.75 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1.5 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 1.25 }
+	}
+	else_if = {
+		limit = {
+			OWNER = {
+				has_idea = tno_academic_base_golden_age
+			}
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.15 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 0.25 }
+		multiply_variable = { RUS_state_auth_condition_pop = 0.5 }
+		multiply_variable = { RUS_state_libcon_condition_pop = 0.5 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1.75 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 1.5 }
+	}
+
+	#Religion causes conservatism
+	if = {
+		limit = {
+			OWNER = {
+				has_idea = tno_religious_rights_state_religion
+			}
+		}
+		add_to_variable = { RUS_state_conservative_condition_pop = 0.1 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 1.35 }
+		multiply_variable = { RUS_state_auth_condition_pop = 1.15 }
+		multiply_variable = { RUS_state_libcon_condition_pop = 1.15 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 0.75 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 0.75 }
+	}
+	else_if = {
+		limit = {
+			OWNER = {
+				has_idea = tno_religious_rights_pluralism
+			}
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.025 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 1.15 }
+		multiply_variable = { RUS_state_auth_condition_pop = 1.05 }
+		multiply_variable = { RUS_state_libcon_condition_pop = 1.05 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 0.90 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 0.90 }
+	}
+	else_if = {
+		limit = {
+			OWNER = {
+				has_idea = tno_religious_rights_secularism
+			}
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.05 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 0.85 }
+		multiply_variable = { RUS_state_auth_condition_pop = 0.95 }
+		multiply_variable = { RUS_state_libcon_condition_pop = 0.95 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1.1 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 1.1 }
+	}
+	else_if = {
+		limit = {
+			OWNER = {
+				has_idea = tno_religious_rights_state_atheism
+			}
+		}
+		add_to_variable = { RUS_state_liberal_condition_pop = 0.075 }
+		multiply_variable = { RUS_state_conservative_condition_pop = 0.65 }
+		multiply_variable = { RUS_state_auth_condition_pop = 0.85 }
+		multiply_variable = { RUS_state_libcon_condition_pop = 0.85 }
+		multiply_variable = { RUS_state_liberal_condition_pop = 1.25 }
+		multiply_variable = { RUS_state_socdem_condition_pop = 1.25 }
+	}
+
+	RUS_get_final_popularities = yes
+}
+
+#Calculates polling averages - to clear later
+RUS_calculate_polling_averages = {
+	set_variable = { RUS_state_socdem_final_poll_pop = RUS_state_socdem_pop }
+	set_variable = { RUS_state_auth_final_poll_pop = RUS_state_auth_pop }
+	set_variable = { RUS_state_libcon_final_poll_pop = RUS_state_auth_pop }
+	set_variable = { RUS_state_liberal_final_poll_pop = RUS_state_liberal_pop }
+	set_variable = { RUS_state_conservative_final_poll_pop = RUS_state_conservative_pop }
+
+	add_to_variable = { RUS_state_socdem_final_poll_pop = RUS_state_socdem_condition_pop }
+	add_to_variable = { RUS_state_auth_final_poll_pop = RUS_state_auth_condition_pop }
+	add_to_variable = { RUS_state_libcon_final_poll_pop = RUS_state_auth_condition_pop }
+	add_to_variable = { RUS_state_liberal_final_poll_pop = RUS_state_liberal_condition_pop }
+	add_to_variable = { RUS_state_conservative_final_poll_pop = RUS_state_conservative_condition_pop }
+
+	add_to_variable = { RUS_state_socdem_final_poll_pop = RUS_state_socdem_temp_pop }
+	add_to_variable = { RUS_state_auth_final_poll_pop = RUS_state_auth_temp_pop }
+	add_to_variable = { RUS_state_libcon_final_poll_pop = RUS_state_auth_temp_pop }
+	add_to_variable = { RUS_state_liberal_final_poll_pop = RUS_state_liberal_temp_pop }
+	add_to_variable = { RUS_state_conservative_final_poll_pop = RUS_state_conservative_temp_pop }
+
+	add_to_variable = { RUS_state_socdem_final_poll_pop = PREV.RUS_socdem_global_bonus_pop }
+	add_to_variable = { RUS_state_auth_final_poll_pop = PREV.RUS_auth_global_bonus_pop }
+	add_to_variable = { RUS_state_libcon_final_poll_pop = PREV.RUS_auth_global_bonus_pop }
+	add_to_variable = { RUS_state_liberal_final_poll_pop = PREV.RUS_liberal_global_bonus_pop }
+	add_to_variable = { RUS_state_conservative_final_poll_pop = PREV.RUS_conservative_global_bonus_pop }
+
+	#PSD is a disaster of a political party
+	if = {
+		limit = {
+			OWNER = {
+				tag = KOM
+			}
+		}
+		set_temp_variable = { PSD_unity_multiplier = KOM.KOM_PSD_unity }
+		divide_temp_variable = { PSD_unity_multiplier = 100 }
+		add_to_temp_variable = { PSD_unity_multiplier = 0.3 }
+		multiply_variable = { RUS_state_auth_final_poll_pop = PSD_unity_multiplier }
+	}
+
+	#Komi conservatives get distributed
+	if = {
+		limit = {
+			OWNER = {
+				tag = KOM
+			}
+		}
+		clamp_variable = { var = RUS_state_conservative_final_poll_pop min = 0 max = 0.5 }
+		set_temp_variable = { KOM_conservative_to_liberal_poll_pop = RUS_state_conservative_final_poll_pop }
+		set_temp_variable = { KOM_conservative_to_socdem_poll_pop = RUS_state_conservative_final_poll_pop }
+		set_temp_variable = { KOM_conservative_to_libcon_poll_pop = RUS_state_conservative_final_poll_pop }
+		if = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+				}
+			}
+			divide_temp_variable = { KOM_conservative_to_liberal_poll_pop = 5 }
+			divide_temp_variable = { KOM_conservative_to_socdem_poll_pop = 3 }
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_state_category = town
+					has_state_category = rural
+					has_state_category = pastoral
+					has_state_category = wasteland
+				}
+			}
+			divide_temp_variable = { KOM_conservative_to_liberal_poll_pop = 6 }
+			divide_temp_variable = { KOM_conservative_to_socdem_poll_pop = 3 }
+		}
+
+		#PSD is a disaster of a political party
+		set_temp_variable = { PSD_conservative_multiplier = KOM.KOM_PSD_right_power }
+		divide_temp_variable = { PSD_right_multiplier = 100 }
+		add_to_temp_variable = { PSD_right_multiplier = 0.3 }
+		multiply_temp_variable = { KOM_conservative_to_libcon_poll_pop = PSD_right_multiplier }
+		clamp_variable = { var = KOM_conservative_to_libcon_poll_pop min = 0 max = RUS_state_conservative_final_poll_pop }
+
+		add_to_variable = { RUS_state_socdem_final_poll_pop = KOM_conservative_to_socdem_poll_pop }
+		add_to_variable = { RUS_state_libcon_final_poll_pop = KOM_conservative_to_libcon_poll_pop }
+		add_to_variable = { RUS_state_liberal_final_poll_pop = KOM_conservative_to_liberal_poll_pop }
+
+		set_variable = { RUS_state_conservative_final_poll_pop = 0 }
+	}
+
+	#Vyatka SocDems get distributed
+	if = {
+		limit = {
+			OWNER = {
+				tag = VYT
+			}
+		}
+		clamp_variable = { var = RUS_state_socdem_final_poll_pop min = 0 max = 0.5 }
+		set_temp_variable = { VYT_socdem_to_liberal_poll_pop = RUS_state_socdem_final_poll_pop }
+		set_temp_variable = { VYT_socdem_to_conservative_poll_pop = RUS_state_socdem_final_poll_pop }
+		set_temp_variable = { VYT_socdem_to_auth_poll_pop = RUS_state_socdem_final_poll_pop }
+
+		if = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+				}
+			}
+			multiply_temp_variable = { VYT_socdem_to_liberal_poll_pop = 0.85 }
+			multiply_temp_variable = { VYT_socdem_to_conservative_poll_pop = 0.05 }
+			multiply_temp_variable = { VYT_socdem_to_auth_poll_pop = 0.1 }
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_state_category = town
+					has_state_category = rural
+					has_state_category = pastoral
+					has_state_category = wasteland
+				}
+			}
+			multiply_temp_variable = { VYT_socdem_to_liberal_poll_pop = 0.7 }
+			multiply_temp_variable = { VYT_socdem_to_conservative_poll_pop = 0.1 }
+			multiply_temp_variable = { VYT_socdem_to_auth_poll_pop = 0.2 }
+		}
+
+		add_to_variable = { RUS_state_conservative_final_poll_pop = VYT_socdem_to_conservative_poll_pop }
+		add_to_variable = { RUS_state_auth_final_poll_pop = VYT_socdem_to_auth_poll_pop }
+		add_to_variable = { RUS_state_liberal_final_poll_pop = VYT_socdem_to_liberal_poll_pop }
+
+		set_variable = { RUS_state_socdem_final_poll_pop = 0 }
+	}
+
+	#Sverd SocDems, LibCons and Liberals get distributed
+	if = {
+		limit = {
+			OWNER = {
+				tag = SVR
+			}
+		}
+		clamp_variable = { var = RUS_state_socdem_final_poll_pop min = 0 max = 0.5 }
+		clamp_variable = { var = RUS_state_liberal_final_poll_pop min = 0 max = 0.5 }
+		clamp_variable = { var = RUS_state_libcon_final_poll_pop min = 0 max = 0.5 }
+		set_temp_variable = { SVR_socdem_to_conservative_poll_pop = RUS_state_socdem_final_poll_pop }
+		set_temp_variable = { SVR_socdem_to_auth_poll_pop = RUS_state_socdem_final_poll_pop }
+		set_temp_variable = { SVR_liberal_to_conservative_poll_pop = RUS_state_liberal_final_poll_pop }
+		set_temp_variable = { SVR_liberal_to_auth_poll_pop = RUS_state_liberal_final_poll_pop }
+		set_temp_variable = { SVR_libcon_to_conservative_poll_pop = RUS_state_libcon_final_poll_pop }
+		set_temp_variable = { SVR_libcon_to_auth_poll_pop = RUS_state_libcon_final_poll_pop }
+
+
+		if = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+				}
+			}
+			multiply_temp_variable = { SVR_socdem_to_conservative_poll_pop = 0.4 }
+			multiply_temp_variable = { SVR_liberal_to_conservative_poll_pop = 0.6 }
+			multiply_temp_variable = { SVR_libcon_to_conservative_poll_pop = 0.8 }
+
+
+			multiply_temp_variable = { SVR_socdem_to_auth_poll_pop = 0.1 }
+			multiply_temp_variable = { SVR_liberal_to_auth_poll_pop = 0.2 }
+			multiply_temp_variable = { SVR_libcon_to_auth_poll_pop = 0.3 }
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_state_category = town
+					has_state_category = rural
+					has_state_category = pastoral
+					has_state_category = wasteland
+				}
+			}
+			multiply_temp_variable = { SVR_socdem_to_conservative_poll_pop = 0.3 }
+			multiply_temp_variable = { SVR_liberal_to_conservative_poll_pop = 0.4 }
+			multiply_temp_variable = { SVR_libcon_to_conservative_poll_pop = 0.5 }
+
+			multiply_temp_variable = { SVR_socdem_to_auth_poll_pop = 0.4 }
+			multiply_temp_variable = { SVR_liberal_to_auth_poll_pop = 0.5 }
+			multiply_temp_variable = { SVR_libcon_to_auth_poll_pop = 0.5 }
+		}
+
+		add_to_variable = { RUS_state_conservative_final_pop = SVR_liberal_to_conservative_poll_pop }
+		add_to_variable = { RUS_state_conservative_final_pop = SVR_socdem_to_conservative_poll_pop }
+		add_to_variable = { RUS_state_conservative_final_pop = SVR_libcon_to_conservative_poll_pop }
+
+		add_to_variable = { RUS_state_auth_final_poll_pop = SVR_socdem_to_auth_poll_pop }
+		add_to_variable = { RUS_state_auth_final_poll_pop = SVR_liberal_to_auth_poll_pop }
+		add_to_variable = { RUS_state_auth_final_poll_pop = SVR_libcon_to_auth_poll_pop }
+
+
+		set_variable = { RUS_state_liberal_final_poll_pop = 0 }
+		set_variable = { RUS_state_socdem_final_poll_pop = 0 }
+		set_variable = { RUS_state_libcon_final_poll_pop = 0 }
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: FINAL STATE POLLING RESULTS - CONDEM ([?RUS_state_conservative_final_poll_pop]) - AUTHDEM ([?RUS_state_auth_final_poll_pop]) - LIBDEM ([?RUS_state_liberal_final_poll_pop]) - SOCDEM ([?RUS_state_socdem_final_poll_pop])"
+}
+
+RUS_clear_polling_variables = {
+	every_owned_state = {
+		round_variable = RUS_state_socdem_final_poll_pop
+		round_variable = RUS_state_auth_final_poll_pop
+		round_variable = RUS_state_libcon_final_poll_pop
+		round_variable = RUS_state_liberal_final_poll_pop
+		round_variable = RUS_conservative_final_poll_pop
+	}
+}
+
+RUS_get_final_popularities = {
+	#Prevents modifiers from stacking endlessly
+	set_variable = { RUS_state_socdem_final_pop = RUS_state_socdem_pop }
+	set_variable = { RUS_state_auth_final_pop = RUS_state_auth_pop }
+	set_variable = { RUS_state_libcon_final_pop = RUS_state_libcon_pop }
+	set_variable = { RUS_state_liberal_final_pop = RUS_state_liberal_pop }
+	set_variable = { RUS_state_conservative_final_pop = RUS_state_conservative_pop }
+
+	add_to_variable = { RUS_state_socdem_final_pop = RUS_state_socdem_condition_pop }
+	add_to_variable = { RUS_state_auth_final_pop = RUS_state_auth_condition_pop }
+	add_to_variable = { RUS_state_libcon_final_pop = RUS_state_libcon_condition_pop }
+	add_to_variable = { RUS_state_liberal_final_pop = RUS_state_liberal_condition_pop }
+	add_to_variable = { RUS_state_conservative_final_pop = RUS_state_conservative_condition_pop }
+
+	add_to_variable = { RUS_state_socdem_final_pop = RUS_state_socdem_temp_pop }
+	add_to_variable = { RUS_state_auth_final_pop = RUS_state_auth_temp_pop }
+	add_to_variable = { RUS_state_libcon_final_pop = RUS_state_libcon_temp_pop }
+	add_to_variable = { RUS_state_liberal_final_pop = RUS_state_liberal_temp_pop }
+	add_to_variable = { RUS_state_conservative_final_pop = RUS_state_conservative_temp_pop }
+
+	add_to_variable = { RUS_state_socdem_final_pop = PREV.RUS_socdem_global_bonus_pop }
+	add_to_variable = { RUS_state_auth_final_pop = PREV.RUS_auth_global_bonus_pop }
+	add_to_variable = { RUS_state_libcon_final_pop = PREV.RUS_libcon_global_bonus_pop }
+	add_to_variable = { RUS_state_liberal_final_pop = PREV.RUS_liberal_global_bonus_pop }
+	add_to_variable = { RUS_state_conservative_final_pop = PREV.RUS_conservative_global_bonus_pop }
+
+	#PSD is a disaster of a political party
+	if = {
+		limit = {
+			OWNER = {
+				tag = KOM
+			}
+		}
+		set_temp_variable = { PSD_unity_multiplier = KOM.KOM_PSD_unity }
+		divide_temp_variable = { PSD_unity_multiplier = 100 }
+		add_to_temp_variable = { PSD_unity_multiplier = 0.35 }
+		multiply_variable = { RUS_state_libcon_final_pop = PSD_unity_multiplier }
+	}
+}
+
+RUS_run_election = {
+	set_variable = { RUS_socdem_votes = 0 }
+	set_variable = { RUS_auth_votes = 0 }
+	set_variable = { RUS_libcon_votes = 0 }
+	set_variable = { RUS_liberal_votes = 0 }
+	set_variable = { RUS_conservative_votes = 0 }
+
+	set_variable = { RUS_log_urban_socdem_votes = 0 }
+	set_variable = { RUS_log_urban_auth_votes = 0 }
+	set_variable = { RUS_log_urban_libcon_votes = 0 }
+	set_variable = { RUS_log_urban_liberal_votes = 0 }
+	set_variable = { RUS_log_urban_conservative_votes = 0 }
+
+	set_variable = { RUS_log_rural_socdem_votes = 0 }
+	set_variable = { RUS_log_rural_auth_votes = 0 }
+	set_variable = { RUS_log_rural_libcon_votes = 0 }
+	set_variable = { RUS_log_rural_liberal_votes = 0 }
+	set_variable = { RUS_log_rural_conservative_votes = 0 }
+
+
+	set_variable = { RUS_total_votes = 0 }
+
+	every_owned_state = {
+		RUS_get_final_popularities = yes
+
+		set_variable = { RUS_vote_count_state = state_population_k }
+		multiply_variable = { RUS_vote_count_state = RUS_general_state_turnout }
+
+		set_variable = { RUS_socdem_state_votes = RUS_state_socdem_final_pop }
+		set_variable = { RUS_auth_state_votes = RUS_state_auth_final_pop }
+		set_variable = { RUS_libcon_state_votes = RUS_state_libcon_final_pop }
+		set_variable = { RUS_liberal_state_votes = RUS_state_liberal_final_pop }
+		set_variable = { RUS_conservative_state_votes = RUS_state_conservative_final_pop }
+
+		multiply_variable = { RUS_socdem_state_votes = RUS_vote_count_state }
+		multiply_variable = { RUS_auth_state_votes = RUS_vote_count_state }
+		multiply_variable = { RUS_libcon_state_votes = RUS_vote_count_state }
+		multiply_variable = { RUS_liberal_state_votes = RUS_vote_count_state }
+		multiply_variable = { RUS_conservative_state_votes = RUS_vote_count_state }
+
+		multiply_variable = { RUS_socdem_state_votes = RUS_socdem_state_turnout }
+		multiply_variable = { RUS_auth_state_votes = RUS_auth_state_turnout }
+		multiply_variable = { RUS_libcon_state_votes = RUS_libcon_state_turnout }
+		multiply_variable = { RUS_liberal_state_votes = RUS_liberal_state_turnout }
+		multiply_variable = { RUS_conservative_state_votes = RUS_conservative_state_turnout }
+
+		#Komi conservatives distributed
+		if = {
+			limit = {
+				OWNER = {
+					tag = KOM
+				}
+			}
+			clamp_variable = { var = RUS_conservative_state_votes min = 0 max = 0.5 }
+			set_temp_variable = { KOM_conservative_to_liberal_state_votes = RUS_conservative_state_votes }
+			set_temp_variable = { KOM_conservative_to_socdem_state_votes = RUS_conservative_state_votes }
+			set_temp_variable = { KOM_conservative_to_libcon_state_votes = RUS_conservative_state_votes }
+			if = {
+				limit = {
+					OR = {
+						has_state_category = large_town
+						has_state_category = city
+						has_state_category = large_city
+						has_state_category = metropolis
+						has_state_category = megalopolis
+					}
+				}
+				divide_temp_variable = { KOM_conservative_to_liberal_state_votes = 4 }
+				divide_temp_variable = { KOM_conservative_to_socdem_state_votes = 5 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_state_category = town
+						has_state_category = rural
+						has_state_category = pastoral
+						has_state_category = wasteland
+					}
+				}
+				divide_temp_variable = { KOM_conservative_to_liberal_state_votes = 6 }
+				divide_temp_variable = { KOM_conservative_to_socdem_state_votes = 4 }
+
+			}
+
+			#PSD is a disaster of a political party
+			set_temp_variable = { PSD_conservative_multiplier = KOM.KOM_PSD_right_power }
+			divide_temp_variable = { PSD_conservative_multiplier = 100 }
+			add_to_temp_variable = { PSD_conservative_multiplier = 0.3 }
+			multiply_temp_variable = { KOM_conservative_to_libcon_state_votes = PSD_conservative_multiplier }
+			clamp_variable = { var = KOM_conservative_to_libcon_state_votes min = 0 max = RUS_conservative_state_votes }
+
+			add_to_variable = { RUS_socdem_state_votes = KOM_conservative_to_socdem_state_votes }
+			add_to_variable = { RUS_libcon_state_votes = KOM_conservative_to_libcon_state_votes }
+			add_to_variable = { RUS_liberal_state_votes = KOM_conservative_to_liberal_state_votes }
+
+			#Clear conservative votes
+			clear_variable = RUS_conservative_state_votes
+		}
+
+		#Vyatka SocDems get distributed
+		if = {
+			limit = {
+				OWNER = {
+					tag = VYT
+				}
+			}
+			clamp_variable = { var = RUS_socdem_state_votes min = 0 max = 0.5 }
+			set_temp_variable = { VYT_socdem_to_liberal_state_votes = RUS_socdem_state_votes }
+			set_temp_variable = { VYT_socdem_to_conservative_state_votes = RUS_socdem_state_votes }
+			set_temp_variable = { VYT_socdem_to_auth_state_votes = RUS_socdem_state_votes }
+
+			if = {
+				limit = {
+					OR = {
+						has_state_category = large_town
+						has_state_category = city
+						has_state_category = large_city
+						has_state_category = metropolis
+						has_state_category = megalopolis
+					}
+				}
+				multiply_temp_variable = { VYT_socdem_to_liberal_state_votes = 0.85 }
+				multiply_temp_variable = { VYT_socdem_to_conservative_state_votes = 0.05 }
+				multiply_temp_variable = { VYT_socdem_to_auth_state_votes = 0.1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_state_category = town
+						has_state_category = rural
+						has_state_category = pastoral
+						has_state_category = wasteland
+					}
+				}
+				multiply_temp_variable = { VYT_socdem_to_liberal_state_votes = 0.7 }
+				multiply_temp_variable = { VYT_socdem_to_conservative_state_votes = 0.1 }
+				multiply_temp_variable = { VYT_socdem_to_auth_state_votes = 0.2 }
+			}
+
+			add_to_variable = { RUS_conservative_state_votes = VYT_socdem_to_conservative_state_votes }
+			add_to_variable = { RUS_auth_state_votes = VYT_socdem_to_auth_state_votes }
+			add_to_variable = { RUS_liberal_state_votes = VYT_socdem_to_liberal_state_votes }
+
+			clear_variable = RUS_socdem_state_votes
+		}
+
+		#Sverd SocDems and Liberals get distributed
+		if = {
+			limit = {
+				OWNER = {
+					tag = SVR
+				}
+			}
+			clamp_variable = { var = RUS_socdem_state_votes min = 0 max = 0.5 }
+			clamp_variable = { var = RUS_liberal_state_votes min = 0 max = 0.5 }
+			set_temp_variable = { SVR_socdem_to_conservative_state_votes = RUS_socdem_state_votes }
+			set_temp_variable = { SVR_socdem_to_auth_state_votes = RUS_socdem_state_votes }
+			set_temp_variable = { SVR_liberal_to_conservative_state_votes = RUS_liberal_state_votes }
+			set_temp_variable = { SVR_liberal_to_auth_state_votes = RUS_liberal_state_votes }
+
+
+			if = {
+				limit = {
+					OR = {
+						has_state_category = large_town
+						has_state_category = city
+						has_state_category = large_city
+						has_state_category = metropolis
+						has_state_category = megalopolis
+					}
+				}
+				multiply_temp_variable = { SVR_socdem_to_conservative_state_votes = 0.4 }
+				multiply_temp_variable = { SVR_liberal_to_conservative_state_votes = 0.6 }
+
+				multiply_temp_variable = { SVR_socdem_to_auth_state_votes = 0.1 }
+				multiply_temp_variable = { SVR_liberal_to_auth_state_votes = 0.2 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_state_category = town
+						has_state_category = rural
+						has_state_category = pastoral
+						has_state_category = wasteland
+					}
+				}
+				multiply_temp_variable = { SVR_socdem_to_conservative_state_votes = 0.3 }
+				multiply_temp_variable = { SVR_liberal_to_conservative_state_votes = 0.4 }
+
+				multiply_temp_variable = { SVR_socdem_to_auth_state_votes = 0.4 }
+				multiply_temp_variable = { SVR_liberal_to_auth_state_votes = 0.5 }
+			}
+
+			add_to_variable = { RUS_conservative_state_votes = SVR_liberal_to_conservative_state_votes }
+			add_to_variable = { RUS_conservative_state_votes = SVR_socdem_to_conservative_state_votes }
+
+			add_to_variable = { RUS_auth_state_votes = SVR_socdem_to_auth_state_votes }
+			add_to_variable = { RUS_auth_state_votes = SVR_liberal_to_auth_state_votes }
+
+
+			clear_variable = RUS_socdem_state_votes
+			clear_variable = RUS_liberal_state_votes
+		}
+
+		# First Past the Post - why is this here?
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = RUS_dem_first_past_the_post
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { RUS_auth_state_votes > RUS_liberal_state_votes }
+					check_variable = { RUS_auth_state_votes > RUS_socdem_state_votes }
+					check_variable = { RUS_auth_state_votes > RUS_conservative_state_votes }
+				}
+				add_to_variable = { RUS_auth_state_votes = RUS_liberal_state_votes }
+				add_to_variable = { RUS_auth_state_votes = RUS_socdem_state_votes }
+				add_to_variable = { RUS_auth_state_votes = RUS_conservative_state_votes }
+				set_variable = { RUS_liberal_state_votes = 0 }
+				set_variable = { RUS_socdem_state_votes = 0 }
+				set_variable = { RUS_conservative_state_votes = 0 }
+			}
+			else_if = {
+				limit = {
+					check_variable = { RUS_liberal_state_votes > RUS_auth_state_votes }
+					check_variable = { RUS_liberal_state_votes > RUS_socdem_state_votes }
+					check_variable = { RUS_liberal_state_votes > RUS_conservative_state_votes }
+				}
+				add_to_variable = { RUS_liberal_state_votes = RUS_auth_state_votes }
+				add_to_variable = { RUS_liberal_state_votes = RUS_socdem_state_votes }
+				add_to_variable = { RUS_liberal_state_votes = RUS_conservative_state_votes }
+				set_variable = { RUS_auth_state_votes = 0 }
+				set_variable = { RUS_socdem_state_votes = 0 }
+				set_variable = { RUS_conservative_state_votes = 0 }
+			}
+			else_if = {
+				limit = {
+					check_variable = { RUS_socdem_state_votes > RUS_liberal_state_votes }
+					check_variable = { RUS_socdem_state_votes > RUS_auth_state_votes }
+					check_variable = { RUS_socdem_state_votes > RUS_conservative_state_votes }
+				}
+				add_to_variable = { RUS_socdem_state_votes = RUS_liberal_state_votes }
+				add_to_variable = { RUS_socdem_state_votes = RUS_auth_state_votes }
+				add_to_variable = { RUS_socdem_state_votes = RUS_conservative_state_votes }
+				set_variable = { RUS_liberal_state_votes = 0 }
+				set_variable = { RUS_auth_state_votes = 0 }
+				set_variable = { RUS_conservative_state_votes = 0 }
+			}
+			else_if = {
+				limit = {
+					check_variable = { RUS_conservative_state_votes > RUS_liberal_state_votes }
+					check_variable = { RUS_conservative_state_votes > RUS_socdem_state_votes }
+					check_variable = { RUS_conservative_state_votes > RUS_auth_state_votes }
+				}
+				add_to_variable = { RUS_conservative_state_votes = RUS_liberal_state_votes }
+				add_to_variable = { RUS_conservative_state_votes = RUS_socdem_state_votes }
+				add_to_variable = { RUS_conservative_state_votes = RUS_auth_state_votes }
+				set_variable = { RUS_liberal_state_votes = 0 }
+				set_variable = { RUS_socdem_state_votes = 0 }
+				set_variable = { RUS_auth_state_votes = 0 }
+			}
+			else = {
+				add_to_variable = { RUS_auth_state_votes = RUS_liberal_state_votes }
+				add_to_variable = { RUS_auth_state_votes = RUS_socdem_state_votes }
+				add_to_variable = { RUS_auth_state_votes = RUS_conservative_state_votes }
+				set_variable = { RUS_liberal_state_votes = 0 }
+				set_variable = { RUS_socdem_state_votes = 0 }
+				set_variable = { RUS_conservative_state_votes = 0 }
+			}
+		}
+
+		divide_variable = { RUS_socdem_state_votes = 50 }
+		divide_variable = { RUS_auth_state_votes = 50 }
+		divide_variable = { RUS_liberal_state_votes = 50 }
+		divide_variable = { RUS_conservative_state_votes = 50 }
+
+		#Compensate for low-population states - super inefficient code, fix later
+		if = {
+			limit = {
+				AND = {
+					check_variable = { RUS_conservative_state_votes < 0.5 }
+					check_variable = { RUS_liberal_state_votes < 0.5 }
+					check_variable = { RUS_auth_state_votes < 0.5 }
+					check_variable = { RUS_libcon_state_votes < 0.5 }
+					check_variable = { RUS_socdem_state_votes < 0.5 }
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { THIS.RUS_auth_state_votes > THIS.RUS_liberal_state_votes }
+					check_variable = { THIS.RUS_auth_state_votes > THIS.RUS_socdem_state_votes }
+					check_variable = { THIS.RUS_auth_state_votes > THIS.RUS_libcon_state_votes }
+					check_variable = { THIS.RUS_auth_state_votes > THIS.RUS_conservative_state_votes }
+				}
+				set_variable = { RUS_auth_state_votes = 1 }
+			}
+			else_if = {
+				limit = {
+					check_variable = { THIS.RUS_liberal_state_votes > THIS.RUS_auth_state_votes }
+					check_variable = { THIS.RUS_liberal_state_votes > THIS.RUS_socdem_state_votes }
+					check_variable = { THIS.RUS_liberal_state_votes > THIS.RUS_libcon_state_votes }
+					check_variable = { THIS.RUS_liberal_state_votes > THIS.RUS_conservative_state_votes }
+				}
+				set_variable = { RUS_liberal_state_votes = 1 }
+			}
+			else_if = {
+				limit = {
+					check_variable = { THIS.RUS_socdem_state_votes > THIS.RUS_liberal_state_votes }
+					check_variable = { THIS.RUS_socdem_state_votes > THIS.RUS_auth_state_votes }
+					check_variable = { THIS.RUS_socdem_state_votes > THIS.RUS_libcon_state_votes }
+					check_variable = { THIS.RUS_socdem_state_votes > THIS.RUS_conservative_state_votes }
+				}
+				set_variable = { RUS_socdem_state_votes = 1 }
+			}
+			else_if = {
+				limit = {
+					check_variable = { THIS.RUS_conservative_state_votes > THIS.RUS_liberal_state_votes }
+					check_variable = { THIS.RUS_conservative_state_votes > THIS.RUS_socdem_state_votes }
+					check_variable = { THIS.RUS_conservative_state_votes > THIS.RUS_libcon_state_votes }
+					check_variable = { THIS.RUS_conservative_state_votes > THIS.RUS_auth_state_votes }
+				}
+				set_variable = { RUS_conservative_state_votes = 1 }
+			}
+			else_if = {
+				limit = {
+					check_variable = { THIS.RUS_conservative_state_votes > THIS.RUS_liberal_state_votes }
+					check_variable = { THIS.RUS_conservative_state_votes > THIS.RUS_socdem_state_votes }
+					check_variable = { THIS.RUS_conservative_state_votes > THIS.RUS_conservative_state_votes }
+					check_variable = { THIS.RUS_conservative_state_votes > THIS.RUS_auth_state_votes }
+				}
+				set_variable = { RUS_libcon_state_votes = 1 }
+			}
+		}
+
+
+		round_variable = RUS_socdem_state_votes
+		round_variable = RUS_auth_state_votes
+		round_variable = RUS_libcon_state_votes
+		round_variable = RUS_liberal_state_votes
+		round_variable = RUS_conservative_state_votes
+
+		if = {
+			limit = {
+				check_variable = { RUS_socdem_state_votes < 0 }
+			}
+			set_variable = { RUS_socdem_state_votes = 0 }
+		}
+
+		if = {
+			limit = {
+				check_variable = { RUS_auth_state_votes < 0 }
+			}
+			set_variable = { RUS_auth_state_votes = 0 }
+		}
+
+		if = {
+			limit = {
+				check_variable = { RUS_liberal_state_votes < 0 }
+			}
+			set_variable = { RUS_liberal_state_votes = 0 }
+		}
+		
+		if = {
+			limit = {
+				check_variable = { RUS_libcon_state_votes < 0 }
+			}
+			set_variable = { RUS_libcon_state_votes = 0 }
+		}
+
+		if = {
+			limit = {
+				check_variable = { RUS_conservative_state_votes < 0 }
+			}
+			set_variable = { RUS_conservative_state_votes = 0 }
+		}
+
+		set_variable = { RUS_total_state_votes = RUS_socdem_state_votes }
+		add_to_variable = { RUS_total_state_votes = RUS_auth_state_votes }
+		add_to_variable = { RUS_total_state_votes = RUS_liberal_state_votes }
+		add_to_variable = { RUS_total_state_votes = RUS_libcon_state_votes }
+		add_to_variable = { RUS_total_state_votes = RUS_conservative_state_votes }
+
+		add_to_variable = { PREV.RUS_socdem_votes = RUS_socdem_state_votes }
+		add_to_variable = { PREV.RUS_auth_votes = RUS_auth_state_votes }
+		add_to_variable = { PREV.RUS_liberal_votes = RUS_liberal_state_votes }
+		add_to_variable = { PREV.RUS_libcon_votes = RUS_libcon_state_votes }
+		add_to_variable = { PREV.RUS_conservative_votes = RUS_conservative_state_votes }
+
+		if = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+					check_variable = { state_population_k > 600 }
+				}
+			}
+			add_to_variable = { PREV.RUS_log_urban_socdem_votes = RUS_socdem_state_votes }
+			add_to_variable = { PREV.RUS_log_urban_auth_votes = RUS_auth_state_votes }
+			add_to_variable = { PREV.RUS_log_urban_libcon_votes = RUS_libcon_state_votes }
+			add_to_variable = { PREV.RUS_log_urban_liberal_votes = RUS_liberal_state_votes }
+			add_to_variable = { PREV.RUS_log_urban_conservative_votes = RUS_conservative_state_votes }
+		}
+		if = {
+			limit = {
+				NOT = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+					check_variable = { state_population_k > 600 }
+				}
+			}
+			add_to_variable = { PREV.RUS_log_rural_socdem_votes = RUS_socdem_state_votes }
+			add_to_variable = { PREV.RUS_log_rural_auth_votes = RUS_auth_state_votes }
+			add_to_variable = { PREV.RUS_log_rural_libcon_votes = RUS_libcon_state_votes }
+			add_to_variable = { PREV.RUS_log_rural_liberal_votes = RUS_liberal_state_votes }
+			add_to_variable = { PREV.RUS_log_rural_conservative_votes = RUS_conservative_state_votes }
+		}
+
+
+		#Resetting temp popularity
+		set_variable = { RUS_state_socdem_temp_pop = 0 }
+		set_variable = { RUS_state_auth_temp_pop = 0 }
+		set_variable = { RUS_state_libcon_temp_pop = 0 }
+		set_variable = { RUS_state_liberal_temp_pop = 0 }
+		set_variable = { RUS_state_conservative_temp_pop = 0 }
+
+		log = "[GetDateText]: [THIS.GetName]: STATE RESULTS - CONDEM ([?RUS_conservative_state_votes]) - AUTHDEM ([?RUS_auth_state_votes]) - LIBDEM ([?RUS_liberal_state_votes]) - SOCDEM ([?RUS_socdem_state_votes]) - TOTAL VOTES ([?RUS_total_state_votes])"
+	}
+	round_variable = RUS_socdem_votes
+	round_variable = RUS_auth_votes
+	round_variable = RUS_libcon_votes
+	round_variable = RUS_liberal_votes
+	round_variable = RUS_conservative_votes
+
+	add_to_variable = { RUS_total_votes = RUS_socdem_votes }
+	add_to_variable = { RUS_total_votes = RUS_auth_votes }
+	add_to_variable = { RUS_total_votes = RUS_libcon_votes }
+	add_to_variable = { RUS_total_votes = RUS_liberal_votes }
+	add_to_variable = { RUS_total_votes = RUS_conservative_votes }
+
+	set_variable = { RUS_socdem_percentage_vote = RUS_socdem_votes }
+	set_variable = { RUS_auth_percentage_vote = RUS_auth_votes }
+	set_variable = { RUS_libcon_percentage_vote = RUS_libcon_votes }
+	set_variable = { RUS_liberal_percentage_vote = RUS_liberal_votes }
+	set_variable = { RUS_conservative_percentage_vote = RUS_conservative_votes }
+
+	divide_variable = { RUS_socdem_percentage_vote = RUS_total_votes }
+	divide_variable = { RUS_auth_percentage_vote = RUS_total_votes }
+	divide_variable = { RUS_libcon_percentage_vote = RUS_total_votes }
+	divide_variable = { RUS_liberal_percentage_vote = RUS_total_votes }
+	divide_variable = { RUS_conservative_percentage_vote = RUS_total_votes }
+
+	if = {
+		limit = {
+			tag = KOM
+		}
+
+		set_variable = { RUS_socdem_deputies = RUS_socdem_percentage_vote }
+		set_variable = { RUS_libcon_deputies = RUS_libcon_percentage_vote }
+		set_variable = { RUS_liberal_deputies = RUS_liberal_percentage_vote }
+
+		multiply_variable = { RUS_socdem_deputies = 200 }
+		multiply_variable = { RUS_libcon_deputies = 200 }
+		multiply_variable = { RUS_liberal_deputies = 200 }
+
+		round_variable = RUS_socdem_deputies
+		round_variable = RUS_libcon_deputies
+		round_variable = RUS_liberal_deputies
+
+		set_temp_variable = { RUS_deputy_var_checker = 0 }
+
+		add_to_temp_variable = { RUS_deputy_var_checker = RUS_socdem_deputies }
+		add_to_temp_variable = { RUS_deputy_var_checker = RUS_libcon_deputies }
+		add_to_temp_variable = { RUS_deputy_var_checker = RUS_liberal_deputies }
+
+		if = { #What the fuck. TODO: FIX THIS.
+			limit = {
+				NOT = {
+					check_variable = { RUS_deputy_var_checker = 200 }
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { RUS_deputy_var_checker = 203 }
+				}
+				random_list = {
+					34 = {
+						subtract_from_variable = { RUS_libcon_deputies = 3 }
+					}
+					33 = {
+						subtract_from_variable = { RUS_socdem_deputies = 3 }
+					}
+					33 = {
+						subtract_from_variable = { RUS_liberal_deputies = 3 }
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { RUS_deputy_var_checker = 202 }
+				}
+				random_list = {
+					34 = {
+						subtract_from_variable = { RUS_libcon_deputies = 2 }
+					}
+					33 = {
+						subtract_from_variable = { RUS_socdem_deputies = 2 }
+					}
+					33 = {
+						subtract_from_variable = { RUS_liberal_deputies = 2 }
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { RUS_deputy_var_checker = 201 }
+				}
+				random_list = {
+					34 = {
+						subtract_from_variable = { RUS_libcon_deputies = 1 }
+					}
+					33 = {
+						subtract_from_variable = { RUS_socdem_deputies = 1 }
+					}
+					33 = {
+						subtract_from_variable = { RUS_liberal_deputies = 1 }
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { RUS_deputy_var_checker = 199 }
+				}
+				random_list = {
+					34 = {
+						add_to_variable = { RUS_libcon_deputies = 1 }
+					}
+					33 = {
+						add_to_variable = { RUS_socdem_deputies = 1 }
+					}
+					33 = {
+						add_to_variable = { RUS_liberal_deputies = 1 }
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { RUS_deputy_var_checker = 198 }
+				}
+				random_list = {
+					34 = {
+						add_to_variable = { RUS_libcon_deputies = 2 }
+					}
+					33 = {
+						add_to_variable = { RUS_socdem_deputies = 2 }
+					}
+					33 = {
+						add_to_variable = { RUS_liberal_deputies = 2 }
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { RUS_deputy_var_checker = 197 }
+				}
+				random_list = {
+					34 = {
+						add_to_variable = { RUS_libcon_deputies = 3 }
+					}
+					33 = {
+						add_to_variable = { RUS_socdem_deputies = 3 }
+					}
+					33 = {
+						add_to_variable = { RUS_liberal_deputies = 3 }
+					}
+				}
+			}
+		}
+	}
+
+	multiply_variable = { RUS_socdem_percentage_vote = 100 }
+	multiply_variable = { RUS_auth_percentage_vote = 100 }
+	multiply_variable = { RUS_libcon_percentage_vote = 100 }
+	multiply_variable = { RUS_liberal_percentage_vote = 100 }
+	multiply_variable = { RUS_conservative_percentage_vote = 100 }
+
+	if = { #Victory flags temp disabled until elections are fixed
+		limit = {
+			check_variable = { RUS_auth_votes > RUS_liberal_votes }
+			check_variable = { RUS_auth_votes > RUS_socdem_votes }
+			check_variable = { RUS_auth_votes > RUS_libcon_votes }
+			check_variable = { RUS_auth_votes > RUS_conservative_votes }
+		}
+		#set_country_flag = RUS_ELECTION_AUTH_VICTORY
+	}
+	if = {
+		limit = {
+			check_variable = { RUS_socdem_votes > RUS_auth_votes }
+			check_variable = { RUS_socdem_votes > RUS_liberal_votes }
+			check_variable = { RUS_socdem_votes > RUS_libcon_votes }
+			check_variable = { RUS_socdem_votes > RUS_conservative_votes }
+		}
+		#set_country_flag = RUS_ELECTION_SOCDEM_VICTORY
+	}
+	if = {
+		limit = {
+			check_variable = { RUS_liberal_votes > RUS_auth_votes }
+			check_variable = { RUS_liberal_votes > RUS_socdem_votes }
+			check_variable = { RUS_liberal_votes > RUS_libcon_votes }
+			check_variable = { RUS_liberal_votes > RUS_conservative_votes }
+		}
+		#set_country_flag = RUS_ELECTION_LIBERAL_VICTORY
+	}
+	if = {
+		limit = {
+			check_variable = { RUS_conservative_votes > RUS_auth_votes }
+			check_variable = { RUS_conservative_votes > RUS_socdem_votes }
+			check_variable = { RUS_conservative_votes > RUS_libcon_votes }
+			check_variable = { RUS_conservative_votes > RUS_liberal_votes }
+		}
+		#set_country_flag = RUS_ELECTION_CONSERVATIVE_VICTORY
+	}
+	if = {
+		limit = {
+			check_variable = { RUS_libcon_votes > RUS_auth_votes }
+			check_variable = { RUS_libcon_votes > RUS_socdem_votes }
+			check_variable = { RUS_libcon_votes > RUS_conservative_votes }
+			check_variable = { RUS_libcon_votes > RUS_liberal_votes }
+		}
+		#set_country_flag = RUS_ELECTION_LIBCON_VICTORY
+	}
+	log = "[GetDateText]: [THIS.GetName]: URBAN ELECTION RESULTS - CONDEM VOTES ([?RUS_log_urban_conservative_votes]) - AUTHDEM VOTES ([?RUS_log_urban_auth_votes]) - LIBDEM VOTES ([?RUS_log_urban_liberal_votes]) - SOCDEM VOTES ([?RUS_log_urban_socdem_votes])"
+	log = "[GetDateText]: [THIS.GetName]: RURAL ELECTION RESULTS - CONDEM VOTES ([?RUS_log_rural_conservative_votes]) - AUTHDEM VOTES ([?RUS_log_rural_auth_votes]) - LIBDEM VOTES ([?RUS_log_rural_liberal_votes]) - SOCDEM VOTES ([?RUS_log_rural_socdem_votes])"
+	round_variable = RUS_total_votes
+	log = "[GetDateText]: [THIS.GetName]: FINAL ELECTION RESULTS - CONDEM VOTES ([?RUS_conservative_votes]) - AUTHDEM VOTES ([?RUS_auth_votes]) - LIBDEM VOTES ([?RUS_liberal_votes]) - SOCDEM VOTES ([?RUS_socdem_votes]) - TOTAL VOTES ([?RUS_total_votes])"
+}
+
+RUS_clear_election_variables = {
+	clear_variable = RUS_total_votes
+	clear_variable = RUS_socdem_votes
+	clear_variable = RUS_auth_votes
+	clear_variable = RUS_libcon_votes
+	clear_variable = RUS_liberal_votes
+	clear_variable = RUS_conservative_votes
+	clr_country_flag = RUS_ELECTION_AUTH_VICTORY
+	clr_country_flag = RUS_ELECTION_LIBCON_VICTORY
+	clr_country_flag = RUS_ELECTION_SOCDEM_VICTORY
+	clr_country_flag = RUS_ELECTION_LIBERAL_VICTORY
+	clr_country_flag = RUS_ELECTION_CONSERVATIVE_VICTORY
+
+	every_owned_state = {
+		round_variable = RUS_socdem_state_votes
+		round_variable = RUS_auth_state_votes
+		round_variable = RUS_libcon_state_votes
+		round_variable = RUS_liberal_state_votes
+		round_variable = RUS_conservative_state_votes
+		clear_variable = RUS_total_state_votes
+		clear_variable = RUS_vote_count_state
+	}
+}
+
+RUS_increase_urban_socdem_pop = {
+	custom_effect_tooltip = RUS_increase_urban_socdem_pop_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+				}
+			}
+			add_to_variable = { RUS_state_socdem_pop = 0.05 }
+			add_to_variable = { RUS_state_conservative_pop = -0.05 }
+		}
+	}
+	add_popularity = {
+		ideology = progressivism
+		popularity = 0.025
+	}
+}
+
+RUS_increase_urban_auth_pop = {
+	custom_effect_tooltip = RUS_increase_urban_auth_pop_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+				}
+			}
+			add_to_variable = { RUS_state_auth_pop = 0.05 }
+			add_to_variable = { RUS_state_liberal_pop = -0.05 }
+		}
+	}
+	add_popularity = {
+		ideology = paternalism
+		popularity = 0.025
+	}
+}
+
+RUS_increase_urban_liberal_pop = {
+	custom_effect_tooltip = RUS_increase_urban_liberal_pop_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+				}
+			}
+			add_to_variable = { RUS_state_liberal_pop = 0.05 }
+			add_to_variable = { RUS_state_auth_pop = -0.05 }
+		}
+	}
+	add_popularity = {
+		ideology = liberalism
+		popularity = 0.025
+	}
+}
+
+RUS_increase_urban_libcon_pop = {
+	custom_effect_tooltip = RUS_increase_urban_libcon_pop_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+				}
+			}
+			add_to_variable = { RUS_state_libcon_pop = 0.05 }
+			add_to_variable = { RUS_state_liberal_pop = -0.02 }
+			add_to_variable = { RUS_state_socdem_pop = -0.02 }
+		}
+	}
+	add_popularity = {
+		ideology = liberal_conservatism
+		popularity = 0.025
+	}
+}
+
+RUS_increase_urban_conservative_pop = {
+	custom_effect_tooltip = RUS_increase_urban_conservative_pop_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+				}
+			}
+			add_to_variable = { RUS_state_conservative_pop = 0.05 }
+			add_to_variable = { RUS_state_socdem_pop = -0.05 }
+		}
+	}
+	add_popularity = {
+		ideology = conservatism
+		popularity = 0.025
+	}
+}
+
+
+RUS_increase_rural_socdem_pop = {
+	custom_effect_tooltip = RUS_increase_rural_socdem_pop_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = town
+					has_state_category = rural
+					has_state_category = pastoral
+					has_state_category = wasteland
+				}
+			}
+			add_to_variable = { RUS_state_socdem_pop = 0.05 }
+			add_to_variable = { RUS_state_conservative_pop = -0.05 }
+		}
+	}
+	add_popularity = {
+		ideology = progressivism
+		popularity = 0.025
+	}
+}
+
+RUS_increase_rural_auth_pop = {
+	custom_effect_tooltip = RUS_increase_rural_auth_pop_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = town
+					has_state_category = rural
+					has_state_category = pastoral
+					has_state_category = wasteland
+				}
+			}
+			add_to_variable = { RUS_state_auth_pop = 0.05 }
+			add_to_variable = { RUS_state_liberal_pop = -0.05 }
+		}
+	}
+	add_popularity = {
+		ideology = paternalism
+		popularity = 0.025
+	}
+}
+
+RUS_increase_rural_liberal_pop = {
+	custom_effect_tooltip = RUS_increase_rural_liberal_pop_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = town
+					has_state_category = rural
+					has_state_category = pastoral
+					has_state_category = wasteland
+				}
+			}
+			add_to_variable = { RUS_state_liberal_pop = 0.05 }
+			add_to_variable = { RUS_state_auth_pop = -0.05 }
+		}
+	}
+	add_popularity = {
+		ideology = liberalism
+		popularity = 0.025
+	}
+}
+
+RUS_increase_rural_libcon_pop = {
+	custom_effect_tooltip = RUS_increase_rural_libcon_pop_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = town
+					has_state_category = rural
+					has_state_category = pastoral
+					has_state_category = wasteland
+				}
+			}
+			add_to_variable = { RUS_state_libcon_pop = 0.05 }
+			add_to_variable = { RUS_state_liberal_pop = -0.02 }
+			add_to_variable = { RUS_state_socdem_pop = -0.02 }
+		}
+	}
+	add_popularity = {
+		ideology = liberal_conservatism
+		popularity = 0.025
+	}
+}
+
+RUS_increase_rural_conservative_pop = {
+	custom_effect_tooltip = RUS_increase_rural_conservative_pop_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = town
+					has_state_category = rural
+					has_state_category = pastoral
+					has_state_category = wasteland
+				}
+			}
+			add_to_variable = { RUS_state_conservative_pop = 0.05 }
+			add_to_variable = { RUS_state_socdem_pop = -0.05 }
+		}
+	}
+	add_popularity = {
+		ideology = conservatism
+		popularity = 0.025
+	}
+}
+
+RUS_suppress_rural_voting = {
+	custom_effect_tooltip = RUS_suppress_rural_voting_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = town
+					has_state_category = rural
+					has_state_category = pastoral
+					has_state_category = wasteland
+				}
+			}
+			add_to_variable = { RUS_general_state_turnout = -0.035 }
+		}
+	}
+}
+
+RUS_suppress_urban_voting = {
+	custom_effect_tooltip = RUS_suppress_urban_voting_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+				}
+			}
+			add_to_variable = { RUS_general_state_turnout = -0.035 }
+		}
+	}
+}
+
+RUS_encourage_rural_voting = {
+	custom_effect_tooltip = RUS_encourage_rural_voting_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = town
+					has_state_category = rural
+					has_state_category = pastoral
+					has_state_category = wasteland
+				}
+			}
+			add_to_variable = { RUS_general_state_turnout = 0.035 }
+		}
+	}
+}
+
+RUS_encourage_urban_voting = {
+	custom_effect_tooltip = RUS_encourage_urban_voting_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					has_state_category = large_town
+					has_state_category = city
+					has_state_category = large_city
+					has_state_category = metropolis
+					has_state_category = megalopolis
+				}
+			}
+			add_to_variable = { RUS_general_state_turnout = 0.035 }
+		}
+	}
+}
+
+RUS_suppress_minority_voting = {
+	custom_effect_tooltip = RUS_suppress_minority_voting_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				NOT = {
+					check_variable = { nationality = 151 }
+				}
+			}
+			add_to_variable = { RUS_general_state_turnout = -0.035 }
+		}
+	}
+}
+
+RUS_encourage_minority_voting = {
+	custom_effect_tooltip = RUS_encourage_minority_voting_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				NOT = {
+					check_variable = { nationality = 151 }
+				}
+			}
+			add_to_variable = { RUS_general_state_turnout = 0.035 }
+		}
+	}
+}
+
+RUS_increase_ruling_party_state_pop = {
+	if = {
+		limit = {
+			OWNER = {
+				has_government = paternalism
+			}
+		}
+		add_to_variable = { RUS_state_auth_pop = 0.045 }
+		add_to_variable = { RUS_state_socdem_pop = -0.015 }
+		add_to_variable = { RUS_state_liberal_pop = -0.015 }
+		add_to_variable = { RUS_state_conservative_pop = -0.015 }
+		custom_effect_tooltip = RUS_increase_state_auth_pop_tt
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = progressivism
+			}
+		}
+		add_to_variable = { RUS_state_socdem_pop = 0.045 }
+		add_to_variable = { RUS_state_auth_pop = -0.015 }
+		add_to_variable = { RUS_state_liberal_pop = -0.015 }
+		add_to_variable = { RUS_state_conservative_pop = -0.015 }
+		custom_effect_tooltip = RUS_increase_state_socdem_pop_tt
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberalism
+			}
+		}
+		add_to_variable = { RUS_state_liberal_pop = 0.045 }
+		add_to_variable = { RUS_state_auth_pop = -0.015 }
+		add_to_variable = { RUS_state_socdem_pop = -0.015 }
+		add_to_variable = { RUS_state_conservative_pop = -0.015 }
+		custom_effect_tooltip = RUS_increase_state_liberal_pop_tt
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = conservatism
+			}
+		}
+		add_to_variable = { RUS_state_conservative_pop = 0.045 }
+		add_to_variable = { RUS_state_auth_pop = -0.015 }
+		add_to_variable = { RUS_state_socdem_pop = -0.015 }
+		add_to_variable = { RUS_state_liberal_pop = -0.015 }
+		custom_effect_tooltip = RUS_increase_state_conservative_pop_tt
+	}
+}
+
+RUS_increase_ruling_party_minority_pop = {
+	if = {
+		limit = {
+			has_government = paternalism
+		}
+		custom_effect_tooltip = RUS_increase_state_auth_minority_pop_tt
+		add_popularity = {
+			ideology = paternalism
+			popularity = 0.025
+		}
+	}
+	if = {
+		limit = {
+			has_government = progressivism
+		}
+		custom_effect_tooltip = RUS_increase_state_socdem_minority_pop_tt
+		add_popularity = {
+			ideology = progressivism
+			popularity = 0.025
+		}
+	}
+	if = {
+		limit = {
+			has_government = liberalism
+		}
+		custom_effect_tooltip = RUS_increase_state_liberal_minority_pop_tt
+		add_popularity = {
+			ideology = liberalism
+			popularity = 0.025
+		}
+	}
+	if = {
+		limit = {
+			has_government = conservatism
+		}
+		custom_effect_tooltip = RUS_increase_state_conservative_minority_pop_tt
+		add_popularity = {
+			ideology = conservatism
+			popularity = 0.025
+		}
+	}
+	if = {
+		limit = {
+			has_government = liberal_conservatism
+		}
+		custom_effect_tooltip = RUS_increase_state_libcon_minority_pop_tt
+		add_popularity = {
+			ideology = liberal_conservatism
+			popularity = 0.025
+		}
+	}
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				NOT = {
+					check_variable = { nationality = 151 }
+				}
+			}
+			if = {
+				limit = {
+					OWNER = {
+						has_government = paternalism
+					}
+				}
+				add_to_variable = { RUS_state_auth_pop = 0.04 }
+				add_to_variable = { RUS_state_libcon_pop = -0.01 }
+				add_to_variable = { RUS_state_socdem_pop = -0.01 }
+				add_to_variable = { RUS_state_liberal_pop = -0.01 }
+				add_to_variable = { RUS_state_conservative_pop = -0.01 }
+			}
+			if = {
+				limit = {
+					OWNER = {
+						has_government = liberal_conservatism
+					}
+				}
+				add_to_variable = { RUS_state_libcon_pop = 0.04 }
+				add_to_variable = { RUS_state_socdem_pop = -0.01 }
+				add_to_variable = { RUS_state_liberal_pop = -0.01 }
+				add_to_variable = { RUS_state_auth_pop = -0.01 }
+				add_to_variable = { RUS_state_conservative_pop = -0.01 }
+			}
+			if = {
+				limit = {
+					OWNER = {
+						has_government = progressivism
+					}
+				}
+				add_to_variable = { RUS_state_socdem_pop = 0.04 }
+				add_to_variable = { RUS_state_auth_pop = -0.01 }
+				add_to_variable = { RUS_state_liberal_pop = -0.01 }
+				add_to_variable = { RUS_state_libcon_pop = -0.01 }
+				add_to_variable = { RUS_state_conservative_pop = -0.01 }
+			}
+			if = {
+				limit = {
+					OWNER = {
+						has_government = liberalism
+					}
+				}
+				add_to_variable = { RUS_state_liberal_pop = 0.04 }
+				add_to_variable = { RUS_state_auth_pop = -0.01 }
+				add_to_variable = { RUS_state_socdem_pop = -0.01 }
+				add_to_variable = { RUS_state_libcon_pop = -0.01 }
+				add_to_variable = { RUS_state_conservative_pop = -0.01 }
+			}
+			if = {
+				limit = {
+					OWNER = {
+						has_government = conservatism
+					}
+				}
+				add_to_variable = { RUS_state_conservative_pop = 0.04 }
+				add_to_variable = { RUS_state_auth_pop = -0.01 }
+				add_to_variable = { RUS_state_socdem_pop = -0.01 }
+				add_to_variable = { RUS_state_libcon_pop = -0.01 }
+				add_to_variable = { RUS_state_liberal_pop = -0.01 }
+			}
+		}
+	}
+}
+
+RUS_decrease_ruling_party_minority_pop = {
+	if = {
+		limit = {
+			has_government = paternalism
+		}
+		custom_effect_tooltip = RUS_decrease_state_auth_minority_pop_tt
+		add_popularity = {
+			ideology = paternalism
+			popularity = -0.025
+		}
+	}
+	if = {
+		limit = {
+			has_government = progressivism
+		}
+		custom_effect_tooltip = RUS_decrease_state_socdem_minority_pop_tt
+		add_popularity = {
+			ideology = progressivism
+			popularity = -0.025
+		}
+	}
+	if = {
+		limit = {
+			has_government = liberalism
+		}
+		custom_effect_tooltip = RUS_decrease_state_liberal_minority_pop_tt
+		add_popularity = {
+			ideology = liberalism
+			popularity = -0.025
+		}
+	}
+	if = {
+		limit = {
+			has_government = conservatism
+		}
+		custom_effect_tooltip = RUS_decrease_state_conservative_minority_pop_tt
+		add_popularity = {
+			ideology = conservatism
+			popularity = -0.025
+		}
+	}
+	if = {
+		limit = {
+			has_government = liberal_conservatism
+		}
+		custom_effect_tooltip = RUS_decrease_state_libcon_minority_pop_tt
+		add_popularity = {
+			ideology = liberal_conservatism
+			popularity = -0.025
+		}
+	}
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				NOT = {
+					check_variable = { nationality = 151 }
+				}
+			}
+			if = {
+				limit = {
+					OWNER = {
+						has_government = paternalism
+					}
+				}
+				add_to_variable = { RUS_state_libcon_pop = -0.04 }
+				add_to_variable = { RUS_state_auth_pop = 0.01 }
+				add_to_variable = { RUS_state_socdem_pop = 0.01 }
+				add_to_variable = { RUS_state_liberal_pop = 0.01 }
+				add_to_variable = { RUS_state_conservative_pop = 0.01 }
+			}
+			if = {
+				limit = {
+					OWNER = {
+						has_government = liberal_conservatism
+					}
+				}
+				add_to_variable = { RUS_state_auth_pop = -0.04 }
+				add_to_variable = { RUS_state_socdem_pop = 0.01 }
+				add_to_variable = { RUS_state_liberal_pop = 0.01 }
+				add_to_variable = { RUS_state_libcon_pop = 0.01 }
+				add_to_variable = { RUS_state_conservative_pop = 0.01 }
+			}
+			if = {
+				limit = {
+					OWNER = {
+						has_government = progressivism
+					}
+				}
+				add_to_variable = { RUS_state_socdem_pop = -0.04 }
+				add_to_variable = { RUS_state_auth_pop = 0.01 }
+				add_to_variable = { RUS_state_liberal_pop = 0.01 }
+				add_to_variable = { RUS_state_libcon_pop = 0.01 }
+				add_to_variable = { RUS_state_conservative_pop = 0.01 }
+			}
+			if = {
+				limit = {
+					OWNER = {
+						has_government = liberalism
+					}
+				}
+				add_to_variable = { RUS_state_liberal_pop = -0.04 }
+				add_to_variable = { RUS_state_auth_pop = 0.01 }
+				add_to_variable = { RUS_state_socdem_pop = 0.01 }
+				add_to_variable = { RUS_state_libcon_pop = 0.01 }
+				add_to_variable = { RUS_state_conservative_pop = 0.01 }
+			}
+			if = {
+				limit = {
+					OWNER = {
+						has_government = conservatism
+					}
+				}
+				add_to_variable = { RUS_state_conservative_pop = -0.04 }
+				add_to_variable = { RUS_state_auth_pop = 0.01 }
+				add_to_variable = { RUS_state_socdem_pop = 0.01 }
+				add_to_variable = { RUS_state_libcon_pop = 0.01 }
+				add_to_variable = { RUS_state_liberal_pop = 0.01 }
+			}
+		}
+	}
+}
+
+RUS_add_ruling_party_temp_pop_large = {
+	custom_effect_tooltip = RUS_add_ruling_party_temp_pop_large_tt
+	if = {
+		limit = {
+			OWNER = {
+				has_government = paternalism
+			}
+		}
+		add_to_variable = { RUS_state_auth_temp_pop = 0.075 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = progressivism
+			}
+		}
+		add_to_variable = { RUS_state_socdem_temp_pop = 0.075 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberalism
+			}
+		}
+		add_to_variable = { RUS_state_liberal_temp_pop = 0.075 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = conservatism
+			}
+		}
+		add_to_variable = { RUS_state_conservative_temp_pop = 0.075 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberal_conservatism
+			}
+		}
+		add_to_variable = { RUS_state_libcon_temp_pop = 0.075 }
+	}
+}
+
+RUS_add_ruling_party_temp_pop_medium = {
+	custom_effect_tooltip = RUS_add_ruling_party_temp_pop_medium_tt
+	if = {
+		limit = {
+			OWNER = {
+				has_government = paternalism
+			}
+		}
+		add_to_variable = { RUS_state_auth_temp_pop = 0.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = progressivism
+			}
+		}
+		add_to_variable = { RUS_state_socdem_temp_pop = 0.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberalism
+			}
+		}
+		add_to_variable = { RUS_state_liberal_temp_pop = 0.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = conservatism
+			}
+		}
+		add_to_variable = { RUS_state_conservative_temp_pop = 0.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberal_conservatism
+			}
+		}
+		add_to_variable = { RUS_state_libcon_temp_pop = 0.05 }
+	}
+}
+
+RUS_add_ruling_party_temp_pop_small = {
+	custom_effect_tooltip = RUS_add_ruling_party_temp_pop_small_tt
+	if = {
+		limit = {
+			OWNER = {
+				has_government = paternalism
+			}
+		}
+		add_to_variable = { RUS_state_auth_temp_pop = 0.025 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = progressivism
+			}
+		}
+		add_to_variable = { RUS_state_socdem_temp_pop = 0.025 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberalism
+			}
+		}
+		add_to_variable = { RUS_state_liberal_temp_pop = 0.025 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = conservatism
+			}
+		}
+		add_to_variable = { RUS_state_conservative_temp_pop = 0.025 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberal_conservatism
+			}
+		}
+		add_to_variable = { RUS_state_libcon_temp_pop = 0.025 }
+	}
+}
+
+RUS_decrease_ruling_party_temp_pop_small = {
+	custom_effect_tooltip = RUS_decrease_ruling_party_temp_pop_small_tt
+	if = {
+		limit = {
+			OWNER = {
+				has_government = paternalism
+			}
+		}
+		add_to_variable = { RUS_state_auth_temp_pop = -0.025 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = progressivism
+			}
+		}
+		add_to_variable = { RUS_state_socdem_temp_pop = -0.025 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberalism
+			}
+		}
+		add_to_variable = { RUS_state_liberal_temp_pop = -0.025 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = conservatism
+			}
+		}
+		add_to_variable = { RUS_state_conservative_temp_pop = -0.025 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberal_conservatism
+			}
+		}
+		add_to_variable = { RUS_state_libcon_temp_pop = -0.025 }
+	}
+}
+
+RUS_decrease_ruling_party_temp_pop_medium = {
+	custom_effect_tooltip = RUS_decrease_ruling_party_temp_pop_small_tt
+	if = {
+		limit = {
+			OWNER = {
+				has_government = paternalism
+			}
+		}
+		add_to_variable = { RUS_state_auth_temp_pop = -0.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = progressivism
+			}
+		}
+		add_to_variable = { RUS_state_socdem_temp_pop = -0.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberalism
+			}
+		}
+		add_to_variable = { RUS_state_liberal_temp_pop = -0.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = conservatism
+			}
+		}
+		add_to_variable = { RUS_state_conservative_temp_pop = -0.05 }
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_government = liberal_conservatism
+			}
+		}
+		add_to_variable = { RUS_state_libcon_temp_pop = -0.05 }
+	}
+}
+
+RUS_socdem_campaign_effects = {
+	set_temp_variable = { RUS_election_regional_random_modifier = 2 }
+	randomize_temp_variable = {
+		var = RUS_election_regional_random_modifier
+		distribution = uniform
+		min = 0.00
+		max = 0.08
+	}
+	add_to_variable = { RUS_state_socdem_pop = RUS_election_regional_random_modifier }
+	divide_temp_variable = { RUS_election_regional_random_modifier = 3 }
+	subtract_from_variable = { RUS_state_conservative_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_auth_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_libcon_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_liberal_pop = RUS_election_regional_random_modifier }
+}
+
+RUS_authdem_campaign_effects = {
+	set_temp_variable = { RUS_election_regional_random_modifier = 2 }
+	randomize_temp_variable = {
+		var = RUS_election_regional_random_modifier
+		distribution = uniform
+		min = 0.00
+		max = 0.08
+	}
+	add_to_variable = { RUS_state_auth_pop = RUS_election_regional_random_modifier }
+	divide_temp_variable = { RUS_election_regional_random_modifier = 3 }
+	subtract_from_variable = { RUS_state_conservative_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_liberal_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_socdem_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_libcon_pop = RUS_election_regional_random_modifier }
+}
+
+RUS_libcon_campaign_effects = {
+	set_temp_variable = { RUS_election_regional_random_modifier = 2 }
+	randomize_temp_variable = {
+		var = RUS_election_regional_random_modifier
+		distribution = uniform
+		min = 0.00
+		max = 0.08
+	}
+	add_to_variable = { RUS_state_libcon_pop = RUS_election_regional_random_modifier }
+	divide_temp_variable = { RUS_election_regional_random_modifier = 3 }
+	subtract_from_variable = { RUS_state_conservative_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_liberal_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_socdem_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_auth_pop = RUS_election_regional_random_modifier }
+}
+
+RUS_liberal_campaign_effects = {
+	set_temp_variable = { RUS_election_regional_random_modifier = 2 }
+	randomize_temp_variable = {
+		var = RUS_election_regional_random_modifier
+		distribution = uniform
+		min = 0.00
+		max = 0.08
+	}
+	add_to_variable = { RUS_state_liberal_pop = RUS_election_regional_random_modifier }
+	divide_temp_variable = { RUS_election_regional_random_modifier = 3 }
+	if = {
+		limit = {
+			OWNER = {
+				tag = VYT
+			}
+		}
+		add_to_temp_variable = { RUS_election_regional_random_modifier = 0.03 }
+	}
+	subtract_from_variable = { RUS_state_conservative_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_socdem_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_auth_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_libcon_pop = RUS_election_regional_random_modifier }
+}
+
+RUS_conservative_campaign_effects = {
+	set_temp_variable = { RUS_election_regional_random_modifier = 2 }
+	randomize_temp_variable = {
+		var = RUS_election_regional_random_modifier
+		distribution = uniform
+		min = 0.00
+		max = 0.08
+	}
+	add_to_variable = { RUS_state_conservative_pop = RUS_election_regional_random_modifier }
+	divide_temp_variable = { RUS_election_regional_random_modifier = 3 }
+	subtract_from_variable = { RUS_state_socdem_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_liberal_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_auth_pop = RUS_election_regional_random_modifier }
+	subtract_from_variable = { RUS_state_libcon_pop = RUS_election_regional_random_modifier }
+}
+
+
+RUS_region_campaigning_effects = { #USE IN STATE SCOPE
+	if = {
+		limit = {
+			OWNER = {
+				has_country_flag = RUS_campaigning_for_socdem
+			}
+		}
+		RUS_socdem_campaign_effects = yes
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_country_flag = RUS_campaigning_for_conservative
+			}
+		}
+		RUS_conservative_campaign_effects = yes
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_country_flag = RUS_campaigning_for_liberal
+			}
+		}
+		RUS_liberal_campaign_effects = yes
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_country_flag = RUS_campaigning_for_authdem
+			}
+		}
+		RUS_authdem_campaign_effects = yes
+	}
+	if = {
+		limit = {
+			OWNER = {
+				has_country_flag = RUS_campaigning_for_libcon
+			}
+		}
+		RUS_libcon_campaign_effects = yes
+	}
+}
+
+RUS_arctic_russia_campaign = {
+	custom_effect_tooltip = RUS_arctic_russia_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					region = 150
+					region = 132
+					region = 12
+				}
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_central_russia_campaign = {
+	custom_effect_tooltip = RUS_central_russia_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				region = 133
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_ural_region_campaign = {
+	custom_effect_tooltip = RUS_ural_region_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				region = 138
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_transvolga_campaign = {
+	custom_effect_tooltip = RUS_transvolga_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				region = 40
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_southern_urals_campaign = {
+	custom_effect_tooltip = RUS_southern_urals_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				region = 209
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+
+RUS_trans_urals_campaign = {
+	custom_effect_tooltip = RUS_trans_urals_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				region = 14
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_western_siberia_campaign = {
+	custom_effect_tooltip = RUS_western_siberia_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				region = 151
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_northern_siberia_campaign = {
+	custom_effect_tooltip = RUS_northern_siberia_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				region = 147
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_central_siberia_campaign = {
+	custom_effect_tooltip = RUS_central_siberia_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				region = 207
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_eastern_siberia_campaign = {
+	custom_effect_tooltip = RUS_eastern_siberia_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				region = 149
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_trans_baikal_campaign = {
+	custom_effect_tooltip = RUS_trans_baikal_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				region = 211
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_far_east_campaign = {
+	custom_effect_tooltip = RUS_far_east_campaign_tt
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				OR = {
+					region = 148
+					region = 213
+					region = 236
+				}
+			}
+			RUS_region_campaigning_effects = yes
+		}
+	}
+}
+
+RUS_polls_effect = {
+	if = {
+		limit = { tag = KOM }
+		random_list = {
+			33 = {
+				country_event = {
+					id = russian_democracy_helpers.11
+					days = 4
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.12
+					days = 8
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.15
+					days = 12
+					random_hours = 48
+				}
+			}
+			33 = {
+				country_event = {
+					id = russian_democracy_helpers.12
+					days = 4
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.15
+					days = 8
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.11
+					days = 12
+					random_hours = 48
+				}
+			}
+			34 = {
+				country_event = {
+					id = russian_democracy_helpers.15
+					days = 4
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.11
+					days = 8
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.12
+					days = 12
+					random_hours = 48
+				}
+			}
+		}
+	}
+
+	if = {
+		limit = { tag = VYT }
+		random_list = {
+			33 = {
+				country_event = {
+					id = russian_democracy_helpers.14
+					days = 4
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.12
+					days = 8
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.13
+					days = 12
+					random_hours = 48
+				}
+			}
+			33 = {
+				country_event = {
+					id = russian_democracy_helpers.12
+					days = 4
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.13
+					days = 8
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.14
+					days = 12
+					random_hours = 48
+				}
+			}
+			34 = {
+				country_event = {
+					id = russian_democracy_helpers.13
+					days = 4
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.14
+					days = 8
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.12
+					days = 12
+					random_hours = 48
+				}
+			}
+		}
+	}
+
+	if = {
+		limit = { tag = SVR }
+		random_list = {
+			50 = {
+				country_event = {
+					id = russian_democracy_helpers.14
+					days = 4
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.13
+					days = 8
+					random_hours = 48
+				}
+			}
+			50 = {
+				country_event = {
+					id = russian_democracy_helpers.13
+					days = 4
+					random_hours = 48
+				}
+				country_event = {
+					id = russian_democracy_helpers.14
+					days = 8
+					random_hours = 48
+				}
+			}
+		}
+	}
+}
+
+RUS_state_pops_to_pop_wheel = {
+	#Regional/Superregional political pie chart generator
+
+	every_owned_state = {
+		RUS_get_state_special_party_pop = yes
+	}
+
+	set_variable = { RUS_socdem_pop_points = 0 }
+	set_variable = { RUS_auth_pop_points = 0 }
+	set_variable = { RUS_libcon_pop_points = 0 }
+	set_variable = { RUS_liberal_pop_points = 0 }
+	set_variable = { RUS_conservative_pop_points = 0 }
+
+	every_owned_state = {
+		set_variable = { RUS_pop_population_adjust = state_population_k }
+		set_variable = { RUS_state_socdem_pop_adjusted = RUS_state_socdem_final_pop }
+		set_variable = { RUS_state_auth_pop_adjusted = RUS_state_auth_final_pop }
+		set_variable = { RUS_state_libcon_pop_adjusted = RUS_state_libcon_final_pop }
+		set_variable = { RUS_state_liberal_pop_adjusted = RUS_state_liberal_final_pop }
+		set_variable = { RUS_state_conservative_pop_adjusted = RUS_state_conservative_final_pop }
+
+		multiply_variable = { RUS_state_socdem_pop_adjusted = RUS_pop_population_adjust }
+		multiply_variable = { RUS_state_auth_pop_adjusted = RUS_pop_population_adjust }
+		multiply_variable = { RUS_state_libcon_pop_adjusted = RUS_pop_population_adjust }
+		multiply_variable = { RUS_state_liberal_pop_adjusted = RUS_pop_population_adjust }
+		multiply_variable = { RUS_state_conservative_pop_adjusted = RUS_pop_population_adjust }
+
+		divide_variable = { RUS_state_socdem_pop_adjusted = 100 }
+		divide_variable = { RUS_state_auth_pop_adjusted = 100 }
+		divide_variable = { RUS_state_libcon_pop_adjusted = 100 }
+		divide_variable = { RUS_state_liberal_pop_adjusted = 100 }
+		divide_variable = { RUS_state_conservative_pop_adjusted = 100 }
+
+		ROOT = {
+			add_to_variable = { RUS_socdem_pop_points = PREV.RUS_state_socdem_pop_adjusted }
+			add_to_variable = { RUS_auth_pop_points = PREV.RUS_state_auth_pop_adjusted }
+			add_to_variable = { RUS_libcon_pop_points = PREV.RUS_state_libcon_pop_adjusted }
+			add_to_variable = { RUS_liberal_pop_points = PREV.RUS_state_liberal_pop_adjusted }
+			add_to_variable = { RUS_conservative_pop_points = PREV.RUS_state_conservative_pop_adjusted }
+		}
+	}
+
+	set_variable = { RUS_socdem_percent = RUS_socdem_pop_points }
+	set_variable = { RUS_auth_percent = RUS_auth_pop_points }
+	set_variable = { RUS_libcon_percent = RUS_libcon_pop_points }
+	set_variable = { RUS_liberal_percent = RUS_liberal_pop_points }
+	set_variable = { RUS_conservative_percent = RUS_conservative_pop_points }
+
+	if = {
+		limit = {
+			ROOT = {
+				tag = VYT
+			}
+		}
+		set_variable = { RUS_socdem_to_liberal_pop = RUS_socdem_pop_points }
+		set_variable = { RUS_socdem_to_conservative_pop = RUS_socdem_pop_points }
+		set_variable = { RUS_socdem_to_auth_pop = RUS_socdem_pop_points }
+		multiply_variable = { RUS_socdem_to_liberal_pop = 0.80 }
+		multiply_variable = { RUS_socdem_to_conservative_pop = 0.1 }
+		multiply_variable = { RUS_socdem_to_auth_pop = 0.1 }
+		add_to_variable = { RUS_conservative_pop_points = RUS_socdem_to_conservative_pop }
+		add_to_variable = { RUS_auth_pop_points = RUS_socdem_to_auth_pop }
+		add_to_variable = { RUS_liberal_pop_points = RUS_socdem_to_liberal_pop }
+		set_variable = { RUS_fascism_percent = RUS_auth_pop_points }
+		set_variable = { RUS_despotism_percent = RUS_conservative_pop_points }
+		set_variable = { RUS_socialism_percent = RUS_socdem_pop_points }
+		divide_variable = { RUS_fascism_percent = 4 }
+		divide_variable = { RUS_despotism_percent = 1.4 }
+		divide_variable = { RUS_socialism_percent = 5 }
+		set_variable = { RUS_socdem_pop_points = 0 }
+		set_variable = { RUS_socdem_percent = 0 }
+	}
+
+	set_variable = { RUS_pop_percents_total = 0 }
+	add_to_variable = { RUS_pop_percents_total = RUS_socdem_percent }
+	add_to_variable = { RUS_pop_percents_total = RUS_auth_percent }
+	add_to_variable = { RUS_pop_percents_total = RUS_libcon_percent }
+	add_to_variable = { RUS_pop_percents_total = RUS_liberal_percent }
+	add_to_variable = { RUS_pop_percents_total = RUS_conservative_percent }
+	add_to_variable = { RUS_pop_percents_total = RUS_fascism_percent }
+	add_to_variable = { RUS_pop_percents_total = RUS_despotism_percent }
+	add_to_variable = { RUS_pop_percents_total = RUS_socialism_percent }
+
+	divide_variable = { RUS_socdem_percent = RUS_pop_percents_total }
+	divide_variable = { RUS_auth_percent = RUS_pop_percents_total }
+	divide_variable = { RUS_libcon_percent = RUS_pop_percents_total }
+	divide_variable = { RUS_liberal_percent = RUS_pop_percents_total }
+	divide_variable = { RUS_conservative_percent = RUS_pop_percents_total }
+	divide_variable = { RUS_fascism_percent = RUS_pop_percents_total }
+	divide_variable = { RUS_despotism_percent = RUS_pop_percents_total }
+	divide_variable = { RUS_socialism_percent = RUS_pop_percents_total }
+
+	set_variable = { RUS_socdem_wheel_popularity = RUS_socdem_percent }
+	set_variable = { RUS_auth_wheel_popularity = RUS_auth_percent }
+	set_variable = { RUS_libcon_wheel_popularity = RUS_libcon_percent }
+	set_variable = { RUS_liberal_wheel_popularity = RUS_liberal_percent }
+	set_variable = { RUS_conservative_wheel_popularity = RUS_conservative_percent }
+	set_variable = { RUS_fascism_wheel_popularity = RUS_fascism_percent }
+	set_variable = { RUS_despotism_wheel_popularity = RUS_despotism_percent }
+	set_variable = { RUS_socialism_wheel_popularity = RUS_socialism_percent }
+	
+	multiply_variable = { RUS_socdem_wheel_popularity = 100 }
+	multiply_variable = { RUS_auth_wheel_popularity = 100 }
+	multiply_variable = { RUS_libcon_wheel_popularity = 100 }
+	multiply_variable = { RUS_liberal_wheel_popularity = 100 }
+	multiply_variable = { RUS_conservative_wheel_popularity = 100 }
+	multiply_variable = { RUS_fascism_wheel_popularity = 100 }
+	multiply_variable = { RUS_despotism_wheel_popularity = 100 }
+	multiply_variable = { RUS_socialism_wheel_popularity = 100 }
+	
+	set_variable = { RUS_validator_wheel_pop_master = RUS_socdem_wheel_popularity }
+	add_to_variable = { RUS_validator_wheel_pop_master = RUS_auth_wheel_popularity }
+	add_to_variable = { RUS_validator_wheel_pop_master = RUS_libcon_wheel_popularity }
+	add_to_variable = { RUS_validator_wheel_pop_master = RUS_liberal_wheel_popularity }
+	add_to_variable = { RUS_validator_wheel_pop_master = RUS_conservative_wheel_popularity }
+	add_to_variable = { RUS_validator_wheel_pop_master = RUS_fascism_wheel_popularity }
+	add_to_variable = { RUS_validator_wheel_pop_master = RUS_despotism_wheel_popularity }
+	add_to_variable = { RUS_validator_wheel_pop_master = RUS_socialism_wheel_popularity }
+
+	if = {
+		limit = { 
+			NOT = {
+				check_variable = { RUS_validator_wheel_pop_master = 100 }
+			}
+		}
+		set_variable = { RUS_rounding_error = RUS_validator_wheel_pop_master }
+		subtract_from_variable = { RUS_rounding_error = 100 }
+		if = { #fix the rounding error by changing one party big enough for the rounding not to be seen too much (cant bother to compute the max)
+			limit = { 
+				check_variable = { RUS_socdem_wheel_popularity > 10 }
+				}
+			subtract_from_variable = { RUS_socdem_wheel_popularity = RUS_rounding_error }
+		}
+		else_if = { 
+			limit = { 
+				check_variable = { RUS_auth_wheel_popularity > 10 }
+				}
+			subtract_from_variable = { RUS_auth_wheel_popularity = RUS_rounding_error }
+		}
+		else_if = { 
+			limit = { 
+				check_variable = { RUS_libcon_wheel_popularity > 10 }
+				}
+			subtract_from_variable = { RUS_libcon_wheel_popularity = RUS_rounding_error }
+		}
+		else_if = { 
+			limit = { 
+				check_variable = { RUS_liberal_wheel_popularity > 10 }
+				}
+			subtract_from_variable = { RUS_liberal_wheel_popularity = RUS_rounding_error }
+		}
+		else_if = { 
+			limit = { 
+				check_variable = { RUS_conservative_wheel_popularity > 10 }
+				}
+			subtract_from_variable = { RUS_conservative_wheel_popularity = RUS_rounding_error }
+		}
+		else_if = { 
+			limit = { 
+				check_variable = { RUS_fascism_wheel_popularity > 10 }
+				}
+			subtract_from_variable = { RUS_fascism_wheel_popularity = RUS_rounding_error }
+		}
+		else_if = { 
+			limit = { 
+				check_variable = { RUS_despotism_wheel_popularity > 10 }
+				}
+			subtract_from_variable = { RUS_despotism_wheel_popularity = RUS_rounding_error }
+		}
+		else_if = { 
+			limit = { 
+				check_variable = { RUS_socialism_wheel_popularity > 10 }
+				}
+			subtract_from_variable = { RUS_socialism_wheel_popularity = RUS_rounding_error }
+		}
+	}
+
+	ROOT = {
+		set_popularities = {
+			communist = 0
+			socialist = RUS_socialism_wheel_popularity
+			progressivism = RUS_socdem_wheel_popularity
+			liberalism = RUS_liberal_wheel_popularity
+			liberal_conservatism = RUS_libcon_wheel_popularity
+			conservatism = RUS_conservative_wheel_popularity
+			paternalism = RUS_auth_wheel_popularity
+			despotism = RUS_despotism_wheel_popularity
+			fascism = RUS_fascism_wheel_popularity
+			national_socialism = 0
+			ultranationalism = 0
+		}
+	}
+}

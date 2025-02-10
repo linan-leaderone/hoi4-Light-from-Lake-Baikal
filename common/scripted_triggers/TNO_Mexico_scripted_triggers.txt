@@ -1,0 +1,329 @@
+MEX_kabuki_effect_ordaz_ahead = {
+	AND = {
+		check_variable = { MEX_kabuki_ordaz_power > MEX_kabuki_lozano_power }
+		check_variable = { MEX_kabuki_ordaz_power > MEX_kabuki_madrazo_power }
+	}
+}
+MEX_kabuki_effect_lozano_ahead = {
+	AND = {
+		check_variable = { MEX_kabuki_lozano_power > MEX_kabuki_ordaz_power }
+		check_variable = { MEX_kabuki_lozano_power > MEX_kabuki_madrazo_power }
+	}
+}
+MEX_kabuki_effect_madrazo_ahead = {
+	AND = {
+		check_variable = { MEX_kabuki_madrazo_power > MEX_kabuki_ordaz_power }
+		check_variable = { MEX_kabuki_madrazo_power > MEX_kabuki_lozano_power }
+	}
+}
+MEX_dw_are_units_in_node = {
+	var:MEX_DW_node_units^hold = {
+		AND = {
+			check_variable = { MEX_DW_alliegance = token:MEX_Faction_GOVERNMENT }
+			check_variable = { MEX_DW_UNIT_TYPE = TYPE }
+		}
+	}
+}
+MEX_dw_is_node_visible = {
+	OR = {
+		check_variable = { MEX.MEX_DW_fog_of_war_enabled = 2 }
+		check_variable = { MEX_DW_intel > 50 }
+		NOT = { check_variable = { MEX_DW_node_type = MEX.STRONGHOLD } }
+	}
+}
+MEX_dw_is_connection_visible = {
+	AND = {
+		var:MEX_DW_rendered_connections_start^connection_idx = {
+			MEX_dw_is_node_visible = yes
+		}
+		var:MEX_DW_rendered_connections_end^connection_idx = {
+			MEX_dw_is_node_visible = yes
+		}
+	}
+}
+MEX_dw_is_node_in_battle = {
+	
+}
+MEX_dw_is_node_allegence_known = {
+	OR = {
+		check_variable = { MEX.MEX_DW_fog_of_war_enabled = 2 }
+		
+		NOT = { check_variable = { MEX_DW_controller = 0 } }
+		NOT = { check_variable = { MEX_DW_node_type = MEX.TOWN } }
+	}
+	OR = {
+		check_variable = { MEX_DW_node_type = MEX.CITY }
+		check_variable = { MEX_DW_intel > 24 }
+	}
+	
+}
+MEX_dw_is_connection_allegence_known = {
+	AND = {
+		var:MEX_DW_rendered_connections_start^connection_idx = {
+			MEX_dw_is_node_allegence_known = yes
+		}
+		var:MEX_DW_rendered_connections_end^connection_idx = {
+			MEX_dw_is_node_allegence_known = yes
+		}
+	}
+}
+
+# Econ
+MEX_econ_region_project_available = {
+	if = {
+		limit = {
+			check_variable = { temp_project = 306 }
+		}
+		has_country_leader = { character = MEX_Carlos_Madrazo ruling_only = yes }
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp_region = 1 }
+		}
+		if = {
+			limit = {
+				check_variable = { temp_project = 1 }
+			}
+			date > 1962.9.1
+			set_temp_variable = { temp_value = 6 }
+			MEX_econ_gdp_growth_real_at_least = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { temp_project = 2 }
+			}
+			has_country_leader = { character = MEX_Gustavo_Ordaz ruling_only = yes }
+		}
+		else = {
+			custom_trigger_tooltip = { tooltip = MEX_econ_region_project_no_lock_tt }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp_region = 2 }
+		}
+		if = {
+			limit = {
+				check_variable = { temp_project = 1 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Uruchurtu_dealt_with_tt
+				has_country_flag = Uruchurtu_dealt_with
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = { temp_project = 101 }
+			}
+			set_temp_variable = { temp_project = 1 }
+			set_temp_variable = { temp_status = 1 }
+			MEX_econ_region_project_status_is = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { temp_project = 102 }
+			}
+			set_temp_variable = { temp_project = 1 }
+			set_temp_variable = { temp_status = 1 }
+			MEX_econ_region_project_status_is = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { temp_project = 105 }
+			}
+			set_temp_variable = { temp_project = 103 }
+			set_temp_variable = { temp_status = 1 }
+			MEX_econ_region_project_status_is = yes
+		}
+		else = {
+			custom_trigger_tooltip = { tooltip = MEX_econ_region_project_no_lock_tt }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp_region = 3 }
+		}
+		custom_trigger_tooltip = { tooltip = MEX_econ_region_project_no_lock_tt }
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp_region = 4 }
+		}
+		custom_trigger_tooltip = { tooltip = MEX_econ_region_project_no_lock_tt }
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp_region = 5 }
+		}
+		if = {
+			limit = {
+				check_variable = { temp_project = 1 }
+			}
+			has_country_leader = { character = MEX_Gustavo_Ordaz ruling_only = yes }
+			custom_trigger_tooltip = {
+				tooltip = MEX_has_completed_the_camizal_check
+				has_country_flag = MEX_has_completed_the_chamizal
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = { temp_project = 101 }
+			}
+			has_country_leader = { character = MEX_Raul_Lozano ruling_only = yes }
+		}
+		else = {
+			custom_trigger_tooltip = { tooltip = MEX_econ_region_project_no_lock_tt }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp_region = 6 }
+		}
+		if = {
+			limit = {
+				check_variable = { temp_project = 201 }
+			}
+			has_country_leader = { character = MEX_Gustavo_Ordaz ruling_only = yes }
+		}
+		else_if = {
+			limit = {
+				check_variable = { temp_project = 202 }
+			}
+			set_temp_variable = { temp_value = 6 }
+			MEX_econ_gdp_growth_real_at_least = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { temp_project = 205 }
+			}
+			set_temp_variable = { temp_value = 6 }
+			MEX_econ_gdp_growth_real_at_least = yes
+		}
+		else = {
+			custom_trigger_tooltip = { tooltip = MEX_econ_region_project_no_lock_tt }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp_region = 7 }
+		}
+		if = {
+			limit = {
+				check_variable = { temp_project = 103 }
+			}
+			set_temp_variable = { temp_value = 6 }
+			MEX_econ_gdp_growth_real_at_least = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { temp_project = 201 }
+			}
+			has_country_leader = { character = MEX_Carlos_Madrazo ruling_only = yes }
+		}
+		else = {
+			custom_trigger_tooltip = { tooltip = MEX_econ_region_project_no_lock_tt }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp_region = 8 }
+		}
+		if = {
+			limit = {
+				check_variable = { temp_project = 102 }
+			}
+			OR = {
+				has_country_leader = { character = MEX_Gustavo_Ordaz ruling_only = yes }
+				has_country_leader = { character = MEX_Raul_Lozano ruling_only = yes }
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = { temp_project = 103 }
+			}
+			has_country_leader = { character = MEX_Raul_Lozano ruling_only = yes }
+		}
+		else_if = {
+			limit = {
+				check_variable = { temp_project = 104 }
+			}
+			has_country_leader = { character = MEX_Gustavo_Ordaz ruling_only = yes }
+			has_completed_focus = MEX_sea_of_tehuantepec
+		}
+		else = {
+			custom_trigger_tooltip = { tooltip = MEX_econ_region_project_no_lock_tt }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp_region = 9 }
+		}
+		if = {
+			limit = {
+				check_variable = { temp_project = 201 }
+			}
+			has_country_leader = { character = MEX_Raul_Lozano ruling_only = yes }
+		}
+		else = {
+			custom_trigger_tooltip = { tooltip = MEX_econ_region_project_no_lock_tt }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp_region = 10 }
+		}
+		if = {
+			limit = {
+				check_variable = { temp_project = 1 }
+			}
+			date > 1965.1.1
+			OR = {
+				has_country_leader = { character = MEX_Gustavo_Ordaz ruling_only = yes }
+				has_country_leader = { character = MEX_Raul_Lozano ruling_only = yes }
+			}
+		}
+		else = {
+			custom_trigger_tooltip = { tooltip = MEX_econ_region_project_no_lock_tt }
+		}
+	}
+}
+
+MEX_econ_gdp_growth_real_at_least = {
+	custom_trigger_tooltip = {
+		tooltip = MEX_econ_gdp_growth_real_at_least_tt
+		NOT = {
+			check_variable = { gdp_growth_real < temp_value }
+		}
+	}
+}
+
+MEX_econ_region_project_status_is = {
+	custom_trigger_tooltip = {
+		tooltip = MEX_econ_region_project_status_is_tt
+		check_variable = { temp_project:MEX_econ_project_status@var:temp_region = temp_status }
+	}
+}
+
+MEX_econ_region_debt_crisis_has = {
+	meta_trigger = {
+		text = {
+			has_country_flag = MEX_debt_crisis_[REGION_NUM]_in_progress
+		}
+		REGION_NUM = "[?MEX_econ_region_selected|.0]"
+	}
+}
+
+MEX_econ_region_debt_crisis_any = {
+	OR = {
+		has_country_flag = MEX_debt_crisis_1_in_progress
+		has_country_flag = MEX_debt_crisis_2_in_progress
+		has_country_flag = MEX_debt_crisis_3_in_progress
+		has_country_flag = MEX_debt_crisis_4_in_progress
+		has_country_flag = MEX_debt_crisis_5_in_progress
+		has_country_flag = MEX_debt_crisis_6_in_progress
+		has_country_flag = MEX_debt_crisis_7_in_progress
+		has_country_flag = MEX_debt_crisis_8_in_progress
+		has_country_flag = MEX_debt_crisis_9_in_progress
+		has_country_flag = MEX_debt_crisis_10_in_progress
+	}
+}

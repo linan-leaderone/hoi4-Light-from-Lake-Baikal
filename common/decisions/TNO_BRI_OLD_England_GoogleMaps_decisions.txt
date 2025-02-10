@@ -1,0 +1,1516 @@
+ENG_DECCAT_ENGGOOGLEMAPS = {
+	ENG_DEC_ENGGOOGLEMAPS_HMMLR_TOGGLE_DEBUG = {
+		icon = GFX_decision_generic_prepare_civil_war
+		visible = {
+			is_debug = yes
+		}
+		available = {
+			is_debug = yes
+		}
+		complete_effect = {
+			if = {
+				limit = {
+					has_country_flag = ENG_Player_HMMLR
+				}
+				clr_country_flag = ENG_Player_HMMLR
+				set_country_flag = ENG_Player_Collab
+			}
+			else_if = {
+				limit = {
+					has_country_flag = ENG_Player_Collab
+				}
+				clr_country_flag = ENG_Player_Collab
+				set_country_flag = ENG_Player_HMMLR
+			}
+			else_if = {
+				limit = {
+					NOT = {
+						has_country_flag = ENG_Player_Collab
+						has_country_flag = ENG_Player_HMMLR
+					}
+				}
+				set_country_flag = ENG_Player_HMMLR
+			}
+			every_owned_state = {
+				ENG_GoogleMaps_Math = yes
+			}
+		}
+	}
+
+	####HMMLR GOOGLEMAPS DECISIONS ####
+	# Note by Lavo: Every state has their own decisions because HOI4 
+	# does not refresh decisions instantly but requires 1 day between each
+	
+	## Removed extremely taxing and unecessary decision category, feels like I'm unearthing the fossil that is old England code here
+	# - Scars
+
+	ENG_DEC_INCREASEHMMLRSUPPORT = {
+		icon = GFX_decision_generic_propaganda
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_HMMLR
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			check_variable = { ENG_EnglishGoogleMaps_ChosenState = FROM.id }
+		}
+		target_array = ENG_Googlemap_State
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		state_target = yes
+		on_map_mode = map_and_decisions_view
+		custom_cost_trigger = {
+			check_variable = { ENG_Hmmlr_Guns > 9 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_tt
+		complete_effect = {
+			add_to_variable = { ENG_Hmmlr_Guns = -10 }
+			FROM = {
+				ENG_IncreaseHMMLR_Support_vl = yes
+				set_variable = { ENG_StateStats_RecentAction = 1 }
+			}
+		}
+	}
+
+	ENG_DEC_INCREASEHMMLRTREND = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_HMMLR
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			check_variable = { ENG_EnglishGoogleMaps_ChosenState = FROM.id }
+		}
+		target_array = ENG_Googlemap_State
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		state_target = yes
+		on_map_mode = map_and_decisions_view
+		custom_cost_trigger = {
+			check_variable = { ENG_Hmmlr_Guns > 9 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_tt
+		complete_effect = {
+			add_to_variable = { ENG_Hmmlr_Guns = -10 }
+			FROM = {
+				ENG_IncreaseHMMLR_Trend_low = yes
+				set_variable = { ENG_StateStats_RecentAction = 1 }
+			}
+		}
+	}
+
+	ENG_DEC_HMMLRDESTABILISE = {
+		icon = GFX_decision_generic_humanitarian_aid_increase
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_HMMLR
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			check_variable = { ENG_EnglishGoogleMaps_ChosenState = FROM.id }
+		}
+		target_array = ENG_Googlemap_State
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		state_target = yes
+		on_map_mode = map_and_decisions_view
+		custom_cost_trigger = {
+			check_variable = { ENG_Hmmlr_Guns > 9 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_tt
+		complete_effect = {
+			add_to_variable = { ENG_Hmmlr_Guns = -10 }
+			FROM = {
+				ENG_Decrease_Stab_low = yes
+				set_variable = { ENG_StateStats_RecentAction = 1 }
+			}
+		}
+	}
+
+	ENG_DEC_HMMLRRAIDDONNINGTON = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_HMMLR
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = TNO_ENG_HMMLR_Expanded_Midlands_Operations
+			NOT = { has_country_flag = TNO_ENG_HMMLR_Donnington_Raided }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 2010 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Hmmlr_Guns > 49 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt
+		complete_effect = {
+			set_country_flag = TNO_ENG_HMMLR_Donnington_Raided
+			custom_effect_tooltip = ENG_HMMLR_gains_gun_tt
+			add_to_variable = { ENG_Hmmlr_Guns = 750 }
+			add_to_variable = { ENG_Collab_Guns = -750 }
+			hidden_effect = {
+				128 = {
+					ENG_Decrease_Stab_med = yes
+					ENG_IncreaseHMMLR_Trend_low = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	ENG_DEC_HMMLRRAIDCHILWELL = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_HMMLR
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = TNO_ENG_HMMLR_Expanded_Midlands_Operations
+			NOT = { has_country_flag = TNO_ENG_HMMLR_Chilwell_Raided }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 129 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Hmmlr_Guns > 49 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt
+		complete_effect = {
+			set_country_flag = TNO_ENG_HMMLR_Chilwell_Raided
+			custom_effect_tooltip = ENG_HMMLR_gains_gun_tt
+			add_to_variable = { ENG_Hmmlr_Guns = 750 }
+			add_to_variable = { ENG_Collab_Guns = -750 }
+			hidden_effect = {
+				129 = {
+					ENG_Decrease_Stab_med = yes
+					ENG_IncreaseHMMLR_Trend_low = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	ENG_DEC_HMMLRRAIDFENHAM = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_HMMLR
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = TNO_ENG_HMMLR_Expanded_North_Operations
+			NOT = { has_country_flag = TNO_ENG_HMMLR_Fenham_Raided }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 131 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Hmmlr_Guns > 49 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt
+		complete_effect = {
+			set_country_flag = TNO_ENG_HMMLR_Fenham_Raided
+			custom_effect_tooltip = ENG_HMMLR_gains_gun_tt
+			add_to_variable = { ENG_Hmmlr_Guns = 750 }
+			add_to_variable = { ENG_Collab_Guns = -750 }
+			hidden_effect = {
+				131 = {
+					ENG_Decrease_Stab_med = yes
+					ENG_IncreaseHMMLR_Trend_low = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	ENG_DEC_HMMLRRAIDFULWOOD = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_HMMLR
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = TNO_ENG_HMMLR_Expanded_North_Operations
+			NOT = { has_country_flag = TNO_ENG_HMMLR_Fulwood_Raided }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 132 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Hmmlr_Guns > 49 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt
+		complete_effect = {
+			set_country_flag = TNO_ENG_HMMLR_Fulwood_Raided
+			custom_effect_tooltip = ENG_HMMLR_gains_gun_tt
+			add_to_variable = { ENG_Hmmlr_Guns = 750 }
+			add_to_variable = { ENG_Collab_Guns = -750 }
+			hidden_effect = {
+				132 = {
+					ENG_Decrease_Stab_med = yes
+					ENG_IncreaseHMMLR_Trend_low = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	ENG_DEC_HMMLRRAIDBICESTER = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_HMMLR
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = TNO_ENG_HMMLR_Expanded_South_Operations
+			NOT = { has_country_flag = TNO_ENG_HMMLR_Bicester_Raided }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 126 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Hmmlr_Guns > 49 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt
+		complete_effect = {
+			set_country_flag = TNO_ENG_HMMLR_Bicester_Raided
+			custom_effect_tooltip = ENG_HMMLR_gains_gun_tt
+			add_to_variable = { ENG_Hmmlr_Guns = 750 }
+			add_to_variable = { ENG_Collab_Guns = -750 }
+			hidden_effect = {
+				126 = {
+					ENG_Decrease_Stab_med = yes
+					ENG_IncreaseHMMLR_Trend_low = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	ENG_DEC_HMMLRRAIDHOUNSLOW = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_HMMLR
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = TNO_ENG_HMMLR_Expanded_South_Operations
+			NOT = { has_country_flag = TNO_ENG_HMMLR_Hounslow_Raided }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 1300 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Hmmlr_Guns > 49 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt
+		complete_effect = {
+			set_country_flag = TNO_ENG_HMMLR_Hounslow_Raided
+			custom_effect_tooltip = ENG_HMMLR_gains_gun_tt
+			add_to_variable = { ENG_Hmmlr_Guns = 750 }
+			add_to_variable = { ENG_Collab_Guns = -750 }
+			hidden_effect = {
+				1300 = {
+					ENG_Decrease_Stab_med = yes
+					ENG_IncreaseHMMLR_Trend_low = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	#### COLLAB GOOGLEMAPS DECISIONS ####
+	# Note by Lavo: Every state has their own decisions because HOI4 
+	# does not refresh decisions instantly but requires 1 day between each
+	
+	## Removed extremely taxing and unecessary decision category, feels like I'm unearthing the fossil that is old England code here
+	# - Scars
+
+	ENG_DEC_INCREASECOLLABSUPPORT = {
+		icon = GFX_decision_generic_propaganda
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_Collab
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			check_variable = { ENG_EnglishGoogleMaps_ChosenState = FROM.id }
+		}
+		target_array = ENG_Googlemap_State
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				FROM = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		state_target = yes
+		on_map_mode = map_and_decisions_view
+		custom_cost_trigger = {
+			check_variable = { ENG_Collab_Guns > 9 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_tt
+		complete_effect = {
+			add_to_variable = { ENG_Collab_Guns = -10 }
+			FROM = {
+				ENG_IncreaseCollab_Support_vl = yes
+				set_variable = { ENG_StateStats_RecentAction = 1 }
+				hidden_effect = {
+					ENG_GoogleMaps_Math = yes
+				}
+			}
+		}
+	}
+
+	ENG_DEC_INCREASECOLLABTREND = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_Collab
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			check_variable = { ENG_EnglishGoogleMaps_ChosenState = FROM.id }
+		}
+		target_array = ENG_Googlemap_State
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				FROM = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		state_target = yes
+		on_map_mode = map_and_decisions_view
+		custom_cost_trigger = {
+			check_variable = { ENG_Collab_Guns > 9 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_tt
+		complete_effect = {
+			add_to_variable = { ENG_Collab_Guns = -10 }
+			FROM = {
+				ENG_IncreaseCollab_Trend_low = yes
+				set_variable = { ENG_StateStats_RecentAction = 1 }
+			}
+		}
+	}
+
+	ENG_DEC_COLLABSTABILISE = {
+		icon = GFX_decision_generic_humanitarian_aid_increase
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_Collab
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			check_variable = { ENG_EnglishGoogleMaps_ChosenState = FROM.id }
+		}
+		target_array = ENG_Googlemap_State
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				FROM = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		state_target = yes
+		on_map_mode = map_and_decisions_view
+		custom_cost_trigger = {
+			check_variable = { ENG_Collab_Guns > 9 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_tt
+		complete_effect = {
+			add_to_variable = { ENG_Collab_Guns = -10 }
+			FROM = {
+				ENG_Increase_Stab_low = yes
+				set_variable = { ENG_StateStats_RecentAction = 1 }
+			}
+		}
+	}
+
+
+	ENG_DEC_COLLAB_West_Midlands = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_Collab
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = ENG_expanded_midland_actions
+		}
+		fire_only_once = yes
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 128 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Collab_Guns > 249 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt_bigger
+		complete_effect = {
+			add_to_variable = { ENG_Collab_Guns = -250 }
+			hidden_effect = {
+				128 = {
+					ENG_Increase_Stab_med = yes
+					ENG_IncreaseCollab_Support_med = yes
+					ENG_IncreaseCollab_Trend_med = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	ENG_DEC_COLLAB_East_Midlands = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_Collab
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = ENG_expanded_midland_actions
+		}
+		fire_only_once = yes
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 129 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Collab_Guns > 249 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt_bigger
+		complete_effect = {
+			add_to_variable = { ENG_Collab_Guns = -250 }
+			hidden_effect = {
+				129 = {
+					ENG_Increase_Stab_med = yes
+					ENG_IncreaseCollab_Support_med = yes
+					ENG_IncreaseCollab_Trend_med = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	ENG_DEC_COLLAB_Newcastle = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_Collab
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = ENG_expanded_north_actions
+			NOT = { has_country_flag = ENG_DEC_COLLAB_Newcastle_done }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 131 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Collab_Guns > 249 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt_bigger
+		complete_effect = {
+			set_country_flag = ENG_DEC_COLLAB_Newcastle_done
+			add_to_variable = { ENG_Collab_Guns = -250 }
+			hidden_effect = {
+				131 = {
+					ENG_Increase_Stab_med = yes
+					ENG_IncreaseCollab_Support_med = yes
+					ENG_IncreaseCollab_Trend_med = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	ENG_DEC_COLLAB_Lancashire = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_Collab
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = ENG_expanded_north_actions
+			NOT = { has_country_flag = ENG_DEC_COLLAB_Lancashire_done }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 132 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Collab_Guns > 249 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt_bigger
+		complete_effect = {
+			set_country_flag = ENG_DEC_COLLAB_Lancashire_done
+			add_to_variable = { ENG_Collab_Guns = -250 }
+			hidden_effect = {
+				132 = {
+					ENG_Increase_Stab_med = yes
+					ENG_IncreaseCollab_Support_med = yes
+					ENG_IncreaseCollab_Trend_med = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	ENG_DEC_COLLAB_Oxfordshire = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_Collab
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = ENG_expanded_south_actions
+			NOT = { has_country_flag = ENG_DEC_COLLAB_Oxfordshire_done }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 126 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Collab_Guns > 249 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt_bigger
+		complete_effect = {
+			set_country_flag = ENG_DEC_COLLAB_Oxfordshire_done
+			add_to_variable = { ENG_Collab_Guns = -250 }
+			hidden_effect = {
+				126 = {
+					ENG_Increase_Stab_med = yes
+					ENG_IncreaseCollab_Support_med = yes
+					ENG_IncreaseCollab_Trend_med = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+	ENG_DEC_COLLAB_London = {
+		icon = GFX_decision_generic_assault
+		allowed = { original_tag = ENG }
+		visible = {
+			has_country_flag = ENG_Player_Collab
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = ENG_expanded_south_actions
+			NOT = { has_country_flag = ENG_DEC_COLLAB_London_done }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = ENG_no_operation_this_month_tt
+				var:ENG_EnglishGoogleMaps_ChosenState = {
+					check_variable = { ENG_StateStats_RecentAction = 0 }
+				}
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = { state = 1300 }
+			highlight_color_before_active = 3
+			highlight_color_while_active = 2
+		}
+		custom_cost_trigger = {
+			check_variable = { ENG_Collab_Guns > 249 }
+		}
+		custom_cost_text = ENG_googlemaps_cost_raids_tt_bigger
+		complete_effect = {
+			set_country_flag = ENG_DEC_COLLAB_London_done
+			add_to_variable = { ENG_Collab_Guns = -250 }
+			hidden_effect = {
+				1300 = {
+					ENG_Increase_Stab_med = yes
+					ENG_IncreaseCollab_Support_med = yes
+					ENG_IncreaseCollab_Trend_med = yes
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+				}
+			}
+		}
+	}
+
+
+}
+
+ENG_Opposition_Stuff = {
+	ENG_DEC_HMMLROpposition = {
+		icon = GFX_decision_generic_prepare_civil_war
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+		activation = {
+			has_country_flag = ENG_Player_Collab
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = ENG_Opposition_Monthly_Pulse
+		}
+		visible = {
+			hidden_trigger = {
+				has_country_flag = ENG_Player_Collab
+				has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			}
+		}
+
+		fixed_random_seed = no
+		cancel_if_not_visible = yes
+		is_good = yes
+		days_mission_timeout = 15
+		days_remove = 10
+		priority = 100
+
+		timeout_effect = {
+			hidden_effect = {
+				clr_country_flag = ENG_Opposition_Monthly_Pulse
+				every_owned_state = {
+					random_list = {
+						6 = {
+							ENG_AI_increase_HMMLR_trend = yes
+							modifier = {
+								factor = 0
+								date > 1963.7.1
+							}
+							modifier = {
+								factor = 2
+								date < 1962.7.1
+								ENG = { is_ai = yes }
+							}
+						}
+						3 = {
+							ENG_AI_destabilize_state = yes
+						}
+						2 = {
+							ENG_AI_increase_HMMLR_support = yes
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ENG_DEC_CollabOpposition = {
+		icon = GFX_decision_generic_prepare_civil_war
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+		activation = {
+			has_country_flag = ENG_Player_HMMLR
+			has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			has_country_flag = ENG_Opposition_Monthly_Pulse
+		}
+		visible = {
+			hidden_trigger = {
+				has_country_flag = ENG_Player_HMMLR
+				has_country_flag = ENG_GoogleMaps_ActiveDecisions
+			}
+		}
+
+		fixed_random_seed = no
+		cancel_if_not_visible = yes
+		is_good = yes
+		days_mission_timeout = 15
+		days_remove = 10
+		priority = 100
+
+		timeout_effect = {
+			hidden_effect = {
+				clr_country_flag = ENG_Opposition_Monthly_Pulse
+				every_owned_state = {
+					random_list = {
+						6 = {
+							ENG_AI_increase_Collab_trend = yes
+							modifier = {
+								factor = 0
+								date > 1963.7.1
+							}
+							modifier = {
+								factor = 2
+								date < 1962.7.1
+								ENG = { is_ai = yes }
+							}
+						}
+						3 = {
+							ENG_AI_stabilize_state = yes
+						}
+						2 = {
+							ENG_AI_increase_Collab_support = yes
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ENG_HMMLR_focus_mis = { # THIS ONE FIRES IF YOURE THE COLLABS
+		icon = GFX_decision_generic_prepare_civil_war
+		available = { hidden_trigger = { always = no } }
+		activation = { always = no }
+		days_mission_timeout = ENG_focus_days?6
+		priority = 50
+
+		timeout_effect = {
+			custom_effect_tooltip = ENG_HMMLR_focus_mis_tt
+
+			#Give the effects
+			if = {
+				limit = {
+					check_variable = { ENG_focus_id = 0 }
+				}
+				set_variable = { ENG_focus_days = 20 }
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 1 }
+				}
+				every_owned_state = {
+					limit = {
+						ENG_is_urban_state = yes
+					}
+					ENG_IncreaseHMMLR_Support_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 2 }
+				}
+				ENG_randomize_state_HMMLR = yes
+				ENG_randomize_state_HMMLR = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 2 }
+					}
+					ENG_Decrease_Stab_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 3 }
+				}
+				ENG_randomize_state_HMMLR = yes
+				ENG_randomize_state_HMMLR = yes
+				ENG_randomize_state_HMMLR = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 2 }
+					}
+					ENG_Decrease_Stab_low = yes
+					ENG_IncreaseHMMLR_Support_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 4 }
+				}
+				every_owned_state = {
+					limit = {
+						OR = {
+							state = 129
+							state = 128
+							state = 885
+						}
+					}
+					ENG_IncreaseHMMLR_Trend_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 5 }
+				}
+				ENG_HmmlrGunsPlus_9500 = yes
+				ENG_randomize_state_HMMLR = yes
+				ENG_randomize_state_HMMLR = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 2 }
+					}
+					ENG_IncreaseHMMLR_Support_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 6 }
+				}
+				every_owned_state = {
+					limit = {
+						state = 127
+					}
+					ENG_IncreaseHMMLR_Support_med = yes
+					ENG_Decrease_Stab_highmed = yes
+				}
+				every_owned_state = {
+					limit = {
+						OR = {
+							state = 129
+							state = 128
+							state = 885
+						}
+					}
+					ENG_IncreaseHMMLR_Trend_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 7 }
+				}
+				custom_effect_tooltip = ENG_HMMLR_simulated_focus_blank
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 8 }
+				}
+				every_owned_state = {
+					limit = {
+						OR = {
+							state = 130
+							state = 131
+							state = 132
+						}
+					}
+					ENG_Decrease_Stab_med = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 9 }
+				}
+				ENG_randomize_state_HMMLR = yes
+				ENG_randomize_state_HMMLR = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 2 }
+					}
+					ENG_IncreaseHMMLR_Support_high = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 10 }
+				}
+				FEN = { add_manpower = 5000 }
+				set_country_flag = TNO_ENG_flood_of_volunteers
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 11 }
+				}
+				every_owned_state = {
+					limit = {
+						OR = {
+							state = 131
+							state = 132
+							state = 130
+						}
+					}
+					ENG_IncreaseHMMLR_Trend_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 12 }
+				}
+				custom_effect_tooltip = ENG_Operation_USA_Backing_tt
+				set_country_flag = TNO_Operation_USA_Backing
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 13 }
+				}
+				every_owned_state = {
+					limit = {
+						state = 132
+					}
+					ENG_IncreaseHMMLR_Support_med = yes
+					ENG_Decrease_Stab_highmed = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 14 }
+				}
+				custom_effect_tooltip = ENG_HMMLR_simulated_focus_blank
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 15 }
+				}
+				custom_effect_tooltip = ENG_HMMLR_simulated_focus_blank
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 16 }
+				}
+				custom_effect_tooltip = ENG_HMMLR_simulated_focus_blank
+				
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 17 }
+				}
+				custom_effect_tooltip = ENG_HMMLR_simulated_focus_blank
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 18 }
+				}
+				every_owned_state = {
+					limit = {
+						OR = {
+							state = 1300
+							state = 126
+							state = 127
+						}
+					}
+					ENG_IncreaseHMMLR_Trend_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 19 }
+				}
+				add_to_variable = { ENG_Hmmlr_Guns = 750 }
+				custom_effect_tooltip = ENG_HMMLR_gains_gun_tt
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 20 }
+				}
+				every_owned_state = {
+					limit = {
+						ENG_is_urban_state = yes
+					}
+					ENG_IncreaseHMMLR_Support_high = yes
+					ENG_Decrease_Stab_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 21 }
+				}
+				custom_effect_tooltip = ENG_HMMLR_simulated_focus_blank
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 22 }
+				}
+				custom_effect_tooltip = ENG_HMMLR_simulated_focus_blank
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 23 }
+				}
+				custom_effect_tooltip = ENG_HMMLR_simulated_focus_blank
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 24 }
+				}
+				custom_effect_tooltip = ENG_HMMLR_simulated_focus_blank
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 25 }
+				}
+				custom_effect_tooltip = ENG_HMMLR_simulated_focus_blank
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 26 }
+				}
+				every_owned_state = {
+					limit = {
+						OR = {
+							state = 127
+							state = 1300
+							state = 126
+						}
+					}
+					ENG_Decrease_Stab_low = yes
+				}
+				CRN = {
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = -250
+						producer = CRN
+					}
+				}
+				add_to_variable = { ENG_Hmmlr_Guns = 250 }
+				custom_effect_tooltip = ENG_pay_them_enough_tt
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 27 }
+				}
+				CRN = {
+					add_manpower = -1000
+					add_war_support = -0.08
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 28 }
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 29 }
+				}
+			}
+
+			ENG_pick_next_focus_effect = yes
+			if = {
+				limit = {
+					check_variable = { ENG_focus_counter < 28 }
+				}
+				hidden_effect = { activate_mission = ENG_HMMLR_focus_mis }
+			}
+		}
+	}
+
+	ENG_Collab_focus_mis = { # THIS ONE FIRES IF YOURE HMMLR
+		icon = GFX_decision_generic_prepare_civil_war
+		available = { hidden_trigger = { always = no } }
+		activation = { always = no }
+		days_mission_timeout = ENG_focus_days?6
+		priority = 50
+
+		timeout_effect = {
+			custom_effect_tooltip = ENG_Collab_focus_mis_tt
+
+			#Give the effects
+			if = {
+				limit = {
+					check_variable = { ENG_focus_id = 0 }
+				}
+				set_variable = { ENG_focus_days = 20 }
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 1 }
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 2 }
+				}
+				ENG_CollabGunsPlus_1000 = yes
+				add_manpower = 2500
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 3 }
+				}
+				add_stability = -0.07
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				every_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 1 }
+					}
+					ENG_IncreaseCollab_Support_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 4 }
+				}
+				every_owned_state = {
+					limit = {
+						OR = {
+							state = 130
+							state = 131
+							state = 132
+						}
+					}
+					ENG_DecreaseHMMLR_Trend_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 5 }
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 6 }
+				}
+				every_owned_state = {
+					limit = {
+						state = 130
+					}
+					ENG_DecreaseHMMLR_Support_med = yes
+				}
+				set_country_flag = ENG_dominate_yorkshire
+				custom_effect_tooltip = ENG_dominate_yorkshire_tt
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 7 }
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 8 }
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 9 }
+				}
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 1 }
+					}
+					ENG_DecreaseHMMLR_Support_med = yes
+				}
+				add_war_support = 0.07
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 10 }
+				}
+				add_to_variable = { ENG_Collab_Guns = -100 }
+				custom_effect_tooltip = ENG_collabs_lose_guns_tt
+				set_country_flag = ENG_speak_with_the_army
+				custom_effect_tooltip = ENG_Army_Prepares_tt
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 11 }
+				}
+				every_owned_state = {
+					limit = {
+						is_demilitarized_zone = no
+					}
+					ENG_IncreaseCollab_Trend_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 12 }
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 13 }
+				}
+				ENG_randomize_state_Collab = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 1 }
+					}
+					ENG_Increase_Stab_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 14 }
+				}
+				every_owned_state = {
+					limit = {
+						ENG_is_urban_state = yes
+					}
+					ENG_Increase_Stab_low = yes
+				}
+				ENG_randomize_state_Collab = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 1 }
+					}
+					ENG_IncreaseCollab_Trend_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 15 }
+				}
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 1 }
+					}
+					ENG_Increase_Stab_med = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 16 }
+				}
+				RP_Initialize_Emergency_Relief_Act = yes
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 17 }
+				}
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 1 }
+					}
+					ENG_IncreaseCollab_Support_low = yes
+					ENG_Increase_Stab_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 18 }
+				}
+				every_owned_state = {
+					limit = {
+						is_demilitarized_zone = no
+					}
+					ENG_IncreaseHMMLR_Trend_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 19 }
+				}
+				add_to_variable = { ENG_Collab_Guns = 100 }
+				custom_effect_tooltip = ENG_collabs_gain_guns_tt
+				every_owned_state = {
+					limit = {
+						OR = {
+							state = 127
+							state = 1300
+							state = 126
+							state = 338
+						}
+					}
+					ENG_Increase_Stab_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 20 }
+				}
+				remove_unit_leader_role = ENG_Orde_Wingate
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 21 }
+				}
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 1 }
+					}
+					ENG_DecreaseHMMLR_Support_med = yes
+				}
+				ENG_CollabGunsPlus_5000 = yes
+				add_manpower = 5500
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 22 }
+				}
+				every_owned_state = {
+					limit = {
+						is_demilitarized_zone = no
+					}
+					if = {
+						limit = {
+							ENG_is_urban_state = yes
+						}
+						ENG_Increase_Stab_high = yes
+					}
+					else = {
+						ENG_IncreaseCollab_Support_low = yes
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 23 }
+				}
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 1 }
+					}
+					ENG_IncreaseCollab_Support_med = yes
+				}
+				every_owned_state = {
+					ENG_Increase_Stab_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 24 }
+				}
+				every_owned_state = {
+					limit = {
+						OR = {
+							state = 127
+							state = 1300
+							state = 126
+							state = 338
+						}
+					}
+					ENG_DecreaseHMMLR_Support_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 25 }
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 26 }
+				}
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				ENG_randomize_state_Collab = yes
+				every_owned_state = {
+					limit = {
+						check_variable = { selected_state@THIS = 1 }
+					}
+					ENG_Increase_Stab_low = yes
+					ENG_IncreaseCollab_Support_low = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 27 }
+				}
+				CRN = {
+					add_manpower = 7500
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 28 }
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { ENG_focus_id = 29 }
+				}
+			}
+
+
+			ENG_pick_next_focus_effect = yes
+			if = {
+				limit = {
+					check_variable = { ENG_focus_counter < 28 }
+				}
+				hidden_effect = { activate_mission = ENG_Collab_focus_mis }
+			}
+		}
+	}
+}

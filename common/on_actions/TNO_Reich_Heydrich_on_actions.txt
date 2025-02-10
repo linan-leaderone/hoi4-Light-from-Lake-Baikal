@@ -1,0 +1,166 @@
+on_actions = {
+	on_weekly_GER = {
+		effect = {
+			GER = {
+				if = {
+					limit = { has_country_flag = HGR_Demanded_Bunkers }
+					add_to_variable = { HGR_Bunker_Progress = 1 }
+					add_to_variable = { HGR_Bunker_Quality = 5 }
+
+					add_to_variable = { HGR_Bunker_Progress = HGR_Bunker_Progress_Bonus }
+
+					if = {
+						limit = { NOT = { has_country_flag = HGR_Bunkers_Complete } }
+						if = {
+							limit = { check_variable = { HGR_Bunker_Progress > 99 } }
+							set_country_flag = HGR_Bunkers_Complete
+						}
+					}
+				}
+
+				if = {
+					limit = { has_country_flag = HGR_Demanded_Nukes }
+					add_to_variable = { HGR_Nukes_Progress = 1 }
+					add_to_variable = { HGR_Nukes_Quality = 5 }
+
+					add_to_variable = { HGR_Nukes_Progress = HGR_Nukes_Progress_Bonus }
+					if = {
+						limit = { check_variable = { HGR_Nukes_Progress_Bonus > 0 } }
+						add_to_variable = { HGR_Nukes_Progress_Bonus = -1 }
+					}
+
+					if = {
+						limit = { NOT = { has_country_flag = HGR_Nukes_Complete } }
+						if = {
+							limit = { check_variable = { HGR_Nukes_Progress > 99 } }
+							set_country_flag = HGR_Nukes_Complete
+						}
+					}
+				}
+
+				if = {
+					limit = { has_country_flag = HGR_Demanded_Bunkers }
+					add_to_variable = { HGR_Bunker_Time_Remaining = -7 }
+				}
+
+				if = {
+					limit = { has_country_flag = HGR_Demanded_Nukes }
+					add_to_variable = { HGR_Nuke_Time_Remaining = -7 }
+				}
+
+				if = {
+					limit = { has_country_flag = HGR_Enable_Nuke_GUI }
+					GER = { update_nuke_control = yes }
+				}
+			}
+		}
+	}
+
+	# ROOT is loser
+	# FROM is winner
+
+	on_capitulation = {
+		effect = {
+			if = { # Speidel defeated
+				limit = {
+					ROOT = {
+						tag = GER
+					}
+					FROM = {
+						tag = HGR
+					}
+				}
+				HGR = {
+					country_event = {
+						id = HGR.24
+					}
+				}
+				GER = {
+					country_event = {
+						id = HGR.24
+					}
+				}
+			}
+
+			if = { # GBW - Burgundy defeated
+				limit = {
+					ROOT = {
+						tag = BRG
+					}
+					FROM = {
+						OR = {
+							tag = GER
+							is_in_faction_with = GER
+						}
+					}
+					BRG = { has_country_flag = TNO_nuke_disabled }
+					GER = { has_country_leader = { character = GER_reinhard_heydrich ruling_only = yes } }
+				}
+				GER = {
+					country_event = HGR.680
+					load_focus_tree = ZZZ_blank_focus
+				}
+			}
+			if = { # GBW - Burgundy wins
+				limit = {
+					ROOT = {
+						tag = GER
+					}
+					FROM = {
+						OR = {
+							tag = BRG
+							is_in_faction_with = BRG
+						}
+					}
+					GER = { has_country_leader = { character = GER_reinhard_heydrich ruling_only = yes } }
+				}
+				BRG = {
+					clr_country_flag = TNO_nuke_disabled
+					country_event = nuclearwar.6
+				}
+			}
+
+			if = { # GCW - Bormann defeated
+				limit = {
+					ROOT = {
+						tag = BGR
+					}
+					FROM = {
+						tag = HGR
+					}
+				}
+				HGR = {
+					country_event = HGR.25
+				}
+			}
+
+			if = { # GCW - Speer defeated
+				limit = {
+					ROOT = {
+						tag = SGR
+					}
+					FROM = {
+						tag = HGR
+					}
+				}
+				HGR = {
+					country_event = HGR.26
+				}
+			}
+
+			if = { # GCW - Göring defeated
+				limit = {
+					ROOT = {
+						tag = GGR
+					}
+					FROM = {
+						tag = HGR
+					}
+				}
+				HGR = {
+					country_event = HGR.27
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,1857 @@
+
+###Scripted Effects for China###
+CHI_GUI_LegYuan_Setup = {
+	set_variable = { CHI_GUI_pro_japan_influence = faction_pro_japan_influence }
+	multiply_variable = { CHI_GUI_pro_japan_influence = 100 }
+	set_variable = { CHI_GUI_old_guard_influence = faction_old_guard_influence }
+	multiply_variable = { CHI_GUI_old_guard_influence = 100 }
+	set_variable = { CHI_GUI_reformist_influence = faction_reformist_influence }
+	multiply_variable = { CHI_GUI_reformist_influence = 100 }
+	clamp_variable = {
+		var = CHI_GUI_pro_japan_influence
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = CHI_GUI_old_guard_influence
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = CHI_GUI_reformist_influence
+		min = 0
+		max = 100
+	}
+	add_to_variable = { TNO_CHI_LegYuan_GUI_dirty = 1 }
+}
+
+CHI_GUI_Tech_Innovation_setup = {
+	set_variable = { CHI_GUI_tech_innovation = tech_innovation }
+	multiply_variable = { CHI_GUI_tech_innovation = 100 }
+	clamp_variable = {
+		var = CHI_GUI_tech_innovation
+		min = 0
+		max = 100
+	}
+	add_to_variable = { TNO_CHI_Tech_GUI_dirty = 1 }
+}
+
+CHI_GUI_Edu_Modernisation_setup = {
+	set_variable = { CHI_GUI_edu_modernisation = edu_modernisation }
+	multiply_variable = { CHI_GUI_edu_modernisation = 100 }
+	clamp_variable = {
+		var = CHI_GUI_edu_modernisation
+		min = 0
+		max = 100
+	}
+	add_to_variable = { TNO_CHI_Edu_GUI_dirty = 1 }
+}
+
+#Updates Faction Government Opinion weekly
+CHI_Yuan_influence_change = {
+	set_temp_variable = { faction_influence_change_japanophile_calc = faction_influence_change_japanophile }
+	add_to_temp_variable = { faction_influence_change_japanophile_calc = faction_pro_japan_influence }
+	if = {
+		limit = { check_variable = { faction_influence_change_japanophile_calc < 0 } }
+		set_temp_variable = { faction_influence_change_japanophile = faction_pro_japan_influence }
+		multiply_temp_variable = { faction_influence_change_japanophile = -1 }
+		add_to_variable = { faction_pro_japan_influence = faction_influence_change_japanophile }
+	}
+	else = {
+		add_to_variable = { faction_pro_japan_influence = faction_influence_change_japanophile }
+	}
+
+	set_temp_variable = { faction_influence_change_oldguard_calc = faction_influence_change_oldguard }
+	add_to_temp_variable = { faction_influence_change_oldguard_calc = faction_old_guard_influence }
+	if = {
+		limit = { check_variable = { faction_influence_change_oldguard_calc < 0 } }
+		set_temp_variable = { faction_influence_change_oldguard = faction_old_guard_influence }
+		multiply_temp_variable = { faction_influence_change_oldguard = -1 }
+		add_to_variable = { faction_old_guard_influence = faction_influence_change_oldguard }
+	}
+	else = {
+		add_to_variable = { faction_old_guard_influence = faction_influence_change_oldguard }
+	}
+
+	set_temp_variable = { faction_influence_change_reformist_calc = faction_influence_change_reformist }
+	add_to_temp_variable = { faction_influence_change_reformist_calc = faction_reformist_influence }
+	if = {
+		limit = { check_variable = { faction_influence_change_reformist_calc < 0 } }
+		set_temp_variable = { faction_influence_change_reformist = faction_reformist_influence }
+		multiply_temp_variable = { faction_influence_change_reformist = -1 }
+		add_to_variable = { faction_reformist_influence = faction_influence_change_reformist }
+	}
+	else = {
+		add_to_variable = { faction_reformist_influence = faction_influence_change_reformist }
+	}
+
+	custom_effect_tooltip = CHI_Yuan_influence_change_tt
+}
+
+CHI_Yuan_opinion_change = {
+	add_to_variable = { faction_pro_japan_opinion = faction_opinion_change_japanophile }
+	add_to_variable = { faction_old_guard_opinion = faction_opinion_change_oldguard }
+	add_to_variable = { faction_reformist_opinion = faction_opinion_change_reformist }
+	custom_effect_tooltip = CHI_Yuan_opinion_change_tt
+}
+
+CHI_Yuan_opinion_modify_change = {
+	add_to_variable = { faction_pro_japan_modifier_increase = faction_modifier_change_i_japanophile }
+	add_to_variable = { faction_old_guard_modifier_increase = faction_modifier_change_i_oldguard }
+	add_to_variable = { faction_reformist_modifier_increase = faction_modifier_change_i_reformist }
+	add_to_variable = { faction_pro_japan_modifier_decrease = faction_modifier_change_d_japanophile }
+	add_to_variable = { faction_old_guard_modifier_decrease = faction_modifier_change_d_oldguard }
+	add_to_variable = { faction_reformist_modifier_decrease = faction_modifier_change_d_reformist }
+	custom_effect_tooltip = CHI_Yuan_opinion_modify_change_tt
+}
+
+CHI_NSB_initialize = {
+	set_variable = { CHI_GUI_NSB_effectiveness = 50 }
+	set_country_flag = CHI_NSB_initialized
+	add_to_variable = { TNO_CHI_LegYuan_GUI_dirty = 1 }
+}
+
+CHI_NSB_invest_calc = {
+	set_temp_variable = { CHI_NSB_pp = CHI_LegYuan_GUI_invest_pp }
+	multiply_temp_variable = { CHI_NSB_pp = -1 }
+	add_political_power = var:CHI_NSB_pp
+	set_temp_variable = { CHI_NSB_fund = CHI_LegYuan_GUI_invest_money }
+	multiply_temp_variable = { CHI_NSB_fund = 0.001 }
+	set_temp_variable = { temp_econ_spending_amount = CHI_NSB_fund }
+	econ_spend_money_once_effect_raw_money = yes
+
+	multiply_temp_variable = { CHI_NSB_pp = -0.5 }
+	multiply_temp_variable = { CHI_NSB_fund = 80 }
+	add_to_variable = { CHI_GUI_NSB_effectiveness = CHI_NSB_pp }
+	add_to_variable = { CHI_GUI_NSB_effectiveness = CHI_NSB_fund }
+	set_country_flag = {
+		flag = CHI_NSB_invest_cooldown
+		days = 30
+		value = 1
+	}
+	add_to_variable = { TNO_CHI_LegYuan_GUI_dirty = 1 }
+	clamp_variable = {
+		var = CHI_GUI_NSB_effectiveness
+		min = 0
+		max = 100
+	}
+}
+
+CHI_NSB_decay = {
+	set_temp_variable = { CHI_GUI_NSB_decay_calc = 0 }
+	randomize_temp_variable = {
+		var = CHI_GUI_NSB_decay_calc
+		distribution = uniform
+		min = 0.5
+		max = 3.0
+	}
+	if = {
+		limit = {
+			OR = {
+				check_variable = { faction_pro_japan_influence > 0.5 }
+				check_variable = { faction_old_guard_influence > 0.5 }
+				check_variable = { faction_reformist_influence > 0.5 }
+			}
+		}
+		multiply_temp_variable = { CHI_GUI_NSB_decay_calc = 2 }
+	}
+	multiply_temp_variable = { CHI_GUI_NSB_decay_calc = -1 }
+	add_to_variable = { CHI_GUI_NSB_effectiveness = CHI_GUI_NSB_decay_calc }
+	if = {
+		limit = { is_ai = yes }
+		set_temp_variable = { CHI_GUI_NSB_save_ai_calc = 0 }
+		randomize_temp_variable = {
+			var = CHI_GUI_NSB_save_ai_calc
+			distribution = uniform
+			min = 0.5
+			max = 3.0
+		}
+		add_to_variable = { CHI_GUI_NSB_effectiveness = CHI_GUI_NSB_save_ai_calc }
+		random_list = {
+			33 = {
+				set_temp_variable = { tempSATraining = 2 }
+				CHI_change_sa_training = yes
+			}
+			33 = {
+				set_temp_variable = { tempSARecruitment = 2 }
+				CHI_change_sa_recruitment = yes
+			}
+			33 = {
+				set_temp_variable = { tempSAWeaponry = 2 }
+				CHI_change_sa_weaponry = yes
+			}
+		}
+	}
+	clamp_variable = {
+		var = CHI_GUI_NSB_effectiveness
+		min = 0
+		max = 100
+	}
+}
+
+CHI_NSB_calculation = {
+	set_variable = { CHI_GUI_NSB_decision_time_calc = CHI_GUI_NSB_effectiveness }
+	multiply_variable = { CHI_GUI_NSB_decision_time_calc = 0.35 }
+	set_variable = { CHI_GUI_NSB_decision_time = 70 }
+	subtract_from_variable = { CHI_GUI_NSB_decision_time = CHI_GUI_NSB_decision_time_calc }
+	round_variable = CHI_GUI_NSB_decision_time_calc
+	round_variable = CHI_GUI_NSB_decision_time
+}
+
+CHI_update_pro_japan_opinion = {
+	if = {
+		limit = {
+			check_variable = {
+				faction_pro_japan_opinion > 50
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { faction_pro_japan_opinion > 90 }
+			}
+			subtract_from_variable = { faction_pro_japan_opinion = faction_pro_japan_actual_two_decrease }
+		}
+		else_if = {
+			limit = {
+				check_variable = { faction_pro_japan_opinion > 75 }
+			}
+			subtract_from_variable = { faction_pro_japan_opinion = faction_pro_japan_actual_onefive_decrease }
+		}
+		else = {
+			subtract_from_variable = { faction_pro_japan_opinion = faction_pro_japan_actual_decrease }
+		}
+		if = {
+			limit = {
+				check_variable = { faction_pro_japan_opinion < 50 }
+			}
+
+			set_variable = { faction_pro_japan_opinion = 50 }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				faction_pro_japan_opinion < 50
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { faction_pro_japan_opinion < 10 }
+			}
+			add_to_variable = { faction_pro_japan_opinion = faction_pro_japan_actual_two_increase }
+		}
+		else_if = {
+			limit = {
+				check_variable = { faction_pro_japan_opinion < 25 }
+			}
+			add_to_variable = { faction_pro_japan_opinion = faction_pro_japan_actual_onefive_increase }
+		}
+		else = {
+			add_to_variable = { faction_pro_japan_opinion = faction_pro_japan_actual_increase }
+		}
+		if = {
+			limit = {
+				check_variable = { faction_pro_japan_opinion > 50 }
+			}
+
+			set_variable = { faction_pro_japan_opinion = 50 }
+		}
+	}
+}
+CHI_update_old_guard_opinion = {
+	if = {
+		limit = {
+			check_variable = {
+				faction_old_guard_opinion > 50
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { faction_old_guard_opinion > 90 }
+			}
+			subtract_from_variable = { faction_old_guard_opinion = faction_old_guard_actual_two_decrease }
+		}
+		else_if = {
+			limit = {
+				check_variable = { faction_old_guard_opinion > 75 }
+			}
+			subtract_from_variable = { faction_old_guard_opinion = faction_old_guard_actual_onefive_decrease }
+		}
+		else = {
+			subtract_from_variable = { faction_old_guard_opinion = faction_old_guard_actual_decrease }
+		}
+		if = {
+			limit = {
+				check_variable = { faction_old_guard_opinion < 50 }
+			}
+
+			set_variable = { faction_old_guard_opinion = 50 }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				faction_old_guard_opinion < 50
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { faction_old_guard_opinion < 10 }
+			}
+			add_to_variable = { faction_old_guard_opinion = faction_old_guard_actual_two_increase }
+		}
+		else_if = {
+			limit = {
+				check_variable = { faction_old_guard_opinion < 25 }
+			}
+			add_to_variable = { faction_old_guard_opinion = faction_old_guard_actual_onefive_increase }
+		}
+		else = {
+			add_to_variable = { faction_old_guard_opinion = faction_old_guard_actual_increase }
+		}
+		if = {
+			limit = {
+				check_variable = { faction_old_guard_opinion > 50 }
+			}
+
+			set_variable = { faction_old_guard_opinion = 50 }
+		}
+	}
+}
+CHI_update_reformist_opinion = {
+	if = {
+		limit = {
+			check_variable = {
+				faction_reformist_opinion > 50
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { faction_reformist_opinion > 90 }
+			}
+			subtract_from_variable = { faction_reformist_opinion = faction_reformist_actual_two_decrease }
+		}
+		else_if = {
+			limit = {
+				check_variable = { faction_reformist_opinion > 75 }
+			}
+			subtract_from_variable = { faction_reformist_opinion = faction_reformist_actual_onefive_decrease }
+		}
+		else = {
+			subtract_from_variable = { faction_reformist_opinion = faction_reformist_actual_decrease }
+		}
+		if = {
+			limit = {
+				check_variable = { faction_reformist_opinion < 50 }
+			}
+
+			set_variable = { faction_reformist_opinion = 50 }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				faction_reformist_opinion < 50
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { faction_reformist_opinion < 10 }
+			}
+			add_to_variable = { faction_reformist_opinion = faction_reformist_actual_two_increase }
+		}
+		else_if = {
+			limit = {
+				check_variable = { faction_reformist_opinion < 25 }
+			}
+			add_to_variable = { faction_reformist_opinion = faction_reformist_actual_onefive_increase }
+		}
+		else = {
+			add_to_variable = { faction_reformist_opinion = faction_reformist_actual_increase }
+		}
+		if = {
+			limit = {
+				check_variable = { faction_reformist_opinion > 50 }
+			}
+
+			set_variable = { faction_reformist_opinion = 50 }
+		}
+	}
+}
+
+CHI_update_opinion_change_rate = {
+	#update opinion change rate
+	set_variable = { faction_pro_japan_actual_increase = faction_pro_japan_modifier_increase }
+	set_variable = { faction_pro_japan_actual_decrease = faction_pro_japan_modifier_decrease }
+	set_variable = { faction_old_guard_actual_increase = faction_old_guard_modifier_increase }
+	set_variable = { faction_old_guard_actual_decrease = faction_old_guard_modifier_decrease }
+	set_variable = { faction_reformist_actual_increase = faction_reformist_modifier_increase }
+	set_variable = { faction_reformist_actual_decrease = faction_reformist_modifier_decrease }
+
+	#base weekly change at 0.20
+	multiply_variable = { faction_pro_japan_actual_increase = 0.20 }
+	multiply_variable = { faction_pro_japan_actual_decrease = 0.20 }
+	multiply_variable = { faction_old_guard_actual_increase = 0.20 }
+	multiply_variable = { faction_old_guard_actual_decrease = 0.20 }
+	multiply_variable = { faction_reformist_actual_increase = 0.20 }
+	multiply_variable = { faction_reformist_actual_decrease = 0.20 }
+
+	set_variable = { faction_pro_japan_actual_onefive_increase = faction_pro_japan_actual_increase }
+	set_variable = { faction_pro_japan_actual_onefive_decrease = faction_pro_japan_actual_decrease }
+	set_variable = { faction_old_guard_actual_onefive_increase = faction_old_guard_actual_increase }
+	set_variable = { faction_old_guard_actual_onefive_decrease = faction_old_guard_actual_decrease }
+	set_variable = { faction_reformist_actual_onefive_increase = faction_reformist_actual_increase }
+	set_variable = { faction_reformist_actual_onefive_decrease = faction_reformist_actual_decrease }
+
+	multiply_variable = { faction_pro_japan_actual_onefive_increase = 1.5 }
+	multiply_variable = { faction_pro_japan_actual_onefive_decrease = 1.5 }
+	multiply_variable = { faction_old_guard_actual_onefive_increase = 1.5 }
+	multiply_variable = { faction_old_guard_actual_onefive_decrease = 1.5 }
+	multiply_variable = { faction_reformist_actual_onefive_increase = 1.5 }
+	multiply_variable = { faction_reformist_actual_onefive_decrease = 1.5 }
+
+	set_variable = { faction_pro_japan_actual_two_increase = faction_pro_japan_actual_increase }
+	set_variable = { faction_pro_japan_actual_two_decrease = faction_pro_japan_actual_decrease }
+	set_variable = { faction_old_guard_actual_two_increase = faction_old_guard_actual_increase }
+	set_variable = { faction_old_guard_actual_two_decrease = faction_old_guard_actual_decrease }
+	set_variable = { faction_reformist_actual_two_increase = faction_reformist_actual_increase }
+	set_variable = { faction_reformist_actual_two_decrease = faction_reformist_actual_decrease }
+
+	multiply_variable = { faction_pro_japan_actual_two_increase = 2 }
+	multiply_variable = { faction_pro_japan_actual_two_decrease = 2 }
+	multiply_variable = { faction_old_guard_actual_two_increase = 2 }
+	multiply_variable = { faction_old_guard_actual_two_decrease = 2 }
+	multiply_variable = { faction_reformist_actual_two_increase = 2 }
+	multiply_variable = { faction_reformist_actual_two_decrease = 2 }
+}
+
+CHI_Update_Leg_Yuan_Modifier = {#Updates the dynamic modifier for Leg. Yuan Faction Effects
+	set_variable = { CHI_leg_yuan_faction_congoods = 0 }
+	set_variable = { CHI_leg_yuan_faction_pol_power = 0 }
+	set_variable = { CHI_leg_yuan_faction_stab = 0 }
+	set_variable = { CHI_leg_yuan_exc = 0 }
+	set_variable = { CHI_leg_yuan_conspeed = 0 }
+	set_variable = { CHI_leg_yuan_facoutput = 0 }
+	set_variable = { CHI_leg_yuan_respeed = 0 }
+
+	set_temp_variable = { faction_pro_japan_influence_calc = faction_pro_japan_influence }
+	set_temp_variable = { faction_old_guard_influence_calc = faction_old_guard_influence }
+	set_temp_variable = { faction_reformist_influence_calc = faction_reformist_influence }
+
+	set_temp_variable = { faction_pro_japan_opinion_calc = faction_pro_japan_opinion }
+	set_temp_variable = { faction_old_guard_opinion_calc = faction_old_guard_opinion }
+	set_temp_variable = { faction_reformist_opinion_calc = faction_reformist_opinion }
+
+	subtract_from_temp_variable = { faction_pro_japan_opinion_calc = 50 }
+	subtract_from_temp_variable = { faction_old_guard_opinion_calc = 50 }
+	subtract_from_temp_variable = { faction_reformist_opinion_calc = 50 }
+
+	multiply_temp_variable = { faction_pro_japan_opinion_calc = 0.01 }
+	multiply_temp_variable = { faction_old_guard_opinion_calc = 0.01 }
+	multiply_temp_variable = { faction_reformist_opinion_calc = 0.01 }
+
+	multiply_temp_variable = { faction_pro_japan_opinion_calc = faction_pro_japan_influence_calc }
+	multiply_temp_variable = { faction_old_guard_opinion_calc = faction_old_guard_influence_calc }
+	multiply_temp_variable = { faction_reformist_opinion_calc = faction_reformist_influence_calc }
+
+	set_temp_variable = { CHI_leg_yuan_respeed_calc = 0.3 }
+	set_temp_variable = { CHI_leg_yuan_exc_calc = 0.6 }
+	set_temp_variable = { CHI_leg_yuan_faction_congoods_calc = -0.3 }
+	set_temp_variable = { CHI_leg_yuan_faction_pol_power_calc = 0.5 }
+	set_temp_variable = { CHI_leg_yuan_conspeed_calc = 0.3 }
+	set_temp_variable = { CHI_leg_yuan_facoutput_calc = 0.4 }
+
+	multiply_temp_variable = { CHI_leg_yuan_respeed_calc = faction_pro_japan_opinion_calc }
+	multiply_temp_variable = { CHI_leg_yuan_exc_calc = faction_pro_japan_opinion_calc }
+	multiply_temp_variable = { CHI_leg_yuan_faction_congoods_calc = faction_old_guard_opinion_calc }
+	multiply_temp_variable = { CHI_leg_yuan_faction_pol_power_calc = faction_old_guard_opinion_calc }
+	multiply_temp_variable = { CHI_leg_yuan_conspeed_calc = faction_reformist_opinion_calc }
+	multiply_temp_variable = { CHI_leg_yuan_facoutput_calc = faction_reformist_opinion_calc }
+
+	set_variable = { CHI_leg_yuan_respeed = CHI_leg_yuan_respeed_calc }
+	set_variable = { CHI_leg_yuan_exc = CHI_leg_yuan_exc_calc }
+	set_variable = { CHI_leg_yuan_faction_congoods = CHI_leg_yuan_faction_congoods_calc }
+	set_variable = { CHI_leg_yuan_faction_pol_power = CHI_leg_yuan_faction_pol_power_calc }
+	set_variable = { CHI_leg_yuan_conspeed = CHI_leg_yuan_conspeed_calc }
+	set_variable = { CHI_leg_yuan_facoutput = CHI_leg_yuan_facoutput_calc }
+
+	set_temp_variable = { faction_opinion_total_calc = faction_pro_japan_opinion }
+	add_to_temp_variable = { faction_opinion_total_calc = faction_old_guard_opinion }
+	add_to_temp_variable = { faction_opinion_total_calc = faction_reformist_opinion }
+	divide_temp_variable = { faction_opinion_total_calc = 100 }
+	subtract_from_temp_variable = { faction_opinion_total_calc = 1.5 }
+
+	set_temp_variable = { CHI_leg_yuan_faction_stab_calc = 0.2 }
+	multiply_temp_variable = { CHI_leg_yuan_faction_stab_calc = faction_opinion_total_calc }
+	set_variable = { CHI_leg_yuan_faction_stab = CHI_leg_yuan_faction_stab_calc }
+
+	force_update_dynamic_modifier = yes
+}
+
+CHI_Leg_Yuan_Clamp_Everything = {
+	clamp_variable = {
+		var = faction_pro_japan_influence
+		min = 0
+		max = 1
+	}
+	clamp_variable = {
+		var = faction_old_guard_influence
+		min = 0
+		max = 1
+	}
+	clamp_variable = {
+		var = faction_reformist_influence
+		min = 0
+		max = 1
+	}
+	clamp_variable = {
+		var = faction_pro_japan_opinion
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = faction_old_guard_opinion
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = faction_reformist_opinion
+		min = 0
+		max = 100
+	}
+}
+
+#Unlocks latest unresearched pre-1970 Computing tech
+
+CHI_Unlock_Latest_Computing = {
+	if = {
+		limit = {
+			has_tech = computing_machine_1960
+		}
+		add_tech_bonus = {
+			name = electronics
+			bonus = 0.50
+			uses = 1
+			category = electronics
+		}
+	}
+	else_if = {
+		limit = {
+			has_tech = computing_machine_1950
+		}
+		set_technology = { computing_machine_1960 = 1 }
+		add_tech_bonus = {
+			name = electronics
+			bonus = 1.00
+			uses = 1
+			category = electronics
+		}
+	}
+	else_if = {
+		limit = {
+			has_tech = advanced_computing_machine
+		}
+		set_technology = { computing_machine_1950 = 1 }
+	}
+}
+
+#Manning the Factories
+
+CHI_Man_the_Factories = {
+	if = {
+		limit = {
+			has_idea = CHI_Manning_Factories_1
+		}
+
+		hidden_effect = {
+			swap_ideas = {
+				remove_idea = CHI_Manning_Factories_1
+				add_idea = CHI_Manning_Factories_2
+			}
+		}
+		custom_effect_tooltip = CHI_Man_the_Factories_tt
+	}
+
+	else_if = {
+		limit = {
+			has_idea = CHI_Manning_Factories_2
+		}
+
+		hidden_effect = {
+			swap_ideas = {
+				remove_idea = CHI_Manning_Factories_2
+				add_idea = CHI_Manning_Factories_3
+			}
+		}
+		custom_effect_tooltip = CHI_Man_the_Factories_tt
+	}
+
+	#else_if = {
+	#	limit = {
+	#		has_idea = CHI_Manning_Factories_3
+	#	}
+#
+	#	hidden_effect = {
+	#		swap_ideas = {
+	#			remove_idea = CHI_Manning_Factories_3
+	#			add_idea = CHI_Manning_Factories_4
+	#		}
+	#	}
+	#	custom_effect_tooltip = CHI_Man_the_Factories_tt
+	#}
+
+	else = {
+		custom_effect_tooltip = CHI_Man_the_Factories_tt
+	}
+
+}
+
+#Lessens the effects of the "Slave of the Japanese" national spirit
+
+CHI_Reduce_Reliance_on_Japan = {
+	if = {
+		limit = {
+			has_idea = CHI_slave_of_the_samurai_0
+		}
+		custom_effect_tooltip = CHI_Reduce_Slave_tt
+		hidden_effect = {
+			swap_ideas = {
+				remove_idea = CHI_slave_of_the_samurai_0
+				add_idea = CHI_slave_of_the_samurai_1
+			}
+		}
+	}
+
+	else_if = {
+		limit = {
+			has_idea = CHI_slave_of_the_samurai_1
+		}
+		custom_effect_tooltip = CHI_Reduce_Slave_tt
+		hidden_effect = {
+			swap_ideas = {
+				remove_idea = CHI_slave_of_the_samurai_1
+				add_idea = CHI_slave_of_the_samurai_2
+			}
+		}
+	}
+
+	else_if = {
+		limit = {
+			has_idea = CHI_slave_of_the_samurai_2
+		}
+		custom_effect_tooltip = CHI_Reduce_Slave_tt
+		hidden_effect = {
+			swap_ideas = {
+				remove_idea = CHI_slave_of_the_samurai_2
+				add_idea = CHI_slave_of_the_samurai_3
+			}
+		}
+	}
+
+	else_if = {
+		limit = {
+			has_idea = CHI_slave_of_the_samurai_3
+		}
+		custom_effect_tooltip = CHI_Reduce_Slave_tt
+		hidden_effect = {
+			swap_ideas = {
+				remove_idea = CHI_slave_of_the_samurai_3
+				add_idea = CHI_slave_of_the_samurai_4
+			}
+		}
+	}
+}
+
+#Changes China's map colour as the Modernisations progress
+
+CHI_Change_Colour = {
+	if = {
+		limit = {
+			has_cosmetic_tag = CHI_JAP
+		}
+		hidden_effect = {
+			drop_cosmetic_tag = yes
+			set_cosmetic_tag = CHI_ONE
+		}
+	}
+
+	else_if = {
+		limit = {
+			has_cosmetic_tag = CHI_ONE
+		}
+		hidden_effect = {
+			drop_cosmetic_tag = yes
+			set_cosmetic_tag = CHI_TWO
+		}
+	}
+
+	else_if = {
+		limit = {
+			has_cosmetic_tag = CHI_TWO
+		}
+		hidden_effect = {
+			drop_cosmetic_tag = yes
+			set_cosmetic_tag = CHI_THREE
+		}
+	}
+}
+
+#Lessens the penalties of China's breadbasket idea
+
+CHI_Improve_breadbasket = {
+	if = {
+		limit = {
+			has_idea = CHI_japans_breadbasket_0
+		}
+		hidden_effect = {
+			swap_ideas = {
+				remove_idea = CHI_japans_breadbasket_0
+				add_idea = CHI_japans_breadbasket_1
+			}
+		}
+		custom_effect_tooltip = CHI_breadbasket_improve_tt
+	}
+	else_if = {
+		limit = {
+			has_idea = CHI_japans_breadbasket_1
+		}
+		hidden_effect = {
+			swap_ideas = {
+				remove_idea = CHI_japans_breadbasket_1
+				add_idea = CHI_japans_breadbasket_2
+			}
+		}
+		custom_effect_tooltip = CHI_breadbasket_improve_tt
+	}
+}
+
+#Reloads Tree to show crisis trees, shamelessly stolen from US_scripted_effects
+CHI_reload_tree = {
+	mark_focus_tree_layout_dirty = yes
+}
+
+YUN_reload_tree = {
+	mark_focus_tree_layout_dirty = yes
+}
+
+YUN_NPA_reload_tree = {
+	mark_focus_tree_layout_dirty = yes
+}
+
+## Militarization Effects
+CHI_Nagasaki_Summit_Effects = {
+	if = {
+		limit = { has_country_flag = chi_nagasaki_sucess }
+		set_technology = { infantry_weapons_3 = 1
+	infantry_kit_4 = 1 }
+		set_technology = { artillery_1950 = 1 }
+		add_equipment_to_stockpile = { type = infantry_equipment_3 amount = 8500 producer = JAP }
+		swap_ideas = {
+			remove_idea = CHI_small_army
+			add_idea = CHI_Restricted_Army
+		}
+		clr_country_flag = chi_nagasaki_sucess
+		set_country_flag = chi_limit_max
+	}
+	else_if = {
+		limit = { has_country_flag = chi_nagasaki_partial }
+		add_equipment_to_stockpile = { type = infantry_equipment_2 amount = 8500 producer = JAP }
+		swap_ideas = {
+			remove_idea = CHI_small_army
+			add_idea = CHI_Restricted_Army
+		}
+		clr_country_flag = chi_nagasaki_partial
+		set_country_flag = chi_limit_middle
+	}
+	else_if = {
+		limit = { has_country_flag = chi_nagasaki_failure }
+		swap_ideas = {
+			remove_idea = CHI_small_army
+			add_idea = CHI_Restricted_Army
+		}
+		clr_country_flag = chi_nagasaki_failure
+		set_country_flag = chi_limit_low
+	}
+}
+
+CHI_check_middle_western_insurrection_tree = {
+	if = {
+		limit = {
+			NOT = { has_country_flag = CHI_show_western_tree_hidden_middle }
+			count_triggers = {
+				amount = 2
+				has_completed_focus = CHI_Retreat_Does_Not_Mean_Run_Away
+				has_completed_focus = CHI_Move_On_Our_Orders
+				has_completed_focus = CHI_Send_In_The_Next_Batch
+				has_completed_focus = CHI_First_Time_Warriors
+				has_completed_focus = CHI_The_Right_Tools_For_The_Job
+			}
+		}
+		set_country_flag = CHI_show_western_tree_hidden_middle
+		CHI_reload_tree = yes
+	}
+}
+
+### YUN stuff ###
+
+clamp_chi_influence = {
+	set_variable = { chi_influence = chi_influence }
+	clamp_variable = {
+		var = chi_influence
+		min = 0
+		max = 100
+	}
+}
+
+CHI_save_pre_puppet_politics = {
+	save_party_popularities = yes
+	get_current_government_type = yes
+}
+
+CHI_apply_pre_puppet_politics = {
+	apply_party_popularities = yes
+	restore_previous_government_type = yes
+}
+
+YUN_NPA_add_Yunnan_claims = {#Adds claims for China so the event file stops looking like AIDS
+	every_state = {
+		limit = {
+			OR = {
+				is_core_of = XIN
+				is_core_of = QIN
+				is_core_of = TIB
+				is_core_of = GNG
+				is_core_of = GUX
+				is_core_of = SHX
+				is_core_of = XIK
+				is_core_of = MAN
+				is_core_of = MEN
+				is_core_of = CHI
+				state = 329
+				state = 434
+				state = 524
+				state = 537
+				state = 591
+				state = 809
+				state = 810
+				state = 811
+				state = 812
+				state = 814
+				state = 1364
+			}
+		}
+		add_claim_by = YUN
+	}
+}
+
+WI_Japan_is_happy = {
+	every_state = {
+		limit = { is_core_of = CHI }
+		CHI = { transfer_state = PREV }
+	}
+	CHI = {
+		if = {
+			limit = {
+				NOT = { country_exists = XIK }
+			}
+			transfer_state = 905
+			transfer_state = 964
+		}
+		set_cosmetic_tag = CHI_JAP
+		set_party_name = {
+			ideology = fascism
+			name = CHI_fascism_party
+			long_name = CHI_fascism_party_long
+		}
+		NCC = {
+			CHI_wang_yintai = { set_nationality = CHI }
+		}
+		promote_character = CHI_wang_yintai
+		set_politics = {
+			ruling_party = fascism
+			last_election = "1960.11.11"
+			election_frequency = 36
+			elections_allowed = no
+		}
+		set_popularities = {
+			communist = 7
+			ultranationalism = 0
+			socialist = 5
+			progressivism = 7
+			liberalism = 5
+			conservatism = 3
+			paternalism = 13
+			despotism = 11
+			fascism = 49
+			national_socialism = 0
+
+		}
+		load_focus_tree = ZZZ_blank_focus
+		add_ideas = Sphere_Economic_Dependent
+		econ_join_sphere_JAP = yes
+	}
+
+	JAP = {
+		transfer_state = 591
+		transfer_state = 810
+		transfer_state = 811
+		transfer_state = 812
+		transfer_state = 813
+		transfer_state = 1464
+		add_to_faction = CHI
+		add_to_faction = SHX
+		add_to_faction = MEN
+		add_to_faction = GUX
+		add_to_faction = GAN
+		add_to_faction = YUN
+	}
+
+	YUN = {
+		transfer_state = 603
+		transfer_state = 325
+		transfer_state = 960
+		set_cosmetic_tag = YUN_southwest_united
+		set_politics = {
+			ruling_party = despotism
+			last_election = "1960.11.11"
+			election_frequency = 36
+			elections_allowed = no
+		}
+		set_popularities = {
+			communist = 0
+			ultranationalism = 0
+			socialist = 0
+			progressivism = 0
+			liberalism = 0
+			conservatism = 0
+			paternalism = 30
+			despotism = 70
+			fascism = 0
+			national_socialism = 0
+
+		}
+		YUN_he_yingqin = {
+			add_country_leader_role = {
+				country_leader = {
+					desc = "POLITICS_HE_YINGQIN_JAP_DESC"
+					expire = "8000.1.1"
+					ideology = despotism_warlordism_subtype
+					traits = {}
+					id = -1
+				}
+				promote_leader = yes
+			}
+		}
+		add_ideas = Sphere_Chinese_Warlord
+		econ_join_sphere_JAP = yes
+		CHI_save_pre_puppet_politics = yes
+		CHI = {
+			set_autonomy = {
+				target = PREV
+				autonomy_state = autonomy_china_warlord_regime
+			}
+		}
+		CHI_apply_pre_puppet_politics = yes
+	}
+
+	if = {
+		limit = {
+			NOT = { country_exists = GNG }
+		}
+		every_state = {
+			limit = { is_core_of = GNG }
+			GNG = {
+				transfer_state = PREV
+			}
+		}
+		GNG = {
+			add_ideas = Sphere_Special_Econ_Zone
+			econ_join_sphere_JAP = yes
+			TNO_startup_nation = yes
+		}
+		add_to_faction = GNG
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = MAN }
+		}
+		every_state = {
+			limit = { is_core_of = MAN }
+			MAN = {
+				transfer_state = PREV
+			}
+		}
+		MAN = {
+			add_ideas = Sphere_Fully_Dependent
+			econ_join_sphere_JAP = yes
+			TNO_startup_nation = yes
+		}
+		add_to_faction = MAN
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = MEN }
+		}
+		every_state = {
+			limit = { is_core_of = MEN }
+			MEN = { transfer_state = PREV }
+		}
+		MEN = {
+			CHI_save_pre_puppet_politics = yes
+			CHI = {
+				set_autonomy = {
+					target = PREV
+					autonomy_state = autonomy_china_warlord_regime
+				}
+			}
+			CHI_apply_pre_puppet_politics = yes
+			add_ideas = Sphere_Economic_Dependent
+			econ_join_sphere_JAP = yes
+			TNO_startup_nation = yes
+		}
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = QIN }
+		}
+		if = {
+			limit = { NOT = { country_exists = GAN } }
+			every_state = {
+				limit = { is_core_of = GAN }
+				GAN = { transfer_state = PREV }
+			}
+			GAN = {
+				transfer_state = 604
+				transfer_state = 906
+				add_ideas = Sphere_Imp_Protectorate
+				econ_join_sphere_JAP = yes
+				TNO_startup_nation = yes
+			}
+			add_to_faction = GAN
+			every_state = {
+				limit = { is_owned_by = GAN }
+				add_core_of = GAN
+			}
+		}
+		else = {
+			GAN = {
+				transfer_state = 604
+				transfer_state = 906
+				set_cosmetic_tag = GAN_northwest
+				every_state = {
+					limit = { is_owned_by = GAN }
+					add_core_of = GAN
+				}
+			}
+		}
+	}
+	else = {
+		if = {
+			limit = { NOT = { country_exists = GAN } }
+			every_state = {
+				limit = { is_core_of = GAN }
+				GAN = { transfer_state = PREV }
+			}
+			GAN = {
+				add_ideas = Sphere_Imp_Protectorate
+				econ_join_sphere_JAP = yes
+				TNO_startup_nation = yes
+			}
+			add_to_faction = GAN
+			every_state = {
+				limit = { is_owned_by = GAN }
+				add_core_of = GAN
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			NOT = { country_exists = XIN }
+		}
+		every_state = {
+			limit = { is_core_of = XIN }
+			GAN = { transfer_state = PREV }
+		}
+	}
+
+	if = {
+		limit = {
+			NOT = { country_exists = GUX }
+		}
+		every_state = {
+			limit = {
+				OR = {
+					is_core_of = GUX
+				}
+			}
+			GUX = { transfer_state = PREV }
+		}
+		GUX = {
+			set_cosmetic_tag = GUX_IJA
+			remove_ideas = Sphere_Chinese_Warlord
+			add_ideas = Sphere_Imp_Protectorate
+			econ_join_sphere_JAP = yes
+			TNO_startup_nation = yes
+			set_popularities = {
+				communist = 0
+				ultranationalism = 0
+				socialist = 0
+				progressivism = 0
+				liberalism = 0
+				conservatism = 0
+				paternalism = 0
+				despotism = 100
+				fascism = 0
+				national_socialism = 0
+			}
+			set_party_name = {
+				ideology = despotism
+				long_name = GUX_JAP_despotism_party_long
+				name = GUX_JAP_despotism_party
+			}
+			set_politics = {
+				ruling_party = despotism
+				last_election = "1960.11.11"
+				election_frequency = 36
+				elections_allowed = no
+			}
+			remove_all_ministers = yes
+			retire_country_leader = yes
+			promote_character = GUX_takeda_goro
+			add_ideas = GUX_Watanabe_Keitaro_hog
+			add_ideas = GUX_Takashima_Masuo_for
+			add_ideas = GUX_Murai_Sumio_eco
+			add_ideas = GUX_Miyazaki_Kiyotaka_sec
+		}
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = SHX }
+		}
+		every_state = {
+			limit = { is_core_of = SHX }
+			SHX = { transfer_state = PREV }
+		}
+		SHX = {
+			CHI_save_pre_puppet_politics = yes
+			CHI = {
+				set_autonomy = {
+					target = PREV
+					autonomy_state = autonomy_china_warlord_regime
+				}
+			}
+			CHI_apply_pre_puppet_politics = yes
+			add_ideas = Sphere_Chinese_Warlord
+			econ_join_sphere_JAP = yes
+			TNO_startup_nation = yes
+		}
+	}
+
+	if = {
+		limit = {
+			NOT = { country_exists = TIB }
+		}
+		every_state = {
+			limit = { is_core_of = TIB }
+			TIB = { transfer_state = PREV }
+		}
+		TIB = {
+			add_ideas = Sphere_Observer
+			econ_join_sphere_JAP = yes
+			TNO_startup_nation = yes
+		}
+	}
+	every_country = {
+		limit = { has_idea = NLF_Member }
+		remove_ideas = NLF_Member
+	}
+}
+
+WI_Japan_is_angry = {
+	every_country = {
+		limit = { has_idea = Sphere_Chinese_Warlord }
+		remove_ideas = Sphere_Chinese_Warlord
+		add_ideas = Sphere_Fully_Dependent
+	}
+	JAP = { #Japan gets its states back at start
+		transfer_state = 591
+		transfer_state = 810
+		transfer_state = 811
+		transfer_state = 812
+		transfer_state = 1464
+	}
+	CHI = {
+		every_state = {
+			limit = {
+				is_core_of = CHI
+				NOT = { state = 811 }
+				NOT = { state = 812 }
+			}
+			CHI = { transfer_state = PREV }
+		}
+		set_cosmetic_tag = CHI_JAP
+		set_party_name = {
+			ideology = fascism
+			name = CHI_JAP_fascism_party
+			long_name = CHI_JAP_fascism_party_long
+		}
+		set_party_name = {
+			ideology = despotism
+			long_name = CHI_JAP_PUP_despotism_party_long
+			name = CHI_JAP_PUP_despotism_party
+		}
+		set_party_name = {
+			ideology = paternalism
+			long_name = CHI_JAP_PUP_paternalism_party_long
+			name = CHI_JAP_PUP_paternalism_party
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			long_name = CHI_JAP_PUP_ultranationalism_party_long
+			name = CHI_JAP_PUP_ultranationalism_party
+		}
+		promote_character = CHI_zhang_renli
+		set_politics = {
+			ruling_party = fascism
+			last_election = "1960.11.11"
+			election_frequency = 36
+			elections_allowed = no
+		}
+		set_popularities = {
+			communist = 7
+			ultranationalism = 7
+			socialist = 5
+			progressivism = 0
+			liberalism = 5
+			conservatism = 3
+			paternalism = 13
+			despotism = 11
+			fascism = 49
+			national_socialism = 0
+		}
+		set_temp_variable = { debt_temp = -40 } #Absurd, yes, but the game breaks without it
+		econ_national_debt_change = yes
+		load_focus_tree = ZZZ_blank_focus
+	}
+	YUN = {
+		transfer_state = 325
+		transfer_state = 603
+		transfer_state = 960
+		every_state = {
+			limit = { is_core_of = GUX }
+			YUN = { transfer_state = PREV }
+		}
+		every_owned_state = {
+			limit = { NOT = { is_core_of = YUN } }
+			add_core_of = PREV
+		}
+		CHI = {
+			puppet = YUN
+		}
+		set_cosmetic_tag = YUN_JAP
+		promote_character = YUN_Zhang_Zhongzhi
+		set_party_name = {
+			ideology = fascism
+			long_name = YUN_JAP_fascism_party_long
+			name = YUN_JAP_fascism_party
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			long_name = CHI_JAP_PUP_ultranationalism_party_long
+			name = CHI_JAP_PUP_ultranationalism_party
+		}
+		set_politics = {
+			ruling_party = fascism
+			last_election = "1960.11.11"
+			election_frequency = 36
+			elections_allowed = no
+		}
+		set_popularities = {
+			communist = 15
+			ultranationalism = 12
+			socialist = 0
+			progressivism = 0
+			liberalism = 0
+			conservatism = 0
+			paternalism = 8
+			despotism = 10
+			fascism = 55
+			national_socialism = 0
+		}
+		remove_ideas = Sphere_Chinese_Warlord
+		add_ideas = Sphere_Fully_Dependent
+		econ_join_sphere_JAP = yes
+		set_variable = { national_debt = 0 }
+		load_focus_tree = ZZZ_blank_focus
+		TNO_startup_nation = yes
+	}
+	GAN = {
+		every_state = {
+			limit = { is_core_of = GAN }
+			GAN = { transfer_state = PREV }
+		}
+		transfer_state = 604
+		transfer_state = 906
+		add_ideas = Sphere_Imp_Protectorate
+		econ_join_sphere_JAP = yes
+		TNO_startup_nation = yes
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = GNG } #GNG is Guangdong
+		}
+		every_state = {
+			limit = { is_core_of = GNG }
+			GNG = { transfer_state = PREV }
+		}
+		GNG = { #Guangdong spawns again
+			add_ideas = Sphere_Corporate_Dependency
+			econ_join_sphere_JAP = yes
+			TNO_startup_nation = yes #Why is this here?
+		}
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = MAN } #MAN is Manchuria
+		}
+		every_state = {
+			limit = { is_core_of = MAN }
+			MAN = { transfer_state = PREV }
+		}
+	}
+	MEN = {
+		add_ideas = Sphere_Fully_Dependent
+		every_state = {
+			limit = { is_core_of = MEN }
+			MEN = { transfer_state = PREV }
+		}
+	}
+	SIC = {
+		remove_ideas = Sphere_Chinese_Warlord
+		add_ideas = Sphere_Imp_Protectorate
+		set_party_name = {
+			ideology = paternalism
+			long_name = CHI_JAP_PUP_paternalism_party_long
+			name = CHI_JAP_PUP_paternalism_party
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			long_name = CHI_JAP_PUP_ultranationalism_party_long
+			name = CHI_JAP_PUP_ultranationalism_party
+		}
+		set_party_name = {
+			ideology = communist
+			long_name = CHI_communist_party_long
+			name = CHI_communist_party
+		}
+		transfer_state = 605
+		transfer_state = 905
+		transfer_state = 1537
+		transfer_state = 1538
+		transfer_state = 1963
+		set_cosmetic_tag = SIC_IJA
+		econ_join_sphere_JAP = yes
+		TNO_startup_nation = yes
+		every_owned_state = {
+			add_core_of = SIC
+		}
+	}
+	XIN = {
+		every_state = {
+			limit = { is_core_of = XIN }
+			XIN = { transfer_state = PREV }
+		}
+		retire_country_leader = yes
+		promote_character = XIN_power_vacuum
+		set_cosmetic_tag = XIN_IJA
+		add_ideas = Sphere_Fully_Dependent
+		econ_join_sphere_JAP = yes
+		set_party_name = {
+			ideology = despotism
+			long_name = XIN_IJA_despotism_party_long
+			name = XIN_IJA_despotism_party
+		}
+	}
+	TIB = {
+		every_state = {
+			limit = { is_core_of = TIB }
+			TIB = { transfer_state = PREV }
+		}
+		add_ideas = Sphere_Observer
+		econ_join_sphere_JAP = yes
+		TNO_startup_nation = yes
+		transfer_state = 964
+		transfer_state = 1963
+		transfer_state = 1964
+		every_owned_state = {
+			limit = { is_owned_by = TIB }
+			add_core_of = TIB
+		}
+	}
+	NCC = {
+		set_cosmetic_tag = CHI_JAP_PUP
+		transfer_state = 615
+		transfer_state = 622
+		transfer_state = 956
+		transfer_state = 607
+		transfer_state = 1023
+		transfer_state = 614
+		transfer_state = 609
+		transfer_state = 608
+		transfer_state = 1020
+		transfer_state = 1021
+		transfer_state = 1022
+		transfer_state = 597
+		transfer_state = 1014
+		transfer_state = 1015
+		transfer_state = 606
+		transfer_state = 598
+		every_owned_state = {
+			limit = { NOT = { is_core_of = NCC } }
+			add_core_of = PREV
+		}
+		remove_ideas = Sphere_Imp_Protectorate
+		add_ideas = Sphere_Fully_Dependent
+		econ_join_sphere_JAP = yes
+		set_party_name = {
+			ideology = fascism
+			long_name = CHI_JAP_PUP_fascism_party_long
+			name = CHI_JAP_PUP_fascism_party
+		}
+		set_party_name = {
+			ideology = paternalism
+			long_name = CHI_JAP_PUP_paternalism_party_long
+			name = CHI_JAP_PUP_paternalism_party
+		}
+		set_party_name = {
+			ideology = despotism
+			long_name = CHI_JAP_PUP_despotism_party_long
+			name = CHI_JAP_PUP_despotism_party
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			long_name = CHI_JAP_PUP_ultranationalism_party_long
+			name = CHI_JAP_PUP_ultranationalism_party
+		}
+		retire_country_leader = yes
+		promote_character = SHX_su_tiren
+		set_temp_variable = { debt_temp = 10 } #Absurd, yes, but the game breaks without it
+		econ_national_debt_change = yes
+		TNO_startup_nation = yes
+	}
+	for_each_scope_loop = {
+		array = YUN.greater_china_states
+		if = {
+			limit = { NOT = { is_owned_by = CHI } }
+			remove_core_of = CHI
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = XIK } }
+			remove_core_of = XIK
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = GUX } }
+			remove_core_of = GUX
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = SHX } }
+			remove_core_of = SHX
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = QIN } }
+			remove_core_of = QIN
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = XIN } }
+			remove_core_of = XIN
+		}
+	}
+	every_country = {
+		limit = { has_idea = NLF_Member }
+		remove_ideas = NLF_Member
+	}	
+	JAP = {
+		add_to_faction = SHX
+		add_to_faction = SIC
+		add_to_faction = GAN
+		add_to_faction = YUN
+		add_to_faction = MEN
+		add_to_faction = CHI
+		add_to_faction = XIN
+	}
+	if = {
+		limit = { NCC = { is_in_faction = no } }
+		JAP = { add_to_faction = NCC }
+		NCC = { add_ideas = Sphere_Fully_Dependent }#Because it breaks without it
+	}
+}
+
+WI_Japan_is_crazy = {
+	every_state = {
+		limit = {
+			OR = {
+				is_core_of = CHI
+				is_core_of = GAN
+				is_core_of = SHX
+				is_core_of = YUN
+				is_core_of = MEN
+			}
+			NOT = {
+				is_core_of = GNG
+				is_core_of = MAN
+			}
+		}
+		CHI = {
+			transfer_state = PREV
+		}
+	}
+
+	puppet = CHI
+	CHI = {
+		set_cosmetic_tag = CHI_JAP
+		every_country = {
+			limit = { original_tag = CHI }
+			generate_character = {
+				token_base = CHI_wang_yintai
+				country_leader = {
+					desc = "POLITICS_WANG_YINTAI_DESC"
+					ideology = fascism_corporatism_subtype
+					traits = { }
+					expire = "1999.1.1.1"
+					id = -1
+				}
+			}
+		}
+		set_politics = {
+			ruling_party = fascism
+			last_election = "1960.11.11"
+			election_frequency = 36
+			elections_allowed = no
+		}
+		set_popularities = {
+			communist = 7
+			ultranationalism = 0
+			socialist = 5
+			progressivism = 7
+			liberalism = 5
+			conservatism = 3
+			paternalism = 13
+			despotism = 11
+			fascism = 49
+			national_socialism = 0
+
+		}
+		set_temp_variable = { debt_temp = -40 } #Absurd, yes, but the game breaks without it
+		econ_national_debt_change = yes
+		set_capital = { state = 613 remember_old_capital = no }
+		load_focus_tree = ZZZ_blank_focus
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = XIK }
+		}
+		every_state = {
+			limit = { is_core_of = XIK }
+			CHI = {
+				transfer_state = PREV
+			}
+		}
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = GNG }
+		}
+		every_state = {
+			limit = { is_core_of = GNG }
+			GNG = {
+				transfer_state = PREV
+			}
+		}
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = GUX }
+		}
+		every_state = {
+			limit = { is_core_of = GUX }
+			CHI = {
+				transfer_state = PREV
+			}
+		}
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = MAN }
+		}
+		every_state = {
+			limit = { is_core_of = MAN }
+			MAN = {
+				transfer_state = PREV
+				transfer_state = 810
+			}
+		}
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = QIN }
+		}
+		every_state = {
+			limit = { is_core_of = QIN }
+			CHI = {
+				transfer_state = PREV
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			NOT = { country_exists = XIN }
+		}
+		every_state = {
+			limit = { is_core_of = XIN }
+			CHI = {
+				transfer_state = PREV
+			}
+		}
+	}
+	if = {
+		limit = {
+			NOT = { country_exists = TIB }
+		}
+		every_state = {
+			limit = { is_core_of = TIB }
+			CHI = {
+				transfer_state = PREV
+			}
+		}
+	}
+	CHI = {
+		every_owned_state = {
+			limit = { NOT = { is_core_of = CHI } }
+			add_core_of = PREV
+		}
+	}
+	for_each_scope_loop = {
+		array = YUN.greater_china_states
+		if = {
+			limit = { NOT = { is_owned_by = XIK } }
+			remove_core_of = XIK
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = GUX } }
+			remove_core_of = GUX
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = SHX } }
+			remove_core_of = SHX
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = GAN } }
+			remove_core_of = GAN
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = QIN } }
+			remove_core_of = QIN
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = XIN } }
+			remove_core_of = XIN
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = MEN } }
+			remove_core_of = XIN
+		}
+		else_if = {
+			limit = { NOT = { is_owned_by = TIB } }
+			remove_core_of = TIB
+		}
+	}
+	every_country = {
+		limit = { has_idea = NLF_Member }
+		remove_ideas = NLF_Member
+	}
+	GNG = {
+		if = {
+			limit = {
+				NOT = {
+					is_in_faction_with = JAP
+				}
+			}
+			add_ideas = Sphere_Corporate_Dependency
+			JAP = {
+				add_to_faction = GNG
+			}
+		}
+	}
+	MAN = {
+		if = {
+			limit = {
+				NOT = {
+					is_in_faction_with = JAP
+				}
+			}
+			add_ideas = Sphere_Fully_Dependent
+			JAP = {
+				add_to_faction = MAN
+			}
+		}
+	}
+	#every_state = {
+	#	limit = {
+	#		is_in_array = { YUN.greater_china_states = THIS }
+	#	}
+	#	if = {
+	#		limit = { controller = { tag = CHI } }
+	#	}
+	#	else_if = {
+	#		limit = { controller = { tag = GNG } }
+	#	}
+	#}
+}
+
+CHI_calc_research_cost_change = {
+	add_to_variable = { CHI_research_misc_costs = CHI_calc_cost }
+	custom_effect_tooltip = CHI_research_cost_change_tt
+}
+CHI_calc_research_income_change = {
+	add_to_variable = { CHI_research_misc_income = CHI_calc_income }
+	custom_effect_tooltip = CHI_research_income_change_tt
+}
+CHI_calc_edu_cost_change = {
+	add_to_variable = { CHI_edu_misc_costs = CHI_calc_cost }
+	custom_effect_tooltip = CHI_edu_cost_change_tt
+}
+CHI_calc_industry_cost_change = {
+	add_to_variable = { CHI_industry_misc_costs = CHI_calc_cost }
+	custom_effect_tooltip = CHI_industry_cost_change_tt
+}
+CHI_calc_industry_income_change = {
+	add_to_variable = { CHI_industry_misc_income = CHI_calc_income }
+	custom_effect_tooltip = CHI_industry_income_change_tt
+}
+CHI_calc_industry_pu_change = {
+	add_to_variable = { CHI_industry_free_pus = CHI_industry_free_pus_calc }
+	custom_effect_tooltip = CHI_industry_pu_change_tt
+}
+CHI_calc_legyuan_cost_change = {
+	add_to_variable = { CHI_leg_yuan_misc_costs = CHI_calc_cost }
+	custom_effect_tooltip = CHI_legyuan_cost_change_tt
+}
+CHI_calc_legyuan_income_change = {
+	add_to_variable = { CHI_leg_yuan_misc_income = CHI_calc_income }
+	custom_effect_tooltip = CHI_legyuan_income_change_tt
+}
+CHI_calc_oilcrisis_cost_change = {
+	add_to_variable = { CHI_oilcrisis_misc_costs = CHI_calc_cost }
+	custom_effect_tooltip = CHI_oilcrisis_cost_change_tt
+}
+CHI_calc_oilcrisis_income_change = {
+	add_to_variable = { CHI_oilcrisis_misc_income = CHI_calc_income }
+	custom_effect_tooltip = CHI_oilcrisis_income_change_tt
+}
+YUN_calc_xinan_dev_cost_change = {
+	add_to_variable = { YUN_xinan_dev_misc_costs = YUN_calc_cost }
+	custom_effect_tooltip = YUN_xinandev_cost_change_tt
+}
+YUN_calc_xinan_dev_income_change = {
+	add_to_variable = { YUN_xinan_dev_misc_income = YUN_calc_income }
+	custom_effect_tooltip = YUN_xinandev_cost_income_tt
+}
+YUN_calc_burma_road_cost_change = {
+	add_to_variable = { YUN_bur_road_const_misc_costs = YUN_calc_cost }
+	custom_effect_tooltip = YUN_bur_road_const_cost_change_tt
+}
+
+### SECRET ARMY
+
+CHI_setup_secret_army = {
+	set_variable = { CHI_sa_recruitment = 10 }
+	set_variable = { CHI_sa_weaponry = 10 }
+	set_variable = { CHI_sa_training = 10 }
+	CHI_calc_secret_army_buffs = yes
+	add_dynamic_modifier = { modifier = CHI_secret_army }
+	force_update_dynamic_modifier = yes
+}
+
+# for loading oobs templates when WI starts. For spawning units
+CHI_secret_army_load_template_archetypes = {
+	load_oob = CHI_secret_army_template_setup
+}
+
+CHI_calc_secret_army_buffs = {
+	# training time from recruitment. max = -0.25
+	set_variable = { CHI_sa_training_time = CHI_sa_recruitment }
+	divide_variable = { CHI_sa_training_time = 400 }
+	multiply_variable = { CHI_sa_training_time = -1 }
+
+	# army proff gain from recruitment. max = 4
+	set_variable = { CHI_sa_army_prof_gain = CHI_sa_recruitment }
+	divide_variable = { CHI_sa_army_prof_gain = 25 }
+
+	# research speed from weaponry. max 0.1
+	set_variable = { CHI_sa_research_speed = CHI_sa_weaponry }
+	divide_variable = { CHI_sa_research_speed = 1000 }
+
+	# factory output from weaponry. max 0.25
+	set_variable = { CHI_sa_factory_output = CHI_sa_weaponry }
+	divide_variable = { CHI_sa_factory_output = 400 }
+
+	# org from training. max = 0.2
+	set_variable = { CHI_sa_org = CHI_sa_training }
+	divide_variable = { CHI_sa_org = 500 }
+
+	# army speed from training. max = 0.2
+	set_variable = { CHI_sa_speed = CHI_sa_training }
+	divide_variable = { CHI_sa_speed = 500 }
+
+	force_update_dynamic_modifier = yes
+}
+
+# change Secret Army recruitment
+CHI_change_sa_recruitment = {
+	set_temp_variable = { tempSARecruitment_tt = tempSARecruitment }
+	if = {
+		limit = { check_variable = { tempSARecruitment < 0 } }
+		multiply_temp_variable = { tempSARecruitment_tt = -1 }
+		custom_effect_tooltip = CHI_sa_decrease_recruitment_tt
+	}
+	else = {
+		custom_effect_tooltip = CHI_sa_increase_recruitment_tt
+	}
+	add_to_variable = { CHI_sa_recruitment = tempSARecruitment }
+	clamp_variable = { var = CHI_sa_recruitment min = 0 max = 100 }
+	CHI_calc_secret_army_buffs = yes
+}
+
+# change Secret Army weaponry
+CHI_change_sa_weaponry = {
+	set_temp_variable = { tempSAWeaponry_tt = tempSAWeaponry }
+	if = {
+		limit = { check_variable = { tempSAWeaponry < 0 } }
+		multiply_temp_variable = { tempSAWeaponry_tt = -1 }
+		custom_effect_tooltip = CHI_sa_decrease_weaponry_tt
+	}
+	else = {
+		custom_effect_tooltip = CHI_sa_increase_weaponry_tt
+	}
+	add_to_variable = { CHI_sa_weaponry = tempSAWeaponry }
+	clamp_variable = { var = CHI_sa_weaponry min = 0 max = 100 }
+	CHI_calc_secret_army_buffs = yes
+}
+
+# change Secret Army training
+CHI_change_sa_training = {
+	set_temp_variable = { tempSATraining_tt = tempSATraining }
+	if = {
+		limit = { check_variable = { tempSATraining < 0 } }
+		multiply_temp_variable = { tempSATraining_tt = -1 }
+		custom_effect_tooltip = CHI_sa_decrease_training_tt
+	}
+	else = {
+		custom_effect_tooltip = CHI_sa_increase_training_tt
+	}
+	add_to_variable = { CHI_sa_training = tempSATraining }
+	clamp_variable = { var = CHI_sa_training min = 0 max = 100 }
+	CHI_calc_secret_army_buffs = yes
+}

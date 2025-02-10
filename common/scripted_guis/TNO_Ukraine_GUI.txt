@@ -1,0 +1,676 @@
+scripted_gui = {
+
+	TNO_Ukraine_GUI_Open = {
+		context_type = player_context
+		parent_window_token = politics_tab
+		window_name = "TNO_Ukraine_GUI_Open"
+
+		visible = {
+			has_country_flag = UKR_bb_enabled
+		}
+
+		effects = {
+			Ukraine_GUI_Open_Button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = Ukraine_GUI_Visible_Flag }
+					}
+					set_country_flag = Ukraine_GUI_Visible_Flag
+				}
+				else = {
+					clr_country_flag = Ukraine_GUI_Visible_Flag
+				}
+				set_country_flag = gui_alert_hidden
+				add_to_variable = { UKR_BB_DIRTY = 0.01 }
+			}
+		}
+
+		triggers = {
+			gui_alert_visible = {
+				NOT = { has_country_flag = gui_alert_hidden }
+			}
+		}
+		properties = {
+			Ukraine_GUI_Open_Button = {
+				image = "GFX_UKR_BB_icon_opener_[ROOT.GetTag]"
+			}
+		}
+	}
+
+	TNO_Ukraine_GUI_Region_Stateview = {
+		context_type = selected_state_context
+		window_name = "TNO_Ukraine_GUI_Region_Stateview"
+		parent_window_token = selected_state_view
+		visible = {
+			has_variable = region_var
+			ROOT = { has_country_flag = UKR_bb_enabled }
+		}
+		properties = {
+			breadbasket_icon = {
+				image = "GFX_UKR_BB_icon_opener_[ROOT.GetTag]"
+			}
+		}
+	}
+
+	TNO_Ukraine_GUI_Main = {
+		context_type = player_context
+		window_name = "TNO_Ukraine_GUI_Main"
+		visible = { has_country_flag = Ukraine_GUI_Visible_Flag }
+		dirty = UKR_BB_DIRTY
+
+		dynamic_lists = {
+			map_gridbox = {
+				array = UKR_bb_map_array
+				entry_container = "UKR_map_container"
+				index = j
+				value = k
+			}
+		}
+
+		triggers = {
+			holy_fuck_shit_hit_the_fan_visible = { # I literally dont know what Im using this for
+				always = no
+			}
+		}
+
+		########################
+		### map_gridbox shit ###
+		########################
+		triggers = {
+			map_button_visible = {
+				if = {
+					limit = {
+						check_variable = { BB_selected_region = k }
+					}
+					set_temp_variable = { map_frame = 1 }
+				}
+				else = {
+					set_temp_variable = { map_frame = 2 }
+				}
+				check_variable = {
+					var = k:resistance_control^0
+					value = 50
+					compare = greater_than_or_equals
+				}
+			}
+			map_outline_crimea_visible = {
+				is_in_array = { UKR_bb_map_array = 137 }
+			}
+			map_outline_galicia_visible = {
+				is_in_array = { UKR_bb_map_array = 91 }
+			}
+			map_button_alert_visible = {
+				if = {
+					limit = {
+						check_variable = { BB_selected_region = k }
+					}
+					set_temp_variable = { map_alert_frame = 1 }
+				}
+				else = {
+					set_temp_variable = { map_alert_frame = 2 }
+				}
+				check_variable = { k:resistance_control^0 < 50 }
+			}
+		}
+		properties = {
+			map_button = {
+				image = "GFX_UKR_BB_map_[?k]"
+				frame = map_frame
+				x = UKR_bb_map_x^j
+				y = UKR_bb_map_y^j
+			}
+			map_button_alert = {
+				image = "GFX_UKR_BB_map_[?k]_alert"
+				frame = map_alert_frame
+				x = UKR_bb_map_x^j
+				y = UKR_bb_map_y^j
+			}
+		}
+		effects = {
+			map_button_click = {
+				set_variable = { BB_selected_region = k }
+				add_to_variable = { UKR_BB_DIRTY = 0.01 }
+			}
+			map_button_alert_click = {
+				set_variable = { BB_selected_region = k }
+				add_to_variable = { UKR_BB_DIRTY = 0.01 }
+				set_temp_variable = { temp_state = k }
+				effect_tooltip = {
+					UKR_bb_resistance_debuffs = yes
+				}
+			}
+		}
+		### map_gridbox end ###
+
+		dynamic_lists = {
+			tabs_gridbox = {
+				array = dummy
+				entry_container = "UKR_BB_tab_[?opened_tab]"
+				value = asdnaiusfdbsdgj
+				index = asfnuidfskdjnsiud
+			}
+		}
+		effects = {
+			tab_1_button_click = {
+				set_variable = { opened_tab = 1 }
+				add_to_variable = { UKR_BB_DIRTY = 0.01 }
+			}
+			tab_2_button_click = {
+				set_variable = { opened_tab = 2 }
+				add_to_variable = { UKR_BB_DIRTY = 0.01 }
+			}
+		}
+
+		#######################
+		### development tab ###
+		#######################
+		triggers = {
+			# frame control
+			development_circle_visible = {
+				set_temp_variable = { circle_frame = BB_selected_region:development_level }
+				multiply_temp_variable = { circle_frame = 10 }
+			}
+		}
+
+		properties = {
+			development_bar = {
+				frame = BB_selected_region:development
+			}
+			exploitation_bar = {
+				frame = BB_selected_region:exploitation
+			}
+			development_circle = {
+				frame = circle_frame
+			}
+		}
+
+		## Consumption
+
+		triggers = {
+			consumption_countdown_bar_visible = {
+				set_temp_variable = { consumption_countdown_frame = 365 }
+				subtract_from_temp_variable = { consumption_countdown_frame = UKR_bb_consumption_countdown }
+				multiply_temp_variable = { consumption_countdown_frame = 0.822 } # Conversion factor of 365 days:300 frames
+				round_temp_variable = consumption_countdown_frame
+			}
+			consumption_actions_button_visible = {
+				NOT = { has_country_flag = UKR_BB_consumption_actions_show }
+				has_country_flag = UKR_bb_consumption_enabled
+			}
+			consumption_overlay_visible = {
+				NOT = {
+					has_country_flag = UKR_bb_consumption_enabled
+				}
+			}
+		}
+
+		effects = {
+			consumption_actions_button_click = {
+				set_country_flag = UKR_BB_consumption_actions_show
+				add_to_variable = { UKR_BB_DIRTY = 0.01 }
+			}
+		}
+
+		properties = {
+			consumption_stock_gain_bar = {
+				frame = gain_frame
+			}
+			consumption_stock_stockpile_bar = {
+				frame = stockpile_frame
+			}
+			consumption_demand_local_bar = {
+				frame = grain_local_frame
+			}
+			consumption_demand_german_bar = {
+				frame = grain_demand_frame
+			}
+			stock_total_num = {
+				x = stock_total_num_x
+			}
+			demand_total_num = {
+				x = demand_total_num_x
+			}
+			consumption_countdown_bar = {
+				frame = consumption_countdown_frame
+			}
+			consumption_overlay = {
+				image = "GFX_UKR_BB_consumption_overlay_[ROOT.GetTag]"
+			}
+		}
+
+		### end development tab ###
+
+		######################
+		### resistance tab ###
+		######################
+		triggers = {
+			# Frame control
+			pie_0_visible = {
+				NOT = {
+					check_variable = { BB_selected_region:resistance_control^0 < 1 }
+				}
+			}
+			pie_1_visible = {
+				set_temp_variable = { pie_1_frame = BB_selected_region:resistance_control^1 }
+				add_to_temp_variable = { pie_1_frame = BB_selected_region:resistance_control^0 }
+				NOT = {
+					check_variable = { pie_1_frame = 0 }
+				}
+			}
+			pie_2_visible = {
+				set_temp_variable = { pie_2_frame = BB_selected_region:resistance_control^2 }
+				add_to_temp_variable = { pie_2_frame = BB_selected_region:resistance_control^1 }
+				add_to_temp_variable = { pie_2_frame = BB_selected_region:resistance_control^0 }
+				NOT = {
+					check_variable = { pie_2_frame < 1 }
+				}
+			}
+
+			full_control_0_visible = {
+				check_variable = { BB_selected_region:resistance_control^0 > 99.5 }
+			}
+			full_control_1_visible = {
+				check_variable = { BB_selected_region:resistance_control^1 > 99.5 }
+			}
+			full_control_2_visible = {
+				check_variable = { BB_selected_region:resistance_control^2 > 99.5 }
+			}
+			full_control_3_visible = {
+				check_variable = { BB_selected_region:resistance_control^3 > 99.5 }
+			}
+
+			# Frame control 2: Trigonometry Boogaloo (Technically it's pos control but w/e)
+			pie_0_num_visible = {
+				set_temp_variable = { angle = BB_selected_region:resistance_control^0 }
+				divide_temp_variable = { angle = 2 }
+				multiply_temp_variable = { angle = 3.6 }
+
+				TNO_trig_run_sin = yes
+				multiply_temp_variable = { result_s = 30 }
+				set_temp_variable = { result_s_0 = result_s }
+
+				TNO_trig_run_cos = yes
+				multiply_temp_variable = { result_c = -30 }
+				add_to_temp_variable = { result_c = 60 }
+				set_temp_variable = { result_c_0 = result_c }
+
+				NOT = {
+					check_variable = { BB_selected_region:resistance_control^0 < 5 }
+					check_variable = { BB_selected_region:resistance_control^0 > 99.5 }
+				}
+			}
+			pie_1_num_visible = {
+				set_temp_variable = { angle = BB_selected_region:resistance_control^1 }
+				divide_temp_variable = { angle = 2 }
+				add_to_temp_variable = { angle = BB_selected_region:resistance_control^0 }
+				multiply_temp_variable = { angle = 3.6 }
+
+				TNO_trig_run_sin = yes
+				multiply_temp_variable = { result_s = 30 }
+				set_temp_variable = { result_s_1 = result_s }
+
+				TNO_trig_run_cos = yes
+				multiply_temp_variable = { result_c = -30 }
+				add_to_temp_variable = { result_c = 60 }
+				set_temp_variable = { result_c_1 = result_c }
+
+				NOT = {
+					check_variable = { BB_selected_region:resistance_control^1 < 5 }
+					check_variable = { BB_selected_region:resistance_control^1 > 99.5 }
+				}
+			}
+			pie_2_num_visible = {
+				set_temp_variable = { angle = BB_selected_region:resistance_control^2 }
+				divide_temp_variable = { angle = 2 }
+				add_to_temp_variable = { angle = BB_selected_region:resistance_control^1 }
+				add_to_temp_variable = { angle = BB_selected_region:resistance_control^0 }
+				multiply_temp_variable = { angle = 3.6 }
+
+				TNO_trig_run_sin = yes
+				multiply_temp_variable = { result_s = 30 }
+				set_temp_variable = { result_s_2 = result_s }
+
+				TNO_trig_run_cos = yes
+				multiply_temp_variable = { result_c = -30 }
+				add_to_temp_variable = { result_c = 60 }
+				set_temp_variable = { result_c_2 = result_c }
+
+				NOT = {
+					check_variable = { BB_selected_region:resistance_control^2 < 5 }
+					check_variable = { BB_selected_region:resistance_control^2 > 99.5 }
+				}
+			}
+			pie_3_num_visible = {
+				set_temp_variable = { angle = BB_selected_region:resistance_control^3 }
+				divide_temp_variable = { angle = 2 }
+				add_to_temp_variable = { angle = BB_selected_region:resistance_control^2 }
+				add_to_temp_variable = { angle = BB_selected_region:resistance_control^1 }
+				add_to_temp_variable = { angle = BB_selected_region:resistance_control^0 }
+				multiply_temp_variable = { angle = 3.6 }
+
+				TNO_trig_run_sin = yes
+				multiply_temp_variable = { result_s = 30 }
+				set_temp_variable = { result_s_3 = result_s }
+
+				TNO_trig_run_cos = yes
+				multiply_temp_variable = { result_c = -30 }
+				add_to_temp_variable = { result_c = 60 }
+				set_temp_variable = { result_c_3 = result_c }
+
+				NOT = {
+					check_variable = { BB_selected_region:resistance_control^3 < 5 }
+					check_variable = { BB_selected_region:resistance_control^3 > 99.5 }
+				}
+			}
+		}
+
+		properties = {
+			pie_0 = {
+				image = "[UKR_BB_pie_0_GFX]"
+				frame = BB_selected_region:resistance_control^0
+			}
+			pie_1 = {
+				image = "[UKR_BB_pie_1_GFX]"
+				frame = pie_1_frame
+			}
+			pie_2 = {
+				image = "[UKR_BB_pie_2_GFX]"
+				frame = pie_2_frame
+			}
+			pie_3 = {
+				image = "[UKR_BB_pie_3_GFX]"
+				frame = 100
+			}
+
+			pie_0_num = {
+				x = result_s_0
+				y = result_c_0
+			}
+			pie_1_num = {
+				x = result_s_1
+				y = result_c_1
+			}
+			pie_2_num = {
+				x = result_s_2
+				y = result_c_2
+			}
+			pie_3_num = {
+				x = result_s_3
+				y = result_c_3
+			}
+
+			desolation_bar = {
+				frame = BB_selected_region:desolation
+			}
+		}
+
+		# Resistance activities
+		dynamic_lists = {
+			resistance_activity_gridbox = {
+				array = UKR_bb_resistance_activities_array
+				entry_container = resistance_activity_entry
+				index = r_i
+			}
+		}
+		triggers = {
+			decisive_region_bar_visible = {
+				set_temp_variable = { decisive_region_bar_frame = UKR_bb_resistance_activities_decisive_control_array^r_i }
+				divide_temp_variable = { decisive_region_bar_frame = UKR_bb_resistance_activities_decisive_max_array^r_i }
+				multiply_temp_variable = { decisive_region_bar_frame = 100 }
+			}
+			decisive_region_bar_threshold_visible = {
+				set_temp_variable = { decisive_region_bar_threshold_x = UKR_bb_resistance_activities_decisive_threshold_array^r_i }
+				divide_temp_variable = { decisive_region_bar_threshold_x = UKR_bb_resistance_activities_decisive_max_array^r_i }
+				multiply_temp_variable = { decisive_region_bar_threshold_x = 178 }
+				add_to_temp_variable = { decisive_region_bar_threshold_x = 132 }
+			}
+			decisive_region_bar_warning_visible = {
+				check_variable = { UKR_bb_resistance_activities_decisive_control_array^r_i > UKR_bb_resistance_activities_decisive_threshold_array^r_i }
+			}
+			decisive_multiple_phantom_visible = {
+				check_variable = { UKR_bb_resistance_activities_decisive_region_array^r_i = 999 }
+			}
+			effect_button_visible = {
+				if = {
+					limit = {
+						check_variable = { UKR_bb_resistance_activities_decisive_control_array^r_i > UKR_bb_resistance_activities_decisive_threshold_array^r_i }
+					}
+					set_temp_variable = { effect_button_frame = 2 }
+				}
+				else = {
+					set_temp_variable = { effect_button_frame = 1 }
+				}
+			}
+		}
+		effects = {
+			decisive_multiple_phantom_click = {
+				set_temp_variable = { region_index = 0 }
+				UKR_BB_resistance_activity_multiple_region_display = yes
+			}
+			effect_button_click = {
+				effect_tooltip = {
+					UKR_BB_resistance_activity_effect_execute = yes
+				}
+			}
+		}
+		properties = {
+			resistance_logo = {
+				image = "GFX_[?v.GetTokenKey]"
+			}
+			decisive_region_bar = {
+				frame = decisive_region_bar_frame
+			}
+			decisive_region_bar_threshold = {
+				x = decisive_region_bar_threshold_x
+			}
+			effect_button = {
+				frame = effect_button_frame
+			}
+		}
+
+		### end resistance tab ###
+
+		effects = {
+			Ukraine_GUI_Main_Close_Button_click = {
+				clr_country_flag = Ukraine_GUI_Visible_Flag
+				add_to_variable = { UKR_BB_DIRTY = 0.01 }
+			}
+		}
+		properties = {
+			tabs_bg = {
+				frame = opened_tab
+			}
+			regionflavor_image = { image = "[Get_UKR_RegionFlavor_Image]" }
+		}
+	}
+
+	TNO_Ukraine_GUI_Resistance_Stockpile = {
+		window_name = TNO_Ukraine_GUI_Resistance_Stockpile
+		context_type = player_context
+		parent_window_name = TNO_Ukraine_GUI_Main
+	}
+	TNO_Ukraine_GUI_Resistance_Stockpile_inside = {
+		window_name = TNO_Ukraine_GUI_Resistance_Stockpile_inside
+		context_type = player_context
+		parent_window_name = TNO_Ukraine_GUI_Resistance_Stockpile_instance
+		visible = {
+			has_country_flag = UKR_BB_Partisan_Stockpile_active
+		}
+	}
+
+	TNO_Ukraine_GUI_Consumption_Actions_SubGUI = {
+		window_name = TNO_Ukraine_GUI_Consumption_Actions_SubGUI
+		context_type = player_context
+		parent_window_name = TNO_Ukraine_GUI_Main
+	}
+	TNO_Ukraine_GUI_Consumption_Actions_SubGUI_inside = {
+		window_name = TNO_Ukraine_GUI_Consumption_Actions_SubGUI_inside
+		context_type = player_context
+		parent_window_name = "TNO_Ukraine_GUI_Consumption_Actions_SubGUI_instance"
+		visible = {
+			check_variable = { opened_tab = 1 }
+			has_country_flag = UKR_BB_consumption_actions_show
+			has_country_flag = UKR_bb_consumption_enabled
+		}
+
+		dynamic_lists = {
+			consumption_actions_gridbox = {
+				array = UKR_bb_consumption_actions_array
+				entry_container = consumption_actions_entry
+			}
+		}
+
+		properties = {
+			consumption_action_button = {
+				image = "GFX_[?v.GetTokenKey]"
+			}
+			consumption_action_button_cooldown = {
+				frame = UKR_bb_consumption_actions_cooldown^i
+			}
+		}
+
+		triggers = {
+			consumption_action_button_click_enabled = {
+				UKR_BB_can_do_consumption_action = yes
+				check_variable = { UKR_bb_consumption_actions_cooldown^i = 0 }
+			}
+			consumption_action_button_cooldown_visible = {
+				check_variable = { UKR_bb_consumption_actions_cooldown^i > 0 }
+			}
+			consumption_action_button_cooldown_text_visible = {
+				check_variable = { UKR_bb_consumption_actions_cooldown^i > 0 }
+			}
+		}
+
+		effects = {
+			consumption_action_button_click = {
+				UKR_bb_consumption_actions_execute = yes
+			}
+			consumption_actions_button_close_click = {
+				clr_country_flag = UKR_BB_consumption_actions_show
+				add_to_variable = { UKR_BB_DIRTY = 0.01 }
+			}
+		}
+	}
+
+	# I made these its own GUI because it mustn't be dirty var'd
+	TNO_Ukraine_GUI_Development_Actions_SubGUI_parent = {
+		window_name = TNO_Ukraine_GUI_Development_Actions_SubGUI_parent
+		context_type = player_context
+		parent_window_name = TNO_Ukraine_GUI_Main
+	}
+	TNO_Ukraine_GUI_Development_Actions_SubGUI = {
+		window_name = TNO_Ukraine_GUI_Development_Actions_SubGUI
+		context_type = player_context
+		parent_window_name = TNO_Ukraine_GUI_Development_Actions_SubGUI_parent_instance
+		visible = { check_variable = { opened_tab = 1 } }
+		dynamic_lists = {
+			development_actions_gridbox = {
+				array = UKR_BB_actions_development_array
+				entry_container = development_actions_entry
+				value = d_action_val
+				index = d_action_idx
+			}
+		}
+		properties = {
+			do_action_button = {
+				image = "GFX_UKR_BB_actions_[?d_action_val.GetTokenKey]"
+			}
+		}
+		triggers = {
+			box_click_enabled = {
+				UKR_BB_can_do_dev_action = yes
+				check_variable = { UKR_BB_actions_development_cooldown^d_action_idx = 0 }
+			}
+			do_action_button_click_enabled = {
+				UKR_BB_can_do_dev_action = yes
+				check_variable = { UKR_BB_actions_development_cooldown^d_action_idx = 0 }
+			}
+			cross_visible = {
+				UKR_BB_can_do_dev_action = no
+			}
+			phantom_cost_tooltip_click_enabled = {
+				UKR_BB_can_do_dev_action = yes
+			}
+		}
+		effects = {
+			do_action_button_click = {
+				UKR_bb_d_actions_execute = yes
+				set_variable = { UKR_BB_actions_development_cooldown^d_action_idx = 30 }
+			}
+		}
+
+		triggers = {
+			cooldown_bar_visible = {
+				check_variable = { UKR_BB_actions_development_cooldown^d_action_idx > 0 }
+				set_temp_variable = { cooldown_frame = 30 }
+				subtract_from_temp_variable = { cooldown_frame = UKR_BB_actions_development_cooldown^d_action_idx }
+			}
+		}
+		properties = {
+			cooldown_bar = {
+				frame = cooldown_frame
+			}
+		}
+	}
+
+	TNO_Ukraine_GUI_Resistance_Actions_SubGUI_parent = {
+		window_name = TNO_Ukraine_GUI_Resistance_Actions_SubGUI_parent
+		context_type = player_context
+		parent_window_name = TNO_Ukraine_GUI_Main
+	}
+	TNO_Ukraine_GUI_Resistance_Actions_SubGUI = {
+		window_name = TNO_Ukraine_GUI_Resistance_Actions_SubGUI
+		context_type = player_context
+		parent_window_name = TNO_Ukraine_GUI_Resistance_Actions_SubGUI_parent_instance
+		visible = { check_variable = { opened_tab = 2 } }
+		dynamic_lists = {
+			resistance_actions_gridbox = {
+				array = UKR_BB_actions_resistance_array
+				entry_container = resistance_actions_entry
+				value = r_action_val
+				index = r_action_idx
+			}
+		}
+		properties = {
+			do_action_button = {
+				image = "GFX_UKR_BB_actions_[?r_action_val.GetTokenKey]"
+			}
+		}
+		triggers = {
+			box_click_enabled = {
+				UKR_BB_can_do_res_action = yes
+				check_variable = { UKR_BB_actions_resistance_cooldown^r_action_idx = 0 }
+			}
+			do_action_button_click_enabled = {
+				UKR_BB_can_do_res_action = yes
+				check_variable = { UKR_BB_actions_resistance_cooldown^r_action_idx = 0 }
+			}
+			cross_visible = {
+				UKR_BB_can_do_res_action = no
+			}
+			phantom_cost_tooltip_click_enabled = {
+				UKR_BB_can_do_res_action = yes
+			}
+		}
+		effects = {
+			do_action_button_click = {
+				UKR_bb_r_actions_execute = yes
+				set_variable = { UKR_BB_actions_resistance_cooldown^r_action_idx = 30 }
+			}
+		}
+
+		triggers = {
+			cooldown_bar_visible = {
+				check_variable = { UKR_BB_actions_resistance_cooldown^r_action_idx > 0 }
+				set_temp_variable = { cooldown_frame = 30 }
+				subtract_from_temp_variable = { cooldown_frame = UKR_BB_actions_resistance_cooldown^r_action_idx }
+			}
+		}
+		properties = {
+			cooldown_bar = {
+				frame = cooldown_frame
+			}
+		}
+	}
+}

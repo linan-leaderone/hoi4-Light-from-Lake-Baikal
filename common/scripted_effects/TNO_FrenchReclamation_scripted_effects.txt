@@ -1,0 +1,1973 @@
+#
+# ███████╗██████╗ ███████╗███╗   ██╗ ██████╗██╗  ██╗    ██████╗ ███████╗ ██████╗██╗      █████╗ ███╗   ███╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+# ██╔════╝██╔══██╗██╔════╝████╗  ██║██╔════╝██║  ██║    ██╔══██╗██╔════╝██╔════╝██║     ██╔══██╗████╗ ████║██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+# █████╗  ██████╔╝█████╗  ██╔██╗ ██║██║     ███████║    ██████╔╝█████╗  ██║     ██║     ███████║██╔████╔██║███████║   ██║   ██║██║   ██║██╔██╗ ██║
+# ██╔══╝  ██╔══██╗██╔══╝  ██║╚██╗██║██║     ██╔══██║    ██╔══██╗██╔══╝  ██║     ██║     ██╔══██║██║╚██╔╝██║██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+# ██║     ██║  ██║███████╗██║ ╚████║╚██████╗██║  ██║    ██║  ██║███████╗╚██████╗███████╗██║  ██║██║ ╚═╝ ██║██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+# ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝    ╚═╝  ╚═╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+# code by Oveja and Scood
+#
+# FFR_begin_reclamation
+# FFR_begin_reclamation_civil_war
+# FFR_reconciliation
+# FFR_reclamation_victory
+# FFR_reclamation_defeat
+
+FFR_begin_reclamation = {
+
+	log = "[GetDateText]: [Root.GetName]: FFR_begin_reclamation; Executing."
+
+	# Unlocks templates for French
+	FRA = {
+		country_lock_all_division_template = no
+	}
+
+	# Help from Iberia
+	if = {
+		limit = {
+			has_global_flag = IBR_FFR_negotiations_successful
+			IBR = { check_variable = { IBR.FFR_negotiations_5 = 1 } }
+		}
+		IBR = {
+			country_event = france_reclamation.proxy.IBR.1
+			diplomatic_relation = {
+				country = FRD
+				relation = non_aggression_pact
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = military_access
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = docking_rights
+				active = yes
+			}
+		}
+	}
+
+	# If France is in Pakt
+	if = {
+		limit = { FRA = { is_in_faction_with = GER } }
+		GER = { end_puppet = FRA }
+		FRA = {
+			add_ideas = GER_BOR_dont_join_wars_please
+			set_country_flag = reclamation_was_german_puppet
+			leave_faction = yes
+			#remove_ideas = Pakt_Mitstreiter
+			#econ_leave_sphere = yes
+		}
+		every_country = {
+			limit = { is_subject_of = FRA }
+			add_ideas = GER_BOR_dont_join_wars_please
+		}
+	}
+	else_if = {
+		limit = { FRA = { is_subject_of = ITA } }
+		ITA = { end_puppet = FRA }
+		FRA = {
+			add_ideas = GER_BOR_dont_join_wars_please
+			set_country_flag = reclamation_was_italian_puppet
+			leave_faction = yes
+			#remove_ideas = Pakt_Mitstreiter
+			#econ_leave_sphere = yes
+		}
+		every_country = {
+			limit = { is_subject_of = FRA }
+			add_ideas = GER_BOR_dont_join_wars_please
+		}
+	}
+
+	# Spawns #
+	FFR = {
+		add_ideas = {
+			GER_BOR_dont_join_wars_please
+			FFR_the_reclamation
+		}
+		every_country = {
+			limit = { is_in_faction_with = FFR }
+			add_ideas = GER_BOR_dont_join_wars_please
+		}
+		if = {
+			limit = {
+				OR = {
+					has_global_flag = IBR_FFR_negotiations_successful
+					has_global_flag = IBR_FFR_post_war_aid
+					has_global_flag = SPR_FFR_post_war_aid
+				}
+			}
+			load_oob = "FFR_Dragoon"
+		}
+		else = { load_oob = "FFR_Bordeaux" }
+	}
+	# If there hasn't been a civil war
+	if = {
+		limit = { NOT = { has_global_flag = FRA_civil_war_over } }
+		FRD = {
+			transfer_state = 19
+			add_state_core = 19
+			division_template = {
+				name = "Infantry Division"
+				regiments = {
+					infantry = { x = 0 y = 0 }
+					infantry = { x = 0 y = 1 }
+					infantry = { x = 0 y = 2 }
+					infantry = { x = 1 y = 0 }
+					infantry = { x = 1 y = 1 }
+					infantry = { x = 1 y = 2 }
+					infantry = { x = 2 y = 0 }
+					infantry = { x = 2 y = 1 }
+					infantry = { x = 2 y = 2 }
+				}
+				support = {
+					artillery = { x = 0 y = 0 }
+					engineer = { x = 0 y = 1 }
+				}
+			}
+			19 = {
+				create_unit = {
+					division = "division_template = \"Infantry Division\" start_experience_factor = 0.3 start_equipment_factor = 0.4"
+					owner = FRD
+					prioritize_location = 9737
+					allow_spawning_on_enemy_provs = yes
+				}
+				create_unit = {
+					division = "division_template = \"Infantry Division\" start_experience_factor = 0.3 start_equipment_factor = 0.4"
+					owner = FRD
+					prioritize_location = 11565
+					allow_spawning_on_enemy_provs = yes
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						has_global_flag = IBR_FFR_negotiations_successful
+						has_global_flag = IBR_FFR_post_war_aid
+						has_global_flag = SPR_FFR_post_war_aid
+					}
+				}
+				transfer_state = 21
+				add_state_core = 21
+				21 = {
+					create_unit = {
+						division = "division_template = \"Infantry Division\" start_experience_factor = 0.3 start_equipment_factor = 0.4"
+						owner = FRD
+						prioritize_location = 11834
+						allow_spawning_on_enemy_provs = yes
+					}
+					create_unit = {
+						division = "division_template = \"Infantry Division\" start_experience_factor = 0.3 start_equipment_factor = 0.4"
+						owner = FRD
+						prioritize_location = 15194
+						allow_spawning_on_enemy_provs = yes
+					}
+				}
+			}
+			declare_war_on = { target = FRA type = annex_everything }
+			add_ideas = FRD_aiding_the_reclamation
+			set_country_flag = FMA_MEMBER
+			add_ideas = FMA_Faction
+		}
+		FFR = {
+			declare_war_on = { target = FRA type = annex_everything }
+			diplomatic_relation = {
+				country = FRD
+				relation = non_aggression_pact
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = military_access
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = docking_rights
+				active = yes
+			}
+		}
+		if = {
+			limit = { FFR = { is_faction_leader = yes } }
+			FFR = { add_to_faction = FRD }
+		}
+		else_if = {
+			limit = { WOL = { is_faction_leader = yes } }
+			WOL = { add_to_faction = FRD }
+		}
+		every_country = {
+			limit = { is_in_faction_with = FFR }
+			diplomatic_relation = {
+				country = FRD
+				relation = non_aggression_pact
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = military_access
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = docking_rights
+				active = yes
+			}
+			add_equipment_to_stockpile = {
+				type = convoy_1
+				amount = 100
+			}
+		}
+
+		if = {
+			limit = {
+				FFR_check_failed_negotiations = yes
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FFRnews.1
+					days = 1
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				FFR_check_no_negotiations = yes
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FFRnews.2
+					days = 1
+				}
+			}
+		}
+	}
+	# If there already has been a civil war
+	else = {
+		FFR = {
+			transfer_state = 19
+			if = {
+				limit = {
+					OR = {
+						has_global_flag = IBR_FFR_negotiations_successful
+						has_global_flag = IBR_FFR_post_war_aid
+						has_global_flag = SPR_FFR_post_war_aid
+					}
+				}
+				transfer_state = 21
+			}
+			declare_war_on = { target = FRA type = annex_everything }
+		}
+		every_country = {
+			limit = { is_in_faction_with = FFR }
+			add_equipment_to_stockpile = {
+				type = convoy_1
+				amount = 100
+			}
+		}
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = FFRnews.6
+				days = 1
+			}
+		}
+	}
+
+	# Overall #
+	set_global_flag = FFR_reclamation_happening
+
+	# Proxy Vars #
+	FFR = {
+		set_variable = { FrenchReclamation_Focus_Stored = 2 }
+		add_to_array = { FrenchReclamation_Focus = 1 }
+		add_to_array = { FrenchReclamation_Focus = 4 }
+		add_to_array = { FrenchReclamation_Focus = 1 }
+
+		set_variable = { FFR_Reclamation_Modifier_war_support_factor = 0 }
+		set_variable = { FFR_Reclamation_Modifier_army_morale_factor = 0 }
+		set_variable = { FFR_Reclamation_Modifier_army_org_factor = 0 }
+		set_variable = { FFR_Reclamation_Modifier_planning_speed = 0 }
+		set_variable = { FFR_Reclamation_Modifier_out_of_supply_factor = 0 }
+		set_variable = { FFR_Reclamation_Modifier_army_defence_factor = 0 }
+		add_dynamic_modifier = { modifier = FFR_Reclamation_DynamicModifier }
+	}
+
+	FFR_reclamation_dynamic_modifier_calculate = yes
+
+	# Events #
+	USA = { country_event = france_reclamation.proxy.USA.1 }
+	GER = { country_event = france_reclamation.proxy.GER.1 }
+
+	log = "[GetDateText]: [Root.GetName]: FFR_begin_reclamation; Completed execution."
+
+}
+
+FFR_begin_reclamation_civil_war = {
+	log = "[GetDateText]: [Root.GetName]: FFR_begin_reclamation_civil_war; Executing."
+
+	# Overall #
+	set_global_flag = FFR_reclamation_civil_war_happening
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = FFRnews.5
+			days = 1
+		}
+	}
+
+	# Help from Iberia
+	if = {
+		limit = {
+			has_global_flag = IBR_FFR_negotiations_successful
+			IBR = { check_variable = { IBR.FFR_negotiations_5 = 1 } }
+		}
+		IBR = { country_event = france_reclamation.proxy.IBR.1 }
+	}
+
+	FRA = { add_ideas = GER_BOR_dont_join_wars_please }
+
+	# Tags #
+	FFR = {
+		add_ideas = {
+			GER_BOR_dont_join_wars_please
+			FFR_the_reclamation
+		}
+	}
+	every_country = {
+		limit = { is_in_faction_with = FFR }
+		add_ideas = GER_BOR_dont_join_wars_please
+	}
+
+	# Spawns #
+	if = { # Poujade
+		limit = {
+			has_global_flag = FRA_civil_war_poujade
+		}
+
+		FFR = {
+			declare_war_on = {
+				target = FRS
+				type = annex_everything
+			}
+			declare_war_on = {
+				target = FRM
+				type = annex_everything
+			}
+
+			diplomatic_relation = {
+				country = FRD
+				relation = non_aggression_pact
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = military_access
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = docking_rights
+				active = yes
+			}
+
+			if = {
+				limit = {
+					OR = {
+						has_global_flag = IBR_FFR_negotiations_successful
+						has_global_flag = IBR_FFR_post_war_aid
+						has_global_flag = SPR_FFR_post_war_aid
+					}
+				}
+				load_oob = "FFR_Dragoon"
+			}
+			else = { load_oob = "FFR_Bordeaux" }
+		}
+		if = {
+			limit = { FFR = { is_faction_leader = yes } }
+			FFR = { add_to_faction = FRD }
+		}
+		else_if = {
+			limit = { WOL = { is_faction_leader = yes } }
+			WOL = { add_to_faction = FRD }
+		}
+		FRD = {
+			add_ideas = FRD_aiding_the_reclamation
+		}
+		every_country = {
+			limit = { is_in_faction_with = FFR }
+			diplomatic_relation = {
+				country = FRD
+				relation = non_aggression_pact
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = military_access
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = docking_rights
+				active = yes
+			}
+			add_equipment_to_stockpile = {
+				type = convoy_1
+				amount = 100
+			}
+		}
+	}
+
+	else = { # Sidos
+		FFR = {
+			declare_war_on = {
+				target = FRS
+				type = annex_everything
+			}
+			declare_war_on = {
+				target = FGR
+				type = annex_everything
+			}
+			declare_war_on = {
+				target = FMM
+				type = annex_everything
+			}
+			declare_war_on = {
+				target = FRM
+				type = annex_everything
+			}
+			declare_war_on = {
+				target = FIT
+				type = annex_everything
+			}
+			declare_war_on = {
+				target = FRV
+				type = annex_everything
+			}
+
+			diplomatic_relation = {
+				country = FRD
+				relation = non_aggression_pact
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = military_access
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = docking_rights
+				active = yes
+			}
+
+			if = {
+				limit = {
+					OR = {
+						has_global_flag = IBR_FFR_negotiations_successful
+						has_global_flag = IBR_FFR_post_war_aid
+						has_global_flag = SPR_FFR_post_war_aid
+					}
+				}
+				load_oob = "FFR_Dragoon"
+			}
+			else = { load_oob = "FFR_Bordeaux" }
+		}
+		if = {
+			limit = { FFR = { is_faction_leader = yes } }
+			FFR = { add_to_faction = FRD }
+		}
+		else_if = {
+			limit = { WOL = { is_faction_leader = yes } }
+			WOL = { add_to_faction = FRD }
+		}
+		FRD = {
+			add_ideas = FRD_aiding_the_reclamation
+		}
+		every_country = {
+			limit = { is_in_faction_with = FFR }
+			diplomatic_relation = {
+				country = FRD
+				relation = non_aggression_pact
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = military_access
+				active = yes
+			}
+			diplomatic_relation = {
+				country = FRD
+				relation = docking_rights
+				active = yes
+			}
+			add_equipment_to_stockpile = {
+				type = convoy_1
+				amount = 100
+			}
+		}
+	}
+
+	# Proxy Vars #
+	FFR = {
+		set_variable = { FrenchReclamation_Focus_Stored = 2 }
+		add_to_array = { FrenchReclamation_Focus = 1 }
+		add_to_array = { FrenchReclamation_Focus = 4 }
+		add_to_array = { FrenchReclamation_Focus = 1 }
+
+		set_variable = { FFR_Reclamation_Modifier_war_support_factor = 0 }
+		set_variable = { FFR_Reclamation_Modifier_army_morale_factor = 0 }
+		set_variable = { FFR_Reclamation_Modifier_army_org_factor = 0 }
+		set_variable = { FFR_Reclamation_Modifier_planning_speed = 0 }
+		set_variable = { FFR_Reclamation_Modifier_out_of_supply_factor = 0 }
+		set_variable = { FFR_Reclamation_Modifier_army_defence_factor = 0 }
+		add_dynamic_modifier = { modifier = FFR_Reclamation_DynamicModifier }
+	}
+
+	FFR_reclamation_dynamic_modifier_calculate = yes
+
+	# Events #
+	USA = { country_event = france_reclamation.proxy.USA.1 }
+	GER = { country_event = france_reclamation.proxy.GER.1 }
+
+	log = "[GetDateText]: [Root.GetName]: FFR_begin_reclamation_civil_war; Completed execution."
+
+}
+
+FFR_reclamation_dynamic_modifier_calculate = {
+	FFR = {
+		##################
+		# // SUPPLIES // #
+		##################
+		if = {
+			limit = { check_variable = { FrenchReclamation_Focus^0 = 0 } }
+			set_variable = { FFR_Reclamation_Modifier_out_of_supply_factor = 0.15 }
+			set_variable = { FFR_Reclamation_Modifier_army_org_factor = -0.2 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^0 = 1 } }
+			set_variable = { FFR_Reclamation_Modifier_out_of_supply_factor = 0.1 }
+			set_variable = { FFR_Reclamation_Modifier_army_org_factor = -0.1 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^0 = 2 } }
+			set_variable = { FFR_Reclamation_Modifier_out_of_supply_factor = 0 }
+			set_variable = { FFR_Reclamation_Modifier_army_org_factor = 0 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^0 = 3 } }
+			set_variable = { FFR_Reclamation_Modifier_out_of_supply_factor = -0.25 }
+			set_variable = { FFR_Reclamation_Modifier_army_org_factor = 0.2 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^0 = 4 } }
+			set_variable = { FFR_Reclamation_Modifier_out_of_supply_factor = -0.3 }
+			set_variable = { FFR_Reclamation_Modifier_army_org_factor = 0.3 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^0 = 5 } }
+			set_variable = { FFR_Reclamation_Modifier_out_of_supply_factor = -0.45 }
+			set_variable = { FFR_Reclamation_Modifier_army_org_factor = 0.4 }
+		}
+		#################
+		# // TENSION // #
+		#################
+		if = {
+			limit = { check_variable = { FrenchReclamation_Focus^1 = 0 } }
+			set_variable = { FFR_Reclamation_Modifier_war_support_factor = -0.3 }
+			set_variable = { FFR_Reclamation_Modifier_planning_speed = -0.15 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^1 = 1 } }
+			set_variable = { FFR_Reclamation_Modifier_war_support_factor = -0.15 }
+			set_variable = { FFR_Reclamation_Modifier_planning_speed = -0.05 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^1 = 2 } }
+			set_variable = { FFR_Reclamation_Modifier_war_support_factor = 0 }
+			set_variable = { FFR_Reclamation_Modifier_planning_speed = 0 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^1 = 3 } }
+			set_variable = { FFR_Reclamation_Modifier_war_support_factor = 0.2 }
+			set_variable = { FFR_Reclamation_Modifier_planning_speed = 0.1 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^1 = 4 } }
+			set_variable = { FFR_Reclamation_Modifier_war_support_factor = 0.4 }
+			set_variable = { FFR_Reclamation_Modifier_planning_speed = 0.3 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^1 = 5 } }
+			set_variable = { FFR_Reclamation_Modifier_war_support_factor = 0.8 }
+			set_variable = { FFR_Reclamation_Modifier_planning_speed = 0.6 }
+		}
+		####################
+		# // CONFIDENCE // #
+		####################
+		if = {
+			limit = { check_variable = { FrenchReclamation_Focus^2 = 0 } }
+			set_variable = { FFR_Reclamation_Modifier_army_defence_factor = 0.3 }
+			set_variable = { FFR_Reclamation_Modifier_army_morale_factor = -0.15 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^2 = 1 } }
+			set_variable = { FFR_Reclamation_Modifier_army_defence_factor = 0.2 }
+			set_variable = { FFR_Reclamation_Modifier_army_morale_factor = -0.1 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^2 = 2 } }
+			set_variable = { FFR_Reclamation_Modifier_army_defence_factor = 0 }
+			set_variable = { FFR_Reclamation_Modifier_army_morale_factor = 0 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^2 = 3 } }
+			set_variable = { FFR_Reclamation_Modifier_army_defence_factor = -0.1 }
+			set_variable = { FFR_Reclamation_Modifier_army_morale_factor = 0.2 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^2 = 4 } }
+			set_variable = { FFR_Reclamation_Modifier_army_defence_factor = -0.2 }
+			set_variable = { FFR_Reclamation_Modifier_army_morale_factor = 0.35 }
+		}
+		else_if = {
+			limit = { check_variable = { FrenchReclamation_Focus^2 = 5 } }
+			set_variable = { FFR_Reclamation_Modifier_army_defence_factor = -0.3 }
+			set_variable = { FFR_Reclamation_Modifier_army_morale_factor = 0.5 }
+		}
+		force_update_dynamic_modifier = yes
+	}
+	USA_FFR_reclamation_dynamic_modifier_calculate = yes
+}
+
+USA_FFR_reclamation_dynamic_modifier_calculate = {
+	USA = {
+		if = {
+			limit = { is_in_array = { TNO_active_conflicts = token:GC_FranceCW } }
+			if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^0 = 0 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_command_power_gain = 0 }
+			}
+			else_if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^0 = 1 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_command_power_gain = -0.1 }
+			}
+			else_if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^0 = 2 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_command_power_gain = -0.15 }
+			}
+			else_if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^0 = 3 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_command_power_gain = -0.2 }
+			}
+			else_if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^0 = 4 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_command_power_gain = -0.25 }
+			}
+			else_if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^0 = 5 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_command_power_gain = -0.3 }
+			}
+			if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^2 = 0 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_political_power_gain = 0 }
+			}
+			else_if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^2 = 1 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_political_power_gain = -0.1 }
+			}
+			else_if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^2 = 2 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_political_power_gain = -0.15 }
+			}
+			else_if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^2 = 3 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_political_power_gain = -0.2 }
+			}
+			else_if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^2 = 4 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_political_power_gain = -0.25 }
+			}
+			else_if = {
+				limit = { check_variable = { FFR.FrenchReclamation_Focus^2 = 5 } }
+				set_variable = { USA_FFR_Reclamation_Modifier_political_power_gain = -0.3 }
+			}
+			force_update_dynamic_modifier = yes
+		}
+	}
+}
+
+FFR_reclamation_stored_focus_add_Y = {
+	custom_effect_tooltip = FFR_reclamation_stored_focus_add_Y_tt
+	add_to_variable = { FFR.FrenchReclamation_Focus_Stored = Y }
+	clamp_variable = { var = FFR.FrenchReclamation_Focus_Stored min = 0 max = 5 }
+}
+
+FFR_reclamation_aspect_X_add_focus_Y = {
+	custom_effect_tooltip = FFR_reclamation_aspect_X_add_focus_Y_tt
+	add_to_variable = { FFR.FrenchReclamation_Focus^X = Y }
+	clamp_variable = { var = FFR.FrenchReclamation_Focus^X min = 0 max = 5 }
+	FFR_reclamation_dynamic_modifier_calculate = yes
+}
+
+FFR_reconciliation = {
+	set_global_flag = FFR_reconciliation_happened
+	FFR_reconciliation_setup = yes
+
+	FRA = {
+		if = { # Monarchy
+			limit = {
+				FRA = { has_cosmetic_tag = FRA_kingdom }
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FFRnews.7
+					days = 1
+				}
+			}
+		}
+
+		else_if = { # Republic
+			limit = {
+				FRA = { has_cosmetic_tag = FRA_republic }
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FFRnews.4
+					days = 1
+				}
+			}
+		}
+
+		else = { # Normal Reconciliation
+			set_cosmetic_tag = FRA_FFR
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FFRnews.3
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+FFR_reconciliation_setup = {
+	every_country = { # End puppets
+		limit = { is_puppet_of = FFR }
+
+		FFR = { end_puppet = PREV }
+		if = {
+			limit = { has_idea = FMA_Puppet }
+			remove_faction_status = yes
+			add_ideas = FMA_Faction
+		}
+	}
+
+	FRA = { # Changes faction and econ leadership over to France
+		if = { # French Military Alliance
+			limit = { FFR = { has_country_flag = FMA_MEMBER } }
+
+			FFR = {
+				add_to_faction = FRA
+				clr_country_flag = FMA_MEMBER
+				remove_faction_status = yes
+			}
+
+			set_country_flag = FMA_MEMBER
+			set_faction_leader = yes
+
+			remove_faction_status = yes
+			add_ideas = FMA_Faction
+		}
+
+		else_if = { # French Community
+			limit = { FFR = { has_country_flag = FRU_MEMBER } }
+
+			FFR = {
+				add_to_faction = FRA
+				clr_country_flag = FRU_MEMBER
+				remove_faction_status = yes
+			}
+
+			set_country_flag = FRU_MEMBER
+			set_faction_leader = yes
+
+			remove_faction_status = yes
+			add_ideas = FRU_Faction
+		}
+
+		if = { # Econ sphere
+			limit = { FFR = { has_country_flag = HAS_ECON_SPHERE } }
+
+			set_country_flag = HAS_ECON_SPHERE
+			set_variable = { ECON_SPHERE_LEADER = FRA }
+			set_variable = { SPHERE_INSULARITY = 10 }
+
+			every_country = {
+				limit = { is_in_faction_with = FFR }
+				econ_join_sphere_FRA = yes
+			}
+		}
+		else_if = {
+			limit = { has_global_flag = FFR_joined_USA_econ_sphere }
+			every_country = {
+				limit = { is_in_faction_with = FFR }
+				econ_join_sphere_USA = yes
+			}
+		}
+		FFR = {
+			clr_country_flag = HAS_ECON_SPHERE
+			clear_variable = ECON_SPHERE_LEADER
+		}
+
+		FFR = { leave_faction = yes }
+	}
+
+	FFR = {
+		every_character = {
+			limit = { has_character_flag = FFR_character }
+			set_nationality = FRA
+		}
+		transfer_navy = {
+			target = FRA
+		}
+		every_owned_state = {
+			remove_core_of = FFR
+		}
+	}
+	FRA = {
+		annex_country = {
+			target = FFR
+			transfer_troops = yes
+		}
+		add_state_core = 713 #Kerguelen handover
+		country_lock_all_division_template = no
+	}
+	IVO = {
+		add_state_core = 779
+		add_state_core = 1210
+		add_state_core = 780
+		add_state_core = 1209
+		add_state_core = 1208
+		transfer_state = 779
+		transfer_state = 1210
+		transfer_state = 780
+		transfer_state = 1209
+		transfer_state = 1208
+		TNO_startup_nation = yes
+		add_ideas = WEST_AFRICA_idea_economic_reconstruction
+
+		set_politics = { ruling_party = paternalism }
+		set_popularities = {
+			socialist = 10
+			liberalism = 10
+			conservatism = 30
+			paternalism = 50
+		}
+		if = {
+			limit = {
+				FRA = {
+					has_country_flag = HAS_ECON_SPHERE
+				}
+			}
+			econ_join_sphere_FRA = yes
+		}
+		else_if = {
+			limit = {
+				has_global_flag = FFR_joined_USA_econ_sphere
+			}
+			econ_join_sphere_USA = yes
+		}
+	}
+	BKF = {
+		transfer_state = 834
+		transfer_state = 1217
+		transfer_state = 1541
+		TNO_startup_nation = yes
+		add_ideas = WEST_AFRICA_idea_economic_reconstruction
+
+		remove_ideas = {
+			BKF_idea_remnant_francophilia
+			BKF_idea_relative_democracy
+			WEST_AFRICA_idea_obliterated_infrastructures
+		}
+
+		promote_character = BKF_Daniel_Ouezzin_Coulibaly
+		set_politics = { ruling_party = conservatism }
+		set_popularities = {
+			liberalism = 35
+			conservatism = 40
+			paternalism = 25
+		}
+		if = {
+			limit = {
+				FRA = {
+					has_country_flag = HAS_ECON_SPHERE
+				}
+			}
+			econ_join_sphere_FRA = yes
+		}
+		else_if = {
+			limit = {
+				has_global_flag = FFR_joined_USA_econ_sphere
+			}
+			econ_join_sphere_USA = yes
+		}
+	}
+
+	if = { # WAA
+		limit = { WOL = { has_country_flag = WAA_MEMBER } }
+
+		WOL = {
+			add_to_faction = IVO
+			add_to_faction = BKF
+		}
+
+		IVO = {
+			set_country_flag = WAA_MEMBER
+			add_ideas = WEST_AFRICA_idea_economic_reconstruction
+			remove_faction_status = yes
+			add_ideas = WAA_Faction
+		}
+		BKF = {
+			set_country_flag = WAA_MEMBER
+			add_ideas = WEST_AFRICA_idea_economic_reconstruction
+			remove_faction_status = yes
+			add_ideas = WAA_Faction
+		}
+	}
+	else_if = { # WAF
+		limit = { WOL = { has_country_flag = WAF_MEMBER } }
+
+		WOL = {
+			add_to_faction = IVO
+			add_to_faction = BKF
+		}
+
+		IVO = {
+			set_country_flag = WAF_MEMBER
+			add_ideas = WEST_AFRICA_idea_economic_reconstruction
+			remove_faction_status = yes
+			add_ideas = WAF_Faction
+		}
+		BKF = {
+			set_country_flag = WAF_MEMBER
+			add_ideas = WEST_AFRICA_idea_economic_reconstruction
+			remove_faction_status = yes
+			add_ideas = WAF_Faction
+		}
+	}
+	else_if = { # FMA
+		limit = { WOL = { has_country_flag = FMA_MEMBER } }
+
+		FRA = {
+			add_to_faction = IVO
+			add_to_faction = BKF
+		}
+
+		IVO = {
+			set_country_flag = FMA_MEMBER
+			add_ideas = WEST_AFRICA_idea_economic_reconstruction
+			remove_faction_status = yes
+			add_ideas = FMA_Faction
+			set_cosmetic_tag = IVO_FFRPuppet
+		}
+		BKF = {
+			set_country_flag = FMA_MEMBER
+			add_ideas = WEST_AFRICA_idea_economic_reconstruction
+			remove_faction_status = yes
+			add_ideas = FMA_Faction
+			set_cosmetic_tag = BKF_FFRPuppet
+		}
+	}
+	else_if = { # FRU
+		limit = { WOL = { has_country_flag = FRU_MEMBER } }
+
+		FRA = {
+			add_to_faction = IVO
+			add_to_faction = BKF
+		}
+
+		IVO = {
+			set_country_flag = FRU_MEMBER
+			add_ideas = WEST_AFRICA_idea_economic_reconstruction
+			remove_faction_status = yes
+			add_ideas = FRU_Faction
+			set_cosmetic_tag = IVO_FFRPuppet
+		}
+		BKF = {
+			set_country_flag = FRU_MEMBER
+			add_ideas = WEST_AFRICA_idea_economic_reconstruction
+			remove_faction_status = yes
+			add_ideas = FRU_Faction
+			set_cosmetic_tag = BKF_FFRPuppet
+		}
+	}
+
+	if = {
+		limit = { has_global_flag = FFR_joined_USA_econ_sphere }
+		USA = {
+			country_event = {
+				id = france_reclamation.7
+				days = 50
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			has_global_flag = IBR_FFR_negotiations_successful
+			IBR = { check_variable = { IBR.FFR_negotiations_1 = 1 } }
+			IBR = { has_country_flag = HAS_ECON_SPHERE } # Prevents from joining dead sphere if Iberian Wars started
+		}
+		if = {
+			limit = { IBR = { is_in_faction_with = USA } }
+			USA = {
+				country_event = {
+					id = france_reclamation.8
+					days = 50
+				}
+			}
+		}
+		else = {
+			# leave empty in purpose
+		}
+		FRA = {
+			clr_country_flag = HAS_ECON_SPHERE
+			econ_join_sphere_IBR = yes
+		}
+		every_country = {
+			limit = { is_in_faction_with = FRA }
+			econ_join_sphere_IBR = yes
+		}
+	}
+	else_if = {
+		limit = {
+			has_global_flag = IBR_FFR_negotiations_successful
+			IBR = { check_variable = { IBR.FFR_negotiations_1 = 2 } }
+			IBR = { has_country_flag = HAS_ECON_SPHERE } # Prevents from joining dead sphere if Iberian Wars started
+		}
+		FRA = {
+			clr_country_flag = HAS_ECON_SPHERE
+			econ_join_sphere_IBR = yes
+		}
+		every_country = {
+			limit = { is_in_faction_with = FRA }
+			econ_join_sphere_IBR = yes
+		}
+		if = {
+			limit = { IBR = { is_in_faction_with = USA } }
+			random_list = {
+				40 = {
+					USA = {
+						country_event = {
+							id = france_reclamation.8
+							days = 50
+						}
+					}
+				}
+				60 = {
+					# leave empty on purpose
+				}
+			}
+		}
+	}
+	else = {
+		random_list = {
+			60 = {
+				USA = {
+					country_event = {
+						id = france_reclamation.8
+						days = 50
+					}
+				}
+			}
+			40 = {
+				# leave empty on purpose
+			}
+		}
+	}
+
+	# Political setup in France
+	FRA = {
+		remove_ideas = {
+			FRA_economic_meltdown
+			FRA_the_OAS
+			FRA_the_treaty_of_vichy
+			FRA_les_annees_noires
+			FRA_war_against_200_families
+			FRA_200_families_vanquished
+			FRA_back_in_the_pakt
+			FRA_learning_from_the_reich
+			FRA_mediterranean_brotherhood
+			FRA_learning_from_the_empire
+			FRA_latin_bloc
+			FRA_across_the_pyrenees
+			FRA_delouvrier_plan
+			FRA_the_fair_state
+			FRA_plan_PRIME
+			FRA_technocratic_constitution
+		}
+
+		set_popularities = {
+			progressivism = 29
+			liberalism = 30
+			conservatism = 26
+			despotism = 15
+		}
+		set_politics = {
+			ruling_party = despotism
+			last_election = "1932.5.1"
+			election_frequency = 48
+			elections_allowed = no
+		}
+
+		set_party_name = {
+			ideology = despotism
+			long_name = FRA_despotism_party_FFR_long
+			name = FRA_despotism_party_FFR
+		}
+		set_party_name = {
+			ideology = paternalism
+			long_name = FRA_paternalism_party_FFR_long
+			name = FRA_paternalism_party_FFR
+		}
+		set_party_name = {
+			ideology = conservatism
+			long_name = FRA_conservatism_party_FFR_long
+			name = FRA_conservatism_party_FFR
+		}
+		set_party_name = {
+			ideology = liberalism
+			long_name = FRA_liberalism_party_FFR_long
+			name = FRA_liberalism_party_FFR
+		}
+		set_party_name = {
+			ideology = progressivism
+			long_name = FRA_progressivism_party_FFR_long
+			name = FRA_progressivism_party_FFR
+		}
+		set_party_name = {
+			ideology = liberal_conservatism
+			long_name = FRA_liberal_conservatism_party_FFR_long
+			name = FRA_liberal_conservatism_party_FFR
+		}
+
+		country_event = { id = FRA_SKELETON.43 days = 90 }
+
+		if = { # de Gaulle is dead
+			limit = { has_global_flag = FFR_degaulle_dead }
+
+			add_country_leader_role = {
+				character = FFR_Philippe_Leclerc
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_PHILIPPE_LECLERC_MAINLAND"
+					ideology = despotism_interim_government_subtype
+					expire = "1980.1.1"
+					id = -1
+				}
+			}
+		}
+
+		else = { # Alive de Gaulle
+			add_country_leader_role = {
+				character = FFR_Charles_de_Gaulle
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_CHARLES_DE_GAULLE_MAINLAND"
+					ideology = despotism_interim_government_subtype
+					expire = "1971.1.1"
+					id = -1
+				}
+			}
+			set_country_leader_portrait = { portrait = "gfx/leaders/FRA/Portrait_France_Charles_de_Gaulle_70s.dds" }
+		}
+	}
+}
+
+FFR_reclamation_victory = {
+
+	log = "[GetDateText]: [Root.GetName]: FFR_reclamation_victory; Executing."
+
+	FRD = { remove_ideas = FRD_aiding_the_reclamation }
+
+	set_global_flag = FFR_reclamation_victory
+	clr_global_flag = FFR_reclamation_happening
+	clr_global_flag = FFR_reclamation_civil_war_happening
+
+	every_state = { # Transfer whatever states FFR gobbled up
+		limit = {
+			is_owned_by = FFR
+			is_core_of = FRA
+		}
+
+		FRA = { transfer_state = PREV }
+	}
+
+	every_country = { # End puppets
+		limit = { is_puppet_of = FFR }
+
+		FFR = { end_puppet = PREV }
+		if = {
+			limit = { has_idea = FMA_Puppet }
+			remove_faction_status = yes
+			add_ideas = FMA_Faction
+		}
+	}
+
+	FRA = { # Changes faction and econ leadership over to France
+		if = { # French Military Alliance
+			limit = { FFR = { has_country_flag = FMA_MEMBER } }
+
+			FFR = {
+				add_to_faction = FRA
+				clr_country_flag = FMA_MEMBER
+				remove_faction_status = yes
+			}
+
+			set_country_flag = FMA_MEMBER
+			set_faction_leader = yes
+
+			remove_faction_status = yes
+			add_ideas = FMA_Faction
+		}
+
+		else_if = { # French Community
+			limit = { FFR = { has_country_flag = FRU_MEMBER } }
+
+			FFR = {
+				add_to_faction = FRA
+				clr_country_flag = FRU_MEMBER
+				remove_faction_status = yes
+			}
+
+			set_country_flag = FRU_MEMBER
+			set_faction_leader = yes
+
+			remove_faction_status = yes
+			add_ideas = FRU_Faction
+		}
+
+		if = { # Econ sphere
+			limit = { FFR = { has_country_flag = HAS_ECON_SPHERE } }
+
+			set_country_flag = HAS_ECON_SPHERE
+			set_variable = { ECON_SPHERE_LEADER = FRA }
+
+			every_country = {
+				limit = { is_in_faction_with = FFR }
+				econ_join_sphere_FRA = yes
+			}
+		}
+		else_if = {
+			limit = { has_global_flag = FFR_joined_USA_econ_sphere }
+			every_country = {
+				limit = { is_in_faction_with = FFR }
+				econ_join_sphere_USA = yes
+			}
+		}
+
+		FFR = {
+			clr_country_flag = HAS_ECON_SPHERE
+			clear_variable = ECON_SPHERE_LEADER
+		}
+
+		FFR = { leave_faction = yes }
+	}
+
+	FFR = {
+		every_character = {
+			limit = { has_character_flag = FFR_character }
+			set_nationality = FRA
+		}
+		transfer_navy = {
+			target = FRA
+		}
+		every_owned_state = {
+			remove_core_of = FFR
+		}
+	}
+	FRA = {
+		annex_country = {
+			target = FFR
+			transfer_troops = yes
+		}
+		add_state_core = 713 #Kerguelen handover
+		if = {
+			limit = { country_exists = BRG }
+			set_capital = { state = 19 remember_old_capital = no }
+		}
+		else = {
+			set_capital = { state = 786 remember_old_capital = no }
+		}
+	}
+	IVO = {
+		add_state_core = 779
+		add_state_core = 1210
+		add_state_core = 780
+		add_state_core = 1209
+		add_state_core = 1208
+		transfer_state = 779
+		transfer_state = 1210
+		transfer_state = 780
+		transfer_state = 1209
+		transfer_state = 1208
+		TNO_startup_nation = yes
+
+		set_politics = { ruling_party = paternalism }
+		set_popularities = {
+			socialist = 10
+			liberalism = 10
+			conservatism = 30
+			paternalism = 50
+		}
+		if = {
+			limit = {
+				FRA = {
+					has_country_flag = HAS_ECON_SPHERE
+				}
+			}
+			econ_join_sphere_FRA = yes
+		}
+		else_if = {
+			limit = {
+				has_global_flag = FFR_joined_USA_econ_sphere
+			}
+			econ_join_sphere_USA = yes
+		}
+	}
+	BKF = {
+		transfer_state = 834
+		transfer_state = 1217
+		transfer_state = 1541
+		TNO_startup_nation = yes
+
+		remove_ideas = {
+			BKF_idea_remnant_francophilia
+			BKF_idea_relative_democracy
+			WEST_AFRICA_idea_obliterated_infrastructures
+		}
+
+		promote_character = BKF_Daniel_Ouezzin_Coulibaly
+		set_politics = { ruling_party = conservatism }
+		set_popularities = {
+			liberalism = 35
+			conservatism = 40
+			paternalism = 25
+		}
+		if = {
+			limit = {
+				FRA = {
+					has_country_flag = HAS_ECON_SPHERE
+				}
+			}
+			econ_join_sphere_FRA = yes
+		}
+		else_if = {
+			limit = {
+				has_global_flag = FFR_joined_USA_econ_sphere
+			}
+			econ_join_sphere_USA = yes
+		}
+	}
+
+	if = { # WAA
+		limit = { WOL = { has_country_flag = WAA_MEMBER } }
+
+		WOL = {
+			add_to_faction = IVO
+			add_to_faction = BKF
+		}
+
+		IVO = {
+			set_country_flag = WAA_MEMBER
+			remove_faction_status = yes
+			add_ideas = WAA_Faction
+		}
+		BKF = {
+			set_country_flag = WAA_MEMBER
+			remove_faction_status = yes
+			add_ideas = WAA_Faction
+		}
+	}
+	else_if = { # WAF
+		limit = { WOL = { has_country_flag = WAF_MEMBER } }
+
+		WOL = {
+			add_to_faction = IVO
+			add_to_faction = BKF
+		}
+
+		IVO = {
+			set_country_flag = WAF_MEMBER
+			remove_faction_status = yes
+			add_ideas = WAF_Faction
+		}
+		BKF = {
+			set_country_flag = WAF_MEMBER
+			remove_faction_status = yes
+			add_ideas = WAF_Faction
+		}
+	}
+	else_if = { # FMA
+		limit = { WOL = { has_country_flag = FMA_MEMBER } }
+
+		FRA = {
+			add_to_faction = IVO
+			add_to_faction = BKF
+		}
+
+		IVO = {
+			set_country_flag = FMA_MEMBER
+			remove_faction_status = yes
+			add_ideas = FMA_Faction
+			set_cosmetic_tag = IVO_FFRPuppet
+		}
+		BKF = {
+			set_country_flag = FMA_MEMBER
+			remove_faction_status = yes
+			add_ideas = FMA_Faction
+			set_cosmetic_tag = BKF_FFRPuppet
+		}
+	}
+	else_if = { # FRU
+		limit = { WOL = { has_country_flag = FRU_MEMBER } }
+
+		FRA = {
+			add_to_faction = IVO
+			add_to_faction = BKF
+		}
+
+		IVO = {
+			set_country_flag = FRU_MEMBER
+			remove_faction_status = yes
+			add_ideas = FRU_Faction
+			set_cosmetic_tag = IVO_FFRPuppet
+		}
+		BKF = {
+			set_country_flag = FRU_MEMBER
+			remove_faction_status = yes
+			add_ideas = FRU_Faction
+			set_cosmetic_tag = BKF_FFRPuppet
+		}
+	}
+
+	if = {
+		limit = { has_global_flag = FFR_joined_USA_econ_sphere }
+		USA = {
+			country_event = {
+				id = france_reclamation.7
+				days = 50
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			has_global_flag = IBR_FFR_negotiations_successful
+			IBR = { check_variable = { IBR.FFR_negotiations_1 = 1 } }
+			IBR = { has_country_flag = HAS_ECON_SPHERE } # Prevents from joining dead sphere if Iberian Wars started
+		}
+		if = {
+			limit = { IBR = { is_in_faction_with = USA } }
+			USA = {
+				country_event = {
+					id = france_reclamation.8
+					days = 50
+				}
+			}
+		}
+		else = {
+			# leave empty in purpose
+		}
+		FRA = {
+			clr_country_flag = HAS_ECON_SPHERE
+			econ_join_sphere_IBR = yes
+		}
+		every_country = {
+			limit = { is_in_faction_with = FRA }
+			econ_join_sphere_IBR = yes
+		}
+	}
+	else_if = {
+		limit = {
+			has_global_flag = IBR_FFR_negotiations_successful
+			IBR = { check_variable = { IBR.FFR_negotiations_1 = 2 } }
+			IBR = { has_country_flag = HAS_ECON_SPHERE } # Prevents from joining dead sphere if Iberian Wars started
+		}
+		FRA = {
+			clr_country_flag = HAS_ECON_SPHERE
+			econ_join_sphere_IBR = yes
+		}
+		every_country = {
+			limit = { is_in_faction_with = FRA }
+			econ_join_sphere_IBR = yes
+		}
+		if = {
+			limit = { IBR = { is_in_faction_with = USA } }
+			random_list = {
+				40 = {
+					USA = {
+						country_event = {
+							id = france_reclamation.8
+							days = 50
+						}
+					}
+				}
+				60 = {
+					# leave empty on purpose
+				}
+			}
+		}
+	}
+	else = {
+		random_list = {
+			60 = {
+				USA = {
+					country_event = {
+						id = france_reclamation.8
+						days = 50
+					}
+				}
+			}
+			40 = {
+				# leave empty on purpose
+			}
+		}
+	}
+
+	# Political setup in France
+	FRA = {
+		set_cosmetic_tag = FRA_FFR
+		remove_ideas = {
+			FRA_economic_meltdown
+			FRA_the_OAS
+			FRA_the_treaty_of_vichy
+			FRA_les_annees_noires
+			FRA_war_against_200_families
+			FRA_200_families_vanquished
+			FRA_back_in_the_pakt
+			FRA_learning_from_the_reich
+			FRA_mediterranean_brotherhood
+			FRA_learning_from_the_empire
+			FRA_latin_bloc
+			FRA_across_the_pyrenees
+			FRA_delouvrier_plan
+			FRA_the_fair_state
+			FRA_plan_PRIME
+			FRA_technocratic_constitution
+			FRA_Henri_VII
+		}
+
+		set_popularities = {
+			progressivism = 29
+			liberalism = 30
+			conservatism = 26
+			despotism = 15
+		}
+		set_politics = {
+			ruling_party = despotism
+			last_election = "1932.5.1"
+			election_frequency = 48
+			elections_allowed = no
+		}
+
+		set_party_name = {
+			ideology = despotism
+			long_name = FRA_despotism_party_FFR_long
+			name = FRA_despotism_party_FFR
+		}
+		set_party_name = {
+			ideology = paternalism
+			long_name = FRA_paternalism_party_FFR_long
+			name = FRA_paternalism_party_FFR
+		}
+		set_party_name = {
+			ideology = conservatism
+			long_name = FRA_conservatism_party_FFR_long
+			name = FRA_conservatism_party_FFR
+		}
+		set_party_name = {
+			ideology = liberalism
+			long_name = FRA_liberalism_party_FFR_long
+			name = FRA_liberalism_party_FFR
+		}
+		set_party_name = {
+			ideology = progressivism
+			long_name = FRA_progressivism_party_FFR_long
+			name = FRA_progressivism_party_FFR
+		}
+		set_party_name = {
+			ideology = liberal_conservatism
+			long_name = FRA_liberal_conservatism_party_FFR_long
+			name = FRA_liberal_conservatism_party_FFR
+		}
+
+		if = { # Sidos, Militias, OAS
+			limit = {
+				OR = {
+					has_country_flag = FRA_sidos_elected
+					has_country_flag = FRA_militia_coup
+					has_country_flag = FRA_milice_coup
+				}
+			}
+			country_event = { id = FRA_SKELETON.43 days = 365 }
+		}
+		else_if = { # Bichelonne
+			limit = { has_country_flag = FRA_bichelonne_elected }
+			country_event = { id = FRA_SKELETON.43 days = 273 }
+		}
+		else = { country_event = { id = FRA_SKELETON.43 days = 181 } }
+
+		if = { # de Gaulle is dead
+			limit = { has_global_flag = FFR_degaulle_dead }
+
+			add_country_leader_role = {
+				character = FFR_Philippe_Leclerc
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_PHILIPPE_LECLERC_MAINLAND"
+					ideology = despotism_interim_government_subtype
+					expire = "1980.1.1"
+					id = -1
+				}
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FFRnews.12
+					days = 1
+				}
+			}
+		}
+
+		else = { # Alive de Gaulle
+			add_country_leader_role = {
+				character = FFR_Charles_de_Gaulle
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_CHARLES_DE_GAULLE_MAINLAND"
+					ideology = despotism_interim_government_subtype
+					expire = "1971.1.1"
+					id = -1
+				}
+			}
+			set_country_leader_portrait = { portrait = "gfx/leaders/FRA/Portrait_France_Charles_de_Gaulle_70s.dds" }
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FFRnews.11
+					days = 1
+				}
+			}
+		}
+	}
+
+	FFR = {
+		clear_array = FFR.FrenchReclamation_Focus
+		clear_variable = FrenchReclamation_Focus_Stored
+		clear_variable = FFR_Reclamation_Modifier_war_support_factor
+		clear_variable = FFR_Reclamation_Modifier_army_morale_factor
+		clear_variable = FFR_Reclamation_Modifier_army_org_factor
+		clear_variable = FFR_Reclamation_Modifier_planning_speed
+		clear_variable = FFR_Reclamation_Modifier_out_of_supply_factor
+		clear_variable = FFR_Reclamation_Modifier_army_defence_factor
+		remove_dynamic_modifier = { modifier = FFR_Reclamation_DynamicModifier }
+	}
+
+	# Live America & Germany Reaction #
+	USA = {
+		clear_variable = USA_FFR_Reclamation_Modifier_command_power_gain
+		clear_variable = USA_FFR_Reclamation_Modifier_political_power_gain
+		remove_dynamic_modifier = { modifier = USA_FFR_Reclamation_Modifier }
+		TNO_fopo_remove_french_reclamation_any_tab = yes
+		country_event = france_reclamation.proxy.USA.9999
+		if = {
+			limit = { has_global_flag = FFR_degaulle_dead }
+			country_event = france_reclamation.10
+		}
+		else = { country_event = france_reclamation.9 }
+	}
+	GER = {
+		TNO_fopo_remove_french_reclamation_any_tab = yes
+		country_event = france_reclamation.proxy.GER.9999
+	}
+	# Live Iberia Reaction #
+	if = {
+		limit = { has_global_flag = IBR_FFR_negotiations_successful }
+		IBR = {
+			remove_dynamic_modifier = { modifier = USA_FFR_Reclamation_Modifier }
+			TNO_fopo_remove_french_reclamation_any_tab = yes
+			country_event = france_reclamation.proxy.IBR.9999
+		}
+	}
+}
+
+FFR_reclamation_defeat = {
+	log = "[GetDateText]: [Root.GetName]: FFR_reclamation_defeat; Executing."
+
+	set_global_flag = FFR_reclamation_defeat
+	clr_global_flag = FFR_reclamation_happening
+	clr_global_flag = FFR_reclamation_civil_war_happening
+
+	FRD = { remove_ideas = FRD_aiding_the_reclamation }
+
+	every_country = { #Peaces out West Africa
+		limit = {
+			is_in_faction_with = FFR
+		}
+		white_peace = FRA
+		remove_ideas = GER_BOR_dont_join_wars_please
+	}
+
+	every_country = { # End puppets
+		limit = { is_puppet_of = FFR }
+
+		FFR = { end_puppet = PREV }
+		leave_faction = yes
+		remove_faction_status = yes
+	}
+
+	FRA = { remove_ideas = GER_BOR_dont_join_wars_please }
+	
+	if = { # Volunteers
+		limit = {
+			FRA = { has_volunteers_amount_from = { tag = GER count > 0 } }
+		}
+		GER = {
+			set_temp_variable = { target = FRA }
+			TNO_clear_and_recall_volunteers = yes
+		}
+	}
+	if = {
+		limit = {
+			FRA = { has_volunteers_amount_from = { tag = ITA count > 0 } }
+		}
+		ITA = {
+			set_temp_variable = { target = FRA }
+			TNO_clear_and_recall_volunteers = yes
+		}
+	}
+	if = {
+		limit = {
+			FRA = { has_volunteers_amount_from = { tag = IBR count > 0 } }
+		}
+		IBR = {
+			set_temp_variable = { target = FRA }
+			TNO_clear_and_recall_volunteers = yes
+		}
+	}
+
+	if = { # Dismantle econ sphere
+		limit = { FFR = { has_country_flag = HAS_ECON_SPHERE } }
+
+		every_country = {
+			limit = { check_variable = { ECON_SPHERE_LEADER = FFR } }
+			econ_leave_sphere = yes
+		}
+
+		FFR = {
+			clr_country_flag = HAS_ECON_SPHERE
+			econ_leave_sphere = yes
+		}
+	}
+
+	if = { # Dismantling faction
+		limit = {
+			FFR = {
+				OR = {
+					has_country_flag = FMA_MEMBER
+					has_country_flag = FRU_MEMBER
+				}
+			}
+		}
+
+		every_country = {
+			limit = {
+				OR = {
+					has_country_flag = FMA_MEMBER
+					has_country_flag = FRU_MEMBER
+				}
+			}
+
+			leave_faction = yes
+			remove_faction_status = yes
+			clr_country_flag = FMA_MEMBER
+			clr_country_flag = FRU_MEMBER
+			drop_cosmetic_tag = yes
+		}
+	}
+
+	FFR = {
+		every_owned_state = {
+			remove_core_of = FFR
+		}
+	}
+	FRA = {
+		annex_country = {
+			target = FFR
+			transfer_troops = yes
+		}
+		add_state_core = 713 #Kerguelen handover
+	}
+
+	IVO = {
+		add_state_core = 779
+		add_state_core = 1210
+		add_state_core = 780
+		add_state_core = 1209
+		add_state_core = 1208
+		transfer_state = 779
+		transfer_state = 1210
+		transfer_state = 780
+		transfer_state = 1209
+		transfer_state = 1208
+		TNO_startup_nation = yes
+
+		set_politics = { ruling_party = paternalism }
+		set_popularities = {
+			socialist = 10
+			liberalism = 10
+			conservatism = 30
+			paternalism = 50
+		}
+	}
+	BKF = {
+		transfer_state = 834
+		transfer_state = 1217
+		transfer_state = 1541
+		TNO_startup_nation = yes
+
+		remove_ideas = {
+			BKF_idea_remnant_francophilia
+			BKF_idea_relative_democracy
+		}
+
+		promote_character = BKF_Daniel_Ouezzin_Coulibaly
+		set_politics = { ruling_party = conservatism }
+		set_popularities = {
+			liberalism = 35
+			conservatism = 40
+			paternalism = 25
+		}
+	}
+
+	if = { # WAA
+		limit = { WOL = { has_country_flag = WAA_MEMBER } }
+
+		WOL = {
+			add_to_faction = IVO
+			add_to_faction = BKF
+		}
+
+		IVO = {
+			set_country_flag = WAA_MEMBER
+			remove_faction_status = yes
+			add_ideas = WAA_Faction
+		}
+		BKF = {
+			set_country_flag = WAA_MEMBER
+			remove_faction_status = yes
+			add_ideas = WAA_Faction
+		}
+	}
+	else_if = { # WAF
+		limit = { WOL = { has_country_flag = WAF_MEMBER } }
+
+		WOL = {
+			add_to_faction = IVO
+			add_to_faction = BKF
+		}
+
+		IVO = {
+			set_country_flag = WAF_MEMBER
+			remove_faction_status = yes
+			add_ideas = WAF_Faction
+			econ_join_sphere_WOL = yes
+		}
+		BKF = {
+			set_country_flag = WAF_MEMBER
+			remove_faction_status = yes
+			add_ideas = WAF_Faction
+			econ_join_sphere_WOL = yes
+		}
+	}
+
+	FFR = {
+		clear_array = FFR.FrenchReclamation_Focus
+		clear_variable = FrenchReclamation_Focus_Stored
+		clear_variable = FFR_Reclamation_Modifier_war_support_factor
+		clear_variable = FFR_Reclamation_Modifier_army_morale_factor
+		clear_variable = FFR_Reclamation_Modifier_army_org_factor
+		clear_variable = FFR_Reclamation_Modifier_planning_speed
+		clear_variable = FFR_Reclamation_Modifier_out_of_supply_factor
+		clear_variable = FFR_Reclamation_Modifier_army_defence_factor
+		remove_dynamic_modifier = { modifier = FFR_Reclamation_DynamicModifier }
+	}
+
+	if = {
+		limit = { FRA = { has_country_flag = reclamation_was_german_puppet } }
+		GER = { add_to_faction = FRA }
+	}
+	else_if = {
+		limit = { FRA = { has_country_flag = reclamation_was_italian_puppet } }
+		ITA = { add_to_faction = FRA }	
+		FRA = {
+			get_current_government_type = yes
+			save_party_popularities = yes
+		}
+		ITA = {
+			set_autonomy = {
+				target = FRA
+				autonomy_state = autonomy_italy_associate
+			}
+		}
+		FRA = {
+			restore_previous_government_type = yes
+			apply_party_popularities = yes
+			if = {
+				limit = { ITA = { has_idea = ITA_Mediterranean_Bloc_Leader } }
+				add_ideas = ITA_Mediterranean_Bloc_Member
+			}
+			if = {
+				limit = { ITA = { has_idea = ITA_Imperial_Alliance_Leader } }
+				add_ideas = ITA_Imperial_Alliance_Member
+			}
+			if = {
+				limit = { ITA = { has_idea = ITA_Rome_Pact_Leader } }
+				add_ideas = ITA_Rome_Pact_Member
+			}
+		}
+	}
+
+	# Live America & Germany Reaction #
+	USA = {
+		TNO_fopo_remove_french_reclamation_any_tab = yes
+		country_event = france_reclamation.proxy.USA.9998
+	}
+	GER = {
+		TNO_fopo_remove_french_reclamation_any_tab = yes
+		country_event = france_reclamation.proxy.GER.9998
+	}
+	# Live Iberia Reaction #
+	if = {
+		limit = { has_global_flag = IBR_FFR_negotiations_successful }
+		IBR = {
+			remove_dynamic_modifier = { modifier = USA_FFR_Reclamation_Modifier }
+			TNO_fopo_remove_french_reclamation_any_tab = yes
+			country_event = france_reclamation.proxy.IBR.9998
+		}
+	}
+}

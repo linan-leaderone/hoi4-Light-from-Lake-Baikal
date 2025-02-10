@@ -1,0 +1,178 @@
+TYM_famine_increase = {
+	custom_effect_tooltip = TYM_famine_increase_tt
+	hidden_effect = {
+		if = {
+			limit = {
+				has_idea = TYM_famine_5
+			}
+			swap_ideas = {
+				remove_idea = TYM_famine_5
+				add_idea = TYM_famine_4
+			}
+			set_variable = { TYMAgriculturalStrain = 75 }
+		}
+		else_if = {
+			limit = {
+				has_idea = TYM_famine_4
+			}
+			swap_ideas = {
+				remove_idea = TYM_famine_4
+				add_idea = TYM_famine_3
+			}
+			set_variable = { TYMAgriculturalStrain = 75 }
+		}
+		else_if = {
+			limit = {
+				has_idea = TYM_famine_3
+			}
+			swap_ideas = {
+				remove_idea = TYM_famine_3
+				add_idea = TYM_famine_2
+			}
+			set_variable = { TYMAgriculturalStrain = 75 }
+		}
+		else_if = {
+			limit = {
+				has_idea = TYM_famine_2
+			}
+			swap_ideas = {
+				remove_idea = TYM_famine_2
+				add_idea = TYM_famine_1
+			}
+			set_variable = { TYMAgriculturalStrain = 75 }
+		}
+		else_if = {
+			limit = {
+				has_idea = TYM_famine_1
+			}
+			remove_ideas = TYM_famine_1
+			set_variable = { TYMAgriculturalStrain = 25 }
+		}
+		else = {
+			set_variable = { TYMAgriculturalStrain = 25 }
+		}
+	}
+}
+
+TYM_famine_worsen = {
+	custom_effect_tooltip = TYM_famine_worsen_tt
+	subtract_from_variable = { TYMAgriculturalStrain = 100 }
+	hidden_effect = {
+		if = {
+			limit = {
+				NOT = {
+					has_idea = TYM_famine_1
+					has_idea = TYM_famine_2
+					has_idea = TYM_famine_3
+					has_idea = TYM_famine_4
+					has_idea = TYM_famine_5
+				}
+			}
+			add_ideas = TYM_famine_1
+		}
+		else_if = {
+			limit = {
+				has_idea = TYM_famine_1
+			}
+			swap_ideas = {
+				remove_idea = TYM_famine_1
+				add_idea = TYM_famine_2
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = TYM_famine_2
+			}
+			swap_ideas = {
+				remove_idea = TYM_famine_2
+				add_idea = TYM_famine_3
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = TYM_famine_3
+			}
+			swap_ideas = {
+				remove_idea = TYM_famine_3
+				add_idea = TYM_famine_4
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = TYM_famine_4
+			}
+			swap_ideas = {
+				remove_idea = TYM_famine_4
+				add_idea = TYM_famine_5
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = TYM_famine_5
+			}
+			add_stability = -0.10
+			add_manpower = -750
+		}
+	}
+}
+
+TYM_Coup_Check = {
+	if = {
+		limit = { check_variable = { khrushchev_coup > 1 } }
+		country_event = {
+			id = TYM.124
+			days = 5
+			random_days = 5
+		}
+	}
+	else_if = {
+		limit = { check_variable = { khrushchev_coup > 2 } }
+		country_event = {
+			id = TYM.126
+			days = 3
+			random_days = 3
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { khrushchev_coup > 3 }
+			NOT = { has_country_flag = ISH_coup_happened }
+		}
+		country_event = {
+			id = TYM.130
+			days = 3
+			random_days = 3
+		}
+	}
+}
+
+TYM_Famine_Check = { #I HATE OLD TNO I HATE OLD TNO
+	hidden_effect = {
+		if = {
+			limit = {
+				check_variable = { TYMAgriculturalStrain > 99.99 }
+			}
+			TYM_famine_worsen = yes
+			set_temp_variable = { TYM_PLEASE = 1 }
+		}
+		else_if = {
+			limit = {
+				check_variable = { TYMAgriculturalStrain < 0.01 }
+			}
+			TYM_famine_increase = yes
+		}
+		clamp_variable = {
+			var = TYMAgriculturalStrain
+			min = 0
+			max = 100
+		}
+		if = {
+			limit = {
+				check_variable = {
+					TYM_PLEASE = 1
+				}
+			}
+			set_variable = { TYMAgriculturalStrain = 75 }
+		}
+	}
+}

@@ -1,0 +1,1093 @@
+CC_change_readiness_ofn = {
+	add_to_variable = { ENG.CC_readiness_actual = readiness_temp }
+	clamp_variable = {
+		var = ENG.CC_readiness_actual
+		min = 0
+		max = 100
+	}
+	ENG = { set_variable = { CC_player_readiness_display = ENG.CC_readiness_actual } }
+	USA = { set_variable = { CC_player_readiness_display = ENG.CC_readiness_actual } }
+	CC_calculate_actual_readiness_gap = yes
+	if = {
+		limit = { tag = GER }
+		if = {
+			limit = {
+				check_variable = {
+					readiness_temp < 0
+				}
+			}
+			multiply_temp_variable = { readiness_temp = -1 }
+			custom_effect_tooltip = CC_opponent_ofn_readiness_decrease_tt
+		}
+		else = {
+			custom_effect_tooltip = CC_opponent_ofn_readiness_increase_tt
+		}
+	}
+	else = {
+		if = {
+			limit = {
+				check_variable = {
+					readiness_temp < 0
+				}
+			}
+			multiply_temp_variable = { readiness_temp = -1 }
+			custom_effect_tooltip = CC_player_readiness_decrease_tt
+		}
+		else = {
+			custom_effect_tooltip = CC_player_readiness_increase_tt
+		}
+	}
+}
+CC_change_readiness_pakt = {
+	add_to_variable = { GER.CC_readiness_actual = readiness_temp }
+	clamp_variable = {
+		var = GER.CC_readiness_actual
+		min = 0
+		max = 100
+	}
+	GER = { set_variable = { CC_player_readiness_display = GER.CC_readiness_actual } }
+	CC_calculate_actual_readiness_gap = yes
+	if = {
+		limit = { tag = GER }
+		if = {
+			limit = {
+				check_variable = {
+					readiness_temp < 0
+				}
+			}
+			multiply_temp_variable = { readiness_temp = -1 }
+			custom_effect_tooltip = CC_player_readiness_decrease_tt
+		}
+		else = {
+			custom_effect_tooltip = CC_player_readiness_increase_tt
+		}
+	}
+	else = {
+		if = {
+			limit = {
+				check_variable = {
+					readiness_temp < 0
+				}
+			}
+			multiply_temp_variable = { readiness_temp = -1 }
+			custom_effect_tooltip = CC_opponent_pakt_readiness_decrease_tt
+		}
+		else = {
+			custom_effect_tooltip = CC_opponent_pakt_readiness_increase_tt
+		}
+	}
+}
+CC_calculate_actual_readiness_gap = {
+	set_temp_variable = { temp_gap = GER.CC_readiness_actual }
+	subtract_from_temp_variable = { temp_gap = ENG.CC_readiness_actual }
+	ENG = { set_variable = { ENG.CC_actual_readiness_gap = temp_gap } } ###positive number = pakt favourable, negative number = ofn favourable
+}
+
+CC_progress_buildup_meter = {
+	add_to_variable = { ENG.CC_buildup_progression = buildup_temp }
+	if = {
+		limit = {
+			check_variable = { buildup_temp < 0 }
+			NOT = { tag = GER }
+		}
+		multiply_temp_variable = { buildup_temp = -1 }
+		custom_effect_tooltip = CC_progress_buildup_decrease_ofn_tt
+	}
+	else_if = {
+		limit = { NOT = { tag = GER } }
+		custom_effect_tooltip = CC_progress_buildup_increase_ofn_tt
+	}
+	else = {
+		custom_effect_tooltip = CC_progress_buildup_increase_pakt_tt
+	}
+	clamp_variable = {
+		var = ENG.CC_buildup_progression
+		min = 0
+		max = 100
+	}
+	CC_check_buildup_meter = yes
+}
+
+CC_check_buildup_meter = {
+	if = {
+		limit = {
+			check_variable = { ENG.CC_buildup_progression > 40 }
+			NOT = { has_country_flag = ENG_CC_meeting_happened }
+		}
+		set_country_flag = ENG_CC_meeting_happened
+		hidden_effect = {
+			USA = {
+				country_event = { id = channelcrisis.52 }
+			}
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { ENG.CC_buildup_progression = 100 }
+		}
+		#set_variable = { CC_buildup_rate = 0 }
+		hidden_effect = {
+			USA = {
+				country_event = { id = channelcrisis.53 }
+			}
+		}
+	}
+}
+CC_change_opposing_displayed_info = {
+	if = {
+		limit = { tag = GER }
+		add_to_variable = { GER.CC_current_uncertainty = temp_uncertainty }
+		clamp_variable = {
+			var = GER.CC_current_uncertainty
+			min = 0
+			max = 100
+		}
+		CC_update_certainty = yes
+		else = { #OFN
+			add_to_variable = { ENG.CC_current_uncertainty = temp_uncertainty }
+			clamp_variable = {
+				var = ENG.CC_current_uncertainty
+				min = 0
+				max = 100
+			}
+			CC_update_certainty = yes
+		}
+	}
+	if = {
+		limit = {
+			check_variable = {
+				temp_uncertainty < 0
+			}
+		}
+		multiply_temp_variable = { temp_uncertainty = -1 }
+		if = {
+			limit = {
+				check_variable = {
+					temp_uncertainty < 7
+				}
+			}
+			custom_effect_tooltip = CC_uncertainty_decrease_small
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					temp_uncertainty > 30
+				}
+			}
+			custom_effect_tooltip = CC_uncertainty_decrease_large
+		}
+		else = { custom_effect_tooltip = CC_uncertainty_decrease_medium }
+	}
+	else = {
+		if = {
+			limit = {
+				check_variable = {
+					temp_uncertainty < 7
+				}
+			}
+			custom_effect_tooltip = CC_uncertainty_increase_small
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					temp_uncertainty > 30
+				}
+			}
+			custom_effect_tooltip = CC_uncertainty_increase_large
+		}
+		else = { custom_effect_tooltip = CC_uncertainty_increase_medium }
+	}
+}
+CC_set_opposing_displayed_info = {
+	if = {
+		limit = { tag = GER }
+		set_variable = { GER.CC_current_uncertainty = temp_uncertainty }
+		clamp_variable = {
+			var = GER.CC_current_uncertainty
+			min = 0
+			max = 100
+		}
+		CC_update_certainty = yes
+	}
+	else = { #OFN
+		set_variable = { ENG.CC_current_uncertainty = temp_uncertainty }
+		clamp_variable = {
+			var = ENG.CC_current_uncertainty
+			min = 0
+			max = 100
+		}
+		CC_update_certainty = yes
+	}
+}
+CC_update_certainty = { #applies a new random deviation each time
+	if = {
+		limit = { tag = GER }
+		set_temp_variable = { temp_base_deviation = GER.CC_current_uncertainty }
+		divide_temp_variable = { temp_base_deviation = 2 }
+		set_temp_variable = { temp_gap_check_h = 100 }
+		subtract_from_temp_variable = { temp_gap_check_h = ENG.CC_readiness_actual }
+		if = {
+			limit = { #don't let it go above 100, can't clamp as it would subtract from the accuracy value
+				check_variable = { temp_base_deviation > temp_gap_check_h }
+			}
+			set_temp_variable = { temp_high = 100 }
+			set_temp_variable = { temp_low = 100 }
+			subtract_from_temp_variable = { temp_low = GER.CC_current_uncertainty }
+		}
+		else_if = { #don't let it go under 0
+			limit = {
+				check_variable = { temp_base_deviation > ENG.CC_readiness_actual }
+			}
+			set_temp_variable = { temp_low = 0 }
+			set_temp_variable = { temp_high = GER.CC_current_uncertainty }
+		}
+		else = {
+			set_temp_variable = { temp_high = ENG.CC_readiness_actual }
+			set_temp_variable = { temp_low = ENG.CC_readiness_actual }
+			add_to_temp_variable = { temp_high = temp_base_deviation }
+			subtract_from_temp_variable = { temp_low = temp_base_deviation }
+			if = {
+				limit = { #don't apply deviation if value is too low
+					check_variable = { temp_base_deviation > 3 }
+				}
+				set_temp_variable = { temp_random_max = temp_base_deviation }
+				set_temp_variable = { temp_random_min = temp_base_deviation }
+				subtract_from_temp_variable = { temp_random_max = 1 }
+				multiply_temp_variable = { temp_random_min = -1 }
+				add_to_temp_variable = { temp_random_min = 1 }
+				set_variable_to_random = {
+					var = temp_random_deviation
+					max = temp_random_max
+					min = temp_random_min
+				}
+				set_temp_variable = { temp_max_check = 100 }
+				subtract_from_temp_variable = { temp_max_check = temp_high }
+				set_temp_variable = { temp_min_check = 0 }
+				subtract_from_temp_variable = { temp_min_check = temp_low }
+				if = {
+					limit = {
+						check_variable = { temp_random_deviation > temp_max_check }
+					}
+					set_temp_variable = { temp_random_deviation = temp_max_check }
+				}
+				else_if = {
+					limit = {
+						check_variable = { temp_random_deviation < 0 }
+						set_temp_variable = { temp_min_check = temp_random_deviation }
+						multiply_temp_variable = { temp_min_check = -1 }
+						if = {
+							limit = {
+								check_variable = { temp_min_check > temp_low }
+							}
+							set_temp_variable = { temp_random_deviation = temp_low }
+							multiply_temp_variable = { temp_random_deviation = -1 }
+						}
+					}
+				}
+				add_to_temp_variable = { temp_high = temp_random_deviation }
+				add_to_temp_variable = { temp_low = temp_random_deviation }
+			}
+		}
+		CC_apply_updated_certainty = yes
+	}
+	else = { #OFN
+		set_temp_variable = { temp_base_deviation = ENG.CC_current_uncertainty }
+		divide_temp_variable = { temp_base_deviation = 2 }
+		set_temp_variable = { temp_gap_check_h = 100 }
+		subtract_from_temp_variable = { temp_gap_check_h = GER.CC_readiness_actual }
+		if = {
+			limit = { #don't let it go above 100, can't clamp as it would subtract from the accuracy value
+				check_variable = { temp_base_deviation > temp_gap_check_h }
+			}
+			set_temp_variable = { temp_high = 100 }
+			set_temp_variable = { temp_low = 100 }
+			subtract_from_temp_variable = { temp_low = ENG.CC_current_uncertainty }
+		}
+		else_if = { #don't let it go under 0
+			limit = {
+				check_variable = { temp_base_deviation > GER.CC_readiness_actual }
+			}
+			set_temp_variable = { temp_low = 0 }
+			set_temp_variable = { temp_high = ENG.CC_current_uncertainty }
+		}
+		else = {
+			set_temp_variable = { temp_high = GER.CC_readiness_actual }
+			set_temp_variable = { temp_low = GER.CC_readiness_actual }
+			add_to_temp_variable = { temp_high = temp_base_deviation }
+			subtract_from_temp_variable = { temp_low = temp_base_deviation }
+			if = {
+				limit = { #don't apply deviation if value is too low
+					check_variable = { temp_base_deviation > 3 }
+				}
+				set_temp_variable = { temp_random_max = temp_base_deviation }
+				set_temp_variable = { temp_random_min = temp_base_deviation }
+				subtract_from_temp_variable = { temp_random_max = 1 }
+				multiply_temp_variable = { temp_random_min = -1 }
+				add_to_temp_variable = { temp_random_min = 1 }
+				set_variable_to_random = {
+					var = temp_random_deviation
+					max = temp_random_max
+					min = temp_random_min
+				}
+				set_temp_variable = { temp_max_check = 100 }
+				subtract_from_temp_variable = { temp_max_check = temp_high }
+				set_temp_variable = { temp_min_check = 0 }
+				subtract_from_temp_variable = { temp_min_check = temp_low }
+				if = {
+					limit = {
+						check_variable = { temp_random_deviation > temp_max_check }
+					}
+					set_temp_variable = { temp_random_deviation = temp_max_check }
+				}
+				else_if = {
+					limit = {
+						check_variable = { temp_random_deviation < 0 }
+						set_temp_variable = { temp_min_check = temp_random_deviation }
+						multiply_temp_variable = { temp_min_check = -1 }
+						if = {
+							limit = {
+								check_variable = { temp_min_check > temp_low }
+							}
+							set_temp_variable = { temp_random_deviation = temp_low }
+							multiply_temp_variable = { temp_random_deviation = -1 }
+						}
+					}
+				}
+				add_to_temp_variable = { temp_high = temp_random_deviation }
+				add_to_temp_variable = { temp_low = temp_random_deviation }
+			}
+		}
+		CC_apply_updated_certainty = yes
+	}
+}
+CC_apply_updated_certainty = {
+	clamp_temp_variable = {
+		var = temp_high
+		min = 0
+		max = 100
+	}
+	clamp_temp_variable = {
+		var = temp_low
+		min = 0
+		max = 100
+	}
+	if = {
+		limit = { tag = GER }
+		set_variable = { CC_possible_readiness_max = temp_high }
+		set_variable = { CC_possible_readiness_min = temp_low }
+		CC_assemble_opposing_frame_variable = yes
+	}
+	else = {
+		ENG = {
+			set_variable = { CC_possible_readiness_max = temp_high }
+			set_variable = { CC_possible_readiness_min = temp_low }
+			CC_assemble_opposing_frame_variable = yes
+		}
+		USA = {
+			CC_assemble_opposing_frame_variable = yes
+		}
+	}
+}
+CC_assemble_opposing_frame_variable = {
+	set_variable = { CC_display_two = temp_high }
+	set_variable = { CC_display_one = temp_low }
+	meta_effect = {
+		text = {
+			set_variable = { CC_opposing_readiness_display = [LOW_END][ZEROES][HIGH_END] }
+		}
+		LOW_END = "[?CC_display_one|.0]"
+		ZEROES = "[Get_CC_Zeroes_Amount]"
+		HIGH_END = "[?CC_display_two|.0]"
+	}
+	log = "[GetDateText]: [THIS.GetName]: Opposing Readiness: [?THIS.CC_opposing_readiness_display]"
+}
+CC_negotiations_initiate_stage = { #all ofn side acceptance flags run through USA for now
+	if = {
+		limit = { ##15 stages total divided into 3 with checkpoints, 1-5 (british general matters), 6-10 (british security matters), 11-15 (ofn and strategic)
+			check_variable = { ENG.CC_negotiations_getstage > 10 }
+		}
+		add_to_array = { ENG.cc_negotiations_concessions_array = token:concession_11 } #no nukes in britain
+		USA = {
+			set_country_flag = CC_negotiations_accept_or_reject
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { ENG.CC_negotiations_getstage > 5 }
+		}
+		add_to_array = { ENG.cc_negotiations_concessions_array = token:concession_6 } #channel demil zone
+		USA = {
+			set_country_flag = CC_negotiations_accept_or_reject
+		}
+	}
+	else = {
+		#add_to_array = { ENG.cc_negotiations_concessions_array = token:ex1 }
+		add_to_array = { ENG.cc_negotiations_concessions_array = token:concession_1 } #return all pakt nationals
+		USA = {
+			set_country_flag = CC_negotiations_accept_or_reject
+		}
+	}
+}
+CC_negotiations_advance = {
+	ENG = {
+		add_to_variable = { CC_negotiations_getstage = 1 }
+		meta_effect = {
+			text = {
+				add_to_array = { ENG.cc_negotiations_concessions_array = token:concession_[NUMBER] }
+			}
+			NUMBER = "[?ENG.CC_negotiations_getstage]"
+		}
+	}
+	USA = {
+		set_country_flag = CC_negotiations_accept_or_reject
+	}
+}
+CC_accept_button_effect = {
+	hidden_effect = {
+		if = {
+			limit = { tag = GER }
+			if = { #penalty so that you don't just keep demanding until the ofn says no
+				limit = { has_country_flag = CC_negotiations_accept_or_reject }
+				add_political_power = -70
+			}
+			clr_country_flag = CC_negotiations_accept_or_demand
+			set_variable = { GER.cc_negotiations_reject_button_frame = 2 }
+			clr_country_flag = CC_negotiations_accept_or_reject
+			CC_negotiations_succeed_stage = yes
+		}
+		else_if = {
+			limit = { tag = USA }
+			clr_country_flag = CC_negotiations_accept_or_reject
+			meta_effect = {
+				text = { #move the concession to confirmed
+					add_to_array = { ENG.cc_negotiations_confirmed_array = token:concession_[NUMBER] }
+				}
+				NUMBER = "[?ENG.CC_negotiations_getstage]"
+			}
+			if = {
+				limit = { #America accepts final concession of stage
+					CC_very_severe_concession_active = yes
+				}
+				CC_negotiations_succeed_stage = yes
+				else = {
+					GER = {
+						set_country_flag = CC_negotiations_accept_or_demand
+						set_variable = { GER.cc_negotiations_reject_button_frame = 2 }
+					}
+				}
+			}
+		}
+	}
+}
+CC_reject_demand_button_effect = {
+	hidden_effect = {
+		if = {
+			limit = { tag = GER }
+			if = { #reject stated terms
+				limit = { has_country_flag = CC_negotiations_accept_or_reject }
+				clr_country_flag = CC_negotiations_accept_or_reject
+				set_variable = { GER.cc_negotiations_reject_button_frame = 2 }
+				CC_negotiations_fail = yes
+			}
+			else = { #demand more
+				clr_country_flag = CC_negotiations_accept_or_demand
+				set_variable = { GER.cc_negotiations_reject_button_frame = 2 }
+				CC_negotiations_advance = yes
+			}
+		}
+		else_if = {
+			limit = { tag = USA }
+			clr_country_flag = CC_negotiations_accept_or_reject
+			if = {
+				limit = { #rejected an essential term
+					CC_essential_concession_active = yes
+				}
+				CC_negotiations_fail = yes
+			}
+			else = {
+				GER = { set_country_flag = CC_negotiations_accept_or_reject }
+				set_variable = { GER.cc_negotiations_reject_button_frame = 1 }
+			}
+		}
+	}
+}
+CC_negotiations_fail = {
+	clr_global_flag = channel_crisis_negotiations_ongoing
+	ENG = { add_to_variable = { ENG.CC_negotiation_decision_cost = 100 } }
+	GER = { country_event = { id = channelcrisis_nego.41 } }
+	USA = { country_event = { id = channelcrisis_nego.40 } }
+	if = {
+		limit = {
+			check_variable = { ENG.CC_negotiations_getstage > 10 }
+		}
+		ENG = {
+			set_variable = { CC_negotiations_getstage = 11 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_15 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_14 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_13 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_12 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_11 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_15 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_14 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_13 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_12 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_11 }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { ENG.CC_negotiations_getstage > 5 }
+		}
+		ENG = {
+			set_variable = { CC_negotiations_getstage = 6 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_10 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_9 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_8 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_7 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_6 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_10 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_9 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_8 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_7 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_6 }
+		}
+	}
+	else = {
+		ENG = {
+			set_variable = { CC_negotiations_getstage = 1 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_5 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_4 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_3 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_2 }
+			remove_from_array = { ENG.cc_negotiations_confirmed_array = token:concession_1 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_5 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_4 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_3 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_2 }
+			remove_from_array = { ENG.cc_negotiations_concessions_array = token:concession_1 }
+		}
+	}
+}
+CC_negotiations_succeed_stage = {
+	if = {
+		limit = { #successful negotiations ending
+			check_variable = { ENG.CC_negotiations_getstage > 10 }
+		}
+		clr_global_flag = channel_crisis_ongoing_confrontation
+		set_global_flag = channel_crisis_happened_before
+		ENG = { country_event = { id = channelcrisis_nego.52 hours = 23 } } #delayed effects here
+		USA = {
+			country_event = { id = channelcrisis_nego.50 }
+		}
+		GER = {
+			country_event = { id = channelcrisis_nego.51 }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { ENG.CC_negotiations_getstage > 5 }
+		}
+		ENG = {
+			set_variable = { CC_negotiations_getstage = 11 }
+			country_event = { id = channelcrisis_nego.3 }
+			country_event = { id = channelcrisis_nego.31 hours = 23 } #delayed trigger for the next stage
+		}
+		GER = { country_event = { id = channelcrisis_nego.3 } }
+		USA = { country_event = { id = channelcrisis_nego.3 } }
+	}
+	else = {
+		ENG = {
+			set_variable = { CC_negotiations_getstage = 6 }
+			country_event = { id = channelcrisis_nego.3 }
+			country_event = { id = channelcrisis_nego.31 hours = 23 } #delayed trigger for the next stage
+		}
+		GER = { country_event = { id = channelcrisis_nego.3 } }
+		USA = { country_event = { id = channelcrisis_nego.3 } }
+	}
+}
+CC_end_effects = { #non-ai rule negotiation ending uses separate block
+	clr_global_flag = channel_crisis_ongoing_confrontation
+	set_global_flag = channel_crisis_happened_before
+	if = {
+		limit = { #ww3 ending #todo put custom triggers
+			check_variable = { GER.CC_readiness_actual > 80 }
+			check_variable = { ENG.CC_readiness_actual > 80 }
+			OR = {
+				USA = { is_ai = no }
+				ENG = { is_ai = no }
+				GER = { is_ai = no }
+			}
+		}
+		hidden_effect = {
+			USA = {
+				set_temp_variable = { temp_uncertainty = 0 }
+				CC_set_opposing_displayed_info = yes
+				country_event = { id = channelcrisis.130 }
+				set_country_flag = disable_red_button
+				if = {
+					limit = { is_ai = no }
+					country_event = { id = nuclearwar.6 days = 6 }
+				}
+				else = {
+					GER = { country_event = { id = nuclearwar.6 days = 6 } }
+				}
+			}
+			GER = {
+				set_temp_variable = { temp_uncertainty = 0 }
+				CC_set_opposing_displayed_info = yes
+				country_event = { id = channelcrisis.131 hours = 7 }
+				declare_war_on = {
+					target = ENG
+					type = annex_everything
+				}
+				declare_war_on = {
+					target = USA
+					type = annex_everything
+				}
+				set_country_flag = disable_red_button
+			}
+		}
+	}
+	else_if = { #ai rule prompted negotiation ending
+		limit = {
+			has_game_rule = {
+				rule = ENG_CHANNEL_CRISIS
+				option = ENG_CHANNEL_CRISIS_NEGOTIATION
+			}
+			USA = { is_ai = yes }
+			ENG = { is_ai = yes }
+			GER = { is_ai = yes }
+		}
+		add_to_array = { ENG.cc_negotiations_confirmed_array = token:concession_1 }
+		add_to_array = { ENG.cc_negotiations_confirmed_array = token:concession_6 }
+		add_to_array = { ENG.cc_negotiations_confirmed_array = token:concession_7 }
+		add_to_array = { ENG.cc_negotiations_confirmed_array = token:concession_11 }
+		ENG = { country_event = { id = channelcrisis_nego.52 } }
+	}
+	else_if = {
+		limit = { #sealion ii ending
+			OR = {
+				check_variable = { ENG.CC_readiness_actual < GER.CC_readiness_actual }
+				AND = {
+					has_game_rule = {
+						rule = ENG_CHANNEL_CRISIS
+						option = ENG_CHANNEL_CRISIS_SEALION2
+					}
+					USA = { is_ai = yes }
+					ENG = { is_ai = yes }
+					GER = { is_ai = yes }
+				}
+			}
+			NOT = {
+				AND = {
+					has_game_rule = {
+						rule = ENG_CHANNEL_CRISIS
+						option = ENG_CHANNEL_CRISIS_OFN
+					}
+					USA = { is_ai = yes }
+					ENG = { is_ai = yes }
+					GER = { is_ai = yes }
+				}
+			}
+		}
+		hidden_effect = {
+			USA = {
+				diplomatic_relation = {
+					country = ENG
+					relation = guarantee
+					active = no
+				}
+				set_temp_variable = { temp_uncertainty = 0 }
+				CC_set_opposing_displayed_info = yes
+				country_event = { id = channelcrisis.100 hours = 9 }
+			}
+			GER = {
+				set_global_flag = GER_sealion_ii
+				set_temp_variable = { temp_uncertainty = 0 }
+				CC_set_opposing_displayed_info = yes
+				country_event = { id = channelcrisis.101 } #other effects fired through here
+			}
+			JAP = {
+				country_event = { id = channelcrisis.92 days = 3 }
+			}
+			ENG = {
+				set_country_flag = ENG_CC_sealion_ii_ending
+			}
+
+			USA = {
+				set_temp_variable = { Victory_ID = 3 }
+				set_temp_variable = { Victory_Outcome = 1 }
+				set_temp_variable = { Victory_Points = -200 }
+				Cold_War_GUI_ManipulateVictory = yes
+			}
+			GER = {
+				set_temp_variable = { Victory_ID = 3 }
+				set_temp_variable = { Victory_Outcome = 5 }
+				set_temp_variable = { Victory_Points = 200 }
+				Cold_War_GUI_ManipulateVictory = yes
+			}
+		}
+	}
+	else = { #full ofn ending
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD_ENG.303 }
+			}
+			USA = {
+				set_temp_variable = { temp_uncertainty = 0 }
+				CC_set_opposing_displayed_info = yes
+				country_event = { id = channelcrisis.120 days = 1 }
+			}
+			GER = {
+				set_temp_variable = { temp_uncertainty = 0 }
+				CC_set_opposing_displayed_info = yes
+				if = {
+					limit = { has_global_flag = german_civil_war_speervic }
+					country_event = { id = channelcrisis.121 hours = 12 }
+				}
+				else = { country_event = { id = channelcrisis.122 hours = 12 } } #bormann
+			}
+			JAP = {
+				country_event = { id = channelcrisis.91 days = 3 }
+			}
+			ENG = {
+				set_country_flag = ENG_CC_full_ofn_ending
+				country_event = {
+					id = hmmlrSkeleton.1
+					days = 40
+				}
+				meta_effect = { #sets up next election date in country ui
+					text = {
+						set_politics = {
+							ruling_party = despotism
+							last_election = "[current_election_date]"
+							elections_allowed = yes
+							election_frequency = 4
+						}
+					}
+					current_election_date = "[?global.date.GetDateStringNoHour]"
+				}
+			}
+
+			USA = {
+				set_temp_variable = { Victory_ID = 3 }
+				set_temp_variable = { Victory_Outcome = 5 }
+				set_temp_variable = { Victory_Points = 200 }
+				Cold_War_GUI_ManipulateVictory = yes
+			}
+			GER = {
+				set_temp_variable = { Victory_ID = 3 }
+				set_temp_variable = { Victory_Outcome = 1 }
+				set_temp_variable = { Victory_Points = -200 }
+				Cold_War_GUI_ManipulateVictory = yes
+			}
+		}
+	}
+}
+CC_apply_agreed_concessions = {
+	if = { #corporate asset compensation
+		limit = { is_in_array = { ENG.cc_negotiations_confirmed_array = token:concession_2 } }
+		ENG = {
+			set_country_flag = ENG_corporate_compensation_to_germany
+			set_temp_variable = { temp_econ_spending_amount = 0.1 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		GER = {
+			set_temp_variable = { money_reserves_temp = 0.1 }
+			econ_money_reserves_change_raw_money = yes
+		}
+	}
+	if = { #expanded asset compensation
+		limit = { is_in_array = { ENG.cc_negotiations_confirmed_array = token:concession_4 } }
+		ENG = { #$500M in total is this a good number?
+			clr_country_flag = ENG_corporate_compensation_to_germany
+			set_country_flag = ENG_expanded_corporate_compensation_to_germany
+			set_temp_variable = { temp_econ_spending_amount = 0.4 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		GER = {
+			set_temp_variable = { money_reserves_temp = 0.4 }
+			econ_money_reserves_change_raw_money = yes
+		}
+	}
+	if = { #recognition of british 'injustices'
+		limit = { is_in_array = { ENG.cc_negotiations_confirmed_array = token:concession_5 } }
+		ENG = {
+			set_country_flag = ENG_message_to_germany_concession
+			add_political_power = -50
+		}
+		GER = { add_political_power = 100 }
+	}
+	if = { #continental security zone
+		limit = { is_in_array = { ENG.cc_negotiations_confirmed_array = token:concession_6 } }
+		ENG = {
+			set_country_flag = ENG_csz_established
+			every_owned_state = {
+				limit = {
+					region = 1
+					is_coastal = yes
+					NOT = { state = 338 }
+				}
+				set_demilitarized_zone = yes
+			}
+		}
+	}
+	if = { #renounce channel islands claims
+		limit = { is_in_array = { ENG.cc_negotiations_confirmed_array = token:concession_8 } }
+		ENG = {
+			#set_country_flag = renounced_channel_islands_claims #checking the core is enough
+			remove_state_core = 1994
+		}
+	}
+	if = { #limitations on ofn expansion
+		limit = { is_in_array = { ENG.cc_negotiations_confirmed_array = token:concession_12 } }
+		set_global_flag = limitations_on_ofn_expansion_pakt_area
+	}
+	if = { #expanded limitations on ofn expansion
+		limit = { is_in_array = { ENG.cc_negotiations_confirmed_array = token:concession_13 } }
+		set_global_flag = limitations_on_ofn_expansion_europe
+	}
+	if = { #fugitive deportation agreement
+		limit = { is_in_array = { ENG.cc_negotiations_confirmed_array = token:concession_14 } }
+		ENG = {
+			set_country_flag = ENG_fugitive_deportation_agreement
+		}
+	}
+	if = { #end saw/spy exchange
+		limit = { is_in_array = { ENG.cc_negotiations_confirmed_array = token:concession_15 } }
+		#
+	}
+}
+
+ENG_CC_end_sealion_2 = {
+	GER = {
+		white_peace = ENG
+		set_autonomy = {
+			target = ENG
+			autonomy_state = autonomy_collaborator_puppet_state
+		}
+	}
+	ENG = {
+		set_politics = {
+			ruling_party = national_socialism
+		}
+		set_popularities = {
+			communist = 2
+			liberalism = 3
+			liberal_conservatism = 1
+			socialist = 4
+			progressivism = 4
+			conservatism = 2
+			national_socialism = 84
+		}
+		remove_ideas = {
+			#ideas#
+			ENG_German_Corporate_Dominance_1
+			ENG_The_Channel
+			ENG_The_Terrible_Twins
+			Pakt_Mitstreiter
+			ENG_The_Peoples_spirit
+			ENG_A_Militia_Force
+			ENG_For_Queen_and_Country
+			ENG_Union_Supply_Line_Blockaded
+			ENG_the_last_battle
+			ENG_the_last_battle_2
+			ENG_the_last_battle_3
+			ENG_who_dares_wins
+			ENG_who_dares_wins_2
+			ENG_who_dares_wins_3
+			ENG_who_dares_wins_4
+			ENG_who_dares_wins_5
+			ENG_the_left_resistance
+			ENG_the_left_resistance_2
+			ENG_the_left_resistance_3
+			ENG_the_left_resistance_4
+			ENG_Britains_Economic_Ruin
+			ENG_Fractured_Food_Supply
+
+			ENG_Ambitions_Of_Equity
+			ENG_Revolution_of_the_Right
+			ENG_A_Motley_Government
+			ENG_Socialist_Nationalisation
+
+			ENG_lost_and_hopeless
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			#ministers#
+			ENG_John_Tyndall_hog
+			#ideas#
+			ENG_The_British_Catastrophe
+			ENG_Those_Who_Would_Fight_Time
+			ENG_British_Free_Corps
+			### POLITICAL ###
+			tno_political_parties_one_party_state
+			tno_religious_rights_secularism
+			tno_trade_unions_illegal
+			tno_immigration_you_will_never_leave
+			tno_slavery_penal_labor
+			tno_public_meetings_regulated
+			tno_press_rights_state_press_only
+			tno_vote_franchise_no_voting
+
+			### MILITARY ###
+			tno_conscription_limited_conscription
+			tno_military_supervision_no_supervision
+			tno_training_basic_training
+			tno_draft_exemptions_civil_service_deferment
+
+			### ECONOMIC ###
+			tno_trade_laws_limited_exports
+			tno_income_taxation_low_income_weighted
+			tno_minimum_wage_trinket_minimum_wage
+			tno_max_workhours_12_hour_work_day
+			tno_pensions_low_pensions
+			tno_unemployment_trinket_subsidies
+
+			### SOCIAL ###
+			tno_health_care_low_income_protections
+			tno_education_public_education
+			tno_penal_system_harsh_penal_code
+			tno_gender_rights_women_in_the_workplace
+			tno_security_totalitarian_police
+			tno_regulations_token_regulations
+
+			### MISC ###
+			tno_refugees_banned
+			tno_women_banned
+			tno_racial_integration_none
+			tno_child_labor_illegal
+			tno_safety_limited_regulations
+			tno_pollution_no_controls
+			tno_lgbt_rights_lgbt_outlawed
+			tno_minorities_oppression
+
+			### SOCIETAL DEVELOPMENT ###
+			tno_academic_base_secondary_schooling
+			tno_research_facilities_modern
+			tno_agriculture_mass_mechanized
+			tno_healthcare_developed
+			tno_industrial_equipment_manufacturing_lines
+			tno_industrial_expertise_experienced
+			tno_admin_efficiency_deficient_administrative_systems
+			tno_army_professionalism_political_interference
+		}
+		every_unit_leader = {
+			retire = yes
+		}
+		set_party_name = {
+			ideology = national_socialism
+			long_name = ENG_national_socialism_salvation_party_long
+			name = ENG_national_socialism_salvation_party
+		}
+		#retire_country_leader = yes
+		ENG_William_Joyce = {
+			promote_character = national_socialism_subtype
+		}
+		add_ideas = Pakt_Marionettenstaat
+		set_cosmetic_tag = ENG_national_republic
+		econ_join_sphere_GER = yes
+		if = {
+			limit = { has_global_flag = german_civil_war_speervic }
+			join_zollverein = yes
+		}
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Gelenkte_Wirtschaft }
+		econ_subtype_change = yes
+		add_opinion_modifier = { target = CAN modifier = CAN_usurping_liberals }
+		add_opinion_modifier = { target = AST modifier = CAN_usurping_liberals }
+		add_opinion_modifier = { target = NZL modifier = CAN_usurping_liberals }
+		add_opinion_modifier = { target = BLZ modifier = CAN_usurping_liberals }
+		CAN = { add_opinion_modifier = { target = ENG modifier = ENG_illegitimate_government } }
+		AST = { add_opinion_modifier = { target = ENG modifier = ENG_illegitimate_government } }
+		NZL = { add_opinion_modifier = { target = ENG modifier = ENG_illegitimate_government } }
+		BLZ = { add_opinion_modifier = { target = ENG modifier = ENG_illegitimate_government } }
+		GER = { ENG = { clear_embargo_PREV = yes } }
+		GGR = { ENG = { clear_embargo_PREV = yes } }
+		BGR = { ENG = { clear_embargo_PREV = yes } }
+		GGR = { ENG = { clear_embargo_PREV = yes } }
+		SGR = { ENG = { clear_embargo_PREV = yes } }
+		CZE = { ENG = { clear_embargo_PREV = yes } }
+		GGN = { ENG = { clear_embargo_PREV = yes } }
+		SLO = { ENG = { clear_embargo_PREV = yes } }
+		UKR = { ENG = { clear_embargo_PREV = yes } }
+		MCW = { ENG = { clear_embargo_PREV = yes } }
+		OST = { ENG = { clear_embargo_PREV = yes } }
+		COG = { ENG = { clear_embargo_PREV = yes } }
+		CAU = { ENG = { clear_embargo_PREV = yes } }
+		SER = { ENG = { clear_embargo_PREV = yes } }
+		DEN = { ENG = { clear_embargo_PREV = yes } }
+		HOL = { ENG = { clear_embargo_PREV = yes } }
+		NOR = { ENG = { clear_embargo_PREV = yes } }
+		MAD = { ENG = { clear_embargo_PREV = yes } }
+		GRO = { ENG = { clear_embargo_PREV = yes } }
+		ANG = { ENG = { clear_embargo_PREV = yes } }
+		BRG = { ENG = { clear_embargo_PREV = yes } }
+		BUL = { ENG = { clear_embargo_PREV = yes } }
+		FRA = { ENG = { clear_embargo_PREV = yes } }
+		IRE = { ENG = { clear_embargo_PREV = yes } }
+		USA = { ENG = { set_embargo_PREV = yes } }
+		CAN = { ENG = { set_embargo_PREV = yes } }
+		AST = { ENG = { set_embargo_PREV = yes } }
+		GUY = { ENG = { set_embargo_PREV = yes } }
+		NZL = { ENG = { set_embargo_PREV = yes } }
+		ICE = { ENG = { set_embargo_PREV = yes } }
+		BLZ = { ENG = { set_embargo_PREV = yes } }
+		country_event = {
+			id = joyce.1
+			days = 2
+		}
+		GER = {
+			country_event = {
+				id = joyce.1
+				days = 2
+			}
+			delete_units = {
+				division_template = "(spz.) Panzergrenadierabteilung"
+				disband = yes
+			}
+			delete_units = {
+				division_template = "(spz.) Panzerabteilung"
+				disband = yes
+			}
+			delete_units = {
+				division_template = "(spz.) Fallschirmjägerabteilung"
+				disband = yes
+			}
+			delete_units = {
+				division_template = "(spz.) Marineabteilung"
+				disband = yes
+			}
+		}
+		clr_global_flag = GER_sealion_ii
+		clr_global_flag = FEN_GF_WonEcw
+		set_global_flag = ENG_GF_WonEcw
+	}
+	BLZ = {
+		country_event = {
+			id = BLZ_skeleton.5
+			days = 1
+		}
+	}
+	MEX = { # Mexico goes back to hating
+		add_opinion_modifier = {
+			target = ENG
+			modifier = TNO_illegitimate_govt
+		}
+		set_variable = { trade_opinion_embargo@ENG = 1 }
+		add_opinion_modifier = {
+			target = ENG
+			modifier = TNO_embargo_50
+		}
+	}
+	ENG = {
+		add_opinion_modifier = {
+			target = MEX
+			modifier = TNO_refused_to_recognize_us
+		}
+		add_opinion_modifier = {
+			target = MEX
+			modifier = TNO_embargoed_us_50
+		}
+	}
+}

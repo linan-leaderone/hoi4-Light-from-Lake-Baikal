@@ -1,0 +1,643 @@
+##################################
+###  England Influence Battle  ###
+##################################
+
+ENG_foreign_policy_category = {
+
+########################
+###  Channel Crisis  ###
+########################
+	
+	
+
+
+##################################
+###  England Influence Battle  ### DEPRECATED CONTENT
+##################################
+
+	ENG_Faction_ENG_distance_ourselves_from_germany = {
+		allowed = { original_tag = ENG }
+		icon = GFX_decision_generic_civil_support
+		visible = {
+			TNO_fopo_england_influence_battle_selected = yes
+		}
+		cost = 25
+		days_remove = 25
+		days_re_enable = 60
+		ai_will_do = {
+			factor = 10
+
+			modifier = {
+				add = 5
+				check_variable = { ENG_OFN_Influence < ENG_EP_Influence }
+			}
+
+			modifier = {
+				add = 5
+				has_global_flag = ENG_faction_mechanic_Pakt_Leading
+			}
+
+			modifier = {
+				factor = 0
+				check_variable = { ENG_OFN_Influence > ENG_EP_Influence }
+			}
+		}
+		available = {
+			ENG_faction_mech_no_other_decisions = yes
+		}
+		complete_effect = {
+			set_country_flag = ENG_international_mech_decision
+		}
+		remove_effect = {
+			clr_country_flag = ENG_international_mech_decision
+			random_list = {
+				1 = {
+					set_temp_variable = { EP_influence_temp = -1 }
+					ENG_EP_Influence_Change = yes
+				}
+				1 = {
+					set_temp_variable = { EP_influence_temp = -1.25 }
+					ENG_EP_Influence_Change = yes
+				}
+				1 = {
+					set_temp_variable = { EP_influence_temp = -1.5 }
+					ENG_EP_Influence_Change = yes
+				}
+			}
+		}
+	}
+
+	ENG_Faction_ENG_distance_ourselves_from_america = {
+		allowed = { original_tag = ENG }
+		icon = GFX_decision_generic_propaganda
+		visible = {
+			TNO_fopo_england_influence_battle_selected = yes
+		}
+		cost = 25
+		days_remove = 25
+		days_re_enable = 60
+		ai_will_do = {
+			factor = 10
+
+			modifier = {
+				add = 5
+				check_variable = { ENG_OFN_Influence > ENG_EP_Influence }
+			}
+
+			modifier = {
+				add = 5
+				has_global_flag = ENG_faction_mechanic_OFN_Leading
+			}
+
+			modifier = {
+				factor = 0
+				check_variable = { ENG_OFN_Influence < ENG_EP_Influence }
+			}
+		}
+		available = {
+			ENG_faction_mech_no_other_decisions = yes
+		}
+		complete_effect = {
+			set_country_flag = ENG_international_mech_decision
+		}
+		remove_effect = {
+			clr_country_flag = ENG_international_mech_decision
+			random_list = {
+				1 = {
+					set_temp_variable = { OFN_influence_temp = -1 }
+					ENG_OFN_Influence_Change = yes
+				}
+				1 = {
+					set_temp_variable = { OFN_influence_temp = -1.25 }
+					ENG_OFN_Influence_Change = yes
+				}
+				1 = {
+					set_temp_variable = { OFN_influence_temp = -1.5 }
+					ENG_OFN_Influence_Change = yes
+				}
+			}
+		}
+	}
+
+	ENG_Faction_ENG_Invest_in_own_industries = {
+		allowed = { original_tag = ENG }
+		icon = GFX_decision_generic_money
+		visible = {
+			TNO_fopo_england_influence_battle_selected = yes
+		}
+		days_remove = 20
+		days_re_enable = 60
+
+		ai_will_do = {
+			factor = 10
+
+			modifier = {
+				add = 5
+				has_global_flag = ENG_faction_mechanic_England_Leading
+			}
+
+			modifier = {
+				add = 10
+				OR = {
+					AND = {
+						has_global_flag = ENG_faction_mechanic_OFN_Leading
+						NOT = { check_variable = { ENG_Independent_Influence < ENG_EP_Influence } }
+					}
+					AND = {
+						has_global_flag = ENG_faction_mechanic_Pakt_Leading
+						NOT = { check_variable = { ENG_Independent_Influence < ENG_OFN_Influence } }
+					}
+				}
+			}
+
+			modifier = {
+				add = -5
+				OR = {
+					AND = {
+						has_global_flag = ENG_faction_mechanic_OFN_Leading
+						check_variable = { ENG_Independent_Influence < ENG_EP_Influence }
+					}
+					AND = {
+						has_global_flag = ENG_faction_mechanic_Pakt_Leading
+						check_variable = { ENG_Independent_Influence < ENG_OFN_Influence }
+					}
+				}
+			}
+		}
+		available = {
+			ENG_faction_mech_no_other_decisions = yes
+		}
+		custom_cost_trigger = {
+			check_variable = { GDP > 0 }
+			has_political_power > 14.99
+		}
+		custom_cost_text = decision_cost_100_million_15_pp
+		complete_effect = {
+			hidden_effect = {
+				add_political_power = -15
+				set_temp_variable = { temp_econ_spending_amount = 0.1 }
+				econ_spend_money_once_effect_raw_money = yes
+			}
+			set_country_flag = ENG_international_mech_decision
+		}
+		remove_effect = {
+			clr_country_flag = ENG_international_mech_decision
+			random_list = {
+				1 = {
+					set_temp_variable = { ENG_influence_temp = 1.5 }
+					ENG_ENG_Influence_Change = yes
+				}
+				1 = {
+					set_temp_variable = { ENG_influence_temp = 1.75 }
+					ENG_ENG_Influence_Change = yes
+				}
+				1 = {
+					set_temp_variable = { ENG_influence_temp = 2 }
+					ENG_ENG_Influence_Change = yes
+				}
+			}
+			ENG = {
+				random_owned_state = {
+					add_state_modifier = { modifier = { state_GDP_growth_modifier = 0.25 } }
+				}
+			}
+		}
+	}
+
+	ENG_Faction_ENG_rely_on_own_military = {
+		allowed = { original_tag = ENG }
+		icon = GFX_decision_generic_military_parade
+		visible = {
+			TNO_fopo_england_influence_battle_selected = yes
+		}
+		days_remove = 25
+		days_re_enable = 60
+
+		ai_will_do = {
+			factor = 15
+
+			modifier = { # EP and OFN are far in the lead
+				add = -5
+				OR = {
+					AND = {
+						has_global_flag = ENG_faction_mechanic_OFN_Leading
+						check_variable = { ENG_Independent_Influence < ENG_EP_Influence }
+					}
+					AND = {
+						has_global_flag = ENG_faction_mechanic_Pakt_Leading
+						check_variable = { ENG_Independent_Influence < ENG_OFN_Influence }
+					}
+				}
+			}
+		}
+		available = {
+			ENG_faction_mech_no_other_decisions = yes
+		}
+		custom_cost_trigger = {
+			command_power > 24.99
+		}
+		custom_cost_text = decision_cost_25_cp
+		complete_effect = {
+			hidden_effect = {
+				add_command_power = -25
+			}
+			set_country_flag = ENG_international_mech_decision
+		}
+		remove_effect = {
+			clr_country_flag = ENG_international_mech_decision
+			random_list = {
+				1 = {
+					set_temp_variable = { ENG_influence_temp = 1.5 }
+					ENG_ENG_Influence_Change = yes
+				}
+				1 = {
+					set_temp_variable = { ENG_influence_temp = 1.75 }
+					ENG_ENG_Influence_Change = yes
+				}
+				1 = {
+					set_temp_variable = { ENG_influence_temp = 2 }
+					ENG_ENG_Influence_Change = yes
+				}
+			}
+		}
+	}
+
+	ENG_Faction_ENG_utilize_OFN_contacts = {
+		allowed = { original_tag = ENG }
+		icon = GFX_decision_generic_handshake
+		visible = {
+			TNO_fopo_england_influence_battle_selected = yes
+		}
+		days_remove = 15
+		days_re_enable = 60
+		cost = 15
+		ai_will_do = {
+			factor = 10
+
+			modifier = {
+				add = 5
+				has_global_flag = ENG_faction_mechanic_Pakt_Leading
+			}
+
+			modifier = {
+				factor = 0
+				check_variable = { ENG_OFN_Influence > ENG_EP_Influence }
+			}
+
+			modifier = {
+				factor = 0
+				has_global_flag = ENG_faction_mechanic_England_Leading
+				set_temp_variable = { ENG_OFN_Pakt_diff = ENG_OFN_Influence }
+				subtract_from_temp_variable = { ENG_OFN_Pakt_diff = ENG_EP_Influence }
+				check_variable = { ENG_OFN_Pakt_diff > -2.25 }
+			}
+		}
+		available = {
+			ENG_faction_mech_no_other_decisions = yes
+		}
+		complete_effect = {
+			set_country_flag = ENG_international_mech_decision
+		}
+		remove_effect = {
+			clr_country_flag = ENG_international_mech_decision
+			random_list = {
+				1 = {
+					set_temp_variable = { OFN_influence_temp = 1.5 }
+					ENG_OFN_Influence_Change = yes
+					set_temp_variable = { EP_influence_temp = -1 }
+					ENG_EP_Influence_Change = yes
+				}
+				1 = {
+					set_temp_variable = { OFN_influence_temp = 1.25 }
+					ENG_OFN_Influence_Change = yes
+					set_temp_variable = { EP_influence_temp = -0.75 }
+					ENG_EP_Influence_Change = yes
+				}
+			}
+		}
+	}
+
+	ENG_Faction_ENG_utilize_EP_contacts = {
+		allowed = { original_tag = ENG }
+		icon = GFX_decision_generic_phone_call
+		visible = {
+			TNO_fopo_england_influence_battle_selected = yes
+		}
+		days_remove = 15
+		days_re_enable = 60
+		cost = 15
+		ai_will_do = {
+			factor = 10
+
+			modifier = {
+				add = 5
+				has_global_flag = ENG_faction_mechanic_OFN_Leading
+			}
+
+			modifier = {
+				factor = 0
+				check_variable = { ENG_OFN_Influence < ENG_EP_Influence }
+			}
+
+			modifier = {
+				factor = 0
+				has_global_flag = ENG_faction_mechanic_England_Leading
+				set_temp_variable = { ENG_OFN_Pakt_diff = ENG_OFN_Influence }
+				subtract_from_temp_variable = { ENG_OFN_Pakt_diff = ENG_EP_Influence }
+				check_variable = { ENG_OFN_Pakt_diff < 2.25 }
+			}
+		}
+		available = {
+			ENG_faction_mech_no_other_decisions = yes
+		}
+		complete_effect = {
+			set_country_flag = ENG_international_mech_decision
+		}
+		remove_effect = {
+			clr_country_flag = ENG_international_mech_decision
+			random_list = {
+				1 = {
+					set_temp_variable = { EP_influence_temp = 1.5 }
+					ENG_EP_Influence_Change = yes
+					set_temp_variable = { OFN_influence_temp = -1 }
+					ENG_OFN_Influence_Change = yes
+				}
+				1 = {
+					set_temp_variable = { EP_influence_temp = 1.25 }
+					ENG_EP_Influence_Change = yes
+					set_temp_variable = { OFN_influence_temp = -0.75 }
+					ENG_OFN_Influence_Change = yes
+				}
+			}
+		}
+	}
+
+	ENG_Faction_ENG_denounce_the_superpowers = {
+		allowed = { original_tag = ENG }
+		icon = GFX_decision_generic_political_discourse
+		visible = {
+			TNO_fopo_england_influence_battle_selected = yes
+		}
+		cost = 75
+		days_remove = 30
+		days_re_enable = 120
+		ai_will_do = {
+			factor = 10
+
+			modifier = {
+				add = 5
+				OR = {
+					has_global_flag = ENG_faction_mechanic_OFN_Leading
+					has_global_flag = ENG_faction_mechanic_Pakt_Leading
+				}
+			}
+
+			modifier = {
+				add = 10
+				has_global_flag = ENG_faction_mechanic_England_Leading
+			}
+		}
+		available = {
+			ENG_faction_mech_no_other_decisions = yes
+		}
+		complete_effect = {
+			set_country_flag = ENG_international_mech_decision
+		}
+		remove_effect = {
+			clr_country_flag = ENG_international_mech_decision
+			set_temp_variable = { ENG.ENG_influence_temp_monthly = 0.5 }
+			ENG_ENG_Influence_Increase_Change = yes
+			set_temp_variable = { OFN_influence_temp = -2 }
+			ENG_OFN_Influence_Change = yes
+			set_temp_variable = { EP_influence_temp = -2 }
+			ENG_EP_Influence_Change = yes
+		}
+	}
+
+	ENG_Faction_Join_OFN_Mission = {
+		icon = GFX_decision_generic_political_action
+		activation = {
+			always = no
+		}
+		available = {
+			hidden_trigger = {
+				NOT = { TNO_fopo_england_influence_battle_selected = yes }
+			}
+		}
+		is_good = no
+		days_mission_timeout = 60
+		allowed = {
+			tag = ENG
+		}
+		timeout_effect = {
+			country_event = {
+				id = ENG_International_Mechanic.18
+				days = 1
+			}
+		}
+	}
+
+	ENG_Faction_Join_Pakt_Mission = {
+		icon = GFX_decision_generic_document_target
+		activation = {
+			always = no
+		}
+		available = {
+			hidden_trigger = {
+				NOT = { TNO_fopo_england_influence_battle_selected = yes }
+			}
+		}
+		is_good = no
+		days_mission_timeout = 60
+		allowed = {
+			tag = ENG
+		}
+		timeout_effect = {
+			country_event = {
+				id = ENG_International_Mechanic.19
+				days = 1
+			}
+		}
+	}
+
+	ENG_Faction_Close_Faction_Mechanic_Mission = {
+		icon = GFX_decision_generic_independence
+		activation = {
+			always = no
+		}
+		available = {
+			hidden_trigger = {
+				NOT = { TNO_fopo_england_influence_battle_selected = yes }
+			}
+		}
+		is_good = yes
+		days_mission_timeout = 180
+		allowed = {
+			tag = ENG
+		}
+		timeout_effect = {
+			ENG_end_faction_mechanic = yes
+			custom_effect_tooltip = ENG_Faction_Close_Mechanic_tt
+		}
+	}
+
+	ENG_Pakt_Speer_Mission = {
+		icon = GFX_decision_generic_political_action
+		activation = {
+			always = no
+		}
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+		is_good = no
+		days_mission_timeout = 20
+		allowed = {
+			tag = ENG
+		}
+		timeout_effect = {
+			if = {
+				limit = { check_variable = { ENG_Pakt_Mission_Counter = 0 } }
+				complete_national_focus = ENG_bedfellows_with_the_devil
+				set_variable = { ENG_Pakt_Mission_Counter = 1 }
+				activate_mission = ENG_Pakt_Speer_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_Pakt_Mission_Counter = 1 } }
+				complete_national_focus = ENG_relax_trade_barriers
+				set_variable = { ENG_Pakt_Mission_Counter = 2 }
+				activate_mission = ENG_Pakt_Speer_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_Pakt_Mission_Counter = 2 } }
+				complete_national_focus = ENG_the_germans_in_london
+				set_variable = { ENG_Pakt_Mission_Counter = 3 }
+				activate_mission = ENG_Pakt_Speer_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_Pakt_Mission_Counter = 3 } }
+				complete_national_focus = ENG_reject_the_ultimate_humiliation
+				set_variable = { ENG_Pakt_Mission_Counter = 4 }
+				activate_mission = ENG_Pakt_Speer_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_Pakt_Mission_Counter = 4 } }
+				complete_national_focus = ENG_german_technicians
+				set_variable = { ENG_Pakt_Mission_Counter = 5 }
+				activate_mission = ENG_Pakt_Speer_Mission
+			}
+			else = {
+				complete_national_focus = ENG_partners_with_the_hun
+			}
+		}
+	}
+
+	ENG_Pakt_Bormann_Mission = {
+		icon = GFX_decision_generic_political_action
+		activation = {
+			always = no
+		}
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+		is_good = no
+		days_mission_timeout = 20
+		allowed = {
+			tag = ENG
+		}
+		timeout_effect = {
+			if = {
+				limit = { check_variable = { ENG_Pakt_Mission_Counter = 0 } }
+				complete_national_focus = ENG_a_diplomatic_1943
+				set_variable = { ENG_Pakt_Mission_Counter = 1 }
+				activate_mission = ENG_Pakt_Bormann_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_Pakt_Mission_Counter = 1 } }
+				complete_national_focus = ENG_a_line_on_the_north_sea
+				set_variable = { ENG_Pakt_Mission_Counter = 2 }
+				activate_mission = ENG_Pakt_Bormann_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_Pakt_Mission_Counter = 2 } }
+				complete_national_focus = ENG_north_sea_naval_exercises
+				set_variable = { ENG_Pakt_Mission_Counter = 3 }
+				activate_mission = ENG_Pakt_Bormann_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_Pakt_Mission_Counter = 3 } }
+				complete_national_focus = ENG_surrender_the_oil
+				set_variable = { ENG_Pakt_Mission_Counter = 4 }
+				activate_mission = ENG_Pakt_Bormann_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_Pakt_Mission_Counter = 4 } }
+				if = {
+					limit = { NOT = { country_exists = SCO } }
+					complete_national_focus = ENG_give_them_access_to_scapa_flow
+				}
+				set_variable = { ENG_Pakt_Mission_Counter = 5 }
+				activate_mission = ENG_Pakt_Bormann_Mission
+			}
+			else = {
+				complete_national_focus = ENG_a_dream_forever_crushed
+			}
+		}
+	}
+
+	ENG_OFN_Focus_Mission = {
+		icon = GFX_decision_generic_political_action
+		activation = {
+			always = no
+		}
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+		is_good = no
+		days_mission_timeout = 20
+		allowed = {
+			tag = ENG
+		}
+		timeout_effect = {
+			if = {
+				limit = { check_variable = { ENG_OFN_Mission_Counter = 0 } }
+				complete_national_focus = ENG_an_unfortunate_reality
+				set_variable = { ENG_OFN_Mission_Counter = 1 }
+				activate_mission = ENG_OFN_Focus_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_OFN_Mission_Counter = 1 } }
+				complete_national_focus = ENG_the_road_to_washington
+				set_variable = { ENG_OFN_Mission_Counter = 2 }
+				activate_mission = ENG_OFN_Focus_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_OFN_Mission_Counter = 2 } }
+				complete_national_focus = ENG_an_ofn-sided_trade_deal
+				set_variable = { ENG_OFN_Mission_Counter = 3 }
+				activate_mission = ENG_OFN_Focus_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_OFN_Mission_Counter = 3 } }
+				complete_national_focus = ENG_share_our_technology
+				set_variable = { ENG_OFN_Mission_Counter = 4 }
+				activate_mission = ENG_OFN_Focus_Mission
+			}
+			else_if = {
+				limit = { check_variable = { ENG_OFN_Mission_Counter = 4 } }
+				complete_national_focus = ENG_bases_on_britain
+				set_variable = { ENG_OFN_Mission_Counter = 5 }
+				activate_mission = ENG_OFN_Focus_Mission
+			}
+			else = {
+				complete_national_focus = ENG_americas_airstrip
+			}
+		}
+	}
+
+}

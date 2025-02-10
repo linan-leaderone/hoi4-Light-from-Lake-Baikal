@@ -1,0 +1,1731 @@
+RK_difficulty_category = {
+	RK_hard_mode = {
+		icon = GFX_decision_generic_chemicals
+
+		allowed = {
+			OR = {
+				original_tag = ANG
+				original_tag = GRO
+				original_tag = COG
+			}
+		}
+		visible = {
+			OR = {
+				NOT = {
+					has_global_flag = SAFWAR_SAF_hard
+					date > 1963.1.1
+					is_ai = yes
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SAF_hard_mode"
+			set_global_flag = SAFWAR_SAF_hard
+			custom_effect_tooltip = SAF_hard_mode_tt
+			hidden_effect = {
+				SAF = {
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = 40000
+					}
+					add_equipment_to_stockpile = {
+						type = anti_tank_equipment
+						amount = 4000
+					}
+					add_equipment_to_stockpile = {
+						type = motorized_equipment
+						amount = 2500
+					}
+					add_equipment_to_stockpile = {
+						type = support_equipment
+						amount = 4000
+					}
+					if = {
+						limit = {
+							has_dlc = "No Step Back"
+						}
+						add_equipment_to_stockpile = {
+							type = MBT_chassis_1
+							amount = 250
+						}
+					}
+					else = {
+						add_equipment_to_stockpile = {
+							type = MBT_equipment_1
+							amount = 250
+						}
+					}
+
+					add_manpower = 200000
+					add_ideas = RK_SAF_war_AI_hardmode
+					load_oob = SAF_hard
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
+}
+
+GRO_investigate_treason_category = {
+	GRO_monitor_funding = {
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_the_investigation_begins
+		}
+		available = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	GRO_send_the_evidence = {
+		visible = {
+			has_country_flag = GRO_the_investigation_begins
+		}
+		allowed = {
+			tag = GRO
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GRO_has_proof_investigation
+				AND = {
+					any_of = {
+						array = GRO_muller_case_array
+						check_variable = { GRO_muller_case_array^i > -1 }
+						check_variable = { GRO_schenck_case_array^i > -1 }
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_send_the_evidence"
+			hidden_effect = {
+				GRO_compile_the_case = yes
+			}
+
+			clr_country_flag = GRO_the_investigation_begins
+		}
+	}
+	GRO_secure_funding_1 = {
+		visible = {
+			has_country_flag = GRO_the_investigation_begins
+		}
+		allowed = {
+			tag = GRO
+		}
+		ai_will_do = {
+			factor = 50
+		}
+		cost = 25
+
+		days_re_enable = 30
+
+		complete_effect = {
+			custom_effect_tooltip = GRO_secure_funding_tt
+			add_to_variable = {
+				var = investigation_funds
+				value = 10
+			}
+			hidden_effect = {
+				GER = {
+					set_temp_variable = { temp_econ_spending_amount = 0.01 }
+					econ_spend_money_once_effect_raw_money = yes
+				}
+			}
+		}
+	}
+	GRO_secure_funding_2 = {
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_the_investigation_begins
+		}
+		ai_will_do = {
+			factor = 50
+		}
+		cost = 25
+
+		fire_only_once = yes
+
+		complete_effect = {
+			custom_effect_tooltip = GRO_secure_funding_tt
+			add_to_variable = {
+				var = investigation_funds
+				value = 10
+			}
+			hidden_effect = {
+				GER = {
+					set_temp_variable = { temp_econ_spending_amount = 0.01 }
+					econ_spend_money_once_effect_raw_money = yes
+				}
+			}
+		}
+	}
+	GRO_muller_small_investigation = {
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_the_investigation_begins
+		}
+		available = {
+			NOT = {
+				has_country_flag = GRO_muller_investigation
+			}
+			custom_trigger_tooltip = {
+				tooltip = GRO_money_cost_1_tt
+				check_variable = {
+					var = investigation_funds
+					value = 1
+					compare = greater_than_or_equals
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 50
+		}
+		cost = 10
+		days_remove = 25
+
+		fire_only_once = no
+		fixed_random_seed = no
+
+		complete_effect = {
+			subtract_from_variable = {
+				var = investigation_funds
+				value = 1
+			}
+			set_country_flag = GRO_muller_investigation
+		}
+
+		remove_effect = {
+			clr_country_flag = GRO_muller_investigation
+			hidden_effect = {
+				random_list = {
+					65 = {
+						country_event = {
+							id = GRO_INVESTIGATION.31
+							days = 1
+						}
+					}
+					35 = {
+						GRO_muller_investigation_pick_evidence = yes
+					}
+				}
+			}
+		}
+	}
+	GRO_muller_medium_investigation = {
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_the_investigation_begins
+		}
+		available = {
+			NOT = {
+				has_country_flag = GRO_muller_investigation
+			}
+			custom_trigger_tooltip = {
+				tooltip = GRO_money_cost_2_tt
+				check_variable = {
+					var = investigation_funds
+					value = 2
+					compare = greater_than_or_equals
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 50
+		}
+		cost = 25
+		days_remove = 25
+
+		fire_only_once = no
+		fixed_random_seed = no
+
+		complete_effect = {
+			subtract_from_variable = {
+				var = investigation_funds
+				value = 2
+			}
+			set_country_flag = GRO_muller_investigation
+		}
+
+		remove_effect = {
+			clr_country_flag = GRO_muller_investigation
+			hidden_effect = {
+				random_list = {
+					40 = {
+						country_event = {
+							id = GRO_INVESTIGATION.31
+							days = 1
+						}
+					}
+					60 = {
+						GRO_muller_investigation_pick_evidence = yes
+					}
+				}
+			}
+		}
+	}
+	GRO_muller_priority_investigation = {
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_the_investigation_begins
+		}
+		available = {
+			NOT = {
+				has_country_flag = GRO_muller_investigation
+			}
+			custom_trigger_tooltip = {
+				tooltip = GRO_money_cost_3_tt
+				check_variable = {
+					var = investigation_funds
+					value = 3
+					compare = greater_than_or_equals
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 50
+		}
+		cost = 50
+		days_remove = 25
+
+		fire_only_once = no
+		fixed_random_seed = no
+
+		complete_effect = {
+			subtract_from_variable = {
+				var = investigation_funds
+				value = 3
+			}
+			set_country_flag = GRO_muller_investigation
+		}
+
+		remove_effect = {
+			clr_country_flag = GRO_muller_investigation
+			hidden_effect = {
+				random_list = {
+					20 = {
+						country_event = {
+							id = GRO_INVESTIGATION.31
+							days = 1
+						}
+					}
+					80 = {
+						GRO_muller_investigation_pick_evidence = yes
+					}
+				}
+			}
+		}
+	}
+	GRO_schenck_small_investigation = {
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_the_investigation_begins
+		}
+		available = {
+			NOT = {
+				has_country_flag = GRO_schenck_investigation
+			}
+			custom_trigger_tooltip = {
+				tooltip = GRO_money_cost_1_tt
+				check_variable = {
+					var = investigation_funds
+					value = 1
+					compare = greater_than_or_equals
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 50
+		}
+		cost = 10
+		days_remove = 25
+
+		fire_only_once = no
+		fixed_random_seed = no
+
+		complete_effect = {
+			subtract_from_variable = {
+				var = investigation_funds
+				value = 1
+			}
+			set_country_flag = GRO_schenck_investigation
+		}
+
+		remove_effect = {
+			clr_country_flag = GRO_schenck_investigation
+			hidden_effect = {
+				random_list = {
+					85 = {
+						country_event = {
+							id = GRO_INVESTIGATION.32
+							days = 1
+						}
+					}
+					15 = {
+						GRO_schenck_investigation_pick_evidence = yes
+					}
+				}
+			}
+		}
+	}
+	GRO_schenck_medium_investigation = {
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_the_investigation_begins
+		}
+		available = {
+			NOT = {
+				has_country_flag = GRO_schenck_investigation
+			}
+			custom_trigger_tooltip = {
+				tooltip = GRO_money_cost_2_tt
+				check_variable = {
+					var = investigation_funds
+					value = 2
+					compare = greater_than_or_equals
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 50
+		}
+		cost = 25
+		days_remove = 25
+
+		fire_only_once = no
+		fixed_random_seed = no
+
+		complete_effect = {
+			subtract_from_variable = {
+				var = investigation_funds
+				value = 2
+			}
+			set_country_flag = GRO_schenck_investigation
+		}
+
+		remove_effect = {
+			clr_country_flag = GRO_schenck_investigation
+			hidden_effect = {
+				random_list = {
+					70 = {
+						country_event = {
+							id = GRO_INVESTIGATION.32
+							days = 1
+						}
+					}
+					30 = {
+						GRO_schenck_investigation_pick_evidence = yes
+					}
+				}
+			}
+		}
+	}
+	GRO_schenck_priority_investigation = {
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_the_investigation_begins
+		}
+		available = {
+			NOT = {
+				has_country_flag = GRO_schenck_investigation
+			}
+			custom_trigger_tooltip = {
+				tooltip = GRO_money_cost_3_tt
+				check_variable = {
+					var = investigation_funds
+					value = 3
+					compare = greater_than_or_equals
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 50
+		}
+		cost = 50
+		days_remove = 25
+
+		fire_only_once = no
+		fixed_random_seed = no
+
+		complete_effect = {
+			subtract_from_variable = {
+				var = investigation_funds
+				value = 3
+			}
+			set_country_flag = GRO_schenck_investigation
+		}
+
+		remove_effect = {
+			clr_country_flag = GRO_schenck_investigation
+			hidden_effect = {
+				random_list = {
+					50 = {
+						country_event = {
+							id = GRO_INVESTIGATION.32
+							days = 1
+						}
+					}
+					50 = {
+						GRO_schenck_investigation_pick_evidence = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+GRO_war_preparations_category = {
+	GRO_conscript_more_workers = {
+		icon = GFX_decision_generic_industry
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_war_preparations_begin
+		}
+		available = {
+			has_completed_focus = GRO_slave_munitions
+		}
+		ai_will_do = {
+			factor = 0
+		}
+		custom_cost_trigger = { has_manpower > 499 }
+		custom_cost_text = GRO_manpower_500_cost_tt
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_conscript_more_workers"
+			add_manpower = -500
+			add_timed_idea = {
+				idea = GRO_conscripted_additional_workers
+				days = 60
+			}
+		}
+		days_re_enable = 60
+	}
+	GRO_reduced_rations_for_workers = {
+		icon = GFX_decision_generic_humanitarian_aid_decrease
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_war_preparations_begin
+		}
+		available = {
+			has_completed_focus = GRO_slave_munitions
+		}
+		ai_will_do = {
+			factor = 0
+		}
+		custom_cost_trigger = {
+			command_power > 19.99
+		}
+		custom_cost_text = decision_cost_20_cp
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_reduced_rations_for_workers"
+			add_timed_idea = {
+				idea =GRO_reduced_worker_rations
+				days = 60
+			}
+			add_command_power = -20
+		}
+		days_re_enable = 60
+	}
+	GRO_promote_loyalists = {
+		icon = GFX_decision_generic_military_parade
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_war_preparations_begin
+		}
+		available = {
+			has_completed_focus = GRO_southern_land_grants
+		}
+		ai_will_do = {
+			factor = 0
+		}
+		cost = 25
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_promote_loyalists"
+			add_war_support = 0.05
+		}
+		days_re_enable = 30
+	}
+	GRO_chemicals_for_guns = {
+		icon = GFX_decision_generic_chemicals
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_war_preparations_begin
+		}
+		available = {
+			has_completed_focus = GRO_building_a_stockpile
+		}
+		ai_will_do = {
+			factor = 40
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_chemicals_for_guns"
+			set_temp_variable = { temp_econ_spending_amount = 0.01 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 5000
+				producer = GER
+			}
+		}
+		days_re_enable = 90
+	}
+	GRO_make_examples_of_degenerate_ss = {
+		icon = GFX_decision_generic_forced_labor
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_war_preparations_begin
+		}
+		available = {
+			has_completed_focus = GRO_prioritize_ss_development
+		}
+		ai_will_do = {
+			factor = 0
+		}
+		custom_cost_trigger = {
+			command_power > 24.99
+		}
+		custom_cost_text = decision_cost_25_cp
+		custom_cost_text = decision_cost_25_cp
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_make_examples_of_degenerate_ss"
+			add_manpower = -20
+			add_stability = 0.02
+			add_war_support = 0.02
+			add_command_power = -25
+		}
+		days_re_enable = 30
+	}
+	GRO_set_up_patrols = {
+		icon = GFX_decision_generic_prepare_civil_war
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_war_preparations_begin
+			NOT = { has_country_flag = GRO_patrols }
+		}
+		available = {
+			has_completed_focus = GRO_arms_for_aryans
+		}
+		ai_will_do = {
+			factor = 0
+		}
+		custom_cost_trigger = { has_manpower > 49 }
+		custom_cost_text = GRO_manpower_50_cost_tt
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_set_up_patrols"
+			add_manpower = -50
+			add_stability = 0.05
+			set_country_flag = GRO_patrols
+			clr_country_flag = GRO_reduced_patrols
+		}
+	}
+	GRO_reduce_patrols = {
+		icon = GFX_decision_generic_prepare_civil_war
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_war_preparations_begin
+			NOT = { has_country_flag = GRO_reduced_patrols }
+			has_country_flag = GRO_patrols
+		}
+		available = {
+			has_completed_focus = GRO_arms_for_aryans
+		}
+		ai_will_do = {
+			factor = 0
+		}
+		custom_cost_trigger = { command_power > 4.99 }
+		custom_cost_text = decision_cost_5_cp
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_reduce_patrols"
+			add_stability = -0.05
+			add_command_power = -5
+			set_country_flag = GRO_reduced_patrols
+			clr_country_flag = GRO_patrols
+		}
+	}
+	GRO_test_the_gas = {
+		icon = GFX_decision_generic_chemicals
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_war_preparations_begin
+		}
+		available = {
+			has_completed_focus = GRO_booby_trap_the_border
+		}
+		ai_will_do = {
+			factor = 0
+		}
+		custom_cost_trigger = {
+			command_power > 14.99
+			has_political_power > 14.99
+		}
+		custom_cost_text = decision_cost_15_cp_15_pp
+		fire_only_once = yes
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_test_the_gas"
+			add_stability = -0.1
+			add_command_power = -15
+			add_political_power = -15
+			GRO_huttig_paranoia_idea_leveler = yes
+			custom_effect_tooltip = GRO_huttig_paranoia_decrease_tt
+		}
+	}
+}
+
+GRO_booby_trap_the_border_category = {
+
+	GRO_mines_level_1 = {
+
+		on_map_mode = map_and_decisions_view
+
+		state_target = yes
+
+		target_array = core_states
+
+		target_trigger = {
+			FROM = {
+				any_neighbor_state = {
+					is_core_of = SAF
+				}
+				not = { is_core_of = SAF }
+			}
+		}
+		visible= {
+			FROM = {
+				is_controlled_by = GRO
+				NOT = {
+					has_state_flag = level_1_trap
+					has_state_flag = level_2_trap
+					has_state_flag = level_3_trap
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 55
+		}
+
+		days_remove = 30
+		custom_cost_trigger = {
+			command_power > 4.99
+			has_political_power > 14.99
+		}
+		custom_cost_text = decision_cost_5_cp_15_pp
+		remove_effect = {
+			FROM = {
+				set_state_flag = level_1_trap
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_Rommelstadt_level_1"
+			ROOT = {
+				add_command_power = -5
+				add_political_power = -15
+			}
+		}
+	}
+
+	GRO_mines_level_2 = {
+
+		on_map_mode = map_and_decisions_view
+
+		state_target = yes
+
+		target_array = core_states
+
+		target_trigger = {
+			FROM = {
+				has_state_flag = level_1_trap
+			}
+		}
+		visible = {
+			FROM = {
+				is_controlled_by = GRO
+				has_state_flag = level_1_trap
+			}
+		}
+		ai_will_do = {
+			factor = 35
+		}
+		days_remove = 30
+		custom_cost_trigger = {
+			command_power > 9.99
+			has_political_power > 19.99
+		}
+		custom_cost_text = decision_cost_10_cp_20_pp
+		remove_effect = {
+			FROM = {
+				clr_state_flag = level_1_trap
+				set_state_flag = level_2_trap
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_mines_level_1"
+			ROOT = {
+				add_command_power = -10
+				add_political_power = -20
+			}
+		}
+	}
+
+
+	GRO_mines_level_3 = {
+
+		on_map_mode = map_and_decisions_view
+
+		state_target = yes
+
+		target_array = core_states
+
+		target_trigger = {
+			FROM = {
+				has_state_flag = level_2_trap
+			}
+		}
+		visible = {
+			FROM = {
+				is_controlled_by = GRO
+				has_state_flag = level_2_trap
+			}
+		}
+		ai_will_do = {
+			factor = 15
+		}
+		days_remove = 30
+		custom_cost_trigger = {
+			command_power > 14.99
+			has_political_power > 24.99
+		}
+		custom_cost_text = decision_cost_15_cp_25_pp
+		remove_effect = {
+			FROM = {
+				clr_state_flag = level_2_trap
+				set_state_flag = level_3_trap
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_mines_level_3"
+			ROOT = {
+				add_command_power = -15
+				add_political_power = -25
+			}
+		}
+	}
+}
+
+GRO_supply_the_boers_category = {
+	GRO_SAF_war_guns_for_boers_decision = {
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_supplying_the_boers
+		}
+		available = {
+			country_exists = BOR
+			BOR = {
+				has_capitulated = no
+			}
+			GRO = {
+				has_equipment = {
+					infantry_equipment > 999
+				}
+			}
+		}
+		fire_only_once = no
+		days_remove = 90
+		custom_cost_trigger = {
+			command_power > 14.99
+			has_political_power > 49.99
+		}
+		custom_cost_text = decision_cost_15_cp_50_pp
+		ai_will_do = {
+			factor = 20
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_SAF_war_guns_for_boers_decision"
+			GRO = {
+				add_command_power = -15
+				add_political_power = -50
+				send_equipment = {
+					equipment = infantry_equipment
+					amount = 1000
+					target = BOR
+				}
+			}
+		}
+	}
+	GRO_SAF_war_support_equipment_for_boers_decision = {
+		allowed = {
+			tag = GRO
+		}
+		visible = {
+			has_country_flag = GRO_supplying_the_boers
+		}
+		available = {
+			country_exists = BOR
+			BOR = {
+				has_capitulated = no
+			}
+			GRO = {
+				has_equipment = {
+					support_equipment > 749
+				}
+			}
+		}
+		fire_only_once = no
+		days_remove = 90
+		ai_will_do = {
+			factor = 20
+		}
+		custom_cost_trigger = {
+			command_power > 14.99
+			has_political_power > 49.99
+		}
+		custom_cost_text = decision_cost_15_cp_50_pp
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_SAF_war_support_equipment_for_boers_decision"
+			GRO = {
+				add_command_power= -15
+				add_political_power = -50
+				send_equipment = {
+					equipment = support_equipment
+					amount = 750
+					target = BOR
+				}
+			}
+		}
+	}
+	GRO_SAF_war_second_level_equipment_for_boers_decision = {
+		visible = {
+			has_country_flag = GRO_supplying_the_boers
+		}
+		available = {
+			country_exists = BOR
+			BOR = {
+				has_capitulated = no
+			}
+			GRO = {
+				has_equipment = {
+					support_equipment > 1499
+				}
+			}
+		}
+		fire_only_once = yes
+		custom_cost_trigger = {
+			command_power > 19.99
+			has_political_power > 99.99
+		}
+		custom_cost_text = decision_cost_20_cp_100_pp
+		ai_will_do = {
+			factor = 60
+		}
+		complete_effect = {
+			add_command_power = -20
+			add_political_power = -100
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_SAF_war_second_level_equipment_for_boers_decision"
+			set_country_flag = GRO_SAF_war_second_level_boers_aid
+			GRO = {
+				send_equipment = {
+					equipment = support_equipment
+					amount = 1500
+					target = BOR
+				}
+			}
+		}
+	}
+	GRO_SAF_war_artillery_for_boers_decision = {
+		visible = {
+			has_country_flag = GRO_supplying_the_boers
+			has_country_flag = GRO_SAF_war_second_level_boers_aid
+		}
+		available = {
+			country_exists = BOR
+			BOR = {
+				has_capitulated = no
+			}
+			GRO = {
+				has_equipment = {
+					artillery_equipment > 799
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_remove = 90
+		cost = 50
+		ai_will_do = {
+			factor = 20
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_SAF_war_artillery_for_boers_decision"
+			GRO = {
+				send_equipment = {
+					equipment = artillery_equipment
+					amount = 800
+					target = BOR
+				}
+			}
+		}
+	}
+	GRO_SAF_war_anti_air_for_boers_decision = {
+		visible = {
+			has_country_flag = GRO_supplying_the_boers
+			has_country_flag = GRO_SAF_war_second_level_boers_aid
+		}
+		available = {
+			country_exists = BOR
+			BOR = {
+				has_capitulated = no
+			}
+			GRO = {
+				has_equipment = {
+					anti_air_equipment > 499
+				}
+			}
+		}
+		fire_only_once = no
+		days_remove = 90
+		custom_cost_trigger = {
+			command_power > 14.99
+			has_political_power > 49.99
+		}
+		custom_cost_text = decision_cost_15_cp_50_pp
+		ai_will_do = {
+			factor = 20
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_SAF_war_anti_air_for_boers_decision"
+			GRO = {
+				add_command_power = -15
+				add_political_power = -50
+				send_equipment = {
+					equipment = anti_air_equipment
+					amount = 500
+					target = BOR
+				}
+			}
+		}
+	}
+	GRO_SAF_war_apc_for_boers_decision = {
+		visible = {
+			has_country_flag = GRO_supplying_the_boers
+			has_country_flag = GRO_SAF_war_second_level_boers_aid
+		}
+		available = {
+			country_exists = BOR
+			BOR = {
+				has_capitulated = no
+			}
+			GRO = {
+				has_equipment = { APC_chassis > 499 }
+			}
+		}
+		fire_only_once = no
+		days_remove = 90
+		cost = 15
+		ai_will_do = {
+			factor = 20
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_SAF_war_apc_for_boers_decision"
+			GRO = {
+				send_equipment = {
+					equipment = APC_chassis
+					amount = 500
+					target = BOR
+				}
+			}
+		}
+	}
+	GRO_SAF_war_third_level_equipment_for_boers_decision = {
+		visible = {
+			has_country_flag = GRO_supplying_the_boers
+			has_country_flag = GRO_SAF_war_second_level_boers_aid
+		}
+		available = {
+			country_exists = BOR
+			BOR = {
+				has_capitulated = no
+			}
+			GRO = {
+				has_equipment = {
+					support_equipment > 1999
+				}
+			}
+		}
+		fire_only_once = yes
+		cost = 100
+		ai_will_do = {
+			factor = 60
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_SAF_war_third_level_equipment_for_boers_decision"
+			set_country_flag = GRO_SAF_war_third_level_boers_aid
+				send_equipment = {
+					equipment = anti_air_equipment
+					amount = 2000
+					target = BOR
+				}
+
+		}
+	}
+	GRO_SAF_war_jets_for_boers_decision = {
+		visible = {
+			has_country_flag = GRO_supplying_the_boers
+			has_country_flag = GRO_SAF_war_third_level_boers_aid
+		}
+		available = {
+			country_exists = BOR
+			BOR = {
+				has_capitulated = no
+			}
+			GRO = {
+				has_equipment = {
+					jet_fighter_equipment_1 > 199
+				}
+			}
+		}
+		fire_only_once = no
+		days_remove = 90
+		cost = 100
+		ai_will_do = {
+			factor = 20
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_SAF_war_jets_for_boers_decision"
+			GRO = {
+				send_equipment = {
+					equipment = jet_fighter_equipment_1
+					amount = 200
+					target = BOR
+				}
+			}
+		}
+	}
+	GRO_SAF_war_tanks_for_boers_decision = {
+		visible = {
+			has_country_flag = GRO_supplying_the_boers
+			has_country_flag = GRO_SAF_war_third_level_boers_aid
+		}
+		available = {
+			country_exists = BOR
+			BOR = {
+				has_capitulated = no
+			}
+			has_equipment = { MBT_chassis > 199 }
+		}
+		fire_only_once = no
+		days_remove = 90
+		cost = 100
+		ai_will_do = {
+			factor = 20
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_SAF_war_tanks_for_boers_decision"
+			GRO = {
+				send_equipment = {
+					equipment = MBT_chassis
+					amount = 200
+					target = BOR
+				}
+			}
+		}
+	}
+}
+
+GRO_unified_holdouts_category = {
+	GRO_fortify_bouhlerstadt = {
+		visible = {
+			has_country_flag = GRO_unified_holdout_program
+		}
+		available = {
+			controls_state = 544
+		}
+		ai_will_do = {
+			factor = 60
+		}
+		cost = 60
+		fire_only_once = yes
+		days_remove = 30
+		remove_effect = {
+			544 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					province = 13729
+					instant_build = yes
+				}
+			}
+			544 = {
+				add_building_construction = {
+					type = coastal_bunker
+					level = 1
+					province = 13729
+					instant_build = yes
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_fortify_bouhlerstadt"
+
+		}
+	}
+	GRO_fortify_sailsbury = {
+		visible = {
+			has_country_flag = GRO_unified_holdout_program
+		}
+		available = {
+			controls_state = 1061
+		}
+		ai_will_do = {
+			factor = 60
+		}
+		cost = 60
+		fire_only_once = yes
+		days_remove = 30
+		remove_effect = {
+			1061 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					province = 13730
+					instant_build = yes
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_fortify_sailsbury"
+
+		}
+	}
+	GRO_fortify_lusaka = {
+		visible = {
+			has_country_flag = GRO_unified_holdout_program
+		}
+		available = {
+			controls_state = 1066
+		}
+		ai_will_do = {
+			factor = 60
+		}
+		cost = 60
+		fire_only_once = yes
+		days_remove = 30
+		remove_effect = {
+			1066 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					province = 13765
+					instant_build = yes
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_fortify_lusaka"
+
+		}
+	}
+	GRO_fortify_lilongwe = {
+		visible = {
+			has_country_flag = GRO_unified_holdout_program
+		}
+		available = {
+			controls_state = 879
+		}
+		ai_will_do = {
+			factor = 60
+		}
+		cost = 60
+		fire_only_once = yes
+		days_remove = 30
+		remove_effect = {
+			879 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					province = 12986
+					instant_build = yes
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_fortify_lilongwe"
+
+		}
+	}
+	GRO_fortify_dodoma = {
+		visible = {
+			has_country_flag = GRO_unified_holdout_program
+		}
+		available = {
+			controls_state = 1082
+		}
+		ai_will_do = {
+			factor = 60
+		}
+		cost = 60
+		fire_only_once = yes
+		days_remove = 30
+		remove_effect = {
+			1082 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					province = 12911
+					instant_build = yes
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_fortify_dodoma"
+
+		}
+	}
+	GRO_fortify_dar_es_salaam = {
+		visible = {
+			has_country_flag = GRO_unified_holdout_program
+		}
+		available = {
+			controls_state = 1078
+		}
+		ai_will_do = {
+			factor = 60
+		}
+		cost = 60
+		fire_only_once = yes
+		days_remove = 30
+		remove_effect = {
+			1078 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					province = 2196
+					instant_build = yes
+				}
+			}
+			1078 = {
+				add_building_construction = {
+					type = coastal_bunker
+					level = 1
+					province = 2196
+					instant_build = yes
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_fortify_dar_es_salaam"
+
+		}
+	}
+	GRO_fortify_kampala = {
+		visible = {
+			has_country_flag = GRO_unified_holdout_program
+		}
+		available = {
+			controls_state = 548
+		}
+		ai_will_do = {
+			factor = 60
+		}
+		cost = 60
+		fire_only_once = yes
+		days_remove = 30
+		remove_effect = {
+			548 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					province = 12989
+					instant_build = yes
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GRO_fortify_kampala"
+
+		}
+	}
+}
+GRO_resource_buying_category = {
+	GRO_buy_steel_from_germany = {
+		icon = GFX_steel_texticon
+		visible = {
+			NOT = { has_global_flag = german_civil_war }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GRO_debt_under_6B
+				check_variable = { national_debt < 6.0 } #already converted to billion
+			}
+		}
+		ai_will_do = {
+			factor = 0 ##unsure if this should be changed or not
+		}
+
+		days_remove = 30
+
+		fire_only_once = no
+
+		complete_effect = {
+			custom_effect_tooltip = GRO_resource_buying_debt_add_TT
+			random_controlled_state = {
+				prioritize = { 1078 546 1072 1071 544 1060 1059 1058 880 }
+				add_resource = {
+					type = steel
+					amount = 2
+				}
+				add_to_variable = {
+					var = steel_bought
+					value = 2
+				}
+			}
+			add_to_variable = { GRO_resource_misc_cost = 0.005 } #already converted to billion
+		}
+	}
+	GRO_buy_aluminium_from_germany = {
+		icon = GFX_aluminium_texticon
+		visible = {
+			NOT = { has_global_flag = german_civil_war }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GRO_debt_under_6B
+				check_variable = { national_debt < 6.0 } #already converted to billion
+			}
+		}
+		ai_will_do = {
+			factor = 0 ##unsure if this should be changed or not
+		}
+
+		days_remove = 30
+
+		fire_only_once = no
+
+		complete_effect = {
+			custom_effect_tooltip = GRO_resource_buying_debt_add_TT
+			random_controlled_state = {
+				prioritize = { 1078 546 1072 1071 544 1060 1059 1058 880 }
+				add_resource = {
+					type = aluminium
+					amount = 2
+				}
+				add_to_variable = {
+					var = aluminium_bought
+					value = 2
+				}
+			}
+			add_to_variable = { GRO_resource_misc_cost = 0.005 } #already converted to billion
+		}
+	}
+	GRO_buy_oil_from_germany = {
+		icon = GFX_oil_texticon
+		visible = {
+			NOT = { has_global_flag = german_civil_war }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GRO_debt_under_6B
+				check_variable = { national_debt < 6.0 } #already converted to billion
+			}
+		}
+		ai_will_do = {
+			factor = 0 ##unsure if this should be changed or not
+		}
+
+		days_remove = 30
+
+		fire_only_once = no
+
+		complete_effect = {
+			custom_effect_tooltip = GRO_resource_buying_debt_add_TT
+			random_controlled_state = {
+				prioritize = { 1078 546 1072 1071 544 1060 1059 1058 880 }
+				add_resource = {
+					type = oil
+					amount = 2
+				}
+				add_to_variable = {
+					var = oil_bought
+					value = 2
+				}
+			}
+			add_to_variable = { GRO_resource_misc_cost = 0.005 } #already converted to billion
+		}
+	}
+	GRO_buy_chromium_from_germany = {
+		icon = GFX_chromium_texticon
+		visible = {
+			NOT = { has_global_flag = german_civil_war }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GRO_debt_under_6B
+				check_variable = { national_debt < 6.0 } #already converted to billion
+			}
+		}
+		ai_will_do = {
+			factor = 0 ##unsure if this should be changed or not
+		}
+
+		days_remove = 30
+
+		fire_only_once = no
+
+		complete_effect = {
+			custom_effect_tooltip = GRO_resource_buying_debt_add_TT
+			random_controlled_state = {
+				prioritize = { 1078 546 1072 1071 544 1060 1059 1058 880 }
+				add_resource = {
+					type = chromium
+					amount = 2
+				}
+				add_to_variable = {
+					var = chromium_bought
+					value = 2
+				}
+			}
+			add_to_variable = { GRO_resource_misc_cost = 0.005 } #already converted to billion
+		}
+	}
+	GRO_buy_rubber_from_germany = {
+		icon = GFX_rubber_texticon
+		visible = {
+			NOT = { has_global_flag = german_civil_war }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GRO_debt_under_6B
+				check_variable = { national_debt < 6.0 } #already converted to billion
+			}
+		}
+		ai_will_do = {
+			factor = 0 ##unsure if this should be changed or not
+		}
+
+		days_remove = 30
+
+		fire_only_once = no
+
+		complete_effect = {
+			custom_effect_tooltip = GRO_resource_buying_debt_add_TT
+			random_controlled_state = {
+				prioritize = { 1078 546 1072 1071 544 1060 1059 1058 880 }
+				add_resource = {
+					type = rubber
+					amount = 2
+				}
+				add_to_variable = {
+					var = rubber_bought
+					value = 2
+				}
+			}
+			add_to_variable = { GRO_resource_misc_cost = 0.005 } #already converted to billion
+		}
+	}
+	GRO_buy_tungsten_from_germany = {
+		icon = GFX_tungsten_texticon
+		visible = {
+			NOT = { has_global_flag = german_civil_war }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GRO_debt_under_6B
+				check_variable = { national_debt < 6.0 } #already converted to billion
+			}
+		}
+		ai_will_do = {
+			factor = 0 ##unsure if this should be changed or not
+		}
+
+		days_remove = 30
+
+		fire_only_once = no
+
+		complete_effect = {
+			custom_effect_tooltip = GRO_resource_buying_debt_add_TT
+			random_controlled_state = {
+				prioritize = { 1078 546 1072 1071 544 1060 1059 1058 880 }
+				add_resource = {
+					type = tungsten
+					amount = 2
+				}
+				add_to_variable = {
+					var = tungsten_bought
+					value = 2
+				}
+			}
+			add_to_variable = { GRO_resource_misc_cost = 0.005 } #already converted to billion
+		}
+	}
+	GRO_buy_guns_from_germany = {
+		icon = GFX_decision_generic_prepare_civil_war
+		visible = {
+			NOT = { has_global_flag = german_civil_war }
+		}
+		cost = 30
+		ai_will_do = {
+			factor = 60 ##unsure if this should be changed or not
+		}
+
+		days_remove = 30
+
+		days_re_enable = 60
+
+		fire_only_once = no
+
+		complete_effect = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 1000
+				producer = GER
+			}
+			set_temp_variable = { temp_econ_spending_amount = 0.01 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+	}
+	GRO_guns_from_germany = {
+		allowed = {
+			tag = GRO
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GER_AFRIKA_germany_is_stable
+				has_global_flag = german_civil_war
+			}
+		}
+		activation = {
+			always = no
+		}
+		is_good = yes
+		days_mission_timeout = 180
+		days_re_enable = 1
+		timeout_effect = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 2000
+				producer = GER
+			}
+			hidden_effect = {
+				if = {
+					limit = {
+						NOT = { has_global_flag = german_civil_war }
+					}
+					activate_mission = GRO_guns_from_germany
+				}
+			}
+		}
+		complete_effect = {
+		}
+	}
+	GRO_resource_stockpile_depletion = {
+		icon = GFX_decision_generic_supply
+		allowed = { tag = GRO }
+		available = { hidden_trigger = { always = no } }
+		fire_only_once = yes
+		activation = {
+			has_global_flag = german_civil_war
+			NOT = { has_country_flag = german_resources_gone }
+		}
+		is_good = no
+		days_mission_timeout = 30
+		timeout_effect = {
+			custom_effect_tooltip = afrika_resource_stockpile_depletion_tooltip
+			set_country_flag = german_resources_gone
+			hidden_effect = {
+				remove_dynamic_modifier = { modifier = GRO_buy_resource_misc_cost }
+				1078 = { afrika_resources_from_germany_depleted = yes }
+				546 = { afrika_resources_from_germany_depleted = yes }
+				1072 = { afrika_resources_from_germany_depleted = yes }
+				1071 = { afrika_resources_from_germany_depleted = yes }
+				544 = { afrika_resources_from_germany_depleted = yes }
+				1060 = { afrika_resources_from_germany_depleted = yes }
+				1059 = { afrika_resources_from_germany_depleted = yes }
+				1058 = { afrika_resources_from_germany_depleted = yes }
+				880 = { afrika_resources_from_germany_depleted = yes }
+			}
+		}
+	}
+}
+
+GRO_hold_against_amerika_category = {
+	GRO_hold_against_amerika = {
+		activation = { always = no }
+		available = {
+			has_capitulated = yes
+		}
+		fire_only_once = yes
+		days_mission_timeout = 180
+		timeout_effect = {
+			#USA = {
+			#	remove_from_faction = SAF
+			#}
+			#white_peace = USA
+			add_stability = 0.05
+			add_war_support = 0.10
+			if = {
+				limit = {
+					SAF = {
+						has_capitulated = no
+					}
+				}
+				add_timed_idea = { idea = GRO_renewed_offensive days = 35 }
+			}
+			#else = {
+			#	GRO = {
+			#		white_peace = SAF
+			#		country_event = { id = SAFWAR.9 } #Distributes the territory
+			#	}
+			#	COG = {
+			#		white_peace = SAF
+			#		country_event = { id = SAFWAR.10 }
+			#	}
+			#	ANG = {
+			#		white_peace = SAF
+			#		country_event = { id = SAFWAR.11 }
+			#	}
+			#	BOR = {
+			#		white_peace = SAF
+			#		country_event = { id = SAFWAR.12 }
+			#	}
+			#}
+		}
+	}
+}

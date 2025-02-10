@@ -1,0 +1,2961 @@
+#  ██████╗ ███████╗██████╗ ███╗   ███╗ █████╗ ███╗   ██╗██╗   ██╗
+# ██╔════╝ ██╔════╝██╔══██╗████╗ ████║██╔══██╗████╗  ██║╚██╗ ██╔╝
+# ██║  ███╗█████╗  ██████╔╝██╔████╔██║███████║██╔██╗ ██║ ╚████╔╝ 
+# ██║   ██║██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══██║██║╚██╗██║  ╚██╔╝  
+# ╚██████╔╝███████╗██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║   ██║   
+#  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   
+#Decisions
+ 
+#Index; Search for these names using ctrl+f and you'll find the section they entitle.
+#	Germany Debug Decisions
+#		Speer Debug
+#		Bormann Debug
+#		Heydrich Debug
+#		Generic Debug
+#	Germany Power Struggle Decisions
+#	Germany GCW Decisions
+#	Germany Reichsstaat Cabal Decisions
+
+###########################
+# Germany Debug Decisions #
+###########################
+GER_debug_category = {
+	### Speer Debug ###
+	GER_speer_debug_setup = {
+		visible = { NOT = { has_global_flag = german_civil_war_speervic } }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_speer_debug_setup"
+			set_global_flag = SGR_repatriation_started
+			set_global_flag = german_civil_war_speervic
+			set_country_flag = country_has_gui
+			initialize_speer_arrays = yes 
+			set_temp_variable = { Agency = token:Espionage_RND }
+			set_variable = { TNO_Espionage_AgencyLeader = token:Espionage_Gehlen }
+			Espionage_Enable = yes
+			initialize_state_of_the_reich = yes
+			add_dynamic_modifier = { modifier = GER_SGR_the_wirtschaftswunder_dynamic_modifier }
+			set_country_flag = SGR_debug_flag
+			SGR_initialize_SAW = yes
+			country_event = {
+				id = speer.10000
+			}
+			GER = {
+				remove_all_ministers = yes
+				remove_ideas = {
+					GER_Fedor_von_Bock_high_command
+					GER_Ferdinand_Schorner_high_command
+					GER_Wilhelm_Burgdorf_high_command
+					GER_Karl_Donitz_navy_chief
+					GER_Hermann_Goring_air_chief
+				}
+				set_politics = { ruling_party = national_socialism }
+				add_ideas = {
+					GER_Helmut_Schmidt_for
+					GER_Kurt_Georg_Kiesinger_hog
+					GER_Henning_von_Tresckow_sec
+					GER_Ludwig_Erhard_eco
+					GER_Henning_von_Tresckow_high_command
+					GER_Gunther_Luther_navy_chief
+					GER_Johannes_Steinhoff_air_chief
+					SGR_zollverein_germany
+				}
+				country_event = { id = reich.31 }
+				add_to_array = { ZV_members = THIS }
+				GER_albert_speer = {
+					promote_character = { ideology = national_socialism_reformed_national_socialism_subtype }
+				}
+			}
+			every_country = {
+				limit = {
+					check_variable = { ECON_SPHERE_LEADER = GER }
+					NOT = { tag = GER }
+				}
+				join_zollverein = yes
+			}
+
+			promote_character = GER_helmut_schmidt
+			GER_theodor_oberlander = {
+				promote_character = { ideology = national_socialism_2_subtype }
+			}
+			set_politics = { ruling_party = national_socialism }
+		}
+	}
+
+	GER_speer_phase1_trees = {
+		visible = { has_global_flag = german_civil_war_speervic }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_speer_phase1_trees"
+			set_global_flag = south_african_war_happening 
+			set_global_flag = german_civil_war_speervic
+			set_country_flag = SGR_UKR_tree
+			set_country_flag = SPR_HOL_tree
+			set_country_flag = SPR_DEN_tree
+			set_country_flag = SPR_BOM_TREE
+			set_country_flag = SGR_POL_tree
+			set_country_flag = SGR_NOR_tree1
+			set_country_flag = SGR_CAU_tree1
+			set_country_flag = SGR_entered_saw
+			set_country_flag = MCW_SGR_tree
+			set_global_flag = MCW_2SS_Equal
+			clr_country_flag = SGR_phase2
+			set_country_flag = SGR_PHASE_1_DEBUG
+			reload_GER_speer_post_cw_tree = yes
+		}
+
+	}
+
+	GER_speer_phase2_trees = {
+		visible = { has_global_flag = german_civil_war_speervic }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_speer_phase2_trees"
+			clr_global_flag = south_african_war_happening 
+			set_global_flag = german_civil_war_speervic
+			clr_country_flag = SGR_UKR_tree
+			clr_country_flag = SPR_HOL_tree
+			clr_country_flag = SPR_DEN_tree
+			clr_country_flag = SPR_BOM_TREE
+			clr_country_flag = SGR_POL_tree
+			clr_country_flag = SGR_NOR_tree1
+			clr_country_flag = SGR_CAU_tree1
+			clr_country_flag = SGR_entered_saw
+			clr_country_flag = MCW_SGR_tree
+			clr_global_flag = MCW_2SS_Equal
+			set_country_flag = SGR_phase2
+			reload_GER_speer_post_cw_tree = yes
+		}
+
+	}
+
+	GER_speer_phase3_trees_oil = {
+		visible = { has_global_flag = german_civil_war_speervic }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_speer_phase3_trees"
+			clr_global_flag = south_african_war_happening 
+			set_global_flag = german_civil_war_speervic
+			clr_country_flag = SGR_UKR_tree
+			clr_country_flag = SPR_HOL_tree
+			clr_country_flag = SPR_DEN_tree
+			clr_country_flag = SPR_BOM_TREE
+			clr_country_flag = SGR_POL_tree
+			clr_country_flag = SGR_NOR_tree1
+			clr_country_flag = SGR_CAU_tree1
+			clr_country_flag = SGR_entered_saw
+			clr_country_flag = MCW_SGR_tree
+			clr_global_flag = MCW_2SS_Equal
+			clr_country_flag = SGR_phase2
+			set_country_flag = SGR_phase3
+			reload_GER_speer_post_cw_tree = yes
+			SGR_initialize_oil_crisis = yes
+		}
+
+	}
+
+	GER_speer_phase3_trees_fash = {
+		visible = { has_global_flag = german_civil_war_speervic }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_speer_phase3_trees"
+			clr_global_flag = south_african_war_happening 
+			set_global_flag = german_civil_war_speervic
+			clr_country_flag = SGR_UKR_tree
+			clr_country_flag = SPR_HOL_tree
+			clr_country_flag = SPR_DEN_tree
+			clr_country_flag = SPR_BOM_TREE
+			clr_country_flag = SGR_POL_tree
+			clr_country_flag = SGR_NOR_tree1
+			clr_country_flag = SGR_CAU_tree1
+			clr_country_flag = SGR_entered_saw
+			clr_country_flag = MCW_SGR_tree
+			clr_global_flag = MCW_2SS_Equal
+			clr_country_flag = SGR_phase2
+			set_global_flag = SGR_Slave_Revolt
+			set_country_flag = SGR_SR_fash_outcome
+			reload_GER_speer_post_cw_tree = yes
+		}
+
+	}
+
+	GER_speer_phase3_trees_auth = {
+		visible = { has_global_flag = german_civil_war_speervic }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_speer_phase3_trees"
+			clr_global_flag = south_african_war_happening 
+			set_global_flag = german_civil_war_speervic
+			clr_country_flag = SGR_UKR_tree
+			clr_country_flag = SPR_HOL_tree
+			clr_country_flag = SPR_DEN_tree
+			clr_country_flag = SPR_BOM_TREE
+			clr_country_flag = SGR_POL_tree
+			clr_country_flag = SGR_NOR_tree1
+			clr_country_flag = SGR_CAU_tree1
+			clr_country_flag = SGR_entered_saw
+			clr_country_flag = MCW_SGR_tree
+			clr_global_flag = MCW_2SS_Equal
+			clr_country_flag = SGR_phase2
+			set_global_flag = SGR_Slave_Revolt
+			set_country_flag = SGR_SR_authdem_outcome
+			reload_GER_speer_post_cw_tree = yes
+		}
+
+	}
+
+	GER_speer_achieve_comedy = {
+		visible = { has_global_flag = german_civil_war_speervic }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_speer_achieve_comedy"
+			custom_effect_tooltip = GER_speer_achieve_comedy_tt
+			hidden_effect = {
+				country_event = {
+					id = speerdebug.90
+				}
+				set_country_leader_name = { name = GER_albert_speer_meme }
+				set_country_leader_portrait = {
+					portrait = "gfx/leaders/GER/Portrait_GER_Kaiser_Speer.dds"
+				}
+				add_country_leader_role = {
+					character = GER_albert_speer
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_BUNDESKAISER_GERMANY_DESC"
+						ideology = communist_subtype
+						expire = "1990.1.1"
+						id = -1
+					}
+				}
+				set_politics = {
+					ruling_party = communist
+				}
+				set_popularities = {
+					communist = 100
+					ultranationalism = 0
+					socialist = 0
+					progressivism = 0
+					liberalism = 0
+					liberal_conservatism = 0
+					conservatism = 0
+					paternalism = 0
+					despotism = 0
+					fascism = 0
+					national_socialism = 0
+					
+				}
+			}
+		}
+	}
+
+	### Bormann Debug ###
+	GER_bormann_debug_setup = {
+		visible = { NOT = { has_global_flag = german_civil_war_bormannvic } }
+
+		fire_only_once = yes
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_setup"
+			remove_all_ministers = yes
+			promote_character = GER_martin_bormann
+			promote_character = GER_hans_speidel
+			promote_character = GER_hans_filbinger
+			promote_character = GER_eugen_gerstenmaier
+			
+			remove_ideas = {
+				to_banish_want
+				the_two_principles
+				endsieg
+				gone_over
+				GER_Hans_Speidel_army_chief
+				GER_Fedor_von_Bock_high_command
+				GER_Ferdinand_Schorner_high_command
+				GER_Wilhelm_Burgdorf_high_command
+				GER_Karl_Donitz_navy_chief
+				GER_Hermann_Goring_air_chief
+			}
+			add_ideas = {
+				GER_Baldur_von_Schirach_hog
+				GER_Wilhelm_Burgdorf_sec
+				GER_Walther_Hewel_for
+				GER_Kurt_Lange_eco
+				GER_Robert_Ritter_von_Greim_air_chief
+
+				GER_Wilhelm_Burgdorf_high_command
+				GER_Fedor_von_Bock_high_command
+				GER_Walther_Wenck_army_chief
+				GER_BOR_political_rodeo_idea
+				GER_BOR_shellshocked_wehrmacht_idea
+				GER_BOR_the_reich_in_thousand_pieces_1_idea
+				GER_BOR_lost_generation_1_idea
+			}
+			set_popularities = {
+				conservatism = 2
+				paternalism = 4
+				fascism = 18
+				national_socialism = 60
+				ultranationalism = 16
+			}
+			set_party_name = {
+				ideology = national_socialism
+				long_name = BGR_national_socialism_party_long
+				name = BGR_national_socialism_party
+			}
+			set_party_name = {
+				ideology = fascism
+				long_name = BGR_fascism_party_long
+				name = BGR_fascism_party
+			}
+			set_party_name = {
+				ideology = despotism
+				long_name = BGR_despotism_party_long
+				name = BGR_despotism_party
+			}
+			set_party_name = {
+				ideology = paternalism
+				long_name = BGR_paternalism_party_long
+				name = BGR_paternalism_party
+			}
+			set_party_name = {
+				ideology = conservatism
+				long_name = BGR_conservatism_party_long
+				name = BGR_conservatism_party
+			}
+			set_party_name = {
+				ideology = liberalism
+				long_name = BGR_liberalism_party_long
+				name = BGR_liberalism_party
+			}
+			set_party_name = {
+				ideology = progressivism
+				long_name = BGR_progressivism_party_long
+				name = BGR_progressivism_party
+			}
+			set_party_name = {
+				ideology = socialist
+				long_name = BGR_socialist_party_long
+				name = BGR_socialist_party
+			}
+			set_party_name = {
+				ideology = communist
+				long_name = BGR_communist_party_long
+				name = BGR_communist_party
+			}
+			set_party_name = {
+				ideology = ultranationalism
+				long_name = BGR_ultranationalism_party_long
+				name = BGR_ultranationalism_party
+			}
+			set_country_flag = BOR_DBG_Infl_Mech
+			BOR_Influence_Initialize = yes
+			set_global_flag = german_civil_war_bormannvic
+			set_country_flag = BOR_Phase1
+			reload_GER_bormann_post_cw_tree = yes
+		}
+	}
+
+	GER_bormann_debug_grossraum = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_grossraum"
+			country_event = bor_dbg.75
+		}
+	}
+
+	GER_bormann_debug_orpo = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_orpo"
+			country_event = bor_dbg.76
+		}
+	}
+
+	GER_bormann_debug_sphere_trading = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_sphere_trading"
+			GER_Bormann_Sphere_Trade_begin = yes
+		}
+	}
+
+	GER_bormann_debug_phase_1 = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_phase_1"
+			set_country_flag = BOR_Phase1
+			clr_country_flag = BOR_Phase2
+			clr_country_flag = BOR_Phase3
+			clr_country_flag = BOR_Closing
+			clr_country_flag = BOR_Failure
+			reload_GER_bormann_post_cw_tree = yes
+		}
+	}
+
+	GER_bormann_debug_phase_2 = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_phase_2"
+			clr_country_flag = BOR_Phase1
+			set_country_flag = BOR_Phase2
+			clr_country_flag = BOR_Phase3
+			clr_country_flag = BOR_Closing
+			clr_country_flag = BOR_Failure
+			reload_GER_bormann_post_cw_tree = yes
+		}
+	}
+
+	GER_bormann_debug_phase_3 = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_phase_3"
+			clr_country_flag = BOR_Phase1
+			clr_country_flag = BOR_Phase2
+			set_country_flag = BOR_Phase3
+			clr_country_flag = BOR_Closing
+			clr_country_flag = BOR_Failure
+			reload_GER_bormann_post_cw_tree = yes
+		}
+	}
+
+	GER_bormann_debug_closing = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_closing"
+			clr_country_flag = BOR_Phase1
+			clr_country_flag = BOR_Phase2
+			clr_country_flag = BOR_Phase3
+			set_country_flag = BOR_Closing
+			clr_country_flag = BOR_Failure
+			reload_GER_bormann_post_cw_tree = yes
+		}
+	}
+
+	GER_bormann_debug_set_antimil_dis_I = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_set_antimil_dis_I"
+			set_country_flag = BOR_militarists_dismantled
+			clr_country_flag = BOR_reformists_dismantled
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	GER_bormann_debug_set_antiref_dis_I = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_set_antiref_dis_I"
+			set_country_flag = BOR_reformists_dismantled
+			clr_country_flag = BOR_militarists_dismantled
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	GER_bormann_debug_dismantlement_I_antiref = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_dismantlement_I_antiref"
+			country_event = BOR_Dismantlement_I.1
+		}
+	}
+
+	GER_bormann_debug_dismantlement_I_antimil = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_dismantlement_I_antimil"
+			country_event = BOR_Dismantlement_I.100
+		}
+	}
+
+	GER_bormann_debug_dismantlement_II_antiref = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_dismantlement_II_antiref"
+			country_event = bor_disII_discovery.1
+			set_country_flag = BOR_militarists_dismantled
+		}
+	}
+
+	GER_bormann_debug_dismantlement_II_antimil = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_dismantlement_II_antimil"
+			country_event = bor_disII_discovery.1
+			set_country_flag = BOR_reformists_dismantled
+		}
+	}
+
+	GER_bormann_debug_superevents = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_superevents"
+			country_event = bor_dbg.3
+		}
+	}
+
+	GER_bormann_debug_cancermann = {
+		visible = { has_global_flag = german_civil_war_bormannvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_bormann_debug_cancermann"
+			set_country_leader_portrait = {
+				portrait = "gfx/leaders/GER/Portrait_GER_Martin_Bormann_Fuck.dds"
+			}
+			set_country_leader_description = {
+				desc = "POLITICS_MARTIN_BORMANN_FUCK_DESC"
+			}
+		}
+	}
+	
+	### Heydrich Debug ###
+	GER_heydrich_debug_setup = {
+		visible = { NOT = { has_global_flag = german_civil_war_heydrichvic } }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_heydrich_debug_setup"
+			
+			set_global_flag = german_civil_war_heydrichvic
+			remove_all_ministers = yes
+			add_ideas = {
+				#Ministers
+				GER_Philipp_Bouhler_hog
+				GER_Herbert_Otto_Gille_sec
+				GER_Gunter_dAlquen_for
+				GER_August_Frank_eco
+			}
+			remove_ideas = {
+				man_on_the_moon
+				to_banish_want
+				the_two_principles
+				endsieg
+				gone_over
+			}
+
+			promote_character = GER_reinhard_heydrich
+
+			set_politics = { ruling_party = national_socialism }
+			set_popularities = {
+				communist = 0
+				socialist = 0
+				progressivism = 0
+				liberalism = 0
+				liberal_conservatism = 0
+				conservatism = 0
+				paternalism = 0
+				despotism = 0
+				ultranationalism = 0
+				fascism = 0
+				national_socialism = 100
+			}
+			
+			if = {
+				limit = { BRG = { is_ai = yes } }
+				GER = { load_focus_tree = HGR_victory_tree }
+				dismantle_faction = yes
+				every_country = {
+					limit = { is_puppet_of = GER }
+					GER = { end_puppet = PREV }
+				}
+				every_country = {
+					limit = { is_subject_of = GER }
+					set_autonomy = {
+						target = PREV
+						autonomy_state = autonomy_free
+					}
+				}
+				# mfw great game factions wonky
+				BUL = { remove_ideas = Pakt_Bundnispartner }
+				FRA = { remove_ideas = Pakt_Mitstreiter }
+				SER = { remove_ideas = Pakt_Marionettenstaat }
+				diplomatic_relation = {
+					country = BRG
+					relation = non_aggression_pact
+					active = no
+				}
+				SWE = { 
+					remove_ideas = SWE_schwedenisierung_3
+					remove_ideas = SWE_exports_3
+				}
+				remove_resource_rights = 38
+				remove_resource_rights = 217
+				remove_resource_rights = 229
+				remove_resource_rights = 1552
+				remove_resource_rights = 1554
+				remove_resource_rights = 232
+				remove_resource_rights = 235
+				remove_resource_rights = 1564
+				remove_resource_rights = 234
+				remove_resource_rights = 236
+				remove_resource_rights = 539
+				remove_resource_rights = 1162
+				remove_resource_rights = 1164
+				remove_resource_rights = 718
+				create_faction = Einheitspakt
+			}
+			else = {
+				GER = { load_focus_tree = HGR_victory_tree_old }
+			}
+		}
+	}
+
+	GER_heydrich_debug_setup_pre_struggle_pre_warlords = {
+		visible = { has_global_flag = german_civil_war_heydrichvic }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_heydrich_debug_setup_pre_struggle_pre_warlords"
+			set_global_flag = german_civil_war_heydrichvic
+			
+			HGR_setup_bunkers = yes
+			HGR_setup_nukes = yes
+			load_focus_tree = {
+				tree = HGR_victory_tree_bunkers_arsenal
+				keep_completed = yes
+			}
+		}
+	}
+	
+	GER_heydrich_debug_setup_pre_struggle_warlords_stage_1 = {
+		visible = { has_global_flag = german_civil_war_heydrichvic }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_heydrich_debug_setup_pre_struggle_warlords_stage_1"
+			set_global_flag = german_civil_war_heydrichvic
+			
+			HGR_setup_bunkers = yes
+			HGR_setup_nukes = yes
+			FPG = {
+				transfer_state = 61
+				transfer_state = 62
+			}
+			PRK = {
+				transfer_state = 5
+			}
+			load_focus_tree = {
+				tree = HGR_victory_tree_bunkers_arsenal_breakaways
+				keep_completed = yes
+			}
+		}
+	}
+	
+	GER_heydrich_debug_setup_pre_struggle_warlords_stage_2 = {
+		visible = { has_global_flag = german_civil_war_heydrichvic }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_heydrich_debug_setup_pre_struggle_warlords_stage_2"
+			set_global_flag = german_civil_war_heydrichvic
+			
+			HGR_setup_bunkers = yes
+			HGR_setup_nukes = yes
+			FPG = {
+				transfer_state = 61
+				transfer_state = 62
+			}
+			PRK = {
+				transfer_state = 5
+			}
+			SSL = {
+				transfer_state = 56
+				transfer_state = 775
+				transfer_state = 1373
+			}
+			FSP = {
+				transfer_state = 97
+				set_province_controller = 3254
+				set_province_controller = 11386
+				set_province_controller = 11329
+				set_province_controller = 9372
+				set_province_controller = 9327
+			}
+			KHP = {
+				transfer_state = 153
+				transfer_state = 1772
+				transfer_state = 770
+			}
+			AUS = {
+				transfer_state = 4
+				transfer_state = 152
+				transfer_state = 1025
+			}
+			SSW = {
+				transfer_state = 57
+				set_province_controller = 564
+			}
+			LHH = {
+				transfer_state = 51
+				transfer_state = 42
+				transfer_state = 8
+				transfer_state = 28
+				set_province_controller = 11560
+			}
+			APF = {
+				transfer_state = 69
+				transfer_state = 74
+				set_province_controller = 3485
+			}
+			FHH = {
+				transfer_state = 50
+				transfer_state = 72
+			}
+			load_focus_tree = {
+				tree = HGR_victory_tree_bunkers_arsenal_breakaways
+				keep_completed = yes
+			}
+		}
+	}
+	
+	GER_heydrich_debug_setup_struggle = {
+		visible = { has_global_flag = german_civil_war_heydrichvic }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_heydrich_debug_setup_struggle"
+			set_global_flag = german_civil_war_heydrichvic
+			
+			HGR_Disable_Demands = yes
+			set_global_flag = HGR_it_has_begun
+			
+			HGR_place_missiles = yes
+			
+			GER = {
+				remove_ideas = {
+					HGR_PGD1_Focus_1
+					HGR_PGD1_Focus_2
+					HGR_PGD1_Focus_3
+					HGR_PGD1_Focus_4
+					HGR_PGD1_Focus_5
+					HGR_PGD1_Focus_6
+					HGR_SR_Focus_1
+					HGR_SR_Focus_2
+					HGR_SR_Focus_3
+					HGR_SR_Focus_4
+					HGR_SR_Focus_5
+					HGR_SR_Focus_6
+					HGR_idea_mandatory_spartanism
+				}
+				
+				random_list = {
+					34 = {
+						set_country_flag = KSS_Stadler
+					}
+					34 = {
+						set_country_flag = KSS_Gille
+					}
+					34 = {
+						set_country_flag = KSS_Hausser
+					}
+				}
+
+				remove_unit_leader_role = GER_karl_hanke
+				remove_unit_leader_role = GER_sylvester_stadler
+
+				load_focus_tree = HGR_nuclear_struggle_tree
+
+				dismantle_faction = yes
+
+				create_faction = Anti_Himmler_Koalition
+
+				add_ideas = HGR_Rogue_Element
+
+				promote_character = GER_reinhard_heydrich
+				
+				GER_reinhard_heydrich = {
+					set_portraits = {
+						civilian = { large = "gfx/leaders/GER/Portrait_GER_Reinhard_Heydrich_Rogue.dds" }
+					}
+				}
+				set_country_leader_description = {
+					desc = "POLITICS_REINHARD_HEYDRICH_ROGUE_DESC"
+				}
+			}
+			FRA = { every_owned_state = { set_demilitarized_zone = no } }
+			BRG = {
+				set_popularities = {
+					national_socialism = 100
+				}
+
+				create_faction = Himmler_Loyalisten
+
+				load_focus_tree = ZZZ_blank_focus
+
+				remove_ideas = BRG_purge_the_rot
+
+				transfer_state = 1625
+				transfer_state = 1635
+			}
+			BEL = {
+				transfer_state = 34
+				set_cosmetic_tag = BEL_HGR
+				
+				set_popularities = {
+					ultranationalism = 88
+					national_socialism = 12
+				}
+				
+				add_ideas = BEL_restorationist_fervor
+				add_ideas = BEL_high_in_honors
+				
+				load_oob = HWL_BEL
+			}
+			FLR = {
+				transfer_state = 6
+				set_cosmetic_tag = FLR_HGR
+				
+				add_ideas = FLR_fearful_victory
+				add_ideas = FLR_eyes_on_the_border
+				
+				load_oob = HWL_FLR
+			}
+			PIC = {
+				transfer_state = 15
+				transfer_state = 16
+				transfer_state = 788
+				transfer_state = 1626
+				set_cosmetic_tag = PIC_HGR
+				
+				set_popularities = {
+					ultranationalism = 80
+					national_socialism = 20
+				}
+				
+				add_ideas = PIC_in_name_only
+				add_ideas = PIC_robber_barony
+				
+				load_oob = HWL_PIC
+			}
+			DSH = {
+				transfer_state = 52
+				
+				load_oob = HWL_DSH
+			}
+			SSL = {
+				transfer_state = 56
+				transfer_state = 775
+				transfer_state = 1373
+				
+				load_oob = HWL_SSL
+			}
+			FPG = {
+				transfer_state = 61
+				transfer_state = 62
+				transfer_state = 63
+				
+				load_oob = HWL_FPG
+			}
+			PRK = {
+				transfer_state = 5
+				
+				load_oob = HWL_PRK
+			}
+			FSP = {
+				transfer_state = 97
+				set_province_controller = 3254
+				set_province_controller = 11386
+				set_province_controller = 11329
+				set_province_controller = 9372
+				set_province_controller = 9327
+				
+				load_oob = HWL_FSP
+			}
+			ISS = {
+				transfer_state = 66
+				transfer_state = 67
+				
+				load_oob = HWL_ISS
+			}
+			KHP = {
+				transfer_state = 153
+				transfer_state = 1772
+				transfer_state = 770
+				
+				load_oob = HWL_KHP
+			}
+			AUS = {
+				transfer_state = 4
+				transfer_state = 152
+				transfer_state = 1025
+				
+				load_oob = HWL_AUS
+			}
+			SSN = {
+				transfer_state = 54
+				
+				load_oob = HWL_SSN
+			}
+			OKL = {
+				transfer_state = 53
+				53 = {
+					add_building_construction = {
+						type = air_base
+						level = 1
+						instant_build = yes
+					}
+				}
+				load_oob = HWL_OKL
+			}
+			AGS = {
+				transfer_state = 55
+				transfer_state = 60
+				
+				load_oob = HWL_AGS
+			}
+			DSG = {
+				transfer_state = 58
+				transfer_state = 774
+				transfer_state = 744
+				transfer_state = 775
+				
+				load_oob = HWL_DSG
+			}
+			CRI = {
+				transfer_state = 137
+				transfer_state = 1532
+				GER = { GER_theodor_hoffmann = { set_nationality = CRI } }
+				add_country_leader_role = {
+					character = GER_theodor_hoffmann
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_Theodor_Hoffmann_DESC"
+						expire = "1999.10.12"
+						ideology = national_socialism_subtype
+						traits = { }
+						id = -1
+					}
+				}
+				transfer_navy = { target = DSG }
+			}
+			KLB = {
+				transfer_state = 85
+				
+				load_oob = HWL_KLB
+			}
+			SSW = {
+				transfer_state = 57
+				set_province_controller = 564
+				
+				load_oob = HWL_SSW
+			}
+			LHH = {
+				transfer_state = 51
+				transfer_state = 42
+				transfer_state = 8
+				transfer_state = 28
+				set_province_controller = 11560
+				
+				load_oob = HWL_LHH
+			}
+			KSS = {
+				transfer_state = 86
+				transfer_state = 87
+				transfer_state = 98
+				
+				load_oob = HWL_KSS
+			}
+			SSF = {
+				transfer_state = 65
+				transfer_state = 68
+				
+				load_oob = HWL_SSF
+			}
+			APF = {
+				transfer_state = 69
+				transfer_state = 74
+				set_province_controller = 3485
+				
+				load_oob = HWL_APF
+			}
+			OER = {
+				transfer_state = 59
+				transfer_state = 188
+				
+				load_oob = HWL_OER
+			}
+			FHH = {
+				transfer_state = 50
+				transfer_state = 72
+				
+				load_oob = HWL_FHH
+			}
+			HOL = { # Just in case
+				set_politics = {
+					ruling_party = national_socialism
+				}
+			}
+			POL = { # Make the invasion harder
+				annex_country = {
+					target = GGN
+					transfer_troops = no
+				}
+				add_ideas = POL_Hardened_Defense
+				load_oob = POL_uprising
+			}
+			
+			initialize_heydrich_himmler_influence_vars = yes
+			GER = { update_nuke_control = yes }
+		}
+	}
+
+	GER_heydrich_debug_setup_all_influence_decisions = {
+		visible = { has_global_flag = german_civil_war_heydrichvic }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_heydrich_debug_setup_all_influence_decisions"
+			set_country_flag = HGR_Coalition_Unlocked
+			set_country_flag = HGR_foreign_decisions
+			set_country_flag = HGR_FLR_influence_true
+			set_country_flag = HGR_PIC_influence_true
+			set_country_flag = HGR_SSL_influence_true
+			set_country_flag = HGR_SSW_influence_true
+			set_country_flag = HGR_LHH_influence_true
+			set_country_flag = HGR_AGS_influence_true
+			set_country_flag = HGR_KHP_influence_true
+			set_country_flag = HGR_SSN_influence_true
+			set_country_flag = HGR_KLB_influence_true
+			set_country_flag = HGR_FSP_influence_true
+			set_country_flag = HGR_DSH_influence_true
+			set_country_flag = HGR_APF_influence_true
+			set_country_flag = HGR_SSF_influence_true
+			set_country_flag = HGR_KSS_influence_true
+			set_country_flag = HGR_AUS_influence_true
+			set_country_flag = HGR_OER_influence_true
+			set_country_flag = HGR_DSG_influence_true
+			set_country_flag = HGR_FPG_influence_true
+			set_country_flag = HGR_ISS_influence_true
+			set_country_flag = HGR_FHH_influence_true
+			set_country_flag = HGR_OKL_influence_true
+			set_country_flag = HGR_PRK_influence_true
+			set_country_flag = HGR_HOL_influence_true
+			set_country_flag = HGR_BRT_influence_true
+			set_country_flag = HGR_FLR_decision_set_a
+			set_country_flag = HGR_PIC_decision_set_a
+			set_country_flag = HGR_SSL_decision_set_a
+			set_country_flag = HGR_SSW_decision_set_a
+			set_country_flag = HGR_LHH_decision_set_a
+			set_country_flag = HGR_AGS_decision_set_a
+			set_country_flag = HGR_KHP_decision_set_a
+			set_country_flag = HGR_SSN_decision_set_a
+			set_country_flag = HGR_KLB_decision_set_a
+			set_country_flag = HGR_FSP_decision_set_a
+			set_country_flag = HGR_DSH_decision_set_a
+			set_country_flag = HGR_APF_decision_set_a
+			set_country_flag = HGR_SSF_decision_set_a
+			set_country_flag = HGR_KSS_decision_set_a
+			set_country_flag = HGR_AUS_decision_set_a
+			set_country_flag = HGR_OER_decision_set_a
+			set_country_flag = HGR_DSG_decision_set_a
+			set_country_flag = HGR_FPG_decision_set_a
+			set_country_flag = HGR_ISS_decision_set_a
+			set_country_flag = HGR_FHH_decision_set_a
+			set_country_flag = HGR_OKL_decision_set_a
+			set_country_flag = HGR_PRK_decision_set_a
+			set_country_flag = HGR_FLR_decision_set_b
+			set_country_flag = HGR_PIC_decision_set_b
+			set_country_flag = HGR_SSL_decision_set_b
+			set_country_flag = HGR_SSW_decision_set_b
+			set_country_flag = HGR_LHH_decision_set_b
+			set_country_flag = HGR_AGS_decision_set_b
+			set_country_flag = HGR_KHP_decision_set_b
+			set_country_flag = HGR_SSN_decision_set_b
+			set_country_flag = HGR_KLB_decision_set_b
+			set_country_flag = HGR_FSP_decision_set_b
+			set_country_flag = HGR_DSH_decision_set_b
+			set_country_flag = HGR_APF_decision_set_b
+			set_country_flag = HGR_SSF_decision_set_b
+			set_country_flag = HGR_KSS_decision_set_b
+			set_country_flag = HGR_AUS_decision_set_b
+			set_country_flag = HGR_OER_decision_set_b
+			set_country_flag = HGR_DSG_decision_set_b
+			set_country_flag = HGR_FPG_decision_set_b
+			set_country_flag = HGR_ISS_decision_set_b
+			set_country_flag = HGR_FHH_decision_set_b
+			set_country_flag = HGR_OKL_decision_set_b
+			set_country_flag = HGR_PRK_decision_set_b
+			set_country_flag = HGR_BRT_decision_set_a
+			set_country_flag = HGR_BRT_decision_set_b
+		}
+	}
+
+	### Generic Debug ###
+	GER_debug_break_pakt = {
+		visible = { is_faction_leader = yes }
+		fire_only_once = yes
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_debug_break_pakt"
+			dismantle_faction = yes
+			every_country = {
+				limit = { is_puppet_of = GER }
+				GER = { end_puppet = PREV }
+			}
+			every_country = {
+				limit = { is_subject_of = GER }
+				set_autonomy = {
+					target = PREV
+					autonomy_state = autonomy_free
+				}
+			}
+			BUL = { remove_ideas = Pakt_Bundnispartner }
+			FRA = { remove_ideas = Pakt_Mitstreiter }
+			SER = { remove_ideas = Pakt_Marionettenstaat }
+			FIN = { remove_ideas = Pakt_Observer }
+			PER = { remove_ideas = Pakt_Observer }
+			# CYL = { remove_ideas = Pakt_Observer }
+			diplomatic_relation = {
+				country = BRG
+				relation = non_aggression_pact
+				active = no
+			}
+			SWE = { 
+				remove_ideas = Pakt_Observer
+				remove_ideas = SWE_schwedenisierung_3
+				remove_ideas = SWE_exports_3
+			}
+			remove_resource_rights = 38
+			remove_resource_rights = 217
+			remove_resource_rights = 229
+			remove_resource_rights = 1552
+			remove_resource_rights = 1554
+			remove_resource_rights = 232
+			remove_resource_rights = 235
+			remove_resource_rights = 1564
+			remove_resource_rights = 235
+			remove_resource_rights = 1564
+			remove_resource_rights = 234
+			remove_resource_rights = 236
+			remove_resource_rights = 539
+			remove_resource_rights = 1162
+			remove_resource_rights = 1164
+			remove_resource_rights = 718
+			FRA = { every_state = { set_demilitarized_zone = no } }
+		}
+	}
+}
+
+####################################
+# Germany Power Struggle Decisions #
+####################################
+GER_power_struggle_category = {
+	GER_GCW_look_for_opportunities = {
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_legitimacy_opportunities_exhausted_tt
+				NOT = {
+					AND = {
+						has_country_flag = GCW_legitimacy_opportunities_1
+						has_country_flag = GCW_legitimacy_opportunities_2
+						has_country_flag = GCW_legitimacy_opportunities_3
+						has_country_flag = GCW_legitimacy_opportunities_4
+						has_country_flag = GCW_legitimacy_opportunities_5
+						has_country_flag = GCW_legitimacy_opportunities_6
+						has_country_flag = GCW_legitimacy_opportunities_7
+						has_country_flag = GCW_legitimacy_opportunities_8
+						has_country_flag = GCW_legitimacy_opportunities_9
+						has_country_flag = GCW_legitimacy_opportunities_10
+					}
+				}
+			}
+		}
+
+		cancel_if_not_visible = yes
+		fixed_random_seed = no
+
+		cost = 25
+		days_re_enable = 60
+
+		ai_will_do = {
+			factor = 1000
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_look_for_opportunities"
+			hidden_effect = {
+				random_list = {
+					1 = {
+						country_event = reich.609
+						set_country_flag = GCW_legitimacy_opportunities_1
+						modifier = {
+							factor = 0
+							has_country_flag = GCW_legitimacy_opportunities_1
+						}
+					}
+					1 = {
+						country_event = reich.610
+						set_country_flag = GCW_legitimacy_opportunities_2
+						modifier = {
+							factor = 0
+							has_country_flag = GCW_legitimacy_opportunities_2
+						}
+					}
+					1 = {
+						country_event = reich.611
+						set_country_flag = GCW_legitimacy_opportunities_3
+						modifier = {
+							factor = 0
+							has_country_flag = GCW_legitimacy_opportunities_3
+						}
+					}
+					1 = {
+						country_event = reich.612
+						set_country_flag = GCW_legitimacy_opportunities_4
+						modifier = {
+							factor = 0
+							has_country_flag = GCW_legitimacy_opportunities_4
+						}
+					}
+					1 = {
+						country_event = reich.613
+						set_country_flag = GCW_legitimacy_opportunities_5
+						modifier = {
+							factor = 0
+							has_country_flag = GCW_legitimacy_opportunities_5
+						}
+					}
+					1 = {
+						country_event = reich.614
+						set_country_flag = GCW_legitimacy_opportunities_6
+						modifier = {
+							factor = 0
+							has_country_flag = GCW_legitimacy_opportunities_6
+						}
+					}
+					1 = {
+						country_event = reich.615
+						set_country_flag = GCW_legitimacy_opportunities_7
+						modifier = {
+							factor = 0
+							has_country_flag = GCW_legitimacy_opportunities_7
+						}
+					}
+					1 = {
+						country_event = reich.616
+						set_country_flag = GCW_legitimacy_opportunities_8
+						modifier = {
+							factor = 0
+							has_country_flag = GCW_legitimacy_opportunities_8
+						}
+					}
+					1 = {
+						country_event = reich.617
+						set_country_flag = GCW_legitimacy_opportunities_9
+						modifier = {
+							factor = 0
+							has_country_flag = GCW_legitimacy_opportunities_9
+						}
+					}
+					1 = {
+						country_event = reich.618
+						set_country_flag = GCW_legitimacy_opportunities_10
+						modifier = {
+							factor = 0
+							has_country_flag = GCW_legitimacy_opportunities_10
+						}
+					}
+				}
+			}
+		}
+	}
+	GER_GCW_build_up_infantry_weapons = {
+		available = {
+			NOT = { has_country_flag = currently_preparing_for_GCW }
+			custom_trigger_tooltip = {
+				tooltip = GCW_legitimacy_more_than_or_equals_5_tt
+				GCW_legitimacy_more_than_or_equals_5 = yes	
+			}
+		}
+
+		cancel_if_not_visible = yes
+
+		cost = 0
+		days_remove = 30
+
+		ai_will_do = {
+			factor = 50
+
+			modifier = {
+				factor = 0
+				has_country_flag = bormann_for_germany
+				check_variable = { GER_Bormann_Influence < 15 }
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = goring_for_germany
+				check_variable = { GER_Goring_Influence < 15 }
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = speer_for_germany
+				check_variable = { GER_Speer_Influence < 15 }
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = heydrich_for_germany
+				check_variable = { GER_Heydrich_Influence < 15 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_build_up_infantry_weapons"
+			set_country_flag = currently_preparing_for_GCW
+			if = {
+				limit = {
+					has_country_flag = bormann_for_germany
+				}
+				subtract_from_variable = { GER_Bormann_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = goring_for_germany
+				}
+				subtract_from_variable = { GER_Goring_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = speer_for_germany
+				}
+				subtract_from_variable = { GER_Speer_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = heydrich_for_germany
+				}
+				subtract_from_variable = { GER_Heydrich_Influence = 5 }
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove GER_GCW_build_up_infantry_weapons"
+			clr_country_flag = currently_preparing_for_GCW
+			GCW_build_up_infantry_weapons = yes
+		}
+	}
+	GER_GCW_build_up_forts = {
+		visible = {
+			hidden_trigger = {
+				OR = {
+					has_country_flag = GER_Hitler_Stage3
+					has_country_flag = GER_Hitler_Stage4
+					has_country_flag = GER_Hitler_Stage5
+					has_country_flag = GER_Hitler_Stage6
+					has_country_flag = GER_Hitler_Stage7
+					has_country_flag = GER_Hitler_Stage8
+				}
+			}
+		}
+
+		available = {
+			NOT = { has_country_flag = currently_preparing_for_GCW }
+			custom_trigger_tooltip = {
+				tooltip = GCW_legitimacy_more_than_or_equals_5_tt
+				GCW_legitimacy_more_than_or_equals_5 = yes	
+			}
+		}
+
+		cancel_if_not_visible = yes
+		fire_only_once = yes
+
+		cost = 0
+		days_remove = 30
+
+		ai_will_do = {
+			factor = 500
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_build_up_forts"
+			set_country_flag = currently_preparing_for_GCW
+			if = {
+				limit = {
+					has_country_flag = bormann_for_germany
+				}
+				subtract_from_variable = { GER_Bormann_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = goring_for_germany
+				}
+				subtract_from_variable = { GER_Goring_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = speer_for_germany
+				}
+				subtract_from_variable = { GER_Speer_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = heydrich_for_germany
+				}
+				subtract_from_variable = { GER_Heydrich_Influence = 5 }
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove GER_GCW_build_up_forts"
+			clr_country_flag = currently_preparing_for_GCW
+			GCW_build_up_forts = yes
+		}
+	}
+	GER_GCW_build_up_heer_units = {
+		visible = {
+			hidden_trigger = {
+				OR = {
+					has_country_flag = GER_Hitler_Stage5
+					has_country_flag = GER_Hitler_Stage6
+					has_country_flag = GER_Hitler_Stage7
+					has_country_flag = GER_Hitler_Stage8
+				}
+			}
+		}
+
+		available = {
+			NOT = { has_country_flag = currently_preparing_for_GCW }
+			custom_trigger_tooltip = {
+				tooltip = GCW_legitimacy_more_than_or_equals_5_tt
+				GCW_legitimacy_more_than_or_equals_5 = yes	
+			}
+		}
+
+		cancel_if_not_visible = yes
+
+		cost = 0
+		days_remove = 30
+
+		ai_will_do = {
+			factor = 100
+
+			modifier = {
+				factor = 0
+				has_country_flag = bormann_for_germany
+				check_variable = { GER_Bormann_Influence < 15 }
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = goring_for_germany
+				check_variable = { GER_Goring_Influence < 15 }
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = speer_for_germany
+				check_variable = { GER_Speer_Influence < 15 }
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = heydrich_for_germany
+				check_variable = { GER_Heydrich_Influence < 15 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_build_up_heer_units"
+			set_country_flag = currently_preparing_for_GCW
+			if = {
+				limit = {
+					has_country_flag = bormann_for_germany
+				}
+				subtract_from_variable = { GER_Bormann_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = goring_for_germany
+				}
+				subtract_from_variable = { GER_Goring_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = speer_for_germany
+				}
+				subtract_from_variable = { GER_Speer_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = heydrich_for_germany
+				}
+				subtract_from_variable = { GER_Heydrich_Influence = 5 }
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove GER_GCW_build_up_heer_units"
+			clr_country_flag = currently_preparing_for_GCW
+			GCW_build_up_heer_units = yes
+		}
+	}
+	GER_GCW_build_up_prod_units = {
+		visible = {
+			hidden_trigger = {
+				OR = {
+					has_country_flag = GER_Hitler_Stage7
+					has_country_flag = GER_Hitler_Stage8
+				}
+			}
+		}
+
+		available = {
+			NOT = { has_country_flag = currently_preparing_for_GCW }
+			custom_trigger_tooltip = {
+				tooltip = GCW_legitimacy_more_than_or_equals_5_tt
+				GCW_legitimacy_more_than_or_equals_5 = yes	
+			}
+		}
+
+		cancel_if_not_visible = yes
+
+		cost = 0
+		days_remove = 30
+
+		ai_will_do = {
+			factor = 500
+
+			modifier = {
+				factor = 0
+				has_country_flag = bormann_for_germany
+				check_variable = { GER_Bormann_Influence < 15 }
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = goring_for_germany
+				check_variable = { GER_Goring_Influence < 15 }
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = speer_for_germany
+				check_variable = { GER_Speer_Influence < 15 }
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = heydrich_for_germany
+				check_variable = { GER_Heydrich_Influence < 15 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_build_up_prod_units"
+			set_country_flag = currently_preparing_for_GCW
+			if = {
+				limit = {
+					has_country_flag = bormann_for_germany
+				}
+				subtract_from_variable = { GER_Bormann_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = goring_for_germany
+				}
+				subtract_from_variable = { GER_Goring_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = speer_for_germany
+				}
+				subtract_from_variable = { GER_Speer_Influence = 5 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = heydrich_for_germany
+				}
+				subtract_from_variable = { GER_Heydrich_Influence = 5 }
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove GER_GCW_build_up_prod_units"
+			clr_country_flag = currently_preparing_for_GCW
+			GCW_build_up_prod_units = yes
+		}
+	}
+	GER_GCW_secure_bohemia = {
+		visible = {
+			hidden_trigger = {
+				OR = {
+					has_country_flag = GER_Hitler_Stage7
+					has_country_flag = GER_Hitler_Stage8
+				}
+			}
+		}
+
+		available = {
+			NOT = { has_country_flag = currently_preparing_for_GCW }
+			custom_trigger_tooltip = {
+				tooltip = GCW_legitimacy_more_than_or_equals_10_tt
+				GCW_legitimacy_more_than_or_equals_10 = yes
+			}
+		}
+
+		cancel_if_not_visible = yes
+		fire_only_once = yes
+
+		cost = GER_bohemia_cost?200
+		days_remove = 30
+
+		ai_will_do = {
+			factor = 500
+			modifier = {
+				factor = 0
+				has_country_flag = heydrich_for_germany
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_secure_bohemia"
+			if = {
+				limit = { is_ai = yes }
+				add_political_power = -50
+			}
+			set_country_flag = currently_preparing_for_GCW
+			if = {
+				limit = {
+					has_country_flag = bormann_for_germany
+				}
+				subtract_from_variable = { GER_Bormann_Influence = 10 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = goring_for_germany
+				}
+				subtract_from_variable = { GER_Goring_Influence = 10 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = speer_for_germany
+				}
+				subtract_from_variable = { GER_Speer_Influence = 10 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = heydrich_for_germany
+				}
+				subtract_from_variable = { GER_Heydrich_Influence = 10 }
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove GER_GCW_secure_bohemia"
+			custom_effect_tooltip = GER_GCW_secure_bohemia_tt
+			clr_country_flag = currently_preparing_for_GCW
+			if = {
+				limit = {
+					has_country_flag = bormann_for_germany
+				}
+				set_country_flag = GER_CZE_secured_bormann
+			}
+			else_if = {
+				limit = {
+					has_country_flag = goring_for_germany
+				}
+				set_country_flag = GER_CZE_secured_goring
+			}
+			else_if = {
+				limit = {
+					has_country_flag = speer_for_germany
+				}
+				set_country_flag = GER_CZE_secured_speer
+			}
+			else_if = {
+				limit = {
+					has_country_flag = heydrich_for_germany
+				}
+				set_country_flag = GER_CZE_secured_heydrich
+			}
+		}
+	}
+	GER_GCW_bormann_legitimacy = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		cancel_if_not_visible = yes
+		is_good = yes 
+
+		days_mission_timeout = 60
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_bormann_legitimacy"
+			custom_effect_tooltip = GER_increase_legitimacy_small_bormann_tt
+			hidden_effect = {
+				add_to_variable = { GER_Bormann_Influence = 5 }
+				activate_mission = GER_GCW_bormann_legitimacy
+			}
+		}
+	}
+	GER_GCW_goring_legitimacy = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		is_good = yes 
+
+		cancel_if_not_visible = yes
+		days_mission_timeout = 60
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_goring_legitimacy"
+			custom_effect_tooltip = GER_increase_legitimacy_small_goring_tt
+			hidden_effect = {
+				add_to_variable = { GER_Goring_Influence = 5 }
+				activate_mission = GER_GCW_goring_legitimacy
+			}
+		}
+	}
+	GER_GCW_speer_legitimacy = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		cancel_if_not_visible = yes
+		is_good = yes 
+
+		days_mission_timeout = 60
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_speer_legitimacy"
+			custom_effect_tooltip = GER_increase_legitimacy_small_speer_tt
+			hidden_effect = {
+				add_to_variable = { GER_Speer_Influence = 5 }
+				activate_mission = GER_GCW_speer_legitimacy
+			}
+		}
+	}
+	GER_GCW_heydrich_legitimacy = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		cancel_if_not_visible = yes
+		is_good = yes 
+
+		days_mission_timeout = 60
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_heydrich_legitimacy"
+			custom_effect_tooltip = GER_increase_legitimacy_small_heydrich_tt
+			hidden_effect = {
+				add_to_variable = { GER_Heydrich_Influence = 5 }
+				activate_mission = GER_GCW_heydrich_legitimacy
+			}
+		}
+	}
+	GER_GCW_bormann_build_up = {
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		activation = {
+			check_variable = { GER_Bormann_Influence > GER_Bormann_Influence_limit }
+			NOT = { has_country_flag = bormann_for_germany }
+			has_country_flag = GER_power_struggle
+		}
+
+		fixed_random_seed = no
+		cancel_if_not_visible = yes
+		is_good = yes
+
+		days_mission_timeout = 30
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_bormann_build_up"
+			if = {
+				limit = {
+					NOT = { has_country_flag = ai_bormann_build_up }
+				}
+				set_country_flag = ai_bormann_build_up
+			}
+			subtract_from_variable = { GER_Bormann_Influence = 5 }
+			set_temp_variable = { ai_check_temp = 1 }
+			hidden_effect = {
+				random_list = {
+					1 = {
+						GCW_build_up_prod_units = yes
+					}
+					1 = {
+						GCW_build_up_forts = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GER_Hitler_Stage4
+								has_country_flag = GCW_bormann_forts_done
+							}
+						}
+					}
+					1 = {
+						GCW_build_up_infantry_weapons = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GER_Hitler_Stage4
+								has_country_flag = GER_Hitler_Stage5
+								has_country_flag = GER_Hitler_Stage6
+							}
+						}
+					}
+					1 = {
+						GCW_build_up_heer_units = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GER_Hitler_Stage4
+								has_country_flag = GER_Hitler_Stage5
+								has_country_flag = GER_Hitler_Stage6
+								has_country_flag = GER_Hitler_Stage7
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	GER_GCW_goring_build_up = {
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		activation = {
+			check_variable = { GER_Goring_Influence > GER_Goring_Influence_limit }
+			NOT = { has_country_flag = goring_for_germany }
+			has_country_flag = GER_power_struggle
+		}
+
+		fixed_random_seed = no
+		cancel_if_not_visible = yes
+		is_good = yes
+
+		days_mission_timeout = 30
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_goring_build_up"
+			if = {
+				limit = {
+					NOT = { has_country_flag = ai_goring_build_up }
+				}
+				set_country_flag = ai_goring_build_up
+			}
+			subtract_from_variable = { GER_Goring_Influence = 5 }
+			set_temp_variable = { ai_check_temp = 1 }
+			hidden_effect = {
+				random_list = {
+					1 = {
+						GCW_build_up_prod_units = yes
+					}
+					1 = {
+						GCW_build_up_forts = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GCW_goring_forts_done
+							}
+						}
+					}
+					1 = {
+						GCW_build_up_infantry_weapons = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GER_Hitler_Stage4
+							}
+						}
+					}
+					1 = {
+						GCW_build_up_heer_units = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GER_Hitler_Stage4
+								has_country_flag = GER_Hitler_Stage5
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	GER_GCW_speer_build_up = {
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		activation = {
+			check_variable = { GER_Speer_Influence > GER_Speer_Influence_limit }
+			NOT = { has_country_flag = speer_for_germany }
+			has_country_flag = GER_power_struggle
+		}
+
+		fixed_random_seed = no
+		cancel_if_not_visible = yes
+		is_good = yes
+
+		days_mission_timeout = 30
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_speer_build_up"
+			if = {
+				limit = {
+					NOT = { has_country_flag = ai_speer_build_up }
+				}
+				set_country_flag = ai_speer_build_up
+			}
+			subtract_from_variable = { GER_Speer_Influence = 5 }
+			set_temp_variable = { ai_check_temp = 1 }
+			hidden_effect = {
+				random_list = {
+					1 = {
+						GCW_build_up_prod_units = yes
+					}
+					1 = {
+						GCW_build_up_forts = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GCW_speer_forts_done
+							}
+						}
+					}
+					1 = {
+						GCW_build_up_infantry_weapons = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GER_Hitler_Stage4
+							}
+						}
+					}
+					1 = {
+						GCW_build_up_heer_units = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GER_Hitler_Stage4
+								has_country_flag = GER_Hitler_Stage5
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	GER_GCW_heydrich_build_up = {
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		activation = {
+			check_variable = { GER_Heydrich_Influence > GER_Heydrich_Influence_limit }
+			NOT = { has_country_flag = heydrich_for_germany }
+			has_country_flag = GER_power_struggle
+		}
+
+		fixed_random_seed = no
+		cancel_if_not_visible = yes
+		is_good = yes
+
+		days_mission_timeout = 30
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_heydrich_build_up"
+			if = {
+				limit = {
+					NOT = { has_country_flag = ai_heydrich_build_up }
+				}
+				set_country_flag = ai_heydrich_build_up
+			}
+			subtract_from_variable = { GER_Heydrich_Influence = 5 }
+			set_temp_variable = { ai_check_temp = 1 }
+			hidden_effect = {
+				random_list = {
+					1 = {
+						GCW_build_up_prod_units = yes
+					}
+					1 = {
+						GCW_build_up_forts = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GCW_heydrich_forts_done
+							}
+						}
+					}
+					1 = {
+						GCW_build_up_infantry_weapons = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GER_Hitler_Stage4
+							}
+						}
+					}
+					1 = {
+						GCW_build_up_heer_units = yes
+						modifier = {
+							factor = 0
+							OR = {
+								has_country_flag = GER_Hitler_Stage1
+								has_country_flag = GER_Hitler_Stage2
+								has_country_flag = GER_Hitler_Stage3
+								has_country_flag = GER_Hitler_Stage4
+								has_country_flag = GER_Hitler_Stage5
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+#########################
+# Germany GCW Decisions #
+#########################
+GER_GCW_mechanic_category = {
+	GER_GCW_convert_5_legitimacy_to_influence = {
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_legitimacy_more_than_or_equals_5_tt
+				check_variable = { GCW_legitimacy > 4 }
+			}
+		}
+
+		cancel_if_not_visible = yes
+
+		cost = 0
+
+		ai_will_do = {
+			factor = 200
+			modifier = {
+				factor = 0
+				check_variable = { GCW_legitimacy < 75 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_convert_5_legitimacy_to_influence"
+			GCW_decrease_legitimacy_small = yes
+			GCW_increase_influence_small = yes
+		}
+	}
+	GER_GCW_show_hide_influence_opportunities = {
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_show_hide_influence_opportunities"
+			if = {
+				limit = { has_variable = show_GCW_influence_opportunities }
+				clear_variable = show_GCW_influence_opportunities
+				custom_effect_tooltip = GER_GCW_hide_influence_opportunities_tt
+			}
+			else = {
+				set_variable = { show_GCW_influence_opportunities = 1 }
+				custom_effect_tooltip = GER_GCW_show_influence_opportunities_tt
+			}
+		}
+
+		ai_will_do = {
+			factor = 1000
+			modifier = {
+				factor = 0
+				check_variable = { show_GCW_influence_opportunities > 0 }
+			}
+		}
+	}
+	GER_GCW_capture_frankfurt_decision = {
+		visible = {
+			check_variable = { show_GCW_influence_opportunities > 0 }
+			NOT = {
+				OR = {
+					owns_state = 55
+					controls_province = 6488
+				}
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+		highlight_states = {
+			highlight_provinces = { 6488 }
+		}
+		cost = 0
+		fire_only_once = yes
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_frankfurt_decision"
+			GCW_decrease_influence_small = yes
+			activate_mission = GER_GCW_capture_frankfurt_mission
+		}
+	}
+	GER_GCW_capture_frankfurt_mission = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			controls_province = 6488
+		}
+		highlight_states = {
+			highlight_provinces = { 6488 }
+		}
+		cancel_if_not_visible = yes
+		is_good = no
+
+		days_mission_timeout = 50
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_frankfurt_mission"
+			GCW_increase_influence_large = yes
+		}
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_capture_frankfurt_mission"
+		}
+	}
+	GER_GCW_capture_bremen_decision = {
+		visible = {
+			check_variable = { show_GCW_influence_opportunities > 0 }
+			NOT = {
+				OR = {
+					owns_state = 188
+					controls_province = 3326
+				}
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+		highlight_states = {
+			highlight_provinces = { 3326 }
+		}
+		cost = 0
+		fire_only_once = yes
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_bremen_decision"
+			GCW_decrease_influence_small = yes
+			activate_mission = GER_GCW_capture_bremen_mission
+		}
+	}
+	GER_GCW_capture_bremen_mission = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			controls_province = 3326
+		}
+		highlight_states = {
+			highlight_provinces = { 3326 }
+		}
+		cancel_if_not_visible = yes
+		is_good = no
+
+		days_mission_timeout = 50
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_bremen_mission"
+			GCW_increase_influence_large = yes
+		}
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_capture_bremen_mission"
+		}
+	}
+	GER_GCW_capture_danzig_decision = {
+		visible = {
+			check_variable = { show_GCW_influence_opportunities > 0 }
+			NOT = {
+				OR = {
+					owns_state = 85
+					controls_province = 362
+				}
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+		highlight_states = {
+			highlight_provinces = { 362 }
+		}
+		cost = 0
+		fire_only_once = yes
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_danzig_decision"
+			GCW_decrease_influence_small = yes
+			activate_mission = GER_GCW_capture_danzig_mission
+		}
+	}
+	GER_GCW_capture_danzig_mission = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			controls_province = 362
+		}
+		highlight_states = {
+			highlight_provinces = { 362 }
+		}
+		cancel_if_not_visible = yes
+		is_good = no
+
+		days_mission_timeout = 50
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_danzig_mission"
+			GCW_increase_influence_large = yes
+		}
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_capture_danzig_mission"
+		}
+	}
+	GER_GCW_capture_kiel_decision = {
+		visible = {
+			check_variable = { show_GCW_influence_opportunities > 0 }
+			NOT = {
+				OR = {
+					owns_state = 58
+					controls_province = 6389
+				}
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+		highlight_states = {
+			highlight_provinces = { 6389 }
+		}
+		cost = 0
+		fire_only_once = yes
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_kiel_decision"
+			GCW_decrease_influence_small = yes
+			activate_mission = GER_GCW_capture_kiel_mission
+		}
+	}
+	GER_GCW_capture_kiel_mission = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			controls_province = 6389
+		}
+		highlight_states = {
+			highlight_provinces = { 6389 }
+		}
+		cancel_if_not_visible = yes
+		is_good = no
+
+		days_mission_timeout = 50
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_kiel_mission"
+			GCW_increase_influence_large = yes
+		}
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_capture_kiel_mission"
+		}
+	}
+	GER_GCW_capture_munich_decision = {
+		visible = {
+			check_variable = { show_GCW_influence_opportunities > 0 }
+			NOT = {
+				OR = {
+					owns_state = 52
+					controls_province = 692
+				}
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+		highlight_states = {
+			highlight_provinces = { 692 }
+		}
+		cost = 0
+		fire_only_once = yes
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_munich_decision"
+			GCW_decrease_influence_small = yes
+			activate_mission = GER_GCW_capture_munich_mission
+		}
+	}
+	GER_GCW_capture_munich_mission = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			controls_province = 692
+		}
+		highlight_states = {
+			highlight_provinces = { 692 }
+		}
+		cancel_if_not_visible = yes
+		is_good = no
+
+		days_mission_timeout = 50
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_munich_mission"
+			GCW_increase_influence_large = yes
+		}
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_capture_munich_mission"
+		}
+	}
+	GER_GCW_capture_wien_decision = {
+		visible = {
+			check_variable = { show_GCW_influence_opportunities > 0 }
+			NOT = {
+				OR = {
+					owns_state = 1025
+					controls_province = 11666
+				}
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+		highlight_states = {
+			highlight_provinces = { 11666 }
+		}
+		cost = 0
+		fire_only_once = yes
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_wien_decision"
+			GCW_decrease_influence_small = yes
+			activate_mission = GER_GCW_capture_wien_mission
+		}
+	}
+	GER_GCW_capture_wien_mission = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			controls_province = 11666
+		}
+		highlight_states = {
+			highlight_provinces = { 11666 }
+		}
+		cancel_if_not_visible = yes
+		is_good = no
+
+		days_mission_timeout = 50
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_wien_mission"
+			GCW_increase_influence_large = yes
+		}
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_capture_wien_mission"
+		}
+	}
+	GER_GCW_capture_leipzig_decision = {
+		visible = {
+			check_variable = { show_GCW_influence_opportunities > 0 }
+			NOT = {
+				OR = {
+					owns_state = 65
+					controls_province = 3535
+				}
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+		highlight_states = {
+			highlight_provinces = { 3535 }
+		}
+		cost = 0
+		fire_only_once = yes
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_leipzig_decision"
+			GCW_decrease_influence_small = yes
+			activate_mission = GER_GCW_capture_leipzig_mission
+		}
+	}
+	GER_GCW_capture_leipzig_mission = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			controls_province = 3535
+		}
+		highlight_states = {
+			highlight_provinces = { 3535 }
+		}
+		cancel_if_not_visible = yes
+		is_good = no
+
+		days_mission_timeout = 50
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_leipzig_mission"
+			GCW_increase_influence_large = yes
+		}
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_capture_leipzig_mission"
+		}
+	}
+	GER_GCW_capture_hamburg_decision = {
+		visible = {
+			check_variable = { show_GCW_influence_opportunities > 0 }
+			NOT = {
+				OR = {
+					owns_state = 775
+					controls_province = 9347
+				}
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+		highlight_states = {
+			highlight_provinces = { 9347 }
+		}
+		cost = 0
+		fire_only_once = yes
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_hamburg_decision"
+			GCW_decrease_influence_small = yes
+			activate_mission = GER_GCW_capture_hamburg_mission
+		}
+	}
+	GER_GCW_capture_hamburg_mission = {
+		allowed = {
+			always = no
+		}
+
+		available = {
+			controls_province = 9347
+		}
+		highlight_states = {
+			highlight_provinces = { 9347 }
+		}
+		cancel_if_not_visible = yes
+		is_good = no
+
+		days_mission_timeout = 50
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_capture_hamburg_mission"
+			GCW_increase_influence_large = yes
+		}
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout GER_GCW_capture_hamburg_mission"
+		}
+	}
+	GER_GCW_show_hide_influence_actions = {
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_show_hide_influence_actions"
+			if = {
+				limit = { has_variable = show_GCW_influence_actions }
+				clear_variable = show_GCW_influence_actions
+				custom_effect_tooltip = GER_GCW_hide_influence_actions_tt
+			}
+			else = {
+				set_variable = { show_GCW_influence_actions = 1 }
+				custom_effect_tooltip = GER_GCW_show_influence_actions_tt
+			}
+		}
+
+		ai_will_do = {
+			factor = 1000
+			modifier = {
+				factor = 0
+				check_variable = { show_GCW_influence_actions > 0 }
+			}
+		}
+	}
+	GER_GCW_steal_equipment = {
+		visible = {
+			check_variable = { show_GCW_influence_actions > 0 }
+			FROM = { exists = yes }
+		}
+
+		target_array = global.GCW_contenders
+
+		target_trigger = {
+			FROM = {
+				has_war_with = ROOT
+				has_capitulated = no
+				has_equipment = { infantry_equipment > 3999 }
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+
+		cancel_if_not_visible = yes
+
+		cost = 0
+		days_remove = 30
+
+		ai_will_do = {
+			factor = 200
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_steal_equipment"
+			GCW_decrease_influence_small = yes
+			set_country_flag = GCW_decision_taken
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove GER_GCW_steal_equipment"
+			clr_country_flag = GCW_decision_taken
+			FROM = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = -4000
+				}
+			}
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 4000
+			}
+		}
+	}
+	GER_GCW_sabotage_frontlines = {
+		visible = {
+			check_variable = { show_GCW_influence_actions > 0 }
+			FROM = { exists = yes }
+		}
+
+		target_array = global.GCW_contenders
+
+		target_trigger = {
+			FROM = {
+				has_war_with = ROOT
+				has_capitulated = no
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+
+		cancel_if_not_visible = yes
+
+		cost = 0
+		days_remove = 30
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_sabotage_frontlines"
+			GCW_decrease_influence_small = yes
+			set_country_flag = GCW_decision_taken
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove GER_GCW_sabotage_frontlines"
+			clr_country_flag = GCW_decision_taken
+			# timed idea to lower planning speed and bonus
+			FROM = {
+				add_timed_idea = {
+					idea = GCW_sabotaged_frontlines
+					days = 25
+				}
+			}
+		}
+	}
+	GER_GCW_disrupt_supply_lines = {
+		visible = {
+			check_variable = { show_GCW_influence_actions > 0 }
+			FROM = { exists = yes }
+		}
+
+		target_array = global.GCW_contenders
+
+		target_trigger = {
+			FROM = {
+				has_war_with = ROOT
+				has_capitulated = no
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+
+		cancel_if_not_visible = yes
+
+		cost = 0
+		days_remove = 30
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_disrupt_supply_lines"
+			GCW_decrease_influence_small = yes
+			set_country_flag = GCW_decision_taken
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove GER_GCW_disrupt_supply_lines"
+			clr_country_flag = GCW_decision_taken
+			# timed idea to increase attrition and supply consumption
+			FROM = {
+				add_timed_idea = {
+					idea = GCW_disrupted_supply_lines
+					days = 25
+				}
+			}
+		}
+	}
+	GER_GCW_start_uprisings = {
+		visible = {
+			check_variable = { show_GCW_influence_actions > 0 }
+			FROM = { exists = yes }
+		}
+
+		target_array = global.GCW_contenders
+
+		target_trigger = {
+			FROM = {
+				has_war_with = ROOT
+				has_capitulated = no
+			}
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_5_tt
+				check_variable = { GCW_influence > 4 }
+			}
+		}
+
+		cancel_if_not_visible = yes
+
+		cost = 0
+		days_remove = 30
+
+		ai_will_do = {
+			factor = 500
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_start_uprisings"
+			GCW_decrease_influence_small = yes
+			set_country_flag = GCW_decision_taken
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove GER_GCW_start_uprisings"
+			clr_country_flag = GCW_decision_taken
+			FROM = {
+				random_state = {
+					limit = {
+						is_controlled_by = FROM
+						any_neighbor_state = {
+							is_controlled_by = ROOT
+						}
+					}
+					custom_effect_tooltip = GER_GCW_start_uprisings_tt
+					hidden_effect = {
+						ROOT = {
+							set_state_controller = PREV
+							if = {
+								limit = {
+									NOT = { has_template = "Bürgerwehr" }
+								}
+								division_template = {
+									name = "Bürgerwehr"
+									regiments = {
+										light_infantry = { x = 0 y = 0 }
+										light_infantry = { x = 0 y = 1 }
+										light_infantry = { x = 0 y = 2 }
+										light_infantry = { x = 1 y = 0 }
+										light_infantry = { x = 1 y = 1 }
+										light_infantry = { x = 1 y = 2 }
+										light_infantry = { x = 2 y = 0 }
+										light_infantry = { x = 2 y = 1 }
+										light_infantry = { x = 2 y = 2 }
+									}
+									support = {
+										engineer = { x = 0 y = 0 }
+										recon = { x = 0 y = 1 }
+									}
+								}
+							}
+						}
+						create_unit = {
+							division = "division_template = \"Bürgerwehr\" start_experience_factor = 0.1 start_equipment_factor = 0.3"
+							owner = ROOT
+							count = 2
+						}
+						save_event_target_as = GCW_uprising_state
+						FROM = {
+							set_state_controller = PREV
+						}
+					}
+				}
+			}
+		}
+	}
+	GER_GCW_convert_10_influence_to_legitimacy = {
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GCW_influence_more_than_or_equals_10_tt
+				check_variable = { GCW_influence > 9 }
+			}
+		}
+
+		cancel_if_not_visible = yes
+
+		cost = 0
+
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				factor = 100
+				check_variable = { GCW_legitimacy < 50 }
+			}
+			modifier = {
+				factor = 0
+				check_variable = { GCW_legitimacy > 95 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_GCW_convert_10_influence_to_legitimacy"
+			GCW_decrease_influence_large = yes
+			GCW_increase_legitimacy_small = yes
+		}
+	}
+}

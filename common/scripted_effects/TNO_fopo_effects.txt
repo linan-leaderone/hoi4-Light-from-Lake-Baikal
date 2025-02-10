@@ -1,0 +1,1567 @@
+
+# Adds 'conflict_id' to the list of active conflicts
+TNO_add_fopo_conflict_tab = {
+	custom_effect_tooltip = TNO_add_fopo_conflict_tab_tt
+	if = {
+		limit = { NOT = { is_in_array = { TNO_active_conflicts = conflict_id } } }
+		add_to_array = { TNO_active_conflicts = conflict_id }
+
+		set_variable = { selected_conflict_id = conflict_id }
+		clear_array = world_conflict_guis
+		add_to_array = { world_conflict_guis = selected_conflict_id }
+
+		set_variable = { TNO_fopo_selected_front = 1 }
+	}
+	set_temp_variable = { alert_id = token:Alert_Proxy_War_Active }
+	add_TNO_alert_unless_exists = yes
+	hidden_effect = {
+		if = {
+			limit = {
+				check_variable = { NATIONAL_cp_gain_proxy = 0 }
+			}
+			add_dynamic_modifier = { modifier = PROXYNATIONAL_CP_GAIN }
+		}
+		add_to_variable = { NATIONAL_cp_gain_proxy = 0.07 }
+	}
+}
+
+# Removes `conflict_id` from the list of active conflicts
+TNO_remove_fopo_conflict_tab = {
+	custom_effect_tooltip = TNO_remove_fopo_conflict_tab_tt
+	if = {
+		limit = { is_in_array = { TNO_active_conflicts = conflict_id } }
+		remove_from_array = { array = TNO_active_conflicts value = conflict_id }
+	}
+
+	if = {
+		limit = { check_variable = { selected_conflict_id = conflict_id } }
+
+		set_variable = { selected_conflict_id = -1 }
+
+		if = {
+			limit = { check_variable = { TNO_active_conflicts^num > 0 } }
+
+			set_temp_variable = { next_conflict_idx = TNO_active_conflicts^num }
+			subtract_from_temp_variable = { next_conflict_idx = 1 }
+			set_variable = { selected_conflict_id = TNO_active_conflicts^next_conflict_idx }
+
+			clear_array = world_conflict_guis
+			add_to_array = { world_conflict_guis = selected_conflict_id }
+		}
+	}
+
+	if = {
+		limit = {
+			check_variable = { TNO_active_conflicts^num = 0 }
+		}
+		set_temp_variable = { alert_id = token:Alert_Proxy_War_Active }
+		remove_TNO_alert = yes
+	}
+
+	hidden_effect = {
+		add_to_variable = { NATIONAL_cp_gain_proxy = -0.07 }
+		if = {
+			limit = {
+				check_variable = { NATIONAL_cp_gain_proxy = 0 }
+			}
+			remove_dynamic_modifier = { modifier = PROXYNATIONAL_CP_GAIN }
+		}
+	}
+}
+
+# Add/remove Indonesian Civil War
+TNO_fopo_add_indonesia_tab = {
+	set_temp_variable = { conflict_id = token:GC_IndonesiaCW }
+	TNO_add_fopo_conflict_tab = yes
+	if = {
+		limit = { tag = USA }
+		hidden_effect = {
+			PMT = { give_military_access = USA }
+			SLS = { give_military_access = USA }
+			FRI = { give_military_access = USA }
+			NII = { give_military_access = USA }
+			ABD = { give_military_access = USA }
+			DMP = { give_military_access = USA }
+			DMS = { give_military_access = USA }
+			USA = {
+				give_military_access = PMT
+				give_military_access = SLS
+				give_military_access = FRI
+				give_military_access = NII
+				give_military_access = ABD
+				give_military_access = DMP
+				give_military_access = DMS
+			}
+		}
+	}
+	if = {
+		limit = { tag = JAP }
+		hidden_effect = {
+			INS = { give_military_access = JAP }
+			SRB = { give_military_access = JAP }
+			MKS = { give_military_access = JAP }
+			BKB = { give_military_access = JAP }
+
+			JAP = {
+				give_military_access = INS
+				give_military_access = SRB
+				give_military_access = MKS
+				give_military_access = BKB
+			}
+		}
+	}
+}
+TNO_fopo_remove_indonesia_tab = {
+	set_temp_variable = { conflict_id = token:GC_IndonesiaCW }
+	TNO_remove_fopo_conflict_tab = yes
+	if = {
+		limit = { tag = USA }
+		hidden_effect = {
+			PMT = {
+				diplomatic_relation = {
+					country = USA
+					relation = military_access
+					active = no
+				}
+			}
+			SLS = {
+				diplomatic_relation = {
+					country = USA
+					relation = military_access
+					active = no
+				}
+			}
+			FRI = {
+				diplomatic_relation = {
+					country = USA
+					relation = military_access
+					active = no
+				}
+			}
+			NII = {
+				diplomatic_relation = {
+					country = USA
+					relation = military_access
+					active = no
+				}
+			}
+			ABD = {
+				diplomatic_relation = {
+					country = USA
+					relation = military_access
+					active = no
+				}
+			}
+			DMP = {
+				diplomatic_relation = {
+					country = USA
+					relation = military_access
+					active = no
+				}
+			}
+			DMS = {
+				diplomatic_relation = {
+					country = USA
+					relation = military_access
+					active = no
+				}
+			}
+			USA = {
+				diplomatic_relation = {
+					country = PMT
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = SLS
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = FRI
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = NII
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = ABD
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = DMP
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = DMS
+					relation = military_access
+					active = no
+				}
+			}
+		}
+	}
+	if = {
+		limit = { tag = JAP }
+		hidden_effect = {
+			INS = {
+				diplomatic_relation = {
+					country = JAP
+					relation = military_access
+					active = no
+				}
+			}
+			SRB = {
+				diplomatic_relation = {
+					country = JAP
+					relation = military_access
+					active = no
+				}
+			}
+			MKS = {
+				diplomatic_relation = {
+					country = JAP
+					relation = military_access
+					active = no
+				}
+			}
+			BKB = {
+				diplomatic_relation = {
+					country = JAP
+					relation = military_access
+					active = no
+				}
+			}
+
+			JAP = {
+				diplomatic_relation = {
+					country = INS
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = SRB
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = MKS
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = BKB
+					relation = military_access
+					active = no
+				}
+			}
+		}
+	}
+}
+
+# Add/remove South African War
+TNO_fopo_add_saw_tab = {
+	set_temp_variable = { conflict_id = token:GC_SAW }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_saw_tab = {
+	set_temp_variable = { conflict_id = token:GC_SAW }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Jamaican Referendum
+TNO_fopo_add_jamaican_referendum_tab = {
+	set_temp_variable = { conflict_id = token:GC_JamaicanReferendum }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_jamaican_referendum_tab = {
+	set_temp_variable = { conflict_id = token:GC_JamaicanReferendum }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Jamaican Crisis
+
+TNO_fopo_add_jamaican_crisis_tab = {
+	set_temp_variable = { conflict_id = token:GC_JamaicanCrisis }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_jamaican_crisis_tab = {
+	set_temp_variable = { conflict_id = token:GC_JamaicanCrisis }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Iran Civil War
+
+TNO_fopo_add_iran_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_IranCW }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_iran_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_IranCW }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Malayan Civil War
+
+TNO_fopo_add_malaysia_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_MalayanCW }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_malaysia_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_MalayanCW }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Congolese Civil War
+TNO_fopo_add_congo_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_CongoCW }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_congo_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_CongoCW }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+
+# Add/remove West African Crisis
+TNO_fopo_add_wac_tab = {
+	set_temp_variable = { conflict_id = token:GC_WAC }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_wac_tab = {
+	set_temp_variable = { conflict_id = token:GC_WAC }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove angola Civil War
+TNO_fopo_add_angola_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_AngolaCW }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_angola_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_AngolaCW }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Ba'athism Support
+TNO_fopo_add_baathism_support_tab = {
+	set_temp_variable = { conflict_id = token:GC_OilCrisis }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_baathism_support_tab = {
+	set_temp_variable = { conflict_id = token:GC_OilCrisis }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Iberian Wars
+TNO_fopo_add_IBW_tab = {
+	set_temp_variable = { conflict_id = token:GC_IberianWars }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_IBW_tab = {
+	set_temp_variable = { conflict_id = token:GC_IberianWars }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Trinidad Black Power Revolution
+TNO_fopo_add_trinidad_bpr_tab = {
+	set_temp_variable = { conflict_id = token:GC_TrinidadRev }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_trinidad_bpr_tab = {
+	set_temp_variable = { conflict_id = token:GC_TrinidadRev }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove CA_Conference Reunification
+TNO_fopo_add_ca_conference_tab = {
+	set_temp_variable = { conflict_id = token:GC_Turkestan }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_ca_conference_tab = {
+	set_temp_variable = { conflict_id = token:GC_Turkestan }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Mozambican Civil War
+TNO_fopo_add_mozambique_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_MozambiqueCW }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_mozambique_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_MozambiqueCW }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Philippines
+TNO_fopo_add_philippines_tab = {
+	set_temp_variable = { conflict_id = token:GC_BalintawakBlitz }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_philippines_tab = {
+	set_temp_variable = { conflict_id = token:GC_BalintawakBlitz }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove The War for the Philippines
+
+TNO_fopo_add_war_for_philippines_tab = {
+	set_temp_variable = { conflict_id = token:GC_PhilippinesWar }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_war_for_philippines_tab = {
+	set_temp_variable = { conflict_id = token:GC_PhilippinesWar }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove the SAF Reconstruction Mechanic
+
+TNO_fopo_add_saf_reconstruction_conflict_tab = {
+	set_temp_variable = { conflict_id = token:GC_SAWReconstruction }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_saf_reconstruction_conflict_tab = {
+	set_temp_variable = { conflict_id = token:GC_SAWReconstruction }
+	TNO_remove_fopo_conflict_tab = yes
+	hidden_effect = {
+		remove_mission = USA_the_african_quagmire
+		set_country_flag = USA_SAF_WAR_Insurgency_Pulled_Out
+		clr_country_flag = USA_SAF_WAR_Insurgency_Activated
+		clear_variable = USA_manpower_depletion_SAW
+	}
+}
+
+# Add/remove the Madagascar Civil War
+TNO_fopo_add_madagascar_conflict_tab = {
+	set_temp_variable = { conflict_id = token:GC_MalagasyCW }
+	TNO_add_fopo_conflict_tab = yes
+	MAD_setup_proxy_array = yes
+	if = {
+		limit = {
+			tag = USA
+		}
+		set_variable = { MADCW_limited_actions = 3 }
+		set_variable = { MADCW_action_max = 5 }
+		#effect_tooltip = { # activate_mission = USA_MADCW_Action_Counter }
+		hidden_effect = {
+			ZZZ = { activate_mission = ZZZ_USA_MADCW_Action_Counter }
+		}
+	}
+}
+TNO_fopo_remove_madagascar_conflict_tab = {
+	set_temp_variable = { conflict_id = token:GC_MalagasyCW }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove philippines reconstruction
+TNO_fopo_add_philippines_reconstruction_tab = {
+	custom_effect_tooltip = PHI_fopo_begin_reconstruction_tt
+	hidden_effect = {
+		if = {
+			limit = {
+				original_tag = USA
+				country_exists = UPH
+			}
+			activate_mission = USA_UPH_recon_timeout
+		}
+		else_if = {
+			limit = {
+				original_tag = USA
+				country_exists = SPH
+			}
+			activate_mission = USA_SPH_recon_timeout
+		}
+		else_if = {
+			limit = {
+				original_tag = JAP
+			}
+			activate_mission = JAP_PHI_recon_timeout
+		}
+	}
+	set_temp_variable = { conflict_id = token:GC_PhilippinesReconstruction }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_philippines_reconstruction_tab = {
+	set_temp_variable = { conflict_id = token:GC_PhilippinesReconstruction }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Mano Campaign
+TNO_fopo_add_mano_campaign_tab = {
+	set_temp_variable = { conflict_id = token:GC_ManoCamapign }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_mano_campaign_tab = {
+	set_temp_variable = { conflict_id = token:GC_ManoCamapign }
+	TNO_remove_fopo_conflict_tab = yes
+}
+#Orungu
+TNO_fopo_add_orungu_campaign_tab = {
+	set_temp_variable = { conflict_id = token:GC_Orungu }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_orungu_campaign_tab = {
+	set_temp_variable = { conflict_id = token:GC_Orungu }
+	TNO_remove_fopo_conflict_tab = yes
+}
+# SAW Withdrawal
+TNO_fopo_add_saw_withdrawal_tab = {
+	custom_effect_tooltip = SGR_SAW_conclude_tt
+	set_temp_variable = { conflict_id = token:GC_SAWWithdrawal }
+	TNO_add_fopo_conflict_tab = yes
+	TNO_fopo_remove_saw_tab = yes
+	hidden_effect = {
+		set_variable = { GER_withdrawal_timer_var = 365 }
+		# activate_mission = GER_withdrawal_deadline
+	}
+	set_variable = { saw_withdrawal = 1 }
+}
+TNO_fopo_remove_saw_withdrawal_tab = {
+	set_temp_variable = { conflict_id = token:GC_SAWWithdrawal }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# West African Reconstruction Add/remove
+TNO_fopo_add_wafr_reconstruction_tab = {
+	set_temp_variable = { conflict_id = token:GC_WACReconstruction }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_wafr_reconstruction_tab = {
+	set_temp_variable = { conflict_id = token:GC_WACReconstruction }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Puerto Plata Invasion Add/remove
+TNO_fopo_add_puerto_plata_tab = {
+	set_temp_variable = { conflict_id = token:GC_PuertoPlata }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_puerto_plata_tab = {
+	set_temp_variable = { conflict_id = token:GC_PuertoPlata }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# French Reclamation
+TNO_fopo_add_french_reclamation_tab = {
+	if = {
+		limit = { NOT = { has_global_flag = FFR_reclamation_happening } }
+		set_global_flag = FFR_reclamation_happening
+	}
+	set_temp_variable = { conflict_id = token:GC_FranceCW }
+	TNO_add_fopo_conflict_tab = yes
+	if = {
+		limit = { tag = USA }
+		set_variable = { USA_FFR_Reclamation_Modifier_command_power_gain = 0 }
+		set_variable = { USA_FFR_Reclamation_Modifier_political_power_gain = 0 }
+		hidden_effect = { add_dynamic_modifier = { modifier = USA_FFR_Reclamation_Modifier } }
+		USA_FFR_reclamation_dynamic_modifier_calculate = yes
+	}
+}
+TNO_fopo_add_french_reclamation_civil_war_tab = {
+	if = {
+		limit = { NOT = { has_global_flag = FFR_reclamation_civil_war_happening } }
+		set_global_flag = FFR_reclamation_civil_war_happening
+	}
+	set_temp_variable = { conflict_id = token:GC_FranceCW }
+	TNO_add_fopo_conflict_tab = yes
+	if = {
+		limit = { tag = USA }
+		set_variable = { USA_FFR_Reclamation_Modifier_command_power_gain = 0 }
+		set_variable = { USA_FFR_Reclamation_Modifier_political_power_gain = 0 }
+		hidden_effect = { add_dynamic_modifier = { modifier = USA_FFR_Reclamation_Modifier } }
+		USA_FFR_reclamation_dynamic_modifier_calculate = yes
+	}
+}
+TNO_fopo_remove_french_reclamation_any_tab = {
+	if = {
+		limit = { tag = USA }
+		clear_variable = USA_FFR_Reclamation_Modifier_command_power_gain
+		clear_variable = USA_FFR_Reclamation_Modifier_political_power_gain
+		remove_dynamic_modifier = { modifier = USA_FFR_Reclamation_Modifier }
+	}
+	set_temp_variable = { conflict_id = token:GC_FranceCW }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Colombian Civil War Add/remove
+TNO_fopo_add_colombian_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_ColombiaCW }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_colombian_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_ColombiaCW }
+	TNO_remove_fopo_conflict_tab = yes
+}
+COL_load_border_clash_states_array = {
+	add_to_array = { COL.COL_border_clash_states = 1662 }
+	add_to_array = { COL.COL_border_clash_states = 1661 }
+	add_to_array = { COL.COL_border_clash_states = 1660 }
+	add_to_array = { COL.COL_border_clash_states = 493 }
+	add_to_array = { COL.COL_border_clash_states = 1699 }
+	add_to_array = { COL.COL_border_clash_states = 1700 }
+}
+COL_set_civil_war_timer = {
+	set_temp_variable = { COL_civil_war_days = 1164 }
+	set_temp_variable = { COL_global_days = global.num_days }
+	subtract_from_temp_variable = { COL_global_days = 716130 } #num_days fix
+	subtract_from_temp_variable = { COL_civil_war_days = COL_global_days }
+	set_variable = { COL.COL_civil_war_countdown = COL_civil_war_days }
+
+	# activate_mission = USA_COL_civil_war_countdown
+	# activate_mission = JAP_COL_civil_war_countdown
+	# activate_mission = GER_COL_civil_war_countdown
+	# activate_mission = BRA_COL_civil_war_countdown
+	# activate_mission = IBR_COL_civil_war_countdown
+	#probably a better way to do this lol
+}
+
+# Reichsstaat African Cabal Add/remove
+TNO_fopo_add_reichsstaat_african_cabal_tab = {
+	set_temp_variable = { conflict_id = token:GC_ReichsstaatCabal }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_reichsstaat_african_cabal_tab = {
+	set_temp_variable = { conflict_id = token:GC_ReichsstaatCabal }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Iceland Referendum
+TNO_fopo_add_iceland_referendum_tab = {
+	set_temp_variable = { conflict_id = token:GC_IcelandElections }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_iceland_referendum_tab = {
+	set_temp_variable = { conflict_id = token:GC_IcelandElections }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# Add/remove Channel Crisis
+TNO_fopo_add_channel_crisis_tab = {
+	set_temp_variable = { conflict_id = token:GC_ChannelCrisis }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_channel_crisis_tab = {
+	set_temp_variable = { conflict_id = token:GC_ChannelCrisis }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+TNO_bargraph_backround_adjust = {
+	set_variable = { ICE.ICE_OFNSUPPORT_BG = ICE.ICE_OFNSUPPORT }
+	add_to_variable = { ICE.ICE_OFNSUPPORT_BG = 1 }
+
+	set_variable = { ICE.ICE_INDSUPPORT_BG = ICE.ICE_INDSUPPORT }
+	add_to_variable = { ICE.ICE_INDSUPPORT_BG = 1 }
+
+	set_variable = { ICE.ICE_ANTIOFNSUPPORT_BG = ICE.ICE_ANTIOFNSUPPORT }
+	add_to_variable = { ICE.ICE_ANTIOFNSUPPORT_BG = 1 }
+}
+
+ICEPROXY_cycle_end = {
+	ICE = {
+		set_variable = { USA.cycleattack = 0 }
+		set_variable = { GER.cycleattack = 0 }
+
+		if = {
+			limit = {
+				USA = { has_country_flag = ICELANDPROXY_TONE_NEGATIVE }
+			}
+			subtract_from_variable = { USA.ICELANDPROXY_Reputation = 0.05 }
+			clamp_variable = {
+				var = USA.ICELANDPROXY_Reputation
+				min = 0
+				max = 1
+			}
+		}
+		if = {
+			limit = {
+				GER = { has_country_flag = ICELANDPROXY_TONE_NEGATIVE }
+			}
+			subtract_from_variable = { GER.ICELANDPROXY_Reputation = 0.05 }
+			clamp_variable = {
+				var = GER.ICELANDPROXY_Reputation
+				min = 0
+				max = 1
+			}
+		}
+
+		#### TONE, the prisoners dillema thing
+		if = {
+			limit = {
+				AND = {
+					USA = { has_country_flag = ICELANDPROXY_TONE_NEGATIVE }
+					GER = { has_country_flag = ICELANDPROXY_TONE_NEGATIVE }
+				}
+			}
+			add_to_variable = { USA.cycleattack = 2 }
+			add_to_variable = { GER.cycleattack = 2 }
+			subtract_from_variable = { USA.ICELANDPROXY_Reputation = 0.02 }
+			subtract_from_variable = { GER.ICELANDPROXY_Reputation = 0.02 }
+		}
+		else_if = {
+			limit = {
+				AND = {
+					USA = { has_country_flag = ICELANDPROXY_TONE_POSTITIVE }
+					GER = { has_country_flag = ICELANDPROXY_TONE_NEGATIVE }
+				}
+			}
+			add_to_variable = { USA.cycleattack = 3 } #
+			add_to_variable = { GER.cycleattack = 7 } #
+			subtract_from_variable = { USA.ICELANDPROXY_Reputation = 0.05 }
+		}
+		else_if = {
+			limit = {
+				AND = {
+					USA = { has_country_flag = ICELANDPROXY_TONE_NEGATIVE }
+					GER = { has_country_flag = ICELANDPROXY_TONE_POSTITIVE }
+				}
+			}
+			add_to_variable = { USA.cycleattack = 7 } #
+			add_to_variable = { GER.cycleattack = 3 } #
+			subtract_from_variable = { GER.ICELANDPROXY_Reputation = 0.05 }
+		}
+		else_if = {
+			limit = {
+				AND = {
+					USA = { has_country_flag = ICELANDPROXY_TONE_POSTITIVE }
+					GER = { has_country_flag = ICELANDPROXY_TONE_POSTITIVE }
+				}
+			}
+			add_to_variable = { USA.cycleattack = 5 } # yaaaay
+			add_to_variable = { GER.cycleattack = 5 } # yaaaay
+			subtract_from_variable = { USA.ICELANDPROXY_Reputation = 0.07 }
+			subtract_from_variable = { GER.ICELANDPROXY_Reputation = 0.07 }
+		}
+		if = {
+			limit = {
+				AND = {
+					GER = {
+						NOT = {
+							OR = {
+								has_country_flag = ICELANDPROXY_TONE_POSTITIVE
+								has_country_flag = ICELANDPROXY_TONE_NEGATIVE
+							}
+						}
+					}
+					USA = {
+						OR = {
+							has_country_flag = ICELANDPROXY_TONE_POSTITIVE
+							has_country_flag = ICELANDPROXY_TONE_NEGATIVE
+						}
+					}
+				}
+			}
+			set_variable = { GER.cycleattack = 0 } # does nothing?
+			set_variable = { USA.cycleattack = 10 } #
+			subtract_from_variable = { GER.ICELANDPROXY_Reputation = 0.15 }
+		}
+		if = {
+			limit = {
+				AND = {
+					USA = {
+						NOT = {
+							OR = {
+								has_country_flag = ICELANDPROXY_TONE_POSTITIVE
+								has_country_flag = ICELANDPROXY_TONE_NEGATIVE
+							}
+						}
+					}
+					GER = {
+						OR = {
+							has_country_flag = ICELANDPROXY_TONE_POSTITIVE
+							has_country_flag = ICELANDPROXY_TONE_NEGATIVE
+						}
+					}
+				}
+			}
+			set_variable = { USA.cycleattack = 0 } # does nothing?
+			set_variable = { GER.cycleattack = 10 } #
+			subtract_from_variable = { USA.ICELANDPROXY_Reputation = 0.15 }
+		}
+
+		####
+		### division shots!
+		if = {
+			limit = {
+				USA = { has_country_flag = ICELAND_PROXY_Garner_Pos_Press }
+			}
+			divide_variable = { USA.cycleattack = 2 }
+			set_variable = { press_boost = USA.cycleattack }
+			divide_variable = { press_boost = 50 }
+			add_to_variable = { USA.ICELANDPROXY_Reputation = press_boost }
+		}
+		if = {
+			limit = {
+				GER = { has_country_flag = ICELAND_PROXY_Garner_Pos_Press }
+			}
+			divide_variable = { GER.cycleattack = 2 }
+			set_variable = { press_boost = GER.cycleattack }
+			divide_variable = { press_boost = 50 }
+			add_to_variable = { GER.ICELANDPROXY_Reputation = press_boost }
+		}
+
+		# Appeal Group
+		if = {
+			limit = {
+				USA = { has_country_flag = ICELANDPROXY_APPEAL_INDEPENDENTS }
+			}
+
+			set_temp_variable = { reputation_ind_bonus = 0.2 }
+			add_to_temp_variable = { reputation_ind_bonus = USA.ICELANDPROXY_Reputation }
+			if = {
+				limit = {
+					USA = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+				}
+				set_temp_variable = { reputation_ind_bonus = 0.1 }
+			}
+			multiply_variable = { USA.cycleattack = reputation_ind_bonus }
+
+			clamp_variable = {
+				var = USA.cycleattack
+				max = ICE.ICE_INDSUPPORT
+				min = 0
+			}
+
+			subtract_from_variable = { ICE.ICE_INDSUPPORT = USA.cycleattack }
+			add_to_variable = { ICE.ICE_OFNSUPPORT = USA.cycleattack }
+		}
+		else_if = {
+			limit = {
+				USA = { has_country_flag = ICELANDPROXY_APPEAL_BASE }
+			}
+			clamp_variable = {
+				var = USA.cycleattack
+				max = ICE.ICE_ANTIOFNSUPPORT
+				min = 0
+			}
+			subtract_from_variable = { ICE.ICE_ANTIOFNSUPPORT = USA.cycleattack }
+			add_to_variable = { ICE.ICE_INDSUPPORT = USA.cycleattack }
+		}
+		else_if = {
+			limit = {
+				USA = { has_country_flag = ICELANDPROXY_APPEAL_BROAD }
+			}
+			divide_variable = { USA.cycleattack = 2 }
+			set_temp_variable = { part_1_attack = USA.cycleattack }
+			set_temp_variable = { part_2_attack = USA.cycleattack }
+			clamp_temp_variable = {
+				var = part_1_attack
+				max = ICE.ICE_ANTIOFNSUPPORT
+				min = 0
+			}
+			subtract_from_variable = { ICE.ICE_ANTIOFNSUPPORT = part_1_attack }
+			add_to_variable = { ICE.ICE_INDSUPPORT = part_1_attack }
+
+
+			set_temp_variable = { reputation_ind_bonus = 0.2 }
+			add_to_temp_variable = { reputation_ind_bonus = USA.ICELANDPROXY_Reputation }
+			if = {
+				limit = {
+					USA = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+				}
+				set_temp_variable = { reputation_ind_bonus = 0.1 }
+			}
+			multiply_temp_variable = { part_2_attack = reputation_ind_bonus }
+
+			clamp_temp_variable = {
+				var = part_2_attack
+				max = ICE.ICE_INDSUPPORT
+				min = 0
+			}
+			subtract_from_variable = { ICE.ICE_INDSUPPORT = part_2_attack }
+			add_to_variable = { ICE.ICE_OFNSUPPORT = part_2_attack }
+		}
+
+		if = {
+			limit = {
+				GER = { has_country_flag = ICELANDPROXY_APPEAL_INDEPENDENTS }
+			}
+
+			set_temp_variable = { reputation_ind_bonus = 0.2 }
+			add_to_temp_variable = { reputation_ind_bonus = GER.ICELANDPROXY_Reputation }
+			if = {
+				limit = {
+					GER = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+				}
+				set_temp_variable = { reputation_ind_bonus = 0.1 }
+			}
+			multiply_variable = { GER.cycleattack = reputation_ind_bonus }
+
+			clamp_variable = {
+				var = GER.cycleattack
+				max = ICE.ICE_INDSUPPORT
+				min = 0
+			}
+			subtract_from_variable = { ICE.ICE_INDSUPPORT = GER.cycleattack }
+			add_to_variable = { ICE.ICE_ANTIOFNSUPPORT = GER.cycleattack }
+		}
+		else_if = {
+			limit = {
+				GER = { has_country_flag = ICELANDPROXY_APPEAL_BASE }
+			}
+			clamp_variable = {
+				var = GER.cycleattack
+				max = ICE.ICE_OFNSUPPORT
+				min = 0
+			}
+			subtract_from_variable = { ICE.ICE_OFNSUPPORT = GER.cycleattack }
+			add_to_variable = { ICE.ICE_INDSUPPORT = GER.cycleattack }
+		}
+		else_if = {
+			limit = {
+				GER = { has_country_flag = ICELANDPROXY_APPEAL_BROAD }
+			}
+			divide_variable = { GER.cycleattack = 2 }
+			set_temp_variable = { part_1_attack = GER.cycleattack }
+			set_temp_variable = { part_2_attack = GER.cycleattack }
+			clamp_temp_variable = {
+				var = part_1_attack
+				max = ICE.ICE_OFNSUPPORT
+				min = 0
+			}
+			subtract_from_variable = { ICE.ICE_OFNSUPPORT = part_1_attack }
+			add_to_variable = { ICE.ICE_INDSUPPORT = part_1_attack }
+
+			set_temp_variable = { reputation_ind_bonus = 0.2 }
+			add_to_temp_variable = { reputation_ind_bonus = GER.ICELANDPROXY_Reputation }
+			if = {
+				limit = {
+					GER = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+				}
+				set_temp_variable = { reputation_ind_bonus = 0.1 }
+			}
+			multiply_temp_variable = { part_2_attack = reputation_ind_bonus }
+
+			clamp_temp_variable = {
+				var = part_2_attack
+				max = ICE.ICE_INDSUPPORT
+				min = 0
+			}
+			subtract_from_variable = { ICE.ICE_INDSUPPORT = part_2_attack }
+			add_to_variable = { ICE.ICE_ANTIOFNSUPPORT = part_2_attack }
+		}
+
+
+			clamp_variable = {
+				var = USA.ICELANDPROXY_Reputation
+				min = 0
+				max = 1
+			}
+
+			clamp_variable = {
+				var = GER.ICELANDPROXY_Reputation
+				min = 0
+				max = 1
+			}
+
+		ICELAND_bargraph_add_to_100 = yes
+		TNO_bargraph_backround_adjust = yes
+		TNO_ICELAND_calculate_winner_prediction = yes
+	}
+}
+
+ICELAND_bargraph_add_to_100 = {
+	add_to_temp_variable = { max_bargraph_ice = ICE.ICE_OFNSUPPORT }
+	add_to_temp_variable = { max_bargraph_ice = ICE.ICE_ANTIOFNSUPPORT }
+	add_to_temp_variable = { max_bargraph_ice = ICE.ICE_INDSUPPORT }
+
+	set_temp_variable = { OFN_SHIT = ICE.ICE_OFNSUPPORT }
+	divide_temp_variable = { OFN_SHIT = max_bargraph_ice }
+	multiply_temp_variable = { OFN_SHIT = 100 }
+
+	set_temp_variable = { ANTIOFN_SHIT = ICE.ICE_ANTIOFNSUPPORT }
+	divide_temp_variable = { ANTIOFN_SHIT = max_bargraph_ice }
+	multiply_temp_variable = { ANTIOFN_SHIT = 100 }
+
+	set_temp_variable = { IND_SHIT = ICE.ICE_INDSUPPORT }
+	divide_temp_variable = { IND_SHIT = max_bargraph_ice }
+	multiply_temp_variable = { IND_SHIT = 100 }
+
+	set_variable = { ICE.ICE_OFNSUPPORT = OFN_SHIT }
+	set_variable = { ICE.ICE_INDSUPPORT = ANTIOFN_SHIT }
+	set_variable = { ICE.ICE_ANTIOFNSUPPORT = IND_SHIT }
+
+	TNO_bargraph_backround_adjust = yes
+}
+
+TNO_ICELAND_calculate_winner_prediction = {
+	ICE = {
+		clr_country_flag = ICELAND_PROXY_OFN
+		clr_country_flag = ICELAND_PROXY_IND_OFN
+		clr_country_flag = ICELAND_PROXY_NO_LEAD
+		clr_country_flag = ICELAND_PROXY_IND_ANTIOFN
+		clr_country_flag = ICELAND_PROXY_ANTIOFN
+
+		if = {
+			limit = {
+				check_variable = {
+					var = ICE.ICE_OFNSUPPORT
+					value = 50
+					compare = greater_than_or_equals
+				}
+			}
+			set_country_flag = ICELAND_PROXY_OFN
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					var = ICE.ICE_ANTIOFNSUPPORT
+					value = 50
+					compare = greater_than_or_equals
+				}
+			}
+			set_country_flag = ICELAND_PROXY_ANTIOFN
+		}
+		else = {
+			set_temp_variable = { ICE_OFN_PTS = ICE.ICE_OFNSUPPORT }
+			set_temp_variable = { ICE_IND_PTS = ICE.ICE_INDSUPPORT }
+			set_temp_variable = { ICE_ANTIOFN_PTS = ICE.ICE_ANTIOFNSUPPORT }
+
+			if = {
+				limit = {
+					NOT = {
+						OR = {
+							GER = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+							USA = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+						}
+					}
+				}
+				set_temp_variable = { total_rep = USA.ICELANDPROXY_Reputation }
+				add_to_temp_variable = { total_rep = GER.ICELANDPROXY_Reputation }
+				set_temp_variable = { us_multiplier = USA.ICELANDPROXY_Reputation }
+				set_temp_variable = { ger_multiplier = GER.ICELANDPROXY_Reputation }
+
+				divide_temp_variable = { us_multiplier = total_rep }
+				divide_temp_variable = { ger_multiplier = total_rep }
+
+				set_temp_variable = { IND_PT1 = ICE.ICE_INDSUPPORT }
+				set_temp_variable = { IND_PT2 = ICE.ICE_INDSUPPORT }
+
+				multiply_variable = { IND_PT1 = us_multiplier }
+				multiply_variable = { IND_PT2 = ger_multiplier }
+
+				add_to_temp_variable = { ICE_OFN_PTS = IND_PT1 }
+				add_to_temp_variable = { ICE_ANTIOFN_PTS = IND_PT2 }
+			}
+			else_if = {
+				limit = {
+					USA = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+				}
+				add_to_temp_variable = { ICE_ANTIOFN_PTS = ICE_IND_PTS }
+				set_temp_variable = { ICE_IND_PTS = 0 }
+			}
+			else_if = {
+				limit = {
+					GER = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+				}
+				add_to_temp_variable = { ICE_OFN_PTS = ICE_IND_PTS }
+				set_temp_variable = { ICE_IND_PTS = 0 }
+			}
+
+			##
+
+			if = {
+				limit = {
+					OR = {
+						AND = {
+							check_variable = {
+								var = ZZZ.ICEPROXY_mediacycle
+								value = 3
+								compare = less_than_or_equals
+							}
+							check_variable = {
+								var = ICE_OFN_PTS
+								value = 75
+								compare = greater_than_or_equals
+							}
+						}
+						AND = {
+							check_variable = {
+								var = ZZZ.ICEPROXY_mediacycle
+								value = 3
+								compare = greater_than
+							}
+							check_variable = {
+								var = ICE_OFN_PTS
+								value = 50
+								compare = greater_than_or_equals
+							}
+						}
+					}
+				}
+				set_country_flag = ICELAND_PROXY_IND_OFN
+			}
+			else_if = {
+				limit = {
+					OR = {
+						AND = {
+							check_variable = {
+								var = ZZZ.ICEPROXY_mediacycle
+								value = 3
+								compare = less_than_or_equals
+							}
+							check_variable = {
+								var = ICE_ANTIOFN_PTS
+								value = 75
+								compare = greater_than_or_equals
+							}
+						}
+						AND = {
+							check_variable = {
+								var = ZZZ.ICEPROXY_mediacycle
+								value = 3
+								compare = greater_than
+							}
+							check_variable = {
+								var = ICE_ANTIOFN_PTS
+								value = 50
+								compare = greater_than_or_equals
+							}
+						}
+					}
+				}
+				set_country_flag = ICELAND_PROXY_IND_ANTIOFN
+			}
+			else = {
+				set_country_flag = ICELAND_PROXY_NO_LEAD
+			}
+		}
+	}
+}
+
+ICEINFIL_Caught_Countdown = {
+	custom_effect_tooltip = ICEPROX_avoid_get_caught_tt
+	set_variable = { ICEPROX_destroy_evidence = 1 }
+	clr_country_flag = ICEPROX_exposed_cleared
+	set_country_flag = ICEPROX_expose_countdown
+	if = {
+		limit = {
+			tag = USA
+		}
+		# activate_mission = USA_ICE_PROX_investigating_leak
+	}
+	else_if = {
+		limit = {
+			tag = GER
+		}
+		# activate_mission = GER_ICE_PROX_investigating_leak
+	}
+}
+
+TNO_ICELAND_calculate_winner = {
+	clr_country_flag = ICELAND_PROXY_OFN
+	clr_country_flag = ICELAND_PROXY_IND_OFN
+	clr_country_flag = ICELAND_PROXY_NO_LEAD
+	clr_country_flag = ICELAND_PROXY_IND_ANTIOFN
+	clr_country_flag = ICELAND_PROXY_ANTIOFN
+
+	ICE = {
+		set_party_name = {
+			ideology = liberal_conservatism
+			long_name = ICE_liberal_conservatism_party_long
+			name = ICE_liberal_conservatism_party
+		}
+
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						check_variable = {
+							var = ICE.ICE_OFNSUPPORT
+							value = 50
+							compare = greater_than_or_equals
+						}
+						has_game_rule = {
+							rule = ICE_RIOTS
+							option = DEFAULT
+						}
+					}
+					has_game_rule = {
+						rule = ICE_RIOTS
+						option = ICE_RIOTS_OFN_TOTAL
+					}
+				}
+			}
+			### TOTAL OFN VIC
+			set_country_flag = ICELAND_PROXY_OFN
+			hidden_effect = {
+				GER = {
+					country_event = {
+						id = ICE.skeleton.14
+						days = 3
+					}
+				}
+				USA = {
+					country_event = {
+						id = ICE.skeleton.15
+						days = 3
+					}
+				}
+
+				ICE = {
+					random_list = {
+						50 = {
+							modifier = {
+								factor = 0
+								has_game_rule = { rule = ICE_71_ELECTIONS option = ICE_71_ELECTIONS_PROGRESSIVE }
+							}
+							set_politics = {
+								ruling_party = conservatism
+								last_election = "1971.6.13"
+								election_frequency = 48
+								elections_allowed = yes
+							}
+							add_popularity = { ideology = conservatism popularity = 0.03 }
+							retire_ideology_leader = conservatism
+							promote_character = ICE_Geir_Hallgrimsson_1
+							set_party_name = {
+								ideology = conservatism
+								long_name = ICE_conservatism_party_long
+								name = ICE_conservatism_party
+							}
+						}
+						50 = {
+							modifier = {
+								factor = 0
+								has_game_rule = { rule = ICE_71_ELECTIONS option = ICE_71_ELECTIONS_INDEPENDENCE }
+							}
+							set_politics = {
+								ruling_party = conservatism
+								last_election = "1971.6.13"
+								election_frequency = 48
+								elections_allowed = yes
+							}
+							add_popularity = { ideology = conservatism popularity = 0.05 }
+							retire_ideology_leader = conservatism
+							promote_character = ICE_Halldor_Eggert_Sigurosson
+							set_party_name = {
+								ideology = conservatism
+								long_name = ICE_Progs_long
+								name = ICE_Progs
+							}
+						}
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						check_variable = {
+							var = ICE.ICE_ANTIOFNSUPPORT
+							value = 50
+							compare = greater_than_or_equals
+						}
+						has_game_rule = {
+							rule = ICE_RIOTS
+							option = DEFAULT
+						}
+					}
+					has_game_rule = {
+						rule = ICE_RIOTS
+						option = ICE_RIOTS_PAKT_TOTAL
+					}
+				}
+			}
+			### TOTAL PAKT VIC
+			set_country_flag = ICELAND_PROXY_ANTIOFN
+			hidden_effect = {
+				GER = {
+					country_event = {
+						id = ICE.skeleton.12
+						days = 3
+					}
+				}
+				USA = {
+					country_event = {
+						id = ICE.skeleton.13
+						days = 3
+					}
+				}
+				ICE = {
+					set_politics = {
+						ruling_party = progressivism
+						last_election = "1971.6.13"
+						election_frequency = 48
+						elections_allowed = yes
+					}
+					add_popularity = { ideology = progressivism popularity = 0.09 }
+					retire_ideology_leader = progressivism
+					promote_character = ICE_Adda_Bara_Sigfusdottir
+					set_party_name = {
+						ideology = progressivism
+						long_name = ICE_PA
+						name = ICE_PA_sh
+					}
+				}
+			}
+		}
+		else = {
+			set_temp_variable = { ICE_OFN_PTS = ICE.ICE_OFNSUPPORT }
+			set_temp_variable = { ICE_IND_PTS = ICE.ICE_INDSUPPORT }
+			set_temp_variable = { ICE_ANTIOFN_PTS = ICE.ICE_ANTIOFNSUPPORT }
+
+			if = {
+				limit = {
+					NOT = {
+						OR = {
+							GER = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+							USA = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+						}
+					}
+				}
+				set_temp_variable = { total_rep = USA.ICELANDPROXY_Reputation }
+				add_to_temp_variable = { total_rep = GER.ICELANDPROXY_Reputation }
+				set_temp_variable = { us_multiplier = USA.ICELANDPROXY_Reputation }
+				set_temp_variable = { ger_multiplier = GER.ICELANDPROXY_Reputation }
+
+				divide_temp_variable = { us_multiplier = total_rep }
+				divide_temp_variable = { ger_multiplier = total_rep }
+
+				set_temp_variable = { IND_PT1 = ICE.ICE_INDSUPPORT }
+				set_temp_variable = { IND_PT2 = ICE.ICE_INDSUPPORT }
+
+				multiply_variable = { IND_PT1 = us_multiplier }
+				multiply_variable = { IND_PT2 = ger_multiplier }
+
+				add_to_temp_variable = { ICE_OFN_PTS = IND_PT1 }
+				add_to_temp_variable = { ICE_ANTIOFN_PTS = IND_PT2 }
+			}
+			else_if = {
+				limit = {
+					USA = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+				}
+				add_to_temp_variable = { ICE_ANTIOFN_PTS = ICE_IND_PTS }
+				set_temp_variable = { ICE_IND_PTS = 0 }
+			}
+			else_if = {
+				limit = {
+					GER = { has_country_flag = ICELANDPROXY_EXPOSED_COLLUSION }
+				}
+				add_to_temp_variable = { ICE_OFN_PTS = ICE_IND_PTS }
+				set_temp_variable = { ICE_IND_PTS = 0 }
+			}
+
+			##
+
+			if = {
+				limit = {
+					OR = {
+						AND = {
+							check_variable = {
+								var = ICE_OFN_PTS
+								value = 50
+								compare = greater_than_or_equals
+							}
+							has_game_rule = {
+								rule = ICE_RIOTS
+								option = DEFAULT
+							}
+						}
+						has_game_rule = {
+							rule = ICE_RIOTS
+							option = ICE_RIOTS_OFN_SEMI
+						}
+					}
+				}
+				## SEMI OFN WIN, OFN-IND COALITION
+				set_country_flag = ICELAND_PROXY_IND_OFN
+				hidden_effect = {
+					GER = {
+						country_event = {
+							id = ICE.skeleton.14
+							days = 3
+						}
+					}
+					USA = {
+						country_event = {
+							id = ICE.skeleton.15
+							days = 3
+						}
+					}
+					ICE = {
+						random_list = {
+							50 = {
+								modifier = {
+									factor = 0
+									has_game_rule = { rule = ICE_71_ELECTIONS option = ICE_71_ELECTIONS_INDEPENDENCE }
+								}
+								set_politics = {
+									ruling_party = progressivism
+									last_election = "1971.6.13"
+									election_frequency = 48
+									elections_allowed = yes
+								}
+								add_popularity = { ideology = progressivism popularity = 0.03 }
+								retire_ideology_leader = progressivism
+								promote_character = ICE_Gylfi_Thorsteinsson_Gislason
+								set_party_name = {
+									ideology = progressivism
+									long_name = ICE_progressivism_party_long
+									name = ICE_progressivism_party
+								}
+							}
+							50 = {
+								modifier = {
+									factor = 0
+									has_game_rule = { rule = ICE_71_ELECTIONS option = ICE_71_ELECTIONS_SOCDEM }
+								}
+								add_popularity = { ideology = liberal_conservatism popularity = 0.04 }
+								retire_ideology_leader = liberal_conservatism
+								promote_character = ICE_Geir_Hallgrimsson_2
+							}
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						AND = {
+							check_variable = {
+								var = ICE_ANTIOFN_PTS
+								value = 50
+								compare = greater_than_or_equals
+							}
+							has_game_rule = {
+								rule = ICE_RIOTS
+								option = DEFAULT
+							}
+						}
+						has_game_rule = {
+							rule = ICE_RIOTS
+							option = ICE_RIOTS_PAKT_SEMI
+						}
+					}
+				}
+				## SEMI PAKT WIN, PAKT-IND COALITION
+				set_country_flag = ICELAND_PROXY_IND_ANTIOFN
+				hidden_effect = {
+					GER = {
+						country_event = {
+							id = ICE.skeleton.12
+							days = 3
+						}
+					}
+					USA = {
+						country_event = {
+							id = ICE.skeleton.13
+							days = 3
+						}
+					}
+					ICE = {
+						set_politics = {
+							ruling_party = progressivism
+							last_election = "1971.6.13"
+							election_frequency = 48
+							elections_allowed = yes
+						}
+						add_popularity = { ideology = progressivism popularity = 0.03 }
+						retire_ideology_leader = progressivism
+						promote_character = ICE_Hannibal_Valdimarsson
+						set_party_name = {
+							ideology = progressivism
+							long_name = ICE_PA
+							name = ICE_PA_sh
+						}
+					}
+				}
+			}
+		}
+	}
+}
+# England Influence Battle Add/remove
+TNO_fopo_add_england_influence_battle_tab = {
+	set_temp_variable = { conflict_id = token:GC_EnglandInfluenceBattle }
+	TNO_add_fopo_conflict_tab = yes
+}
+TNO_fopo_remove_england_influence_battle_tab = {
+	set_temp_variable = { conflict_id = token:GC_EnglandInfluenceBattle }
+	TNO_remove_fopo_conflict_tab = yes
+}
+
+# HAITIAN CIVIL WAR
+TNO_fopo_add_haitian_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_Haitian_Civil_War }
+	TNO_add_fopo_conflict_tab = yes
+	hidden_effect = {
+		set_country_flag = TNO_HCW_base_phase
+		clr_country_flag = TNO_HCW_buildup_phase
+		clr_country_flag = TNO_HCW_interventionism_phase
+		clr_country_flag = TNO_HCW_disengagement_phase
+
+		clear_array = USA.HAI_map_array
+		clear_array = HAI_map_x
+		clear_array = HAI_map_y
+		set_variable = { HCW_Hinche_frame = 1 }
+		add_to_array = { Haiti_dummy_array = 0 }
+
+		add_to_array = { USA.HAI_map_array = 1728 }
+		add_to_array = { HAI_map_x = 127 }
+		add_to_array = { HAI_map_y = 7 }
+		set_variable = { 1728:HCW_Government_Control = 40 }
+		set_variable = { 1728:HCW_Communist_Control = 20 }
+		set_variable = { 1728:HCW_Divided_Control = 40 }
+
+		add_to_array = { USA.HAI_map_array = 1880 }
+		add_to_array = { HAI_map_x = 222 }
+		add_to_array = { HAI_map_y = 37 }
+		set_variable = { 1880:HCW_Government_Control = 20 }
+		set_variable = { 1880:HCW_Communist_Control = 30 }
+		set_variable = { 1880:HCW_Divided_Control = 50 }
+
+		add_to_array = { USA.HAI_map_array = 1881 }
+		add_to_array = { HAI_map_x = 146 }
+		add_to_array = { HAI_map_y = 149 }
+		set_variable = { 1881:HCW_Government_Control = 45 }
+		set_variable = { 1881:HCW_Communist_Control = 20 }
+		set_variable = { 1881:HCW_Divided_Control = 35 }
+
+		add_to_array = { USA.HAI_map_array = 1882 }
+		add_to_array = { HAI_map_x = 8 }
+		add_to_array = { HAI_map_y = 186 }
+		set_variable = { 1882:HCW_Government_Control = 30 }
+		set_variable = { 1882:HCW_Communist_Control = 20 }
+		set_variable = { 1882:HCW_Divided_Control = 50 }
+
+		set_variable = { HAI_selected_state = 1880 }
+		TNO_HCW_Draw_Pie_Chart = yes
+
+		TNO_HCW_Calculate_Frame = yes
+		set_variable = { HAI_involvement = 5 }
+		set_variable = { HAI_weariness = 0 }
+		set_variable = { HAI.HCW_HAI_professionalism = 0 }
+		set_variable = { HAI.HAI_officer_corp_countdown = 400 }
+		set_variable = { HAI.HAI_army_services_countdown = 200 }
+		set_variable = { HAI.HAI_training_infantry_countdown = 120 }
+		set_variable = { global.HCW_locked_states = 0 }
+
+		TNO_HCW_calc_values = yes
+
+		1728 = { set_variable = { ROOT.HAI_selected_random_state_tick_govt = THIS } }
+		1880 = { set_variable = { ROOT.HAI_selected_random_state_tick_comm = THIS } }
+		# activate_mission = USA_HCW_govt_tick
+		# activate_mission = USA_HCW_ppln_tick
+
+		HAI = { country_event = { id = HIS_HAI.15 days = 30 random_days = 20 } }
+	}
+}
+
+TNO_fopo_remove_haitian_civil_war_tab = {
+	set_temp_variable = { conflict_id = token:GC_Haitian_Civil_War }
+	TNO_remove_fopo_conflict_tab = yes
+	hidden_effect = {
+		clr_country_flag = TNO_HCW_base_phase
+		clr_country_flag = TNO_HCW_buildup_phase
+		clr_country_flag = TNO_HCW_interventionism_phase
+		clr_country_flag = TNO_HCW_disengagement_phase
+
+		clear_array = USA.HAI_map_array
+		clear_array = HAI_map_x
+		clear_array = HAI_map_y
+	}
+}

@@ -1,0 +1,3730 @@
+#Called in ~/common/scripted_effects/TNO_pulse_effects.txt, <first_every_month_script>
+JAP_monthly_pulse = {
+
+	#Diet monthly pulse
+
+	JAP_diet_monthly_pulse = yes
+
+	#Monthly tick for the Showa Emperor NatSpirit, reduces Tension by 1 each month
+	if = {
+		limit = {
+			has_idea = JAP_showa_emperor
+			check_variable = { JAP_tension > 0 }
+		}
+		subtract_from_variable = { JAP_Tension = 1 }
+	}
+
+	#idk what this is use comments you fucking liberals
+	if = {
+		limit = {
+			has_country_flag = japan_kaya_hardliners_making_demands_of_us_flag
+		}
+		subtract_from_variable = { kaya_hardliners_contentment = 5 }
+		clamp_variable = {
+			var = kaya_hardliners_contentment
+			min = 0
+			max = 100
+		}
+		if = {
+			limit = {
+				check_variable = {
+					var = kaya_hardliners_contentment
+					value = 100
+					compare = equals
+				}
+			}
+			country_event = {
+				id = japkaya.150
+				days = 1
+			}
+		}
+		if = {
+			limit = {
+				check_variable = {
+					var = kaya_hardliners_contentment
+					value = 0
+					compare = equals
+				}
+			}
+			country_event = {
+				id = japkaya.151
+				days = 1
+			}
+		}
+	}
+
+	# effect to help the AI not constantly fuck up in the diet
+	if = {
+		limit = {
+			is_ai = yes
+			has_country_flag = JAP_Ino_deposed
+		}
+		JAP_diet_AI_helper = yes
+	}
+
+}
+
+JAP_clear_PM_flags = {
+	clr_country_flag = JAP_Ino_Prime_Minister
+	clr_country_flag = JAP_Ikeda_Prime_Minister
+	clr_country_flag = JAP_Kaya_Prime_Minister
+	clr_country_flag = JAP_Takagi_Prime_Minister
+}
+
+JAP_kaya_start_mechanic = {
+	#Set up some useful arrays
+
+	#The following array represents the total amount of influence a clique has (based on how many seats they have) (UPDATED TO BE BASED ON PIE POPULARITY)
+	add_to_array = {
+		array = JAP_kaya_clique_influence_array
+		value = 0
+		index = 1 #Kido
+	}
+	add_to_array = {
+		array = JAP_kaya_clique_influence_array
+		value = 0
+		index = 2 #Takagi
+	}
+	add_to_array = {
+		array = JAP_kaya_clique_influence_array
+		value = 0
+		index = 4 #Conservatives
+	}
+	add_to_array = {
+		array = JAP_kaya_clique_influence_array
+		value = 0
+		index = 5 #Kaya
+	}
+
+	#The following array represents the total amount of influence a clique is giving you
+	add_to_array = {
+		array = JAP_kaya_clique_loaned_influence_absolute_array
+		value = 0
+		index = 1 #Kido
+	}
+	add_to_array = {
+		array = JAP_kaya_clique_loaned_influence_absolute_array
+		value = 0
+		index = 2 #Takagi
+	}
+	add_to_array = {
+		array = JAP_kaya_clique_loaned_influence_absolute_array
+		value = 0
+		index = 4 #Conservatives
+	}
+	add_to_array = {
+		array = JAP_kaya_clique_loaned_influence_absolute_array
+		value = 0
+		index = 5 #Kaya
+	}
+
+	#This array represents how much influence that clique is lending us
+	add_to_array = {
+		array = JAP_kaya_clique_loaned_influence_percent_array
+		value = 0
+		index = 1 #Kido
+	}
+	add_to_array = {
+		array = JAP_kaya_clique_loaned_influence_percent_array
+		value = 0
+		index = 2 #Takagi
+	}
+	add_to_array = {
+		array = JAP_kaya_clique_loaned_influence_percent_array
+		value = 0
+		index = 4 #Conservatives
+	}
+	add_to_array = {
+		array = JAP_kaya_clique_loaned_influence_percent_array
+		value = 0
+		index = 5 #Kaya
+	}
+	set_variable = { JAP_kaya_clique_loaned_influence_percent_array^1 = 0.4 } #For some reason game refuses to recognize if i have non zero as the value above so this is a workaround for now
+	set_variable = { JAP_kaya_clique_loaned_influence_percent_array^2 = 0.3 }
+	set_variable = { JAP_kaya_clique_loaned_influence_percent_array^4 = 0.6 }
+	set_variable = { JAP_kaya_clique_loaned_influence_percent_array^5 = 1 }
+
+	set_variable = { JAP_kaya_influence_total = 0 } #Varaible for summing up Kaya influence
+	set_variable = { JAP_kaya_influence_ysk = 0 } #How much influence Kaya has over the YSK
+	set_variable = { JAP_kaya_total_ysk_influence = 0 } #Total YSK influence
+	set_variable = { JAP_kaya_kishi_rb_influence = 0.35 } #Determines how much of RB popularity on the wheel goes to Kishi.
+	JAP_kaya_calculate_clique_influences = yes #Figure out clique influences
+	JAP_diet_pop_wheel_translator = yes
+
+	#activate_mission = JAP_kaya_hardliner_demands
+}
+
+JAP_kaya_calculate_influence = {
+	set_variable = { JAP_kaya_influence_total = JAP_kaya_total_ysk_influence }
+	clamp_variable = {
+		var = JAP_kaya_influence_ysk
+		min = 0
+		max = 1
+	}
+	multiply_variable = { JAP_kaya_influence_total = JAP_kaya_influence_ysk }
+}
+
+#Effect for recalculating how much influence each clique in the YSK gives Kaya, should be used whenever diet seats change
+JAP_kaya_calculate_clique_influences = {
+	set_variable = { JAP_kaya_clique_influence_array^1 = JAP.party_popularity@paternalism } #Kido
+	set_variable = { JAP_kaya_clique_influence_array^2 = JAP.party_popularity@conservatism } #Takagi
+	set_variable = { JAP_kaya_clique_influence_array^4 = JAP.party_popularity@fascism } #Conservatives
+	set_variable = { JAP_kaya_clique_influence_array^5 = JAP.party_popularity@despotism } #Kaya
+
+	#Sum up these
+	set_temp_variable = { JAP_kaya_total_ysk_influence_calculator = 0 }
+	add_to_temp_variable = { JAP_kaya_total_ysk_influence_calculator = JAP_kaya_clique_influence_array^1 }
+	add_to_temp_variable = { JAP_kaya_total_ysk_influence_calculator = JAP_kaya_clique_influence_array^2 }
+	add_to_temp_variable = { JAP_kaya_total_ysk_influence_calculator = JAP_kaya_clique_influence_array^4 }
+	add_to_temp_variable = { JAP_kaya_total_ysk_influence_calculator = JAP_kaya_clique_influence_array^5 }
+	set_variable = { JAP_kaya_total_ysk_influence = JAP_kaya_total_ysk_influence_calculator }
+
+	#Now we figure out your new influence amount based omn how much each clique supports you
+
+	set_temp_variable = { JAP_kaya_coalition_influence = 0 }
+
+	#Use support fractions to recalc influence levels
+	set_temp_variable = { JAP_kaya_kido_gain = JAP_kaya_clique_influence_array^1 }
+	multiply_temp_variable = { JAP_kaya_kido_gain = JAP_kaya_clique_loaned_influence_percent_array^1 }
+	add_to_temp_variable = { JAP_kaya_coalition_influence = JAP_kaya_kido_gain }
+	set_variable = { JAP_kaya_clique_loaned_influence_absolute_array^1 = JAP_kaya_kido_gain }
+
+	set_temp_variable = { JAP_kaya_takagi_gain = JAP_kaya_clique_influence_array^2 }
+	multiply_temp_variable = { JAP_kaya_takagi_gain = JAP_kaya_clique_loaned_influence_percent_array^2 }
+	add_to_temp_variable = { JAP_kaya_coalition_influence = JAP_kaya_takagi_gain }
+	set_variable = { JAP_kaya_clique_loaned_influence_absolute_array^2 = JAP_kaya_takagi_gain }
+
+	set_temp_variable = { JAP_kaya_conservative_gain = JAP_kaya_clique_influence_array^4 }
+	multiply_temp_variable = { JAP_kaya_conservative_gain = JAP_kaya_clique_loaned_influence_percent_array^4 }
+	add_to_temp_variable = { JAP_kaya_coalition_influence = JAP_kaya_conservative_gain }
+	set_variable = { JAP_kaya_clique_loaned_influence_absolute_array^4 = JAP_kaya_coalition_influence }
+
+	set_temp_variable = { JAP_kaya_rb_gain = JAP_kaya_clique_influence_array^5 }
+	multiply_temp_variable = { JAP_kaya_rb_gain = JAP_kaya_clique_loaned_influence_percent_array^5 }
+	add_to_temp_variable = { JAP_kaya_coalition_influence = JAP_kaya_rb_gain }
+	set_variable = { JAP_kaya_clique_loaned_influence_absolute_array^5 = JAP_kaya_rb_gain }
+
+	set_variable = { JAP_kaya_influence_ysk = JAP_kaya_coalition_influence }
+
+	#Figure out how much support now derives from rbs
+	divide_temp_variable = { JAP_kaya_rb_gain = JAP_kaya_influence_ysk }
+	set_variable = { JAP_kaya_own_influence = JAP_kaya_rb_gain }
+	JAP_kaya_calculate_influence = yes
+}
+
+#For adding influence from a clique
+#The variables JAP_kaya_influence_divisor and JAP_kaya_targetted_clique need to be set before the effect is invoked.
+JAP_kaya_alter_clique_influence = {
+	#First we figure out how much influence is sought
+	set_temp_variable = { JAP_clique_seat_gain = JAP_kaya_clique_influence_array^JAP_kaya_targetted_clique }
+	divide_temp_variable = { JAP_clique_seat_gain = JAP_kaya_influence_divisor } #You don't get all the support from the clique at once
+	#Now its time to ensure you can't gain more influence from a clique than they actually have
+	subtract_from_variable = { JAP_kaya_influence_ysk = JAP_kaya_clique_loaned_influence_absolute_array^JAP_kaya_targetted_clique } #Remove the old influence amount
+	add_to_variable = { JAP_kaya_clique_loaned_influence_absolute_array^JAP_kaya_targetted_clique = JAP_clique_seat_gain } #Combine the old influence they were giving us with the new influence we will get
+	clamp_variable = { #Clamp that amount
+		var = JAP_kaya_clique_loaned_influence_absolute_array^JAP_kaya_targetted_clique
+		min = 0
+		max = JAP_kaya_clique_influence_array^JAP_kaya_targetted_clique
+	}
+	add_to_variable = { JAP_kaya_influence_ysk = JAP_kaya_clique_loaned_influence_absolute_array^JAP_kaya_targetted_clique } #Add the new influence amount
+	#Calculate how much support Kaya now has from the clique
+	set_temp_variable = { JAP_kaya_influence_fraction_checker = JAP_kaya_clique_loaned_influence_absolute_array^JAP_kaya_targetted_clique } #Temp variable for calcing how much of a clique will support Kaya
+	divide_temp_variable = { JAP_kaya_influence_fraction_checker = JAP_kaya_clique_influence_array^JAP_kaya_targetted_clique } #Gets us the % of the clique that supports us
+	set_variable = { JAP_kaya_clique_loaned_influence_percent_array^JAP_kaya_targetted_clique = JAP_kaya_influence_fraction_checker }
+	clamp_variable = {
+		var = JAP_kaya_clique_loaned_influence_percent_array^JAP_kaya_targetted_clique
+		min = 0
+		max = 1
+	}
+	#Now we figure out your new coalition composition
+	set_temp_variable = { JAP_kaya_rb_influence = JAP_kaya_clique_loaned_influence_absolute_array^5 }
+	divide_temp_variable = { JAP_kaya_rb_influence = JAP_kaya_influence_ysk }
+	set_variable = { JAP_kaya_own_influence = JAP_kaya_rb_influence }
+	clamp_variable = {
+		var = JAP_kaya_own_influence
+		min = 0
+		max = 1
+	}
+	clear_variable = JAP_kaya_targetted_clique
+	clear_variable = JAP_kaya_influence_divisor
+	JAP_kaya_calculate_influence = yes
+}
+
+JAP_kaya_subtract_influence = {
+	#Use as much clique influence as possible
+	set_temp_variable = { JAP_kaya_influence_spending_left = JAP_kaya_influence_reduction }
+	#First we check if we can do all spending from just one clique
+	if = { #Kido
+		limit = { check_variable = { JAP_kaya_clique_loaned_influence_absolute_array^1 > JAP_kaya_influence_reduction } }
+		subtract_from_variable = { JAP_kaya_clique_loaned_influence_absolute_array^1 = JAP_kaya_influence_reduction }
+		subtract_from_variable = { JAP_kaya_influence_ysk = JAP_kaya_clique_loaned_influence_absolute_array^1 }
+	}
+	else_if = { #Takagi
+		limit = { check_variable = { JAP_kaya_clique_loaned_influence_absolute_array^2 > JAP_kaya_influence_reduction } }
+		subtract_from_variable = { JAP_kaya_clique_loaned_influence_absolute_array^2 = JAP_kaya_influence_reduction }
+		subtract_from_variable = { JAP_kaya_influence_ysk = JAP_kaya_clique_loaned_influence_absolute_array^2 }
+	}
+	else_if = { #Conservative
+		limit = { check_variable = { JAP_kaya_clique_loaned_influence_absolute_array^4 > JAP_kaya_influence_reduction } }
+		subtract_from_variable = { JAP_kaya_clique_loaned_influence_absolute_array^4 = JAP_kaya_influence_reduction }
+		subtract_from_variable = { JAP_kaya_influence_ysk = JAP_kaya_clique_loaned_influence_absolute_array^4 }
+	}
+	#We spend portions of influence from each clique untill we havbe used everything
+	else = {
+		subtract_from_temp_variable = { JAP_kaya_influence_spending_left = JAP_kaya_clique_loaned_influence_absolute_array^1 }
+		subtract_from_variable = { JAP_kaya_influence_ysk = JAP_kaya_clique_loaned_influence_absolute_array^1 }
+		set_variable = { JAP_kaya_clique_loaned_influence_absolute_array^1 = 0 }
+		#Check if next clique has enough influence for us to spend the rest of the cost
+		if = { # It is, thank god
+			limit = { check_variable = { JAP_kaya_clique_loaned_influence_absolute_array^2 > JAP_kaya_influence_reduction } }
+			subtract_from_variable = { JAP_kaya_clique_loaned_influence_absolute_array^2 = JAP_kaya_influence_reduction }
+			subtract_from_variable = { JAP_kaya_influence_ysk = JAP_kaya_clique_loaned_influence_absolute_array^2 }
+		}
+		else = { #Nope, prepare for future complications
+			subtract_from_temp_variable = { JAP_kaya_influence_spending_left = JAP_kaya_clique_loaned_influence_absolute_array^2 }
+			subtract_from_variable = { JAP_kaya_influence_ysk = JAP_kaya_clique_loaned_influence_absolute_array^2 }
+			set_variable = { JAP_kaya_clique_loaned_influence_absolute_array^2 = 0 }
+			#Repeat the same thing for the last clique
+			if = { #Last clique is enough
+				limit = { check_variable = { JAP_kaya_clique_loaned_influence_absolute_array^4 > JAP_kaya_influence_reduction } }
+				subtract_from_variable = { JAP_kaya_clique_loaned_influence_absolute_array^4 = JAP_kaya_influence_reduction }
+				subtract_from_variable = { JAP_kaya_influence_ysk = JAP_kaya_clique_loaned_influence_absolute_array^4 }
+			}
+			else = { #It isn't, we need to spend our own influence next
+				subtract_from_temp_variable = { JAP_kaya_influence_spending_left = JAP_kaya_clique_loaned_influence_absolute_array^4 }
+				subtract_from_variable = { JAP_kaya_influence_ysk = JAP_kaya_clique_loaned_influence_absolute_array^4 }
+				set_variable = { JAP_kaya_clique_loaned_influence_absolute_array^4 = 0 }
+				subtract_from_variable = { JAP_kaya_influence_ysk = JAP_kaya_influence_spending_left }
+				subtract_from_variable = { JAP_kaya_clique_loaned_influence_absolute_array^5 = JAP_kaya_influence_spending_left }
+			}
+		}
+	}
+
+	#Update percentage support you have from each clique
+	set_temp_variable = { JAP_kaya_influence_fraction_checker = JAP_kaya_clique_loaned_influence_absolute_array^1 }
+	divide_temp_variable = { JAP_kaya_influence_fraction_checker = JAP_kaya_clique_influence_array^1 } #Gets us the % of the clique that supports us
+	set_variable = { JAP_kaya_clique_loaned_influence_percent_array^1 = JAP_kaya_influence_fraction_checker }
+
+	set_temp_variable = { JAP_kaya_influence_fraction_checker = JAP_kaya_clique_loaned_influence_absolute_array^2 }
+	divide_temp_variable = { JAP_kaya_influence_fraction_checker = JAP_kaya_clique_influence_array^2 } #Gets us the % of the clique that supports us
+	set_variable = { JAP_kaya_clique_loaned_influence_percent_array^2 = JAP_kaya_influence_fraction_checker }
+
+	set_temp_variable = { JAP_kaya_influence_fraction_checker = JAP_kaya_clique_loaned_influence_absolute_array^4 }
+	divide_temp_variable = { JAP_kaya_influence_fraction_checker = JAP_kaya_clique_influence_array^4 } #Gets us the % of the clique that supports us
+	set_variable = { JAP_kaya_clique_loaned_influence_percent_array^4 = JAP_kaya_influence_fraction_checker }
+
+	set_temp_variable = { JAP_kaya_influence_fraction_checker = JAP_kaya_clique_loaned_influence_absolute_array^5 }
+	divide_temp_variable = { JAP_kaya_influence_fraction_checker = JAP_kaya_clique_influence_array^5 } #Gets us the % of the clique that supports us
+	set_variable = { JAP_kaya_clique_loaned_influence_percent_array^5 = JAP_kaya_influence_fraction_checker }
+
+	#Now we figure out your new coalition composition
+	set_temp_variable = { JAP_kaya_rb_influence = JAP_kaya_clique_loaned_influence_absolute_array^5 }
+	divide_temp_variable = { JAP_kaya_rb_influence = JAP_kaya_influence_ysk }
+	set_variable = { JAP_kaya_own_influence = JAP_kaya_rb_influence }
+	clamp_variable = {
+		var = JAP_kaya_own_influence
+		min = 0
+		max = 1
+	}
+
+	JAP_kaya_calculate_influence = yes
+}
+
+JAP_kaya_increase_kishi_influence_low = {
+	custom_effect_tooltip = JAP_kaya_kishi_increase_low
+	add_to_variable = { JAP_kaya_kishi_rb_influence = 0.05 }
+	clamp_variable = {
+		var = JAP_kaya_kishi_rb_influence
+		min = 0
+		max = 1
+	}
+	JAP_kaya_calculate_influence = yes
+	JAP_diet_pop_wheel_translator = yes
+}
+
+JAP_kaya_increase_kishi_influence_medium = {
+	custom_effect_tooltip = JAP_kaya_kishi_increase_medium
+	add_to_variable = { JAP_kaya_kishi_rb_influence = 0.1 }
+	clamp_variable = {
+		var = JAP_kaya_kishi_rb_influence
+		min = 0
+		max = 1
+	}
+	JAP_kaya_calculate_influence = yes
+	JAP_diet_pop_wheel_translator = yes
+}
+
+JAP_kaya_increase_kishi_influence_large = {
+	custom_effect_tooltip = JAP_kaya_kishi_increase_high
+	add_to_variable = { JAP_kaya_kishi_rb_influence = 0.15 }
+	clamp_variable = {
+		var = JAP_kaya_kishi_rb_influence
+		min = 0
+		max = 1
+	}
+	JAP_kaya_calculate_influence = yes
+	JAP_diet_pop_wheel_translator = yes
+}
+
+JAP_kaya_decrease_kishi_influence_low = {
+	custom_effect_tooltip = JAP_kaya_kishi_decrease_low
+	subtract_from_variable = { JAP_kaya_kishi_rb_influence = 0.05 }
+	clamp_variable = {
+		var = JAP_kaya_kishi_rb_influence
+		min = 0
+		max = 1
+	}
+	JAP_kaya_calculate_influence = yes
+	JAP_diet_pop_wheel_translator = yes
+}
+
+JAP_kaya_decrease_kishi_influence_medium = {
+	custom_effect_tooltip = JAP_kaya_kishi_decrease_medium
+	subtract_from_variable = { JAP_kaya_kishi_rb_influence = 0.1 }
+	clamp_variable = {
+		var = JAP_kaya_kishi_rb_influence
+		min = 0
+		max = 1
+	}
+	JAP_kaya_calculate_influence = yes
+	JAP_diet_pop_wheel_translator = yes
+}
+
+JAP_kaya_decrease_kishi_influence_large = {
+	custom_effect_tooltip = JAP_kaya_kishi_decrease_high
+	subtract_from_variable = { JAP_kaya_kishi_rb_influence = 0.15 }
+	clamp_variable = {
+		var = JAP_kaya_kishi_rb_influence
+		min = 0
+		max = 1
+	}
+	JAP_kaya_calculate_influence = yes
+	JAP_diet_pop_wheel_translator = yes
+}
+
+###IKEDA MECHANIC: BROAD SIMILARITY WITH THE KAYA MECHANIC ABOVE###
+JAP_ikeda_start_mechanic = {
+	#Set up some useful arrays
+
+	#The following array represents the total amount of influence a clique has (based on how many seats they have) (UPDATED TO BE BASED ON PIE POPULARITY)
+	add_to_array = {
+		array = JAP_ikeda_clique_influence_array
+		value = 0
+		index = 1 #Kido
+	}
+	add_to_array = {
+		array = JAP_ikeda_clique_influence_array
+		value = 0
+		index = 2 #Takagi
+	}
+	add_to_array = {
+		array = JAP_ikeda_clique_influence_array
+		value = 0
+		index = 4 #Conservatives
+	}
+	add_to_array = {
+		array = JAP_ikeda_clique_influence_array
+		value = 0
+		index = 5 #Kaya
+	}
+
+	#The following array represents the total amount of influence a clique is giving you
+	add_to_array = {
+		array = JAP_ikeda_clique_loaned_influence_absolute_array
+		value = 0
+		index = 1 #Kido
+	}
+	add_to_array = {
+		array = JAP_ikeda_clique_loaned_influence_absolute_array
+		value = 0
+		index = 2 #Takagi
+	}
+	add_to_array = {
+		array = JAP_ikeda_clique_loaned_influence_absolute_array
+		value = 0
+		index = 4 #Conservatives
+	}
+	add_to_array = {
+		array = JAP_ikeda_clique_loaned_influence_absolute_array
+		value = 0
+		index = 5 #Kaya
+	}
+
+	#This array represents how much influence that clique is lending us
+	add_to_array = {
+		array = JAP_ikeda_clique_loaned_influence_percent_array
+		value = 0.05
+		index = 1 #Kido
+	}
+	add_to_array = {
+		array = JAP_ikeda_clique_loaned_influence_percent_array
+		value = 0.1
+		index = 2 #Takagi
+	}
+	add_to_array = {
+		array = JAP_ikeda_clique_loaned_influence_percent_array
+		value = 1
+		index = 4 #Conservatives
+	}
+	add_to_array = {
+		array = JAP_ikeda_clique_loaned_influence_percent_array
+		value = 0
+		index = 5 #Kaya
+	}
+	set_variable = { JAP_ikeda_clique_loaned_influence_percent_array^1 = 0.7 }
+	set_variable = { JAP_ikeda_clique_loaned_influence_percent_array^2 = 0.3 }
+	set_variable = { JAP_ikeda_clique_loaned_influence_percent_array^4 = 1 }
+	set_variable = { JAP_ikeda_clique_loaned_influence_percent_array^5 = 0.4 }
+
+	JAP_ikeda_calculate_clique_influences = yes #Figure out clique influences
+}
+
+JAP_ikeda_calculate_influence = {
+	set_variable = { JAP_ikeda_influence_total = JAP_ikeda_total_ysk_influence }
+	clamp_variable = {
+		var = JAP_ikeda_influence_ysk
+		min = 0
+		max = 1
+	}
+	multiply_variable = { JAP_ikeda_influence_total = JAP_ikeda_influence_ysk }
+}
+
+#Effect for recalculating how much influence each clique in the YSK gives Ikeda, should be used whenever diet seats change
+JAP_ikeda_calculate_clique_influences = {
+	set_variable = { JAP_ikeda_clique_influence_array^1 = JAP.party_popularity@paternalism } #Kido
+	set_variable = { JAP_ikeda_clique_influence_array^2 = JAP.party_popularity@conservatism } #Takagi
+	set_variable = { JAP_ikeda_clique_influence_array^4 = JAP.party_popularity@fascism } #Conservatives
+	set_variable = { JAP_ikeda_clique_influence_array^5 = JAP.party_popularity@despotism } #Kaya
+
+
+	#Sum up these
+	set_temp_variable = { JAP_ikeda_total_ysk_influence_calculator = 0 }
+	add_to_temp_variable = { JAP_ikeda_total_ysk_influence_calculator = JAP_ikeda_clique_influence_array^1 }
+	add_to_temp_variable = { JAP_ikeda_total_ysk_influence_calculator = JAP_ikeda_clique_influence_array^2 }
+	add_to_temp_variable = { JAP_ikeda_total_ysk_influence_calculator = JAP_ikeda_clique_influence_array^4 }
+	add_to_temp_variable = { JAP_ikeda_total_ysk_influence_calculator = JAP_ikeda_clique_influence_array^5 }
+
+	for_each_loop = {
+		array = JAP_ikeda_clique_influence_array
+		add_to_temp_variable = { JAP_ikeda_total_ysk_influence_calculator = v }
+	}
+	set_variable = { JAP_ikeda_total_ysk_influence = JAP_ikeda_total_ysk_influence_calculator }
+
+	#Now we figure out your new influence amount based omn how much each clique supports you
+	set_temp_variable = { JAP_ikeda_coalition_influence = 0 }
+
+	#Use support fractions to recalc influence levels
+	set_temp_variable = { JAP_ikeda_kido_gain = JAP_ikeda_clique_influence_array^1 }
+	multiply_temp_variable = { JAP_ikeda_kido_gain = JAP_ikeda_clique_loaned_influence_percent_array^1 }
+	add_to_temp_variable = { JAP_ikeda_coalition_influence = JAP_ikeda_kido_gain }
+	set_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^1 = JAP_ikeda_kido_gain }
+	clamp_variable = {
+		var = JAP_ikeda_clique_loaned_influence_absolute_array^1
+		min = 0
+		max = 1
+	}
+
+	set_temp_variable = { JAP_ikeda_takagi_gain = JAP_ikeda_clique_influence_array^2 }
+	multiply_temp_variable = { JAP_ikeda_takagi_gain = JAP_ikeda_clique_loaned_influence_percent_array^2 }
+	add_to_temp_variable = { JAP_ikeda_coalition_influence = JAP_ikeda_takagi_gain }
+	set_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^2 = JAP_ikeda_takagi_gain }
+	clamp_variable = {
+		var = JAP_ikeda_clique_loaned_influence_absolute_array^2
+		min = 0
+		max = 1
+	}
+
+	set_temp_variable = { JAP_ikeda_conservative_gain = JAP_ikeda_clique_influence_array^4 }
+	multiply_temp_variable = { JAP_ikeda_conservative_gain = JAP_ikeda_clique_loaned_influence_percent_array^4 }
+	add_to_temp_variable = { JAP_ikeda_coalition_influence = JAP_ikeda_conservative_gain }
+	set_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^4 = JAP_ikeda_coalition_influence }
+	clamp_variable = {
+		var = JAP_ikeda_clique_loaned_influence_absolute_array^4
+		min = 0
+		max = 1
+	}
+
+	set_temp_variable = { JAP_ikeda_rb_gain = JAP_ikeda_clique_influence_array^5 }
+	log = "[GetDateText]: [?JAP_ikeda_clique_loaned_influence_percent_array^5]"
+	multiply_temp_variable = { JAP_ikeda_rb_gain = JAP_ikeda_clique_loaned_influence_percent_array^5 }
+	add_to_temp_variable = { JAP_ikeda_coalition_influence = JAP_ikeda_rb_gain }
+	set_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^5 = JAP_ikeda_rb_gain }
+	clamp_variable = {
+		var = JAP_ikeda_clique_loaned_influence_absolute_array^5
+		min = 0
+		max = 1
+	}
+
+	set_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_coalition_influence }
+	clamp_variable = {
+		var = JAP_ikeda_influence_ysk
+		min = 0
+		max = 1
+	}
+
+	#FIgure out how much support now derives from conservatives
+	set_temp_variable = { JAP_ikeda_conservative_gain = JAP_ikeda_clique_loaned_influence_absolute_array^4 }
+	divide_temp_variable = { JAP_ikeda_conservative_gain = JAP_ikeda_influence_ysk }
+	set_variable = { JAP_ikeda_own_influence = JAP_ikeda_conservative_gain }
+	clamp_variable = {
+		var = JAP_ikeda_own_influence
+		min = 0
+		max = 1
+	}
+	JAP_ikeda_calculate_influence = yes
+}
+
+#For adding influence from a clique
+JAP_ikeda_alter_clique_influence = {
+	#First we figure out how much influence is sought
+	set_temp_variable = { JAP_clique_seat_gain = JAP_ikeda_clique_influence_array^JAP_ikeda_targetted_clique }
+	divide_temp_variable = { JAP_clique_seat_gain = JAP_ikeda_influence_divisor } #You don't get all the support from the clique at once
+
+	log = "[GetDateText]: [?JAP_clique_seat_gain]"
+	#Now its time to ensure you can't gain more influence from a clique than they actually have
+	subtract_from_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_clique_loaned_influence_absolute_array^JAP_ikeda_targetted_clique } #Remove the old influence amount
+	add_to_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^JAP_ikeda_targetted_clique = JAP_clique_seat_gain }
+	clamp_variable = {
+		var = JAP_ikeda_clique_loaned_influence_absolute_array^JAP_ikeda_targetted_clique
+		min = 0
+		max = JAP_ikeda_clique_influence_array^JAP_ikeda_targetted_clique
+	}
+	add_to_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_clique_loaned_influence_absolute_array^JAP_ikeda_targetted_clique } #Add the new influence amount
+
+	#Calculate how much support Kaya now has from the clique
+	set_temp_variable = { JAP_ikeda_influence_fraction_checker = JAP_ikeda_clique_loaned_influence_absolute_array^JAP_ikeda_targetted_clique } #Temp variable for calcing how much of a clique will support Kaya
+	divide_temp_variable = { JAP_ikeda_influence_fraction_checker = JAP_ikeda_clique_influence_array^JAP_ikeda_targetted_clique } #Gets us the % of the clique that supports us
+	set_variable = { JAP_ikeda_clique_loaned_influence_percent_array^JAP_ikeda_targetted_clique = JAP_ikeda_influence_fraction_checker }
+	clamp_variable = {
+		var = JAP_ikeda_clique_loaned_influence_percent_array^JAP_ikeda_targetted_clique
+		min = 0
+		max = 1
+	}
+
+	#Now we figure out your new coalition composition
+	set_temp_variable = { JAP_ikeda_conservative_gain = JAP_ikeda_clique_loaned_influence_absolute_array^4 }
+	divide_temp_variable = { JAP_ikeda_conservative_gain = JAP_ikeda_influence_ysk }
+	set_variable = { JAP_ikeda_own_influence = JAP_ikeda_conservative_gain }
+	clamp_variable = {
+		var = JAP_ikeda_own_influence
+		min = 0
+		max = 1
+	}
+
+	clear_variable = JAP_ikeda_targetted_clique
+	clear_variable = JAP_ikeda_influence_divisor
+	JAP_ikeda_calculate_influence = yes
+}
+
+JAP_ikeda_subtract_influence = {
+	#Use as much clique influence as possible
+	set_temp_variable = { JAP_ikeda_influence_spending_left = JAP_ikeda_influence_reduction }
+
+	#First we check if we can do all spending from just one clique
+	if = { #Kido
+		limit = { check_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^1 > JAP_ikeda_influence_reduction } }
+		subtract_from_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^1 = JAP_ikeda_influence_reduction }
+		subtract_from_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_clique_loaned_influence_absolute_array^1 }
+	}
+	else_if = { #Takagi
+		limit = { check_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^2 > JAP_ikeda_influence_reduction } }
+		subtract_from_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^2 = JAP_ikeda_influence_reduction }
+		subtract_from_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_clique_loaned_influence_absolute_array^2 }
+	}
+	else_if = { #Conservative
+		limit = { check_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^4 > JAP_ikeda_influence_reduction } }
+		subtract_from_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^4 = JAP_ikeda_influence_reduction }
+		subtract_from_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_clique_loaned_influence_absolute_array^4 }
+	}
+	#We spend portions of influence from each clique untill we havbe used everything
+	else = {
+		subtract_from_temp_variable = { JAP_ikeda_influence_spending_left = JAP_ikeda_clique_loaned_influence_absolute_array^1 }
+		subtract_from_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_clique_loaned_influence_absolute_array^1 }
+		set_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^1 = 0 }
+		#Check if next clique has enough influence for us to spend the rest of the cost
+		if = { # It is, thank god
+			limit = { check_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^2 > JAP_ikeda_influence_reduction } }
+			subtract_from_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^2 = JAP_ikeda_influence_reduction }
+			subtract_from_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_clique_loaned_influence_absolute_array^2 }
+		}
+		else = { #Nope, prepare for future complications
+			subtract_from_temp_variable = { JAP_ikeda_influence_spending_left = JAP_ikeda_clique_loaned_influence_absolute_array^2 }
+			subtract_from_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_clique_loaned_influence_absolute_array^2 }
+			set_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^2 = 0 }
+			#Repeat the same thing for the last clique
+			if = { #Last clique is enough
+				limit = { check_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^4 > JAP_ikeda_influence_reduction } }
+				subtract_from_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^4 = JAP_ikeda_influence_reduction }
+				subtract_from_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_clique_loaned_influence_absolute_array^4 }
+			}
+			else = { #It isn't, we need to spend our own influence next
+				subtract_from_temp_variable = { JAP_ikeda_influence_spending_left = JAP_ikeda_clique_loaned_influence_absolute_array^4 }
+				subtract_from_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_clique_loaned_influence_absolute_array^4 }
+				set_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^4 = 0 }
+				subtract_from_variable = { JAP_ikeda_influence_ysk = JAP_ikeda_influence_spending_left }
+				subtract_from_variable = { JAP_ikeda_clique_loaned_influence_absolute_array^5 = JAP_ikeda_influence_spending_left }
+			}
+		}
+	}
+	#Update percentage support you have from each clique
+	set_temp_variable = { JAP_ikeda_influence_fraction_checker = JAP_ikeda_clique_loaned_influence_absolute_array^1 }
+	divide_temp_variable = { JAP_ikeda_influence_fraction_checker = JAP_ikeda_clique_influence_array^1 } #Gets us the % of the clique that supports us
+	set_variable = { JAP_ikeda_clique_loaned_influence_percent_array^1 = JAP_ikeda_influence_fraction_checker }
+
+	set_temp_variable = { JAP_ikeda_influence_fraction_checker = JAP_ikeda_clique_loaned_influence_absolute_array^2 }
+	divide_temp_variable = { JAP_ikeda_influence_fraction_checker = JAP_ikeda_clique_influence_array^2 } #Gets us the % of the clique that supports us
+	set_variable = { JAP_ikeda_clique_loaned_influence_percent_array^2 = JAP_ikeda_influence_fraction_checker }
+
+	set_temp_variable = { JAP_ikeda_influence_fraction_checker = JAP_ikeda_clique_loaned_influence_absolute_array^4 }
+	divide_temp_variable = { JAP_ikeda_influence_fraction_checker = JAP_ikeda_clique_influence_array^4 } #Gets us the % of the clique that supports us
+	set_variable = { JAP_ikeda_clique_loaned_influence_percent_array^4 = JAP_ikeda_influence_fraction_checker }
+
+	set_temp_variable = { JAP_ikeda_influence_fraction_checker = JAP_ikeda_clique_loaned_influence_absolute_array^5 }
+	divide_temp_variable = { JAP_ikeda_influence_fraction_checker = JAP_ikeda_clique_influence_array^5 } #Gets us the % of the clique that supports us
+	set_variable = { JAP_ikeda_clique_loaned_influence_percent_array^5 = JAP_ikeda_influence_fraction_checker }
+
+	#Now we figure out your new coalition composition
+	set_temp_variable = { JAP_ikeda_conservative_gain = JAP_ikeda_clique_loaned_influence_absolute_array^4 }
+	divide_temp_variable = { JAP_ikeda_conservative_gain = JAP_ikeda_influence_ysk }
+	set_variable = { JAP_ikeda_own_influence = JAP_ikeda_conservative_gain }
+	clamp_variable = {
+		var = JAP_ikeda_own_influence
+		min = 0
+		max = 1
+	}
+
+	JAP_ikeda_calculate_influence = yes
+}
+
+JAP_tree_swap = {
+	if = {
+		limit = {
+			has_country_flag = JAP_Ikeda_Prime_Minister
+			NOT = { has_focus_tree = JAP_ikeda_tree }
+		}
+		load_focus_tree = { tree = JAP_ikeda_tree keep_completed = yes }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = JAP_Takagi_Prime_Minister
+			NOT = { has_focus_tree = JAP_takagi_tree }
+		}
+		load_focus_tree = { tree = JAP_takagi_tree keep_completed = yes }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = JAP_Kaya_Prime_Minister
+			NOT = { has_focus_tree = JAP_kaya_tree }
+		}
+		load_focus_tree = { tree = JAP_kaya_tree keep_completed = yes }
+	}
+	else_if = {
+		limit = {
+			NOT = {
+				has_focus_tree = JAP_main_tree
+				OR = {
+					has_country_flag = JAP_Kaya_Prime_Minister
+					has_country_flag = JAP_Takagi_Prime_Minister
+					has_country_flag = JAP_Ikeda_Prime_Minister
+				}
+			}
+		}
+		load_focus_tree = { tree = JAP_main_tree keep_completed = yes }
+	}
+	mark_focus_tree_layout_dirty = yes
+}
+
+JPN_guarded_pearl_success_check = {
+	set_temp_variable = {
+		IJA_check = IJA_Cooperation
+	}
+	set_temp_variable = {
+		IJN_check = IJN_Cooperation
+	}
+	subtract_from_temp_variable = {
+		IJA_check = IJN_check
+	}
+	if = {
+		limit = { check_variable = { IJA_check = 0 } NOT = { has_idea = JAP_Dai_Li_conspiracy } }
+		country_event = {
+			id = jap_newflavour.48
+			days = 30
+			random_days = 10
+		}
+	}
+	else_if = {
+		limit = { NOT = { check_variable = { IJA_check = 0 } } NOT = { has_idea = JAP_Dai_Li_conspiracy } }
+		country_event = {
+			id = jap_newflavour.49
+			days = 30
+			random_days = 10
+		}
+	}
+	else = {
+		country_event = {
+			id = jap_newflavour.50
+			days = 30
+			random_days = 10
+		}
+	}
+}
+
+JAP_find_new_prime_minister = {
+	if = { # Ikeda resigned
+		limit = { check_variable = { JAP_resigning_pm = 4 } }
+
+		if = { # Takagi is stronger than Kaya
+			limit = { check_variable = { JAP_Diet_Faction_Power^2 > JAP_Diet_Faction_Power^5 } }
+			country_event = { id = japresignation.17 days = 3 }
+		}
+
+		else_if = { # Kaya is stronger than Takagi
+			limit = { check_variable = { JAP_Diet_Faction_Power^2 < JAP_Diet_Faction_Power^5 } }
+			country_event = { id = japresignation.19 days = 3 }
+		}
+
+		else = { # They are tied
+			random_list = {
+				1 = {
+					country_event = { id = japresignation.17 days = 3 }
+				}
+				1 = {
+					country_event = { id = japresignation.19 days = 3 }
+				}
+			}
+		}
+	}
+
+	else_if = { # Takagi resigned
+		limit = { check_variable = { JAP_resigning_pm = 2 } }
+
+		if = { # Ikeda is stronger than Kaya
+			limit = { check_variable = { JAP_Diet_Faction_Power^4 > JAP_Diet_Faction_Power^5 } }
+			country_event = { id = japresignation.18 days = 3 }
+		}
+
+		else_if = { # Kaya is stronger than Ikeda
+			limit = { check_variable = { JAP_Diet_Faction_Power^4 < JAP_Diet_Faction_Power^5 } }
+			country_event = { id = japresignation.19 days = 3 }
+		}
+
+		else = { # They are tied
+			random_list = {
+				1 = {
+					country_event = { id = japresignation.18 days = 3 }
+				}
+				1 = {
+					country_event = { id = japresignation.19 days = 3 }
+				}
+			}
+		}
+	}
+
+	else_if = { # Kaya resigned
+		limit = { check_variable = { JAP_resigning_pm = 5 } }
+
+		if = { # Ikeda is stronger than Takagi
+			limit = { check_variable = { JAP_Diet_Faction_Power^4 > JAP_Diet_Faction_Power^2 } }
+			country_event = { id = japresignation.18 days = 3 }
+		}
+
+		else_if = { # Takagi is stronger than Ikeda
+			limit = { check_variable = { JAP_Diet_Faction_Power^4 < JAP_Diet_Faction_Power^2 } }
+			country_event = { id = japresignation.17 days = 3 }
+		}
+
+		else = { # They are tied
+			random_list = {
+				1 = {
+					country_event = { id = japresignation.18 days = 3 }
+				}
+				1 = {
+					country_event = { id = japresignation.17 days = 3 }
+				}
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			OR = {
+				has_game_rule = {
+					rule = JAP_NEW_INTERREGNUM
+					option = JAP_NEW_INTERREGNUM_KAYA
+				}
+				has_game_rule = {
+					rule = JAP_NEW_INTERREGNUM
+					option = JAP_NEW_INTERREGNUM_TAKAGI
+				}
+				has_game_rule = {
+					rule = JAP_NEW_INTERREGNUM
+					option = JAP_NEW_INTERREGNUM_IKEDA
+				}
+			}
+		}
+		clr_country_flag = JAP_new_interregnum
+	}
+
+}
+
+### Japanese Sphere Diplomacy GUI ###
+JAP_clear_all_country_interactions = {
+	clr_country_flag = JapanDiploChinaInteractionsVisible
+	clr_country_flag = JapanDiploGuangdongInteractionsVisible
+	clr_country_flag = JapanDiploGuangxiInteractionsVisible
+	clr_country_flag = JapanDiploGuizhouInteractionsVisible
+	clr_country_flag = JapanDiploManchuriaInteractionsVisible
+	clr_country_flag = JapanDiploMengjiangInteractionsVisible
+	clr_country_flag = JapanDiploShaanxiInteractionsVisible
+	clr_country_flag = JapanDiploSichuanInteractionsVisible
+
+	clr_country_flag = JapanDiploIndiaInteractionsVisible
+	clr_country_flag = JapanDiploBengalInteractionsVisible
+	clr_country_flag = JapanDiploBhutanInteractionsVisible
+	clr_country_flag = JapanDiploNepalInteractionsVisible
+	clr_country_flag = JapanDiploAfghanInteractionsVisible
+
+	clr_country_flag = JapanDiploXikangInteractionsVisible
+	clr_country_flag = JapanDiploXinjiangInteractionsVisible
+	clr_country_flag = JapanDiploHuiInteractionsVisible
+	clr_country_flag = JapanDiploTibetInteractionsVisible
+	clr_country_flag = JapanDiploMaInteractionsVisible
+
+	clr_country_flag = JapanDiploRussiaInteractionsVisible
+
+	clr_country_flag = JapanDiploBurmaInteractionsVisible
+	clr_country_flag = JapanDiploYunnanInteractionsVisible
+	clr_country_flag = JapanDiploThailandInteractionsVisible
+	clr_country_flag = JapanDiploPhilInteractionsVisible
+	clr_country_flag = JapanDiploIndonesiaInteractionsVisible
+	clr_country_flag = JapanDiploShounanInteractionsVisible
+	clr_country_flag = JapanDiploVietnamInteractionsVisible
+	clr_country_flag = JapanDiploLaosInteractionsVisible
+	clr_country_flag = JapanDiploCambodiaInteractionsVisible
+}
+
+### BILLS MECHANIC ###
+JAP_bills_initialise = {
+
+	for_loop_effect = {
+		start = 0
+		end = 6 # need a null one at 0 because of the way japan arrays are numbered. Just start at 0 next time pleaaaaase
+		add_to_array = { JAP_mps_in_favour = 0 }
+		add_to_array = { JAP_supportive_mps_perc = 0 }
+	}
+	set_variable = { JAP_total_mp_support = 0 }
+}
+
+# Sets up intiial stats for chosen bill
+JAP_initiate_bill = {
+	set_variable = { JAP_bill_id = temp_bill_id } # This is so the tooltip works
+	set_variable = { JAP_bill_proposing_faction = temp_bill_proposing_faction } # Set here so the tooltip works
+
+
+	if = { # CONSERVATIVE|INO - Expand Lobbying
+		limit = { check_variable = { JAP_bill_id = 1 } }
+		set_variable = { JAP_bill_significance_fail = 5 }
+		set_variable = { JAP_bill_significance_pass = 5 }
+	}
+	else_if = { # REFORMIST|TAKAGI #KD's Notes - Fuck this line of code, ruins all of my hopes and dreams of having dynamic bills
+		limit = { check_variable = { JAP_prime_minister = 2 } }
+
+		if = { # Railway Privitization Act
+			limit = { check_variable = { JAP_bill_id = 201 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # Fair Competition and Practicies Act
+			limit = { check_variable = { JAP_bill_id = 202 } }
+			set_variable = { JAP_bill_significance_fail = 8 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # Trade Renewal Act
+			limit = { check_variable = { JAP_bill_id = 203 } }
+			set_variable = { JAP_bill_significance_fail = 7 }
+			set_variable = { JAP_bill_significance_pass = 3 }
+		}
+		else_if = { # Price Control Act
+			limit = { check_variable = { JAP_bill_id = 204 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 4 }
+		}
+		else_if = { # Industrial Development Act
+			limit = { check_variable = { JAP_bill_id = 205 } }
+			set_variable = { JAP_bill_significance_fail = 15 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # Reform on Political Organisation Act
+			limit = { check_variable = { JAP_bill_id = 206 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 8 }
+		}
+		else_if = { # Parliamentary Powers Act
+			limit = { check_variable = { JAP_bill_id = 207 } }
+			set_variable = { JAP_bill_significance_fail = 20 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+		else_if = { # Bureaucratic Reform Act
+			limit = { check_variable = { JAP_bill_id = 208 } }
+			set_variable = { JAP_bill_significance_fail = 15 }
+			set_variable = { JAP_bill_significance_pass = 7 }
+		}
+		else_if = { # Army Rationalisation Act
+			limit = { check_variable = { JAP_bill_id = 209 } }
+			set_variable = { JAP_bill_significance_fail = 15 }
+			set_variable = { JAP_bill_significance_pass = 7 }
+		}
+		else_if = { # Anti-Corruption Act
+			limit = { check_variable = { JAP_bill_id = 210 } }
+			set_variable = { JAP_bill_significance_fail = 15 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+		else_if = { # Financial Reform Act
+			limit = { check_variable = { JAP_bill_id = 211 } }
+			set_variable = { JAP_bill_significance_fail = 20 }
+			set_variable = { JAP_bill_significance_pass = 12 }
+		}
+		else_if = { # Financial Reform Act
+			limit = { check_variable = { JAP_bill_id = 212 } }
+			set_variable = { JAP_bill_significance_fail = 12 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # National Eugenics Law Reform
+			limit = { check_variable = { JAP_bill_id = 213 } }
+			if = {
+				limit = { has_completed_focus = JAP_TakagiRecon_Kato_To_The_Table }
+				set_variable = { JAP_bill_significance_fail = 15 }
+				set_variable = { JAP_bill_significance_pass = 6 }
+			}
+			else_if = {
+				limit = { has_completed_focus = JAP_TakagiRecon_Silencing_Activism }
+				set_variable = { JAP_bill_significance_fail = 25 }
+				set_variable = { JAP_bill_significance_pass = 13 }
+			}
+
+		}
+		else_if = { # Liquidation of the North Borneo Administration Act
+			limit = { check_variable = { JAP_bill_id = 214 } }
+			set_variable = { JAP_bill_significance_fail = 25 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+	}
+	else_if = { # CONSERVATIVE|IKEDA
+		limit = { check_variable = { JAP_prime_minister = 4 } }
+
+		if = { # Parliamentary Powers Act
+			limit = { check_variable = { JAP_bill_id = 401 } }
+			set_variable = { JAP_bill_significance_fail = 12 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # Electoral Reform Act
+			limit = { check_variable = { JAP_bill_id = 402 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 5 }
+		}
+		else_if = { # Electoral Constituencies Act
+			limit = { check_variable = { JAP_bill_id = 403 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # Repealing National Security Laws
+			limit = { check_variable = { JAP_bill_id = 404 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 3 }
+		}
+		else_if = { # Anti-Corruption Act
+			limit = { check_variable = { JAP_bill_id = 405 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 2 }
+		}
+		else_if = { # Repealing the National Mobilisation Law
+			limit = { check_variable = { JAP_bill_id = 406 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 8 }
+		}
+		else_if = { # Formation of the Yen Bloc
+			limit = { check_variable = { JAP_bill_id = 407 } }
+			set_variable = { JAP_bill_significance_fail = 20 }
+			set_variable = { JAP_bill_significance_pass = 12 }
+		}
+		else_if = { # Corporate Relief Act
+			limit = { check_variable = { JAP_bill_id = 408 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 5 }
+		}
+		else_if = { # General State Welfare Act
+			limit = { check_variable = { JAP_bill_id = 409 } }
+			if = {
+				limit = { has_completed_focus = JAP_generous_stopgaps }
+				set_variable = { JAP_bill_significance_fail = 20 }
+				set_variable = { JAP_bill_significance_pass = 12 }
+			}
+			else = {
+				set_variable = { JAP_bill_significance_fail = 12 }
+				set_variable = { JAP_bill_significance_pass = 6 }
+			}
+
+		}
+		else_if = { # National Employment Act
+			limit = { check_variable = { JAP_bill_id = 410 } }
+			set_variable = { JAP_bill_significance_fail = 15 }
+			set_variable = { JAP_bill_significance_pass = 7 }
+		}
+		else_if = { # Agricultural Relief Act
+			limit = { check_variable = { JAP_bill_id = 411 } }
+			set_variable = { JAP_bill_significance_fail = 12 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+
+		else_if = { # Access to Higher Education Act
+			limit = { check_variable = { JAP_bill_id = 412 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 5 }
+		}
+
+		else_if = { # Rural Development Act
+			limit = { check_variable = { JAP_bill_id = 413 } }
+			set_variable = { JAP_bill_significance_fail = 15 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+
+		else_if = { # Pensions Act
+			limit = { check_variable = { JAP_bill_id = 414 } }
+			set_variable = { JAP_bill_significance_fail = 15 }
+			set_variable = { JAP_bill_significance_pass = 7 }
+		}
+
+		else_if = { # Development of the Sphere Act
+			limit = { check_variable = { JAP_bill_id = 415 } }
+			set_variable = { JAP_bill_significance_fail = 15 }
+			set_variable = { JAP_bill_significance_pass = 8 }
+		}
+
+		else_if = { # Aviation Act
+			limit = { check_variable = { JAP_bill_id = 416 } }
+			set_variable = { JAP_bill_significance_fail = 12 }
+			set_variable = { JAP_bill_significance_pass = 5 }
+		}
+
+		else_if = { # Maritime Development Act
+			limit = { check_variable = { JAP_bill_id = 417 } }
+			set_variable = { JAP_bill_significance_fail = 8 }
+			set_variable = { JAP_bill_significance_pass = 5 }
+		}
+
+		else_if = { # Financial Regulation Act
+			limit = { check_variable = { JAP_bill_id = 418 } }
+			set_variable = { JAP_bill_significance_fail = 20 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+
+		else_if = { # Corporate Regulation Act
+			limit = { check_variable = { JAP_bill_id = 419 } }
+			set_variable = { JAP_bill_significance_fail = 25 }
+			set_variable = { JAP_bill_significance_pass = 15 }
+		}
+	}
+
+	else_if = { # HARDLINERS|KAYA
+		limit = { check_variable = { JAP_prime_minister = 5 } }
+		if = { # Industrial Stimulus Expansion Act
+			limit = { check_variable = { JAP_bill_id = 501 } }
+			set_variable = { JAP_bill_significance_fail = 12 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # Agricultural Support and Modernisation Act
+			limit = { check_variable = { JAP_bill_id = 502 } }
+			set_variable = { JAP_bill_significance_fail = 16 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # State Insurance and Labour Organisation Act
+			limit = { check_variable = { JAP_bill_id = 503 } }
+			set_variable = { JAP_bill_significance_fail = 12 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # Light Industrial Development Act
+			limit = { check_variable = { JAP_bill_id = 504 } }
+			set_variable = { JAP_bill_significance_fail = 12 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # Industrial Acquisitions and Mergers Act
+			limit = { check_variable = { JAP_bill_id = 505 } }
+			set_variable = { JAP_bill_significance_fail = 20 }
+			set_variable = { JAP_bill_significance_pass = 12 }
+		}
+		else_if = { # Corporate Stabilisation Act
+			limit = { check_variable = { JAP_bill_id = 506 } }
+			set_variable = { JAP_bill_significance_fail = 12 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # Imperial Industrial Plan of [GetYear]
+			limit = { check_variable = { JAP_bill_id = 507 } }
+			set_variable = { JAP_bill_significance_fail = 20 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+		else_if = { # Japan Electrification and Transportation Plan of [GetYear]
+			limit = { check_variable = { JAP_bill_id = 508 } }
+			set_variable = { JAP_bill_significance_fail = 20 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+		else_if = { # Industrial Rationalisation Act
+			limit = { check_variable = { JAP_bill_id = 509 } }
+			set_variable = { JAP_bill_significance_fail = 5 }
+			set_variable = { JAP_bill_significance_pass = 5 }
+		}
+		else_if = { # Nippon Oil Expansion Plan
+			limit = { check_variable = { JAP_bill_id = 510 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+		else_if = { # Corporate Power Restrictions Act
+			limit = { check_variable = { JAP_bill_id = 511 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # State Economic Reorganisation Act
+			limit = { check_variable = { JAP_bill_id = 512 } }
+			set_variable = { JAP_bill_significance_fail = 12 }
+			set_variable = { JAP_bill_significance_pass = 4 }
+		}
+		else_if = { # Trans-Pacific Economic Mobilisation Act
+			limit = { check_variable = { JAP_bill_id = 513 } }
+			set_variable = { JAP_bill_significance_fail = 15 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+		else_if = { # Diet Anti-Corruption and Fair Practices Act
+			limit = { check_variable = { JAP_bill_id = 514 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 5 }
+		}
+		else_if = { # National Values Preservation Act
+			limit = { check_variable = { JAP_bill_id = 515 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 6 }
+		}
+		else_if = { # State Economic Relief Act
+			limit = { check_variable = { JAP_bill_id = 516 } }
+			set_variable = { JAP_bill_significance_fail = 5 }
+			set_variable = { JAP_bill_significance_pass = 5 }
+		}
+		else_if = { # Bureaucratic-Cabinet Planning Board Establishment Act
+			limit = { check_variable = { JAP_bill_id = 517 } }
+			set_variable = { JAP_bill_significance_fail = 10 }
+			set_variable = { JAP_bill_significance_pass = 5 }
+		}
+		else_if = { # Greater East Asia Defense Mobilisation Plan
+			limit = { check_variable = { JAP_bill_id = 518 } }
+			set_variable = { JAP_bill_significance_fail = 12 }
+			set_variable = { JAP_bill_significance_pass = 8 }
+		}
+		else_if = { # Higher Education Regulation Act
+			limit = { check_variable = { JAP_bill_id = 519 } }
+			set_variable = { JAP_bill_significance_fail = 20 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+		else_if = { # Ensure Political Loyalty
+			limit = { check_variable = { JAP_bill_id = 520 } }
+			set_variable = { JAP_bill_significance_fail = 18 }
+			set_variable = { JAP_bill_significance_pass = 9 }
+		}
+		else_if = { # Strategic Industry Departement Act
+			limit = { check_variable = { JAP_bill_id = 521 } }
+			set_variable = { JAP_bill_significance_fail = 16 }
+			set_variable = { JAP_bill_significance_pass = 8 }
+		}
+		else_if = { # Greater East Asian Naval Defence Programme
+			limit = { check_variable = { JAP_bill_id = 522 } }
+			set_variable = { JAP_bill_significance_fail = 20 }
+			set_variable = { JAP_bill_significance_pass = 10 }
+		}
+	}
+
+	# sets supportive mps to approval
+	for_each_loop = {
+		array = JAP_faction_approval
+		set_temp_variable = { JAP_supportive_mps_perc^i = JAP_faction_approval^i }
+	}
+
+	JAP_bills_calc_support_for_bill_initial = yes
+	custom_effect_tooltip = JAP_introduce_bill_tt
+	activate_mission = JAP_bill_voting_mission
+}
+
+# gives effects for chosen bill if passed
+JAP_bill_effects = {
+	if = { # used if already has high growth and is after a resignation to prevent runaway growth
+		limit = {
+			has_country_flag = JAP_resignation_has_happened
+			has_country_flag = JAP_is_econ_bill
+			check_variable = { GDP_growth_real > 2.5 }
+		}
+		set_temp_variable = { temp_econ_GDP_boost_percentage = 0.005 }
+		econ_GDP_boost_once_percentage = yes
+
+	}
+	else_if = {
+		limit = {
+			check_variable = { JAP_bill_id = 1 }
+		}
+		add_political_power = 25
+		add_tech_bonus = {
+			name = industry
+			bonus = 0.5
+			uses = 2
+			category = industry
+		}
+		TNO_worsen_regulations_policy_effectiveness_med = yes
+		TNO_worsen_political_parties_policy_effectiveness_low = yes
+	}
+	else_if = {
+		limit = { check_variable = { JAP_prime_minister = 2 } }
+
+		if = { # Privatise Railways
+			limit = { check_variable = { JAP_bill_id = 201 } }
+			add_timed_idea = {
+				idea = JAP_takagi_railway_privatization
+				days = 180
+			}
+			custom_effect_tooltip = Takagi_privatize_railway_tt
+			set_country_flag = JAP_Railways_Privatized
+			set_temp_variable = { gdp_growth_temp = 0.5 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = 0.2 }
+			econ_inflation_change = yes
+			set_temp_variable = { money_reserves_temp = 0.75 }
+			econ_money_reserves_change_raw_money = yes
+		}
+		else_if = { # Fair Competition and Practicies Act
+			limit = { check_variable = { JAP_bill_id = 202 } }
+			swap_ideas = {
+				remove_idea = JAP_zaibatsu_question
+				add_idea = JAP_zaibatsu_question_2
+			}
+			set_temp_variable = { gdp_growth_temp = 0.5 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = 0.2 }
+			econ_inflation_change = yes
+		}
+		else_if = { # Trade Renewal Act
+			limit = { check_variable = { JAP_bill_id = 203 } }
+			tno_trade_laws_worsen = yes
+			set_temp_variable = { gdp_growth_temp = 0.5 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = -0.2 }
+			econ_inflation_change = yes
+		}
+		else_if = { # Price Controls Act
+			limit = { check_variable = { JAP_bill_id = 204 } }
+			set_temp_variable = { gdp_growth_temp = 1 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = 0.65 }
+			econ_inflation_change = yes
+		}
+		else_if = { # Industrial Development Act
+			limit = { check_variable = { JAP_bill_id = 205 } }
+			if = {
+				limit = { has_completed_focus = JAP_subsidies_keiretsu }
+				set_temp_variable = { gdp_growth_temp = 0.75 }
+				econ_gdp_growth_change = yes
+				set_temp_variable = { inflation_temp = 0.25 }
+				econ_inflation_change = yes
+				if = {
+				limit = { has_idea = JAP_zaibatsu_question }
+					swap_ideas = {
+						remove_idea = JAP_zaibatsu_question
+						add_idea = JAP_zaibatsu_question_2
+					}
+				}
+				if = {
+				limit = { has_idea = JAP_zaibatsu_question_2 }
+					swap_ideas = {
+						remove_idea = JAP_zaibatsu_question_2
+						add_idea = JAP_zaibatsu_question_3
+					}
+				}
+			}
+			else_if = {
+				limit = { has_completed_focus = JAP_aid_zaibatsus }
+				set_temp_variable = { gdp_growth_temp = 1 }
+				econ_gdp_growth_change = yes
+				set_temp_variable = { inflation_temp = 0.25 }
+				econ_inflation_change = yes
+			}
+		}
+		else_if = { # Reform on Political Organisation Act
+			limit = { check_variable = { JAP_bill_id = 206 } }
+			JAP_Takagi_increase_power_avg = yes
+			JAP_Ino_increase_power_avg = yes
+			add_political_power = 50
+			set_temp_variable = { temp_selected_faction = 5 }
+			set_temp_variable = { temp_support_change = -0.025 }
+			JAP_change_faction_support = yes
+			set_temp_variable = { temp_all_support_change = 0.012 }
+			JAP_change_all_other_faction_support = yes
+			TNO_worsen_political_parties_policy_effectiveness_med = yes
+		}
+		else_if = { # Parliamentary Powers Act
+			limit = { check_variable = { JAP_bill_id = 207 } }
+			JAP_Takagi_increase_power_subst = yes
+			JAP_Ino_increase_power_avg = yes
+			TNO_improve_political_parties_policy_effectiveness_high = yes
+		}
+		else_if = { # Bureaucratic Reform Act
+			limit = { check_variable = { JAP_bill_id = 208 } }
+			JAP_Ino_decrease_power_small = yes
+			JAP_Kaya_decrease_power_avg = yes
+			TNO_improve_admin_efficiency_high= yes
+		}
+		else_if = { # Army Rationalisation Act
+			limit = { check_variable = { JAP_bill_id = 209 } }
+			tno_military_supervision_improve = yes
+			JAP_IJA_decrease_big = yes
+			JAP_IJN_increase_med = yes
+			JAP_Kaya_decrease_power_avg = yes
+			TNO_improve_admin_efficiency_high = yes
+		}
+		else_if = { # Anti-Corruption Act
+			limit = { check_variable = { JAP_bill_id = 210 } }
+			add_political_power = 75
+			TNO_improve_admin_efficiency_high = yes
+			JAP_HoP_support_increase_med = yes
+			JAP_PA_support_increase_small = yes
+		}
+		else_if = { # Financial Reform Act (Nakasone)
+			limit = { check_variable = { JAP_bill_id = 211 } }
+			set_temp_variable = { gdp_growth_temp = 1 }
+			econ_gdp_growth_change = yes
+			TNO_worsen_regulations_policy_effectiveness_med = yes
+			hidden_effect = { country_event = { id = japtakagirecon.25 days = 2 } }
+		}
+		else_if = { # Financial Reform Act (Takagi)
+			limit = { check_variable = { JAP_bill_id = 212 } }
+			set_temp_variable = { gdp_growth_temp = 0.45 }
+			econ_gdp_growth_change = yes
+			tno_minimum_wage_improve = yes
+			hidden_effect = { country_event = { id = japtakagirecon.35 days = 2 } }
+		}
+		else_if = { # National Eugenics Law Reform
+			limit = { check_variable = { JAP_bill_id = 213 } }
+			if = {
+				limit = { has_completed_focus = JAP_TakagiRecon_Kato_To_The_Table }
+				tno_gender_rights_improve = yes
+				TNO_improve_gender_rights_policy_effectiveness_high = yes
+				#TNO_improve_lgbt_rights_policy_effectiveness_high = yes
+				JAP_Ino_increase_power_avg = yes
+				set_temp_variable = { temp_selected_faction = 4 }
+				set_temp_variable = { temp_support_change = 0.05 }
+				JAP_change_faction_support = yes
+			}
+			else_if = {
+				limit = { has_completed_focus = JAP_TakagiRecon_Silencing_Activism }
+				add_political_power = 50
+				tno_gender_rights_improve = yes
+				TNO_worsen_gender_rights_policy_effectiveness_high = yes
+				JAP_Takagi_increase_power_avg = yes
+			}
+		}
+		else_if = { # Liquidation of the North Borneo Administration Act
+			limit = { check_variable = { JAP_bill_id = 214 } }
+			set_country_flag = JAP_north_borneo_bill_passed
+			custom_effect_tooltip = JAP_north_borneo_bill_effect_tt
+		}
+
+	}
+
+	else_if = {
+		limit = { check_variable = { JAP_prime_minister = 4 } }
+
+		if = { # Parliamentary Powers Act
+			limit = { check_variable = { JAP_bill_id = 401 } }
+			JAP_HoP_support_increase_med = yes
+			TNO_improve_admin_efficiency_high = yes
+			TNO_improve_political_parties_policy_effectiveness_med = yes
+			TNO_improve_penal_system_policy_effectiveness_low = yes
+			JAP_Ino_increase_power_avg = yes
+			JAP_Takagi_increase_power_small = yes
+		}
+		else_if = { # Electoral Reform Act
+			limit = { check_variable = { JAP_bill_id = 402 } }
+			JAP_Takagi_increase_power_avg = yes
+			set_temp_variable = { temp_selected_faction = 2 }
+			set_temp_variable = { temp_support_change = 0.05 }
+			JAP_change_faction_support = yes
+			set_temp_variable = { temp_selected_faction = 4 }
+			set_temp_variable = { temp_support_change = -0.025 }
+			JAP_change_faction_support = yes
+			JAP_PA_support_increase_big = yes
+			tno_vote_franchise_improve = yes
+			hidden_effect = {
+				TNO_worsen_vote_franchise_policy_effectiveness_high = yes
+				TNO_improve_vote_franchise_policy_effectiveness_monthly_med = yes
+			}
+		}
+		else_if = { # Electoral Constituencies Act
+			limit = { check_variable = { JAP_bill_id = 403 } }
+			JAP_HoP_support_increase_big = yes
+			TNO_improve_admin_efficiency_med = yes
+			add_political_power = 50
+			set_temp_variable = { temp_selected_faction = 2 }
+			set_temp_variable = { temp_support_change = -0.05 }
+			JAP_change_faction_support = yes
+			set_temp_variable = { temp_selected_faction = 5 }
+			set_temp_variable = { temp_support_change = -0.05 }
+			JAP_change_faction_support = yes
+		}
+		else_if = { # Repealing National Security Laws
+			limit = { check_variable = { JAP_bill_id = 404 } }
+			add_stability = -0.01
+			JAP_PA_support_increase_med	= yes
+			TNO_improve_public_meetings_policy_effectiveness_monthly_high = yes
+			TNO_improve_admin_efficiency_med = yes
+			JAP_Takagi_increase_power_small = yes
+			JAP_Ino_increase_power_small = yes
+			set_temp_variable = { temp_selected_faction = 2 }
+			set_temp_variable = { temp_support_change = 0.05 }
+			JAP_change_faction_support = yes
+		}
+		else_if = { # Anti-Corruption Act
+			limit = { check_variable = { JAP_bill_id = 405 } }
+			JAP_Kaya_decrease_power_subst = yes
+			JAP_PA_support_increase_small = yes
+			add_timed_idea = { idea = JAP_ikeda_anticorruption_measures days = 365 }
+			TNO_improve_admin_efficiency_high = yes
+			TNO_improve_army_professionalism_low = yes
+		}
+		else_if = { # Repealing the National Mobilisation Law
+			limit = { check_variable = { JAP_bill_id = 406 } }
+			JAP_PA_support_increase_med = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.005 }
+			set_temp_variable = { gdp_growth_temp = 0.85 }
+			econ_gdp_growth_change = yes
+			econ_GDP_boost_once_percentage = yes
+			set_temp_variable = { inflation_temp = 0.45 }
+			econ_inflation_change = yes
+		}
+		else_if = { # Formation of the Yen Bloc
+			limit = { check_variable = { JAP_bill_id = 407 } }
+			add_political_power = 50
+			set_temp_variable = { gdp_growth_temp = 0.25 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = -0.25 }
+			econ_inflation_change = yes
+			every_country = {
+				limit = {
+					check_variable = { ECON_SPHERE_LEADER = JAP }
+					NOT = { has_country_flag = tno_playable_country }
+				}
+				set_temp_variable = { gdp_growth_temp = 0.25 }
+				econ_gdp_growth_change = yes
+			}
+		}
+		else_if = { # Corporate Relief Act
+			limit = { check_variable = { JAP_bill_id = 408 } }
+			add_stability = 0.06
+			set_temp_variable = { gdp_growth_temp = 0.5 }
+			econ_gdp_growth_change = yes
+			JAP_PA_support_decrease_med = yes
+			set_temp_variable = { temp_selected_faction = 5 }
+			set_temp_variable = { temp_support_change = 0.05 }
+			JAP_change_faction_support = yes
+			set_temp_variable = { temp_econ_spending_amount = 0.25 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		else_if = { # General State Welfare Act
+			limit = { check_variable = { JAP_bill_id = 409 } }
+			if = {
+				limit = { has_completed_focus = JAP_generous_stopgaps }
+				add_political_power = 50
+				tno_unemployment_improve = yes
+				hidden_effect = {
+					TNO_worsen_unemployment_policy_effectiveness_high = yes
+					TNO_improve_unemployment_policy_effectiveness_monthly_med = yes
+				}
+				TNO_improve_poverty_high = yes
+				JAP_PA_support_increase_med = yes
+
+				set_temp_variable = { temp_selected_faction = 4 }
+				set_temp_variable = { temp_support_change = -0.05 }
+				JAP_change_faction_support = yes
+				set_temp_variable = { temp_selected_faction = 2 }
+				set_temp_variable = { temp_support_change = 0.05 }
+				JAP_change_faction_support = yes
+				set_temp_variable = { temp_econ_spending_amount = 0.25 }
+				econ_spend_money_once_effect_raw_money = yes
+			}
+			else_if = {
+				limit = { has_completed_focus = JAP_mind_the_state_coffers }
+				TNO_improve_unemployment_policy_effectiveness_monthly_low = yes
+				TNO_improve_poverty_med = yes
+				JAP_PA_support_increase_small = yes
+
+				set_temp_variable = { temp_selected_faction = 2 }
+				set_temp_variable = { temp_support_change = -0.05 }
+				JAP_change_faction_support = yes
+				set_temp_variable = { temp_econ_spending_amount = 0.1 }
+				econ_spend_money_once_effect_raw_money = yes
+			}
+		}
+		else_if = { # National Employment Act
+			limit = { check_variable = { JAP_bill_id = 410 } }
+			if = {
+				limit = { has_completed_focus = JAP_the_corporate_handbook }
+				set_temp_variable = { business_tax_temp = -0.05 }
+				econ_business_tax_rate_change = yes
+				TNO_worsen_regulations_policy_effectiveness_med = yes
+				TNO_improve_poverty_low = yes
+				set_temp_variable = { gdp_growth_temp = 0.5 }
+				econ_gdp_growth_change = yes
+				set_temp_variable = { temp_selected_faction = 2 }
+				set_temp_variable = { temp_support_change = 0.05 }
+				JAP_change_faction_support = yes
+			}
+			else_if = {
+				limit = { has_completed_focus = JAP_the_technocrats_ideals }
+				TNO_improve_trade_unions_policy_effectiveness_low = yes
+				TNO_improve_minimum_wage_policy_effectiveness_low = yes
+				TNO_improve_poverty_high = yes
+				set_temp_variable = { gdp_growth_temp = 0.35 }
+				econ_gdp_growth_change = yes
+				set_temp_variable = { temp_selected_faction = 5 }
+				set_temp_variable = { temp_support_change = 0.1 }
+				JAP_change_faction_support = yes
+			}
+		}
+		else_if = { # Agricultural Relief Act
+			limit = { check_variable = { JAP_bill_id = 411 } }
+			TNO_improve_agriculture_high = yes
+			TNO_improve_poverty_med = yes
+			set_temp_variable = { gdp_growth_temp = 0.25 }
+			econ_gdp_growth_change = yes
+			JAP_Ino_increase_power_mini = yes
+		}
+
+		else_if = { # Access to Higher Education Act
+			limit = { check_variable = { JAP_bill_id = 412 } }
+			tno_education_improve = yes
+			TNO_improve_industrial_expertise_low = yes
+			TNO_improve_academic_base_low = yes
+			TNO_improve_research_facilities_low = yes
+			hidden_effect = {
+				TNO_improve_education_policy_effectiveness_monthly_high = yes
+				TNO_worsen_education_policy_effectiveness_med = yes
+				country_event = { id = japikedaflavour.3 }
+			}
+		}
+
+		else_if = { # Rural Development Act
+			limit = { check_variable = { JAP_bill_id = 413 } }
+			hidden_effect = { country_event = { id = japikedaflavour.5 } }
+			JAP_PA_support_increase_small = yes
+			TNO_improve_poverty_high = yes
+			random_owned_controlled_state = {
+				limit = {
+					is_core_of = JAP
+					OR = {
+						has_state_category = rural
+						has_state_category = town
+						has_state_category = pastoral
+					}
+					check_variable = { state_value > 100 }
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+				set_temp_variable = { state_value_multiplier_temp = 1.025 }
+				econ_state_value_change_multiply = yes
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_core_of = JAP
+					OR = {
+						has_state_category = rural
+						has_state_category = town
+						has_state_category = pastoral
+					}
+					check_variable = { state_value > 100 }
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+				set_temp_variable = { state_value_multiplier_temp = 1.025 }
+				econ_state_value_change_multiply = yes
+			}
+			set_temp_variable = { temp_econ_spending_amount = 0.825 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+
+		else_if = { # Pensions Act
+			limit = { check_variable = { JAP_bill_id = 414 } }
+			hidden_effect = { country_event = { id = japikedaflavour.6 days = 2 } }
+			JAP_PA_support_increase_med = yes
+			tno_pensions_improve = yes
+			TNO_improve_poverty_med = yes
+			hidden_effect = {
+				TNO_worsen_pensions_policy_effectiveness_high = yes
+				TNO_improve_pensions_policy_effectiveness_monthly_med = yes
+			}
+		}
+
+		else_if = { # Development of the Sphere Act
+			limit = { check_variable = { JAP_bill_id = 415 } }
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.005 }
+			econ_GDP_boost_once_percentage = yes
+			set_temp_variable = { gdp_growth_temp = 0.35 }
+			econ_gdp_growth_change = yes
+			every_country = {
+				limit = {
+					check_variable = { ECON_SPHERE_LEADER = JAP }
+					NOT = { TAG = JAP }
+				}
+				set_temp_variable = { gdp_growth_temp = 0.25 }
+				econ_gdp_growth_change = yes
+			}
+		}
+
+		else_if = { # Aviation Act
+			limit = { check_variable = { JAP_bill_id = 416 } }
+			JAP_IJA_increase_big = yes
+			TNO_improve_army_professionalism_med = yes
+			set_temp_variable = { gdp_growth_temp = 0.15 }
+			econ_gdp_growth_change = yes
+			add_tech_bonus = {
+				name = air_equipment
+				bonus = 0.50
+				uses = 2
+				category = air_equipment
+			}
+			random_owned_controlled_state = {
+				limit = {
+					air_base > 1
+					air_base < 8
+					is_core_of = JAP
+				}
+				add_building_construction = {
+					type = air_base
+					level = 2
+					instant_build = yes
+				}
+				set_temp_variable = { state_value_multiplier_temp = 1.01 }
+				econ_state_value_change_multiply = yes
+			}
+			random_owned_controlled_state = {
+				limit = {
+					air_base > 1
+					air_base < 8
+					is_core_of = JAP
+				}
+				add_building_construction = {
+					type = air_base
+					level = 2
+					instant_build = yes
+				}
+				set_temp_variable = { state_value_multiplier_temp = 1.01 }
+				econ_state_value_change_multiply = yes
+			}
+			random_owned_controlled_state = {
+				limit = {
+					air_base > 1
+					air_base < 8
+					is_core_of = JAP
+				}
+				add_building_construction = {
+					type = air_base
+					level = 2
+					instant_build = yes
+				}
+				set_temp_variable = { state_value_multiplier_temp = 1.01 }
+				econ_state_value_change_multiply = yes
+			}
+			set_temp_variable = { temp_econ_spending_amount = 0.185 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+
+		else_if = { # Maritime Development Act
+			limit = { check_variable = { JAP_bill_id = 417 } }
+			random_owned_controlled_state = {
+				limit = {
+					is_core_of = ROOT
+					naval_base > 1
+					naval_base < 8
+				}
+				add_building_construction = {
+					type = naval_base
+					level = 2
+					instant_build = yes
+					province = {
+						all_provinces = yes
+						limit_to_naval_base = yes
+					}
+				}
+				add_building_construction = {
+					type = dockyayrd
+					level = 2
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 2
+				set_temp_variable = { state_value_multiplier_temp = 1.025 }
+				econ_state_value_change_multiply = yes
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_core_of = ROOT
+					naval_base > 1
+					naval_base < 8
+				}
+				add_building_construction = {
+					type = naval_base
+					level = 2
+					instant_build = yes
+					province = {
+						all_provinces = yes
+						limit_to_naval_base = yes
+					}
+				}
+				add_building_construction = {
+					type = dockyayrd
+					level = 2
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 2
+				set_temp_variable = { state_value_multiplier_temp = 1.025 }
+				econ_state_value_change_multiply = yes
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_core_of = ROOT
+					naval_base > 1
+					naval_base < 8
+				}
+				add_building_construction = {
+					type = naval_base
+					level = 2
+					instant_build = yes
+					province = {
+						all_provinces = yes
+						limit_to_naval_base = yes
+					}
+				}
+				add_building_construction = {
+					type = dockyayrd
+					level = 2
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 2
+				set_temp_variable = { state_value_multiplier_temp = 1.025 }
+				econ_state_value_change_multiply = yes
+			}
+			JAP_IJN_increase_med = yes
+			TNO_improve_army_professionalism_med = yes
+			TNO_improve_industrial_expertise_low = yes
+			set_temp_variable = { temp_econ_spending_amount = 0.345 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+
+		else_if = { # Financial Regulation Act
+			limit = { check_variable = { JAP_bill_id = 418 } }
+			JAP_Ino_increase_power_avg = yes
+			TNO_improve_admin_efficiency_high= yes
+			TNO_improve_income_taxation_policy_effectiveness_med = yes
+			TNO_improve_minimum_wage_policy_effectiveness_med= yes
+			set_temp_variable = { inflation_temp = -0.25 }
+			econ_inflation_change = yes
+			set_temp_variable = { gdp_growth_temp = -0.15 }
+			econ_gdp_growth_change = yes
+		}
+
+		else_if = { # Corporate Regulation Act
+			limit = { check_variable = { JAP_bill_id = 419 } }
+			swap_ideas = {
+				remove_idea = JAP_zaibatsu_question
+				add_idea = JAP_zaibatsu_question_alt_2
+			}
+			TNO_improve_admin_efficiency_low = yes
+			TNO_improve_income_taxation_policy_effectiveness_med = yes
+			TNO_improve_minimum_wage_policy_effectiveness_med= yes
+			TNO_improve_max_workhours_policy_effectiveness_med = yes
+		}
+	}
+
+	else_if = { # HARDLINERS|KAYA
+		limit = { check_variable = { JAP_prime_minister = 5 } }
+		if = { # Industrial Stimulus Expansion Act
+			limit = { check_variable = { JAP_bill_id = 501 } }
+			JAP_PA_support_increase_med = yes
+			TNO_improve_industrial_expertise_high = yes
+			TNO_improve_industrial_equipment_med = yes
+			TNO_improve_agriculture_low = yes
+			set_temp_variable = { gdp_growth_temp = 1 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.025 }
+			econ_GDP_boost_once_percentage = yes
+		}
+		else_if = { # Agricultural Support and Modernisation Act
+			limit = { check_variable = { JAP_bill_id = 502 } }
+			JAP_PA_support_increase_med = yes
+			TNO_improve_agriculture_high = yes
+			TNO_improve_industrial_expertise_low = yes
+			TNO_improve_poverty_med = yes
+			set_temp_variable = { gdp_growth_temp = 0.75 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = 0.15 }
+			econ_inflation_change = yes
+			set_temp_variable = { econ_centralization_temp = -5 }
+			econ_centralization_change = yes
+		}
+		else_if = { # State Insurance and Labour Organisation Act
+			limit = { check_variable = { JAP_bill_id = 503 } }
+			tno_pensions_improve = yes
+			hidden_effect = {
+				TNO_worsen_pensions_policy_effectiveness_high = yes
+				TNO_improve_pensions_policy_effectiveness_monthly_med = yes
+			}
+			JAP_PA_support_increase_med = yes
+			TNO_improve_industrial_expertise_low = yes
+			TNO_improve_poverty_high = yes
+			TNO_improve_pensions_policy_effectiveness_med = yes
+			TNO_improve_trade_unions_policy_effectiveness_med = yes
+		}
+		else_if = { # Light Industrial Development Act
+			limit = { check_variable = { JAP_bill_id = 504 } }
+			add_timed_idea = {
+				idea = JAP_takagi_urban_remodelling
+				days = 250
+			}
+			TNO_improve_admin_efficiency_med = yes
+			TNO_improve_industrial_expertise_high = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.05 }
+			econ_GDP_boost_once_percentage = yes
+		}
+		else_if = { # Industrial Acquisitions and Mergers Act
+			limit = { check_variable = { JAP_bill_id = 505 } }
+			JAP_PA_support_increase_med = yes
+			JAP_IJA_increase_med = yes
+			set_temp_variable = { econ_centralization_temp = 5 }
+			econ_centralization_change = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.01 }
+			econ_GDP_boost_once_percentage = yes
+			set_temp_variable = { gdp_growth_temp = 0.35 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = 0.1 }
+			econ_inflation_change = yes
+		}
+		else_if = { # Corporate Stabilisation Act
+			limit = { check_variable = { JAP_bill_id = 506 } }
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.015 }
+			econ_GDP_boost_once_percentage = yes
+			set_temp_variable = { gdp_growth_temp = 0.5 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = 0.15 }
+			econ_inflation_change = yes
+			JAP_PA_support_decrease_med = yes
+			set_temp_variable = { business_tax_temp = -0.025 }
+			econ_business_tax_rate_change = yes
+		}
+		else_if = { # Imperial Industrial Plan of [GetYear]
+			limit = { check_variable = { JAP_bill_id = 507 } }
+
+			set_temp_variable = { econ_centralization_temp = 10 }
+			econ_centralization_change = yes
+			effect_tooltip = {
+				set_temp_variable = { pus_temp = 5 }
+				econ_pus_change = yes
+			}
+			add_to_variable = { JAP_kaya_free_pus = 5 }
+			force_update_dynamic_modifier = yes
+			set_temp_variable = { gdp_growth_temp = 1.25 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.025 }
+			econ_GDP_boost_once_percentage = yes
+
+			524 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 2
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = offices
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			962 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 2
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = offices
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			JAP_PA_support_decrease_med = yes
+			TNO_worsen_regulations_policy_effectiveness_med = yes
+		}
+		else_if = { # Japan Electrification and Transportation Plan of [GetYear]
+			limit = { check_variable = { JAP_bill_id = 508 } }
+			JAP_PA_support_increase_med = yes
+			TNO_improve_education_policy_effectiveness_med = yes
+			TNO_improve_health_care_policy_effectiveness_med = yes
+			set_temp_variable = { gdp_growth_temp = 1.25 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.02 }
+			econ_GDP_boost_once_percentage = yes
+			282 = {
+				add_building_construction = {
+					type = hospitals
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = schools
+					level = 1
+					instant_build = yes
+				}
+				add_resource = {
+					type = power
+					amount = 3
+				}
+				add_extra_state_shared_building_slots = 2
+			}
+			631 = {
+				add_building_construction = {
+					type = hospitals
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = schools
+					level = 1
+					instant_build = yes
+				}
+				add_resource = {
+					type = power
+					amount = 3
+				}
+				add_extra_state_shared_building_slots = 2
+			}
+		}
+		else_if = { # Industrial Rationalisation Act
+			limit = { check_variable = { JAP_bill_id = 509 } }
+			JAP_HoP_support_increase_med = yes
+			TNO_improve_admin_efficiency_med = yes
+			TNO_improve_industrial_equipment_med = yes
+			TNO_improve_industrial_expertise_med = yes
+			set_temp_variable = { gdp_growth_temp = 0.5 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { econ_centralization_temp = 5 }
+			econ_centralization_change = yes
+		}
+		else_if = { # Nippon Oil Expansion Plan
+			limit = { check_variable = { JAP_bill_id = 510 } }
+			add_timed_idea = {
+				idea = JAP_Kaya_niponoil_boost
+				days = 180
+			}
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.005 }
+			econ_GDP_boost_once_percentage = yes
+			TNO_improve_industrial_expertise_high = yes
+			JAP_IJN_increase_med = yes
+			JAP_IJA_decrease_small = yes
+			JAP_PA_support_decrease_small = yes
+		}
+		else_if = { # Corporate Power Restrictions Act
+			limit = { check_variable = { JAP_bill_id = 511 } }
+			swap_ideas = {
+				remove_idea = JAP_zaibatsu_question_2
+				add_idea = JAP_zaibatsu_question_3
+			}
+			TNO_improve_admin_efficiency_high = yes
+			set_temp_variable = { econ_centralization_temp = 5 }
+			econ_centralization_change = yes
+			JAP_PA_support_increase_small = yes
+		}
+		else_if = { # State Economic Reorganisation Act
+			limit = { check_variable = { JAP_bill_id = 512 } }
+			set_temp_variable = { gdp_growth_temp = 1.25 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.025 }
+			econ_GDP_boost_once_percentage = yes
+			TNO_improve_admin_efficiency_med = yes
+			TNO_improve_industrial_expertise_med = yes
+			set_temp_variable = { econ_centralization_temp = 5 }
+			econ_centralization_change = yes
+			set_temp_variable = { inflation_temp = 0.25 }
+			econ_inflation_change = yes
+		}
+		else_if = { # Trans-Pacific Economic Mobilisation Act
+			limit = { check_variable = { JAP_bill_id = 513 } }
+			set_temp_variable = { gdp_growth_temp = 2 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.035 }
+			econ_GDP_boost_once_percentage = yes
+			army_funding_maximal_increase_med = yes
+			naval_funding_maximal_increase_med = yes
+			TNO_improve_admin_efficiency_high = yes
+			TNO_improve_industrial_expertise_med = yes
+			TNO_improve_industrial_equipment_med = yes
+			JAP_PA_support_decrease_small = yes
+			TNO_worsen_education_policy_effectiveness_low = yes
+			TNO_worsen_health_care_policy_effectiveness_med = yes
+			set_temp_variable = { inflation_temp = 0.5 }
+			econ_inflation_change = yes
+			MAN = {
+				set_temp_variable = { pus_temp = 3 }
+				econ_pus_change = yes
+				328 = {
+					add_resource = {
+						type = power
+						amount = 3
+					}
+				}
+			}
+			GNG = {
+				set_temp_variable = { pus_temp = 3 }
+				econ_pus_change = yes
+				592 = {
+					add_resource = {
+						type = power
+						amount = 3
+					}
+				}
+			}
+		}
+		else_if = { # Diet Anti-Corruption and Fair Practices Act
+			limit = { check_variable = { JAP_bill_id = 514 } }
+			JAP_Kaya_increase_power_avg = yes
+			TNO_improve_political_parties_policy_effectiveness_med = yes
+			TNO_improve_admin_efficiency_high = yes
+			JAP_PA_support_increase_med = yes
+			JAP_Ino_decrease_power_small = yes
+			JAP_Takagi_decrease_power_small = yes
+			JAP_Miki_decrease_power_small = yes
+		}
+		else_if = { # National Values Preservation Act
+			limit = { check_variable = { JAP_bill_id = 515 } }
+			JAP_Kaya_increase_power_subst = yes
+			JAP_IJA_increase_med = yes
+			JAP_IJN_increase_med = yes
+			TNO_worsen_academic_base_low = yes
+			TNO_improve_press_rights_policy_effectiveness_med = yes
+			JAP_Miki_decrease_power_small = yes
+			set_temp_variable = { temp_all_support_change = -0.05 }
+			JAP_change_all_other_faction_support = yes
+		}
+		else_if = { # State Economic Relief Act
+			limit = { check_variable = { JAP_bill_id = 516 } }
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.025 }
+			econ_GDP_boost_once_percentage = yes
+			set_temp_variable = { gdp_growth_temp = 1 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = 0.25 }
+			econ_inflation_change = yes
+			social_funding_minimal_increase_med = yes
+			admin_funding_minimal_increase_med = yes
+			set_temp_variable = { business_tax_temp = -0.025 }
+			econ_business_tax_rate_change = yes
+			set_temp_variable = { temp_econ_spending_amount = 0.35 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		else_if = { # Bureaucratic-Cabinet Planning Board Establishment Act
+			limit = { check_variable = { JAP_bill_id = 517 } }
+			set_temp_variable = { econ_centralization_temp = 5 }
+			econ_centralization_change = yes
+			TNO_improve_admin_efficiency_med = yes
+			JAP_Kaya_increase_power_subst = yes
+			add_political_power = 50
+			set_temp_variable = { gdp_growth_temp = 0.2 }
+			econ_gdp_growth_change = yes
+			531 = {
+				add_building_construction = {
+					type = offices
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			536 = {
+				add_building_construction = {
+					type = offices
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			631 = {
+				add_building_construction = {
+					type = offices
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			custom_effect_tooltip = Kaya_invest_in_hardliner_friends_tt
+			MAN = {
+				set_temp_variable = { gdp_growth_temp = 0.25 }
+				econ_gdp_growth_change = yes
+			}
+			if = {
+				limit = { GNG = { check_variable = { GNG_legco_faction_in_power = 7 } } }
+				GNG = {
+					set_temp_variable = { gdp_growth_temp = 0.25 }
+					econ_gdp_growth_change = yes
+				}
+			}
+		}
+		else_if = { # Greater East Asia Defense Mobilisation Plan
+			limit = { check_variable = { JAP_bill_id = 518 } }
+			JAP_Kaya_increase_power_small = yes
+			JAP_IJA_increase_med = yes
+			JAP_IJN_increase_med = yes
+			army_funding_minimal_increase_med = yes
+			TNO_improve_training_policy_effectiveness_high = yes
+		}
+		else_if = { # Higher Education Regulation Act
+			limit = { check_variable = { JAP_bill_id = 519 } }
+			JAP_Kaya_increase_power_subst = yes
+			JAP_PA_support_decrease_med = yes
+			TNO_improve_political_parties_policy_effectiveness_med = yes
+			TNO_improve_press_rights_policy_effectiveness_med = yes
+			set_temp_variable = { temp_hl_inf_change = 0.05 }
+			JAP_change_hardliner_influence = yes
+			TNO_worsen_academic_base_med = yes
+			set_temp_variable = { temp_all_support_change = -0.05 }
+			JAP_change_all_other_faction_support = yes
+		}
+		else_if = { # Ensure Political Loyalty
+			limit = { check_variable = { JAP_bill_id = 520 } }
+			tno_military_supervision_improve = yes
+			TNO_improve_army_professionalism_high = yes
+			set_temp_variable = { temp_selected_faction = 6 }
+			set_temp_variable = { temp_support_change = -0.05 }
+			JAP_change_faction_support = yes
+			JAP_IJA_decrease_med = yes
+		}
+		else_if = { # Strategic Industry Departement Act
+			limit = { check_variable = { JAP_bill_id = 521 } }
+			set_temp_variable = { pus_temp = 2 }
+			econ_pus_change = yes
+			army_funding_minimal_increase_med = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.005 }
+			econ_GDP_boost_once_percentage = yes
+			591 = {
+				add_building_construction = {
+					type = barracks
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			629 = {
+				add_building_construction = {
+					type = barracks
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			633 = {
+				add_building_construction = {
+					type = barracks
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			JAP_PA_support_decrease_med = yes
+		}
+		else_if = { # Greater East Asian Naval Defence Programme
+			limit = { check_variable = { JAP_bill_id = 522 } }
+			JAP_IJN_increase_med = yes
+			naval_funding_minimal_increase_med = yes
+			add_tech_bonus = {
+				name = ca_tech
+				category = ca_tech
+				bonus = 0.5
+				uses = 1
+			}
+			TNO_improve_army_professionalism_low = yes
+			TNO_improve_admin_efficiency_low = yes
+		}
+	}
+}
+
+# dedicated effect for Takagi's bill breaking up north borneo
+JAP_north_borneo_release_tags_into_sphere = {
+	hidden_effect = {
+		SRK = {
+			add_state_core = 333
+			transfer_state = 333
+
+			TNO_startup_nation = yes
+			econ_join_sphere_JAP = yes
+
+			set_variable = { GDP_growth = 2.8 }
+			set_variable = { income_tax_rate = 0.21 }
+			set_variable = { business_tax_rate = 0.15 }
+			update_economy_tab = yes
+
+			set_temp_variable = { temp_credit_rating = 5 }
+			set_temp_variable = { temp_credit_rating_min = 1 }
+			set_temp_variable = { temp_credit_rating_max = 7 }
+			econ_initialize_credit_rating_system = yes
+
+			add_ideas = {
+				Sphere_Economic_Dependent
+			}
+		}
+		BRU = {
+			add_state_core = 807
+			transfer_state = 807
+
+			TNO_startup_nation = yes
+			econ_join_sphere_JAP = yes
+
+			set_variable = { GDP_growth = 2.8 }
+			set_variable = { income_tax_rate = 0.21 }
+			set_variable = { business_tax_rate = 0.15 }
+			update_economy_tab = yes
+
+			set_temp_variable = { temp_credit_rating = 5 }
+			set_temp_variable = { temp_credit_rating_min = 1 }
+			set_temp_variable = { temp_credit_rating_max = 7 }
+			econ_initialize_credit_rating_system = yes
+			add_ideas = {
+				Sphere_Economic_Dependent
+			}
+		}
+		NRB = {
+			remove_state_core = 333
+			remove_state_core = 807
+			set_capital = { state = 808 }
+			remove_ideas = {
+				NRB_The_37th_Army
+				NRB_Sarawak_Independence_Movement
+				NRB_Extremely_Underfunded
+			}
+
+			set_variable = { national_debt = 0.0 }
+			update_economy_tab = yes
+
+			retire_country_leader = yes
+			promote_character = NRB_Sugiyama_Shigeru
+			set_cosmetic_tag = NRB_NB
+		}
+
+		add_to_faction = SRK
+		add_to_faction = BRU
+	}
+	custom_effect_tooltip = JAP_break_up_north_borneo_tt
+
+}
+
+# checks to see if bill has enough support in the diet and fires pass/fail event
+JAP_bill_pass_check = {
+	if = {
+		limit = {
+			check_variable = { JAP_total_mp_support > 232 }
+			check_variable = { JAP_Peers_support > 0.499 }
+		}
+		country_event = { id = japdietbills.1 }
+	}
+	else = {
+		country_event = { id = japdietbills.2 }
+	}
+}
+
+JAP_fire_bill_pass_flavour_event = {
+	if = {
+		limit = { check_variable = { JAP_bill_id = 501 } }
+		country_event = { id = japkaya_tree_two.7 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 502 } }
+		country_event = { id = japkaya_tree_two.10 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 503 } }
+		country_event = { id = japkaya_tree_two.14 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 504 } }
+		country_event = { id = japkaya_tree_two.18 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 505 } }
+		country_event = { id = japkaya_tree_two.25 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 506 } }
+		country_event = { id = japkaya_tree_two.29 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 511 } }
+		if = {
+			limit = { has_country_flag = JAP_kaya_playing_hardball }
+			country_event = { id = japkaya_tree_two.98 days = 2 }
+			clr_country_flag = JAP_kaya_playing_hardball
+		}
+		else = {
+			country_event = { id = japkaya_tree_two.102 days = 2 }
+		}
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 514 } }
+		country_event = { id = japkaya_tree_one.27 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 517 } }
+		country_event = { id = japkaya_tree_one.43 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 519 } }
+		country_event = { id = japkaya_tree_one.37 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 510 } }
+		country_event = { id = japkaya_tree_two.126 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 512 } }
+		country_event = { id = japkaya_tree_two.133 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 513 } }
+		country_event = { id = japkaya_tree_two.136 days = 2 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { JAP_bill_id = 213 }
+			has_completed_focus = JAP_TakagiRecon_Kato_To_The_Table
+		}
+		country_event = { id = japtakagirecon.91 days = 2 }
+		country_event = { id = japtakagirecon.79 days = 21 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { JAP_bill_id = 213 }
+			has_completed_focus = JAP_TakagiRecon_Silencing_Activism
+		}
+		country_event = { id = japtakagirecon.91 days = 2 }
+		country_event = { id = japtakagirecon.87 days = 5 }
+	}
+}
+
+JAP_fire_bill_fail_flavour_event = {
+	if = {
+		limit = { check_variable = { JAP_bill_id = 501 } }
+		country_event = { id = japkaya_tree_two.8 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 502 } }
+		country_event = { id = japkaya_tree_two.11 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 503 } }
+		country_event = { id = japkaya_tree_two.15 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 504 } }
+		country_event = { id = japkaya_tree_two.19 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 505 } }
+		country_event = { id = japkaya_tree_two.26 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 506 } }
+		country_event = { id = japkaya_tree_two.30 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 511 } }
+		if = {
+			limit = { has_country_flag = JAP_kaya_playing_hardball }
+			country_event = { id = japkaya_tree_two.97 days = 2 }
+			clr_country_flag = JAP_kaya_playing_hardball
+		}
+		else = {
+			country_event = { id = japkaya_tree_two.101 days = 2 }
+		}
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 514 } }
+		country_event = { id = japkaya_tree_one.28 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 517 } }
+		country_event = { id = japkaya_tree_one.44 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 519 } }
+		if = {
+			limit = { has_completed_focus = JAP_appeal_to_the_hardliners }
+			country_event = { id = japkaya_tree_one.38 days = 2 }
+		}
+		else_if = {
+			limit = {
+				NOT = { has_completed_focus = JAP_appeal_to_the_hardliners }
+				has_country_flag = JAP_hea_free_vote
+			}
+			country_event = { id = japkaya_tree_one.40 days = 2 }
+			clr_country_flag = JAP_hea_free_vote
+		}
+		else = {
+			country_event = { id = japkaya_tree_one.39 days = 2 }
+		}
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 510 } }
+		country_event = { id = japkaya_tree_two.127 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 512 } }
+		country_event = { id = japkaya_tree_two.132 days = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_bill_id = 513 } }
+		country_event = { id = japkaya_tree_two.137 days = 2 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { JAP_bill_id = 213 }
+			has_completed_focus = JAP_TakagiRecon_Kato_To_The_Table
+		}
+		country_event = { id = japtakagirecon.94 days = 2 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { JAP_bill_id = 213 }
+			has_completed_focus = JAP_TakagiRecon_Kato_To_The_Table
+		}
+		country_event = { id = japtakagirecon.94 days = 2 }
+	}
+
+
+}
+
+JAP_bill_government_stability_decrease = {
+	subtract_from_variable = { JAP_government_stability_base = JAP_bill_significance_fail }
+	clamp_variable = { var = JAP_government_stability_base min = 0 }
+	custom_effect_tooltip = JAP_bill_government_stability_decrease_tt
+	JAP_calc_government_stability = yes
+}
+
+JAP_bill_government_stability_increase = {
+	add_to_variable = { JAP_government_stability_base = JAP_bill_significance_pass }
+	clamp_variable = { var = JAP_government_stability_base max = 100 }
+	custom_effect_tooltip = JAP_bill_government_stability_increase_tt
+	JAP_calc_government_stability = yes
+}
+
+JAP_government_stability_change = {
+	if = {
+		limit = { check_variable = { temp_government_stability < 0 } }
+		set_temp_variable = { temp_government_stability_tt = temp_government_stability }
+		multiply_temp_variable = { temp_government_stability_tt = -1 }
+		add_to_variable = { JAP_government_stability_base = temp_government_stability }
+		clamp_variable = { var = JAP_government_stability_base min = 0 max = 100 }
+		custom_effect_tooltip = JAP_government_stability_decrease_tt
+	}
+	else = {
+		add_to_variable = { JAP_government_stability_base = temp_government_stability }
+		clamp_variable = { var = JAP_government_stability_base min = 0 max = 100 }
+		custom_effect_tooltip = JAP_government_stability_increase_tt
+	}
+	JAP_calc_government_stability = yes
+}
+
+# modifies faction approval x0.95 after a bill passes
+JAP_bills_faction_approval_effect = {
+	for_each_loop = {
+		array = JAP_faction_approval_base
+		set_temp_variable = { faction_approval_reduction = JAP_faction_approval_base^i }
+		divide_temp_variable = { faction_approval_reduction = 20 }
+		subtract_from_variable = { JAP_faction_approval_base^i = faction_approval_reduction }
+	}
+	custom_effect_tooltip = JAP_bill_pass_Faction_approval_effect_tt
+	JAP_calc_faction_approval = yes
+}
+
+JAP_clear_bills_variables = {
+	set_variable = { JAP_bill_id = 0 }
+	set_variable = { JAP_bill_proposing_faction = 0 }
+	set_variable = { JAP_bill_significance = 0 }
+	for_each_loop = {
+		array = JAP_Diet_Seats
+		set_variable = { JAP_supportive_mps_perc^i = 0 }
+	}
+	clr_country_flag = JAP_is_econ_bill
+	if = {
+		limit = {
+			check_variable = { JAP_prime_minister = 2 }
+			NOT = {
+				has_country_flag = JAP_Takagi_closing_screen_triggered
+			}
+		}
+		JAP_Takagi_ending_checker = yes
+	}
+}
+
+JAP_change_support_for_bill = {
+	multiply_temp_variable = { temp_MP_support_change = JAP_faction_approval^bill_target_faction }
+
+	set_temp_variable = { diff = JAP_Diet_Seats^bill_target_faction }
+	subtract_from_temp_variable = { diff = JAP_mps_in_favour^bill_target_faction }
+	clamp_temp_variable = { var = temp_MP_support_change max = diff }
+
+	round_temp_variable = temp_MP_support_change
+
+	add_to_variable = { JAP_mps_in_favour^bill_target_faction = temp_MP_support_change }
+	clamp_variable = { var = JAP_mps_in_favour^bill_target_faction max = JAP_Diet_Seats^bill_target_faction }
+	custom_effect_tooltip = JAP_change_support_for_bill_tt
+	JAP_update_bill_support = yes
+}
+
+JAP_bills_calc_support_for_bill_initial = {
+	for_each_loop = {
+		array = JAP_Diet_Seats
+		set_variable = { JAP_mps_in_favour^i = JAP_Diet_Seats^i }
+		multiply_variable = { JAP_mps_in_favour^i = JAP_supportive_mps_perc^i }
+		round_variable = JAP_mps_in_favour^i
+	}
+
+	set_variable = { JAP_total_mp_support = 0 }
+	for_each_loop = {
+		array = JAP_Diet_Seats
+		add_to_variable = { JAP_total_mp_support = JAP_mps_in_favour^i }
+	}
+	if = {
+		limit = {
+			OR = {
+				AND = {
+					has_country_flag = JAP_Ino_Prime_Minister
+					has_game_rule = {
+						rule = JAP_INO_BILL_PASS_CHEAT
+						option = JAP_INO_BILL_PASS_CHEAT_YES
+					}
+				}
+				AND = {
+					has_country_flag = JAP_Ikeda_Prime_Minister
+					OR = {
+						has_game_rule = {
+							rule = JAP_IKEDA_BILL_PASS_CHEAT
+							option = JAP_IKEDA_BILL_PASS_CHEAT_YES
+						}
+						AND = {
+							has_game_rule = {
+								rule = JAP_IKEDA_REFORM
+								option = JAP_IKEDA_REFORM_LIBERAL
+							}
+							OR = {
+								check_variable = { JAP_bill_id = 401 }
+								check_variable = { JAP_bill_id = 402 }
+								check_variable = { JAP_bill_id = 404 }
+								check_variable = { JAP_bill_id = 406 }
+								check_variable = { JAP_bill_id = 409 }
+								check_variable = { JAP_bill_id = 410 }
+								check_variable = { JAP_bill_id = 412 }
+								check_variable = { JAP_bill_id = 413 }
+								check_variable = { JAP_bill_id = 414 }
+							}
+						}
+						AND = {
+							has_game_rule = {
+								rule = JAP_IKEDA_REFORM
+								option = JAP_IKEDA_REFORM_CONSERVATIVE
+							}
+							OR = {
+								check_variable = { JAP_bill_id = 403 }
+								check_variable = { JAP_bill_id = 405 }
+								check_variable = { JAP_bill_id = 409 }
+								check_variable = { JAP_bill_id = 410 }
+								check_variable = { JAP_bill_id = 415 }
+								check_variable = { JAP_bill_id = 416 }
+								check_variable = { JAP_bill_id = 417 }
+							}
+						}
+					}
+				}
+				AND = {
+					has_country_flag = JAP_Kaya_Prime_Minister
+					OR = {
+						has_game_rule = {
+							rule = JAP_KAYA_BILL_PASS_CHEAT
+							option = JAP_KAYA_BILL_PASS_CHEAT_YES
+						}
+						has_game_rule = {
+							rule = JAP_KAYA_SUCCESSOR
+							option = JAP_KAYA_SUCCESSOR_NONE
+						}
+						has_game_rule = {
+							rule = JAP_KAYA_SUCCESSOR
+							option = JAP_KAYA_SUCCESSOR_SHIINA
+						}
+						AND = {
+							has_game_rule = {
+								rule = JAP_GOVERNMENT_STABILITY
+								option = JAP_GOVERNMENT_STABILITY_COLLAPSE
+							}
+							OR = {
+								has_country_flag = JAP_hardliner_choice
+								has_country_flag = JAP_realpolitik
+							}
+							NOT = { has_country_flag = JAP_resignation_has_happened }
+						}
+						AND = {
+							OR = {
+								has_game_rule = {
+									rule = JAP_KAYA_SUCCESSOR
+									option = JAP_KAYA_SUCCESSOR_FUKUDA
+								}
+								AND = {
+									has_game_rule = {
+										rule = JAP_GOVERNMENT_STABILITY
+										option = JAP_GOVERNMENT_STABILITY_COLLAPSE
+									}
+									has_country_flag = JAP_own_choice
+								}
+							}
+							NOT = {
+								check_variable = { JAP_bill_id = 519 }
+							}
+						}
+					}
+				}
+				AND = {
+					has_country_flag = JAP_Takagi_Prime_Minister
+					has_game_rule = {
+						rule = JAP_TAKAGI_BILL_PASS_CHEAT
+						option = JAP_TAKAGI_BILL_PASS_CHEAT_YES
+					}
+				}
+			}
+			check_variable = { JAP_total_mp_support < 233 }
+		}
+		set_variable = { JAP_total_mp_support = 233 }
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_game_rule = {
+					rule = JAP_KAYA_SUCCESSOR
+					option = JAP_KAYA_SUCCESSOR_FUKUDA
+				}
+				AND = {
+					has_game_rule = {
+						rule = JAP_GOVERNMENT_STABILITY
+						option = JAP_GOVERNMENT_STABILITY_COLLAPSE
+					}
+					has_country_flag = JAP_own_choice
+				}
+			}
+			check_variable = { JAP_bill_id = 519 }
+			check_variable = { JAP_total_mp_support > 232 }
+		}
+		set_variable = { JAP_total_mp_support = 232 }
+	}
+}
+
+JAP_update_bill_support = {
+	# assignes mps previously in favour to a different faction
+	for_each_loop = {
+		array = JAP_Diet_Seats
+		if = {
+			limit = { check_variable = { JAP_mps_in_favour^i > JAP_Diet_Seats^i } }
+			set_temp_variable = { leftover_mps = JAP_mps_in_favour^i }
+			subtract_from_temp_variable = { leftover_mps = JAP_Diet_Seats^i }
+			subtract_from_variable = { JAP_mps_in_favour^i = leftover_mps }
+
+			add_to_variable = { JAP_total_leftover_mps = leftover_mps }
+		}
+	}
+
+	for_each_loop = {
+		array = JAP_Diet_Seats
+		while_loop_effect = {
+			limit = {
+				check_variable = { JAP_total_leftover_mps > 0 }
+				check_variable = { JAP_mps_in_favour^i < JAP_Diet_Seats^i }
+			}
+
+			add_to_variable = { JAP_mps_in_favour^i = 1 }
+			subtract_from_variable = { JAP_total_leftover_mps = 1 }
+		}
+	}
+
+	# calcs total in favour
+	set_variable = { JAP_total_mp_support = 0 }
+	for_each_loop = {
+		array = JAP_Diet_Seats
+		add_to_variable = { JAP_total_mp_support = JAP_mps_in_favour^i }
+	}
+	if = {
+		limit = {
+			OR = {
+				AND = {
+					has_country_flag = JAP_Ino_Prime_Minister
+					has_game_rule = {
+						rule = JAP_INO_BILL_PASS_CHEAT
+						option = JAP_INO_BILL_PASS_CHEAT_YES
+					}
+				}
+				AND = {
+					has_country_flag = JAP_Ikeda_Prime_Minister
+					OR = {
+						has_game_rule = {
+							rule = JAP_IKEDA_BILL_PASS_CHEAT
+							option = JAP_IKEDA_BILL_PASS_CHEAT_YES
+						}
+						AND = {
+							has_game_rule = {
+								rule = JAP_IKEDA_REFORM
+								option = JAP_IKEDA_REFORM_LIBERAL
+							}
+							OR = {
+								check_variable = { JAP_bill_id = 401 }
+								check_variable = { JAP_bill_id = 402 }
+								check_variable = { JAP_bill_id = 404 }
+								check_variable = { JAP_bill_id = 406 }
+								check_variable = { JAP_bill_id = 409 }
+								check_variable = { JAP_bill_id = 410 }
+								check_variable = { JAP_bill_id = 412 }
+								check_variable = { JAP_bill_id = 413 }
+								check_variable = { JAP_bill_id = 414 }
+							}
+						}
+						AND = {
+							has_game_rule = {
+								rule = JAP_IKEDA_REFORM
+								option = JAP_IKEDA_REFORM_CONSERVATIVE
+							}
+							OR = {
+								check_variable = { JAP_bill_id = 403 }
+								check_variable = { JAP_bill_id = 405 }
+								check_variable = { JAP_bill_id = 409 }
+								check_variable = { JAP_bill_id = 410 }
+								check_variable = { JAP_bill_id = 415 }
+								check_variable = { JAP_bill_id = 416 }
+								check_variable = { JAP_bill_id = 417 }
+							}
+						}
+					}
+				}
+				AND = {
+					has_country_flag = JAP_Kaya_Prime_Minister
+					OR = {
+						has_game_rule = {
+							rule = JAP_KAYA_BILL_PASS_CHEAT
+							option = JAP_KAYA_BILL_PASS_CHEAT_YES
+						}
+						has_game_rule = {
+							rule = JAP_KAYA_SUCCESSOR
+							option = JAP_KAYA_SUCCESSOR_NONE
+						}
+						has_game_rule = {
+							rule = JAP_KAYA_SUCCESSOR
+							option = JAP_KAYA_SUCCESSOR_SHIINA
+						}
+						AND = {
+							has_game_rule = {
+								rule = JAP_GOVERNMENT_STABILITY
+								option = JAP_GOVERNMENT_STABILITY_COLLAPSE
+							}
+							OR = {
+								has_country_flag = JAP_hardliner_choice
+								has_country_flag = JAP_realpolitik
+							}
+							NOT = { has_country_flag = JAP_resignation_has_happened }
+						}
+						AND = {
+							OR = {
+								has_game_rule = {
+									rule = JAP_KAYA_SUCCESSOR
+									option = JAP_KAYA_SUCCESSOR_FUKUDA
+								}
+								AND = {
+									has_game_rule = {
+										rule = JAP_GOVERNMENT_STABILITY
+										option = JAP_GOVERNMENT_STABILITY_COLLAPSE
+									}
+									has_country_flag = JAP_own_choice
+								}
+								NOT = { has_country_flag = JAP_resignation_has_happened }
+							}
+							NOT = {
+								check_variable = { JAP_bill_id = 519 }
+							}
+						}
+					}
+				}
+				AND = {
+					has_country_flag = JAP_Takagi_Prime_Minister
+					has_game_rule = {
+						rule = JAP_TAKAGI_BILL_PASS_CHEAT
+						option = JAP_TAKAGI_BILL_PASS_CHEAT_YES
+					}
+				}
+			}
+			check_variable = { JAP_total_mp_support < 233 }
+		}
+		set_variable = { JAP_total_mp_support = 233 }
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_game_rule = {
+					rule = JAP_KAYA_SUCCESSOR
+					option = JAP_KAYA_SUCCESSOR_FUKUDA
+				}
+				AND = {
+					has_game_rule = {
+						rule = JAP_GOVERNMENT_STABILITY
+						option = JAP_GOVERNMENT_STABILITY_COLLAPSE
+					}
+					has_country_flag = JAP_own_choice
+					NOT = { has_country_flag = JAP_resignation_has_happened }
+				}
+			}
+			check_variable = { JAP_bill_id = 519 }
+			check_variable = { JAP_total_mp_support > 232 }
+		}
+		set_variable = { JAP_total_mp_support = 232 }
+	}
+}
+
+JAP_calc_government_stability = {
+	set_variable = { JAP_government_stability = JAP_government_stability_base }
+
+	if = {
+		limit = {
+			any_of = {
+				array = JAP_Diet_Faction_Power
+				check_variable = { JAP_Diet_Faction_Power^i > JAP_Diet_Faction_Power^JAP_prime_minister }
+			}
+		}
+		set_variable = { JAP_lost_plurality_mod = 0.66 }
+	}
+
+	else = {
+		set_variable = { JAP_lost_plurality_mod = 1 }
+	}
+
+	multiply_variable = { JAP_government_stability = JAP_lost_plurality_mod }
+
+	if = {
+		limit = { check_variable = { JAP_Peers_support < 0.5 } }
+		set_variable = { peers_support_modifier = JAP_Peers_support }
+		add_to_variable = { peers_support_modifier = 0.25 }
+
+		multiply_variable = { JAP_government_stability = peers_support_modifier }
+	}
+
+	round_variable = JAP_government_stability
+
+	if = {
+		limit = {
+			check_variable = { JAP_government_stability < 30 }
+			OR = {
+				has_game_rule = {
+					rule = JAP_GOVERNMENT_STABILITY
+					option = JAP_GOVERNMENT_STABILITY_STABLE
+				}
+				AND = {
+					has_game_rule = {
+						rule = JAP_GOVERNMENT_STABILITY
+						option = JAP_GOVERNMENT_STABILITY_COLLAPSE
+					}
+					NOT = {
+						has_country_flag = JAP_resignation_has_happened
+					}
+					OR = {
+						AND = {
+							has_country_flag = JAP_Ikeda_Prime_Minister
+							NOT = {
+								AND = {
+									has_completed_focus = JAP_ikeda_reconstruction_as_good_as_new
+									check_variable = { JAP_bill_id = 0 }
+								}
+							}
+						}
+						AND = {
+							has_country_flag = JAP_Takagi_Prime_Minister
+							NOT = {
+								AND = {
+									has_country_flag = JAP_Takagi_ending_one
+									OR = {
+										has_country_flag = JAP_Takagi_ending_two
+										AND = {
+											has_completed_focus = JAP_TakagiRecon_Present_To_The_Diet
+											NOT = {
+												has_country_flag = JAP_north_borneo_bill_passed
+											}
+										}
+									}
+									has_country_flag = JAP_Takagi_ending_three
+									OR = {
+										has_completed_focus = JAP_TakagiRecon_The_Triumph_Of_Enterprise
+										has_completed_focus = JAP_TakagiRecon_Triumph_Of_Moderation
+									}
+									has_completed_focus = JAP_TakagiRecon_Japanisation_Continues
+									has_completed_focus = JAP_TakagiRecon_A_Soft_Victory
+									has_completed_focus = JAP_TakagiRecon_The_Steel_Sun_Rises
+									check_variable = { JAP_bill_id = 0 }
+								}
+							}
+						}
+						AND = {
+							check_variable = { JAP_prime_minister = 5 }
+							OR = {
+								AND = {
+									has_game_rule = {
+										rule = JAP_KAYA_SUCCESSOR
+										option = JAP_KAYA_SUCCESSOR_NONE
+									}
+									NOT = {
+										has_country_flag = JAP_Kaya_ending
+									}
+								}
+								has_game_rule = {
+									rule = JAP_KAYA_SUCCESSOR
+									option = JAP_KAYA_SUCCESSOR_FUKUDA
+								}
+								has_game_rule = {
+									rule = JAP_KAYA_SUCCESSOR
+									option = JAP_KAYA_SUCCESSOR_SHIINA
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		set_variable = { JAP_government_stability = 30 }
+	}
+}
+
+### FACTION RELATIONS ###
+
+# Run on game start
+JAP_faction_relations_initialise = {
+
+	for_loop_effect = {
+		start = 0
+		end = 6 # need a null one at 0 because of the way japan arrays are numbered. Just start at 0 next time pleaaaaase
+		add_to_array = { JAP_faction_approval = 0 }
+		add_to_array = { JAP_faction_support_approval_modifier = 0 }
+	}
+
+	add_to_array = { JAP_faction_approval_base = 0 } # always blank
+	add_to_array = { JAP_faction_approval_base = 0.65 }
+	add_to_array = { JAP_faction_approval_base = 0.45 }
+	add_to_array = { JAP_faction_approval_base = 0.45 }
+	add_to_array = { JAP_faction_approval_base = 0.85 }
+	add_to_array = { JAP_faction_approval_base = 0.3 }
+
+	set_variable = { JAP_hardliner_influence = 0 }
+	set_variable = { JAP_hardliner_approval = 0 }
+	JAP_set_base_faction_approval = yes
+}
+
+# Run whenever the PM changes. Sets the unique faction approval starting setup
+JAP_set_base_faction_approval = {
+	if = {
+		limit = { check_variable = { JAP_prime_minister = 2 } }
+		set_variable = { JAP_faction_approval_base^0 = 0 } # always blank
+		set_variable = { JAP_faction_approval_base^1 = 0.4 }
+		set_variable = { JAP_faction_approval_base^2 = 0.9 }
+		set_variable = { JAP_faction_approval_base^3 = 0.3 }
+		set_variable = { JAP_faction_approval_base^4 = 0.3 }
+		set_variable = { JAP_faction_approval_base^5 = 0.15 }
+
+		set_variable = { JAP_hardliner_influence = 0 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_prime_minister = 4 } }
+		set_variable = { JAP_faction_approval_base^0 = 0 } # always blank
+		set_variable = { JAP_faction_approval_base^1 = 0.6 }
+		set_variable = { JAP_faction_approval_base^2 = 0.30 }
+		set_variable = { JAP_faction_approval_base^3 = 0.30 }
+		set_variable = { JAP_faction_approval_base^4 = 0.9 }
+		set_variable = { JAP_faction_approval_base^5 = 0.2 }
+
+		set_variable = { JAP_hardliner_influence = 0 }
+	}
+	else_if = {
+		limit = { check_variable = { JAP_prime_minister = 5 } }
+		set_variable = { JAP_faction_approval_base^0 = 0 } # always blank
+		set_variable = { JAP_faction_approval_base^1 = 0.25 }
+		set_variable = { JAP_faction_approval_base^2 = 0.15 }
+		set_variable = { JAP_faction_approval_base^3 = 0.20 }
+		set_variable = { JAP_faction_approval_base^4 = 0.4 }
+		set_variable = { JAP_faction_approval_base^5 = 0.95 }
+
+		set_variable = { JAP_hardliner_influence = 0.36 }
+		set_variable = { JAP_hardliner_approval = 0.64 }
+	}
+	JAP_calc_faction_approval = yes
+}
+
+JAP_calc_faction_approval = {
+	if = { # if over 60% of the diet porgressively more harsh modifier to relations
+		limit = {
+			check_variable = { JAP_Diet_Faction_Power^JAP_prime_minister > 0.6 }
+		}
+		set_variable = { diet_power_mod_calc = JAP_Diet_Faction_Power^JAP_prime_minister }
+		subtract_from_variable = { diet_power_mod_calc = 0.6 }
+		set_variable = { JAP_diet_power_modifier = 1 }
+		subtract_from_variable = { JAP_diet_power_modifier = diet_power_mod_calc }
+	}
+	else = {
+		set_variable = { JAP_diet_power_modifier = 1 }
+	}
+
+	for_each_loop = {
+		array = JAP_Diet_Seats
+		set_variable = { JAP_faction_approval^i = JAP_faction_approval_base^i }
+		multiply_variable = { JAP_faction_approval^i = JAP_diet_power_modifier }
+
+		set_temp_variable = { idea_modifier_apply = 1 }
+		add_to_temp_variable = { idea_modifier_apply = modifier@other_factions_approval_modifier }
+		if = {
+			limit = {
+				NOT = { check_variable = { i = JAP_prime_minister } }
+			}
+			multiply_variable = { JAP_faction_approval^i = idea_modifier_apply }
+		}
+
+		# calcs modifier for addings MPs
+		set_variable = { JAP_faction_support_approval_modifier^i = JAP_faction_approval^i }
+	}
+
+	if = {
+		limit = { check_variable = { JAP_prime_minister = 5 } }
+		# clamps Kaya's max approval to the base, minus share of dissaporiving HLs
+
+		set_temp_variable = { hl_app = JAP_hardliner_influence }
+		multiply_temp_variable = { hl_app = JAP_hardliner_approval }
+
+		set_temp_variable = { ref_app = 1 }
+		subtract_from_temp_variable = { ref_app = JAP_hardliner_influence }
+		multiply_temp_variable = { ref_app = JAP_faction_approval^5 }
+
+		set_variable = { JAP_faction_approval^5 = ref_app }
+		add_to_variable = { JAP_faction_approval^5 = hl_app }
+	}
+	JAP_calc_total_guarenteed_mps = yes
+}
+
+# For Display. Calculates the minimum number of MPS that can be expected to support any bill.
+JAP_calc_total_guarenteed_mps = {
+	set_variable = { JAP_total_guarenteed_mps = 0 }
+	for_each_loop = {
+		array = JAP_Diet_Seats
+		set_variable = { JAP_guarenteed_mps^i = JAP_faction_approval^i }
+		#divide_variable = { JAP_guarenteed_mps^i = 2 } # 1/2
+
+		multiply_variable = { JAP_guarenteed_mps^i = JAP_Diet_Seats^i }
+		round_variable = JAP_guarenteed_mps^i
+
+		add_to_variable = { JAP_total_guarenteed_mps = JAP_guarenteed_mps^i }
+	}
+}
+
+JAP_change_faction_support = {
+	if = {
+		limit = {
+			check_variable = { temp_support_change < 0 }
+		}
+		multiply_temp_variable = { temp_support_change = -1 }
+		subtract_from_variable = { JAP_faction_approval_base^temp_selected_faction = temp_support_change }
+		clamp_variable = { var = JAP_faction_approval_base^temp_selected_faction min = 0 }
+		custom_effect_tooltip = JAP_decrease_faction_support_tt
+	}
+	else = {
+		add_to_variable = { JAP_faction_approval_base^temp_selected_faction = temp_support_change }
+		clamp_variable = { var = JAP_faction_approval_base^temp_selected_faction max = 1 }
+		custom_effect_tooltip = JAP_improve_faction_support_tt
+	}
+	JAP_calc_faction_approval = yes
+}
+
+JAP_change_all_other_faction_support = {
+	if = {
+		limit = {
+			check_variable = { temp_all_support_change < 0 }
+		}
+		multiply_temp_variable = { temp_all_support_change = -1 }
+		for_each_loop = {
+			array = JAP_faction_approval_base
+			if = {
+				limit = {
+					NOT = {
+						check_variable = { i = temp_selected_faction }
+					}
+				}
+				subtract_from_variable = { JAP_faction_approval_base^i = temp_all_support_change }
+				clamp_variable = { var = JAP_faction_approval_base^i min = 0 }
+			}
+		}
+		custom_effect_tooltip = JAP_decrease_all_other_faction_support_tt
+	}
+	else = {
+		for_each_loop = {
+			array = JAP_faction_approval_base
+			if = {
+				limit = {
+					NOT = {
+						check_variable = { i = temp_selected_faction }
+					}
+				}
+				add_to_variable = { JAP_faction_approval_base^temp_selected_faction = temp_all_support_change }
+				clamp_variable = { var = JAP_faction_approval_base^temp_selected_faction max = 1 }
+			}
+		}
+		custom_effect_tooltip = JAP_improve_all_other_faction_support_tt
+	}
+	JAP_calc_faction_approval = yes
+}
+
+JAP_change_hardliner_influence = {
+	if = {
+		limit = {
+			check_variable = { temp_hl_inf_change < 0 }
+		}
+		multiply_temp_variable = { temp_hl_inf_change = -1 }
+		subtract_from_variable = { JAP_hardliner_influence = temp_hl_inf_change }
+		clamp_variable = { var = JAP_hardliner_influence min = 0 }
+		custom_effect_tooltip = JAP_decrease_hardliner_influence_tt
+	}
+	else = {
+		add_to_variable = { JAP_hardliner_influence = temp_hl_inf_change }
+		clamp_variable = { var = JAP_hardliner_influence max = 1 }
+		custom_effect_tooltip = JAP_increase_hardliner_influence_tt
+	}
+	JAP_hardliner_influence_check = yes
+	JAP_calc_faction_approval = yes
+}
+
+JAP_change_hardliner_approval = {
+	if = {
+		limit = {
+			check_variable = { temp_hl_approval_change < 0 }
+		}
+		multiply_temp_variable = { temp_hl_approval_change = -1 }
+		subtract_from_variable = { JAP_hardliner_approval = temp_hl_approval_change }
+		clamp_variable = { var = JAP_hardliner_approval min = 0 }
+		custom_effect_tooltip = JAP_decrease_hardliner_approval_tt
+	}
+	else = {
+		add_to_variable = { JAP_hardliner_approval = temp_hl_approval_change }
+		clamp_variable = { var = JAP_hardliner_approval max = 1 }
+		custom_effect_tooltip = JAP_increase_hardliner_approval_tt
+	}
+	JAP_calc_faction_approval = yes
+}
+
+JAP_hardliner_influence_check = {
+	if = {
+		limit = { check_variable = { JAP_hardliner_influence < 0.2 }	}
+		hidden_effect = {
+			remove_ideas = {
+				JAP_kaya_hardliners_influence_moderate
+				JAP_kaya_hardliners_influence_high
+				JAP_kaya_hardliners_influence_substantial
+				JAP_kaya_hardliners_influence_overwhelming
+			}
+			add_ideas = JAP_kaya_hardliners_influence_low
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { JAP_hardliner_influence > 0.199 }
+			check_variable = { JAP_hardliner_influence < 0.4 }
+		}
+		hidden_effect = {
+			remove_ideas = {
+				JAP_kaya_hardliners_influence_low
+				JAP_kaya_hardliners_influence_high
+				JAP_kaya_hardliners_influence_substantial
+				JAP_kaya_hardliners_influence_overwhelming
+			}
+			add_ideas = JAP_kaya_hardliners_influence_moderate
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { JAP_hardliner_influence > 0.399 }
+			check_variable = { JAP_hardliner_influence < 0.6 }
+		}
+		hidden_effect = {
+			remove_ideas = {
+				JAP_kaya_hardliners_influence_low
+				JAP_kaya_hardliners_influence_moderate
+				JAP_kaya_hardliners_influence_substantial
+				JAP_kaya_hardliners_influence_overwhelming
+			}
+			add_ideas = JAP_kaya_hardliners_influence_high
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { JAP_hardliner_influence > 0.599 }
+			check_variable = { JAP_hardliner_influence < 0.8 }
+		}
+		hidden_effect = {
+			remove_ideas = {
+				JAP_kaya_hardliners_influence_low
+				JAP_kaya_hardliners_influence_moderate
+				JAP_kaya_hardliners_influence_high
+				JAP_kaya_hardliners_influence_overwhelming
+			}
+			add_ideas = JAP_kaya_hardliners_influence_substantial
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { JAP_hardliner_influence > 0.799 }
+		}
+		hidden_effect = {
+			remove_ideas = {
+				JAP_kaya_hardliners_influence_low
+				JAP_kaya_hardliners_influence_moderate
+				JAP_kaya_hardliners_influence_high
+				JAP_kaya_hardliners_influence_substantial
+			}
+			add_ideas = JAP_kaya_hardliners_influence_overwhelming
+		}
+	}
+	JAP_calc_faction_approval = yes
+}
+
+# Colombia Stuff
+JAP_add_support_new_granada = {
+	custom_effect_tooltip = JAP_colombia_support_idea_initial
+
+	add_to_variable = { CLC_Japanese_Support_Org = CLC_Japanese_Support_Org_Temp }
+	if = {
+		limit = { check_variable = { CLC_Japanese_Support_Org_Temp > 0 } }
+		custom_effect_tooltip = JAP_colombia_support_org_increase
+	}
+
+	add_to_variable = { CLC_Japanese_Support_Training = CLC_Japanese_Support_Training_Temp }
+	if = {
+		limit = { check_variable = { CLC_Japanese_Support_Training_Temp > 0 } }
+		custom_effect_tooltip = JAP_colombia_support_training_increase
+	}
+
+	add_to_variable = { CLC_Japanese_Support_Jungle = CLC_Japanese_Support_Jungle_Temp }
+	if = {
+		limit = { check_variable = { CLC_Japanese_Support_Jungle_Temp > 0 } }
+		custom_effect_tooltip = JAP_colombia_support_terrain_increase
+	}
+
+	add_to_variable = { CLC_Japanese_Support_CAS = CLC_Japanese_Support_CAS_Temp }
+	if = {
+		limit = { check_variable = { CLC_Japanese_Support_CAS_Temp > 0 } }
+		custom_effect_tooltip = JAP_colombia_support_cas_increase
+	}
+}
+
+# Takagi closing screen
+JAP_Takagi_ending_checker = {
+	if = {
+		limit = {
+			OR = {
+				NOT = {
+					has_game_rule = {
+						rule = JAP_GOVERNMENT_STABILITY
+						option = JAP_GOVERNMENT_STABILITY_COLLAPSE
+					}
+				}
+				has_country_flag = JAP_resignation_has_happened
+			}
+			check_variable = { JAP_bill_id = 0 }
+			OR = {
+				has_completed_focus = JAP_TakagiRecon_The_Triumph_Of_Enterprise
+				has_completed_focus = JAP_TakagiRecon_Triumph_Of_Moderation
+			}
+			has_completed_focus = JAP_TakagiRecon_Japanisation_Continues
+			has_completed_focus = JAP_TakagiRecon_A_Soft_Victory
+			has_completed_focus = JAP_TakagiRecon_The_Steel_Sun_Rises
+			#has_country_flag = JAP_Takagi_ending_one
+			OR = {
+				has_country_flag = JAP_Takagi_ending_two
+				AND = {
+					has_completed_focus = JAP_TakagiRecon_Present_To_The_Diet
+					NOT = {
+						has_country_flag = JAP_north_borneo_bill_passed
+					}
+				}
+			}
+			has_country_flag = JAP_Takagi_ending_three
+			has_country_flag = JAP_taken_all_ocfocus
+		}
+		hidden_effect = { country_event = { id = jap_oil.27 days = 2 } }
+	}
+}
+
+
+testdsdssd = {
+	add_ideas = JAP_takagi_wave_of_nationalism
+}
+
+JAP_remove_all_showa_ideas = { #perfected by yugo to cut code bloat # And fixed by KD because it broke the dynamic idea switches
+	remove_ideas = { #Welcome to the GAW, all Showa ideas will be removed except the actual GAW one, YUGO
+		JAP_showa_emperor_kaya
+		JAP_showa_emperor_ikeda
+		JAP_showa_emperor_takagi #Yugo missed this one
+		JAP_showa_emperor_takagi_2
+		JAP_showa_emperor_ikeda_2
+		JAP_showa_emperor_takagi_3
+		JAP_showa_emperor_takagi_4
+		JAP_showa_emperor_ikeda_3
+		JAP_showa_emperor_ikeda_4
+		JAP_showa_emperor_fukuda
+		JAP_showa_emperor_shiina
+		JAP_showa_emperor_HEA_passed
+		JAP_showa_emperor_HEA_failed
+		JAP_showa_emperor_HEA_sabotaged
+		JAP_showa_emperor_hardliner
+		JAP_showa_emperor_moderate
+		JAP_showa_emperor_muto
+		JAP_showa_emperor_hop
+	}
+}
+
+JAP_remove_all_showa_ideas_INT = { #KD's Notes - This version is for the Interregnum
+	remove_ideas = { #KD's Notes - Welcome to the lovely world of the second interregnum, all potential Showa ideas have to be removed to account for it and the different paths
+		JAP_showa_emperor #First we get rid all of the ones that could possibly be in at this point
+		JAP_showa_emperor_yasuda
+		JAP_showa_emperor_ikeda_2
+		JAP_showa_emperor_ikeda_3
+		JAP_showa_emperor_ikeda_4
+		JAP_showa_emperor_takagi_2
+		JAP_showa_emperor_takagi_3
+		JAP_showa_emperor_takagi_4
+		JAP_showa_emperor_fukuda
+		JAP_showa_emperor_shiina
+		JAP_showa_emperor_HEA_passed
+		JAP_showa_emperor_HEA_failed
+		JAP_showa_emperor_HEA_sabotaged
+		JAP_showa_emperor_hardliner
+		JAP_showa_emperor_moderate
+	}
+	if = { #Next we make sure we are NOT removing the idea given for the new PM
+		limit = { NOT = { has_country_flag = JAP_showa_latest_kaya } }
+		remove_ideas = {
+			JAP_showa_emperor_kaya
+		}
+	}
+	if = {
+		limit = { NOT = { has_country_flag = JAP_showa_latest_ikeda } }
+		remove_ideas = {
+			JAP_showa_emperor_ikeda
+		}
+	}
+	if = {
+		limit = { NOT = { has_country_flag = JAP_showa_latest_takagi } }
+		remove_ideas = {
+			JAP_showa_emperor_takagi
+		}
+	} #Finally we pray we didn't miss anything
+}
+
+JAP_remove_all_showa_flags = {
+	#Kaya
+	clr_country_flag = JAP_showa_latest_kaya
+	clr_country_flag = JAP_showa_latest_kaya_HEA_passed
+	clr_country_flag = JAP_showa_latest_kaya_HEA_failed
+	clr_country_flag = JAP_showa_latest_kaya_HEA_sabotaged
+	clr_country_flag = JAP_showa_latest_shiina
+	clr_country_flag = JAP_showa_latest_fukuda
+	#Ikeda
+	clr_country_flag = JAP_showa_latest_ikeda
+	clr_country_flag = JAP_showa_latest_ikeda_2
+	clr_country_flag = JAP_showa_latest_ikeda_3
+	#Takagi
+	clr_country_flag = JAP_showa_latest_takagi
+	clr_country_flag = JAP_showa_latest_takagi_2
+	clr_country_flag = JAP_showa_latest_takagi_3
+	#Failstate
+	clr_country_flag = JAP_showa_latest_muto
+	clr_country_flag = JAP_showa_latest_hop
+}
+
+JAP_Showa_Return_to_SQ = {
+	#Kaya
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_kaya }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_kaya
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_kaya_HEA_passed }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_HEA_passed
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_kaya_HEA_failed }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_HEA_failed
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_kaya_HEA_sabotaged }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_HEA_sabotaged
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_kaya_moderate }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_moderate
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_kaya_hardliner }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_hardliner
+		}
+	}
+	#Ikeda
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_ikeda }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_ikeda
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_ikeda_2 }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_ikeda_2
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_ikeda_3 }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_ikeda_3
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_ikeda_4 }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_ikeda_4
+		}
+	}
+	#Takagi
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_takagi }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_takagi
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_takagi_2 }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_takagi_2
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_takagi_3 }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_takagi_3
+		}
+	}
+	if = {
+		limit = { has_country_flag = JAP_showa_latest_takagi_4 }
+		swap_ideas = {
+			remove_idea = JAP_showa_emperor_gaw
+			add_idea = JAP_showa_emperor_takagi_4
+		}
+	}
+}
+
+# Interregnum Ending Effects
+
+JAP_interregnum_crown_ikeda = {
+	retire_country_leader = yes
+	promote_character = JAP_Ikeda_Masanosuke
+	set_politics = { ruling_party = fascism }
+
+	# Flags
+	clr_country_flag = JAP_in_interregnum
+	clr_country_flag = JAP_interregnum_final_stage
+	clear_variable = candidate_knocked_out
+	JAP_clear_PM_flags = yes
+	set_country_flag = JAP_Ikeda_Prime_Minister
+
+	# Showa Emperor
+	custom_effect_tooltip = JAP_showa_emperor_yay_change_tt
+	JAP_remove_all_showa_flags = yes
+	set_country_flag = JAP_showa_latest_ikeda
+	swap_ideas = {
+		remove_idea = JAP_showa_emperor_yasuda
+		add_idea = JAP_showa_emperor_ikeda
+	}
+
+	# Diet Setup
+	JAP_InoIkeda_PM_initialize = yes
+	set_variable = { JAP_Peers_support = 0.6 } #Unfuck shit if needed
+	set_variable = { JAP_Public_support = 0.35 }
+	JAP_calc_government_stability = yes
+	custom_effect_tooltip = JAP_Warn_Player_tt
+
+	hidden_effect = {
+		JAP_tree_swap = yes
+		complete_national_focus = JAP_prime_minister_ikeda
+		remove_all_ministers = yes
+		add_ideas = {
+			JAP_Hatoyama_Ichiro_hog
+			JAP_Sakurauchi_Yoshio_for
+			JAP_Sato_Eisaku_eco
+			JAP_Ezaki_Masumi_sec
+		}
+		country_event = { id = jap_ar.2 days = 364 }
+		JAP_remove_all_showa_ideas_INT = yes
+		every_country = {
+			limit = { is_ai = no }
+			news_event = WORLD.2065
+		}
+		GNG = {
+			country_event = {
+				id = guangdong_japaninteractions.2
+				days = 1
+			}
+		}
+	}
+}
+
+JAP_interregnum_crown_takagi = {
+	retire_country_leader = yes
+	promote_character = JAP_Takagi_Soukichi
+	set_politics = { ruling_party = conservatism }
+
+	# Flags
+	clr_country_flag = JAP_in_interregnum
+	clr_country_flag = JAP_interregnum_final_stage
+	clear_variable = candidate_knocked_out
+	JAP_clear_PM_flags = yes
+	set_country_flag = JAP_Takagi_Prime_Minister
+
+	# Showa Emperor
+	custom_effect_tooltip = JAP_showa_emperor_yay_change_tt
+	JAP_remove_all_showa_flags = yes
+	set_country_flag = JAP_showa_latest_takagi
+	swap_ideas = {
+		remove_idea = JAP_showa_emperor_yasuda
+		add_idea = JAP_showa_emperor_takagi
+	}
+
+	# Diet Setup
+	JAP_Takagi_PM_initialize = yes
+	JAP_set_base_faction_approval = yes
+	set_variable = { JAP_Peers_support = 0.6 } #Unfuck shit if needed
+	set_variable = { JAP_Public_support = 0.35 }
+	JAP_calc_government_stability = yes
+	custom_effect_tooltip = JAP_Warn_Player_tt
+
+	hidden_effect = {
+		promote_character = JAP_Ikeda_Masanosuke
+		JAP_tree_swap = yes
+		remove_all_ministers = yes
+		add_ideas = {
+			JAP_Kouichi_Kido_hog
+			JAP_Kuranari_Tadashi_for
+			JAP_Nakasone_Yasuhiro_eco
+			JAP_Horikiri_Zenjiro_sec
+		}
+		country_event = { id = jap_ar.1 days = 364 }
+		JAP_remove_all_showa_ideas_INT = yes
+		every_country = {
+			limit = { is_ai = no }
+			news_event = WORLD.2067
+		}
+		GNG = {
+			country_event = {
+				id = guangdong_japaninteractions.1
+				days = 1
+			}
+		}
+	}
+}
+
+JAP_interregnum_crown_kaya = {
+	retire_country_leader = yes
+	promote_character = JAP_Kaya_Okinori
+	set_politics = { ruling_party = despotism }
+
+	# Flags
+	clr_country_flag = JAP_in_interregnum
+	clr_country_flag = JAP_interregnum_final_stage
+	clear_variable = candidate_knocked_out
+	JAP_clear_PM_flags = yes
+	set_country_flag = JAP_Kaya_Prime_Minister
+
+	# Showa Emperor
+	custom_effect_tooltip = JAP_showa_emperor_yay_change_tt
+	JAP_remove_all_showa_flags = yes
+	set_country_flag = JAP_showa_latest_kaya
+	swap_ideas = {
+		remove_idea = JAP_showa_emperor_yasuda
+		add_idea = JAP_showa_emperor_kaya
+	}
+
+	# Diet Setup
+	JAP_Kaya_PM_initialize = yes
+	JAP_set_base_faction_approval = yes
+	set_variable = { JAP_Peers_support = 0.6 } #Unfuck shit if needed
+	set_variable = { JAP_Public_support = 0.35 }
+	JAP_calc_government_stability = yes
+	custom_effect_tooltip = JAP_Warn_Player_tt
+
+	hidden_effect = {
+		promote_character = JAP_Ikeda_Masanosuke
+		JAP_tree_swap = yes
+		remove_all_ministers = yes
+		add_ideas = {
+			JAP_Aoki_Kazuo_hog
+			JAP_Generic_Vacant_eco
+			JAP_Generic_Vacant_for
+			JAP_Generic_Vacant_sec
+		}
+		country_event = { id = jap_ar.3 days = 364 }
+		JAP_remove_all_showa_ideas_INT = yes
+		every_country = {
+			limit = { is_ai = no }
+			news_event = WORLD.2066
+		}
+		GNG = {
+			country_event = {
+				id = guangdong_japaninteractions.3
+				days = 1
+			}
+		}
+	}
+}

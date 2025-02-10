@@ -1,0 +1,665 @@
+scripted_gui = {
+	TNO_Cold_War_GUI_AAT_Selection = {
+		context_type = player_context
+		parent_window_name = "countryinternationalmarketview"
+		window_name = "TNO_Cold_War_GUI_Selection"
+
+		triggers = {
+			cw_gui_button_visible = {
+				NOT = { has_country_flag = TNO_Cold_War_Display }
+			}
+			back_to_market_button_visible = {
+				has_country_flag = TNO_Cold_War_Display
+			}
+		}
+		effects = {
+			# back_button_click = {
+			# 	if = {
+			# 		limit = { has_country_flag = TNO_Cold_War_Display }
+			# 		clr_country_flag = TNO_Cold_War_Display
+			# 	}
+			# 	else = { set_country_flag = TNO_Cold_War_Display }
+			# }
+			cw_gui_button_click = {
+				set_country_flag = TNO_Cold_War_Display
+			}
+			back_to_market_button_click = {
+				clr_country_flag = TNO_Cold_War_Display
+			}
+		}
+	}
+
+	TNO_Cold_War_GUI_AAT = {
+		context_type = player_context
+		parent_window_name = "countryinternationalmarketview"
+		window_name = "TNO_Cold_War_GUI_AAT"
+
+		visible = { has_country_flag = TNO_Cold_War_Display }
+
+		triggers = {
+			Cold_War_GUI_Nuke_Button_click_enabled = {
+				has_nuclear_arsenal = yes
+			}
+			Cold_War_GUI_Rankings_Button_click_enabled = {
+				if = {
+					limit = { check_variable = { TNO_Cold_War_GUI_Tab = 1 } }
+					set_temp_variable = { CW_Rankings_frame = 1 }
+				}
+				else = { set_temp_variable = { CW_Rankings_frame = 2 } }
+			}
+			Cold_War_GUI_Tension_Button_click_enabled = {
+				if = {
+					limit = { check_variable = { TNO_Cold_War_GUI_Tab = 3 } }
+					set_temp_variable = { CW_Tension_frame = 1 }
+				}
+				else = { set_temp_variable = { CW_Tension_frame = 2 } }
+			}
+			Cold_War_GUI_Spheres_Button_click_enabled = {
+				if = {
+					limit = { check_variable = { TNO_Cold_War_GUI_Tab = 5 } }
+					set_temp_variable = { CW_Spheres_frame = 1 }
+				}
+				else = { set_temp_variable = { CW_Spheres_frame = 2 } }
+			}
+			Cold_War_GUI_Nukes_Button_click_enabled = {
+				if = {
+					limit = { check_variable = { TNO_Cold_War_GUI_Tab = 6 } }
+					set_temp_variable = { CW_Nukes_frame = 1 }
+				}
+				else = { set_temp_variable = { CW_Nukes_frame = 2 } }
+			}
+
+			Cold_War_GUI_Sea_Zone_East_Pacific_visible = {
+				var:Cold_War_GUI_SeaZone_SelectedSuperpower = { check_variable = { CW_SeaZone_Status^0 = 1 } }
+			}
+			Cold_War_GUI_Sea_Zone_West_Pacific_visible = {
+				var:Cold_War_GUI_SeaZone_SelectedSuperpower = { check_variable = { CW_SeaZone_Status^1 = 1 } }
+			}
+			Cold_War_GUI_Sea_Zone_South_Atlantic_visible = {
+				var:Cold_War_GUI_SeaZone_SelectedSuperpower = { check_variable = { CW_SeaZone_Status^2 = 1 } }
+			}
+			Cold_War_GUI_Sea_Zone_North_Atlantic_visible = {
+				var:Cold_War_GUI_SeaZone_SelectedSuperpower = { check_variable = { CW_SeaZone_Status^3 = 1 } }
+			}
+			Cold_War_GUI_Sea_Zone_North_Sea_visible = {
+				var:Cold_War_GUI_SeaZone_SelectedSuperpower = { check_variable = { CW_SeaZone_Status^4 = 1 } }
+			}
+			Cold_War_GUI_Sea_Zone_Med_visible = {
+				var:Cold_War_GUI_SeaZone_SelectedSuperpower = { check_variable = { CW_SeaZone_Status^5 = 1 } }
+			}
+			Cold_War_GUI_Sea_Zone_Indian_Ocean_visible = {
+				var:Cold_War_GUI_SeaZone_SelectedSuperpower = { check_variable = { CW_SeaZone_Status^6 = 1 } }
+			}
+		}
+
+		properties = {
+			Cold_War_GUI_Sea_Zone_East_Pacific = { frame = Cold_War_GUI_SeaZone_SelectedSuperpower_Frame }
+			Cold_War_GUI_Sea_Zone_North_Atlantic = { frame = Cold_War_GUI_SeaZone_SelectedSuperpower_Frame }
+			Cold_War_GUI_Sea_Zone_North_Sea = { frame = Cold_War_GUI_SeaZone_SelectedSuperpower_Frame }
+			Cold_War_GUI_Sea_Zone_West_Pacific = { frame = Cold_War_GUI_SeaZone_SelectedSuperpower_Frame }
+			Cold_War_GUI_Sea_Zone_Baltic_Sea = { frame = Cold_War_GUI_SeaZone_SelectedSuperpower_Frame }
+			Cold_War_GUI_Sea_Zone_Med = { frame = Cold_War_GUI_SeaZone_SelectedSuperpower_Frame }
+			Cold_War_GUI_Sea_Zone_South_Atlantic = { frame = Cold_War_GUI_SeaZone_SelectedSuperpower_Frame }
+			Cold_War_GUI_Sea_Zone_Indian_Ocean = { frame = Cold_War_GUI_SeaZone_SelectedSuperpower_Frame }
+
+			TNO_Cold_War_GUI_DEFCON_Meter = { image = "[get_world_tension_topbar_defcon]" }
+			TNO_Cold_War_GUI_Nuke_Small_Icon = { frame = TNO_Cold_War_GUI_Nuke_Small_Icon_Frame }
+			TNO_Cold_War_GUI_PB = {
+				image = "[get_cw_gui_defcon_progbar]"
+				frame = global.TNO_World_Tension
+			}
+
+			Cold_War_GUI_PowerProjection_TagButton = {
+				image = "[Cold_War_GUI_PowerProjection_GetTagImage]"
+				x = global.PowerProjection_X^PP_i
+				y = global.PowerProjection_Y^PP_i
+			}
+		}
+
+		effects = {
+			Cold_War_GUI_PowerProjection_TagButton_click = {
+				set_variable = { ROOT.Cold_War_GUI_SeaZone_SelectedSuperpower = THIS }
+				if = {
+					limit = { tag = USA }
+					set_variable = { ROOT.Cold_War_GUI_SeaZone_SelectedSuperpower_Frame = 1 }
+				}
+				else_if = {
+					limit = { tag = JAP }
+					set_variable = { ROOT.Cold_War_GUI_SeaZone_SelectedSuperpower_Frame = 2 }
+				}
+				else_if = {
+					limit = { tag = GER }
+					set_variable = { ROOT.Cold_War_GUI_SeaZone_SelectedSuperpower_Frame = 3 }
+				}
+				else_if = {
+					limit = { tag = ITA }
+					set_variable = { ROOT.Cold_War_GUI_SeaZone_SelectedSuperpower_Frame = 4 }
+				}
+			}
+
+			Cold_War_GUI_Rankings_Button_click = {
+				set_variable = { TNO_Cold_War_GUI_Tab = 1 }
+				Cold_War_GUI_Fully_Calculate_Scores = yes
+			}
+			Cold_War_GUI_Rankings_Button_right_click = {
+				if = {
+					limit = { has_country_flag = TNO_Cold_War_GUI_Debug }
+					clr_country_flag = TNO_Cold_War_GUI_Debug
+				}
+				else_if = {
+					limit = { is_debug = yes }
+					set_country_flag = TNO_Cold_War_GUI_Debug
+				}
+			}
+
+			Cold_War_GUI_Tension_Button_click = {
+				set_variable = { TNO_Cold_War_GUI_Tab = 3 }
+			}
+
+			Cold_War_GUI_Tension_Button_right_click = {
+				if = {
+					limit = { has_country_flag = TNO_Cold_War_GUI_Debug }
+					clr_country_flag = TNO_Cold_War_GUI_Debug
+				}
+				else_if = {
+					limit = { is_debug = yes }
+					set_country_flag = TNO_Cold_War_GUI_Debug
+				}
+			}
+
+			Cold_War_GUI_Spheres_Button_click = {
+				set_variable = { TNO_Cold_War_GUI_Tab = 5 }
+				econ_recompile_all_spheres = yes
+				clear_array = sphere_list_array
+				every_country = {
+					limit = { has_country_flag = HAS_ECON_SPHERE }
+					add_to_array = { PREV.sphere_list_array = THIS }
+				}
+				get_sorted_scored_countries = {
+					scorer = sphere_list_scorer
+					array = sphere_list_array
+				}
+			}
+
+			Cold_War_GUI_Nukes_Button_click = {
+				set_variable = { TNO_Cold_War_GUI_Tab = 6 }
+				generate_nuclear_powers_array = yes
+				if = {
+					limit = { has_nuclear_arsenal = yes }
+					calculate_strike_capability = yes
+					set_variable = { Nuke_GUI_LeftSwitch = 1 }
+					set_variable = { Nuke_GUI_RightSwitch = 1 }
+					if = {
+						limit = {
+							OR = {
+								tag = GER
+								tag = USA
+								tag = JAP
+							}
+						}
+						clamp_variable = { var = nuclear_stockpile_min_cap min = 3500 }
+					}
+				}
+			}
+		}
+
+		dynamic_lists = {
+			Cold_War_GUI_PowerProjection_Buttons = {
+				array = global.PowerProjection_Tags
+				index = PP_i
+				change_scope = yes
+				entry_container = TNO_Cold_War_GUI_PowerProjection_Buttons_Container_AAT
+			}
+		}
+	}
+
+
+	TNO_Rankings_Tab_AAT = {
+		context_type = player_context
+		parent_window_name = "countryinternationalmarketview"
+		window_name = "TNO_Cold_War_GUI_Rankings_Tab_AAT"
+
+		visible = {
+			has_country_flag = TNO_Cold_War_Display
+			check_variable = { TNO_Cold_War_GUI_Tab = 1 }
+		}
+
+		triggers = {
+			Cold_War_GUI_Rankings_Tab_Vic_add_remove_visible = {
+				has_country_flag = TNO_Cold_War_GUI_Debug
+			}
+			Cold_War_GUI_Rankings_Tab_Vic_sample_logs_visible = {
+				has_country_flag = TNO_Cold_War_GUI_Debug
+			}
+		}
+
+		effects = {
+			TNO_Cold_War_GUI_Rankings_Tab_Superpower_Large_Entry_Background_click = {
+				for_each_scope_loop = {
+					array = global.TNO_Superpowers
+					set_variable = { this.TNO_Cold_War_GUI_Rankings_Tab_Superpower_Entries_Array_Frame = 1 }
+				}
+				add_to_variable = {
+					this.TNO_Cold_War_GUI_Rankings_Tab_Superpower_Entries_Array_Frame = 1
+				}
+				save_global_event_target_as = Cold_War_GUI_Selected_Superpower
+			}
+
+			# Debug buttons
+			Cold_War_GUI_Rankings_Tab_Vic_add_remove_click = {
+				event_target:Cold_War_GUI_Selected_Superpower = {
+					add_to_array = { TNO_Cold_War_GUI_Victory_Entry = 1 }
+					Cold_War_GUI_CalculateDisplayArrays = yes
+				}
+			}
+			Cold_War_GUI_Rankings_Tab_Vic_add_remove_right_click = {
+				event_target:Cold_War_GUI_Selected_Superpower = {
+					clear_array = TNO_Cold_War_GUI_Victory_Entry
+					clear_array = TNO_Cold_War_GUI_Victory_Outcome
+					clear_array = TNO_Cold_War_GUI_Victory_Points
+					clear_array = TNO_Cold_War_GUI_Victory_Entry_Display
+					clear_array = TNO_Cold_War_GUI_Victory_Outcome_Display
+					clear_array = TNO_Cold_War_GUI_Victory_Points_Display
+				}
+			}
+			Cold_War_GUI_Rankings_Tab_Vic_sample_logs_click = {
+				event_target:Cold_War_GUI_Selected_Superpower = {
+					set_temp_variable = { Victory_ID = 1 }
+					set_temp_variable = { Victory_Outcome = 0 }
+					set_temp_variable = { Victory_Points = -20 }
+					Cold_War_GUI_AddVictory = yes
+					set_temp_variable = { Victory_ID = 2 }
+					set_temp_variable = { Victory_Outcome = 1 }
+					set_temp_variable = { Victory_Points = -180 }
+					Cold_War_GUI_AddVictory = yes
+					set_temp_variable = { Victory_ID = 3 }
+					set_temp_variable = { Victory_Outcome = 2 }
+					set_temp_variable = { Victory_Points = -100 }
+					Cold_War_GUI_AddVictory = yes
+					set_temp_variable = { Victory_ID = 4 }
+					set_temp_variable = { Victory_Outcome = 3 }
+					set_temp_variable = { Victory_Points = 0 }
+					Cold_War_GUI_AddVictory = yes
+					set_temp_variable = { Victory_ID = 5 }
+					set_temp_variable = { Victory_Outcome = 4 }
+					set_temp_variable = { Victory_Points = 100 }
+					Cold_War_GUI_AddVictory = yes
+					set_temp_variable = { Victory_ID = 6 }
+					set_temp_variable = { Victory_Outcome = 5 }
+					set_temp_variable = { Victory_Points = 250 }
+					Cold_War_GUI_AddVictory = yes
+
+					Cold_War_GUI_CalculateDisplayArrays = yes
+					Cold_War_GUI_Score_Calculation = yes
+				}
+			}
+		}
+
+		properties = {
+			TNO_Cold_War_GUI_Rankings_Tab_Superpower_Large_Entry_Flag = { image = "[This.GetFlag]" }
+			TNO_Cold_War_GUI_Rankings_Tab_Superpower_Large_Entry_Background = { frame = this.TNO_Cold_War_GUI_Rankings_Tab_Superpower_Entries_Array_Frame }
+		}
+
+		dynamic_lists = {
+			TNO_Cold_War_GUI_Rankings_Tab_Superpower_Large_Entries_List = {
+				array = global.TNO_Superpowers
+				index = i
+				change_scope = yes
+				entry_container = TNO_Cold_War_GUI_Rankings_Tab_Superpower_Large_Entry_AAT
+			}
+
+			TNO_Cold_War_GUI_Rankings_Tab_Superpower_Info_Entry_Victory_List_Gridbox = {
+				array = Cold_War_GUI_Selected_Superpower.TNO_Cold_War_GUI_Victory_Entry_Display
+				index = TNO_Cold_War_GUI_Victories_i
+				entry_container = TNO_Cold_War_GUI_Rankings_Tab_Superpower_Info_Entry_AAT
+			}
+		}
+	}
+
+	TNO_Tension_Tab_AAT= {
+		context_type = player_context
+		parent_window_name = "countryinternationalmarketview"
+		window_name = "TNO_Cold_War_GUI_Tension_Tab_AAT"
+
+		visible = {
+			has_country_flag = TNO_Cold_War_Display
+			check_variable = { TNO_Cold_War_GUI_Tab = 3 }
+		}
+
+		triggers = {
+			Cold_War_GUI_Tension_Tab_add_remove_visible = {
+				has_country_flag = TNO_Cold_War_GUI_Debug
+			}
+			Cold_War_GUI_Tension_Tab_sample_logs_visible = {
+				has_country_flag = TNO_Cold_War_GUI_Debug
+			}
+		}
+
+		effects = {
+			Cold_War_GUI_Tension_Tab_add_remove_click = {
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_WT = 30 }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1 = USA }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2 = JAP }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List = 1 }
+			}
+			Cold_War_GUI_Tension_Tab_add_remove_right_click = {
+				clear_array = global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List
+				clear_array = global.TNO_Cold_War_GUI_Tension_Incidents_WT
+				clear_array = global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1
+				clear_array = global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2
+			}
+			Cold_War_GUI_Tension_Tab_sample_logs_click = {
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_WT = 30 }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1 = USA }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2 = JAP }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List = 1 }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_WT = 15 }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1 = USA }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2 = GER }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List = 2 }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1 = GER }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2 = JAP }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_WT = -8 }
+				add_to_array = { global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List = 3 }
+			}
+		}
+
+		properties = {
+			TNO_Cold_War_GUI_Tension_Entry_A_Progressbar = { frame = global.TNO_superpower_tension^0 }
+			TNO_Cold_War_GUI_Tension_Tab_Entry_A_Superpower_1_Flag = { image = "[USA.GetFlag]" }
+			TNO_Cold_War_GUI_Tension_Tab_Entry_A_Superpower_2_Flag = { image = "[GER.GetFlag]" }
+
+			TNO_Cold_War_GUI_Tension_Entry_B_Progressbar = { frame = global.TNO_superpower_tension^1 }
+			TNO_Cold_War_GUI_Tension_Tab_Entry_B_Superpower_1_Flag = { image = "[GER.GetFlag]" }
+			TNO_Cold_War_GUI_Tension_Tab_Entry_B_Superpower_2_Flag = { image = "[JAP.GetFlag]" }
+
+			TNO_Cold_War_GUI_Tension_Entry_C_Progressbar = { frame = global.TNO_superpower_tension^2 }
+			TNO_Cold_War_GUI_Tension_Tab_Entry_C_Superpower_1_Flag = { image = "[JAP.GetFlag]" }
+			TNO_Cold_War_GUI_Tension_Tab_Entry_C_Superpower_2_Flag = { image = "[USA.GetFlag]" }
+		}
+		dynamic_lists = {
+			Cold_War_GUI_Tension_Tab_Incidents = {
+				array = global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List
+				index = TNO_Cold_War_GUI_Tension_Incidents_i
+				entry_container = Cold_War_GUI_Tension_Tab_Incidents_Entry_AAT
+			}
+		}
+	}
+
+	TNO_Spheres_Tab_AAT = {
+		context_type = player_context
+		parent_window_name = "countryinternationalmarketview"
+		window_name = "TNO_Cold_War_GUI_Spheres_Tab_AAT"
+
+		visible = {
+			has_country_flag = TNO_Cold_War_Display
+			check_variable = { TNO_Cold_War_GUI_Tab = 5 }
+		}
+
+		properties = {
+			Cold_War_GUI_Spheres_Tab_Spheres_Entry_Flag = { image = "[This.GetFlag]" }
+			Cold_War_GUI_Spheres_Tab_Spheres_Entry_Flags_Entry_Flag = { image = "[This.GetFlag]" }
+		}
+
+		dynamic_lists = {
+			Cold_War_GUI_Spheres_Tab_Spheres = {
+				array = THIS.sphere_list_array
+				index = i
+				change_scope = yes
+				entry_container = Cold_War_GUI_Spheres_Tab_Spheres_Entry
+			}
+			Cold_War_GUI_Spheres_Tab_Spheres_Entry_Flags = {
+				array = econ_sphere_members
+				index = i
+				change_scope = yes
+				entry_container = Cold_War_GUI_Spheres_Tab_Spheres_Entry_Flags_Entry_AAT
+			}
+		}
+	}
+
+	TNO_Nukes_Tab_AAT = {
+		context_type = player_context
+		parent_window_name = "countryinternationalmarketview"
+		window_name = "TNO_Cold_War_GUI_Nukes_Tab_AAT"
+
+		visible = {
+			has_country_flag = TNO_Cold_War_Display
+			check_variable = { TNO_Cold_War_GUI_Tab = 6 }
+		}
+
+		triggers = {
+			Cold_War_GUI_Display_BigRedButton_click_enabled = {
+				NOT = {
+					has_country_flag = disable_red_button
+					has_country_flag = nuke_launch_confirmation
+				}
+				check_variable = { Nuke_GUI_LeftSwitch = 2 }
+				check_variable = { Nuke_GUI_RightSwitch = 2 }
+			}
+
+			Cold_War_GUI_DecommissionDisplay_QtdPlusButton_click_enabled = {
+				has_nuclear_arsenal = yes
+				check_variable = { nuclear_stockpile_montly_decomm < 1000 }
+			}
+			Cold_War_GUI_DecommissionDisplay_QtdMinusButton_click_enabled = {
+				check_variable = { nuclear_stockpile_montly_decomm > 0 }
+			}
+			Cold_War_GUI_DecommissionDisplay_CapPlusButton_click_enabled = {
+				check_variable = { nuclear_stockpile_min_cap < nuclear_stockpile }
+			}
+			Cold_War_GUI_DecommissionDisplay_CapMinusButton_click_enabled = {
+				check_variable = { nuclear_stockpile_min_cap > 3500 }
+			}
+			Cold_War_GUI_DecommissionDisplay_Activate_click_enabled = {
+				check_variable = { nuclear_stockpile_montly_decomm > 0 }
+				check_variable = { nuclear_stockpile_min_cap < nuclear_stockpile }
+			}
+
+			Cold_War_GUI_DecommissionDisplay_Activate_visible = {
+				NOT = { has_country_flag = nuclear_decommissioning_active }
+			}
+			Cold_War_GUI_DecommissionDisplay_Deactivate_visible = {
+				has_country_flag = nuclear_decommissioning_active
+			}
+			Cold_War_GUI_Display_SwitchLeft_click_enabled = {
+				NOT = {
+					has_country_flag = disable_red_button
+					has_country_flag = nuke_launch_confirmation
+				}
+				has_nuclear_arsenal = yes
+				is_superpower = yes
+			}
+			Cold_War_GUI_Display_SwitchRight_click_enabled = {
+				NOT = {
+					has_country_flag = disable_red_button
+					has_country_flag = nuke_launch_confirmation
+				}
+				has_nuclear_arsenal = yes
+				is_superpower = yes
+			}
+		}
+
+		effects = {
+			Cold_War_GUI_Display_BigRedButton_click = {
+				set_country_flag = nuke_launch_confirmation
+			}
+			Cold_War_GUI_Display_SwitchLeft_click = {
+				if = {
+					limit = { check_variable = { Nuke_GUI_LeftSwitch = 1 } }
+					set_variable = { Nuke_GUI_LeftSwitch = 2 }
+				}
+				else = { set_variable = { Nuke_GUI_LeftSwitch = 1 } }
+			}
+			Cold_War_GUI_Display_SwitchRight_click = {
+				if = {
+					limit = { check_variable = { Nuke_GUI_RightSwitch = 1 } }
+					set_variable = { Nuke_GUI_RightSwitch = 2 }
+				}
+				else = { set_variable = { Nuke_GUI_RightSwitch = 1 } }
+			}
+
+			Cold_War_GUI_Display_DecommissionButton_Inactive_click = {
+				set_country_flag = nuclear_decommission_menu
+				if = {
+					limit = { NOT = { has_country_flag = nuclear_decommissioning_active } }
+					set_variable = { nuclear_stockpile_montly_decomm = 100 }
+					set_variable = { nuclear_stockpile_min_cap = nuclear_stockpile }
+				}
+			}
+			Cold_War_GUI_Display_DecommissionButton_Active_click = {
+				clr_country_flag = nuclear_decommission_menu
+				if = {
+					limit = { NOT = { has_country_flag = nuclear_decommissioning_active } }
+					clear_variable = nuclear_stockpile_montly_decomm
+					clear_variable = nuclear_stockpile_min_cap
+				}
+			}
+
+			Cold_War_GUI_DecommissionDisplay_QtdPlusButton_click = {
+				add_to_variable = { nuclear_stockpile_montly_decomm = 50 }
+				if = {
+					limit = { check_variable = { nuclear_stockpile > 1000 } }
+					clamp_variable = { var = nuclear_stockpile_montly_decomm min = 0 max = 1000 }
+				}
+				else = {
+					set_temp_variable = { MaxClamp = nuclear_stockpile }
+					subtract_from_temp_variable = { MaxClamp = 1 }
+					clamp_variable = { var = nuclear_stockpile_montly_decomm min = 0 max = MaxClamp }
+				}
+				if = {
+					limit = { has_country_flag = nuclear_decommissioning_active }
+					set_variable = { nuclear_stockpile_change = nuclear_stockpile_montly_decomm }
+					multiply_variable = { nuclear_stockpile_change = -1 }
+				}
+			}
+			Cold_War_GUI_DecommissionDisplay_QtdMinusButton_click = {
+				add_to_variable = { nuclear_stockpile_montly_decomm = -50 }
+				if = {
+					limit = { check_variable = { nuclear_stockpile > 1000 } }
+					clamp_variable = { var = nuclear_stockpile_montly_decomm min = 0 max = 1000 }
+				}
+				else = {
+					set_temp_variable = { MaxClamp = nuclear_stockpile }
+					subtract_from_temp_variable = { MaxClamp = 1 }
+					clamp_variable = { var = nuclear_stockpile_montly_decomm min = 0 max = MaxClamp }
+				}
+				if = {
+					limit = { has_country_flag = nuclear_decommissioning_active }
+					set_variable = { nuclear_stockpile_change = nuclear_stockpile_montly_decomm }
+					multiply_variable = { nuclear_stockpile_change = -1 }
+				}
+			}
+			Cold_War_GUI_DecommissionDisplay_QtdPlusButton_shift_click = {
+				add_to_variable = { nuclear_stockpile_montly_decomm = 5 }
+				if = {
+					limit = { check_variable = { nuclear_stockpile > 1000 } }
+					clamp_variable = { var = nuclear_stockpile_montly_decomm min = 0 max = 1000 }
+				}
+				else = {
+					set_temp_variable = { MaxClamp = nuclear_stockpile }
+					subtract_from_temp_variable = { MaxClamp = 1 }
+					clamp_variable = { var = nuclear_stockpile_montly_decomm min = 0 max = MaxClamp }
+				}
+				if = {
+					limit = { has_country_flag = nuclear_decommissioning_active }
+					set_variable = { nuclear_stockpile_change = nuclear_stockpile_montly_decomm }
+					multiply_variable = { nuclear_stockpile_change = -1 }
+				}
+			}
+			Cold_War_GUI_DecommissionDisplay_QtdMinusButton_shift_click = {
+				add_to_variable = { nuclear_stockpile_montly_decomm = -5 }
+				if = {
+					limit = { check_variable = { nuclear_stockpile > 1000 } }
+					clamp_variable = { var = nuclear_stockpile_montly_decomm min = 0 max = 1000 }
+				}
+				else = {
+					set_temp_variable = { MaxClamp = nuclear_stockpile }
+					subtract_from_temp_variable = { MaxClamp = 1 }
+					clamp_variable = { var = nuclear_stockpile_montly_decomm min = 0 max = MaxClamp }
+				}
+				if = {
+					limit = { has_country_flag = nuclear_decommissioning_active }
+					set_variable = { nuclear_stockpile_change = nuclear_stockpile_montly_decomm }
+					multiply_variable = { nuclear_stockpile_change = -1 }
+				}
+			}
+
+			Cold_War_GUI_DecommissionDisplay_CapPlusButton_click = {
+				add_to_variable = { nuclear_stockpile_min_cap = 10 }
+				clamp_variable = { var = nuclear_stockpile_min_cap min = 3500 max = nuclear_stockpile }
+			}
+			Cold_War_GUI_DecommissionDisplay_CapMinusButton_click = {
+				add_to_variable = { nuclear_stockpile_min_cap = -10 }
+				clamp_variable = { var = nuclear_stockpile_min_cap min = 3500 max = nuclear_stockpile }
+			}
+			Cold_War_GUI_DecommissionDisplay_CapPlusButton_control_click = {
+				add_to_variable = { nuclear_stockpile_min_cap = 100 }
+				clamp_variable = { var = nuclear_stockpile_min_cap min = 3500 max = nuclear_stockpile }
+			}
+			Cold_War_GUI_DecommissionDisplay_CapMinusButton_control_click = {
+				add_to_variable = { nuclear_stockpile_min_cap = -100 }
+				clamp_variable = { var = nuclear_stockpile_min_cap min = 3500 max = nuclear_stockpile }
+			}
+			Cold_War_GUI_DecommissionDisplay_CapPlusButton_shift_click = {
+				add_to_variable = { nuclear_stockpile_min_cap = 1000 }
+				clamp_variable = { var = nuclear_stockpile_min_cap min = 3500 max = nuclear_stockpile }
+			}
+			Cold_War_GUI_DecommissionDisplay_CapMinusButton_shift_click = {
+				add_to_variable = { nuclear_stockpile_min_cap = -1000 }
+				clamp_variable = { var = nuclear_stockpile_min_cap min = 3500 max = nuclear_stockpile }
+			}
+			Cold_War_GUI_DecommissionDisplay_CapPlusButton_right_click = {
+				add_to_variable = { nuclear_stockpile_min_cap = 1 }
+				clamp_variable = { var = nuclear_stockpile_min_cap min = 3500 max = nuclear_stockpile }
+			}
+			Cold_War_GUI_DecommissionDisplay_CapMinusButton_right_click = {
+				add_to_variable = { nuclear_stockpile_min_cap = -1 }
+				clamp_variable = { var = nuclear_stockpile_min_cap min = 3500 max = nuclear_stockpile }
+			}
+
+			Cold_War_GUI_DecommissionDisplay_Activate_click = {
+				set_country_flag = nuclear_decommissioning_active
+				set_variable = { nuclear_stockpile_change = nuclear_stockpile_montly_decomm }
+				multiply_variable = { nuclear_stockpile_change = -1 }
+			}
+			Cold_War_GUI_DecommissionDisplay_Deactivate_click = {
+				clr_country_flag = nuclear_decommissioning_active
+				calculate_nuclear_expenditures = yes
+			}
+		}
+
+		properties = {
+			Cold_War_GUI_NuclearPowers_Flag = { image = "[This.GetFlag]" }
+			Cold_War_GUI_Display_SwitchLeft = { frame = Nuke_GUI_LeftSwitch }
+			Cold_War_GUI_Display_SwitchRight = { frame = Nuke_GUI_RightSwitch }
+		}
+
+		dynamic_lists = {
+			Cold_War_GUI_Nukes_Tab_NuclearPowers = {
+				array = global.nuclear_powers_array
+				index = i
+				change_scope = yes
+				entry_container = Cold_War_GUI_NuclearPowers_Entry_AAT
+			}
+		}
+	}
+
+	TNO_Nuke_Confirmation_Tab_AAT = {
+		context_type = player_context
+		parent_window_name = "countryinternationalmarketview"
+		window_name = "TNO_Cold_War_GUI_Nuke_Confirmation_Tooltip_AAT"
+
+		visible = { has_country_flag = nuke_launch_confirmation }
+
+		effects = {
+			Cold_War_GUI_Nuke_Confirmation_Tooltip_NoButton_click = {
+				clr_country_flag = nuke_launch_confirmation
+			}
+			Cold_War_GUI_Nuke_Confirmation_Tooltip_YesButton_click = {
+				clr_country_flag = nuke_launch_confirmation
+				set_country_flag = disable_red_button
+				country_event = { id = nuclearwar.6 hours = 3 }
+			}
+		}
+	}
+}

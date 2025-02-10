@@ -1,0 +1,963 @@
+TYM_five_year_plan_category = {
+
+	TYM_fyp_the_first_five_year_plan_mission = {
+		allowed = {
+			always = no
+		}
+
+		icon = GFX_decision_generic_money
+
+		available = {
+			NOT = {
+				TYM = {
+					has_country_flag = TYM_fyp_ongoing
+				}
+			}
+		}
+
+		visible = {
+			TYM = {
+				has_country_flag = TYM_fyp_ongoing
+			}
+		}
+
+		selectable_mission = no
+		days_mission_timeout = 1825
+		is_good = no
+		fire_only_once = yes
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove TYM_fyp_the_first_five_year_plan_mission"
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_the_first_five_year_plan_mission"
+		}
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout TYM_fyp_the_first_five_year_plan_mission"
+			clr_country_flag = TYM_fyp_ongoing
+		}
+	}
+#	TYM_fyp_expand_heavy_armaments_industry = {
+#		allowed = {
+#			tag = TYM
+#		}
+#		days_remove = 75
+#		cost = 50
+#		complete_effect = {
+#			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_expand_heavy_armaments_industry"
+#			custom_effect_tooltip = TYM_increase_agricultural_strain_tt
+#			add_to_variable = { TYMAgriculturalStrain = 40 }
+#			set_temp_variable = { temp_econ_spending_amount = 0.05 }
+#			econ_spend_money_once_effect_raw_money = yes
+#		}
+#		modifier = {
+#			consumer_goods_use_modifier = 0.20
+#		}
+#		remove_effect = {
+#			set_temp_variable = { pus_temp = 1 }
+#			econ_pus_change = yes
+#			TNO_improve_max_workhours_policy_effectiveness_low = yes
+#		}
+#		ai_will_do = {
+#			factor = 20
+#		}
+#	}
+#	TYM_fyp_expand_civilian_industry = {
+#		allowed = {
+#			tag = TYM
+#		}
+#		days_remove = 60
+#		cost = 25
+#		complete_effect = {
+#			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_expand_civilian_industry"
+#			custom_effect_tooltip = TYM_increase_agricultural_strain_low_tt
+#			add_to_variable = { TYMAgriculturalStrain = 25 }
+#			set_temp_variable = { temp_econ_spending_amount = 0.04 }
+#			econ_spend_money_once_effect_raw_money = yes
+#		}
+#		modifier = {
+#			consumer_goods_use_modifier = 0.20
+#		}
+#		remove_effect = {
+#			set_temp_variable = { pus_temp = 1 }
+#			econ_pus_change = yes
+#			TNO_improve_minimum_wage_policy_effectiveness_low = yes
+#		}
+#		ai_will_do = {
+#			factor = 0
+#		}
+#	}
+#visible = {
+#	owns_state = 571
+#}
+	TYM_fyp_expand_heavy_armaments_industry = {
+		allowed = {
+			tag = TYM
+		}
+		
+		icon = GFX_decision_generic_industry
+		days_remove = 75
+		cost = TYM_heavy_arms_cost?55
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 44 }
+				factor = 0
+			}
+		}
+		modifier = {
+			monthly_population = -0.05
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_expand_heavy_armaments_industry"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_high_tt
+			add_to_variable = { TYMAgriculturalStrain = 55 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.015 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			set_temp_variable = { pus_temp = 1 }
+			econ_pus_change = yes
+			random_list = {
+				50 = {
+					TNO_improve_max_workhours_policy_effectiveness_low = yes
+				}
+				50 = {
+					TNO_improve_regulations_policy_effectiveness_low = yes
+				}
+			}
+			add_to_variable = { TYM_heavy_arms_cost = 5 }
+		}
+	}
+	TYM_fyp_expand_civilian_industry = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_factory_blue
+		days_remove = 75
+		cost = TYM_civ_ind_cost?45
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 59 }
+				factor = 0
+			}
+		}
+		modifier = {
+			poverty_monthly_rate = 0.05
+			monthly_population = -0.05
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_expand_civilian_industry"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_tt
+			add_to_variable = { TYMAgriculturalStrain = 40 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.01 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			random_owned_controlled_state = {
+				set_temp_variable = { state_value_multiplier_temp = 1.025 }
+				econ_state_value_change_multiply = yes
+			}
+			set_temp_variable = { gdp_growth_temp = 0.03 }
+			econ_gdp_growth_change = yes
+			random_list = {
+				50 = {
+					TNO_improve_minimum_wage_policy_effectiveness_low = yes
+				}
+				50 = {
+					TNO_improve_unemployment_policy_effectiveness_low = yes
+				}
+			}
+			add_to_variable = { TYM_civ_ind_cost = 5 }
+		}
+	}
+	TYM_fyp_expand_electric = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_power
+		days_remove = 75
+		cost = TYM_power_cost?55
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 59 }
+				factor = 0
+			}
+			modifier = {
+				power < production_units
+				factor = 10
+			}
+		}
+		modifier = {
+			monthly_population = -0.05
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_expand_electric"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_tt
+			add_to_variable = { TYMAgriculturalStrain = 40 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.01 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			random_list = {
+				10 = {
+					random_owned_controlled_state = {
+						add_building_construction = {
+							type = thermoelectric_plant
+							level = 1
+							instant_build = yes
+						}
+						add_resource = {
+							type = power
+							amount = 2
+						}
+						set_temp_variable = { state_value_multiplier_temp = 1.01 }
+						econ_state_value_change_multiply = yes
+					}
+				}
+				20 = {
+					random_owned_controlled_state = {
+						add_building_construction = {
+							type = thermoelectric_plant
+							level = 1
+							instant_build = yes
+						}
+						set_temp_variable = { state_value_multiplier_temp = 1.005 }
+						econ_state_value_change_multiply = yes
+					}
+				}
+				40 = {
+					random_owned_controlled_state = {
+						add_resource = {
+							type = power
+							amount = 3
+						}
+						set_temp_variable = { state_value_multiplier_temp = 1.004 }
+						econ_state_value_change_multiply = yes
+					}
+				}
+				30 = {
+					random_owned_controlled_state = {
+						add_resource = {
+							type = power
+							amount = 2
+						}
+						set_temp_variable = { state_value_multiplier_temp = 1.002 }
+						econ_state_value_change_multiply = yes
+					}
+				}
+			}
+			set_temp_variable = { gdp_growth_temp = 0.03 }
+			econ_gdp_growth_change = yes
+			add_to_variable = { TYM_power_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_new_production_methods = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_workers
+		days_remove = 75
+		cost = TYM_prod_methods_cost?65
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 74 }
+				factor = 0
+			}
+		}
+		modifier = {
+			monthly_population = -0.05
+			industrial_expertise_monthly_rate = 10
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_new_production_methods"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_low_tt
+			add_to_variable = { TYMAgriculturalStrain = 25 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.005 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			custom_effect_tooltip = TYM_new_production_methods_tt
+			subtract_from_variable = { industrial_expertise_counter = 10 }
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			random_owned_controlled_state = {
+				set_temp_variable = { state_value_multiplier_temp = 1.04 }
+				econ_state_value_change_multiply = yes
+			}
+			TNO_improve_trade_unions_policy_effectiveness_low = yes
+			add_to_variable = { TYM_prod_methods_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_expand_healthcare_infrastructure = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_building_hospital
+		days_remove = 60
+		cost = TYM_health_cost?20
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 74 }
+				factor = 0
+			}
+		}
+		modifier = {
+			poverty_monthly_rate = 0.01
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_expand_healthcare_infrastructure"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_low_tt
+			add_to_variable = { TYMAgriculturalStrain = 25 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.005 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			random_owned_controlled_state = {
+				add_building_construction = {
+					type = hospitals
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+				set_temp_variable = { state_value_multiplier_temp = 1.003 }
+				econ_state_value_change_multiply = yes
+			}
+			TNO_improve_health_care_policy_effectiveness_low = yes
+			add_to_variable = { TYM_health_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_expand_administrative_infrastructure = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_building_offices
+		days_remove = 60
+		cost = TYM_admin_cost?20
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 74 }
+				factor = 0
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_expand_administrative_infrastructure"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_low_tt
+			add_to_variable = { TYMAgriculturalStrain = 25 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.005 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			random_owned_controlled_state = {
+				add_building_construction = {
+					type = offices
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+				set_temp_variable = { state_value_multiplier_temp = 1.003 }
+				econ_state_value_change_multiply = yes
+			}
+			random_list = {
+				75 = {
+					TNO_improve_income_taxation_policy_effectiveness_low = yes
+				}
+				25 = {
+					TNO_improve_admin_efficiency_really_low = yes
+				}
+			}
+			add_to_variable = { TYM_admin_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_expand_school_infrastructure = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_building_school
+		days_remove = 60
+		cost = TYM_school_cost?20
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 74 }
+				factor = 0
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_expand_school_infrastructure"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_low_tt
+			add_to_variable = { TYMAgriculturalStrain = 25 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.005 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			random_owned_controlled_state = {
+				add_building_construction = {
+					type = schools
+					level = 1
+					instant_build = yes
+				}
+				add_extra_state_shared_building_slots = 1
+				set_temp_variable = { state_value_multiplier_temp = 1.003 }
+				econ_state_value_change_multiply = yes
+			}
+			TNO_improve_education_policy_effectiveness_low = yes
+			add_to_variable = { TYM_school_cost = 5 }
+		}
+	
+	}
+	TYM_fyp_expand_civil_defense_infrastructure = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_infrastructure
+		days_remove = 50
+		cost = TYM_defense_cost?25
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 74 }
+				factor = 0
+			}
+		}
+		modifier = {
+			monthly_population = -0.05
+			army_speed_factor = 0.05
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_expand_civil_defense_infrastructure"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_low_tt
+			add_to_variable = { TYMAgriculturalStrain = 25 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.005 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					infrastructure < 10
+					free_building_slots = {
+						building = infrastructure
+						size > 1
+						include_locked = no
+					}
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					infrastructure < 10
+					free_building_slots = {
+						building = infrastructure
+						size > 1
+						include_locked = no
+					}
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = { gdp_growth_temp = 0.02 }
+			econ_gdp_growth_change = yes
+			add_to_variable = { TYM_defense_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_resettle_rural_population = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_destroy_city
+		days_remove = 75
+		cost = TYM_settle_cost?30
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 44 }
+				factor = 0
+			}
+		}
+		modifier = {
+			monthly_population = -0.1
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_resettle_rural_population"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_high_tt
+			add_to_variable = { TYMAgriculturalStrain = 55 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.02 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		modifier = {
+			production_speed_buildings_factor = 0.25
+		}
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					OR = {
+						has_state_category = rural
+						has_state_category = town
+						has_state_category = pastoral
+					}
+				}
+				add_manpower = -5500
+				set_temp_variable = { state_value_multiplier_temp = 0.97 }
+				econ_state_value_change_multiply = yes
+			}
+			random_owned_controlled_state = {
+				limit = {
+					OR = {
+						has_state_category = large_town
+						has_state_category = city
+						has_state_category = large_city
+					}
+				}
+				add_manpower = 5500
+				set_temp_variable = { state_value_multiplier_temp = 1.02 }
+				econ_state_value_change_multiply = yes
+			}
+			set_temp_variable = { gdp_growth_temp = 0.05 }
+			econ_gdp_growth_change = yes
+			add_to_variable = { TYM_settle_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_develop_urban_centers = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_building
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 59 }
+				factor = 0
+			}
+		}
+		modifier = {
+			monthly_population = -0.05
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_develop_urban_centers"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_tt
+			add_to_variable = { TYMAgriculturalStrain = 40 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.01 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		days_remove = 65
+		cost = TYM_urban_cost?30
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					OR = {
+						has_state_category = large_town
+						has_state_category = city
+						has_state_category = large_city
+					}
+				}
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+				set_temp_variable = { state_value_multiplier_temp = 1.015 }
+				econ_state_value_change_multiply = yes
+			}
+			random_owned_controlled_state = {
+				limit = {
+					OR = {
+						has_state_category = large_town
+						has_state_category = city
+						has_state_category = large_city
+					}
+				}
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+				set_temp_variable = { state_value_multiplier_temp = 1.015 }
+				econ_state_value_change_multiply = yes
+			}
+			set_temp_variable = { gdp_growth_temp = 0.03 }
+			econ_gdp_growth_change = yes
+			add_to_variable = { TYM_urban_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_collectivize_farms = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_farm
+		days_remove = 75
+		cost = TYM_collectivize_cost?45
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 44 }
+				factor = 0
+			}
+		}
+		modifier = {
+			monthly_population = 0.05
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_collectivize_farms"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_high_tt
+			add_to_variable = { TYMAgriculturalStrain = 55 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.005 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			custom_effect_tooltip = TYM_collective_farms_tt
+			subtract_from_variable = { agriculture_counter = 10 }
+			random_owned_controlled_state = {
+				set_temp_variable = { state_value_multiplier_temp = 1.02 }
+				econ_state_value_change_multiply = yes
+			}
+			TNO_improve_trade_unions_policy_effectiveness_low = yes
+			add_to_variable = { TYM_collectivize_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_encourage_agricultural_mechanization = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_industrial_farm
+		days_remove = 75
+		cost = TYM_mechanization_cost?45
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 74 }
+				factor = 0
+			}
+		}
+		modifier = {
+			monthly_population = 0.05
+			agriculture_monthly_rate = 10
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_encourage_agricultural_mechanization"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_low_tt
+			add_to_variable = { TYMAgriculturalStrain = 25 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.005 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			custom_effect_tooltip = TYM_decrease_agricultural_strain_tt
+			subtract_from_variable = { TYMAgriculturalStrain = 10 }
+			add_to_variable = { TYMAgriculturalStrainTicker = 3 }
+			set_temp_variable = { gdp_growth_temp = 0.1 }
+			econ_gdp_growth_change = yes
+			add_to_variable = { TYM_mechanization_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_expand_resource_exploitation = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_oil_extraction
+		days_remove = 50
+		cost = TYM_resource_cost?45
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				check_variable = { TYMAgriculturalStrain > 59 }
+				factor = 0
+			}
+		}
+		modifier = {
+			monthly_population = -0.05
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_expand_resource_exploitation"
+			custom_effect_tooltip = TYM_increase_agricultural_strain_tt
+			add_to_variable = { TYMAgriculturalStrain = 40 }
+			clamp_variable = {
+				var = TYMAgriculturalStrain
+				min = 0
+				max = 100
+			}
+			set_temp_variable = { temp_gdp_paid = 0.005 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			random_list = {
+				33 = {
+					random_owned_controlled_state = {
+						add_resource = {
+							type = oil
+							amount = 2
+						}
+						set_temp_variable = { state_value_multiplier_temp = 1.01 }
+						econ_state_value_change_multiply = yes
+					}
+					random_owned_controlled_state = {
+						add_resource = {
+							type = steel
+							amount = 5
+						}
+						set_temp_variable = { state_value_multiplier_temp = 1.01 }
+						econ_state_value_change_multiply = yes
+					}
+				}
+				33 = {
+					random_owned_controlled_state = {
+						add_resource = {
+							type = aluminium
+							amount = 5
+						}
+						set_temp_variable = { state_value_multiplier_temp = 1.01 }
+						econ_state_value_change_multiply = yes
+					}
+					random_owned_controlled_state = {
+						add_resource = {
+							type = tungsten
+							amount = 2
+						}
+						set_temp_variable = { state_value_multiplier_temp = 1.01 }
+						econ_state_value_change_multiply = yes
+					}
+				}
+				33 = {
+					random_owned_controlled_state = {
+						add_resource = {
+							type = chromium
+							amount = 3
+						}
+						set_temp_variable = { state_value_multiplier_temp = 1.01 }
+						econ_state_value_change_multiply = yes
+					}
+					random_owned_controlled_state = {
+						add_resource = {
+							type = steel
+							amount = 4
+						}
+						set_temp_variable = { state_value_multiplier_temp = 1.01 }
+						econ_state_value_change_multiply = yes
+					}
+				}
+			}
+			
+			set_temp_variable = { gdp_growth_temp = 0.03 }
+			econ_gdp_growth_change = yes
+			add_to_variable = { TYM_resource_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_invest_in_r_and_d = {
+		allowed = {
+			tag = TYM
+		}
+		icon = GFX_decision_generic_research
+		days_remove = 50
+		cost = TYM_rnd_cost?45
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_invest_in_r_and_d"
+			set_temp_variable = { temp_gdp_paid = 0.005 }
+			econ_spend_money_once_effect_GDP_percent = yes
+			TYM_Famine_Check = yes
+		}
+		remove_effect = {
+			TNO_improve_research_facilities_low = yes
+			random_list = {
+				33 = {
+					add_tech_bonus = {
+						name = industry
+						bonus = 0.5
+						uses = 1
+						category = industry
+					}
+				}
+				33 = {
+					add_tech_bonus = {
+						name = construction_tech
+						bonus = 0.5
+						uses = 1
+						category = construction_tech
+					}
+				}
+				33 = {
+					add_tech_bonus = {
+						name = electronics
+						bonus = 0.5
+						uses = 1
+						category = electronics
+					}
+				}
+			}
+			add_to_variable = { TYM_rnd_cost = 5 }
+		}
+		
+	}
+	TYM_fyp_the_third_five_year_plan_mission = {
+		allowed = {
+			always = no
+		}
+
+		icon = GFX_decision_generic_money
+
+		available = {
+			NOT = {
+				TYM = {
+					has_country_flag = TYM_3rd_fyp_ongoing
+				}
+			}
+		}
+
+		visible = {
+			TYM = {
+				has_country_flag = TYM_3rd_fyp_ongoing
+			}
+		}
+
+		selectable_mission = no
+		days_mission_timeout = 1825
+		is_good = no
+		fire_only_once = yes
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove TYM_fyp_the_third_five_year_plan_mission"
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_the_third_five_year_plan_mission"
+		}
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout TYM_fyp_the_third_five_year_plan_mission"
+			clr_country_flag = TYM_3rd_fyp_ongoing
+		}
+	}
+	TYM_fyp_another_five_year_plan_mission = {
+		allowed = {
+			always = no
+		}
+
+		icon = GFX_decision_generic_money
+
+		available = {
+			NOT = {
+				TYM = {
+					has_country_flag = TYM_another_fyp_ongoing
+				}
+			}
+		}
+
+		visible = {
+			TYM = {
+				has_country_flag = TYM_another_fyp_ongoing
+			}
+		}
+
+		selectable_mission = no
+		days_mission_timeout = 1825
+		is_good = no
+		fire_only_once = yes
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove TYM_fyp_another_five_year_plan_mission"
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision TYM_fyp_another_five_year_plan_mission"
+		}
+
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout TYM_fyp_another_five_year_plan_mission"
+			clr_country_flag = TYM_another_fyp_ongoing
+		}
+	}
+}

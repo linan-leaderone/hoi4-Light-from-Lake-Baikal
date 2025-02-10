@@ -1,0 +1,263 @@
+################
+#GOOGLEMAPS GUI#
+################
+ENG_GoogleMaps_MonthlyUpdate = { #It's actually a monthly update now for balance reasons - Obsidian
+	log = "[GetDateText]: [Root.GetName]: GOOGLEMAPS WEEKLY UPDATE"
+	set_country_flag = ENG_Opposition_Monthly_Pulse
+	ENG_GoogleMaps_Math = yes
+	ENG = {
+		clr_country_flag = ENG_HMMLR_RECENT_ACTION
+		clr_country_flag = ENG_COLLAB_RECENT_ACTION
+		every_owned_state = {
+			add_to_variable = { ENG_StateStats_HmmlrSupport = ENG_StateStats_HmmlrSupportTrend }
+			ENG_ClampHmmlrSupport = yes
+			set_variable = { ENG_StateStats_RecentAction = 0 }
+		}
+		if = {
+			limit = { is_ai = yes }
+			# No way to get the AI to use gun system, so fake it
+			set_variable = { ENG.ENG_OFN_Relations = 50 }
+			set_variable = { ENG.ENG_Cornwall_Relations = 50 }
+			add_political_power = -50		#Medium gun shipment is 30 pp, plus 20 to account for relation boosts
+			
+			# No way to get the AI to use google maps system, so fake it
+			ENG = {
+				every_owned_state = {
+					set_variable = { ENG_StateStats_RecentAction = 1 }
+					if = { #HMMLR
+						limit = { ENG = { has_country_flag = ENG_Player_HMMLR } }
+						random_list = {
+							6 = {
+								ENG_AI_increase_HMMLR_trend = yes
+								modifier = {
+									factor = 0
+									date > 1963.7.1
+								}
+								modifier = {
+									factor = 2
+									date < 1962.7.1
+								}
+							}
+							3 = {
+								ENG_AI_destabilize_state = yes
+							}
+							2 = {
+								ENG_AI_increase_HMMLR_support = yes
+							}
+						}
+					}
+					else = { #Collab
+						random_list = {
+							6 = {
+								ENG_AI_increase_Collab_trend = yes
+								modifier = {
+									factor = 0
+									date > 1963.7.1
+								}
+								modifier = {
+									factor = 2
+									date < 1962.7.1
+								}
+							}
+							3 = {
+								ENG_AI_stabilize_state = yes
+							}
+							2 = {
+								ENG_AI_increase_Collab_support = yes
+							}
+						}
+					}
+				}
+			}
+
+			if = { #HMMLR
+				limit = { ENG = { has_country_flag = ENG_Player_HMMLR } }
+				add_to_variable = { ENG.ENG_Hmmlr_Guns = 490 } # Medium gun shipment minus 10
+			}
+			else = { #Collab
+				add_to_variable = { ENG.ENG_Collab_Guns = 490 } # Medium gun shipment minus 10
+			}
+		}
+	}
+}
+
+ENG_GoogleMaps_Math = {
+	log = "[GetDateText]: [Root.GetName]: GOOGLEMAPS MATH"
+	ENG = {
+		#States tends to go back to initial value
+		every_owned_state = {
+			if = { # North trys to reach 80
+				limit = {
+					OR = {
+						state = 130
+						state = 131
+						state = 132
+					}
+				}
+				if = {
+					limit = { check_variable = { ENG_StateStats_HmmlrSupport < 80 } }
+					set_variable = { ENG_state_drift = ENG_StateStats_HmmlrSupport }
+					add_to_variable = { ENG_state_drift = -80 }
+					divide_variable = { ENG_state_drift = -15 }
+				}
+				else = {
+					set_variable = { ENG_state_drift = 0 }
+				}
+				if = { # More for capital
+					limit = { state = 131 }
+					multiply_variable = { ENG_state_drift = 1.4 }
+				}
+			}
+			else_if = { # South trys to reach 20
+				limit = {
+					OR = {
+						state = 126
+						state = 127
+						state = 1300
+					}
+				}
+				if = {
+					limit = { check_variable = { ENG_StateStats_HmmlrSupport > 20 } }
+					set_variable = { ENG_state_drift = ENG_StateStats_HmmlrSupport }
+					add_to_variable = { ENG_state_drift = -20 }
+					divide_variable = { ENG_state_drift = -15 }
+				}
+				else = {
+					set_variable = { ENG_state_drift = 0 }
+				}
+				if = { # More for capital
+					limit = { state = 1300 }
+					multiply_variable = { ENG_state_drift = 1.4 }
+				}
+			}
+			else = { # The rest trys to reach 50
+				set_variable = { ENG_state_drift = ENG_StateStats_HmmlrSupport }
+				add_to_variable = { ENG_state_drift = -50 }
+				divide_variable = { ENG_state_drift = -10 }
+			}
+
+			#Apply stability effect on drift
+
+			set_variable = { ENG_StateStats_StabilityEffect = ENG_StateStats_Stability } #0 to 100
+			divide_variable = { ENG_StateStats_StabilityEffect = 100 } #0 to 1
+			add_to_variable = { ENG_StateStats_StabilityEffect = 0.5 } #0 -> 0.5, 100-> 1.5
+			if = {
+				limit = { # Government drift, 0 -> 0.5(50%), 100 -> 1.5(150%),
+					check_variable = { ENG_state_drift < 0 }
+				}
+				multiply_variable = { ENG_state_drift = ENG_StateStats_StabilityEffect }
+			}
+			else = { # HMMLR drift, 0 -> 1.5(150%), 100 -> 0.5(50%),
+				multiply_variable = { ENG_StateStats_StabilityEffect = -1 } #0 -> -0.5, 100-> -1.5
+				add_to_variable = { ENG_StateStats_StabilityEffect = 2 } #0 -> 1.5, 100-> 0.5
+				multiply_variable = { ENG_state_drift = ENG_StateStats_StabilityEffect }
+			}
+
+			set_variable = { ENG_StateStats_HmmlrSupportTrend = ENG_state_drift }
+			add_to_variable = { ENG_StateStats_HmmlrSupportTrend = ENG_StateStats_RawHmmlrSupportTrend }
+		}
+	}
+	ENG = {
+		if = {
+			limit = {
+				has_country_flag = ENG_operation_start
+			}
+			ENG_evaluate_mission_chance = yes
+		}
+	}
+}
+
+ENG_ClampHmmlrSupport = {
+	clamp_variable = {
+		var = ENG_StateStats_HmmlrSupport
+		min = 0
+		max = 100
+	}
+}
+
+ENG_ClampStateStability = {
+	clamp_variable = {
+		var = ENG_StateStats_Stability
+		min = 0
+		max = 100
+	}
+}
+
+ENG_AI_increase_HMMLR_support = {
+	add_to_variable = { ENG_Hmmlr_Guns = -10 }
+	THIS = {
+		ENG_IncreaseHMMLR_Support_vl = yes
+		set_variable = { ENG_StateStats_RecentAction = 1 }
+	}
+}
+
+ENG_AI_increase_HMMLR_trend = {
+	add_to_variable = { ENG_Hmmlr_Guns = -10 }
+	THIS = {
+		add_to_variable = { ENG_StateStats_RawHmmlrSupportTrend = 0.5 }
+		custom_effect_tooltip = ENG_DEC_INCREASEHMMLRTREND_tt
+		set_variable = { ENG_StateStats_RecentAction = 1 }
+	}
+	hidden_effect = {
+		ENG_GoogleMaps_Math = yes
+	}
+}
+
+ENG_AI_destabilize_state = {
+	add_to_variable = { ENG_Hmmlr_Guns = -10 }
+	THIS = {
+		ENG_Decrease_Stab_low = yes
+		set_variable = { ENG_StateStats_RecentAction = 1 }
+	}
+}
+
+ENG_AI_increase_Collab_support = {
+	add_to_variable = { ENG_Collab_Guns = -10 }
+	THIS = {
+		ENG_IncreaseCollab_Support_vl = yes
+		set_variable = { ENG_StateStats_RecentAction = 1 }
+	}
+}
+
+ENG_AI_increase_Collab_trend = {
+	add_to_variable = { ENG_Collab_Guns = -10 }
+	THIS = {
+		add_to_variable = { ENG_StateStats_RawHmmlrSupportTrend = -0.5 }
+		set_variable = { ENG_StateStats_RecentAction = 1 }
+	}
+	hidden_effect = {
+		ENG_GoogleMaps_Math = yes
+	}
+}
+
+ENG_AI_stabilize_state = {
+	add_to_variable = { ENG_Collab_Guns = -10 }
+	THIS = {
+		ENG_Increase_Stab_low = yes
+		set_variable = { ENG_StateStats_RecentAction = 1 }
+	}
+}
+
+ENG_randomize_state_Collab = {
+	hidden_effect = {
+		random_owned_controlled_state = {
+			limit = {
+				is_demilitarized_zone = no
+				NOT = { check_variable = { selected_state@THIS = 1 } }
+			}
+			set_temp_variable = { selected_state@THIS = 1 }
+		}
+	}
+}
+
+ENG_randomize_state_HMMLR = {
+	hidden_effect = {
+		random_owned_controlled_state = {
+			limit = {
+				is_demilitarized_zone = no
+				NOT = { check_variable = { selected_state@THIS = 2 } }
+			}
+			set_temp_variable = { selected_state@THIS = 2 }
+		}
+	}
+}

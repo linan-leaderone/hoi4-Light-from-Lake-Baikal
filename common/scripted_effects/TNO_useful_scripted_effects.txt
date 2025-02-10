@@ -1,0 +1,1589 @@
+#	Various useful scripted effects
+#
+#
+#
+#	Moved Laws-related scriptedd effects to TNO_Laws_scripted_effects.txt  -Wendell08
+
+# removes all current ministers (other than intel) for the country in scope - no tooltips displayed
+remove_all_ministers = {
+	hidden_effect = {
+		remove_ideas_with_trait = head_of_government
+		remove_ideas_with_trait = foreign_minister
+		remove_ideas_with_trait = economy_minister
+		remove_ideas_with_trait = security_minister
+	}
+}
+
+remove_all_high_command = {
+	hidden_effect = {
+		remove_ideas_with_trait = high_command
+		remove_ideas_with_trait = army_chief
+		remove_ideas_with_trait = air_chief
+		remove_ideas_with_trait = navy_chief
+	}
+}
+
+#fill empty minister slots
+fill_empty_minister = {
+	if = {
+		limit = {
+			NOT = { has_idea_with_trait = head_of_government }
+		}
+		meta_effect = {
+			text = {
+				add_ideas = [currenttag]_Generic_Vacant_hog
+			}
+			currenttag = "[THIS.GetTag]"
+		}
+	}
+	if = {
+		limit = {
+			NOT = { has_idea_with_trait = foreign_minister }
+		}
+		meta_effect = {
+			text = {
+				add_ideas = [currenttag]_Generic_Vacant_for
+			}
+			currenttag = "[THIS.GetTag]"
+		}
+	}
+	if = {
+		limit = {
+			NOT = { has_idea_with_trait = security_minister }
+		}
+		meta_effect = {
+			text = {
+				add_ideas = [currenttag]_Generic_Vacant_sec
+			}
+			currenttag = "[THIS.GetTag]"
+		}
+	}
+	if = {
+		limit = {
+			NOT = { has_idea_with_trait = economy_minister }
+		}
+		meta_effect = {
+			text = {
+				add_ideas = [currenttag]_Generic_Vacant_eco
+			}
+			currenttag = "[THIS.GetTag]"
+		}
+	}
+}
+
+# Should be used in history file only when a country doesn't have ministers for the rest of the game.
+# If a country adds ministers in the middle of the game, add the effect and then remove the vacant positions when you're adding the minsiters
+fill_empty_minister_nochecks = {
+	meta_effect = {
+		text = {
+			add_ideas = {
+				[currenttag]_Generic_Vacant_hog
+				[currenttag]_Generic_Vacant_for
+				[currenttag]_Generic_Vacant_sec
+				[currenttag]_Generic_Vacant_eco
+			}
+		}
+		currenttag = "[THIS.GetTag]"
+	}
+}
+
+# Removes all ideas & natspirits for a given tag
+# Does not affect dynamic modifiers, obviously
+remove_all_ideas = {
+	# These two natspirits are fixed, and represent the ones at the beginning and end of the ideas folder, respectively
+	set_temp_variable = { first_natspirit = token:ZZZ_first_natspirit }
+	set_temp_variable = { last_natspirit = token:ZZZ_last_natspirit } # This natspirit ensures that Laws, SocDev, TT Econ-related & Faction ideas do not get wiped out by this
+
+	for_loop_effect = {
+		start = first_natspirit
+		end = last_natspirit
+		value = natspirit
+		meta_effect = {
+			text = { if = { limit = { has_idea = [TOKEN] } remove_ideas = [TOKEN] } }
+			TOKEN = "[?natspirit.GetTokenKey]"
+		}
+	}
+}
+
+# Writes all ideas & their token values in the game log
+d_log_all_ideas = {
+	set_temp_variable = { first_natspirit = token:ZZZ_first_natspirit }
+	set_temp_variable = { last_natspirit = token:tno_admin_efficiency_well_oiled_machine } # The actual last natspirit in the files
+	set_temp_variable = { total_natspirits = last_natspirit }
+	subtract_from_temp_variable = { total_natspirits = first_natspirit }
+
+	for_loop_effect = {
+		start = first_natspirit
+		end = last_natspirit
+		value = natspirit
+		log = "[?natspirit]: [?natspirit.GetTokenLocalizedKey] ([?natspirit.GetTokenKey])"
+	}
+
+	log = "First Natspirit: [?first_natspirit]"
+	log = "Last Natspirit: [?last_natspirit]"
+	log = "Total Natspirits: [?total_natspirits]"
+}
+
+# changes the government of the country in scope to that of ROOT (the country running the event)
+
+fire_nuclear_war = {
+	log = "[GetDateText]: [Root.GetName]: Total Nuclear War Initiating"
+	set_variable = { global.world_population_pre = 0 }
+	set_variable = { global.world_population_post = 0 }
+	set_global_flag = TNO_world_tension_WW3
+	#news_event = { id = WORLD.100 hours = 1 }
+	ZZZ = {
+		set_cosmetic_tag = ZZZ_nuclear
+		fire_nukes = yes
+		set_global_flag = NUCLEAR_WAR
+		country_event = { id = RAD_DBG.0 days = 16 }
+		country_event = { id = RAD_DBG.1 days = 20 }
+	}
+	set_global_flag = TNO_my_world_is_on_fire_how_about_yours
+	every_country = {
+		load_focus_tree = ZZZ_blank_focus
+		if = {
+			limit = { is_ai = no }
+			set_temp_variable = { TNO_temp_super_event = token:SE_NUCLEAR_WAR }
+			TNO_fire_super_event = yes
+			ZZZ = {
+				set_country_flag = PLAYER_NATION_POSTAPOC
+				change_tag_from = PREV
+			}
+		}
+		if = {
+			limit = {
+				is_ai = no
+				capital_scope = {
+					is_on_continent = europe
+				}
+			}
+			set_global_flag = play_RAD_EU_PostApoc_Events
+		}
+		else_if = {
+			limit = {
+				is_ai = no
+				capital_scope = {
+					is_on_continent = north_america
+				}
+			}
+			set_global_flag = play_RAD_NA_PostApoc_Events
+		}
+		else_if = {
+			limit = {
+				is_ai = no
+				capital_scope = {
+					is_on_continent = south_america
+				}
+			}
+			set_global_flag = play_RAD_SA_PostApoc_Events
+		}
+		else_if = {
+			limit = {
+				is_ai = no
+				capital_scope = {
+					is_on_continent = middle_east
+				}
+			}
+			set_global_flag = play_RAD_ME_PostApoc_Events
+		}
+		else_if = {
+			limit = {
+				is_ai = no
+				capital_scope = {
+					is_on_continent = africa
+				}
+			}
+			set_global_flag = play_RAD_AF_PostApoc_Events
+		}
+		else_if = {
+			limit = {
+				is_ai = no
+				capital_scope = {
+					is_on_continent = asia
+				}
+				NOT = {
+					original_tag = CHI
+					original_tag = IND
+					original_tag = AZH
+					original_tag = VIN
+					original_tag = THA
+					original_tag = CAM
+					original_tag = LAO
+					original_tag = AST
+					original_tag = NZL
+					original_tag = BUR
+					original_tag = PHI
+					original_tag = INS
+					original_tag = NRB
+					original_tag = SHO
+				}
+			}
+			set_global_flag = play_RAD_EA_PostApoc_Events
+		}
+		else_if = {
+			limit = {
+				is_ai = no
+				original_tag = CHI
+			}
+			set_global_flag = play_RAD_CH_PostApoc_Events
+		}
+		else_if = {
+			limit = {
+				is_ai = no
+				OR = {
+					original_tag = IND
+					original_tag = AZH
+				}
+			}
+			set_global_flag = play_RAD_IN_PostApoc_Events
+		}
+		else_if = {
+			limit = {
+				is_ai = no
+				OR = {
+					original_tag = VIN
+					original_tag = THA
+					original_tag = CAM
+					original_tag = LAO
+					original_tag = AST
+					original_tag = NZL
+					original_tag = BUR
+					original_tag = PHI
+					original_tag = INS
+					original_tag = NRB
+					original_tag = SHO
+				}
+			}
+			set_global_flag = play_RAD_SEA_PostApoc_Events
+		}
+		else_if = {
+			limit = {
+				is_ai = no
+				is_russian_nation = yes
+			}
+			set_global_flag = play_RAD_RUS_PostApoc_Events
+		}
+		else_if = {
+			limit = {
+				is_ai = no
+			}
+			set_global_flag = play_RAD_International_PostApoc_Events
+		}
+
+		# Other special checks
+		if = {
+			limit = {
+				OMS = { exists = yes }
+			}
+			set_global_flag = OMS_PostApoc_Event
+		}
+		if = {
+			limit = {
+				DRL = { has_country_leader = { character = DRL_Oskar_Dirlewanger ruling_only = yes } }
+			}
+			set_global_flag = DRL_PostApoc_Event
+		}
+		if = {
+			limit = {
+				GER = { has_war_with = RUS }
+			}
+			set_global_flag = WRW2_PostApoc_Event
+		}
+		if = {
+			limit = {
+				USA = { has_country_leader = { character = USA_Margaret_Chase_Smith ruling_only = yes } }
+			}
+			set_global_flag = USA_MCS_PostApoc_Event
+		}
+		if = {
+			limit = {
+				GER = { has_country_leader = { character = GER_hermann_goring ruling_only = yes } }
+			}
+			set_global_flag = Goering_PostApoc_Event
+		}
+		if = {
+			limit = {
+				GER = { has_war_with = USA }
+			}
+			set_global_flag = USA_GER_WW3_PostApoc_Event
+		}
+		if = {
+			limit = {
+				ANG = { has_country_leader = { character = ANG_Wolfgang_Schenck ruling_only = yes } }
+			}
+			set_global_flag = Schenck_PostApoc_Event
+		}
+		if = {
+			limit = {
+				COG = { has_country_leader = { character = COG_Siegfried_Muller ruling_only = yes } }
+			}
+			set_global_flag = Muller_PostApoc_Event
+		}
+	}
+}
+fire_nukes = {
+	country_event = { id = nuclearwar.10 hours = 1 }
+	country_event = { id = nuclearwar.11 hours = 2 }
+	country_event = { id = nuclearwar.12 hours = 3 }
+	country_event = { id = nuclearwar.13 hours = 4 }
+	country_event = { id = nuclearwar.14 hours = 5 }
+	country_event = { id = nuclearwar.15 hours = 6 }
+	country_event = { id = nuclearwar.16 hours = 7 }
+	country_event = { id = nuclearwar.17 hours = 8 }
+	country_event = { id = nuclearwar.18 hours = 9 }
+	country_event = { id = nuclearwar.19 hours = 10 }
+	country_event = { id = nuclearwar.101 days = 1 }
+}
+copy_government_of_ROOT = {
+	meta_effect = {
+		text = { set_politics = { ruling_party = [PARTY] } }
+		PARTY = "[?ROOT.current_party_ideology_group.GetTokenKey]"
+	}
+}
+
+get_current_government_type = {
+	set_temp_variable = { current_gov = current_party_ideology_group }
+}
+
+restore_previous_government_type = {
+	hidden_effect = {
+		meta_effect = {
+			text = { set_politics = { ruling_party = [PARTY] } }
+			PARTY = "[?current_gov.GetTokenKey]"
+		}
+	}
+}
+
+#adjust_research_modifier = {
+#	#stolen with approval from Yard1
+#	#thanks bb
+#	set_temp_variable = { var_research_adjustment_pre_ironclad_temp = 1 }
+#	set_variable = { var_research_adjustment_pre_ironclad = 1 }
+#	subtract_from_variable = { var_research_adjustment_pre_ironclad = modifier@research_speed_factor }
+#	if = {
+#		limit = { check_variable = { var_research_adjustment_pre_ironclad = 0 } } # we don't want to divide by 0
+#		add_to_variable = { var_research_adjustment_pre_ironclad = 0.001 }
+#	}
+#	divide_temp_variable = { var_research_adjustment_pre_ironclad_temp = var_research_adjustment_pre_ironclad }
+#	set_variable = { var_research_adjustment_pre_ironclad = var_research_adjustment_pre_ironclad_temp }
+#	subtract_from_variable = { var_research_adjustment_pre_ironclad = 1 }
+#	subtract_from_variable = { var_research_adjustment_pre_ironclad = modifier@research_speed_factor }
+#	add_dynamic_modifier = {
+#		modifier = research_pre_ironclad_modifier
+#	}
+#}
+#
+#adjust_factory_output_modifier = {
+#	set_temp_variable = { var_factory_adjustment_temp = 1 }
+#	set_variable = { var_factory_adjustment = 1 }
+#	subtract_from_variable = { var_factory_adjustment = modifier@industrial_capacity_factory }
+#	if = {
+#		limit = { check_variable = { var_factory_adjustment = 0 } } # we don't want to divide by 0
+#		add_to_variable = { var_factory_adjustment = 0.001 }
+#	}
+#	divide_temp_variable = { var_factory_adjustment_temp = var_factory_adjustment }
+#	set_variable = { var_factory_adjustment = var_factory_adjustment_temp }
+#	subtract_from_variable = { var_factory_adjustment = 1 }
+#	subtract_from_variable = { var_factory_adjustment = modifier@industrial_capacity_factory }
+#	add_dynamic_modifier = {
+#		modifier = factory_output_modifier
+#	}
+#}
+#
+#adjust_dockyard_output_modifier = {
+#	set_temp_variable = { var_dockyard_adjustment_temp = 1 }
+#	set_variable = { var_dockyard_adjustment = 1 }
+#	subtract_from_variable = { var_dockyard_adjustment = modifier@industrial_capacity_dockyard }
+#	if = {
+#		limit = { check_variable = { var_dockyard_adjustment = 0 } } # we don't want to divide by 0
+#		add_to_variable = { var_dockyard_adjustment = 0.001 }
+#	}
+#	divide_temp_variable = { var_dockyard_adjustment_temp = var_dockyard_adjustment }
+#	set_variable = { var_dockyard_adjustment = var_dockyard_adjustment_temp }
+#	subtract_from_variable = { var_dockyard_adjustment = 1 }
+#	subtract_from_variable = { var_dockyard_adjustment = modifier@industrial_capacity_dockyard }
+#	add_dynamic_modifier = {
+#		modifier = dockyard_output_modifier
+#	}
+#}
+#
+#adjust_construction_speed_modifier = {
+#	set_temp_variable = { var_construction_adjustment_temp = 1 }
+#	set_variable = { var_construction_adjustment = 1 }
+#	subtract_from_variable = { var_construction_adjustment = modifier@production_speed_buildings_factor }
+#	if = {
+#		limit = { check_variable = { var_construction_adjustment = 0 } } # we don't want to divide by 0
+#		add_to_variable = { var_construction_adjustment = 0.001 }
+#	}
+#	divide_temp_variable = { var_construction_adjustment_temp = var_construction_adjustment }
+#	set_variable = { var_construction_adjustment = var_construction_adjustment_temp }
+#	subtract_from_variable = { var_construction_adjustment = 1 }
+#	subtract_from_variable = { var_construction_adjustment = modifier@production_speed_buildings_factor }
+#	add_dynamic_modifier = {
+#		modifier = construction_speed_modifier
+#	}
+#}
+
+adjust_efficiency_cap_modifier = {
+	set_temp_variable = { var_efficiency_cap_adjustment_temp = modifier@production_factory_max_efficiency_factor }
+	add_to_temp_variable = { var_efficiency_cap_adjustment_temp = -0.05 }
+	set_variable = { var_efficiency_cap_adjustment = 0 }
+	subtract_from_variable = { var_efficiency_cap_adjustment = var_efficiency_cap_adjustment_temp }
+	add_dynamic_modifier = {
+		modifier = efficiency_cap_modifier
+	}
+}
+
+unite_russia = {
+	every_other_country = {
+		limit = {
+			is_russian_nation = yes
+			NOT = {
+				is_kazakh_nation = yes
+			}
+		}
+		PREV = {
+			annex_country = {
+				target = PREV
+				transfer_troops = yes
+			}
+		}
+	}
+	activate_decision = russian_total_reunification
+}
+
+unite_wrs = {
+	every_other_country = {
+		limit = {
+			OR = {
+				is_central_russian_nation = yes
+				is_west_siberian_nation = yes
+				is_southern_urals_nation = yes
+			}
+		}
+		PREV = {
+			annex_country = {
+				target = PREV
+				transfer_troops = yes
+			}
+		}
+	}
+	activate_decision = russian_reunification
+}
+
+unite_siberia = {
+	every_other_country = {
+		limit = {
+			OR = {
+				is_central_siberian_nation = yes
+				is_far_eastern_nation = yes
+			}
+		}
+		PREV = {
+			annex_country = {
+				target = PREV
+				transfer_troops = yes
+			}
+		}
+	}
+	activate_decision = siberian_reunification
+}
+
+
+unite_west_russia = {
+	every_other_country = {
+		limit = {
+			is_central_russian_nation = yes
+			NOT = {
+				tag = ONG
+			}
+		}
+		PREV = {
+			annex_country = {
+				target = PREV
+				transfer_troops = yes
+			}
+		}
+	}
+	activate_decision = west_russia_reunification
+}
+
+unite_west_siberia = {
+	every_other_country = {
+		limit = {
+			is_west_siberian_nation = yes
+		}
+		PREV = {
+			annex_country = {
+				target = PREV
+				transfer_troops = yes
+			}
+		}
+	}
+	activate_decision = west_siberia_reunification
+}
+
+unite_central_siberia = {
+	every_other_country = {
+		limit = {
+			is_central_siberian_nation = yes
+		}
+		PREV = {
+			annex_country = {
+				target = PREV
+				transfer_troops = yes
+			}
+		}
+	}
+	activate_decision = central_siberia_reunification
+}
+
+unite_far_east = {
+	every_other_country = {
+		limit = {
+			is_far_eastern_nation = yes
+		}
+		PREV = {
+			annex_country = {
+				target = PREV
+				transfer_troops = yes
+			}
+		}
+	}
+	activate_decision = far_east_reunification
+}
+
+unite_south_urals = {
+	every_other_country = {
+		limit = {
+			is_southern_urals_nation = yes
+		}
+		PREV = {
+			annex_country = {
+				target = PREV
+				transfer_troops = yes
+			}
+		}
+	}
+}
+
+random_get_superreg = {
+	if = {
+		limit = {
+			ROOT = {
+				is_central_russian_nation = no
+				is_west_siberian_nation = no
+			}
+		}
+		random_country = {
+			limit = {
+				OR = {
+					is_central_russian_nation = yes
+					is_west_siberian_nation = yes
+				}
+				is_russian_unifier = yes
+			}
+			unite_wrs = yes
+		}
+	}
+	else = { unite_wrs = yes }
+	if = {
+		limit = {
+			ROOT = {
+				is_central_siberian_nation = no
+				is_far_eastern_nation = no
+			}
+		}
+		random_country = {
+			limit = {
+				OR = {
+					is_central_siberian_nation = yes
+					is_far_eastern_nation = yes
+				}
+				is_russian_unifier = yes
+			}
+			unite_siberia = yes
+		}
+	}
+	else = { unite_siberia = yes }
+}
+
+random_get_regionals = {
+	if = {
+		limit = {
+			ROOT = { is_central_russian_nation = no }
+		}
+		random_country = {
+			limit = {
+				AND = {
+					is_central_russian_nation = yes
+					is_russian_unifier = yes
+				}
+			}
+			unite_west_russia = yes
+		}
+	}
+	else = { unite_west_russia = yes }
+	if = {
+		limit = {
+			ROOT = { is_west_siberian_nation = no }
+		}
+		random_country = {
+			limit = {
+				AND = {
+					is_west_siberian_nation = yes
+					is_russian_unifier = yes
+				}
+			}
+			unite_west_siberia = yes
+		}
+	}
+	else = { unite_west_siberia = yes }
+	if = {
+		limit = {
+			ROOT = { is_central_siberian_nation = no }
+		}
+		random_country = {
+			limit = {
+				AND = {
+					is_central_siberian_nation = yes
+					is_russian_unifier = yes
+				}
+			}
+			unite_central_siberia = yes
+		}
+	}
+	else = { unite_central_siberia = yes }
+	if = {
+		limit = {
+			ROOT = { is_far_eastern_nation = no }
+		}
+		random_country = {
+			limit = {
+				AND = {
+					is_far_eastern_nation = yes
+					is_russian_unifier = yes
+				}
+			}
+			unite_far_east = yes
+		}
+	}
+	else = { unite_far_east = yes }
+}
+
+TNO_div_limiter_calculate_unit_cap = {
+	set_variable = { TNOLimiterIndustry = production_units }
+	multiply_variable = { TNOLimiterIndustry = 1.5 }
+	multiply_variable = { TNOLimiterIndustry = DivLimiterEscalatorPerm }
+	if = {
+		limit = {
+			tag = USA
+			has_war = no
+		}
+		divide_variable = { TNOLimiterIndustry = 11.9 }
+	}
+	else_if = {
+		limit = {
+			tag = JAP
+			has_war = no
+		}
+		divide_variable = { TNOLimiterIndustry = 7.1 }
+	}
+	else_if = {
+		limit = {
+			tag = ITA
+		}
+		divide_variable = { TNOLimiterIndustry = 5 }
+	}
+	else_if = {
+		limit = {
+			tag = GER
+		}
+		divide_variable = { TNOLimiterIndustry = 1.9 }
+	}
+	else_if = {
+		limit = {
+			tag = ENG
+		}
+		divide_variable = { TNOLimiterIndustry = 1.7 }
+	}
+	if = {  #Caps unit production based on PUs
+		limit = {
+			has_war = no
+			OR = {
+				check_variable = { num_divisions > TNOLimiterIndustry }
+				check_variable = { num_divisions = TNOLimiterIndustry }
+			}
+		}
+		set_country_flag = TNO_DIVISIONS_CAPPED
+	}
+	if = {
+		limit = {
+			check_variable = { num_divisions < TNOLimiterIndustry }
+			has_country_flag = TNO_DIVISIONS_CAPPED
+			NOT = {
+				AND = {
+					tag = GER
+					has_country_flag = sgr_werhmacht_division_limiter_activated
+				}
+			}
+		}
+		clr_country_flag = TNO_DIVISIONS_CAPPED
+	}
+}
+
+TNO_cancel_border_war_scope = {
+	every_owned_state = {
+		limit = {
+			has_border_war = yes
+		}
+		every_neighbor_state = {
+			limit = {
+				has_border_war = yes
+			}
+			set_temp_variable = {
+				attacker_scope = THIS
+				defender_scope = PREV
+			}
+			TNO_cancel_border_war_effect = yes
+		}
+	}
+}
+
+TNO_cancel_border_war_effect = {
+	if = {
+		limit = {
+			has_border_war_between = {
+				attacker = ROOT.attacker_scope
+				defender = ROOT.defender_scope
+			}
+		}
+		cancel_border_war = {
+			dont_fire_events = yes
+			defender = ROOT.defender_scope
+			attacker = ROOT.attacker_scope
+		}
+		log = "[GetDateText]: [Root.GetName]: ABORTED BORDER WAR BETWEEN [ROOT.attacker_scope.GetName] AND [ROOT.defender_scope.GetName]"
+	}
+	if = {
+		limit = {
+			has_border_war_between = {
+				attacker = ROOT.defender_scope
+				defender = ROOT.attacker_scope
+			}
+		}
+		cancel_border_war = {
+			dont_fire_events = yes
+			defender = ROOT.attacker_scope
+			attacker = ROOT.defender_scope
+		}
+		log = "[GetDateText]: [Root.GetName]: ABORTED BORDER WAR BETWEEN [ROOT.defender_scope.GetName] AND [ROOT.attacker_scope.GetName]"
+	}
+	# Add additional logging to identify the states causing the issue
+	else = {
+		log = "[GetDateText]: [Root.GetName]: NO BORDER WAR FOUND BETWEEN [ROOT.attacker_scope.GetName] and [ROOT.defender_scope.GetName]"
+	}
+}
+
+# Puppeting a country completly fucks up party popularities, thanks PDX
+# Use both effects on the same scope
+save_party_popularities = { # Use this before puppeting
+	log = "[GetDateText]: [THIS.GetName]: Running save_party_popularities command"
+	set_temp_variable = { PartyPopTotal = 0 }
+	add_to_array = { PartyPops = party_popularity@communist }
+	add_to_array = { PartyPops = party_popularity@socialist }
+	add_to_array = { PartyPops = party_popularity@progressivism }
+	add_to_array = { PartyPops = party_popularity@liberalism }
+	add_to_array = { PartyPops = party_popularity@liberal_conservatism }
+	add_to_array = { PartyPops = party_popularity@conservatism }
+	add_to_array = { PartyPops = party_popularity@paternalism }
+	add_to_array = { PartyPops = party_popularity@despotism }
+	add_to_array = { PartyPops = party_popularity@fascism }
+	add_to_array = { PartyPops = party_popularity@national_socialism }
+	add_to_array = { PartyPops = party_popularity@ultranationalism }
+
+	# Alt Ideologies
+	add_to_array = { PartyPops = party_popularity@communist_1 }
+	add_to_array = { PartyPops = party_popularity@communist_2 }
+	add_to_array = { PartyPops = party_popularity@communist_3 }
+	add_to_array = { PartyPops = party_popularity@communist_4 }
+	add_to_array = { PartyPops = party_popularity@socialist_1 }
+	add_to_array = { PartyPops = party_popularity@socialist_2 }
+	add_to_array = { PartyPops = party_popularity@progressivism_1 }
+	add_to_array = { PartyPops = party_popularity@progressivism_2 }
+	add_to_array = { PartyPops = party_popularity@liberalism_1 }
+	add_to_array = { PartyPops = party_popularity@liberalism_2 }
+	add_to_array = { PartyPops = party_popularity@conservatism_1 }
+	add_to_array = { PartyPops = party_popularity@conservatism_2 }
+	add_to_array = { PartyPops = party_popularity@paternalism_1 }
+	add_to_array = { PartyPops = party_popularity@paternalism_2 }
+	add_to_array = { PartyPops = party_popularity@despotism_1 }
+	add_to_array = { PartyPops = party_popularity@despotism_2 }
+	add_to_array = { PartyPops = party_popularity@despotism_3 }
+	add_to_array = { PartyPops = party_popularity@despotism_4 }
+	add_to_array = { PartyPops = party_popularity@fascism_1 }
+	add_to_array = { PartyPops = party_popularity@fascism_2 }
+	add_to_array = { PartyPops = party_popularity@fascism_3 }
+	add_to_array = { PartyPops = party_popularity@fascism_4 }
+	add_to_array = { PartyPops = party_popularity@national_socialism_1 }
+	add_to_array = { PartyPops = party_popularity@national_socialism_2 }
+	add_to_array = { PartyPops = party_popularity@national_socialism_3 }
+	add_to_array = { PartyPops = party_popularity@national_socialism_4 }
+
+	for_each_loop = {
+		array = PartyPops
+		multiply_variable = { PartyPops^i = 100 }
+		round_variable = PartyPops^i
+		add_to_temp_variable = { PartyPopTotal = PartyPops^i }
+	}
+
+	if = {
+		limit = { check_variable = { PartyPopTotal > 100 } }
+		subtract_from_temp_variable = { PartyPopTotal = 100 }
+		log = "[GetDateText]: [THIS.GetName]: PartyPops value exceeds 100 - [?PartyPopTotal]"
+		for_each_loop = {
+			array = PartyPops
+			if = {
+				limit = { check_variable = { PartyPops^i > PartyPopTotal } }
+				subtract_from_variable = { PartyPops^i = PartyPopTotal }
+				add_to_temp_variable = { break = 1 }
+			}
+		}
+	}
+	else_if = {
+		limit = { check_variable = { PartyPopTotal < 100 } }
+		subtract_from_temp_variable = { PartyPopTotal = 100 }
+		multiply_temp_variable = { PartyPopTotal = -1 }
+		log = "[GetDateText]: [THIS.GetName]: PartyPops value is less than 100 - [?PartyPopTotal]"
+		set_temp_variable = { a = 0 }
+		randomize_temp_variable = {
+			var = a
+			distribution = uniform
+			min = 0
+			max = 11
+		}
+		round_temp_variable = a
+		add_to_variable = { PartyPops^a = PartyPopTotal }
+	}
+}
+
+apply_party_popularities = { # Use this after puppeting
+	hidden_effect = {
+		set_popularities = {
+			communist = PartyPops^0
+			socialist = PartyPops^1
+			progressivism = PartyPops^2
+			liberalism = PartyPops^3
+			liberal_conservatism = PartyPops^4
+			conservatism = PartyPops^5
+			paternalism = PartyPops^6
+			despotism = PartyPops^7
+			fascism = PartyPops^8
+			national_socialism = PartyPops^9
+			ultranationalism = PartyPops^10
+
+			# Alt Ideologies
+			communist_1 = PartyPops^11
+			communist_2 = PartyPops^12
+			communist_3 = PartyPops^13
+			communist_4 = PartyPops^14
+			socialist_1 = PartyPops^15
+			socialist_2 = PartyPops^16
+			progressivism_1 = PartyPops^17
+			progressivism_2 = PartyPops^18
+			liberalism_1 = PartyPops^19
+			liberalism_2 = PartyPops^20
+			conservatism_1 = PartyPops^21
+			conservatism_2 = PartyPops^22
+			paternalism_1 = PartyPops^23
+			paternalism_2 = PartyPops^24
+			despotism_1 = PartyPops^25
+			despotism_2 = PartyPops^26
+			despotism_3 = PartyPops^27
+			despotism_4 = PartyPops^28
+			fascism_1 = PartyPops^29
+			fascism_2 = PartyPops^30
+			fascism_3 = PartyPops^31
+			fascism_4 = PartyPops^32
+			national_socialism_1 = PartyPops^33
+			national_socialism_2 = PartyPops^34
+			national_socialism_3 = PartyPops^35
+			national_socialism_4 = PartyPops^36
+		}
+		clear_array = PartyPops
+	}
+}
+
+# Alt Oil Crisis which accepts multiplicative modifier
+TNO_Alt_Oil_Crisis_apply_modifier = {
+	log = "[GetDateText]: [Root.GetName]: add dynamic modifier TNO_Oil_Crisis"
+	hidden_effect = {
+		add_dynamic_modifier = { modifier = TNO_Alt_Oil_Crisis_dynamic_modifier }
+	}
+	set_variable = { OC_Alt_fuel_gain_factor_base = -0.4 }
+	set_variable = { OC_Alt_production_oil_factor_base = -0.5 }
+	set_variable = { OC_Alt_political_power_factor_base = -0.25 }
+	set_variable = { OC_Alt_stability_factor_base = -0.15 }
+	set_variable = { OC_Alt_production_speed_buildings_factor_base = -0.35 }
+	set_variable = { OC_Alt_consumer_goods_factor_base = 0.25 }
+	set_variable = { OC_Alt_industrial_capacity_factory_base = -0.1 }
+	set_variable = { OC_Alt_industrial_capacity_dockyard_base = -0.1 }
+	set_variable = { OC_Alt_trade_opinion_factor_base = -0.5 }
+	set_variable = { OC_annual_gdp_growth_factor_base = -0.25 }
+	set_variable = { OC_Alt_annual_gdp_growth_factor_base = -0.08 }
+	set_variable = { OC_Alt_personnel_cost_modifier_base = 0.25 }
+
+	set_variable = { OC_Alt_fuel_gain_factor = -0.4 }
+	set_variable = { OC_Alt_production_oil_factor = -0.5 }
+	set_variable = { OC_Alt_political_power_factor = -0.25 }
+	set_variable = { OC_Alt_stability_factor = -0.15 }
+	set_variable = { OC_Alt_production_speed_buildings_factor = -0.35 }
+	set_variable = { OC_Alt_consumer_goods_factor = 0.25 }
+	set_variable = { OC_Alt_industrial_capacity_factory = -0.1 }
+	set_variable = { OC_Alt_industrial_capacity_dockyard = -0.1 }
+	set_variable = { OC_Alt_trade_opinion_factor = -0.5 }
+	set_variable = { OC_annual_gdp_growth_factor = -0.25 }
+	set_variable = { OC_Alt_annual_gdp_growth_factor = -0.08 }
+	set_variable = { OC_Alt_personnel_cost_modifier = 0.25 }
+
+	set_variable = { OC_Alt_energy_modifier = 1 }
+
+	force_update_dynamic_modifier = yes
+}
+
+TNO_Alt_Oil_Crisis_reduce_effects = {
+	log = "[GetDateText]: [Root.GetName]: TNO_Oil_Crisis effects reduced ([?OC_dynamic_modifier_counter])"
+	if = {
+		limit = {
+			check_variable = { OC_dynamic_modifier_counter < 4 }
+		}
+		custom_effect_tooltip = TNO_Oil_Crisis_reduce_effects_tooltip
+	}
+	else_if = {
+		limit = {
+			check_variable = { OC_dynamic_modifier_counter = 4 }
+		}
+		custom_effect_tooltip = TNO_Oil_Crisis_remove_modifier_tooltip
+	}
+	
+	subtract_from_variable = { OC_Alt_energy_modifier = 0.2 }
+
+	TNO_Alt_Oil_Crisis_calc_modifiers = yes
+
+	add_to_variable = { OC_dynamic_modifier_counter = 1 } # Counter for the number of times this effect has been called
+	if = { # Once it hits five, remove the dynamic effect and clear the variables
+		limit = {
+			check_variable = { OC_dynamic_modifier_counter = 5 }
+		}
+		TNO_Alt_Oil_Crisis_remove_modifier = yes
+		clear_variable = OC_dynamic_modifier_counter
+	}
+}
+
+# used to apply alt energy modifier, currently only used by Hart
+TNO_Alt_Oil_Crisis_calc_modifiers = {
+	set_variable = { OC_Alt_fuel_gain_factor = OC_Alt_fuel_gain_factor_base }
+	set_variable = { OC_Alt_production_oil_factor = OC_Alt_production_oil_factor_base }
+	set_variable = { OC_Alt_political_power_factor = OC_Alt_political_power_factor_base }
+	set_variable = { OC_Alt_stability_factor = OC_Alt_stability_factor_base }
+	set_variable = { OC_Alt_production_speed_buildings_factor = OC_Alt_production_speed_buildings_factor_base }
+	set_variable = { OC_Alt_consumer_goods_factor = OC_Alt_consumer_goods_factor_base }
+	set_variable = { OC_Alt_industrial_capacity_factory = OC_Alt_industrial_capacity_factory_base }
+	set_variable = { OC_Alt_industrial_capacity_dockyard = OC_Alt_industrial_capacity_dockyard_base }
+	set_variable = { OC_Alt_trade_opinion_factor = OC_Alt_trade_opinion_factor_base }
+	set_variable = { OC_annual_gdp_growth_factor = OC_annual_gdp_growth_factor_base }
+	set_variable = { OC_Alt_annual_gdp_growth_factor = OC_Alt_annual_gdp_growth_factor_base }
+	set_variable = { OC_Alt_personnel_cost_modifier = OC_Alt_personnel_cost_modifier_base }
+
+	multiply_variable = { OC_Alt_fuel_gain_factor = OC_Alt_energy_modifier }
+	multiply_variable = { OC_Alt_production_oil_factor = OC_Alt_energy_modifier }
+	multiply_variable = { OC_Alt_political_power_factor = OC_Alt_energy_modifier }
+	multiply_variable = { OC_Alt_stability_factor = OC_Alt_energy_modifier }
+	multiply_variable = { OC_Alt_production_speed_buildings_factor = OC_Alt_energy_modifier }
+	multiply_variable = { OC_Alt_consumer_goods_factor = OC_Alt_energy_modifier }
+	multiply_variable = { OC_Alt_industrial_capacity_factory = OC_Alt_energy_modifier }
+	multiply_variable = { OC_Alt_industrial_capacity_dockyard = OC_Alt_energy_modifier }
+	multiply_variable = { OC_Alt_trade_opinion_factor = OC_Alt_energy_modifier }
+	multiply_variable = { OC_annual_gdp_growth_factor = OC_Alt_energy_modifier }
+	multiply_variable = { OC_Alt_annual_gdp_growth_factor = OC_Alt_energy_modifier }
+	multiply_variable = { OC_Alt_personnel_cost_modifier = OC_Alt_energy_modifier }
+
+	force_update_dynamic_modifier = yes
+}
+
+TNO_Alt_Oil_Crisis_remove_modifier = {
+	log = "[GetDateText]: [Root.GetName]: remove dynamic modifier TNO_Alt_Oil_Crisis_dynamic_modifier"
+	custom_effect_tooltip = TNO_Oil_Crisis_remove_modifier_tooltip
+	hidden_effect = {
+		remove_dynamic_modifier = { modifier = TNO_Alt_Oil_Crisis_dynamic_modifier }
+	}
+	clear_variable = OC_Alt_fuel_gain_factor
+	clear_variable = OC_Alt_production_oil_factor
+	clear_variable = OC_Alt_political_power_factor
+	clear_variable = OC_Alt_stability_factor
+	clear_variable = OC_Alt_production_speed_buildings_factor
+	clear_variable = OC_Alt_consumer_goods_factor
+	clear_variable = OC_Alt_industrial_capacity_factory
+	clear_variable = OC_Alt_industrial_capacity_dockyard
+	clear_variable = OC_Alt_trade_opinion_factor
+	clear_variable = OC_Alt_annual_gdp_growth_factor
+	clear_variable = OC_Alt_proportional_pop_cost
+	clear_variable = OC_Alt_personnel_cost_modifier
+}
+
+# Oil Crisis modifier stuff
+TNO_Oil_Crisis_apply_modifier = {
+	log = "[GetDateText]: [Root.GetName]: add dynamic modifier TNO_Oil_Crisis"
+	set_variable = { OC_fuel_gain_factor = -0.4 }
+	set_variable = { OC_production_oil_factor = -0.5 }
+	set_variable = { OC_political_power_factor = -0.25 }
+	set_variable = { OC_stability_factor = -0.15 }
+	set_variable = { OC_production_speed_buildings_factor = -0.35 }
+	set_variable = { OC_consumer_goods_factor = 0.25 }
+	set_variable = { OC_industrial_capacity_factory = -0.1 }
+	set_variable = { OC_industrial_capacity_dockyard = -0.1 }
+	set_variable = { OC_trade_opinion_factor = -0.5 }
+	set_variable = { OC_annual_gdp_growth_factor = -0.25 }
+	set_variable = { OC_personnel_cost_modifier = 0.25 }
+	hidden_effect = { add_dynamic_modifier = { modifier = TNO_Oil_Crisis_dynamic_modifier } }
+}
+
+TNO_Oil_Crisis_reduce_effects = { # Can be fired up to 5 times until the OC modifier is removed
+	log = "[GetDateText]: [Root.GetName]: TNO_Oil_Crisis effects reduced ([?OC_dynamic_modifier_counter])"
+	if = {
+		limit = {
+			NOT = { tag = IBR }
+			check_variable = { OC_dynamic_modifier_counter < 4 }
+		}
+		custom_effect_tooltip = TNO_Oil_Crisis_reduce_effects_tooltip
+	}
+	else_if = {
+		limit = {
+			NOT = { tag = IBR }
+			check_variable = { OC_dynamic_modifier_counter = 4 }
+		}
+		custom_effect_tooltip = TNO_Oil_Crisis_remove_modifier_tooltip
+	}
+	add_to_variable = { OC_fuel_gain_factor = 0.08 }
+	add_to_variable = { OC_production_oil_factor = 0.1 }
+	add_to_variable = { OC_political_power_factor = 0.05 }
+	add_to_variable = { OC_stability_factor = 0.03 }
+	add_to_variable = { OC_production_speed_buildings_factor = 0.07 }
+	add_to_variable = { OC_consumer_goods_factor = -0.05 }
+	add_to_variable = { OC_industrial_capacity_factory = 0.02 }
+	add_to_variable = { OC_industrial_capacity_dockyard = 0.02 }
+	add_to_variable = { OC_trade_opinion_factor = 0.1 }
+
+	add_to_variable = { OC_dynamic_modifier_counter = 1 } # Counter for the number of times this effect has been called
+	if = { # Once it hits five, remove the dynamic effect and clear the variables
+		limit = {
+			check_variable = { OC_dynamic_modifier_counter = 5 }
+		}
+		TNO_Oil_Crisis_remove_modifier = yes
+		clear_variable = OC_dynamic_modifier_counter
+	}
+}
+
+TNO_Oil_Crisis_remove_modifier = {
+	log = "[GetDateText]: [Root.GetName]: remove dynamic modifier TNO_Oil_Crisis"
+	custom_effect_tooltip = TNO_Oil_Crisis_remove_modifier_tooltip
+	hidden_effect = {
+		remove_dynamic_modifier = { modifier = TNO_Oil_Crisis_dynamic_modifier }
+	}
+	clear_variable = OC_fuel_gain_factor
+	clear_variable = OC_production_oil_factor
+	clear_variable = OC_political_power_factor
+	clear_variable = OC_stability_factor
+	clear_variable = OC_production_speed_buildings_factor
+	clear_variable = OC_consumer_goods_factor
+	clear_variable = OC_industrial_capacity_factory
+	clear_variable = OC_industrial_capacity_dockyard
+	clear_variable = OC_trade_opinion_factor
+	clear_variable = OC_annual_gdp_growth_factor
+	clear_variable = OC_proportional_pop_cost
+	clear_variable = OC_personnel_cost_modifier
+}
+
+TNO_Oil_Crisis_reduce_effects_USA = { # USA unique : only gives pp and stab back (mostly)
+	log = "[GetDateText]: [Root.GetName]: TNO_Oil_Crisis effects reduced ([?OC_dynamic_modifier_counter])"
+	custom_effect_tooltip = TNO_Oil_Crisis_reduce_effects_tooltip
+	if = {
+		limit = { check_variable = { OC_dynamic_modifier_counter_USA < 4 } }
+
+		add_to_variable = { OC_political_power_factor = 0.05 }
+		add_to_variable = { OC_stability_factor = 0.03 }
+
+		add_to_variable = { OC_dynamic_modifier_counter_USA = 1 } # Counter for the number of times this effect has been called
+	}
+	else_if = { # Once it hits five, remove the dynamic effect and clear the variables
+		limit = { check_variable = { OC_dynamic_modifier_counter_USA = 4 } }
+
+		#clear_variable = OC_dynamic_modifier_counter_USA
+
+		add_to_variable = { OC_fuel_gain_factor = 0.16 }
+		add_to_variable = { OC_production_oil_factor = 0.2 }
+		add_to_variable = { OC_political_power_factor = 0.05 }
+		add_to_variable = { OC_stability_factor = 0.03 }
+		add_to_variable = { OC_production_speed_buildings_factor = 0.14 }
+		add_to_variable = { OC_consumer_goods_factor = -0.1 }
+		add_to_variable = { OC_industrial_capacity_factory = 0.04 }
+		add_to_variable = { OC_industrial_capacity_dockyard = 0.04 }
+		add_to_variable = { OC_trade_opinion_factor = 0.2 }
+
+		add_to_variable = { OC_dynamic_modifier_counter_USA = 1 } # Counter for the number of times this effect has been called
+	}
+}
+
+# Babylonian (Newton) method of finding square roots by Yard1 (https://hackmd.io/@Yard1/B1w3sRCNv)
+# Feel free to use and modify provided credits are given
+
+# # Finding the square root of 10.
+# set_variable = { sr_arg_number = 10 } # Put 10 into the argument variable
+# square_root_number = yes # Run the effect
+# set_variable = { out = sr_ret_number } # Set your out variable to the return variable
+
+# Square roots a number (sr_arg_number), returns value in sr_ret_number.
+square_root_babylonian = {
+	if = {
+		limit = {
+			check_variable = { sr_arg_number < 0.001 }
+		}
+		set_variable = { sr_ret_number = 0 }
+	}
+	else = {
+		# overflow at 2147483.647
+		# therefore, highest possible square root * 2 is ~2931
+		set_temp_variable = { x = 2931 }
+
+		set_temp_variable = { y = 1 }
+		set_temp_variable = { e = 0.001 } # precision - game can't go any lower than this
+		while_loop_effect = {
+			limit = {
+				set_temp_variable = { t_x = x }
+				subtract_from_temp_variable = { t_x = y }
+				check_variable = { t_x > e }
+			}
+			add_to_temp_variable = { x = y }
+			divide_temp_variable = { x = 2 }
+			set_temp_variable = { y = sr_arg_number }
+			divide_temp_variable = { y = x }
+		}
+		set_variable = { sr_ret_number = x }
+	}
+}
+
+remove_faction_status = {
+	hidden_effect = {
+		remove_ideas = {
+			UA_Member
+			AS_Member
+			Pakt_Leader
+			Pakt_Military_Authority
+			Pakt_Protektorat
+			Pakt_Integrated_Reichskommissariat
+			Pakt_Autonomous_Reichskommissariat
+			Pakt_Reichsland
+			Pakt_Marionettenstaat
+			Pakt_Mitstreiter
+			Pakt_Bundnispartner
+			Pakt_Ordensstaat
+			Pakt_Observer
+			Anti_Heydrich_Pact
+			Sphere_Leader
+			Sphere_Core_Member
+			Sphere_Chinese_Warlord
+			Sphere_Corporate_Dependency
+			Sphere_Imp_Protectorate
+			Sphere_Fully_Dependent
+			Sphere_Economic_Dependent
+			Sphere_Coequal
+			Sphere_Observer
+			NLF_Leader
+			NLF_Member
+			OFN_Leader_of_The_Free_World
+			OFN_Independent_Member
+			OFN_Dependent_Member
+			OFN_Military_Government
+			OFN_Mandate
+			OFN_Observer
+			TRI_Founder_IT
+			TRI_Founder_IB
+			TRI_Founder_TR
+			TRI_Member
+			TRI_Member_Client
+			TRI_Observer
+			ITA_Mediterranean_Bloc_Leader
+			ITA_Imperial_Alliance_Leader
+			ITA_Rome_Pact_Leader
+			ITA_Mediterranean_Bloc_Member
+			ITA_Imperial_Alliance_Member
+			ITA_Rome_Pact_Member
+			LEV_UNION_Member
+			LEV_UNION_Mandate
+			UFF_Faction
+			HUF_Faction
+			HRF_Faction
+			PALF_Faction
+			PALF_Satellite
+			WAA_Faction
+			WAA_Protectorate
+			WAF_Faction
+			WAF_Supervised
+			FMA_Faction
+			FMA_Puppet
+			FRU_Faction
+			FRU_Associated
+			Mano_Member
+			UAS_Member
+		}
+		clr_country_flag = CADL_MEMBER
+		clr_country_flag = CASA_MEMBER
+		clr_country_flag = CAL_MEMBER
+		clr_country_flag = PER_RILF_MEMBER
+		clr_country_flag = SMAC_MEMBER
+	}
+}
+
+TNO_unlock_nuclear_tech = {
+	set_country_flag = tno_can_research_nuclear_tech
+	custom_effect_tooltip = tno_can_research_nuclear_tech_tt
+}
+
+upgrade_state_category = { # Used in state scope - Wasteland, Tiny/Small Island and Enclave are not included here.
+	if = {
+		limit = {
+			has_state_category = pastoral
+		}
+		set_state_category = rural
+	}
+	else_if = {
+		limit = {
+			has_state_category = rural
+		}
+		set_state_category = town
+	}
+	else_if = {
+		limit = {
+			has_state_category = town
+		}
+		set_state_category = large_town
+	}
+	else_if = {
+		limit = {
+			has_state_category = large_town
+		}
+		set_state_category = city
+	}
+	else_if = {
+		limit = {
+			has_state_category = city
+		}
+		set_state_category = large_city
+	}
+	else_if = {
+		limit = {
+			has_state_category = large_city
+		}
+		set_state_category = metropolis
+	}
+	else_if = {
+		limit = {
+			has_state_category = metropolis
+		}
+		set_state_category = megalopolis
+	}
+}
+
+downgrade_state_category = { # Used in state scope - Tiny/Small Island and Enclave are not included here.
+	if = {
+		limit = {
+			has_state_category = megalopolis
+		}
+		set_state_category = metropolis
+	}
+	else_if = {
+		limit = {
+			has_state_category = metropolis
+		}
+		set_state_category = large_city
+	}
+	else_if = {
+		limit = {
+			has_state_category = large_city
+		}
+		set_state_category = city
+	}
+	else_if = {
+		limit = {
+			has_state_category = city
+		}
+		set_state_category = large_town
+	}
+	else_if = {
+		limit = {
+			has_state_category = large_town
+		}
+		set_state_category = town
+	}
+	else_if = {
+		limit = {
+			has_state_category = town
+		}
+		set_state_category = rural
+	}
+	else_if = {
+		limit = {
+			has_state_category = rural
+		}
+		set_state_category = pastoral
+	}
+	else_if = {
+		limit = {
+			has_state_category = pastoral
+		}
+		set_state_category = wasteland
+	}
+}
+wac_why = {
+	WOL = {
+		add_to_faction = EWE
+		add_to_faction = SUS
+	}
+}
+WAC_test_state_for_cores_waa = {
+	clear_variable = ZZZ.WAC_WAA_2_country_restore
+	for_each_loop = {
+		array = global.WAC_WAA_faction
+		index = idx
+
+		if = {
+			limit = {
+				event_target:wac_scen_2_waa_state = {
+					is_core_of = global.WAC_WAA_faction^idx
+				}
+			}
+			set_variable = { ZZZ.WAC_WAA_2_country_to_restore = global.WAC_WAA_faction^idx }
+		}
+	}
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { ZZZ.WAC_WAA_2_country_to_restore = 0 }
+			}
+		}
+		set_variable = { ZZZ.WAC_WAA_2_country_restore = 1 }
+	}
+	clear_array = throwaway_array_for_wac
+	add_to_array = { throwaway_array_for_wac = ZZZ.WAC_WAA_2_country_to_restore }
+	for_each_scope_loop = {
+		array = throwaway_array_for_wac
+		
+		save_global_event_target_as = wac_scen_2_waa_country
+	}
+}
+WAC_test_state_for_cores_fma = {
+	clear_variable = ZZZ.WAC_FMA_2_country_restore
+	for_each_loop = {
+		array = global.WAC_FMA_faction
+		index = idx
+
+		if = {
+			limit = {
+				event_target:wac_scen_2_fma_state = {
+					is_core_of = global.WAC_FMA_faction^idx
+				}
+			}
+			set_variable = { ZZZ.WAC_FMA_2_country_to_restore = global.WAC_FMA_faction^idx }
+		}
+	}
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { ZZZ.WAC_FMA_2_country_to_restore = 0 }
+			}
+		}
+		set_variable = { ZZZ.WAC_FMA_2_country_restore = 1 }
+	}
+	clear_array = throwaway_array_for_fma
+	add_to_array = { throwaway_array_for_fma = ZZZ.WAC_FMA_2_country_to_restore }
+	for_each_scope_loop = {
+		array = throwaway_array_for_fma
+		
+		save_global_event_target_as = wac_scen_2_fma_country
+	}
+}
+WAC_test_state_for_cores_palf = {
+	clear_variable = ZZZ.WAC_PALF_2_country_restore
+	for_each_loop = {
+		array = global.WAC_PALF_faction
+		index = idx
+
+		if = {
+			limit = {
+				event_target:wac_scen_2_palf_state = {
+					is_core_of = global.WAC_PALF_faction^idx
+				}
+			}
+			set_variable = { ZZZ.WAC_PALF_2_country_to_restore = global.WAC_PALF_faction^idx }
+		}
+	}
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { ZZZ.WAC_PALF_2_country_to_restore = 0 }
+			}
+		}
+		set_variable = { ZZZ.WAC_PALF_2_country_restore = 1 }
+	}
+	clear_array = throwaway_array_for_palf
+	add_to_array = { throwaway_array_for_palf = ZZZ.WAC_PALF_2_country_to_restore }
+	for_each_scope_loop = {
+		array = throwaway_array_for_palf
+		
+		save_global_event_target_as = wac_scen_2_palf_country
+	}
+}
+WAC_test_state_for_cores_mano = {
+	if = {
+		limit = {
+			event_target:wac_mano_state = {
+				is_core_of = LIB
+			}
+		}
+		set_variable = { ZZZ.WAC_MANO_country_to_restore = 1 }
+		LIB = {
+			save_global_event_target_as = wac_mano_country
+		}
+	}
+	else_if = {
+		limit = {
+			event_target:wac_mano_state = {
+				is_core_of = MDI
+			}
+		}
+		set_variable = { ZZZ.WAC_MANO_country_to_restore = 1 }
+		MDI = {
+			save_global_event_target_as = wac_mano_country
+		}
+	}
+	else = {
+		set_variable = { ZZZ.WAC_MANO_country_to_restore = 0 }
+	}
+}
+SAW_test_state_for_cores_as = {
+	if = {
+		limit = {
+			event_target:saw_as_state = {
+				is_core_of = GRO
+			}
+		}
+		set_variable = { ZZZ.SAW_AS_country_to_restore = 1 }
+		GRO = {
+			save_global_event_target_as = saw_as_country
+		}
+	}
+	else_if = {
+		limit = {
+			event_target:saw_as_state = {
+				is_core_of = ANG
+			}
+		}
+		set_variable = { ZZZ.SAW_AS_country_to_restore = 1 }
+		ANG = {
+			save_global_event_target_as = saw_as_country
+		}
+	}
+	else_if = {
+		limit = {
+			event_target:saw_as_state = {
+				is_core_of = BOR
+			}
+		}
+		set_variable = { ZZZ.SAW_AS_country_to_restore = 1 }
+		BOR = {
+			save_global_event_target_as = saw_as_country
+		}
+	}
+	else_if = {
+		limit = {
+			event_target:saw_as_state = {
+				is_core_of = COG
+			}
+		}
+		set_variable = { ZZZ.SAW_AS_country_to_restore = 1 }
+		COG = {
+			save_global_event_target_as = saw_as_country
+		}
+	}
+	else = {
+		set_variable = { ZZZ.SAW_AS_country_to_restore = 0 }
+	}
+}
+WAC_check_offset = {
+	if = {
+		limit = {
+			JOL = {
+				has_capitulated = yes
+			}
+			701 = {
+				is_controlled_by = WOL
+			}
+		}
+		701 = {
+			set_state_controller_to = JOL
+		}
+	}
+}
+
+d_demil_state = {
+	ROOT = {
+		set_demilitarized_zone = yes
+		log = "[ROOT.GetName] is now demilitarized"
+	}
+}
+
+d_remil_state = {
+	ROOT = {
+		set_demilitarized_zone = no
+		log = "[ROOT.GetName] is no longer demilitarized"
+	}
+}
+
+# Receives:
+# min
+# | max
+# | integer
+# Outputs:
+# - rand
+get_rand = {
+	set_temp_variable = { size = max?1 }
+	add_to_temp_variable = { size = min?0 }
+
+	set_temp_variable = { rand = random }
+	multiply_temp_variable = { rand = size }
+	subtract_from_temp_variable = { rand = min }
+
+	if = {
+		limit = { NOT = { check_variable = { integer = 0 } } }
+		round_temp_variable = rand
+	}
+}
+
+# Arguments: rvar
+round_var_up = {
+	set_temp_variable = { old_val = rvar }
+	round_temp_variable = rvar
+	if = {
+		limit = { check_variable = { old_val > rvar } }
+		add_to_temp_variable = { rvar = 1 }
+	}
+}
+round_var_down = {
+	set_temp_variable = { old_val = rvar }
+	round_temp_variable = rvar
+	if = {
+		limit = { check_variable = { rvar > old_val } }
+		subtract_from_temp_variable = { rvar = 1 }
+	}
+}

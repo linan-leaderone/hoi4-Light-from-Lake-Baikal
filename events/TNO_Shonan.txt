@@ -1,0 +1,2517 @@
+####################################################
+## Shonan Events - Written by Butteryicarus(lol) ###
+####################################################
+
+add_namespace = sho
+add_namespace = SHOUS
+add_namespace = SHOJAP
+
+country_event = { #Intro
+	id = sho.0
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.0" }
+	title = sho.0.t
+	desc = sho.0.desc
+	picture = GFX_report_event_generic_military_parade
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.0.a
+		hidden_effect = {
+			JAP = {
+				country_event = {
+					id = sho.1
+					days = 5
+				}
+			}
+			USA = {
+				country_event = {
+					id = sho.2
+					days = 5
+				}
+			}
+		}
+	}
+}
+
+
+country_event = { #Japan can intervene
+	id = sho.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.1" }
+	title = sho.1.t
+	desc = sho.1.desc
+	picture = GFX_report_event_MLY_soldiers
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.1.a
+		custom_effect_tooltip = JAP_can_send_aid_malaya
+		hidden_effect = {
+			set_country_flag = JAP_aid_SHO
+			set_temp_variable = { target = SHO }
+			TNO_increase_volunteer_cap_1 = yes
+		}
+		TNO_fopo_add_malaysia_civil_war_tab = yes
+	}
+}
+
+country_event = { #US introduction event, can send some aid
+	id = sho.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.2" }
+	title = sho.2.t
+	desc = sho.2.desc
+	picture = GFX_report_event_MLY_docking_port
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.2.a
+		set_country_flag = USA_aid_MLY
+		TNO_fopo_add_malaysia_civil_war_tab = yes
+		custom_effect_tooltip = USA_can_send_aid_malaya
+		add_command_power = 15
+		hidden_effect = {
+			USA = {
+				country_event = {
+					id = SHOUS.5
+					days = 14
+				}
+				#country_event = {
+				#	id = SHOUS.6
+				#	days = 14
+				#}
+			}
+		}
+	}
+}
+
+country_event = { #US can now send volunteers
+	id = sho.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.3" }
+	title = sho.3.t
+	desc = sho.3.desc
+	picture = GFX_report_event_MLY_docking_port
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.3.a
+		custom_effect_tooltip = USA_can_send_more_aid_malaya_troops
+		hidden_effect = {
+			MLY = {
+				add_equipment_to_stockpile = {
+					type = convoy_1
+					amount = 25
+					producer = USA
+				}
+			}
+			USA = {
+				set_temp_variable = { target = MLY }
+				TNO_increase_volunteer_cap_1 = yes
+				if = {
+					limit = {
+						is_ai = yes
+					}
+					MLY = {
+						add_equipment_to_stockpile = {
+							type = infantry_equipment
+							amount = 300
+							producer = USA
+						}
+						add_equipment_to_stockpile = {
+							type = anti_tank_equipment_1
+							amount = 200
+							producer = USA
+						}
+						add_equipment_to_stockpile = {
+							type = artillery_equipment
+							amount = 150
+							producer = USA
+						}
+						add_equipment_to_stockpile = {
+							type = transport_helicopter_equipment_1
+							amount = 60
+							producer = USA
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { #Yay the Americans won
+	id = sho.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.4" }
+	title = sho.4.t
+	desc = sho.4.desc
+	picture = GFX_report_event_USA_nixon_happy
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = { set_country_flag = conclusion_victory }
+
+	option = {
+		name = sho.4.a
+
+		set_temp_variable = { conclusion_weeks = 4 }
+		set_temp_variable = { conclusion_bonus = 0.01 }
+		USA_proxy_conclusion_effect = yes
+
+		add_political_power = 75
+		hidden_effect = {
+			set_temp_variable = { Victory_ID = 25 }
+			set_temp_variable = { Victory_Outcome = 4 }
+			set_temp_variable = { Victory_Points = 75 }
+			Cold_War_GUI_ManipulateVictory = yes
+			set_global_flag = malay_usa_won
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = WORLD.18112
+			}
+		}
+		USA = { set_country_flag = TNO_CIA_MLY_Operations_Can_Begin }
+		TNO_fopo_remove_malaysia_civil_war_tab = yes
+		custom_effect_tooltip = TNO_CIA_MLY_unlocked_tt
+	}
+}
+
+country_event = { #Nay the Americans lost
+	id = sho.41
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.41" }
+	title = sho.41.t
+	desc = sho.41.desc
+	picture = GFX_report_event_USA_nixon_sad
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.41.a
+
+		set_temp_variable = { conclusion_weeks = 4 }
+		set_temp_variable = { conclusion_bonus = 0.01 }
+		USA_proxy_conclusion_effect = yes
+
+		add_political_power = -75
+		hidden_effect = {
+			USA = {
+				set_temp_variable = { Victory_ID = 25 }
+				set_temp_variable = { Victory_Outcome = 2 }
+				set_temp_variable = { Victory_Points = -75 }
+				Cold_War_GUI_ManipulateVictory = yes
+			}
+		}
+		TNO_fopo_remove_malaysia_civil_war_tab = yes
+	}
+}
+
+country_event = { #Yay the Japanese won
+	id = sho.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.5" }
+	title = sho.5.t
+	desc = sho.5.desc
+	picture = GFX_report_event_MLY_collab_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.5.a
+		JAP = {
+			add_to_faction = SHO
+		}
+		hidden_effect = {
+			SHO = {
+				add_ideas = Sphere_Imp_Protectorate
+			}
+			MLY = {
+				remove_ideas = {
+					MLY_Dismal_Infrastructure
+					MLY_The_UMAJF
+					MLY_driven_to_the_countryside
+					MLY_operation_nassau
+				}
+			}
+		}
+		TNO_fopo_remove_malaysia_civil_war_tab = yes
+
+		set_temp_variable = { Victory_ID = 25 }
+		set_temp_variable = { Victory_Outcome = 4 }
+		set_temp_variable = { Victory_Points = 75 }
+		Cold_War_GUI_ManipulateVictory = yes
+
+		if = { # Total Japan victory check here
+			limit = {
+				MLY = { exists = no	}
+			}
+			JAP = {
+				country_event = {
+					id = SHOJAP.5
+					days = 3 #To avoid event overlap
+				}
+				JAP_PA_support_increase_med = yes
+			}
+			hidden_effect = {
+				every_country = {
+					limit = { is_ai = no }
+					news_event = WORLD.18126
+				}
+			}
+		}
+		else = { # Partial Japan victory check here
+		}
+	}
+}
+
+country_event = { #Nay the Japanese lost
+	id = sho.51
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.51" }
+	title = sho.51.t
+	desc = sho.51.desc
+	picture = GFX_report_event_MLY_collab_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.51.a
+		TNO_fopo_remove_malaysia_civil_war_tab = yes
+		add_political_power = -75
+		JAP_PA_support_decrease_med = yes
+
+		set_temp_variable = { Victory_ID = 25 }
+		set_temp_variable = { Victory_Outcome = 2 }
+		set_temp_variable = { Victory_Points = -75 }
+		Cold_War_GUI_ManipulateVictory = yes
+
+		add_to_faction = SHO
+		SHO = {
+			hidden_effect = { add_ideas = Sphere_Fully_Dependent }
+			#econ_join_sphere_JAP = yes
+			if = { # Partial Japanese loss check here
+				limit = {
+					NOT = {
+						has_country_leader = { character = SHO_Takeo_Kurosawa ruling_only = yes }
+					}
+				}
+				hidden_effect = {
+					every_owned_state = {
+						add_core_of = JHR
+					}
+					JHR = {
+						annex_country = {
+							target = SHO
+							transfer_troops = yes
+						}
+						econ_join_sphere_JAP = yes
+						add_ideas = Sphere_Fully_Dependent
+						JAP = { add_to_faction = JHR }
+					}
+				}
+			}
+			else_if = { # Total Japanese loss check here
+				limit = {
+					has_country_leader = { character = SHO_Takeo_Kurosawa ruling_only = yes }
+				}
+			}
+		}
+	}
+}
+
+country_event = { #Ahmad wins the election!
+	id = sho.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.8" }
+	title = sho.8.t
+	desc = sho.8.desc
+	picture = GFX_report_event_MLY_communists
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.8.a
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = socialist
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 60
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		promote_character = MLY_Ahmad_Boestamam
+		set_popularities = {
+			communist = 8
+			socialist = 32
+			progressivism = 18
+			liberalism = 6
+			conservatism = 24
+			paternalism = 7
+			despotism = 5
+		}
+		set_party_name = {
+			ideology = communist
+			name = MLY_communist_party_postwar
+			long_name = MLY_communist_party_postwar_long
+		}
+		set_party_name = {
+			ideology = socialist
+			name = MLY_socialist_party_coalition
+			long_name = MLY_socialist_party_coalition_long
+		}
+		set_party_name = {
+			ideology = progressivism
+			name = MLY_progressivism_party_coalition
+			long_name = MLY_progressivism_party_coalition_long
+		}
+		set_party_name = {
+			ideology = liberalism
+			name = MLY_liberalism_party_postwar
+			long_name = MLY_liberalism_party_postwar_long
+		}
+		set_party_name = {
+			ideology = conservatism
+			name = MLY_conservatism_party_postwar
+			long_name = MLY_conservatism_party_postwar_long
+		}
+		set_party_name = {
+			ideology = paternalism
+			name = MLY_paternalism_party_postwar
+			long_name = MLY_paternalism_party_postwar_long
+		}
+		set_party_name = {
+			ideology = despotism
+			name = MLY_despotism_party_postwar
+			long_name = MLY_despotism_party_postwar_long
+		}
+		USA = {
+			country_event = {
+				id = SHOUS.1
+				days = 1
+			}
+		}
+		news_event = {
+			id = WORLD.18114
+			days = 1
+		}
+		set_cosmetic_tag = MLY_free
+
+		#country_event = { # 1967 Monarchy Referendum
+		#	id = sho.30
+		#	days = 1095
+		#}
+	}
+}
+
+country_event = { #Razak wins the election!
+	id = sho.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.9" }
+	title = sho.9.t
+	desc = sho.9.desc
+	picture = GFX_report_event_MLY_razak_meets_jfk
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.9.a
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = conservatism
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 60
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		promote_character = MLY_Tun_Abdul_Razak
+		set_popularities = {
+			communist = 8
+			socialist = 24
+			progressivism = 13
+			liberalism = 8
+			conservatism = 32
+			paternalism = 10
+			despotism = 5
+		}
+		set_party_name = {
+			ideology = communist
+			name = MLY_communist_party_postwar
+			long_name = MLY_communist_party_postwar_long
+		}
+		set_party_name = {
+			ideology = socialist
+			name = MLY_socialist_party_coalition
+			long_name = MLY_socialist_party_coalition_long
+		}
+		set_party_name = {
+			ideology = progressivism
+			name = MLY_progressivism_party_coalition
+			long_name = MLY_progressivism_party_coalition_long
+		}
+		set_party_name = {
+			ideology = liberalism
+			name = MLY_liberalism_party_postwar
+			long_name = MLY_liberalism_party_postwar_long
+		}
+		set_party_name = {
+			ideology = conservatism
+			name = MLY_conservatism_party_postwar
+			long_name = MLY_conservatism_party_postwar_long
+		}
+		set_party_name = {
+			ideology = paternalism
+			name = MLY_paternalism_party_postwar
+			long_name = MLY_paternalism_party_postwar_long
+		}
+		set_party_name = {
+			ideology = despotism
+			name = MLY_despotism_party_postwar
+			long_name = MLY_despotism_party_postwar_long
+		}
+		USA = {
+			country_event = {
+				id = SHOUS.2
+				days = 1
+			}
+		}
+		news_event = {
+			id = WORLD.18115
+			days = 1
+		}
+		set_cosmetic_tag = MLY_free
+		custom_effect_tooltip = razak_victory_tt
+		#country_event = { # 1967 Monarchy Referendum
+		#	id = sho.30
+		#	days = 1095
+		#}
+	}
+}
+
+country_event = { #Burnahuddin Al-Helmy wins!
+	id = sho.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.10" }
+	title = sho.10.t
+	desc = sho.10.desc
+	picture = GFX_report_event_MLY_collab_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.10.a
+		set_party_name = {
+			ideology = socialist
+			name = SHO_socialist_party_2
+			long_name = SHO_socialist_party_2_long
+		}
+		set_party_name = {
+			ideology = communist
+			name = SHO_communist_party_2
+			long_name = SHO_communist_party_2_long
+		}
+		set_party_name = {
+			ideology = conservatism
+			name = SHO_conservatism_party_2
+			long_name = SHO_conservatism_party_2_long
+		}
+		set_party_name = {
+			ideology = paternalism
+			name = SHO_paternalism_party_2
+			long_name = SHO_paternalism_party_2_long
+		}
+		set_party_name = {
+			ideology = despotism
+			name = SHO_despotism_party_2
+			long_name = SHO_despotism_party_2_long
+		}
+		set_party_name = {
+			ideology = fascism
+			name = SHO_fascism_party_2
+			long_name = SHO_fascism_party_2_long
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			name = SHO_ultranationalism_party_2
+			long_name = SHO_ultranationalism_party_2_long
+		}
+		set_politics = { ruling_party = socialist }
+		promote_character = SHO_Burnahuddin_Al_Helmy
+		set_popularities = {
+			communist = 6
+			socialist = 26
+			conservatism = 21
+			paternalism = 17
+			despotism = 13
+			fascism = 10
+			ultranationalism = 7
+		}
+		#add_ideas = {
+		#	SHO_Heightened_Ethnic_Tension
+		#	SHO_Reforging_Indonesian_Ties
+		#	SHO_The_Heartland
+		#}
+		remove_ideas = {
+			SHO_Dai-nijyugo
+			SHO_minority
+			SHO_Zaibatsu
+			SHO_Marai_Giyugun_Auxiliaries
+		}
+		JAP = {
+			country_event = {
+				id = SHOJAP.1
+				days = 1
+			}
+		}
+		news_event = {
+			id = WORLD.18116
+			days = 1
+		}
+
+	}
+}
+
+country_event = { #Dato Onn Jaafar wins!
+	id = sho.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.11" }
+	title = sho.11.t
+	desc = sho.11.desc
+	picture = GFX_report_event_MLY_onn_jaafar
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.11.a
+		set_politics = { ruling_party = conservatism }
+		set_party_name = {
+			ideology = socialist
+			name = SHO_socialist_party_2
+			long_name = SHO_socialist_party_2_long
+		}
+		set_party_name = {
+			ideology = communist
+			name = SHO_communist_party_2
+			long_name = SHO_communist_party_2_long
+		}
+		set_party_name = {
+			ideology = conservatism
+			name = SHO_conservatism_party_2
+			long_name = SHO_conservatism_party_2_long
+		}
+		set_party_name = {
+			ideology = paternalism
+			name = SHO_paternalism_party_2
+			long_name = SHO_paternalism_party_2_long
+		}
+		set_party_name = {
+			ideology = despotism
+			name = SHO_despotism_party_2
+			long_name = SHO_despotism_party_2_long
+		}
+		set_party_name = {
+			ideology = fascism
+			name = SHO_fascism_party_2
+			long_name = SHO_fascism_party_2_long
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			name = SHO_ultranationalism_party_2
+			long_name = SHO_ultranationalism_party_2_long
+		}
+		promote_character = SHO_Dato_Onn_Jaafar
+		set_popularities = {
+			communist = 6
+			socialist = 21
+			conservatism = 26
+			paternalism = 17
+			despotism = 13
+			fascism = 10
+			ultranationalism = 7
+		}
+		JAP = {
+			country_event = {
+				id = SHOJAP.2
+				days = 1
+			}
+		}
+		remove_ideas = {
+			SHO_Dai-nijyugo
+			SHO_minority
+			SHO_Zaibatsu
+			SHO_Marai_Giyugun_Auxiliaries
+		}
+		news_event = {
+			id = WORLD.18117
+			days = 1
+		}
+
+		hidden_effect = {
+			country_event = {
+				id = sho.12
+				days = 270
+			}
+		}
+	}
+}
+
+country_event = { #Jaafar is kill long live Albar
+	id = sho.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.12" }
+	title = sho.12.t
+	desc = sho.12.desc
+	picture = GFX_report_event_MLY_port
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.12.a
+		kill_country_leader = yes
+		set_politics = { ruling_party = paternalism }
+		promote_character = SHO_Syed_Jaafar_Albar
+		remove_ideas = {
+			SHO_Dai-nijyugo
+			SHO_minority
+			SHO_Zaibatsu
+			SHO_Marai_Giyugun_Auxiliaries
+		}
+		set_popularities = {
+			communist = 6
+			socialist = 21
+			conservatism = 17
+			paternalism = 26
+			despotism = 13
+			fascism = 10
+			ultranationalism = 7
+		}
+		#add_ideas = {
+		#	SHO_Reeling_the_party_in
+		#	SHO_Firebrand_Agenda
+		#	SHO_Greater_Ambitions
+		#}
+		JAP = {
+			country_event = {
+				id = SHOJAP.3
+				days = 1
+			}
+		}
+		news_event = {
+			id = WORLD.18118
+			days = 1
+		}
+
+	}
+}
+
+country_event = { #Malaya ceasefire - Askar Wataniah sweeps over existing nationalistic parties.
+	id = sho.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.13" }
+	title = sho.13.t
+	desc = sho.13.desc
+	picture = GFX_report_event_MLY_collab_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.13.a
+		set_politics = { ruling_party = despotism }
+		promote_character = MLY_Yeop_Mahidin
+		set_popularities = {
+			communist = 10
+			paternalism = 20
+			despotism = 70
+		}
+		remove_ideas = {
+			MLY_Dismal_Infrastructure
+			MLY_The_UMAJF
+			MLY_driven_to_the_countryside
+			MLY_operation_nassau
+		}
+		set_party_name = {
+			ideology = communist
+			name = MLY_communist_party_postwar
+			long_name = MLY_communist_party_postwar_long
+		}
+		set_party_name = {
+			ideology = socialist
+			name = MLY_socialist_party_postwar
+			long_name = MLY_socialist_party_postwar_long
+		}
+		set_party_name = {
+			ideology = progressivism
+			name = MLY_progressivism_party_postwar
+			long_name = MLY_progressivism_party_postwar_long
+		}
+		set_party_name = {
+			ideology = despotism
+			name = MLY_despotism_party_postwar
+			long_name = MLY_despotism_party_postwar_long
+		}
+		#add_ideas = {
+		#	MLY_Wataniah_Junta
+		#	MLY_Fragile_Administration
+		#	MLY_An_Unfixable_Schism
+		#}
+		USA = {
+			country_event = {
+				id = SHOUS.3
+				days = 1
+			}
+			every_owned_state = {
+				limit = { can_have_elections_in_state = yes }
+				add_to_variable = { NPP_Y_bonus_popularity = 0.002 }
+			}
+		}
+		country_event = {
+			id = sho.131
+			days = 360
+		}
+		news_event = {
+			id = WORLD.18119
+			days = 1
+		}
+		drop_cosmetic_tag = yes
+		set_cosmetic_tag = MLY_AW
+
+	}
+}
+
+country_event = { #Malaya ceasefire - End of military rule
+	id = sho.131
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.131" }
+	title = sho.131.t
+	desc = sho.131.desc
+	picture = GFX_report_event_MLY_collab_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.131.a
+		set_politics = { ruling_party = paternalism }
+		promote_character = MLY_Tun_Hussein_Onn
+		set_popularities = {
+			conservatism = 40
+			paternalism = 20
+			socialist = 30
+			despotism = 10
+		}
+		#remove_ideas = {
+		#	MLY_Wataniah_Junta
+		#	MLY_Fragile_Administration
+		#	MLY_An_Unfixable_Schism
+		#}
+		set_party_name = {
+			ideology = conservatism
+			name = MLY_conservatism_party_postwar
+			long_name = MLY_conservatism_party_postwar_long
+		}
+		set_party_name = {
+			ideology = paternalism
+			name = MLY_paternalism_party_postwar
+			long_name = MLY_paternalism_party_postwar_long
+		}
+		news_event = {
+			id = WORLD.18211
+			days = 1
+		}
+		drop_cosmetic_tag = yes
+		set_cosmetic_tag = MLY_AW
+
+	}
+}
+
+country_event = { #Malaya ceasefire - The Chairman stays.
+	id = sho.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.14" }
+	title = sho.14.t
+	desc = sho.14.desc
+	picture = GFX_report_event_generic_military_parade
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.14.a
+		hidden_effect = {
+			set_popularities = {
+				communist = 70
+				socialist = 20
+				despotism = 10
+			}
+			remove_ideas = {
+				MLY_Dismal_Infrastructure
+				MLY_The_UMAJF
+				MLY_driven_to_the_countryside
+				MLY_operation_nassau
+			}
+			#country_event = { # non-existent event
+			#	id = sho.141
+			#	days = 360
+			#}
+			set_party_name = {
+				ideology = communist
+				name = MLY_communist_party_postwar
+				long_name = MLY_communist_party_postwar_long
+			}
+			set_party_name = {
+				ideology = socialist
+				name = MLY_socialist_party_postwar
+				long_name = MLY_socialist_party_postwar_long
+			}
+			set_party_name = {
+				ideology = progressivism
+				name = MLY_progressivism_party_postwar
+				long_name = MLY_progressivism_party_postwar_long
+			}
+			set_party_name = {
+				ideology = despotism
+				name = MLY_despotism_party_postwar
+				long_name = MLY_despotism_party_postwar_long
+			}
+		}
+		set_politics = { ruling_party = communist }
+		set_cosmetic_tag = MLY_PKM
+		USA = {
+			country_event = {
+				id = SHOUS.4
+				days = 1
+			}
+			every_owned_state = {
+				limit = { can_have_elections_in_state = yes }
+				add_to_variable = { NPP_L_bonus_popularity = 0.002 }
+			}
+		}
+		#add_ideas = {
+		#	MLY_The_UMAJF_Again
+		#	MLY_Fortress_Malaya
+		#	MLY_Revolutionary_Emergency_Decrees
+		#}
+		news_event = {
+			id = WORLD.18120
+			days = 1
+		}
+
+	}
+}
+
+country_event = { #Malaya ceasefire - Syed Jaafar Albar takes helm.
+	id = sho.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.15" }
+	title = sho.15.t
+	desc = sho.15.desc
+	picture = GFX_report_event_MLY_port
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.15.a
+		set_politics = { ruling_party = paternalism }
+		promote_character = SHO_Syed_Jaafar_Albar
+		set_popularities = {
+			communist = 6
+			socialist = 21
+			conservatism = 17
+			paternalism = 26
+			despotism = 13
+			fascism = 10
+			ultranationalism = 7
+		}
+		#add_ideas = {
+		#	SHO_Reeling_the_party_in
+		#	SHO_Firebrand_Agenda
+		#	SHO_Greater_Ambitions
+		#}
+		JAP = {
+			country_event = {
+				id = SHOJAP.4
+				days = 1
+			}
+		}
+		news_event = {
+			id = WORLD.18121
+			days = 1
+		}
+	}
+}
+
+country_event = { #Johor rejoins Malaya
+	id = sho.300
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.300" }
+	title = sho.300.t
+	desc = sho.300.desc
+	picture = GFX_report_event_MLY_port
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.300.a
+		MLY = {
+			add_state_core = 806
+			annex_country = {
+				target = JHR
+				transfer_troops = no
+			}
+		}
+		SHO = {
+			transfer_state = 751
+			set_politics = {
+				ruling_party = despotism
+			}
+			set_party_name = {
+				ideology = despotism
+				long_name = SHO_despotism_party_long_SG
+				name = SHO_despotism_party_SG
+			}
+			set_party_name = {
+				ideology = ultranationalism
+				long_name = SHO_ultranationalism_party_long_SG
+				name = SHO_ultranationalism_party_SG
+			}
+			set_popularities = {
+				despotism = 80
+				ultranationalism = 20
+			}
+			promote_character = SHO_Takeo_Kurosawa
+			set_cosmetic_tag = SHO_Singapore
+		}
+		news_event = {
+			id = WORLD.18230
+			days = 1
+		}
+	}
+}
+
+country_event = { # You held the capital for 60 days, you've won
+	id = sho.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.16" }
+	title = sho.16.t
+	desc = sho.16.desc
+	picture = GFX_report_event_MLY_port
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.16.a
+		USA = {
+			country_event = { id = sho.4 days = 2 }
+		}
+		JAP = {
+			country_event = { id = sho.51 }
+		}
+		MLY = {
+			annex_country = {
+				target = SHO
+				transfer_troops = no
+			}
+			save_global_event_target_as = winning_country
+		}
+		SHO = {
+			transfer_state = 751
+			set_politics = {
+				ruling_party = despotism
+			}
+			set_party_name = {
+				ideology = despotism
+				long_name = SHO_despotism_party_long_SG
+				name = SHO_despotism_party_SG
+			}
+			set_party_name = {
+				ideology = ultranationalism
+				long_name = SHO_ultranationalism_party_long_SG
+				name = SHO_ultranationalism_party_SG
+			}
+			hidden_effect = {
+				set_popularities = {
+					despotism = 80
+					ultranationalism = 20
+				}
+			}
+			promote_character = SHO_Takeo_Kurosawa
+			set_cosmetic_tag = SHO_Singapore
+			save_global_event_target_as = losing_country
+		}
+		set_global_flag = war_won
+		set_global_flag = show_peace_popup_alert
+		add_to_variable = { global.peace_popup_dirty = 1 }
+		hidden_effect = { #Hidden to greatly cleanup tt
+			SHO_war_end_effect = yes
+		}
+	}
+}
+
+country_event = { # Yasuda Crisis popped, check time
+	id = sho.17
+	title = sho.17.t
+	desc = sho.17.desc
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.17" }
+	picture = GFX_report_event_MLY_port
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = MLY_WAR_HAPPENING
+		JAP = {
+			has_country_flag = JAP_Economic_Wars
+		}
+	}
+	option = {
+		name = sho.17.a
+		if = { # Total USA victory
+			limit = {
+				SHO = {
+					all_owned_state = {
+						OR = {
+							is_fully_controlled_by = MLY
+							state = 751
+						}
+					}
+				}
+			}
+			hidden_effect = {
+				MLY = {
+					annex_country = {
+						target = SHO
+						transfer_troops = no
+					}
+					save_global_event_target_as = winning_country
+				}
+				SHO = {
+					transfer_state = 751
+					set_politics = {
+						ruling_party = despotism
+					}
+					set_party_name = {
+						ideology = despotism
+						long_name = SHO_despotism_party_long_SG
+						name = SHO_despotism_party_SG
+					}
+					set_party_name = {
+						ideology = ultranationalism
+						long_name = SHO_ultranationalism_party_long_SG
+						name = SHO_ultranationalism_party_SG
+					}
+					set_popularities = {
+						despotism = 80
+						ultranationalism = 20
+					}
+					promote_character = SHO_Takeo_Kurosawa
+					set_cosmetic_tag = SHO_Singapore
+					save_global_event_target_as = losing_country
+				}
+				set_global_flag = war_won
+				set_global_flag = show_peace_popup_alert
+				add_to_variable = { global.peace_popup_dirty = 1 }
+			}
+			USA = {
+				country_event = { id = sho.4 days = 2 }
+			}
+			JAP = {
+				country_event = { id = sho.51 }
+			}
+		}
+		else_if = { # Partial US victory, partial Japanese loss
+			limit = {
+				MLY = {
+					num_of_controlled_states > 4
+				}
+			}
+			hidden_effect = {
+				MLY = {
+					white_peace = SHO
+					transfer_state = 336
+					transfer_state = 1453
+					transfer_state = 1454
+					transfer_state = 805
+					transfer_state = 804
+				}
+				SHO = {
+					set_country_flag = SHO_loosing_ceasefire
+				}
+			}
+			USA = {
+				country_event = { id = sho.4 days = 4 }
+				custom_effect_tooltip = USA_all_voters_header_tt
+				set_temp_variable = { USA_week_change_union_pro = 4 }
+				add_to_variable = { Demographic_Shift_union_pro_Weeks = USA_week_change_union_pro }
+				set_temp_variable = { USA_week_change_black_pro = 4 }
+				add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_black_pro }
+				set_temp_variable = { USA_week_change_hispanic_pro = 4 }
+				add_to_variable = { Demographic_Shift_hispanic_pro_Weeks = USA_week_change_hispanic_pro }
+				set_temp_variable = { USA_week_change_minority_pro = 4 }
+				add_to_variable = { Demographic_Shift_minority_pro_Weeks = USA_week_change_minority_pro }
+				set_temp_variable = { USA_week_change_nativists_pro = 4 }
+				add_to_variable = { Demographic_Shift_nativists_pro_Weeks = USA_week_change_nativists_pro }
+				set_temp_variable = { USA_week_change_urban_pro = 4 }
+				add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_urban_pro }
+				set_temp_variable = { USA_week_change_rural_pro = 4 }
+				add_to_variable = { Demographic_Shift_rural_pro_Weeks = USA_week_change_rural_pro }
+				custom_effect_tooltip = USA_union_pro_shift
+
+				set_temp_variable = { USA_week_change_union_nat = 4 }
+				add_to_variable = { Demographic_Shift_union_nat_Weeks = USA_week_change_union_nat }
+				set_temp_variable = { USA_week_change_black_nat = 4 }
+				add_to_variable = { Demographic_Shift_black_nat_Weeks = USA_week_change_black_nat }
+				set_temp_variable = { USA_week_change_hispanic_nat = 4 }
+				add_to_variable = { Demographic_Shift_hispanic_nat_Weeks = USA_week_change_hispanic_nat }
+				set_temp_variable = { USA_week_change_minority_nat = 4 }
+				add_to_variable = { Demographic_Shift_minority_nat_Weeks = USA_week_change_minority_nat }
+				set_temp_variable = { USA_week_change_nativists_nat = 4 }
+				add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_nativists_nat }
+				set_temp_variable = { USA_week_change_urban_nat = 4 }
+				add_to_variable = { Demographic_Shift_urban_nat_Weeks = USA_week_change_urban_nat }
+				set_temp_variable = { USA_week_change_rural_nat = 4 }
+				add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_rural_nat }
+				custom_effect_tooltip = USA_union_nat_shift
+			}
+			JAP = {
+				country_event = { id = sho.51 days = 2 }
+			}
+		}
+		else = { # Partial US loss, partial Japanese victory
+			hidden_effect = {
+				SHO = {
+					white_peace = MLY
+				}
+				MLY = {
+					random_list = {
+						50 = {
+							modifier = {
+								factor = 0
+								has_game_rule = { rule = MLY_CEASEFIRE_OUTCOME option = MLY_CEASEFIRE_OUTCOME_COMMUNISM }
+							}
+							country_event = {
+								id = sho.13
+							}
+						}
+						50 = {
+							modifier = {
+								factor = 0
+								has_country_flag = JAP_sown_division
+							}
+							modifier = {
+								factor = 0
+								has_game_rule = { rule = MLY_CEASEFIRE_OUTCOME option = MLY_CEASEFIRE_OUTCOME_MILITARY_JUNTA }
+							}
+							country_event = {
+								id = sho.14
+							}
+						}
+					}
+					set_country_flag = MLY_loosing_ceasefire
+				}
+			}
+			USA = {
+				country_event = { id = sho.41 days = 2 }
+				set_temp_variable = { USA_week_change_urban_com = 2 }
+				add_to_variable = { Demographic_Shift_urban_com_Weeks = USA_week_change_urban_com }
+
+				set_temp_variable = { USA_week_change_rural_anv = 2 }
+				add_to_variable = { Demographic_Shift_rural_anv_Weeks = USA_week_change_rural_anv }
+			}
+			JAP = {
+				country_event = { id = sho.5 days = 2 }
+			}
+		}
+		hidden_effect = { #Hidden to greatly cleanup tt
+			SHO_war_end_effect = yes
+		}
+	}
+}
+
+### American Shonan Events ###
+
+country_event = { # Boestamam won. Partial Domino Operations it is.
+	id = SHOUS.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOUS.1" }
+	title = SHOUS.1.t
+	desc = SHOUS.1.desc
+	picture = GFX_report_event_generic_military_parade
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOUS.1.a
+		custom_effect_tooltip = USA_NPP_C_popularity_grows_low
+		add_political_power = 50
+		hidden_effect = {
+			set_temp_variable = { USA_week_change_urban_pro = 3 }
+			add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_urban_pro }
+		}
+	}
+}
+
+country_event = { # US reaction to Tun Abdul Razak being elected
+	id = SHOUS.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOUS.2" }
+	title = SHOUS.2.t
+	desc = SHOUS.2.desc
+	picture = GFX_report_event_MLY_razak_meets_jfk
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOUS.2.a
+		add_political_power = 50
+		MLY = {
+			econ_join_sphere_USA = yes
+			add_ideas = OFN_Observer
+			set_cosmetic_tag = MLY_OFN_Aligned
+		}
+		if = {
+			limit = { USA_RD_ruling_party = yes }
+			custom_effect_tooltip = USA_all_voters_header_tt
+			set_temp_variable = { USA_week_change_union_dem = 1 }
+			add_to_variable = { Demographic_Shift_union_dem_Weeks = USA_week_change_union_dem }
+			set_temp_variable = { USA_week_change_black_dem = 1 }
+			add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_black_dem }
+			set_temp_variable = { USA_week_change_hispanic_dem = 1 }
+			add_to_variable = { Demographic_Shift_hispanic_dem_Weeks = USA_week_change_hispanic_dem }
+			set_temp_variable = { USA_week_change_minority_dem = 1 }
+			add_to_variable = { Demographic_Shift_minority_dem_Weeks = USA_week_change_minority_dem }
+			set_temp_variable = { USA_week_change_nativists_dem = 1 }
+			add_to_variable = { Demographic_Shift_nativists_dem_Weeks = USA_week_change_nativists_dem }
+			set_temp_variable = { USA_week_change_urban_dem = 1 }
+			add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_urban_dem }
+			set_temp_variable = { USA_week_change_rural_dem = 1 }
+			add_to_variable = { Demographic_Shift_rural_dem_Weeks = USA_week_change_rural_dem }
+			custom_effect_tooltip = USA_union_dem_shift
+
+			set_temp_variable = { USA_week_change_union_rep = 1 }
+			add_to_variable = { Demographic_Shift_union_rep_Weeks = USA_week_change_union_rep }
+			set_temp_variable = { USA_week_change_black_rep = 1 }
+			add_to_variable = { Demographic_Shift_black_rep_Weeks = USA_week_change_black_rep }
+			set_temp_variable = { USA_week_change_hispanic_rep = 1 }
+			add_to_variable = { Demographic_Shift_hispanic_rep_Weeks = USA_week_change_hispanic_rep }
+			set_temp_variable = { USA_week_change_minority_rep = 1 }
+			add_to_variable = { Demographic_Shift_minority_rep_Weeks = USA_week_change_minority_rep }
+			set_temp_variable = { USA_week_change_nativists_rep = 1 }
+			add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_nativists_rep }
+			set_temp_variable = { USA_week_change_urban_rep = 1 }
+			add_to_variable = { Demographic_Shift_urban_rep_Weeks = USA_week_change_urban_rep }
+			set_temp_variable = { USA_week_change_rural_rep = 1 }
+			add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_rural_rep }
+			custom_effect_tooltip = USA_union_rep_shift
+		}
+		else = {
+			custom_effect_tooltip = USA_all_voters_header_tt
+			set_temp_variable = { USA_week_change_union_pro = 1 }
+			add_to_variable = { Demographic_Shift_union_pro_Weeks = USA_week_change_union_pro }
+			set_temp_variable = { USA_week_change_black_pro = 1 }
+			add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_black_pro }
+			set_temp_variable = { USA_week_change_hispanic_pro = 1 }
+			add_to_variable = { Demographic_Shift_hispanic_pro_Weeks = USA_week_change_hispanic_pro }
+			set_temp_variable = { USA_week_change_minority_pro = 1 }
+			add_to_variable = { Demographic_Shift_minority_pro_Weeks = USA_week_change_minority_pro }
+			set_temp_variable = { USA_week_change_nativists_pro = 1 }
+			add_to_variable = { Demographic_Shift_nativists_pro_Weeks = USA_week_change_nativists_pro }
+			set_temp_variable = { USA_week_change_urban_pro = 1 }
+			add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_urban_pro }
+			set_temp_variable = { USA_week_change_rural_pro = 1 }
+			add_to_variable = { Demographic_Shift_rural_pro_Weeks = USA_week_change_rural_pro }
+			custom_effect_tooltip = USA_union_pro_shift
+
+			set_temp_variable = { USA_week_change_union_nat = 1 }
+			add_to_variable = { Demographic_Shift_union_nat_Weeks = USA_week_change_union_nat }
+			set_temp_variable = { USA_week_change_black_nat = 1 }
+			add_to_variable = { Demographic_Shift_black_nat_Weeks = USA_week_change_black_nat }
+			set_temp_variable = { USA_week_change_hispanic_nat = 1 }
+			add_to_variable = { Demographic_Shift_hispanic_nat_Weeks = USA_week_change_hispanic_nat }
+			set_temp_variable = { USA_week_change_minority_nat = 1 }
+			add_to_variable = { Demographic_Shift_minority_nat_Weeks = USA_week_change_minority_nat }
+			set_temp_variable = { USA_week_change_nativists_nat = 1 }
+			add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_nativists_nat }
+			set_temp_variable = { USA_week_change_urban_nat = 1 }
+			add_to_variable = { Demographic_Shift_urban_nat_Weeks = USA_week_change_urban_nat }
+			set_temp_variable = { USA_week_change_rural_nat = 1 }
+			add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_rural_nat }
+			custom_effect_tooltip = USA_union_nat_shift
+		}
+	}
+}
+
+country_event = { # US reaction to Wataniah winning the struggle.
+	id = SHOUS.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOUS.3" }
+	title = SHOUS.3.t
+	desc = SHOUS.3.desc
+	picture = GFX_report_event_MLY_collab_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOUS.3.a
+		add_political_power = 50
+		MLY = {
+			econ_join_sphere_USA = yes
+		}
+		if = {
+			limit = { USA_RD_ruling_party = yes }
+			custom_effect_tooltip = USA_all_voters_header_tt
+			set_temp_variable = { USA_week_change_union_dem = 1 }
+			add_to_variable = { Demographic_Shift_union_dem_Weeks = USA_week_change_union_dem }
+			set_temp_variable = { USA_week_change_black_dem = 1 }
+			add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_black_dem }
+			set_temp_variable = { USA_week_change_hispanic_dem = 1 }
+			add_to_variable = { Demographic_Shift_hispanic_dem_Weeks = USA_week_change_hispanic_dem }
+			set_temp_variable = { USA_week_change_minority_dem = 1 }
+			add_to_variable = { Demographic_Shift_minority_dem_Weeks = USA_week_change_minority_dem }
+			set_temp_variable = { USA_week_change_nativists_dem = 1 }
+			add_to_variable = { Demographic_Shift_nativists_dem_Weeks = USA_week_change_nativists_dem }
+			set_temp_variable = { USA_week_change_urban_dem = 1 }
+			add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_urban_dem }
+			set_temp_variable = { USA_week_change_rural_dem = 1 }
+			add_to_variable = { Demographic_Shift_rural_dem_Weeks = USA_week_change_rural_dem }
+			custom_effect_tooltip = USA_union_dem_shift
+
+			set_temp_variable = { USA_week_change_union_rep = 1 }
+			add_to_variable = { Demographic_Shift_union_rep_Weeks = USA_week_change_union_rep }
+			set_temp_variable = { USA_week_change_black_rep = 1 }
+			add_to_variable = { Demographic_Shift_black_rep_Weeks = USA_week_change_black_rep }
+			set_temp_variable = { USA_week_change_hispanic_rep = 1 }
+			add_to_variable = { Demographic_Shift_hispanic_rep_Weeks = USA_week_change_hispanic_rep }
+			set_temp_variable = { USA_week_change_minority_rep = 1 }
+			add_to_variable = { Demographic_Shift_minority_rep_Weeks = USA_week_change_minority_rep }
+			set_temp_variable = { USA_week_change_nativists_rep = 1 }
+			add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_nativists_rep }
+			set_temp_variable = { USA_week_change_urban_rep = 1 }
+			add_to_variable = { Demographic_Shift_urban_rep_Weeks = USA_week_change_urban_rep }
+			set_temp_variable = { USA_week_change_rural_rep = 1 }
+			add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_rural_rep }
+			custom_effect_tooltip = USA_union_rep_shift
+		}
+		else = {
+			custom_effect_tooltip = USA_all_voters_header_tt
+			set_temp_variable = { USA_week_change_union_pro = 1 }
+			add_to_variable = { Demographic_Shift_union_pro_Weeks = USA_week_change_union_pro }
+			set_temp_variable = { USA_week_change_black_pro = 1 }
+			add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_black_pro }
+			set_temp_variable = { USA_week_change_hispanic_pro = 1 }
+			add_to_variable = { Demographic_Shift_hispanic_pro_Weeks = USA_week_change_hispanic_pro }
+			set_temp_variable = { USA_week_change_minority_pro = 1 }
+			add_to_variable = { Demographic_Shift_minority_pro_Weeks = USA_week_change_minority_pro }
+			set_temp_variable = { USA_week_change_nativists_pro = 1 }
+			add_to_variable = { Demographic_Shift_nativists_pro_Weeks = USA_week_change_nativists_pro }
+			set_temp_variable = { USA_week_change_urban_pro = 1 }
+			add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_urban_pro }
+			set_temp_variable = { USA_week_change_rural_pro = 1 }
+			add_to_variable = { Demographic_Shift_rural_pro_Weeks = USA_week_change_rural_pro }
+			custom_effect_tooltip = USA_union_pro_shift
+
+			set_temp_variable = { USA_week_change_union_nat = 1 }
+			add_to_variable = { Demographic_Shift_union_nat_Weeks = USA_week_change_union_nat }
+			set_temp_variable = { USA_week_change_black_nat = 1 }
+			add_to_variable = { Demographic_Shift_black_nat_Weeks = USA_week_change_black_nat }
+			set_temp_variable = { USA_week_change_hispanic_nat = 1 }
+			add_to_variable = { Demographic_Shift_hispanic_nat_Weeks = USA_week_change_hispanic_nat }
+			set_temp_variable = { USA_week_change_minority_nat = 1 }
+			add_to_variable = { Demographic_Shift_minority_nat_Weeks = USA_week_change_minority_nat }
+			set_temp_variable = { USA_week_change_nativists_nat = 1 }
+			add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_nativists_nat }
+			set_temp_variable = { USA_week_change_urban_nat = 1 }
+			add_to_variable = { Demographic_Shift_urban_nat_Weeks = USA_week_change_urban_nat }
+			set_temp_variable = { USA_week_change_rural_nat = 1 }
+			add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_rural_nat }
+			custom_effect_tooltip = USA_union_nat_shift
+		}
+	}
+}
+
+country_event = { # US reaction to Chin Peng staying.
+	id = SHOUS.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOUS.4" }
+	title = SHOUS.4.t
+	desc = SHOUS.4.desc
+	picture = GFX_report_event_MLY_communists
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOUS.4.a
+		add_political_power = 50
+	}
+}
+
+country_event = {
+	id = SHOUS.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOUS.5" }
+	title = SHOUS.5.t
+	desc = SHOUS.5.desc
+	picture = GFX_report_event_MLY_razak_meets_jfk
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOUS.5.a
+		add_political_power = 30
+		custom_effect_tooltip = razak_victory_tt
+	}
+}
+
+#country_event = {
+#	id = SHOUS.6
+#	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOUS.6" }
+#	title = SHOUS.6.t
+#	desc = SHOUS.6.desc
+#	picture = GFX_report_event_MLY_communists
+#
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#
+#	option = {
+#		name = SHOUS.6.a
+#		add_political_power = 15
+#		custom_effect_tooltip = Boestamam_victory_tt
+#	}
+#}
+
+#country_event = {
+#	id = SHOUS.7
+#	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOUS.7" }
+#	title = SHOUS.7.t
+#	desc = SHOUS.7.desc
+#	picture = GFX_report_event_MLY_burning_building
+#
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#
+#	option = {
+#		name = SHOUS.7.a
+#
+#	}
+#}
+
+country_event = {
+	id = SHOUS.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOUS.8" }
+	title = SHOUS.8.t
+	desc = SHOUS.8.desc
+	picture = GFX_report_event_MLY_burning_building
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOUS.8.a
+		add_political_power = 15
+		hidden_effect = {
+			news_event = WORLD.18112
+		}
+	}
+}
+
+country_event = {
+	id = SHOUS.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOUS.9" }
+	title = SHOUS.9.t
+	desc = SHOUS.9.desc
+	picture = GFX_report_event_generic_military_parade
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOUS.9.a
+		add_political_power = 15
+		hidden_effect = {
+			news_event = WORLD.18112
+		}
+	}
+}
+
+country_event = {
+	id = SHOUS.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOUS.10" }
+	title = SHOUS.10.t
+	desc = SHOUS.10.desc
+	picture = GFX_report_event_generic_military_parade
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOUS.10.a
+		add_political_power = 15
+	}
+}
+
+### Japanese Shonan Events ###
+
+country_event = { # Japan reaction to Al winning
+	id = SHOJAP.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOJAP.1" }
+	title = SHOJAP.1.t
+	desc = SHOJAP.1.desc
+	picture = GFX_report_event_MLY_collab_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOJAP.1.a
+	}
+}
+country_event = { # Japan reaction to Dato Onn Jaafar winning
+	id = SHOJAP.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOJAP.2" }
+	title = SHOJAP.2.t
+	desc = SHOJAP.2.desc
+	picture = GFX_report_event_MLY_onn_jaafar
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOJAP.2.a
+		add_political_power = 50
+		custom_effect_tooltip = jaafar_victory_tt
+	}
+}
+country_event = { # Japan reaction to Jaafar dying, Jaafar takes over
+	id = SHOJAP.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOJAP.3" }
+	title = SHOJAP.3.t
+	desc = SHOJAP.3.desc
+	picture = GFX_report_event_MLY_railway
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOJAP.3.a
+		add_political_power = 50
+	}
+}
+country_event = { # Japan reaction to Jaafar taking after ceasefire
+	id = SHOJAP.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOJAP.4" }
+	title = SHOJAP.4.t
+	desc = SHOJAP.4.desc
+	picture = GFX_report_event_MLY_collab_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOJAP.4.a
+	}
+}
+
+country_event = { # Pan Asianism stays, now to make sure Dato Onn Jaafar wins
+	id = SHOJAP.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOJAP.5" }
+	title = SHOJAP.5.t
+	desc = SHOJAP.5.desc
+	picture = GFX_report_event_MLY_collab_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOJAP.5.a
+	}
+
+}
+
+country_event = { # Philippines Operations
+	id = SHOJAP.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOJAP.6" }
+	title = SHOJAP.6.t
+	desc = SHOJAP.6.desc
+	picture = GFX_report_event_MLY_collab_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOJAP.6.a
+		add_political_power = 50
+	}
+
+}
+
+country_event = { # Indonesia Operations
+	id = SHOJAP.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOJAP.7" }
+	title = SHOJAP.7.t
+	desc = SHOJAP.7.desc
+	picture = GFX_report_event_MLY_collab_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOJAP.7.a
+		add_political_power = 50
+	}
+
+}
+
+country_event = { # Time to rebuild Malaya from the ground up
+	id = SHOJAP.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOJAP.8" }
+	title = SHOJAP.8.t
+	desc = SHOJAP.8.desc
+	picture = GFX_report_event_MLY_collab_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOJAP.8.a
+		add_political_power = 50
+	}
+}
+
+country_event = { # rip japan
+	id = SHOJAP.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event SHOJAP.9" }
+	title = SHOJAP.9.t
+	desc = SHOJAP.9.desc
+	picture = GFX_report_event_MLY_collab_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = SHOJAP.9.a
+	}
+}
+
+##################### MECHANICAL CHECKS ########################################
+
+country_event = {
+	id = sho.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.18" }
+	is_triggered_only = yes
+	trigger = {
+		has_global_flag = MLY_WAR_HAPPENING
+		NOT = {
+			check_variable = { MLY_check_already_happened = 1 }
+		}
+	}
+	hidden = yes
+
+	option = {
+		if = {
+			limit = {
+				MLY = {
+					OR = {
+						controls_state = 336
+						controls_state = 751
+					}
+				}
+			}
+			USA = {
+				country_event = {
+					id = sho.3
+					hours = 1
+				}
+			}
+			set_variable = { MLY_check_already_happened = 1 }
+		}
+		else = {
+			country_event = {
+				id = sho.18
+				days = 1
+			}
+		}
+	}
+}
+
+country_event = { #Event that runs the winner
+	id = sho.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.19" }
+	title = sho.19.t
+	desc = sho.19.desc
+	picture = GFX_report_event_generic_military_parade
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = sho.19.a #Razak or Ahmad
+		MLY = {
+			drop_cosmetic_tag = yes
+			random_list = {
+				35 = {
+					country_event = sho.9
+
+					modifier = {
+						factor = 0
+						has_game_rule = { rule = MLY_PATH option = MLY_PATH_SOCIALISM }
+					}
+
+				}
+				65 = {
+					country_event = sho.8
+
+					modifier = {
+						factor = 0
+						has_game_rule = { rule = MLY_PATH option = MLY_PATH_CONSERVATISM }
+					}
+
+					modifier = {
+						add = -20
+						check_variable = { USA.TNO_razak_election_weight > 0 }
+						has_game_rule = { rule = MLY_PATH option = DEFAULT }
+					}
+					modifier = {
+						add = -20
+						check_variable = { USA.TNO_razak_election_weight > 1 }
+						has_game_rule = { rule = MLY_PATH option = DEFAULT }
+					}
+					modifier = {
+						add = -25
+						check_variable = { USA.TNO_razak_election_weight > 2 }
+						has_game_rule = { rule = MLY_PATH option = DEFAULT }
+					}
+				}
+			}
+			remove_ideas = {
+				MLY_Fading_Front
+				MLY_Provisional_Constitution
+			}
+		}
+	}
+}
+
+country_event = { #Event that runs the winner
+	id = sho.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.20" }
+	title = sho.20.t
+	desc = sho.20.desc
+	picture = GFX_report_event_generic_military_parade
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = sho.20.a
+		SHO = {
+			drop_cosmetic_tag = yes
+			remove_ideas = Sphere_Imp_Protectorate #These effects here switch to the Civilian Government
+			add_ideas = Sphere_Fully_Dependent
+			if = {
+				limit = {
+					MLY = {
+						has_country_flag = MLY_loosing_ceasefire
+					}
+				}
+				country_event = sho.15
+			}
+			else = {
+				random_list = {
+					50 = {
+						country_event = sho.10
+						modifier = {
+							factor = 0
+							has_country_flag = SHO_Onn_will_win #Postponed to ST
+						}
+						modifier = {
+							factor = 0
+							has_game_rule = { rule = SHO_PATH option = SHO_PATH_CD }
+						}
+					}
+					50 = {
+						country_event = sho.11
+						modifier = {
+							factor = 0
+							has_game_rule = { rule = SHO_PATH option = SHO_PATH_SOCIALISM }
+						}
+					}
+
+				}
+			}
+			set_country_flag = SHO_elections_ran
+		}
+	}
+}
+
+country_event = { #Johor skeleton reunification
+	id = sho.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.21" }
+	title = sho.21.t
+	desc = sho.21.desc
+	picture = GFX_report_event_generic_military_parade
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	trigger = { country_exists = JHR }
+
+	option = {
+		name = sho.21.a
+		JHR = {
+			random_list = {
+				40 = { # Johor rejoins
+					JAP = {
+						country_event = {
+							id = SHOJAP.9
+							days = 3
+						}
+					}
+					country_event = {
+						id = sho.300
+						days = 14
+					}
+					modifier = {
+						factor = 0
+						has_game_rule = { rule = JHR_REUNIFICATION_PATH option = JHR_REUNIFICATION_PATH_STATUS_QUO }
+					}
+				}
+				60 = { # lol oil crisis happens
+					set_country_flag = JHR_remains
+					hidden_effect = {
+						country_event = {
+							id = sho.300
+							days = 334
+						}
+					}
+					modifier = {
+						factor = 0
+						has_game_rule = { rule = JHR_REUNIFICATION_PATH option = JHR_REUNIFICATION_PATH_REUNIFICATION_SUCCESS }
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { #Johor skeleton reunification in oil crisis
+	id = sho.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.22" }
+	title = sho.22.t
+	desc = sho.22.desc
+	picture = GFX_report_event_generic_military_parade
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = sho.22.a
+		if = {
+			limit = {
+				JHR = {
+					exists = yes
+					has_country_flag = JHR_remains
+				}
+			}
+			JHR = {
+				JAP = {
+					country_event = {
+						id = SHOJAP.9
+						days = 3
+					}
+				}
+				country_event = {
+					id = sho.300
+					days = 14
+				}
+			}
+		}
+	}
+}
+
+############################ CHECKS END HERE ##################################
+
+country_event = { #1967 Monarchy Referendum
+	id = sho.30
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.30" }
+	title = sho.30.t
+	desc = sho.30.desc
+	picture = GFX_report_event_MLY_communists
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.30.a
+		random_list = {
+			50 = {
+				modifier = {
+					add = 20
+					has_government = socialist
+				}
+				#modifier = {
+				#	factor = 0
+				#	OR = {
+				#		has_game_rule = { rule = MLY_1967_REFERENDUM option = MLY_1967_REFERENDUM_MONARCHY_ELECTION }
+				#		has_game_rule = { rule = MLY_1967_REFERENDUM option = MLY_1967_REFERENDUM_MONARCHY_NOC }
+				#	}
+				#}
+				set_cosmetic_tag = MLY_republic
+
+				country_event = { # Aftermath - socialist
+					id = sho.31
+					days = 90
+				}
+			}
+			50 = {
+				modifier = {
+					add = 20
+					has_government = conservatism
+				}
+				#modifier = {
+				#	factor = 0
+				#	OR = {
+				#		has_game_rule = { rule = MLY_1967_REFERENDUM option = MLY_1967_REFERENDUM_REPUBLIC_ELECTION }
+				#		has_game_rule = { rule = MLY_1967_REFERENDUM option = MLY_1967_REFERENDUM_REPUBLIC_COMMUNIST }
+				#	}
+				#}
+
+				country_event = { # Aftermath - conservative
+					id = sho.32
+					days = 90
+				}
+			}
+		}
+	}
+}
+
+country_event = { #Aftermath - socialist
+	id = sho.31
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.31" }
+	title = sho.31.t
+	desc = sho.31.desc
+	picture = GFX_report_event_MLY_communists
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.31.a
+		random_list = {
+			20 = { # Communist coup
+				#modifier = {
+				#	factor = 0
+				#	has_game_rule = { rule = MLY_1967_REFERENDUM option = MLY_1967_REFERENDUM_REPUBLIC_ELECTION }
+				#}
+				add_popularity = { ideology = communist popularity = 0.25 }
+				set_politics = {
+					ruling_party = communist
+					elections_allowed = no
+				}
+				set_cosmetic_tag = MLY_PKM
+			}
+			80 = {
+				#modifier = {
+				#	factor = 0
+				#	has_game_rule = { rule = MLY_1967_REFERENDUM option = MLY_1967_REFERENDUM_REPUBLIC_COMMUNIST }
+				#}
+				country_event = { # 1968 Elections
+					id = sho.34
+					days = 275
+				}
+			}
+		}
+	}
+}
+
+country_event = { #Aftermath - conservative
+	id = sho.32
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.32" }
+	title = sho.32.t
+	desc = sho.32.desc
+	picture = GFX_report_event_MLY_communists
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.32.a
+		random_list = {
+			20 = { # National Operations Council
+				#modifier = {
+				#	factor = 0
+				#	has_game_rule = { rule = MLY_1967_REFERENDUM option = MLY_1967_REFERENDUM_MONARCHY_ELECTION }
+				#}
+				add_popularity = { ideology = paternalism popularity = party_popularity@conservatism }
+				add_popularity = { ideology = despotism popularity = 0.07 }
+				set_politics = { ruling_party = paternalism }
+				add_country_leader_role = {
+					character = MLY_Tun_Abdul_Razak
+					country_leader = {
+						expire = "1999.1.1.1"
+						ideology = paternalism_anocracy_subtype
+						traits = { }
+					}
+					promote_leader = yes
+				}
+				country_event = { # NOC aftermath
+					id = sho.33
+					days = 30
+				}
+			}
+			80 = {
+				#modifier = {
+				#	factor = 0
+				#	has_game_rule = { rule = MLY_1967_REFERENDUM option = MLY_1967_REFERENDUM_MONARCHY_NOC }
+				#}
+				country_event = { # 1968 Elections
+					id = sho.34
+					days = 275
+				}
+			}
+		}
+	}
+}
+
+country_event = { #Aftermath - NOC
+	id = sho.33
+	immediate = { log = "[GetDateText]: [Root.GetName]: event sho.33" }
+	title = sho.33.t
+	desc = sho.33.desc
+	picture = GFX_report_event_MLY_communists
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sho.33.a
+		random_list = {
+			50 = { # Army takes over
+				#modifier = {
+				#	factor = 0
+				#	has_game_rule = { rule = MLY_FATE_NOC option = MLY_FATE_NOC_ELECTION }
+				#}
+				add_popularity = { ideology = despotism popularity = 0.15 }
+				set_politics = {
+					ruling_party = despotism
+					elections_allowed = no
+				}
+				add_country_leader_role = {
+					character = MLY_Ibrahim_Ismail
+					country_leader = {
+						expire = "1999.1.1.1"
+						ideology = despotism_military_junta_subtype
+						traits = { }
+					}
+					promote_leader = yes
+				}
+			}
+			50 = { # Back to normal
+				#modifier = {
+				#	factor = 0
+				#	has_game_rule = { rule = MLY_FATE_NOC option = MLY_FATE_NOC_COUP }
+				#}
+				add_popularity = { ideology = conservatism popularity = 0.24 }
+				set_politics = { ruling_party = conservatism }
+				add_country_leader_role = {
+					character = MLY_Tun_Abdul_Razak
+					country_leader = {
+						expire = "1999.1.1.1"
+						ideology = conservatism_paternalistic_conservatism_subtype
+						traits = { }
+					}
+					promote_leader = yes
+				}
+				country_event = { # 1968 Elections
+					id = sho.34
+					days = 245
+				}
+			}
+		}
+	}
+}
+
+country_event = { #1968 Elections
+	id = sho.34
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event sho.34"
+		set_party_name = {
+			ideology = progressivism
+			name = MLY_progressivism_party_1968
+			long_name = MLY_progressivism_party_1968_long
+		}
+	}
+	title = sho.34.t
+	desc = sho.34.desc
+	picture = GFX_report_event_MLY_communists
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Ishak Haji Muhammad
+		name = sho.34.a
+		ai_chance = {
+			factor = 20
+			#modifier = {
+			#	factor = 0
+			#	OR = {
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_BOESTAMAM }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_AZIZ }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HUSSEIN }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_RAZAK }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_ISMAIL }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_PENG }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_NASIR }
+			#	}
+			#}
+		}
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = socialist
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 60
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		add_country_leader_role = {
+			character = MLY_Ishak_Haji_Muhammad
+			country_leader = {
+				expire = "1999.1.1.1"
+				ideology = socialist_revolutionary_frontism_subtype
+				traits = { }
+			}
+			promote_leader = yes
+		}
+		set_popularities = {
+			communist = 10
+			socialist = 27
+			progressivism = 18
+			liberalism = 11
+			conservatism = 17
+			paternalism = 12
+			despotism = 5
+		}
+	}
+	option = { # Ahmad Boestamam
+		name = sho.34.b
+		ai_chance = {
+			factor = 20
+			#modifier = {
+			#	factor = 0
+			#	OR = {
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HAJI }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_AZIZ }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HUSSEIN }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_RAZAK }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_ISMAIL }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_PENG }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_NASIR }
+			#	}
+			#}
+		}
+		promote_character = MLY_Ahmad_Boestamam
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = socialist
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 60
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		set_popularities = {
+			communist = 10
+			socialist = 27
+			progressivism = 18
+			liberalism = 11
+			conservatism = 17
+			paternalism = 12
+			despotism = 5
+		}
+	}
+	option = { # Aziz Ishak
+		name = sho.34.c
+		ai_chance = {
+			factor = 20
+			#modifier = {
+			#	factor = 0
+			#	OR = {
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_BOESTAMAM }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HAJI }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HUSSEIN }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_RAZAK }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_ISMAIL }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_PENG }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_NASIR }
+			#	}
+			#}
+		}
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = progressivism
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 60
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		add_country_leader_role = {
+			character = MLY_Aziz_Ishak
+			country_leader = {
+				expire = "1999.1.1.1"
+				ideology = progressivism_liberal_socialism_subtype
+				traits = { }
+			}
+			promote_leader = yes
+		}
+		set_popularities = {
+			communist = 10
+			socialist = 18
+			progressivism = 27
+			liberalism = 11
+			conservatism = 17
+			paternalism = 12
+			despotism = 5
+		}
+	}
+	option = { # Tun Hussein Onn
+		name = sho.34.d
+		ai_chance = {
+			factor = 20
+			#modifier = {
+			#	factor = 0
+			#	OR = {
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_BOESTAMAM }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HAJI }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_AZIZ }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_RAZAK }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_ISMAIL }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_PENG }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_NASIR }
+			#	}
+			#}
+		}
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = conservatism
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 60
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		add_country_leader_role = {
+			character = MLY_Tun_Hussein_Onn
+			country_leader = {
+				expire = "1999.1.1.1"
+				ideology = conservatism_paternalistic_conservatism_subtype
+				traits = { }
+			}
+			promote_leader = yes
+		}
+		set_popularities = {
+			communist = 8
+			socialist = 20
+			progressivism = 12
+			liberalism = 15
+			conservatism = 23
+			paternalism = 17
+			despotism = 5
+		}
+	}
+	option = { # Tun Abdul Razak
+		name = sho.34.e
+		ai_chance = {
+			factor = 20
+			#modifier = {
+			#	factor = 0
+			#	OR = {
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_BOESTAMAM }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HAJI }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_AZIZ }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HUSSEIN }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_ISMAIL }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_PENG }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_NASIR }
+			#	}
+			#}
+		}
+		promote_character = MLY_Tun_Abdul_Razak
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = conservatism
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 60
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		set_popularities = {
+			communist = 8
+			socialist = 20
+			progressivism = 12
+			liberalism = 15
+			conservatism = 23
+			paternalism = 17
+			despotism = 5
+		}
+	}
+	option = { # Tun Dr. Ismail
+		name = sho.34.f
+		ai_chance = {
+			factor = 20
+			#modifier = {
+			#	factor = 0
+			#	OR = {
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_BOESTAMAM }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HAJI }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_AZIZ }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HUSSEIN }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_RAZAK }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_PENG }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_NASIR }
+			#	}
+			#}
+		}
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = liberalism
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 60
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		add_country_leader_role = {
+			character = MLY_Tun_Hussein_Onn
+			country_leader = {
+				expire = "1999.1.1.1"
+				ideology = conservatism_paternalistic_conservatism_subtype
+				traits = { }
+			}
+			promote_leader = yes
+		}
+		set_popularities = {
+			communist = 8
+			socialist = 20
+			progressivism = 12
+			liberalism = 23
+			conservatism = 17
+			paternalism = 15
+			despotism = 5
+		}
+	}
+	option = { # Chin Peng
+		name = sho.34.g
+		ai_chance = {
+			factor = 20
+			#modifier = {
+			#	factor = 0
+			#	OR = {
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_BOESTAMAM }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HAJI }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_AZIZ }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HUSSEIN }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_RAZAK }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_ISMAIL }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_NASIR }
+			#	}
+			#}
+		}
+		trigger = {
+			has_government = conservatism
+		}
+		promote_character = MLY_Chin_Peng
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = communist
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 60
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		set_popularities = {
+			communist = 35
+			socialist = 18
+			progressivism = 13
+			liberalism = 11
+			conservatism = 11
+			paternalism = 7
+			despotism = 5
+		}
+
+		set_party_name = {
+			ideology = communist
+			name = MLY_communist_party_1968
+			long_name = MLY_communist_party_1968_long
+		}
+	}
+	option = { # Syed Nasir Ismail
+		name = sho.34.h
+		ai_chance = {
+			factor = 20
+			#modifier = {
+			#	factor = 0
+			#	OR = {
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_BOESTAMAM }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HAJI }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_AZIZ }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_HUSSEIN }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_RAZAK }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_ISMAIL }
+			#		has_game_rule = { rule = MLY_1968_ELECTION option = MLY_1968_ELECTION_PENG }
+			#	}
+			#}
+		}
+		trigger = {
+			has_government = socialist
+		}
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = paternalism
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 60
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		add_country_leader_role = {
+			character = MLY_Syed_Nasir_Ismail
+			country_leader = {
+				expire = "1999.1.1.1"
+				ideology = paternalism_national_conservatism_subtype
+				traits = { }
+			}
+			promote_leader = yes
+		}
+		set_popularities = {
+			communist = 7
+			socialist = 11
+			progressivism = 11
+			liberalism = 13
+			conservatism = 18
+			paternalism = 35
+			despotism = 5
+		}
+	}
+}

@@ -1,0 +1,117 @@
+scripted_gui = {
+	#Supply mechanic
+	UKR_ucw_supply_GUI = {
+		context_type = decision_category
+		window_name = "UKR_ucw_supply_GUI"
+
+		visible = {
+			OR = {
+				original_tag = FUK
+				original_tag = BOV
+				original_tag = UKR
+				original_tag = UKS
+			}
+		}
+
+		effects = {
+			UKR_ucw_supply_button_1_click = {
+				if = {
+					limit = { NOT = { has_country_flag = UCW_conserve_supply } has_political_power > 29.99 }
+					add_political_power = -30
+					set_country_flag = { flag = UCW_supply_button_selected days = 30 value = 1 }
+
+					clr_country_flag = UCW_feed_soldiers
+					clr_country_flag = UCW_feed_people
+					set_country_flag = UCW_conserve_supply
+
+					remove_ideas = {
+						UKR_supply_inefficient
+						UKR_supply_feed_soldiers
+						UKR_supply_feed_people
+					}
+					add_ideas = UKR_supply_conserve
+				}
+			}
+			UKR_ucw_supply_button_2_click = {
+				if = {
+					limit = { NOT = { has_country_flag = UCW_feed_soldiers } has_political_power > 29.99 }
+					add_political_power = -30
+					set_country_flag = { flag = UCW_supply_button_selected days = 30 value = 1 }
+
+					clr_country_flag = UCW_feed_people
+					clr_country_flag = UCW_conserve_supply
+					set_country_flag = UCW_feed_soldiers
+
+					remove_ideas = {
+						UKR_supply_inefficient
+						UKR_supply_feed_people
+						UKR_supply_conserve
+					}
+					add_ideas = UKR_supply_feed_soldiers
+				}
+			}
+			UKR_ucw_supply_button_3_click = {
+				if = {
+					limit = { NOT = { has_country_flag = UCW_feed_people } has_political_power > 29.99 }
+					add_political_power = -30
+					set_country_flag = { flag = UCW_supply_button_selected days = 30 value = 1 }
+
+					clr_country_flag = UCW_feed_soldiers
+					clr_country_flag = UCW_conserve_supply
+					set_country_flag = UCW_feed_people
+
+					remove_ideas = {
+						UKR_supply_inefficient
+						UKR_supply_feed_soldiers
+						UKR_supply_conserve
+					}
+					add_ideas = UKR_supply_feed_people
+				}
+			}
+
+			# Debug
+			UKR_ucw_debug_click = {
+				add_to_variable = {
+					UCW_remaining_supply = 50
+				}
+			}
+			UKR_ucw_debug_right_click = {
+				add_to_variable = {
+					UCW_remaining_supply = -50
+				}
+			}
+		}
+
+		triggers = {
+
+			# Action buttons
+
+			UKR_ucw_supply_button_1_click_enabled = {
+				OR = {
+					NOT = { has_country_flag = UCW_supply_button_selected }
+					has_country_flag = UCW_conserve_supply
+				}
+			}
+			UKR_ucw_supply_button_2_click_enabled = {
+				OR = {
+					NOT = { has_country_flag = UCW_supply_button_selected }
+					has_country_flag = UCW_feed_soldiers
+				}
+			}
+			UKR_ucw_supply_button_3_click_enabled = {
+				OR = {
+					NOT = { has_country_flag = UCW_supply_button_selected }
+					has_country_flag = UCW_feed_people
+				}
+			}
+
+			# Debug
+			UKR_ucw_debug_visible = { is_debug = yes }
+		}
+
+		properties = {
+			UKR_ucw_supply_GUI_ProgressBar = { frame = UCW_remaining_supply }
+			UKR_ucw_supply_selected_display = { image = [getUCWActionDisplay] }
+		}
+	}
+}

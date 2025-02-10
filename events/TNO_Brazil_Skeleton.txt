@@ -1,0 +1,1405 @@
+add_namespace = BRA_scripted
+
+country_event = { # Military Coup Trigger
+	id = BRA_scripted.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.1" }
+	title = BRA_scripted.1.t
+	desc = BRA_scripted.1.desc
+	picture = x
+
+	trigger = {
+		date > 1968.6.10
+		tag = BRA
+		NOT = {
+			has_government = despotism
+		}
+	}
+
+	fire_only_once = yes
+
+	option = { # Coup
+		name = BRA_scripted.1.a
+		ai_chance = {
+			base = 0
+			modifier = {
+				has_country_leader = {
+					character = BRA_Juscelino_Kubitschek
+					ruling_only = yes
+				}
+				add = 15
+			}
+			modifier = {
+				has_country_flag = BRA_sorbonne_jk
+				add = 20
+			}
+
+			modifier = {
+				has_country_leader = {
+					character = BRA_Carlos_Lacerda
+					ruling_only = yes
+				}
+				add = 10
+			}
+			modifier = {
+				has_country_flag = BRA_lacerda_coup_happened
+				add = 5
+			}
+			modifier = {
+				has_country_flag = BRA_sorbonne_lacerda
+				add = 10
+			}
+
+			modifier = {
+				has_country_leader = {
+					character = BRA_Joao_Goulart
+					ruling_only = yes
+				}
+				add = 50
+			}
+			modifier = {
+				has_country_flag = BRA_punished_jango
+				add = 5
+			}
+
+			modifier = {
+				has_country_leader = {
+					character = BRA_Adhemar_de_Barros
+					ruling_only = yes
+				}
+				add = 35
+			}
+
+			modifier = {
+				has_country_leader = {
+					character = BRA_Janio_Quadros
+					ruling_only = yes
+				}
+				add = 30
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_COUP_LATE option = BRA_COUP_LATE_NO }
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { BRA_military_sorbonne_power > BRA_military_hardliners_power }
+			}
+			BRA_Ernesto_Geisel = {
+				promote_character = yes
+			}
+		}
+		else = {
+			BRA_Costa_e_Silva = {
+				promote_character = yes
+			}
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			BRA_Generic_Vacant_hog
+			BRA_Generic_Vacant_for
+			BRA_Generic_Vacant_eco
+			BRA_Generic_Vacant_sec
+		}
+		set_party_name = {
+			ideology = despotism
+			long_name = BRA_despotism_party_long
+			name = BRA_despotism_party
+		}
+		set_politics = {
+			ruling_party = despotism
+			elections_allowed = no
+		}
+		add_popularity = {
+			ideology = despotism
+			popularity = 0.3
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.150 days = 1 }
+		}
+	}
+
+	option = { # No Coup
+		name = BRA_scripted.1.b
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_COUP_LATE option = BRA_COUP_LATE_YES }
+			}
+		}
+	}
+}
+
+country_event = { # 1970 Election
+	id = BRA_scripted.2
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event BRA_scripted.2"
+		BRA_Getulio_Vargas_Filho = {
+			promote_character = yes
+		}
+		BRA_Edna_Lott = {
+			promote_character = { ideology = progressivism_subtype }
+		}
+		BRA_Tancredo_Neves = {
+			promote_character = yes
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			BRA_Generic_Vacant_hog
+			BRA_Generic_Vacant_for
+			BRA_Generic_Vacant_eco
+			BRA_Generic_Vacant_sec
+		}
+	}
+	title = BRA_scripted.2.t
+	desc = BRA_scripted.2.desc
+	picture = x
+
+	fire_only_once = yes
+
+	trigger = { #
+		date > 1970.10.2
+		tag = BRA
+		NOT = {
+			has_government = despotism
+		}
+	}
+
+	option = { #Jango
+		name = BRA_scripted.2.a
+		ai_chance = {
+			base = 99
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_SALGADO }
+			}
+		}
+		trigger = {
+			has_government = progressivism
+		}
+		country_event = {
+			id = BRA_scripted.200
+			days = 90
+		}
+	}
+
+	option = { #JK
+		name = BRA_scripted.2.b
+		ai_chance = {
+			base = 99
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_SALGADO }
+			}
+		}
+		trigger = {
+			has_government = liberalism
+		}
+		country_event = {
+			id = BRA_scripted.201
+			days = 90
+		}
+	}
+
+	option = { #Lacerda
+		name = BRA_scripted.2.c
+		ai_chance = {
+			base = 99
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_SALGADO }
+			}
+		}
+		trigger = {
+			OR = {
+				has_government = liberal_conservatism
+				has_country_flag = BRA_lacerda_coup_happened
+			}
+		}
+		country_event = {
+			id = BRA_scripted.202
+			days = 90
+		}
+	}
+
+	option = { #Quadros
+		name = BRA_scripted.2.d
+		ai_chance = {
+			base = 99
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_SALGADO }
+			}
+		}
+		trigger = {
+			has_government = conservatism
+		}
+		country_event = {
+			id = BRA_scripted.203
+			days = 90
+		}
+	}
+
+	option = { #Adhemar
+		name = BRA_scripted.2.e
+		ai_chance = {
+			base = 99
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_SALGADO }
+			}
+		}
+		trigger = {
+			AND = {
+				has_government = liberal_conservatism
+				NOT = {
+					has_country_flag = BRA_lacerda_coup_happened
+				}
+			}
+		}
+		country_event = {
+			id = BRA_scripted.204
+			days = 90
+		}
+	}
+
+	option = { #Salgado wins
+		name = BRA_scripted.2.f
+		ai_chance = {
+			base = 99
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRIZOLA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_LACERDA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+		}
+		trigger = {
+			NOT = {
+				has_country_flag = BRA_punished_jango
+				has_country_flag = BRA_lacerda_coup_happened
+				has_country_flag = BRA_sorbonne_jk
+				has_country_flag = BRA_sorbonne_lacerda
+			}
+		}
+		country_event = {
+			id = BRA_scripted.205
+			days = 90
+		}
+	}
+}
+
+country_event = { # 1970 Election: Jango
+	id = BRA_scripted.200
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.200" }
+	title = BRA_scripted.200.t
+	desc = BRA_scripted.200.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Brizola
+		name = BRA_scripted.200.a
+		ai_chance = {
+			base = 40
+			modifier = {
+				has_country_flag = BRA_punished_jango
+				add = 20
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_LACERDA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+		}
+		set_politics = {
+			ruling_party = progressivism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		BRA_Leonel_Brizola = {
+			promote_character = { ideology = progressivism_left_wing_populism_subtype }
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = 0.07
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.151 days = 1 }
+		}
+	}
+
+	option = { #Lacerda
+		name = BRA_scripted.200.b
+		ai_chance = {
+			base = 30
+			modifier = {
+				has_country_flag = BRA_punished_jango
+				add = -30
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRIZOLA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+		}
+		set_politics = {
+			ruling_party = liberal_conservatism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		set_country_leader_description = {
+			ideology = liberal_conservatism
+			desc = POLITICS_CARLOS_LACERDA_1970_DESC
+		}
+	}
+
+	option = { #Braga
+		name = BRA_scripted.200.c
+		ai_chance = {
+			base = 0
+			modifier = {
+				has_country_flag = BRA_punished_jango
+				add = 10
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRIZOLA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_LACERDA }
+			}
+		}
+		set_politics = {
+			ruling_party = conservatism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = conservatism
+			popularity = 0.1
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.156 days = 1 }
+		}
+	}
+
+	option = { #Vargas Jr
+		name = BRA_scripted.200.d
+		ai_chance = {
+			base = 20
+			modifier = {
+				has_country_flag = BRA_punished_jango
+				add = 10
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRIZOLA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_LACERDA }
+			}
+		}
+		set_politics = {
+			ruling_party = paternalism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.185 days = 1 }
+		}
+	}
+
+	option = { #Edna
+		name = BRA_scripted.200.e
+		ai_chance = {
+			base = 10
+			modifier = {
+				has_country_flag = BRA_punished_jango
+				add = -10
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRIZOLA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_LACERDA }
+			}
+		}
+		set_politics = {
+			ruling_party = progressivism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.183 days = 1 }
+		}
+	}
+}
+
+country_event = { # 1970 Election: JK
+	id = BRA_scripted.201
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.201" }
+	title = BRA_scripted.201.t
+	desc = BRA_scripted.201.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Tancredo
+		name = BRA_scripted.201.a
+		ai_chance = {
+			base = 50
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_LACERDA }
+			}
+		}
+		set_politics = {
+			ruling_party = liberalism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.184 days = 1 }
+		}
+	}
+
+	option = { #Lacerda
+		name = BRA_scripted.201.b
+		ai_chance = {
+			base = 0
+			modifier = {
+				has_country_flag = BRA_sorbonne_jk
+				add = 35
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+		}
+		set_politics = {
+			ruling_party = liberal_conservatism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		set_country_leader_description = {
+			ideology = liberal_conservatism
+			desc = POLITICS_CARLOS_LACERDA_1970_DESC
+		}
+	}
+
+	option = { #Braga
+		name = BRA_scripted.201.c
+		ai_chance = {
+			base = 30
+			modifier = {
+				has_country_flag = BRA_sorbonne_jk
+				add = -15
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_LACERDA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+		}
+		set_politics = {
+			ruling_party = conservatism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = conservatism
+			popularity = 0.1
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.156 days = 1 }
+		}
+	}
+
+	option = { #Edna
+		name = BRA_scripted.201.d
+		ai_chance = {
+			base = 20
+			modifier = {
+				has_country_flag = BRA_sorbonne_jk
+				add = -20
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_LACERDA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+		}
+		set_politics = {
+			ruling_party = progressivism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.183 days = 1 }
+		}
+	}
+}
+
+country_event = { # 1970 Election: Lacerda
+	id = BRA_scripted.202
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.202" }
+	title = BRA_scripted.202.t
+	desc = BRA_scripted.202.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Tancredo
+		name = BRA_scripted.202.a
+		ai_chance = {
+			base = 20
+			modifier = {
+				has_country_flag = BRA_sorbonne_lacerda
+				add = 20
+			}
+			modifier = {
+				has_country_flag = BRA_lacerda_coup_happened
+				add = -10
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRIZOLA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+		}
+		set_politics = {
+			ruling_party = liberalism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.184 days = 1 }
+		}
+	}
+
+	option = { #Braga
+		name = BRA_scripted.202.b
+		ai_chance = {
+			base = 40
+			modifier = {
+				has_country_flag = BRA_sorbonne_lacerda
+				add = 20
+			}
+			modifier = {
+				has_country_flag = BRA_lacerda_coup_happened
+				add = 20
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRIZOLA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+		}
+		set_politics = {
+			ruling_party = conservatism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = conservatism
+			popularity = 0.1
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.156 days = 1 }
+		}
+	}
+
+	option = { #Edna
+		name = BRA_scripted.202.c
+		ai_chance = {
+			base = 15
+			modifier = {
+				has_country_flag = BRA_sorbonne_lacerda
+				add = -15
+			}
+			modifier = {
+				has_country_flag = BRA_lacerda_coup_happened
+				add = -15
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRIZOLA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+		}
+		set_politics = {
+			ruling_party = progressivism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.183 days = 1 }
+		}
+	}
+
+	option = { #Vargas Jr.
+		name = BRA_scripted.202.d
+		ai_chance = {
+			base = 0
+			modifier = {
+				has_country_flag = BRA_lacerda_coup_happened
+				add = 30
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRIZOLA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+		}
+		set_politics = {
+			ruling_party = paternalism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.185 days = 1 }
+		}
+	}
+
+	option = { #Brizola
+		name = BRA_scripted.202.e
+		ai_chance = {
+			base = 25
+			modifier = {
+				has_country_flag = BRA_sorbonne_lacerda
+				add = -25
+			}
+			modifier = {
+				has_country_flag = BRA_lacerda_coup_happened
+				add = -25
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+		}
+		set_politics = {
+			ruling_party = progressivism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		BRA_Leonel_Brizola = {
+			promote_character = { ideology = progressivism_left_wing_populism_subtype }
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = 0.07
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.151 days = 1 }
+		}
+	}
+}
+
+country_event = { # 1970 Election: Quadros
+	id = BRA_scripted.203
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.203" }
+	title = BRA_scripted.203.t
+	desc = BRA_scripted.203.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Braga
+		name = BRA_scripted.203.a
+		ai_chance = {
+			base = 40
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_TANCREDO
+					}
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_BRIZOLA
+					}
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_VARGAS
+					}
+				}
+			}
+		}
+		set_politics = {
+			ruling_party = conservatism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		promote_character = {
+			character = BRA_Ney_Braga
+			ideology = conservatism_christian_conservatism_subtype
+		}
+		set_party_name = {
+			ideology = conservatism
+			long_name = BRA_conservatism_party_long
+			name = BRA_conservatism_party
+		}
+		add_popularity = {
+			ideology = conservatism
+			popularity = -0.1
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.156 days = 1 }
+		}
+	}
+
+	option = { #Tancredo
+		name = BRA_scripted.203.b
+		ai_chance = {
+			base = 30
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_BRAGA
+					}
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_BRIZOLA
+					}
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_VARGAS
+					}
+				}
+			}
+		}
+		set_politics = {
+			ruling_party = liberalism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		promote_character = {
+			character = BRA_Ney_Braga
+			ideology = conservatism_christian_conservatism_subtype
+		}
+		set_party_name = {
+			ideology = conservatism
+			long_name = BRA_conservatism_party_long
+			name = BRA_conservatism_party
+		}
+		add_popularity = {
+			ideology = conservatism
+			popularity = -0.2
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.184 days = 1 }
+		}
+	}
+
+	option = { #Brizola
+		name = BRA_scripted.203.c
+		ai_chance = {
+			base = 15
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_BRAGA
+					}
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_TANCREDO
+					}
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_VARGAS
+					}
+				}
+			}
+		}
+		set_politics = {
+			ruling_party = progressivism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		BRA_Leonel_Brizola = {
+			promote_character = { ideology = progressivism_left_wing_populism_subtype }
+		}
+		promote_character = {
+			character = BRA_Ney_Braga
+			ideology = conservatism_christian_conservatism_subtype
+		}
+		set_party_name = {
+			ideology = conservatism
+			long_name = BRA_conservatism_party_long
+			name = BRA_conservatism_party
+		}
+		add_popularity = {
+			ideology = conservatism
+			popularity = -0.2
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = 0.07
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.151 days = 1 }
+		}
+	}
+
+	option = { #Vargas Jr.
+		name = BRA_scripted.203.d
+		ai_chance = {
+			base = 15
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_BRAGA
+					}
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_TANCREDO
+					}
+					has_game_rule = {
+						rule = BRA_1970_ELECTIONS
+						option = BRA_1970_ELECTIONS_BRIZOLA
+					}
+				}
+			}
+		}
+		set_politics = {
+			ruling_party = paternalism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.185 days = 1 }
+		}
+	}
+}
+
+country_event = { # 1970 Election: Adhemar
+	id = BRA_scripted.204
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.204" }
+	title = BRA_scripted.204.t
+	desc = BRA_scripted.204.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Vargas Jr.
+		name = BRA_scripted.204.a
+		ai_chance = {
+			base = 30
+
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+		}
+		set_politics = {
+			ruling_party = paternalism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.185 days = 1 }
+		}
+	}
+
+	option = { #Braga
+		name = BRA_scripted.204.b
+		ai_chance = {
+			base = 30
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+		}
+		set_politics = {
+			ruling_party = conservatism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = conservatism
+			popularity = 0.1
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.156 days = 1 }
+		}
+	}
+
+	option = { #Edna
+		name = BRA_scripted.204.c
+		ai_chance = {
+			base = 30
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_TANCREDO }
+			}
+		}
+		set_politics = {
+			ruling_party = progressivism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.183 days = 1 }
+		}
+	}
+
+	option = { #Tancredo
+		name = BRA_scripted.204.d
+		ai_chance = {
+			base = 10
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_VARGAS }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_EDNA }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_1970_ELECTIONS option = BRA_1970_ELECTIONS_BRAGA }
+			}
+		}
+		set_politics = {
+			ruling_party = liberalism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.184 days = 1 }
+		}
+	}
+}
+
+country_event = { # Salgado elected
+	id = BRA_scripted.205
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.205" }
+	title = BRA_scripted.205.t
+	desc = BRA_scripted.205.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = BRA_scripted.205.a
+		set_politics = {
+			ruling_party = fascism
+			last_election = "1970.10.3"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = fascism
+			popularity = 0.25
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.148 days = 1 }
+		}
+	}
+}
+
+country_event = { # Castelo Branco's fate
+	id = BRA_scripted.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.3" }
+	title = BRA_scripted.3.t
+	desc = BRA_scripted.3.desc
+	picture = x
+
+	fire_only_once = yes
+
+	trigger = {
+		tag = BRA
+		date > 1967.3.14
+		has_country_leader = {
+			character = BRA_Humberto_Castelo_Branco
+			ruling_only = yes
+		}
+	}
+
+	option = { #Costa e Silva
+		name = BRA_scripted.3.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_CASTELO_SUCCESSOR option = BRA_CASTELO_SUCCESSOR_GEISEL }
+			}
+		}
+		BRA_Costa_e_Silva = {
+			promote_character = yes
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			BRA_Generic_Vacant_hog
+			BRA_Generic_Vacant_for
+			BRA_Generic_Vacant_eco
+			BRA_Generic_Vacant_sec
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.152 days = 1 }
+		}
+	}
+
+	option = { #Geisel
+		name = BRA_scripted.3.b
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = BRA_CASTELO_SUCCESSOR option = BRA_CASTELO_SUCCESSOR_SILVA }
+			}
+		}
+		country_event = { id = BRA_scripted.300 days = 365 }
+	}
+}
+
+country_event = { # Geisel succeeds Castelo Branco
+	id = BRA_scripted.300
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.300" }
+	title = BRA_scripted.300.t
+	desc = BRA_scripted.300.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = BRA_scripted.300.a
+		BRA_Ernesto_Geisel = {
+			promote_character = yes
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			BRA_Generic_Vacant_hog
+			BRA_Generic_Vacant_for
+			BRA_Generic_Vacant_eco
+			BRA_Generic_Vacant_sec
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.153 days = 1 }
+		}
+	}
+}
+
+country_event = { # The death of Costa e Silva
+	id = BRA_scripted.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.4" }
+	title = BRA_scripted.4.t
+	desc = BRA_scripted.4.desc
+	picture = x
+
+	fire_only_once = yes
+
+	trigger = {
+		tag = BRA
+		date > 1969.8.30
+		has_country_leader = {
+			character = BRA_Costa_e_Silva
+			ruling_only = yes
+		}
+	}
+
+	option = {
+		name = BRA_scripted.4.a
+		BRA_Emergency_Junta = {
+			promote_character = yes
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			BRA_Generic_Vacant_hog
+			BRA_Generic_Vacant_for
+			BRA_Generic_Vacant_eco
+			BRA_Generic_Vacant_sec
+		}
+		country_event = { id = BRA_scripted.400 days = 60 }
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.154 days = 1 }
+		}
+	}
+}
+
+country_event = { # Medici Appointed
+	id = BRA_scripted.400
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.400" }
+	title = BRA_scripted.400.t
+	desc = BRA_scripted.400.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = BRA_scripted.4.a
+		BRA_Emilio_Medici = {
+			promote_character = yes
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = LATAM_news.155 days = 1 }
+		}
+	}
+}
+
+country_event = { # Punished Goulart
+	id = BRA_scripted.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BRA_scripted.5" }
+	title = BRA_scripted.5.t
+	desc = BRA_scripted.5.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = BRA_scripted.5.a
+		set_politics = {
+			ruling_party = progressivism
+			elections_allowed = yes
+		}
+	}
+
+	option = {
+		name = BRA_scripted.5.b
+	}
+}

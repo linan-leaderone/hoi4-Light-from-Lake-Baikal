@@ -1,0 +1,635 @@
+scripted_gui = {
+	TNO_Bormann_Kartenhaus_OpenButtonContainer = {
+		window_name = "TNO_Bormann_Kartenhaus_AccessButton"
+		context_type = player_context
+		parent_window_token = politics_tab
+
+		visible = {
+			tag = GER
+			OR = {
+				has_country_flag = BOR_Kartenhaus_Active
+				has_country_flag = BOR_DBG_Infl_Mech
+			}
+		}
+
+		effects = {
+			TNO_Bormann_Kartenhaus_OpenButton_click = {
+				if = {
+					limit = { NOT = { has_country_flag = GER_Bormann_SIG_GUI_Open } }
+					set_country_flag = GER_Bormann_SIG_GUI_Open
+					BOR_Kartenhaus_Open = yes
+				}
+				else_if = {
+					limit = { has_country_flag = GER_Bormann_SIG_GUI_Open }
+					clr_country_flag = GER_Bormann_SIG_GUI_Open
+					BOR_Kartenhaus_Close = yes
+					GER_Bormann_Kartenhaus_Info_ClearBtnFlags = yes
+				}
+				clr_country_flag = gui_alert_visible
+			}
+			TNO_Bormann_Kartenhaus_OpenButton_right_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = GER_BOR_SIG_debug_screen_buttons }
+						is_debug = yes
+					}
+					set_country_flag = GER_BOR_SIG_debug_screen_buttons
+				}
+				else_if = {
+					limit = {
+						has_country_flag = GER_BOR_SIG_debug_screen_buttons
+						is_debug = yes
+					}
+					clr_country_flag = GER_BOR_SIG_debug_screen_buttons
+				}
+			}
+		}
+
+		triggers = {
+			gui_alert_visible = {
+				has_country_flag = gui_alert_visible
+			}
+		}
+	}
+
+	TNO_Bormann_Kartenhaus_DisplayContainer = {
+		context_type = player_context
+		parent_window_token = "TNO_Bormann_Kartenhaus_OpenButtonContainer"
+		window_name = "TNO_Bormann_Kartenhaus_Display"
+
+		visible = {
+			has_country_flag = GER_Bormann_SIG_GUI_Open
+		}
+
+		dynamic_lists = {
+			Kartenhaus_SIGGridBox = {
+				array = BOR_SIGType
+				index = Kartenhaus_SIGGridBox_i
+				change_scope = no
+
+				entry_container = Kartenhaus_SIGContainer
+			}
+
+			TNO_Kartenhaus_LogBox_Gridbox = {
+				array = BOR_SIGLogs
+				index = TNO_BOR_SIG_GUI_Logs_Gridbox_i
+				change_scope = no
+
+				entry_container = TNO_Kartenhaus_Logs_Container
+			}
+		}
+
+		properties = {
+			Kartenhaus_ControlBar = {
+				frame = BOR_AlliedControlPerc_Disp
+			}
+			Kartenhaus_PowerBar_Left = {
+				frame = BOR_ReformistPowerPerc_Disp #Fix this when you generalize
+			}
+			Kartenhaus_PowerBar_Right = {
+				frame = BOR_MilitaristPowerPerc_Disp #Fix this when you generalize
+			}
+			Kartenhaus_FactionLoyalty_Bar_Reformist = {
+				frame = BOR_ReformistSupport #Fix this when you generalize
+			}
+			Kartenhaus_FactionLoyalty_Bar_Conservative = {
+				frame = BOR_StateSupport #Fix this when you generalize
+			}
+			Kartenhaus_FactionLoyalty_Bar_Militarist = {
+				frame = BOR_MilitaristSupport #Fix this when you generalize
+			}
+
+
+			# SIG Card SIGType Container
+			Kartenhaus_SIG_StatusContainer = {
+				image = [BOR_SIG_GetTypeSprite]
+			}
+			Kartenhaus_SIG_Mini = {
+				image = [BOR_SIG_Cards_GetMini]
+			}
+			#x = BOR_SIG_GUI_milbar_X
+			Kartenhaus_SIG_bg = {
+				image = [Kartenhaus_GetSIG_bg]
+			}
+
+			TNO_Bormann_Kartenhaus_Card_BG = {
+				image = [Kartenhaus_GetSIG_bg]
+			}
+
+			TNO_Bormann_Kartenhaus_Card_LoyaltyBar_Left = {
+				frame = BOR_Kartenhaus_LoyaltyBar_Ref_Disp #Fix this when you generalize
+			}
+			TNO_Bormann_Kartenhaus_Card_LoyaltyBar_Right = {
+				frame = BOR_Kartenhaus_LoyaltyBar_Mil_Disp #Fix this when you generalize
+			}
+
+			TNO_Bormann_Kartenhaus_Card_SelectionBtn_Ref = {
+				image = [BOR_Kartenhaus_SelectionBtn_Ref_GetState]
+			}
+
+			TNO_Bormann_Kartenhaus_Card_SelectionBtn_Con = {
+				image = [BOR_Kartenhaus_SelectionBtn_Con_GetState]
+			}
+
+			TNO_Bormann_Kartenhaus_Card_SelectionBtn_Mil = {
+				image = [BOR_Kartenhaus_SelectionBtn_Mil_GetState]
+			}
+
+			TNO_Bormann_Kartenhaus_Card_Boundary = {
+				image = [BOR_Card_SIG_GetTypeSprite]
+			}
+
+			TNO_Bormann_Kartenhaus_Card_Header_IconLeft = {
+				image = "[BOR_Kartenhaus_SIG_Target.BOR_SIG_Cards_GetMini_New]"
+			}
+			TNO_Bormann_Kartenhaus_Card_Header_IconRight = {
+				image = "[BOR_Kartenhaus_SIG_Target.BOR_SIG_Cards_GetMini_New]"
+			}
+		}
+
+		triggers = {
+			Kartenhaus_DismantleBtn_click_enabled = {
+				if = {
+					limit = { NOT = { has_country_flag = BOR_PreparationOccured } }
+					GER_Kartenhaus_CanDismantle = yes
+				}
+				else = { GER_Kartenhaus_CanExecute = yes }
+			}
+
+			Kartenhaus_PowerBar_Left_visible = {
+				check_variable = { BOR_ReformistPowerPerc > 0 }
+			}
+			Kartenhaus_PowerBar_Right_visible = {
+				check_variable = { BOR_MilitaristPowerPerc > 0 }
+			}
+
+			Kartenhaus_FactionLoyalty_Bar_Reformist_visible = {
+				NOT = { has_country_flag = BOR_reformists_dismantled }
+			}
+			Kartenhaus_FactionLoyalty_Bar_Militarist_visible = {
+				NOT = { has_country_flag = BOR_militarists_dismantled }
+			}
+			Kartenhaus_FactionLoyalty_Title_Reformist_Dismantled_visible = {
+				has_country_flag = BOR_reformists_dismantled
+			}
+			Kartenhaus_FactionLoyalty_Title_Militarist_Dismantled_visible = {
+				has_country_flag = BOR_militarists_dismantled
+			}
+
+			# Interaction Type ID's:
+			# 0 = Add Power
+			# 1 = Sub Power
+			# 2 = Add Loyalty
+			# 3 = Sub Loyalty
+			Kartenhaus_Log_InteractionPower_visible = {
+				check_variable = { BOR_SIG_Log_InteractionType^TNO_BOR_SIG_GUI_Logs_Gridbox_i < 2 }
+			}
+			Kartenhaus_Log_InteractionLoyalty_visible = {
+				check_variable = { BOR_SIG_Log_InteractionType^TNO_BOR_SIG_GUI_Logs_Gridbox_i > 1 }
+			}
+
+			Kartenhaus_SIGContainer_Loyalty_visible = {
+				NOT = { check_variable = { BOR_SIGType^Kartenhaus_SIGGridBox_i = 0 } }
+			}
+			Kartenhaus_SIG_LoyaltySeperator_visible = {
+				NOT = { check_variable = { BOR_SIGType^Kartenhaus_SIGGridBox_i = 0 } }
+			}
+			Kartenhaus_SIG_LoyaltySeperator_Dismantled_visible = {
+				check_variable = { BOR_SIGType^Kartenhaus_SIGGridBox_i = 0 }
+			}
+			Kartenhaus_SIG_Loyalty_Dismantled_visible = {
+				check_variable = { BOR_SIGType^Kartenhaus_SIGGridBox_i = 0 }
+			}
+
+			#Debug stuff
+			Kartenhaus_logs_debug_setup_visible = {
+				has_country_flag = GER_BOR_SIG_debug_screen_buttons
+			}
+			Kartenhaus_logs_debug_add_remove_visible = {
+				has_country_flag = GER_BOR_SIG_debug_screen_buttons
+			}
+			Kartenhaus_logs_debug_add_interaction_visible = {
+				has_country_flag = GER_BOR_SIG_debug_screen_buttons
+			}
+			Kartenhaus_logs_debug_reformist_support_visible = {
+				has_country_flag = GER_BOR_SIG_debug_screen_buttons
+			}
+			Kartenhaus_logs_debug_conservative_support_visible = {
+				has_country_flag = GER_BOR_SIG_debug_screen_buttons
+			}
+			Kartenhaus_logs_debug_militarist_support_visible = {
+				has_country_flag = GER_BOR_SIG_debug_screen_buttons
+			}
+			Kartenhaus_logs_debug_kill_the_church_visible = {
+				has_country_flag = GER_BOR_SIG_debug_screen_buttons
+			}
+			Kartenhaus_logs_debug_AI_test_visible = {
+				has_country_flag = GER_BOR_SIG_debug_screen_buttons
+			}
+
+			## Selection buttons
+			TNO_Bormann_Kartenhaus_Card_SelectionBtn_Ref_click_enabled = {
+				NOT = { has_country_flag = BOR_reformists_dismantled }
+			}
+			TNO_Bormann_Kartenhaus_Card_SelectionBtn_Mil_click_enabled = {
+				NOT = { has_country_flag = BOR_militarists_dismantled }
+			}
+
+			## Interaction Buttons
+			# Loyalty
+			TNO_Bormann_Kartenhaus_Card_InteractionBtn_Loyalty_Add_click_enabled = {
+				check_variable = { BOR_Kartenhaus_InteractionsCount > 0 }
+				OR = {
+					has_country_flag = BOR_Kartenhaus_Card_RefSelection
+					has_country_flag = BOR_Kartenhaus_Card_ConSelection
+					has_country_flag = BOR_Kartenhaus_Card_MilSelection
+				}
+				if = {
+					limit = { has_country_flag = BOR_Kartenhaus_Card_RefSelection }
+					check_variable = { BOR_SIGLoyalty_Ref^BOR_Kartenhaus_SIG_Target < 100 }
+				}
+				else_if = {
+					limit = { has_country_flag = BOR_Kartenhaus_Card_ConSelection }
+					check_variable = { BOR_SIGLoyalty_State^BOR_Kartenhaus_SIG_Target < 100 }
+				}
+				else_if = {
+					limit = { has_country_flag = BOR_Kartenhaus_Card_MilSelection }
+					check_variable = { BOR_SIGLoyalty_Mil^BOR_Kartenhaus_SIG_Target < 100 }
+				}
+				has_political_power > 19
+			}
+
+			TNO_Bormann_Kartenhaus_Card_InteractionBtn_Loyalty_Sub_click_enabled = {
+				check_variable = { BOR_Kartenhaus_InteractionsCount > 0 }
+				OR = {
+					has_country_flag = BOR_Kartenhaus_Card_RefSelection
+					has_country_flag = BOR_Kartenhaus_Card_ConSelection
+					has_country_flag = BOR_Kartenhaus_Card_MilSelection
+				}
+				if = {
+					limit = { has_country_flag = BOR_Kartenhaus_Card_RefSelection }
+					check_variable = { BOR_SIGLoyalty_Ref^BOR_Kartenhaus_SIG_Target > 0 }
+				}
+				else_if = {
+					limit = { has_country_flag = BOR_Kartenhaus_Card_ConSelection }
+					check_variable = { BOR_SIGLoyalty_State^BOR_Kartenhaus_SIG_Target > 0 }
+				}
+				else_if = {
+					limit = { has_country_flag = BOR_Kartenhaus_Card_MilSelection }
+					check_variable = { BOR_SIGLoyalty_Mil^BOR_Kartenhaus_SIG_Target > 0 }
+				}
+				has_political_power > 19
+			}
+
+			#Power
+			TNO_Bormann_Kartenhaus_Card_InteractionBtn_Power_Add_click_enabled = {
+				check_variable = { BOR_Kartenhaus_InteractionsCount > 0 }
+				check_variable = { BOR_SIGPower^BOR_Kartenhaus_SIG_Target < 999 }
+				has_political_power > 19
+			}
+
+			TNO_Bormann_Kartenhaus_Card_InteractionBtn_Power_Sub_click_enabled = {
+				check_variable = { BOR_Kartenhaus_InteractionsCount > 0 }
+				check_variable = { BOR_SIGPower^BOR_Kartenhaus_SIG_Target > 5 }
+				has_political_power > 19
+			}
+
+			## InfoScrawl
+
+			# Buttons
+			TNO_Bormann_Kartenhaus_Info_TBZ_OverviewBtn_visible = {
+				GER_Kartenhaus_InfoScrawl_AnyActive = no
+			}
+
+			TNO_Bormann_Kartenhaus_Info_TBZ_ControlAndFactionsBtn_visible = {
+				GER_Kartenhaus_InfoScrawl_AnyActive = no
+			}
+
+			TNO_Bormann_Kartenhaus_Info_TBZ_SIGBtn_visible = {
+				GER_Kartenhaus_InfoScrawl_AnyActive = no
+			}
+
+			TNO_Bormann_Kartenhaus_Info_TBZ_InteractionsBtn_visible = {
+				GER_Kartenhaus_InfoScrawl_AnyActive = no
+			}
+
+			# Buttons Click_enabled (remove in later releases)
+			TNO_Bormann_Kartenhaus_Info_TBZ_OverviewBtn_click_enabled = {
+				always = no
+			}
+
+			TNO_Bormann_Kartenhaus_Info_TBZ_ControlAndFactionsBtn_click_enabled = {
+				always = no
+			}
+
+			TNO_Bormann_Kartenhaus_Info_TBZ_SIGBtn_click_enabled = {
+				always = no
+			}
+
+			TNO_Bormann_Kartenhaus_Info_TBZ_InteractionsBtn_click_enabled = {
+				always = no
+			}
+
+			# Header
+
+			TNO_Bormann_Kartenhaus_InfoScrawl_Header_BackBtn_visible = {
+				GER_Kartenhaus_InfoScrawl_AnyActive = yes
+			}
+
+			TNO_Bormann_Kartenhaus_InfoScrawl_Header_TitleContainer_visible = {
+				GER_Kartenhaus_InfoScrawl_AnyActive = yes
+			}
+
+			TNO_Bormann_Kartenhaus_InfoScrawl_Header_Divider_visible = {
+				GER_Kartenhaus_InfoScrawl_AnyActive = yes
+			}
+
+			TNO_Bormann_Kartenhaus_InfoScrawl_Scrawl_Text_visible = {
+				GER_Kartenhaus_InfoScrawl_AnyActive = yes
+			}
+		}
+
+		effects = {
+			#SIG Card Button
+			Kartenhaus_SIG_InteractionsBtn_click = {
+				if = {
+					limit = { NOT = { check_variable = { BOR_SIGType^Kartenhaus_SIGGridBox_i = 0 } } }
+					set_variable = { BOR_Kartenhaus_SIG_Target = Kartenhaus_SIGGridBox_i }
+					BOR_Kartenhaus_OnCardSelect = yes
+				}
+			}
+
+			Kartenhaus_CloseBtn_click = {
+				clr_country_flag = GER_Bormann_SIG_GUI_Open
+				BOR_Kartenhaus_Close = yes
+				GER_Bormann_Kartenhaus_Info_ClearBtnFlags = yes
+			}
+			Kartenhaus_DismantleBtn_click = {
+				if = { # Preparation
+					limit = { has_country_flag = BOR_DiscoveryOccured }
+					## Dismantlement I
+					# Anti-Mil
+					if = {
+						limit = {
+							has_country_flag = BOR_Dismantlement_I_active
+							has_country_flag = BOR_Dismantlement_I_AntiMil
+						}
+						country_event = BOR_Dismantlement_I.117
+					}
+					# Anti-Ref
+					else_if = {
+						limit = {
+							has_country_flag = BOR_Dismantlement_I_active
+							has_country_flag = BOR_Dismantlement_I_AntiRef
+						}
+						country_event = BOR_Dismantlement_I.29
+					}
+					## Dismantlement II
+					else_if = {
+						limit = { has_country_flag = BOR_Dismantlement_II_active }
+						country_event = bor_disII_preparation.1
+					}
+					## Debug
+					else = { country_event = BOR_Dismantlement.2 }
+					set_country_flag = BOR_PreparationInProgress
+					clr_country_flag = BOR_DiscoveryOccured
+				}
+				else_if = { # Execution
+					limit = { has_country_flag = BOR_PreparationOccured }
+					## Dismantlement I
+					# Anti-Mil
+					if = {
+						limit = {
+							has_country_flag = BOR_Dismantlement_I_active
+							has_country_flag = BOR_Dismantlement_I_AntiMil
+						}
+						if = {
+							limit = { has_country_flag = GER_BOR_DisI_AntiMil_RoenneSurvived }
+							country_event = BOR_Dismantlement_I.130
+						}
+						else = { country_event = BOR_Dismantlement_I.135 }
+					}
+					# Anti-Ref
+					else_if = {
+						limit = {
+							has_country_flag = BOR_Dismantlement_I_active
+							has_country_flag = BOR_Dismantlement_I_AntiRef
+						}
+						if = {
+							limit = { has_country_flag = BOR_DresdenMassacre }
+							country_event = BOR_Dismantlement_I.50
+						}
+						else = { country_event = BOR_Dismantlement_I.45 }
+					}
+					## Dismantlement II
+					else_if = {
+						limit = { has_country_flag = BOR_Dismantlement_II_active }
+						country_event = bor_disII_execution.1
+					}
+					## Debug
+					else = { country_event = BOR_Dismantlement.2 }
+					clr_country_flag = BOR_PreparationInProgress
+					clr_country_flag = BOR_PreparationOccured
+				}
+			}
+
+			#Debug stuff
+			#Logs
+			Kartenhaus_logs_debug_setup_click = {
+				set_variable = { BOR_SIGLogs_num = 3 }
+				add_to_array = { BOR_SIGLogs = 1 }
+				resize_array = { BOR_SIGLogs = BOR_SIGLogs_num }
+
+				add_to_array = { BOR_SIG_Log_Actor = 0 }
+				resize_array = { BOR_SIG_Log_Actor = 3 }
+				set_variable = { BOR_SIG_Log_Actor^0 = 0 }
+				set_variable = { BOR_SIG_Log_Actor^1 = 1 }
+				set_variable = { BOR_SIG_Log_Actor^2 = 2 }
+
+				add_to_array = { BOR_SIG_Log_AffectedSIG = 0 }
+				resize_array = { BOR_SIG_Log_AffectedSIG = 3 }
+				set_variable = { BOR_SIG_Log_AffectedSIG^0 = 2 }
+				set_variable = { BOR_SIG_Log_AffectedSIG^1 = 6 }
+				set_variable = { BOR_SIG_Log_AffectedSIG^2 = 4 }
+
+				add_to_array = { BOR_SIG_Log_InteractionType = 0 }
+				resize_array = { BOR_SIG_Log_InteractionType = 3 }
+				set_variable = { BOR_SIG_Log_InteractionType^0 = 0 }
+				set_variable = { BOR_SIG_Log_InteractionType^1 = 2 }
+				set_variable = { BOR_SIG_Log_InteractionType^2 = 1 }
+
+				add_to_array = { BOR_SIG_Log_InteractionTarget = 0 }
+				resize_array = { BOR_SIG_Log_InteractionTarget = 3 }
+				set_variable = { BOR_SIG_Log_InteractionTarget^1 = 0 }
+
+				add_to_array = { BOR_SIG_Log_BeforeValue = 0 }
+				resize_array = { BOR_SIG_Log_BeforeValue = 3 }
+				set_variable = { BOR_SIG_Log_BeforeValue^0 = 230 }
+				set_variable = { BOR_SIG_Log_BeforeValue^1 = 30 }
+				set_variable = { BOR_SIG_Log_BeforeValue^2 = 300 }
+
+				add_to_array = { BOR_SIG_Log_AfterValue = 0 }
+				resize_array = { BOR_SIG_Log_AfterValue = 3 }
+				set_variable = { BOR_SIG_Log_AfterValue^0 = 235 }
+				set_variable = { BOR_SIG_Log_AfterValue^1 = 33 }
+				set_variable = { BOR_SIG_Log_AfterValue^2 = 280 }
+
+				add_to_array = { BOR_SIG_Log_ValueChange = 0 }
+				resize_array = { BOR_SIG_Log_ValueChange = 3 }
+
+				set_temp_variable = { Log_ValueChange = BOR_SIG_Log_AfterValue^0 }
+				subtract_from_temp_variable = { Log_ValueChange = BOR_SIG_Log_BeforeValue^0 }
+				set_variable = { BOR_SIG_Log_ValueChange^0 = Log_ValueChange }
+
+				set_temp_variable = { Log_ValueChange = BOR_SIG_Log_AfterValue^1 }
+				subtract_from_temp_variable = { Log_ValueChange = BOR_SIG_Log_BeforeValue^1 }
+				set_variable = { BOR_SIG_Log_ValueChange^1 = Log_ValueChange }
+
+				set_temp_variable = { Log_ValueChange = BOR_SIG_Log_AfterValue^2 }
+				subtract_from_temp_variable = { Log_ValueChange = BOR_SIG_Log_BeforeValue^2 }
+				set_variable = { BOR_SIG_Log_ValueChange^2 = Log_ValueChange }
+			}
+			Kartenhaus_logs_debug_setup_right_click = {
+				clear_array = BOR_SIGLogs
+				clear_variable = BOR_SIGLogs_num
+				clear_array = BOR_SIG_Log_Actor
+				clear_array = BOR_SIG_Log_AffectedSIG
+				clear_array = BOR_SIG_Log_InteractionType
+				clear_array = BOR_SIG_Log_InteractionTarget
+				clear_array = BOR_SIG_Log_BeforeValue
+				clear_array = BOR_SIG_Log_AfterValue
+				clear_array = BOR_SIG_Log_ValueChange
+			}
+			Kartenhaus_logs_debug_add_remove_click = {
+				BOR_SIG_expand_log_list = yes
+				add_to_array = { array = BOR_SIG_Log_Actor value = 0 index = 0 }
+				add_to_array = { array = BOR_SIG_Log_AffectedSIG value = 0 index = 0 }
+				add_to_array = { array = BOR_SIG_Log_InteractionType value = 0 index = 0 }
+				add_to_array = { array = BOR_SIG_Log_InteractionTarget value = 0 index = 0 }
+				add_to_array = { array = BOR_SIG_Log_BeforeValue value = 0 index = 0 }
+				add_to_array = { array = BOR_SIG_Log_AfterValue value = 0 index = 0 }
+				add_to_array = { array = BOR_SIG_Log_ValueChange value = 0 index = 0 }
+			}
+			Kartenhaus_logs_debug_add_remove_right_click = {
+				if = {
+					limit = { check_variable = { BOR_SIGLogs_num > 0 } }
+					subtract_from_variable = { BOR_SIGLogs_num = 1 }
+					resize_array = { BOR_SIGLogs = BOR_SIGLogs_num }
+					resize_array = { BOR_SIG_Log_Actor = BOR_SIGLogs_num }
+					resize_array = { BOR_SIG_Log_AffectedSIG = BOR_SIGLogs_num }
+					resize_array = { BOR_SIG_Log_InteractionType = BOR_SIGLogs_num }
+					resize_array = { BOR_SIG_Log_InteractionTarget = BOR_SIGLogs_num }
+					resize_array = { BOR_SIG_Log_BeforeValue = BOR_SIGLogs_num }
+					resize_array = { BOR_SIG_Log_AfterValue = BOR_SIGLogs_num }
+					resize_array = { BOR_SIG_Log_ValueChange = BOR_SIGLogs_num }
+				}
+			}
+			Kartenhaus_logs_debug_add_interaction_click = {
+				add_to_variable = { BOR_Kartenhaus_InteractionsCount = 3 }
+			}
+			Kartenhaus_logs_debug_reformist_support_click = {
+				BOR_SIG_AS_0_1 = yes
+			}
+			Kartenhaus_logs_debug_reformist_support_right_click = {
+				BOR_SIG_SS_0_1 = yes
+			}
+			Kartenhaus_logs_debug_conservative_support_click = {
+				BOR_SIG_AS_1_1 = yes
+			}
+			Kartenhaus_logs_debug_conservative_support_right_click = {
+				BOR_SIG_SS_1_1 = yes
+			}
+			Kartenhaus_logs_debug_militarist_support_click = {
+				BOR_SIG_AS_2_1 = yes
+			}
+			Kartenhaus_logs_debug_militarist_support_right_click = {
+				BOR_SIG_SS_2_1 = yes
+			}
+			Kartenhaus_logs_debug_kill_the_church_click = {
+				set_variable = { BOR_SIG_DF_i = Church }
+				BOR_Kartenhaus_DismantleSIG = yes
+			}
+			Kartenhaus_logs_debug_kill_the_church_right_click = {
+				set_variable = { BOR_SIGPower^3				= 156 }
+				set_variable = { BOR_SIGType^3				= 2 }
+				set_variable = { BOR_SIGLoyalty_Ref^3 		= 34 }
+				set_variable = { BOR_SIGLoyalty_State^3 	= 43 }
+				set_variable = { BOR_SIGLoyalty_Mil^3 		= 23 }
+			}
+			Kartenhaus_logs_debug_AI_test_click = {
+				BOR_SIG_AI_BiweeklyCheck = yes
+			}
+
+			## Selection Buttons
+			TNO_Bormann_Kartenhaus_Card_SelectionBtn_Ref_click = {
+				set_country_flag = BOR_Kartenhaus_Card_RefSelection
+				clr_country_flag = BOR_Kartenhaus_Card_ConSelection
+				clr_country_flag = BOR_Kartenhaus_Card_MilSelection
+			}
+
+			TNO_Bormann_Kartenhaus_Card_SelectionBtn_Con_click = {
+				clr_country_flag = BOR_Kartenhaus_Card_RefSelection
+				set_country_flag = BOR_Kartenhaus_Card_ConSelection
+				clr_country_flag = BOR_Kartenhaus_Card_MilSelection
+			}
+
+			TNO_Bormann_Kartenhaus_Card_SelectionBtn_Mil_click = {
+				clr_country_flag = BOR_Kartenhaus_Card_RefSelection
+				clr_country_flag = BOR_Kartenhaus_Card_ConSelection
+				set_country_flag = BOR_Kartenhaus_Card_MilSelection
+			}
+
+			## Interaction Buttons
+			# Loyalty
+			TNO_Bormann_Kartenhaus_Card_InteractionBtn_Loyalty_Add_click = {
+				hidden_effect = { BOR_Kartenhaus_AddLoyaltyInteraction = yes }
+				BOR_Kartenhaus_OnCardSelect = yes
+				add_political_power = -20
+			}
+
+			TNO_Bormann_Kartenhaus_Card_InteractionBtn_Loyalty_Sub_click = {
+				hidden_effect = { BOR_Kartenhaus_SubLoyaltyInteraction = yes }
+				BOR_Kartenhaus_OnCardSelect = yes
+				add_political_power = -20
+			}
+
+			#Power
+			TNO_Bormann_Kartenhaus_Card_InteractionBtn_Power_Add_click = {
+				hidden_effect = { BOR_Kartenhaus_AddPowerInteraction = yes }
+				BOR_Kartenhaus_OnCardSelect = yes
+				add_political_power = -20
+			}
+
+			TNO_Bormann_Kartenhaus_Card_InteractionBtn_Power_Sub_click = {
+				hidden_effect = { BOR_Kartenhaus_SubPowerInteraction = yes }
+				BOR_Kartenhaus_OnCardSelect = yes
+				add_political_power = -20
+			}
+
+			## InfoScrawl
+			TNO_Bormann_Kartenhaus_Info_TBZ_OverviewBtn_click = {
+				GER_Bormann_Kartenhaus_Info_ClearBtnFlags = yes
+				set_country_flag = GER_Bormann_Kartenhaus_GUI_InfoScrawl_Overview
+			}
+
+			TNO_Bormann_Kartenhaus_Info_TBZ_ControlAndFactionsBtn_click = {
+				GER_Bormann_Kartenhaus_Info_ClearBtnFlags = yes
+				set_country_flag = GER_Bormann_Kartenhaus_GUI_InfoScrawl_ControlAndFactions
+			}
+
+			TNO_Bormann_Kartenhaus_Info_TBZ_SIGBtn_click = {
+				GER_Bormann_Kartenhaus_Info_ClearBtnFlags = yes
+				set_country_flag = GER_Bormann_Kartenhaus_GUI_InfoScrawl_SIG
+			}
+
+			TNO_Bormann_Kartenhaus_Info_TBZ_InteractionsBtn_click = {
+				GER_Bormann_Kartenhaus_Info_ClearBtnFlags = yes
+				set_country_flag = GER_Bormann_Kartenhaus_GUI_InfoScrawl_Interactions
+			}
+
+			TNO_Bormann_Kartenhaus_InfoScrawl_Header_BackBtn_click = {
+				GER_Bormann_Kartenhaus_Info_ClearBtnFlags = yes
+			}
+		}
+	}
+}

@@ -1,0 +1,2275 @@
+#  ██████╗ ███████╗██████╗ ███╗   ███╗ █████╗ ███╗   ██╗██╗   ██╗ #
+# ██╔════╝ ██╔════╝██╔══██╗████╗ ████║██╔══██╗████╗  ██║╚██╗ ██╔╝ #
+# ██║  ███╗█████╗  ██████╔╝██╔████╔██║███████║██╔██╗ ██║ ╚████╔╝  #
+# ██║   ██║██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══██║██║╚██╗██║  ╚██╔╝   #
+# ╚██████╔╝███████╗██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║   ██║    #
+#  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝    #
+##Espionage Events
+
+#Index; Search for these names using ctrl+f and you'll find the section they entitle.
+#	Generic Espionage Events
+#	Speer/RND Events
+#	Bormann/HVA Events
+
+############################
+# Generic Espionage Events #
+############################
+add_namespace = GER_Espionage
+
+country_event = { # Generic failure event for Germany
+	id = GER_Espionage.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.1" }
+	title = GER_Espionage.1.t
+	desc = GER_Espionage.1.desc
+	picture = GFX_report_event_IBR_basques_arrested
+	
+	is_triggered_only = yes
+	immediate = { Espionage_FailureEffect_Setup = yes }
+	
+	option = { #
+		name = GER_Espionage.1.a
+		Espionage_FailureEffect = yes
+		if = {
+			limit = { has_global_flag = german_civil_war_bormannvic }
+			BOR_SIG_SP_6_3 = yes
+		}
+	}
+}
+
+country_event = { # Generic failure event for the infiltrated nation
+	id = GER_Espionage.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.2" }
+	title = GER_Espionage.2.t
+	desc = { text = GER_Espionage.2.desc_RND trigger = { check_variable = { TNO_Espionage_Agency = token:Espionage_RND } } }
+	desc = { text = GER_Espionage.2.desc_HVA trigger = { NOT = { check_variable = { TNO_Espionage_Agency = token:Espionage_RND } } } }
+	picture = GFX_report_event_IBR_basques_arrested
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = GER_Espionage.2.a
+	}
+}
+
+country_event = { # Unternehmen Schwert (Russian sabotage) report
+	id = GER_Espionage.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.3" }
+	title = GER_Espionage.3.t
+	desc = { text = GER_Espionage.3.desc_west_russia     trigger = { has_country_flag = GER_Espionage_WSR_target } }
+	desc = { text = GER_Espionage.3.desc_west_siberia    trigger = { has_country_flag = GER_Espionage_WSB_target } }
+	desc = { text = GER_Espionage.3.desc_central_siberia trigger = { has_country_flag = GER_Espionage_CSB_target } }
+	desc = { text = GER_Espionage.3.desc_far_east        trigger = { has_country_flag = GER_Espionage_FST_target } }
+	picture = GFX_report_event_GER_radio_espionage
+
+	is_triggered_only = yes
+
+	option = { #
+		name = GER_Espionage.3.a
+		Espionage_SuccessEffect = yes
+		if = {
+			limit = { has_country_flag = GER_Espionage_WSR_target }
+			effect_tooltip = {
+				WSR = {
+					add_stability = -0.05
+					add_political_power = -150
+					TNO_worsen_army_professionalism_low = yes
+					set_temp_variable = { gdp_growth_temp = -0.1 }
+					econ_gdp_growth_change = yes
+				}
+			}
+			clr_country_flag = GER_Espionage_WSR_target
+		}
+		else_if = {
+			limit = { has_country_flag = GER_Espionage_WSB_target }
+			effect_tooltip = {
+				WSB = {
+					add_stability = -0.05
+					add_political_power = -150
+					TNO_worsen_army_professionalism_low = yes
+					set_temp_variable = { gdp_growth_temp = -0.1 }
+					econ_gdp_growth_change = yes
+				}
+			}
+			clr_country_flag = GER_Espionage_WSB_target
+		}
+		else_if = {
+			limit = { has_country_flag = GER_Espionage_CSB_target }
+			effect_tooltip = {
+				CSB = {
+					add_stability = -0.05
+					add_political_power = -150
+					TNO_worsen_army_professionalism_low = yes
+					set_temp_variable = { gdp_growth_temp = -0.1 }
+					econ_gdp_growth_change = yes
+				}
+			}
+			clr_country_flag = GER_Espionage_CSB_target
+		}
+		else_if = {
+			limit = { has_country_flag = GER_Espionage_FST_target }
+			effect_tooltip = {
+				FST = {
+					add_stability = -0.05
+					add_political_power = -150
+					TNO_worsen_army_professionalism_low = yes
+					set_temp_variable = { gdp_growth_temp = -0.1 }
+					econ_gdp_growth_change = yes
+				}
+			}
+			clr_country_flag = GER_Espionage_FST_target
+		}
+	}
+}
+
+country_event = { # Sabotage event for the Russias
+	id = GER_Espionage.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.4" }
+	title = GER_Espionage.4.t
+	desc = GER_Espionage.4.desc
+	picture = GFX_report_event_IBR_factory_sabotage
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = GER_Espionage.4.a
+		add_stability = -0.05
+		add_political_power = -150
+		TNO_worsen_army_professionalism_low = yes
+		set_temp_variable = { gdp_growth_temp = -0.1 }
+		econ_gdp_growth_change = yes
+	}
+}
+
+country_event = { # Unternehmen Geld (Oktan aid) report
+	id = GER_Espionage.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.5" }
+	title = GER_Espionage.5.t
+	desc = GER_Espionage.5.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = GER_Espionage.5.a
+		Espionage_SuccessEffect = yes
+		effect_tooltip = { SAM = { add_political_power = 150 } }
+		unlock_decision_tooltip = GER_Espionage_aid_oktan
+		set_country_flag = GER_Espionage_oktan_aid_unlock
+	}
+}
+
+country_event = { # Germany promises Oktan help
+	id = GER_Espionage.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.6" }
+	title = GER_Espionage.6.t
+	desc = GER_Espionage.6.desc
+	picture = GFX_report_event_generic_crate_of_guns
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = GER_Espionage.6.a
+		add_political_power = 150
+	}
+}
+
+country_event = { # Unternehmen Vertrauen report
+	id = GER_Espionage.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.7" }
+	title = GER_Espionage.7.t
+	desc = GER_Espionage.7.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = GER_Espionage.7.a
+		Espionage_SuccessEffect = yes
+		effect_tooltip = { RUS_increase_tension_10 = yes }
+	}
+}
+
+country_event = { # Diplomatic unification talks sabotaged by Germany
+	id = GER_Espionage.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.8" }
+	title = GER_Espionage.8.t
+	desc = GER_Espionage.8.desc
+	picture = GFX_report_event_GER_agreement
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = GER_Espionage.8.a
+		effect_tooltip = { RUS_increase_tension_10 = yes }
+	}
+}
+
+country_event = { # Notification event about the unification messing ops being available
+	id = GER_Espionage.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.9" }
+	title = GER_Espionage.9.t
+	desc = GER_Espionage.9.desc
+	picture = GFX_report_event_RUS_democracy
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		NOT = { has_global_flag = SGR_natsoc_collapse }
+		has_country_flag = TNO_Espionage_Mech_Active
+	}
+	
+	option = { #
+		name = GER_Espionage.9.a
+		custom_effect_tooltip = TNO_Espionage_NewOperationAvailable_tt
+	}
+}
+
+country_event = { # Unternehmen Kreuzritter report
+	id = GER_Espionage.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.10" }
+	title = GER_Espionage.10.t
+	desc = GER_Espionage.10.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.10.a
+		Espionage_SuccessEffect = yes
+		OMS = { custom_effect_tooltip = GER_Espionage_omsk_insurgency_increase }
+	}
+}
+
+country_event = { # Omsk - Batov got aid, foreign inteference suspected
+	id = GER_Espionage.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.11" }
+	title = GER_Espionage.11.t
+	desc = GER_Espionage.11.desc
+	picture = GFX_report_event_generic_rebels
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.11.a
+		custom_effect_tooltip = GER_Espionage_omsk_insurgency_increase
+		add_to_variable = { OMS_insurgency_batov_ava_base = 1 }
+	}
+}
+
+country_event = { # Unternehmen Teufel report
+	id = GER_Espionage.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.12" }
+	title = GER_Espionage.12.t
+	desc = GER_Espionage.12.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.12.a
+		Espionage_SuccessEffect = yes
+		#effect_tooltip = { OMO = { OMO_medium_temptation = yes } }
+	}
+}
+
+country_event = { # Divine Mandate - Sudoplatov got some help from... somewhere
+	id = GER_Espionage.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.13" }
+	title = GER_Espionage.13.t
+	desc = GER_Espionage.13.desc
+	picture = GFX_report_event_RUS_orthodox_bible
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.13.a
+		#OMO_medium_temptation = yes
+	}
+}
+
+country_event = { # Unternehmen Kuckucksvögel report
+	id = GER_Espionage.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.14" }
+	title = GER_Espionage.14.t
+	desc = GER_Espionage.14.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.14.a
+		Espionage_SuccessEffect = yes
+		USA = { custom_effect_tooltip = wallace.yocket.2.tt }
+	}
+}
+
+country_event = { # Yockey goes on a campaign, apparently he got extra funding from somewhere
+	id = GER_Espionage.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.15" }
+	title = GER_Espionage.15.t
+	desc = GER_Espionage.15.desc
+	picture = GFX_report_event_USA_yockeys_2
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #
+		name = GER_Espionage.15.a
+		custom_effect_tooltip = wallace.yocket.2.tt
+
+		custom_effect_tooltip = USA_rural_voters_header_tt
+		set_temp_variable = { USA_week_change_rural_anv = 1 }
+		add_to_variable = { Demographic_Shift_rural_anv_Weeks = USA_week_change_rural_anv }
+		custom_effect_tooltip = USA_rural_anv_shift
+		custom_effect_tooltip = USA_nativists_voters_header_tt
+		set_temp_variable = { USA_week_change_nativists_anv = 2 }
+		add_to_variable = { Demographic_Shift_nativists_anv_Weeks = USA_week_change_nativists_anv }
+		custom_effect_tooltip = USA_nativists_anv_shift
+		
+		hidden_effect = {
+			set_country_flag = USA_guarantee_ai_yockey_choice
+			add_to_variable = { USA_NPP_Unity = 1 }
+		}
+	}
+}
+
+country_event = { # Unternehmen Zimmer report
+	id = GER_Espionage.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.16" }
+	title = GER_Espionage.16.t
+	desc = GER_Espionage.16.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.16.a
+		Espionage_SuccessEffect = yes
+		USA = { custom_effect_tooltip = GER_Espionage_lnpp_discredited }
+	}
+}
+
+country_event = { # The L-NPP is discredited in an incident
+	id = GER_Espionage.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.17" }
+	title = GER_Espionage.17.t
+	desc = GER_Espionage.17.desc
+	picture = GFX_report_event_USA_marxists_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.17.a
+		custom_effect_tooltip = GER_Espionage_lnpp_discredited
+		hidden_effect = {
+			set_temp_variable = { USA_week_change_rural_anv = 2 }
+			add_to_variable = { Demographic_Shift_rural_anv_Weeks = USA_week_change_rural_anv }
+			custom_effect_tooltip = USA_rural_anv_shift
+			custom_effect_tooltip = USA_nativists_voters_header_tt
+			set_temp_variable = { USA_week_change_nativists_anv = 2 }
+			add_to_variable = { Demographic_Shift_nativists_anv_Weeks = USA_week_change_nativists_anv }
+			custom_effect_tooltip = USA_nativists_anv_shift
+		}
+	}
+}
+
+country_event = { # Unternehmen Erikson report
+	id = GER_Espionage.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.18" }
+	title = GER_Espionage.18.t
+	desc = GER_Espionage.18.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.18.a
+		Espionage_SuccessEffect = yes
+		USA = { custom_effect_tooltip = USA_subtract_OFN_unity }
+	}
+}
+
+country_event = { # Germany seeds OFN disunity in Canada
+	id = GER_Espionage.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.19" }
+	title = GER_Espionage.19.t
+	desc = GER_Espionage.19.desc
+	picture = GFX_report_event_generic_commune_protest 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.19.a
+		custom_effect_tooltip = USA_subtract_OFN_unity
+		add_to_variable = { OFN_Unity = -1 }
+		clamp_variable = { var = OFN_Unity min = 1 max = 30 }
+	}
+}
+
+country_event = { # Unternehmen Nervenkitzel report
+	id = GER_Espionage.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.20" }
+	title = GER_Espionage.20.t
+	desc = GER_Espionage.20.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.20.a
+		Espionage_SuccessEffect = yes
+		USA = { custom_effect_tooltip = USA_subtract_OFN_unity }
+	}
+}
+
+country_event = { # Germany seeds OFN disunity in Australia
+	id = GER_Espionage.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.21" }
+	title = GER_Espionage.21.t
+	desc = GER_Espionage.21.desc
+	picture = GFX_report_event_generic_commune_protest
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.21.a
+		custom_effect_tooltip = USA_subtract_OFN_unity
+		add_to_variable = { OFN_Unity = -1 }
+		clamp_variable = { var = OFN_Unity min = 1 max = 30 }
+	}
+}
+
+country_event = { # Unternehmen Schlange report
+	id = GER_Espionage.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.22" }
+	title = GER_Espionage.22.t
+	desc = GER_Espionage.22.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = GER_Espionage.22.a
+		Espionage_SuccessEffect = yes
+	}
+}
+
+country_event = { # Germany destabilizes the OFN mandates
+	id = GER_Espionage.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.23" }
+	title = GER_Espionage.23.t
+	desc = GER_Espionage.23.desc
+	picture = GFX_report_event_GRO_african_rebels
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = GER_Espionage.23.a
+		add_stability = -0.1
+	}
+}
+
+country_event = { # Unternehmen Blau report
+	id = GER_Espionage.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.24" }
+	title = GER_Espionage.24.t
+	desc = GER_Espionage.24.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.24.a
+		Espionage_SuccessEffect = yes
+		SPS = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 600
+				producer = GER
+			}
+			custom_effect_tooltip = GER_Espionage.24.tt #More understandable to Germany player
+			custom_effect_tooltip = GER_Espionage_IBR_war_exhaustion
+		}
+	}
+}
+
+country_event = { # Blue Division receives some aid from Germany
+	id = GER_Espionage.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.25" }
+	title = GER_Espionage.25.t
+	desc = GER_Espionage.25.desc
+	picture = GFX_report_event_IBR_frente_azul_flag
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.25.a
+		add_equipment_to_stockpile = {
+			type = infantry_equipment
+			amount = 600
+			producer = GER
+		}
+		custom_effect_tooltip = GER_Espionage_IBR_war_exhaustion
+		add_to_variable = { IberianWarExhaustion = 5 }
+	}
+}
+
+country_event = { # The RND/HVA aids the AAS
+	id = GER_Espionage.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.26" }
+	title = GER_Espionage.26.t
+	desc = GER_Espionage.26.desc
+	picture = GFX_report_event_IBR_AAS_logo
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = GER_Espionage.26.a
+		trigger = { tag = GER }
+		Espionage_SuccessEffect = yes
+		IBR = {
+			country_event = GER_Espionage.26
+			custom_effect_tooltip = IBR_add_aas_tt
+			custom_effect_tooltip = IBR_sub_cnt_activity_small_on_tt
+			custom_effect_tooltip = IBR_sub_cnt_supplies_small_on_tt
+			custom_effect_tooltip = IBR_sub_cnt_support_small_on_tt
+			custom_effect_tooltip = IBR_sub_tba_activity_small_on_tt
+			custom_effect_tooltip = IBR_sub_tba_supplies_small_on_tt
+			custom_effect_tooltip = IBR_sub_tba_support_small_on_tt
+			custom_effect_tooltip = IBR_sub_eta_activity_small_on_tt
+			custom_effect_tooltip = IBR_sub_eta_supplies_small_on_tt
+			custom_effect_tooltip = IBR_sub_eta_support_small_on_tt
+			custom_effect_tooltip = IBR_sub_fslp_activity_small_on_tt
+			custom_effect_tooltip = IBR_sub_fslp_supplies_small_on_tt
+			custom_effect_tooltip = IBR_sub_fslp_support_small_on_tt
+		}
+	}
+	option = { #
+		name = GER_Espionage.26.a
+		trigger = { tag = IBR }
+		custom_effect_tooltip = IBR_add_aas_tt
+		add_to_variable = { IBR_AAS_Resources = 2 }
+		custom_effect_tooltip = IBR_sub_cnt_activity_small_on_tt
+		custom_effect_tooltip = IBR_sub_cnt_supplies_small_on_tt
+		custom_effect_tooltip = IBR_sub_cnt_support_small_on_tt
+		add_to_variable = { IBR_CNT_Activity = -1 }
+		add_to_variable = { IBR_CNT_Resources = -1 }
+		add_to_variable = { IBR_CNT_Support = -1 }
+		custom_effect_tooltip = IBR_sub_tba_activity_small_on_tt
+		custom_effect_tooltip = IBR_sub_tba_supplies_small_on_tt
+		custom_effect_tooltip = IBR_sub_tba_support_small_on_tt
+		add_to_variable = { IBR_TBA_Activity = -1 }
+		add_to_variable = { IBR_TBA_Resources = -1 }
+		add_to_variable = { IBR_TBA_Support = -1 }
+		custom_effect_tooltip = IBR_sub_eta_activity_small_on_tt
+		custom_effect_tooltip = IBR_sub_eta_supplies_small_on_tt
+		custom_effect_tooltip = IBR_sub_eta_support_small_on_tt
+		add_to_variable = { IBR_ETA_Activity = -1 }
+		add_to_variable = { IBR_ETA_Resources = -1 }
+		add_to_variable = { IBR_ETA_Support = -1 }
+		custom_effect_tooltip = IBR_sub_fslp_activity_small_on_tt
+		custom_effect_tooltip = IBR_sub_fslp_supplies_small_on_tt
+		custom_effect_tooltip = IBR_sub_fslp_support_small_on_tt
+		add_to_variable = { IBR_FSLP_Activity = -1 }
+		add_to_variable = { IBR_FSLP_Resources = -1 }
+		add_to_variable = { IBR_FSLP_Support = -1 }
+	}
+}
+
+country_event = { # Unternehmen Gehhilfe report
+	id = GER_Espionage.27
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.27" }
+	title = { text = GER_Espionage.27.t_a trigger = { IBR = { has_country_flag = legislature_council } } }
+	title = { text = GER_Espionage.27.t_b trigger = { IBR = { has_country_flag = advisory_council } } }
+	desc = { text = GER_Espionage.27.desc_a trigger = { IBR = { has_country_flag = legislature_council } } }
+	desc = { text = GER_Espionage.27.desc_b trigger = { IBR = { has_country_flag = advisory_council } } }
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.27.a
+		Espionage_SuccessEffect = yes
+		IBR = {
+			if = {
+				limit = { has_country_flag = legislature_council }
+				custom_effect_tooltip = GER_Espionage_IBR_decrease_reformism
+			}
+			else = {
+				custom_effect_tooltip = GER_Espionage_IBR_increase_reformism
+			}
+			if = {
+				limit = { NOT = { has_country_flag = IBR_caudillo_mechanic_over } }
+				custom_effect_tooltip = GER_Espionage_IBR_franco_influence
+			}
+		}
+	}
+}
+
+country_event = { # Germany pushes Iberia to the AuthDem council
+	id = GER_Espionage.28
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.28" }
+	title = { text = GER_Espionage.28.t_a trigger = { has_country_flag = legislature_council } }
+	title = { text = GER_Espionage.28.t_b trigger = { has_country_flag = advisory_council } }
+	desc = { text = GER_Espionage.28.desc_a trigger = { has_country_flag = legislature_council } }
+	desc = { text = GER_Espionage.28.desc_b trigger = { has_country_flag = advisory_council } }
+	picture = GFX_report_event_IBR_council
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.28.a
+		trigger = { has_country_flag = legislature_council }
+		custom_effect_tooltip = GER_Espionage_IBR_decrease_reformism
+		add_to_variable = { IBR_council_reformism = -5 }
+		if = {
+			limit = { NOT = { has_country_flag = IBR_caudillo_mechanic_over } }
+			custom_effect_tooltip = GER_Espionage_IBR_franco_influence
+			add_to_variable = { IBR_military_alignment = 2 }
+			add_to_variable = { IBR_church_alignment = 2 }
+			add_to_variable = { IBR_burocrat_alignment = 2 }
+			add_to_variable = { IBR_business_alignment = 2 }
+			add_to_variable = { IBR_settlers_alignment = 2 }
+			add_to_variable = { IBR_native_alignment = 2 }
+			add_to_variable = { IBR_foreign_alignment = 2 }
+			add_to_variable = { IBR_intellectual_alignment = 2 }
+			add_to_variable = { IBR_majority_alignment = 2 }
+			add_to_variable = { IBR_regional_alignment = 2 }
+			IBR_check_caudillo_popularity = yes
+		}
+		add_to_variable = { IBRIberiaStability = 2 }
+	}
+	option = { #
+		name = GER_Espionage.28.b
+		trigger = { has_country_flag = advisory_council }
+		custom_effect_tooltip = GER_Espionage_IBR_increase_influence
+		add_to_variable = { IBR_council_influence = 5 }
+		if = {
+			limit = { NOT = { has_country_flag = IBR_caudillo_mechanic_over } }
+			custom_effect_tooltip = GER_Espionage_IBR_franco_influence
+			add_to_variable = { IBR_military_alignment = 2 }
+			add_to_variable = { IBR_church_alignment = 2 }
+			add_to_variable = { IBR_burocrat_alignment = 2 }
+			add_to_variable = { IBR_business_alignment = 2 }
+			add_to_variable = { IBR_settlers_alignment = 2 }
+			add_to_variable = { IBR_native_alignment = 2 }
+			add_to_variable = { IBR_foreign_alignment = 2 }
+			add_to_variable = { IBR_intellectual_alignment = 2 }
+			add_to_variable = { IBR_majority_alignment = 2 }
+			add_to_variable = { IBR_regional_alignment = 2 }
+			IBR_check_caudillo_popularity = yes
+		}
+		add_to_variable = { IBRIberiaStability = 2 }
+	}
+}
+
+country_event = { # Unternehmen Stahl report
+	id = GER_Espionage.29
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.29" }
+	title = GER_Espionage.29.t
+	desc = GER_Espionage.29.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.29.a
+		Espionage_SuccessEffect = yes
+		ITA = { custom_effect_tooltip = GER_Espionage_BFI_increase_ital_independence }
+	}
+}
+
+country_event = { # Germany frustrates the US' and Japan's effots in the BFI
+	id = GER_Espionage.30
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.30" }
+	title = GER_Espionage.30.t
+	desc = GER_Espionage.30.desc
+	picture = GFX_report_event_IBR_big_meeting
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = GER_Espionage.30.a
+		trigger = { tag = ITA }
+		custom_effect_tooltip = GER_Espionage_BFI_increase_ital_independence
+		BFI_increase_italy_influence_med = yes
+	}
+	option = { #
+		name = GER_Espionage.30.b
+		trigger = { tag = USA }
+		custom_effect_tooltip = GER_Espionage_BFI_increase_ital_independence
+	}
+	option = { #
+		name = GER_Espionage.30.c
+		trigger = { tag = JAP }
+		custom_effect_tooltip = GER_Espionage_BFI_increase_ital_independence
+	}
+}
+
+country_event = { #
+	id = GER_Espionage.31
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.31" }
+	title = GER_Espionage.31.t
+	desc = GER_Espionage.31.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.31.a
+	}
+}
+
+country_event = { #
+	id = GER_Espionage.32
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.32" }
+	title = GER_Espionage.32.t
+	desc = GER_Espionage.32.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.32.a
+	}
+}
+
+country_event = { #
+	id = GER_Espionage.33
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.33" }
+	title = GER_Espionage.33.t
+	desc = GER_Espionage.33.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.33.a
+	}
+}
+
+country_event = { #
+	id = GER_Espionage.34
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.34" }
+	title = GER_Espionage.34.t
+	desc = GER_Espionage.34.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.34.a
+	}
+}
+
+country_event = { #
+	id = GER_Espionage.35
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.35" }
+	title = GER_Espionage.35.t
+	desc = GER_Espionage.35.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.35.a
+	}
+}
+
+country_event = { #
+	id = GER_Espionage.36
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.36" }
+	title = GER_Espionage.36.t
+	desc = GER_Espionage.36.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.36.a
+	}
+}
+
+country_event = { #
+	id = GER_Espionage.37
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.37" }
+	title = GER_Espionage.37.t
+	desc = GER_Espionage.37.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.37.a
+	}
+}
+
+country_event = { #
+	id = GER_Espionage.38
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.38" }
+	title = GER_Espionage.38.t
+	desc = GER_Espionage.38.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.38.a
+	}
+}
+
+country_event = { #
+	id = GER_Espionage.39
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.39" }
+	title = GER_Espionage.39.t
+	desc = GER_Espionage.39.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.39.a
+	}
+}
+
+country_event = { #
+	id = GER_Espionage.40
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GER_Espionage.40" }
+	title = GER_Espionage.40.t
+	desc = GER_Espionage.40.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = GER_Espionage.40.a
+	}
+}
+
+####################
+# Speer/RND Events #
+####################
+add_namespace = RND
+
+country_event = { #RND intel report numero 1
+	id = RND.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.1" }
+	title = RND.1.t
+	desc = RND.1.d
+	picture = GFX_report_event_GER_gehlen
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = RND.1.a
+		set_country_flag = SGR_phase1_assassinations
+	}
+}
+
+country_event = { #Karl Brandt
+	id = RND.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.2" }
+	title = RND.2.t
+	desc = RND.2.d
+	picture = GFX_report_event_GER_gehlen_bloody 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.2.a
+		add_stability = 0.1
+		add_regime_stab_small = yes
+	}
+}
+
+country_event = { #Hans Kammler
+	id = RND.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.3" }
+	title = RND.3.t
+	desc = RND.3.d
+	picture = GFX_report_event_GER_gehlen_bloody 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.3.a
+		add_stability = 0.1
+		add_regime_stab_small = yes
+	}
+}
+
+country_event = { #Karl Hanke
+	id = RND.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.4" }
+	title = RND.4.t
+	desc = RND.4.d
+	picture = GFX_report_event_GER_gehlen_bloody
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.4.a
+		add_stability = 0.1
+		add_regime_stab_small = yes
+		clr_country_flag = SGR_phase1_assassinations
+	}
+}
+
+country_event = {
+	id = RND.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.5" }
+	title = RND.5.t
+	desc = RND.5.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.5.a
+	}
+}
+
+country_event = {
+	id = RND.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.6" }
+	title = RND.6.t
+	desc = RND.6.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.6.a
+	}
+}
+
+country_event = { # Unternehmen Singvogel (Thailand infiltration) RND report
+	id = RND.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.7" }
+	title = RND.7.t
+	desc = RND.7.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.7.a
+		Espionage_SuccessEffect = yes
+		set_country_flag = SGR_RND_Thailand_foothold
+		add_political_power = 50
+		add_stability = 0.05
+	}
+}
+
+country_event = { # Unternehmen Morgensonne (Japan infiltration) RND report
+	id = RND.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.8" }
+	title = RND.8.t
+	desc = RND.8.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.8.a
+		Espionage_SuccessEffect = yes
+		add_political_power = 100
+		add_stability = 0.05
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 5 }
+	}
+}
+
+country_event = { # Unternehmen Spähadler (US propaganda survey) RND report
+	id = RND.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.9" }
+	title = RND.9.t
+	desc = RND.9.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.9.a
+		Espionage_SuccessEffect = yes
+		set_country_flag = SGR_RND_USA_foothold
+		add_political_power = 50
+		add_stability = 0.05
+	}
+}
+
+country_event = { # Unternehmen Nadelöhr (Infiltration of US banks) RND report
+	id = RND.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.10" }
+	title = RND.10.t
+	desc = RND.10.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.10.a
+		Espionage_SuccessEffect = yes
+		add_political_power = 100
+		add_stability = 0.05
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 5 }
+		custom_effect_tooltip = SGR_cut_off_BRG_money_supply
+		add_to_variable = { BRG.BRG_collapse_chance = 40 }
+	}
+}
+
+country_event = { # Unternehmen Königsmacher (Contact with Symslovsky in Vyatka) RND report
+	id = RND.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.11" }
+	title = RND.11.t
+	desc = RND.11.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.11.a
+		Espionage_SuccessEffect = yes
+		add_political_power = 30
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 2.5 }
+	}
+}
+
+country_event = { # Unternehmen Königsmacher, event for Vyatka
+	id = RND.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.12" }
+	title = RND.12.t
+	desc = RND.12.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.12.a
+		GER = {
+			send_equipment = {
+				equipment = infantry_equipment
+				amount = 1350
+				target = VYT
+			}
+		}
+		VYT = {
+			add_opinion_modifier = {
+				target = GER
+				modifier = GER_VYT_favor_owed
+			}
+			add_timed_idea = {
+				idea = GER_SGR_RND_advisors
+				days = 365
+			}
+		}
+	}
+}
+
+country_event = { # Unternehmen Rotbart, Omsk
+	id = RND.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.13" }
+	title = RND.13.t
+	desc = RND.13.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.13.a
+		Espionage_SuccessEffect = yes
+		add_stability = -0.05
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 2.5 }
+	}
+}
+
+country_event = { # Unternehmen Rotbart, Amur
+	id = RND.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.14" }
+	title = RND.14.t
+	desc = RND.14.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.14.a
+		Espionage_SuccessEffect = yes
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 2.5 }
+	}
+}
+
+country_event = { # Unternehmen Rotbart, Hyperborea
+	id = RND.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.15" }
+	title = RND.15.t
+	desc = RND.15.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.15.a
+		Espionage_SuccessEffect = yes
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 2.5 }
+	}
+}
+
+country_event = { # Unternehmen Tapferkeit, initial infiltration of Burgundy
+	id = RND.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.16" }
+	title = RND.16.t
+	desc = RND.16.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.16.a
+		Espionage_SuccessEffect = yes
+		set_country_flag = SGR_RND_Burgundy_foothold
+		add_political_power = 100
+		custom_effect_tooltip = SGR_ramp_up_pressure
+		add_to_variable = { BRG.BRG_collapse_chance = 25 }
+	}
+}
+
+country_event = { # Germany establishes bases in Brazil
+	id = RND.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.19" }
+	title = RND.19.t
+	desc = RND.19.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.19.a
+		Espionage_SuccessEffect = yes
+		set_country_flag = SGR_unlock_brazil_decisions
+	}
+}
+
+country_event = { # German 'expats' buys houses and stores in Brazil
+	id = RND.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.20" }
+	title = RND.20.t
+	desc = RND.20.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.20.a
+	}
+}
+
+country_event = { # 
+	id = RND.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.21" }
+	title = RND.21.t
+	desc = RND.21.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.21.a
+	}
+}
+
+country_event = { # 
+	id = RND.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.22" }
+	title = RND.22.t
+	desc = RND.22.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.22.a
+	}
+}
+
+country_event = { # 
+	id = RND.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.23" }
+	title = RND.23.t
+	desc = RND.23.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.23.a
+	}
+}
+
+country_event = { # 
+	id = RND.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.24" }
+	title = RND.24.t
+	desc = RND.24.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.24.a
+	}
+}
+
+country_event = { # 
+	id = RND.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.25" }
+	title = RND.25.t
+	desc = RND.25.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # 
+		name = RND.25.a
+	}
+}
+
+country_event = { #
+	id = RND.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.26" }
+	title = RND.26.t
+	desc = RND.26.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.26.a
+	}
+}
+
+country_event = { # 
+	id = RND.27
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.27" }
+	title = RND.27.t
+	desc = RND.27.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.27.a
+	}
+}
+
+country_event = { # 
+	id = RND.28
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.28" }
+	title = RND.28.t
+	desc = RND.28.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.28.a
+	}
+}
+
+country_event = { # 
+	id = RND.29
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.29" }
+	title = RND.29.t
+	desc = RND.29.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.29.a
+	}
+}
+
+country_event = { # Unternehmen Rotbart, Tukhachevksy
+	id = RND.30
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.30" }
+	title = RND.30.t
+	desc = RND.30.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.30.a
+		Espionage_SuccessEffect = yes
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 2.5 }
+	}
+}
+
+country_event = { # Unternehmen Rotbart, Serov
+	id = RND.31
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.31" }
+	title = RND.31.t
+	desc = RND.31.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.31.a
+		Espionage_SuccessEffect = yes
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 2.5 }
+	}
+}
+country_event = { # Unternehmen Rotbart, Gumilyov
+	id = RND.32
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.32" }
+	title = RND.32.t
+	desc = RND.32.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.32.a
+		Espionage_SuccessEffect = yes
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 2.5 }
+	}
+}
+country_event = { # Unternehmen Rotbart, Taboritsky
+	id = RND.33
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.33" }
+	title = RND.33.t
+	desc = RND.33.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.33.a
+		Espionage_SuccessEffect = yes
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 2.5 }
+	}
+}
+country_event = { 
+	id = RND.34
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.34" }
+	title = RND.34.t
+	desc = RND.34.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.34.a
+	}
+}
+
+country_event = { 
+	id = RND.35
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.35" }
+	title = RND.35.t
+	desc = RND.35.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.35.a
+	}
+}
+
+country_event = { 
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.36" }
+	title = RND.36.t
+	desc = RND.36.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.36.a
+	}
+}
+
+country_event = { 
+	id = RND.37
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.37" }
+	title = RND.37.t
+	desc = RND.37.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.37.a
+	}
+}
+
+country_event = { 
+	id = RND.38
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.38" }
+	title = RND.38.t
+	desc = RND.38.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.38.a
+	}
+}
+
+country_event = { 
+	id = RND.39
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.39" }
+	title = RND.39.t
+	desc = RND.39.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.39.a
+	}
+}
+
+country_event = { 
+	id = RND.40
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.40" }
+	title = RND.40.t
+	desc = RND.40.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.40.a
+	}
+}
+
+country_event = { # SALGADO GAMING
+	id = RND.41
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.41" }
+	title = RND.41.t
+	desc = RND.41.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.41.a
+		hidden_effect= {
+			clear_array = BRA_senate_major_parties
+			add_to_array = { BRA_senate_major_parties = PARTY_PRP }
+
+			set_variable = { BRA_senate_major_party_align^PARTY_PDC = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PTN = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PR  = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PL  = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PSB = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PCB = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PCDOB = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PST = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PNB = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PDT = PARTY_PRP }
+
+			set_variable = { BRA_senate_major_party_align^PARTY_PSD = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PTB = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_UDN = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_PSP = PARTY_PRP }
+
+			set_variable = { BRA_senate_major_party_align^PARTY_ARENA = PARTY_PRP }
+			set_variable = { BRA_senate_major_party_align^PARTY_MDB = PARTY_PRP }
+
+			BRA_redraw_senate_diagram = yes
+		}
+		hidden_effect = {
+			BRA_setup_high_amnt = yes
+			clear_array = BRA_modify_electoral_parties
+			add_to_array = { BRA_modify_electoral_parties = 5 }
+			BRA_modify_electoral_chances_nationwide = yes
+		}
+		custom_effect_tooltip = BRA_boost_PRP_candidates_nationwide_high
+	}
+}
+
+country_event = { # Report on assistance on Paraguayan government in Bush War - Weapons sent to Frente de Guerra to beat back FULNA insurgents, training provided by existing German agents inside Paraguay. Pro-government forces soon begin battle with insurgents, decisive victory in government's side. 
+	id = RND.42
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.42" }
+	title = RND.42.t
+	desc = RND.42.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.42.a
+		add_political_power = 50
+		Espionage_SuccessEffect = yes
+		PAR = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 600
+				producer = GER
+			}
+			add_popularity = {
+				ideology = national_socialism
+				popularity = 0.03
+			}
+			set_country_flag = PAR_GER_help
+		}
+	}
+}
+
+country_event = { # Report on assistance on FdG insurgency in Bush War - Weapons sent to Frente de Guerra to assist them in insurgency against Paraguayan government and FULNA, training provided by existing German agents. FdG militias manage to secure a strategic position after extensive training and planning by RND agents.
+	id = RND.43
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.43" }
+	title = RND.43.t
+	desc = RND.43.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.43.a
+		add_political_power = 50
+		Espionage_SuccessEffect = yes
+		PAR = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 600
+				producer = GER
+			}
+			add_popularity = {
+				ideology = national_socialism
+				popularity = 0.03
+			}
+			set_country_flag = PAR_GER_help_FdG_insurgency
+		}
+	}
+}
+
+country_event = { # Report on Che Guevara taking over Paraguay under FULNA - two versions. If the player has not discovered Che's presence in Paraguay, event is about how Che's appearance after disappearing for several years after El Cautinzo in Chile has cleared up the fog of confusion with FULNA's strength. Else, event is about how Che's emergence as leader is expected when taking into account his organizational skills.
+	id = RND.44
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.44" }
+	title = RND.44.t
+	desc = { 
+		text = RND.44.t.che
+		trigger = { 
+			has_country_flag = GER_know_che
+		} 
+	}
+	desc = { 
+		text = RND.44.t.noche
+		trigger = { 
+			NOT = {
+				has_country_flag = GER_know_che
+			}
+		} 
+	}
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.44.a
+		set_country_flag = RND_unlock_paraguay_ops_2
+	}
+}
+
+country_event = { # Report on the beginning of the Paraguayan Bush War - government is losing control of the countryside to FULNA led by an unknown leader, advise player to send assistance to the Paraguayan government/pro-German insurgency there.
+	id = RND.45
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.45" }
+	title = RND.45.t
+	desc = {
+		text = RND.45.t.democraticos
+		trigger = {
+			PAR = { # Democráticos
+				has_country_leader = {
+					character = PAR_Federico_Chaves
+					ruling_only = yes
+				}
+			}
+		}
+	}
+	desc = {
+		text = RND.45.t.gov
+		trigger = {
+			PAR = {
+				NOT = { # Not Democráticos
+					has_country_leader = {
+						character = PAR_Federico_Chaves
+						ruling_only = yes
+					}
+				}
+			}
+		}
+	}
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.45.a
+		set_country_flag = RND_unlock_paraguay_ops_1
+		hidden_effect = {
+			country_event = { id = RND.48 days = 5 }
+		}
+	}
+}
+
+country_event = { # Report on operation against communist forces in Paraguay - intel network has identified several communist strongholds and formations across Paraguay, intelligence is sent to democrats in the wake of the coming clash between them and the communists for control of Paraguay.
+	id = RND.46
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.46" }
+	title = RND.46.t
+	desc = RND.46.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.46.a
+		Espionage_SuccessEffect = yes
+		PAR = {
+			add_popularity = {
+				ideology = socialist
+				popularity = -0.02
+			}
+			add_popularity = {
+				ideology = communist
+				popularity = -0.03
+			}
+			set_country_flag = GER_PAR_help_democrats
+		}
+	}
+}
+
+country_event = { # Commies took power anyways, time to assist foreign intervention
+	id = RND.47
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.47" }
+	title = RND.47.t
+	desc = RND.47.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.47.a
+		set_country_flag = RND_unlock_paraguay_ops_3
+	}
+}
+
+country_event = { # The stench of bolshevism can be smelled from Germania - Che Guevara's trail has gone silent, perhaps Paraguay is where he went after going dark following the suspicions that he had organized and caused the El Cautinzo in Chile. Emphasise on how tracking down Che would be beneficial in turning Brazil and Argentina hostile against a US-recognized Paraguay.
+	id = RND.48
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.48" }
+	title = RND.48.t
+	desc = RND.48.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.48.a
+		set_country_flag = GER_find_che
+	}
+}
+
+country_event = { # Report on Che Guevara's location - agents has located him in several safehouses across Paraguay, confirm that Che is helping FULNA to organize and operate in Paraguay. Report ends with writer saying that an appropriate report will be sent to Brazil and Argentina in line with current plans.
+	id = RND.49
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.49" }
+	title = RND.49.t
+	desc = RND.49.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.49.a
+		set_country_flag = GER_know_che
+		custom_effect_tooltip = SGR_RND_mission_success_increase_tt
+		Espionage_SuccessEffect = yes
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 2.5 }
+		hidden_effect = {
+			BRA = {
+				country_event = { id = RND.50 days = 5 }
+			}
+			ARG = {
+				country_event = { id = RND.51 days = 2 }
+			}
+		}
+	}
+}
+
+country_event = { # Report version for Brazil
+	id = RND.50
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.50" }
+	title = RND.50.t
+	desc = RND.50.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.50.a
+	}
+}
+
+country_event = { # Report version for Argentina
+	id = RND.51
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.51" }
+	title = RND.51.t
+	desc = RND.51.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.51.a
+	}
+}
+
+country_event = { # 
+	id = RND.52
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.52" }
+	title = RND.52.t
+	desc = RND.52.desc
+	picture = GFX_report_event_SGR_RND_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.52.a
+		Espionage_SuccessEffect = yes
+		PAR = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = -1000
+			}
+		}
+	}
+}
+
+country_event = { # 
+	id = RND.53
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.53" }
+	title = RND.53.t
+	desc = RND.53.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.53.a
+	}
+}
+
+country_event = { # 
+	id = RND.54
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.54" }
+	title = RND.54.t
+	desc = RND.54.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.54.a
+	}
+}
+
+country_event = { # 
+	id = RND.55
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.55" }
+	title = RND.55.t
+	desc = RND.55.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.55.a
+	}
+}
+
+country_event = { # 
+	id = RND.56
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.56" }
+	title = RND.56.t
+	desc = RND.56.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.56.a
+	}
+}
+
+country_event = { # 
+	id = RND.57
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.57" }
+	title = RND.57.t
+	desc = RND.57.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.57.a
+	}
+}
+
+country_event = { # 
+	id = RND.58
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.58" }
+	title = RND.58.t
+	desc = RND.58.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.58.a
+	}
+}
+
+country_event = { # 
+	id = RND.59
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.59" }
+	title = RND.59.t
+	desc = RND.59.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.59.a
+	}
+}
+
+country_event = { # 
+	id = RND.60
+	immediate = { log = "[GetDateText]: [Root.GetName]: event RND.60" }
+	title = RND.60.t
+	desc = RND.60.desc
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = RND.60.a
+	}
+}
+
+######################
+# Bormann/HVA Events #
+######################
+add_namespace = HVA
+add_namespace = HVA_JAP # Japan-exclusive events - to be moved into their own CIA/RND/HVA equivalent in the future
+
+country_event = { # Unternehmen Tapferkeit - 2nd infiltration successful
+	id = HVA.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.1" }
+	title = HVA.1.t
+	desc = HVA.1.desc
+	picture = GFX_report_event_GER_orpo
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = HVA.1.a
+		Espionage_SuccessEffect = yes
+		add_political_power = 100
+		BOR_SIG_AP_6_10 = yes
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 5 }
+	}
+}
+
+country_event = { # Unternehmen Tapferkeit - 2nd infiltration fails, but still gets some results
+	id = HVA.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.2" }
+	title = HVA.2.t
+	desc = HVA.2.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = HVA.2.a
+		Espionage_SuccessEffect = yes
+		add_political_power = 50
+		BOR_SIG_AP_6_5 = yes
+		add_to_variable = { TNO_Espionage_Bonus_Mission = 3 }
+	}
+}
+
+country_event = { # Unternehmen Drache - The HVA makes contact with Gao, procuring a carefuly worded statement endorsing the Fifth Modernization (Unification)
+	id = HVA.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.3" }
+	title = HVA.3.t
+	desc = HVA.3.desc
+	picture = GFX_report_event_CHI_nanjing2
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = HVA.3.a
+		trigger = { tag = GER }
+		Espionage_SuccessEffect = yes
+		BOR_SIG_AP_0_5 = yes
+		effect_tooltip = { CHI = { add_political_power = 100 } }
+	}
+	option = { #
+		name = HVA.3.a
+		trigger = { tag = CHI }
+		add_political_power = 100
+	}
+}
+
+country_event = { # Unternehmen Raubvögel - report
+	id = HVA.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.4" }
+	title = HVA.4.t
+	desc = HVA.4.desc
+	picture = GFX_report_event_GER_orpo
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = HVA.4.a
+		Espionage_SuccessEffect = yes
+		effect_tooltip = {
+			JAP = {
+				add_stability = -0.04
+				add_political_power = -80
+			}
+			every_country = {
+				limit = {
+					OR = {
+						tag = BUR
+						tag = PHI
+						tag = NRB
+					}
+				}
+				add_timed_idea = {
+					idea = GER_HVA_sphere_rebel_aid
+					days = 500
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Unternehmen Raubvögel - Japan notification event
+	id = HVA.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.5" }
+	title = HVA.5.t
+	desc = HVA.5.desc
+	picture = GFX_report_event_generic_revolution_colour
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = HVA.5.a
+		add_stability = -0.04
+		add_political_power = -80
+		every_country = {
+			limit = {
+				OR = {
+					tag = BUR
+					tag = PHI
+					tag = NRB
+				}
+			}
+			add_timed_idea = {
+				idea = GER_HVA_sphere_rebel_aid
+				days = 500
+			}
+		}
+		hidden_effect = {
+			random_list = {
+				70 = { country_event = { id = HVA_JAP.1 days = 90 } } # Japan doesn't find out
+				30 = { country_event = { id = HVA_JAP.2 days = 90 } } # Japan finds out
+			}
+		}
+	}
+}
+
+country_event = { # Unternehmen Raubvögel - Japan doesn't find out
+	id = HVA_JAP.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA_JAP.1" }
+	title = HVA_JAP.1.t
+	desc = HVA_JAP.1.desc
+	picture = GFX_report_event_JAP_flamethrower3
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = HVA_JAP.1.a
+		add_stability = 0.02
+	}
+}
+
+country_event = { # Unternehmen Raubvögel - Japan finds out Germany did it
+	id = HVA_JAP.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA_JAP.2" }
+	title = HVA_JAP.2.t
+	desc = HVA_JAP.2.desc
+	picture = GFX_report_event_GER_orpo
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = HVA_JAP.2.a
+		add_stability = 0.02
+		add_war_support = 0.03
+		GER = { country_event = HVA.6 }
+	}
+}
+
+country_event = { # Unternehmen Raubvögel - Japan found out uh oh
+	id = HVA.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.6" }
+	title = HVA.6.t
+	desc = HVA.6.desc
+	picture = GFX_report_event_JAP_diet_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = HVA.6.a
+		BOR_SIG_SP_0_3 = yes
+		BOR_SIG_SP_6_10 = yes
+		GER_Bormann_Sphere_Trade_decrease_opinion_high = yes
+	}
+}
+
+country_event = { # Unternehmen Unsterblich - training goes well
+	id = HVA.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.7" }
+	title = HVA.7.t
+	desc = HVA.7.desc
+	picture = GFX_report_event_GER_herbst_police_murder
+	
+	is_triggered_only = yes
+	
+	option = { #
+		name = HVA.7.a
+		trigger = { tag = GER }
+		Espionage_SuccessEffect = yes
+		add_command_power = 15
+		effect_tooltip = { PER = { add_ideas = GER_HVA_counterinsurgency_training } }
+	}
+	option = { #
+		name = HVA.7.a
+		trigger = { tag = PER }
+		add_ideas = GER_HVA_counterinsurgency_training
+	}
+}
+
+country_event = { # Unternehmen Schwarzes Gold - report
+	id = HVA.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.8" }
+	title = HVA.8.t
+	desc = HVA.8.desc
+	picture = GFX_report_event_GER_city_burning
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = HVA.8.a
+		Espionage_SuccessEffect = yes
+		every_other_country = {
+			limit = {
+				OR = {
+					tag = SAU
+					AND = {
+						tag = GUL
+						has_government = despotism
+					}
+					has_war_with = EGB
+					has_war_with = SDS
+					has_war_with = BIR
+					has_war_with = NYM
+					has_war_with = OMB
+				}
+			}
+			effect_tooltip = { add_timed_idea = { idea = GER_Bormann_OC_orpo_sabotage days = 365 } }
+		}
+	}
+}
+
+country_event = { # Speer is kidnapped and shot quietly
+	id = HVA.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.9" }
+	title = HVA.9.t
+	desc = HVA.9.desc
+	picture = GFX_report_event_GER_herbst_police_murder
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = HVA.9.a
+		Espionage_SuccessEffect = yes
+		BOR_SIG_AP_0_10 = yes
+		add_political_power = 100
+		add_stability = 0.03
+		hidden_effect = {
+			country_event = { id = bormannflavor.24 days = 1 }
+			every_country = { news_event = { id = WORLD_REICH.110 days = 2 } }
+		}
+	}
+}
+
+country_event = { # Speer is openly murdered by the HVA
+	id = HVA.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.10" }
+	title = HVA.10.t
+	desc = HVA.10.desc
+	picture = GFX_report_event_GER_herbst_police_murder
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = HVA.10.a
+		Espionage_SuccessEffect = yes
+		BOR_SIG_AP_0_10 = yes
+		BOR_SIG_SL_0_3_0 = yes
+		BOR_SIG_SL_4_3_0 = yes
+		BOR_SIG_SL_2_3_0 = yes
+		hidden_effect = {
+			country_event = { id = bormannflavor.26 days = 1 }
+			USA = { country_event = { id = bormannflavor.27 days = 2 } }
+			every_country = { news_event = { id = WORLD_REICH.111 days = 3 } }
+			set_temp_variable = { tension_WT = 10 }
+			set_temp_variable = { tension_superpower_1 = USA }
+			set_temp_variable = { tension_superpower_2 = GER }
+			set_temp_variable = { tension_id = 50 }
+			TNO_change_tension = yes
+		}
+	}
+}
+
+country_event = { # HVA assassination attempt on Erhard and Kiesinger
+	id = HVA.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HVA.11" }
+	title = HVA.11.t
+	desc = HVA.11.desc
+	picture = GFX_report_event_GER_kiesinger
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = HVA.11.a
+		Espionage_SuccessEffect = yes
+		BOR_SIG_AP_0_10 = yes
+		BOR_SIG_SL_0_1_0 = yes
+		BOR_SIG_SL_4_1_0 = yes
+		BOR_SIG_SL_2_1_0 = yes
+	}
+}

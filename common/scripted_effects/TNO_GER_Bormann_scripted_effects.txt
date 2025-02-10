@@ -1,0 +1,563 @@
+########################################################################
+##  ██████╗  ██████╗ ██████╗ ███╗   ███╗ █████╗ ███╗   ██╗███╗   ██╗  ##
+##  ██╔══██╗██╔═══██╗██╔══██╗████╗ ████║██╔══██╗████╗  ██║████╗  ██║  ##
+##  ██████╔╝██║   ██║██████╔╝██╔████╔██║███████║██╔██╗ ██║██╔██╗ ██║  ##
+##  ██╔══██╗██║   ██║██╔══██╗██║╚██╔╝██║██╔══██║██║╚██╗██║██║╚██╗██║  ##
+##  ██████╔╝╚██████╔╝██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║██║ ╚████║  ##
+##  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝  ##
+########################################################################
+
+#Kartenhaus effects are stored in -/common/scripted_effects/TNO_Bormann_Kartenhaus_scripted_effects.txt
+
+######################
+# Focus Tree Reloads #
+######################
+
+reload_GER_bormann_post_cw_tree = {
+	custom_effect_tooltip = GER_new_options_focus_tree
+	mark_focus_tree_layout_dirty = yes
+
+	hidden_effect = {
+		if = {
+			limit = { NOT = { has_focus_tree = GER_bormann_post_cw_tree } }
+			load_focus_tree = GER_bormann_post_cw_tree
+		}
+	}
+}
+
+###################
+# Generic Effects #
+###################
+
+GER_BOR_NOR_fail_negotiations = {
+	custom_effect_tooltip = BOR_NOR_negotiations_will_end
+	hidden_effect = {
+		country_event = { id = bormann.1068 days = 1 }
+		GER = { country_event = { id = bormann.1068 days = 1 } }
+	}
+}
+
+GER_BOR_set_up_moskowien = {
+	custom_effect_tooltip = GER_BOR_set_up_moskowien_tt
+	hidden_effect = {
+		MCW = {
+			GER = {
+				set_autonomy = {
+					target = MCW
+					autonomy_state = autonomy_military_government
+				}
+				GER_walther_wenck = {
+					set_nationality = MCW
+				}
+			}
+			set_popularities = { national_socialism = 100 }
+			set_party_name = {
+				ideology = national_socialism
+				long_name = BOR_military_government
+				name = BOR_military_government
+			}
+			add_country_leader_role = {
+				character = GER_walther_wenck
+				country_leader = {
+					expire = "1999.4.20"
+					ideology = national_socialism_subtype
+					id = -1
+				}
+				promote_leader = yes
+			}
+			set_cosmetic_tag = MCW_BOR
+			econ_join_sphere_GER = yes
+			remove_faction_status = yes
+			add_ideas = Pakt_Military_Authority
+
+			transfer_state = 263
+			transfer_state = 209
+			transfer_state = 210
+			transfer_state = 246
+			transfer_state = 244
+			transfer_state = 264
+			transfer_state = 247
+			transfer_state = 219
+			transfer_state = 242
+			transfer_state = 243
+			transfer_state = 241
+			transfer_state = 224
+			transfer_state = 257
+			transfer_state = 260
+			transfer_state = 245
+			transfer_state = 222
+			transfer_state = 1421
+			transfer_state = 1434
+			transfer_state = 1442
+			transfer_state = 1435
+			transfer_state = 1443
+			transfer_state = 1441
+			transfer_state = 1436
+			transfer_state = 195
+			transfer_state = 238
+			transfer_state = 217
+			transfer_state = 401
+			transfer_state = 237
+			transfer_state = 244
+			transfer_state = 239
+			every_owned_state = { add_core_of = MCW }
+		}
+	}
+}
+
+#####################
+# South African War #
+#####################
+GER_Bormann_SAF_initialize_SAW = {
+	custom_effect_tooltip = SGR_SAW_entry_tt
+
+	hidden_effect = {
+		add_dynamic_modifier = { modifier = GER_BOR_student_protests_dynamic_modifier }
+		add_ideas = GER_BOR_student_protests
+	
+		set_variable = { GER_Bormann_SAW_involvement = 15 }
+		set_variable = { GER_Bormann_SAW_civilian_protest = 10 }
+		set_variable = { GER_Bormann_SAW_civilian_protest_growth_base = 0.5 }
+		set_variable = { GER_Bormann_SAW_involvement_check = GER_Bormann_SAW_involvement }
+		set_variable = { GER_advisor_level = 0 }
+	
+		set_variable = { GER_Bormann_SAW_max_stab_hit = 0.05 }
+		set_variable = { GER_Bormann_SAW_max_pp_hit = 0.1 }
+
+		set_country_flag = GER_SAW_intervention
+		TNO_fopo_add_saw_tab = yes
+
+		set_temp_variable = { tension_WT = 5 }
+		set_temp_variable = { tension_superpower_1 = GER }
+		set_temp_variable = { tension_superpower_2 = USA }
+		set_temp_variable = { tension_id = 27 }
+		TNO_change_tension = yes
+		GER_Bormann_SAW_protest_growth = yes
+
+		GRO = { country_event = { id = SAFWAR.8 days = 4 } }
+		ANG = { country_event = { id = SAFWAR.8 days = 4 } }
+		COG = { country_event = { id = SAFWAR.8 days = 4 } }
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = WORLD.565
+				days = 1
+			}
+		}
+	}
+}
+
+GER_Bormann_SAF_conclude_SAW = {
+	custom_effect_tooltip = SGR_SAW_conclude_tt
+
+	set_country_flag = GER_Bormann_SAW_withdrawal
+	clr_country_flag = GER_SAW_intervention
+	TNO_fopo_remove_saw_tab = yes
+	TNO_fopo_remove_saw_withdrawal_tab = yes
+	
+	remove_ideas = GER_BOR_student_protests
+	remove_dynamic_modifier = { modifier = GER_BOR_student_protests_dynamic_modifier }
+	hidden_effect = {
+		set_temp_variable = { target = COG }
+		TNO_clear_and_recall_volunteers = yes
+		set_temp_variable = { target = GRO }
+		TNO_clear_and_recall_volunteers = yes
+		set_temp_variable = { target = ANG }
+		TNO_clear_and_recall_volunteers = yes
+		set_temp_variable = { target = BOR }
+		TNO_clear_and_recall_volunteers = yes
+	}
+	if = {
+		limit = { NOT = { GRO = { has_country_flag = GRO_cabal_active } } }
+		GRO_REICHSSTAAT_calculate_cabal_power = yes
+	}
+	clear_variable = GER_Bormann_SAW_involvement
+	clear_variable = GER_Bormann_SAW_civilian_protest
+	clear_variable = GER_Bormann_SAW_civilian_protest_growth_base
+	clear_variable = GER_Bormann_SAF_protests_severity_pp
+	clear_variable = GER_Bormann_SAF_protests_severity_stab
+
+	if = {
+		limit = { has_completed_focus = BOR_alle_waffen_gegen_suedafrika }
+		add_to_variable = { misc_expense = -600 }
+	}
+
+	#Calculating how many soldiers end up returning
+
+	set_temp_variable = { tempSoldiers = 1 }
+
+	randomize_temp_variable = {
+		var = tempSoldiers
+		distribution = uniform
+		min = 0.5
+		max = 0.8
+	}
+
+	multiply_variable = { GER_Bormann_SAF_manpower = tempSoldiers }
+
+	round_variable = GER_Bormann_SAF_manpower
+}
+
+GER_Bormann_SAW_protest_growth = {
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest_growth_base
+		min = 0
+		max = 10
+	}
+	
+	add_to_variable = { GER_Bormann_SAW_civilian_protest = GER_Bormann_SAW_civilian_protest_growth_base }
+	multiply_variable = { GER_Bormann_SAW_civilian_protest_growth_base = 1.5 }
+
+	GER_Bormann_SAW_calculate_idea_values = yes
+
+	custom_effect_tooltip = BOR_SAW_war_report_predic_tt
+
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_calculate_idea_values = {
+	
+	set_temp_variable = { tempStab = GER_Bormann_SAW_max_stab_hit }
+	set_temp_variable = { tempPP = GER_Bormann_SAW_max_pp_hit }
+	set_temp_variable = { tempProtest = GER_Bormann_SAW_civilian_protest }
+	
+	multiply_temp_variable = { tempProtest = 0.01 }
+	divide_temp_variable = { tempProtest = 2 }
+
+	multiply_temp_variable = { tempStab = tempProtest }
+	multiply_temp_variable = { tempStab = -1 }
+	multiply_temp_variable = { tempPP = tempProtest }
+	multiply_temp_variable = { tempPP = -1 }
+
+	set_variable = { GER_Bormann_SAF_protests_severity_pp = tempPP }
+	set_variable = { GER_Bormann_SAF_protests_severity_stab = tempStab }
+}
+
+GER_Bormann_SAW_involvement_increase_small = {
+	custom_effect_tooltip = SGR_SAW_involvement_increase_small_tt
+	add_to_variable = { GER_Bormann_SAW_involvement = 2.5 }
+	add_to_variable = { GER_Bormann_SAW_civilian_protest = 2.5 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_involvement_increase_med = {
+	custom_effect_tooltip = SGR_SAW_involvement_increase_med_tt
+	add_to_variable = { GER_Bormann_SAW_involvement = 5 }
+	add_to_variable = { GER_Bormann_SAW_civilian_protest = 5 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_involvement_increase_big = {
+	custom_effect_tooltip = SGR_SAW_involvement_increase_big_tt
+	add_to_variable = { GER_Bormann_SAW_involvement = 10 }
+	add_to_variable = { GER_Bormann_SAW_civilian_protest = 10 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_involvement_decrease_small = {
+	custom_effect_tooltip = SGR_SAW_involvement_decrease_small_tt
+	subtract_from_variable = { GER_Bormann_SAW_involvement = 2.5 }
+	subtract_from_variable = { GER_Bormann_SAW_civilian_protest = 2.5 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_involvement_decrease_med = {
+	custom_effect_tooltip = SGR_SAW_involvement_decrease_med_tt
+	subtract_from_variable = { GER_Bormann_SAW_involvement = 5 }
+	subtract_from_variable = { GER_Bormann_SAW_civilian_protest = 5 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_involvement_decrease_big = {
+	custom_effect_tooltip = SGR_SAW_involvement_decrease_big_tt
+	subtract_from_variable = { GER_Bormann_SAW_involvement = 10 }
+	subtract_from_variable = { GER_Bormann_SAW_civilian_protest = 10 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_protest_increase_small = {
+	custom_effect_tooltip = SGR_SAW_protests_increase_small_tt
+	add_to_variable = { GER_Bormann_SAW_civilian_protest = 2.5 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_protest_increase_med = {
+	custom_effect_tooltip = SGR_SAW_protests_increase_med_tt
+	add_to_variable = { GER_Bormann_SAW_civilian_protest = 5 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_protest_increase_big = {
+	custom_effect_tooltip = SGR_SAW_protests_increase_big_tt
+	add_to_variable = { GER_Bormann_SAW_civilian_protest = 10 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_protest_decrease_small = {
+	custom_effect_tooltip = SGR_SAW_protests_decrease_small_tt
+	subtract_from_variable = { GER_Bormann_SAW_civilian_protest = 2.5 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_protest_decrease_med = {
+	custom_effect_tooltip = SGR_SAW_protests_decrease_med_tt
+	subtract_from_variable = { GER_Bormann_SAW_civilian_protest = 5 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+GER_Bormann_SAW_protest_decrease_big = {
+	custom_effect_tooltip = SGR_SAW_protests_decrease_big_tt
+	subtract_from_variable = { GER_Bormann_SAW_civilian_protest = 10 }
+	clamp_variable = {
+		var = GER_Bormann_SAW_civilian_protest
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = GER_Bormann_SAW_involvement
+		min = 0
+		max = 100
+	}
+}
+
+#####################
+# Sphere trade mech #
+#####################
+# Starter
+GER_Bormann_Sphere_Trade_begin = {
+	log = "[GetDateText]: [Root.GetName]: Bormann Sphere Trade mechanic initialized"
+	unlock_decision_category_tooltip = GER_Bormann_Sphere_Trade_category
+	set_variable = { BOR_Sphere_Trade_japan_opinion = 2 }
+	set_variable = { BOR_Sphere_Trade_suck_up_cost = 20 }
+	set_variable = { BOR_Sphere_Trade_political_power_gain = -0.1 }
+	set_variable = { BOR_Sphere_Trade_research_speed_factor_base = 0 }
+	set_variable = { BOR_Sphere_Trade_production_factory_efficiency_gain_factor_base = 0.03 }
+	set_variable = { BOR_Sphere_Trade_gdp_growth_modifier_base = 1 }
+	set_variable = { BOR_Sphere_Trade_research_speed_factor = 0 }
+	set_variable = { BOR_Sphere_Trade_production_factory_efficiency_gain_factor = 0 }
+	set_variable = { BOR_Sphere_Trade_gdp_growth_modifier = 0 }
+	add_dynamic_modifier = { modifier = GER_BOR_sphere_trade_dynamic_modifier }
+	hidden_effect = { add_ideas = GER_BOR_sphere_trade }
+	custom_effect_tooltip = GER_BOR_sphere_trading_depends_on_relations_tt
+	GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+}
+
+# Increase opinion
+GER_Bormann_Sphere_Trade_increase_opinion_low = {
+	log = "[GetDateText]: [Root.GetName]: GER_Bormann_Sphere_Trade_increase_opinion_low; Executing"
+	custom_effect_tooltip = GER_BOR_sphere_trading_increase_relations_tt
+	add_to_variable = { BOR_Sphere_Trade_japan_opinion = 1 }
+	clamp_variable = { var = BOR_Sphere_Trade_japan_opinion min = 0 max = 10 }
+	GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+}
+
+GER_Bormann_Sphere_Trade_increase_opinion_med = {
+	log = "[GetDateText]: [Root.GetName]: GER_Bormann_Sphere_Trade_increase_opinion_med; Executing"
+	custom_effect_tooltip = GER_BOR_sphere_trading_increase_relations_tt
+	add_to_variable = { BOR_Sphere_Trade_japan_opinion = 2 }
+	clamp_variable = { var = BOR_Sphere_Trade_japan_opinion min = 0 max = 10 }
+	GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+}
+
+GER_Bormann_Sphere_Trade_increase_opinion_high = {
+	log = "[GetDateText]: [Root.GetName]: GER_Bormann_Sphere_Trade_increase_opinion_high; Executing"
+	custom_effect_tooltip = GER_BOR_sphere_trading_increase_relations_tt
+	add_to_variable = { BOR_Sphere_Trade_japan_opinion = 3 }
+	clamp_variable = { var = BOR_Sphere_Trade_japan_opinion min = 0 max = 10 }
+	GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+}
+
+# Decrease opinion
+GER_Bormann_Sphere_Trade_decrease_opinion_low = {
+	log = "[GetDateText]: [Root.GetName]: GER_Bormann_Sphere_Trade_decrease_opinion_low; Executing"
+	custom_effect_tooltip = GER_BOR_sphere_trading_decrease_relations_tt
+	add_to_variable = { BOR_Sphere_Trade_japan_opinion = -1 }
+	clamp_variable = { var = BOR_Sphere_Trade_japan_opinion min = 0 max = 10 }
+	GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+
+	# Failure check
+	GER_Bormann_Sphere_Trade_check_for_failure = yes
+}
+
+GER_Bormann_Sphere_Trade_decrease_opinion_med = {
+	log = "[GetDateText]: [Root.GetName]: GER_Bormann_Sphere_Trade_decrease_opinion_med; Executing"
+	custom_effect_tooltip = GER_BOR_sphere_trading_decrease_relations_tt
+	add_to_variable = { BOR_Sphere_Trade_japan_opinion = -2 }
+	clamp_variable = { var = BOR_Sphere_Trade_japan_opinion min = 0 max = 10 }
+	GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+
+	# Failure check
+	GER_Bormann_Sphere_Trade_check_for_failure = yes
+}
+
+GER_Bormann_Sphere_Trade_decrease_opinion_high = {
+	log = "[GetDateText]: [Root.GetName]: GER_Bormann_Sphere_Trade_decrease_opinion_high; Executing"
+	custom_effect_tooltip = GER_BOR_sphere_trading_decrease_relations_tt
+	add_to_variable = { BOR_Sphere_Trade_japan_opinion = -3 }
+	clamp_variable = { var = BOR_Sphere_Trade_japan_opinion min = 0 max = 10 }
+	GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+
+	# Failure check
+	GER_Bormann_Sphere_Trade_check_for_failure = yes
+}
+
+# Check to see if you fucked up and Japan wants to kick you off
+GER_Bormann_Sphere_Trade_check_for_failure = {
+	log = "[GetDateText]: [Root.GetName]: GER_Bormann_Sphere_Trade_check_for_failure; Executing"
+	if = {
+		limit = { check_variable = { BOR_Sphere_Trade_japan_opinion = 0 } }
+		log = "[GetDateText]: [Root.GetName]: GER_Bormann_Sphere_Trade_check_for_failure; Failure - Germany about to get kicked"
+		hidden_effect = { country_event = { id = bormann.1818 days = 7 } }
+	}
+}
+
+# Calculate the effects of the relationship variable into the modifier
+GER_Bormann_Sphere_Trade_calculate_relationship_effects = {
+	log = "[GetDateText]: [Root.GetName]: GER_Bormann_Sphere_Trade_calculate_relationship_effects; Executing"
+	set_variable = { BOR_Sphere_Trade_research_speed_factor = 0 }
+	set_variable = { BOR_Sphere_Trade_production_factory_efficiency_gain_factor = 0 }
+	set_variable = { BOR_Sphere_Trade_gdp_growth_modifier = 0 }
+
+	# Define new modifiers
+	set_variable = { OpinionTradeEffects = BOR_Sphere_Trade_japan_opinion }
+	set_variable = { OpinionGDPEffects = BOR_Sphere_Trade_japan_opinion }
+	add_to_variable = { OpinionTradeEffects = -2 }
+	add_to_variable = { OpinionGDPEffects = -2 }
+	if = {
+		limit = { check_variable = { BOR_Sphere_Trade_japan_opinion > 2 } }
+		multiply_variable = { OpinionTradeEffects = 0.05 }
+		divide_variable = { OpinionGDPEffects = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { BOR_Sphere_Trade_japan_opinion < 2 } }
+		multiply_variable = { OpinionTradeEffects = 0.1 }
+		multiply_variable = { OpinionGDPEffects = 0.25 }
+		add_to_variable = { OpinionGDPEffects = 1 }
+	}
+
+	if = {
+		limit = { check_variable = { OpinionGDPEffects < 1 } }
+		add_to_variable = { OpinionGDPEffects = 1 }
+	}
+	add_to_variable = { OpinionTradeEffects = 1 }
+
+	divide_variable = { OpinionGDPEffects = 2 }
+
+	# Apply new modifiers
+	set_variable = { BOR_Sphere_Trade_research_speed_factor = BOR_Sphere_Trade_research_speed_factor_base }
+	set_variable = { BOR_Sphere_Trade_production_factory_efficiency_gain_factor = BOR_Sphere_Trade_production_factory_efficiency_gain_factor_base }
+	set_variable = { BOR_Sphere_Trade_gdp_growth_modifier = BOR_Sphere_Trade_gdp_growth_modifier_base }
+	multiply_variable = { BOR_Sphere_Trade_research_speed_factor = OpinionTradeEffects }
+	multiply_variable = { BOR_Sphere_Trade_production_factory_efficiency_gain_factor = OpinionTradeEffects }
+	multiply_variable = { BOR_Sphere_Trade_gdp_growth_modifier = OpinionGDPEffects }
+
+	force_update_dynamic_modifier = yes
+}

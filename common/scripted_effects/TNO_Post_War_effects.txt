@@ -1,0 +1,167 @@
+#	Scripted triggers for Post War events
+#
+#	By Nijato
+#	
+#	Credit to the Kaiserreich Team
+
+# This can be used normally: TAG = { white_peace_with_ROOT = yes }
+# Remember: ROOT is the country running the current event
+# THIS is the TAG you are running this action on
+
+white_peace_with_ROOT = {
+	hidden_effect = {
+		set_temp_variable = { this_country = THIS }
+		# See if they're actually at war first
+		if = {
+			limit = { NOT = { has_war_with = ROOT } }
+			# Nothing
+		}
+
+		# First check if THIS is in a faction
+		else_if = {
+			limit = {
+				is_in_faction = no
+				ROOT = {
+					any_enemy_country = {
+						is_in_faction = no
+						has_war_together_with = var:this_country
+					}
+				}
+			}
+			set_country_flag = TNO_temp_faction
+			save_event_target_as = white_peace_defender
+			create_faction = "Temporary Defender Faction"
+			every_country = {
+				limit = {
+					is_in_faction = no
+					has_war_together_with = PREV
+					has_war_with = ROOT
+				}
+				event_target:white_peace_defender = { add_to_faction = PREV }
+			}
+		}
+
+		# Then check if ROOT is in a faction
+		else_if = {
+			limit = {
+				ROOT = { is_in_faction = no }
+				any_enemy_country = {
+					is_in_faction = no
+					has_war_together_with = ROOT
+				}
+			}
+			ROOT = {
+				set_country_flag = TNO_temp_faction
+				create_faction = "Temporary Attacker Faction"
+			}
+			every_country = {
+				limit = {
+					is_in_faction = no
+					has_war_together_with = ROOT
+					has_war_with = PREV
+				}
+				ROOT = { add_to_faction = PREV }
+			}
+		}
+	}
+
+	# Now white peace as per normal
+	white_peace = ROOT
+
+	# Then dismantle factions if necessary
+	hidden_effect = {
+		if = {
+			limit = { has_country_flag = TNO_temp_faction }
+			clr_country_flag = TNO_temp_faction
+			dismantle_faction = yes
+		}
+		ROOT = {
+			if = {
+				limit = { has_country_flag = TNO_temp_faction }
+				clr_country_flag = TNO_temp_faction
+				dismantle_faction = yes
+			}
+		}
+	}
+}
+
+# NOTE: "save_event_target_as = white_peace_receiver" needs to be performed first
+# Then you use "TAG = { white_peace_with_TARGET = yes }"
+
+white_peace_with_TARGET = {
+	hidden_effect = {
+		set_temp_variable = { this_country = THIS }
+		# See if they're actually at war first
+		if = {
+			limit = { NOT = { has_war_with = event_target:white_peace_receiver } }
+			# Nothing
+		}
+
+		# First check if defender is in a faction
+		else_if = {
+			limit = {
+				is_in_faction = no
+				event_target:white_peace_receiver = {
+					any_enemy_country = {
+						is_in_faction = no
+						has_war_together_with = var:this_country
+					}
+				}
+			}
+			set_country_flag = TNO_temp_faction
+			save_event_target_as = white_peace_offer
+			create_faction = "Temporary Defender Faction"
+			every_country = {
+				limit = {
+					is_in_faction = no
+					has_war_together_with = PREV
+					has_war_with = event_target:white_peace_receiver
+				}
+				event_target:white_peace_offer = { add_to_faction = PREV }
+			}
+		}
+
+		# Then check if EVENT_TARGET is in a faction
+		else_if = {
+			limit = {
+				event_target:white_peace_receiver = { is_in_faction = no }
+				any_enemy_country = {
+					is_in_faction = no
+					has_war_together_with = event_target:white_peace_receiver
+				}
+			}
+			event_target:white_peace_receiver = {
+				set_country_flag = TNO_temp_faction
+				create_faction = "Temporary Attacker Faction"
+			}
+			every_country = {
+				limit = {
+					is_in_faction = no
+					has_war_together_with = event_target:white_peace_receiver
+					has_war_with = PREV
+				}
+				event_target:white_peace_receiver = { add_to_faction = PREV }
+			}
+		}
+	}
+
+	# Now white peace as per normal
+	white_peace = event_target:white_peace_receiver
+
+	# Then dismantle factions if necessary
+	hidden_effect = {
+		if = {
+			limit = { has_country_flag = TNO_temp_faction }
+			clr_country_flag = TNO_temp_faction
+			dismantle_faction = yes
+		}
+		event_target:white_peace_receiver = {
+			if = {
+				limit = { has_country_flag = TNO_temp_faction }
+				clr_country_flag = TNO_temp_faction
+				dismantle_faction = yes
+			}
+		}
+	}
+}
+

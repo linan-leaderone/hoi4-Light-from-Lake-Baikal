@@ -1,0 +1,144 @@
+scripted_gui = {
+	TNO_state_lore_button = {
+		window_name = "TNO_state_lore_button"
+		context_type = selected_state_context
+		parent_window_token = selected_state_view
+		visible = {
+			is_in_array = { array = global.state_with_lore value = THIS.id }
+			NOT = { has_global_flag = TNO_my_world_is_on_fire_how_about_yours }
+		}
+		triggers = {
+			gui_alert_visible = {
+				ROOT = {
+					NOT = { has_country_flag = TNO_SL_disable_arrows }
+				}
+			}
+		}
+		effects = {
+			state_button_click = {
+				if = {
+					limit = {
+						check_variable = { ROOT.selected_lore_state = THIS.id }
+					}
+					ROOT = {
+						clear_array = lore_entries_onscreen
+						clear_variable = selected_lore
+						clear_variable = selected_lore_alt
+						clear_variable = selected_lore_state
+					}
+				}
+				else = {
+					clear_array = ROOT.lore_entries_onscreen
+					for_each_loop = {
+						array = lore_entries
+						add_to_array = { ROOT.lore_entries_onscreen = v }
+					}
+					set_variable = { ROOT.selected_lore_state = THIS.id }
+					ROOT = {
+						set_variable = { selected_lore = lore_entries_onscreen^0 }
+						set_variable = { selected_lore_alt = lore_entries_onscreen^0 }
+						if = {
+							limit = {
+								NOT = { has_country_flag = TNO_SL_disable_arrows }
+							}
+							set_country_flag = TNO_SL_disable_arrows
+						}
+					}
+				}
+			}
+			state_button_right_click = {
+				ROOT = {
+					if = {
+						limit = {
+							has_country_flag = TNO_state_lore_mapicons_enabled
+						}
+						clr_country_flag = TNO_state_lore_mapicons_enabled
+					}
+					else = { set_country_flag = TNO_state_lore_mapicons_enabled }
+				}
+			}
+		}
+	}
+
+	TNO_state_lore = {
+		window_name = "TNO_state_lore"
+		context_type = player_context
+		visible = { has_variable = selected_lore }
+		dynamic_lists = {
+			lore_selection_grid = {
+				array = lore_entries_onscreen
+				entry_container = "TNO_lore_selection_entry"
+				index = sl_i
+				value = selected_lore
+			}
+		}
+		effects = {
+			close_btn_click = {
+				clear_array = lore_entries_onscreen
+				clear_variable = selected_lore
+				clear_variable = selected_lore_alt
+				clear_variable = selected_lore_state
+			}
+			entry_button_click = {
+				set_variable = { selected_lore = lore_entries_onscreen^sl_i }
+				set_variable = { selected_lore_alt = lore_entries_onscreen^sl_i }
+			}
+		}
+		triggers = {
+			entry_button_click_enabled = { # The magic of temp vars
+				if = {
+					limit = {
+						check_variable = { selected_lore_alt = lore_entries_onscreen^sl_i }
+					}
+					set_temp_variable = { sl_grid_y = 17 }
+				}
+				else = { set_temp_variable = { sl_grid_y = 22 } }
+			}
+		}
+		properties = {
+			state_lore_image = {
+				image = "[Statelore_Get_winter]"
+			}
+			entry_button = {
+				image = "[Statelore_Get_grid_entry_GFX]"
+			}
+			initials = {
+				y = sl_grid_y
+			}
+		}
+	}
+	
+	TNO_state_lore_mapicons = {
+		context_type = state_mapicon
+		window_name = "TNO_state_lore_mapicons"
+		visible = { ROOT = { has_country_flag = TNO_state_lore_mapicons_enabled } }
+		mapmode = default
+		mapicon_targets = {
+			target_array = global.state_with_lore
+		}
+		triggers = {
+			entry_amount_visible = {
+				check_variable = { FROM.lore_entries^num > 1 }
+			}
+		}
+		effects = {
+			state_lore_mapicon_click = {
+				clear_array = ROOT.lore_entries_onscreen
+				set_variable = { ROOT.selected_lore_state = FROM.id }
+				for_each_loop = {
+					array = lore_entries
+					add_to_array = { ROOT.lore_entries_onscreen = v }
+				}
+				ROOT = {
+					set_variable = { selected_lore = lore_entries_onscreen^0 }
+					set_variable = { selected_lore_alt = lore_entries_onscreen^0 }
+				}
+			}
+			state_lore_mapicon_right_click = {
+				ROOT = {
+					clr_country_flag = TNO_state_lore_mapicons_enabled
+				}
+			}
+		}
+	}
+}

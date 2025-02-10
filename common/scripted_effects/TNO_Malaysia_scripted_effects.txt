@@ -1,0 +1,163 @@
+### Literally all this for a single script, this is my legacy
+
+SHO_WINS = {
+	SHO = {
+		annex_country = {
+			target = MLY
+			transfer_troops = no
+		}
+		every_owned_state = {
+			add_core_of = SHO
+			remove_core_of = MLY
+		}
+	}
+	SHO_war_end_effect = yes
+	JAP = { country_event = sho.5 }
+	USA = { country_event = sho.41 }
+	set_global_flag = skip_default_capitulation
+}
+
+MLY_WINS = {
+	MLY = {
+		annex_country = {
+			target = SHO
+			transfer_troops = no
+		}
+		every_owned_state = {
+			add_core_of = MLY
+			remove_core_of = SHO
+		}
+		set_capital = { state = 1454 remember_old_capital = no }
+	}
+	SHO_war_end_effect = yes
+	USA = { country_event = sho.4 }
+	JAP = { country_event = sho.51 }
+	set_global_flag = skip_default_capitulation
+}
+
+SHO_war_end_effect = {
+	clr_global_flag = MLY_WAR_HAPPENING
+	MLY = {
+		remove_ideas = {
+			MLY_Dismal_Infrastructure
+			MLY_The_UMAJF
+			MLY_driven_to_the_countryside
+			MLY_operation_nassau
+		}
+		if = {
+			limit = {
+				1454 = {
+					NOT = {
+						is_owned_and_controlled_by = SHO
+					}
+				}
+			}
+			MLY = {
+				set_capital = { state = 1454 remember_old_capital = no }
+				drop_cosmetic_tag = yes
+				set_cosmetic_tag = MLY_TempGov
+				set_politics = { ruling_party = socialist }
+				promote_character = MLY_Ahmad_Boestamam
+				add_ideas = {
+					MLY_Fading_Front
+					MLY_Provisional_Constitution
+				}
+				set_popularities = {
+					communist = 10
+					socialist = 40
+					conservatism = 30
+					despotism = 20
+				}
+				set_party_name = {
+					ideology = conservatism
+					long_name = MLY_tempgov_party_long
+					name = MLY_tempgov_party
+				}
+				set_party_name = {
+					ideology = paternalism
+					long_name = MLY_tempgov_party_long
+					name = MLY_tempgov_party
+				}
+				set_party_name = {
+					ideology = communist
+					long_name = MLY_tempgov_party_long
+					name = MLY_tempgov_party
+				}
+				set_party_name = {
+					ideology = socialist
+					long_name = MLY_tempgov_party_long
+					name = MLY_tempgov_party
+				}
+				set_party_name = {
+					ideology = progressivism
+					long_name = MLY_tempgov_party_long
+					name = MLY_tempgov_party
+				}
+				set_party_name = {
+					ideology = despotism
+					long_name = MLY_tempgov_party_long
+					name = MLY_tempgov_party
+				}
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_country_flag = MLY_loosing_ceasefire
+					}
+				}
+				country_event = { id = sho.19 days = 365 }
+				log = "[GetDateText]: [Root.GetName]: run elections for shonan in 1 year"
+			}
+		}
+		if = {
+			limit = {
+				SHO = {
+					exists = no
+				}
+			}
+			every_owned_state = {
+				remove_core_of = SHO
+			}
+		}
+	}
+	SHO = {
+		remove_ideas = {
+			SHO_Dai-nijyugo
+			SHO_minority
+			SHO_Zaibatsu
+			SHO_Marai_Giyugun_Auxiliaries
+		}
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = SHO_loosing_ceasefire
+					has_country_leader = { character = SHO_Takeo_Kurosawa ruling_only = yes }
+				}
+			}
+			country_event = { id = sho.20 days = 365 }
+			log = "[GetDateText]: [Root.GetName]: run elections for shonan in 1 year"
+		}
+		if = {
+			limit = {
+				MLY = {
+					exists = no
+				}
+			}
+			every_state = {
+				remove_core_of = MLY
+			}
+		}
+	}
+	
+	USA = {
+		TNO_fopo_remove_malaysia_civil_war_tab = yes
+		remove_mission = USA_hold_the_line
+		set_temp_variable = { target = MLY }
+		TNO_clear_num_volunteers = yes
+	}
+	JAP = {
+		TNO_fopo_remove_malaysia_civil_war_tab = yes
+		set_temp_variable = { target = SHO }
+		TNO_clear_num_volunteers = yes
+	}
+}

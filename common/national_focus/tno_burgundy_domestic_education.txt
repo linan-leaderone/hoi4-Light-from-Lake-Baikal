@@ -1,0 +1,659 @@
+###tex coded this bitch###
+shared_focus = {
+	id = BRG_education_waiting_for_text
+	icon = GFX_focus_BRG_bildungsprogramm
+	cost = 3.00
+	x = 19
+	y = 0
+	
+	offset = {
+		x = 10
+		y = 0
+		trigger = {
+			has_country_flag = BRG_fall_ragnarchar_allowed
+		}
+	} 
+	allow_branch = { has_country_flag = BRG_education_debug_waiting_on_you_tex }
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_education_waiting_for_text"
+		unlock_decision_category_tooltip = BRG_Domestic_Education_category
+		custom_effect_tooltip = BRG_Initalize_Education_Tree
+		set_variable = { BRG_National_Indoctrination = 50 }
+		set_country_flag = BRG_Education_Crisis_Begun
+		hidden_effect = {
+			add_dynamic_modifier = { modifier = BRG_education_tree_dynamic_modifier }
+			country_event = { id = BRG_education.2 days = 60 }
+			country_event = { id = BRG_education.3 days = 120 }
+			country_event = { id = BRG_education.4 days = 300 }
+			set_variable = { BRG_education_tree_research_speed_variable = -0.1 }
+			set_variable = { BRG_education_tree_pp_factor_variable = -0.05 }
+			set_variable = { BRG_education_SocDev_variable = -1 }
+			set_variable = { BRG_education_tree_stab_factor_variable = -0.05 }
+			set_variable = { BRG_education_tree_war_support_factor_variable = -0.15 }
+			TNO_improve_education_policy_effectiveness_low = yes
+			every_owned_state = {
+				limit = { check_variable = { nationality = 123 } }#French
+				BRG_Increase_charlemagne_support_large = yes
+				BRG_Decrease_himmler_support_large = yes
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = BRG_new_history
+	icon = GFX_focus_BRG_burgundian_nationalism
+	cost = 3.00
+	x = -3
+	y = 1
+	prerequisite = { focus = BRG_education_waiting_for_text }
+	relative_position_id = BRG_education_waiting_for_text
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_new_history"
+		custom_effect_tooltip = BRG_NI_Boost_10
+		add_to_variable = { BRG_National_Indoctrination = 10 }
+		country_event = { id = BRG_education.10 }
+	}
+}
+
+shared_focus = {
+	id = BRG_new_program
+	icon = GFX_focus_BRG_germanize_french_language
+	cost = 3.00
+	x = 3
+	y = 1
+	prerequisite = { focus = BRG_education_waiting_for_text }
+	relative_position_id = BRG_education_waiting_for_text
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_new_program"
+		custom_effect_tooltip = BRG_NI_Boost_10
+		add_to_variable = { BRG_National_Indoctrination = 10 }
+		#TNO_improve_minorities_policy_effectiveness_med = yes
+		TNO_improve_gender_rights_policy_effectiveness_med = yes
+		random_owned_state = {
+			BRG_Increase_himmler_support_medium = yes
+			add_building_construction = {
+				type = schools
+				level = 1
+				instant_build = yes
+			}
+		}
+		random_owned_state = {
+			BRG_Increase_himmler_support_medium = yes
+			add_building_construction = {
+				type = schools
+				level = 1
+				instant_build = yes
+			}
+		}
+	}
+}
+shared_focus = {
+	id = BRG_erase_degeneracy
+	icon = GFX_focus_BRG_there_was_no_belgium
+	cost = 3.00
+	x = 1
+	y = 1
+	prerequisite = { focus = BRG_new_history }
+	relative_position_id = BRG_new_history
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_erase_degeneracy"
+		custom_effect_tooltip = BRG_Gain_50_NI
+		add_to_variable = { BRG_National_Indoctrination = 50 }
+		random_owned_state = {
+			limit = { state = 34 }
+			34 = {
+				custom_effect_tooltip = BRG_higher_susceptibility
+				add_to_variable = { THIS.BRG_Conversion_Susceptibility = 5 }
+			}
+		}
+		country_event = { id = BRG_education.24 days = 4 }
+	}
+}
+shared_focus = {
+	id = BRG_cleanse_mistakes
+	icon = GFX_focus_BRG_there_was_no_france
+	cost = 3.00
+	x = -1
+	y = 1
+	prerequisite = { focus = BRG_new_history }
+	relative_position_id = BRG_new_history
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_cleanse_mistakes"
+		custom_effect_tooltip = BRG_NI_Boost_10
+		add_to_variable = { BRG_National_Indoctrination = 10 }
+		random_owned_state = {
+			limit = {
+				check_variable = { nationality = 123 } #French
+			}
+			custom_effect_tooltip = BRG_higher_susceptibility
+			add_to_variable = { THIS.BRG_Conversion_Susceptibility = 5 }
+		}
+		country_event = { id = BRG_education.20 days = 5 }
+	}
+}
+
+shared_focus = {
+	id = BRG_burgundian_irredentism
+	icon = GFX_focus_BRG_carolignian_revival
+	cost = 3.00
+	x = 0
+	y = 2
+	prerequisite = { focus = BRG_erase_degeneracy }
+	prerequisite = { focus = BRG_cleanse_mistakes }
+	relative_position_id = BRG_new_history
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_burgundian_irredentism"
+		custom_effect_tooltip = BRG_unlock_culture_conversion
+		custom_effect_tooltip = BRG_Gain_50_NI
+		add_to_variable = { BRG_National_Indoctrination = 50 }
+		TNO_improve_admin_efficiency_low = yes
+		#TNO_improve_minorities_policy_effectiveness_low = yes
+		TNO_improve_political_parties_policy_effectiveness_low = yes
+	}
+}
+
+shared_focus = {
+	id = BRG_deal_with_the_legions
+	icon = GFX_focus_HGR_burgundian_ss
+	cost = 3.00
+	x = 2
+	y = 1
+	prerequisite = { focus = BRG_burgundian_irredentism }
+	relative_position_id = BRG_burgundian_irredentism
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_deal_with_the_legions"
+		random_owned_state = {
+			limit = { check_variable = { nationality = 123 } } #French
+			custom_effect_tooltip = BRG_higher_susceptibility
+			add_to_variable = { THIS.BRG_Conversion_Susceptibility = 5 }
+			BRG_Increase_himmler_support_large = yes
+		}
+		country_event = { id = BRG_education.12 }
+	}
+}
+
+shared_focus = {
+	id = BRG_search_for_professors
+	icon = GFX_focus_BRG_find_the_professors
+	cost = 3.00
+	x = -1
+	y = 1
+	prerequisite = { focus = BRG_new_program }
+	relative_position_id = BRG_new_program
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_search_for_professors"
+		custom_effect_tooltip = BRG_Gain_50_NI
+		add_to_variable = { BRG_National_Indoctrination = 50 }
+		TNO_improve_education_policy_effectiveness_med = yes
+		TNO_improve_academic_base_low = yes
+		country_event = {
+			id = BRG_education.31
+			days = 10
+		}
+		random_owned_state = {
+			limit = {
+				check_variable = { nationality = 123 } #French
+			}
+			custom_effect_tooltip = BRG_higher_susceptibility
+			add_to_variable = { THIS.BRG_Conversion_Susceptibility = 5 }
+		}
+	}
+}
+
+shared_focus = {
+	id = BRG_burn_the_old_books
+	icon = GFX_focus_BRG_burn_the_old_books
+	cost = 3.00
+	x = 1
+	y = 1
+	prerequisite = { focus = BRG_new_program }
+	relative_position_id = BRG_new_program
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_burn_the_old_books"
+		custom_effect_tooltip = BRG_Gain_50_NI
+		add_to_variable = { BRG_National_Indoctrination = 50 }
+		TNO_improve_education_policy_effectiveness_high = yes
+		random_owned_state = {
+			limit = {
+				check_variable = { nationality = 123 } #French
+			}
+			custom_effect_tooltip = BRG_higher_susceptibility
+			add_to_variable = { THIS.BRG_Conversion_Susceptibility = 5 }
+		}
+		country_event = { id = BRG_education.11 }
+	}
+}
+
+shared_focus = {
+	id = BRG_jean_mabire_in_every_school
+	icon = GFX_focus_BRG_jean_mabire_program
+	cost = 3.00
+	x = 0
+	y = 2
+	prerequisite = { focus = BRG_burn_the_old_books }
+	prerequisite = { focus = BRG_search_for_professors }
+	relative_position_id = BRG_new_program
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_jean_mabire_in_every_school"
+		add_ideas = BRG_Jean_Mabire_Thought
+		add_popularity = {
+			ideology = national_socialism
+			popularity = 0.07
+		}
+		random_owned_state = {
+			BRG_Increase_himmler_support_large = yes
+			add_building_construction = {
+				type = school
+				level = 1
+				instant_build = yes
+			}
+		}
+		every_owned_state = {
+			BRG_Increase_himmler_support_medium = yes
+		}
+		custom_effect_tooltip = BRG_Gain_50_NI
+		add_to_variable = { BRG_National_Indoctrination = 50 }
+	}
+}
+
+shared_focus = {
+	id = BRG_authenitiziat #what the fuck
+	icon = GFX_focus_BRG_apply_grenzeschild_knowledge
+	cost = 3.00
+	x = -2
+	y = 1
+	prerequisite = { focus = BRG_jean_mabire_in_every_school }
+	relative_position_id = BRG_jean_mabire_in_every_school
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_authenitiziat"
+		hidden_effect = { country_event = { id = BRG_education.15 days = 8 } }
+		TNO_improve_admin_efficiency_low = yes
+		#TNO_improve_racial_integration_policy_effectiveness_med = yes
+		custom_effect_tooltip = BRG_Unlock_Some_French
+		custom_effect_tooltip = BRG_NI_Boost_10
+		add_to_variable = { BRG_National_Indoctrination = 10 }
+	}
+}
+
+shared_focus = {
+	id = BRG_our_germanic_hertiage
+	icon = GFX_focus_BRG_our_germanic_heritage
+	cost = 3.00
+	x = -1
+	y = 1
+	prerequisite = {
+		focus = BRG_authenitiziat
+		focus = BRG_deal_with_the_legions
+	}
+	relative_position_id = BRG_authenitiziat
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_our_germanic_hertiage"
+		#TNO_improve_racial_integration_policy_effectiveness_med = yes
+		TNO_improve_education_policy_effectiveness_low = yes
+		custom_effect_tooltip = BRG_Unlock_Some_French
+		custom_effect_tooltip = BRG_Gain_50_NI
+		add_to_variable = { BRG_National_Indoctrination = 50 }
+		country_event = { id = BRG_education.13 }
+	}
+}
+
+shared_focus = {
+	id = BRG_french_are_not_german
+	icon = GFX_focus_BRG_the_french_are_not_germans
+	cost = 3.00
+	x = -1
+	y = 1
+	mutually_exclusive = { focus = BRG_our_brothers_the_french }
+	prerequisite = { focus = BRG_our_germanic_hertiage }
+	relative_position_id = BRG_our_germanic_hertiage
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_french_are_not_german"
+		custom_effect_tooltip = BRG_Gain_50_NI
+		add_to_variable = { BRG_National_Indoctrination = 50 }
+		custom_effect_tooltip = BRG_Reduce_Harsh
+		TNO_improve_security_policy_effectiveness_med = yes
+		#TNO_worsen_minorities_policy_effectiveness_med = yes
+		hidden_effect = {
+			country_event = {
+				id = BRG_education.33
+				days = 14
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = BRG_our_brothers_the_french
+	icon = GFX_focus_BRG_our_friends_the_french
+	cost = 3.00
+	x = 1
+	y = 1
+	mutually_exclusive = { focus = BRG_french_are_not_german }
+	prerequisite = { focus = BRG_our_germanic_hertiage }
+	relative_position_id = BRG_our_germanic_hertiage
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_our_brothers_the_french"
+		custom_effect_tooltip = BRG_NI_Boost_10
+		add_to_variable = { BRG_National_Indoctrination = 10 }
+		every_owned_state = {
+			limit = {
+				check_variable = { nationality = 123 } #French
+			}
+			custom_effect_tooltip = BRG_higherer_susceptibility
+			add_to_variable = { THIS.BRG_Conversion_Susceptibility = 10 }
+		}
+		country_event = {
+			id = BRG_education.34
+			days = 2
+		}
+	}
+}
+
+shared_focus = {
+	id = BRG_our_lineage_secured
+	icon = GFX_focus_BRG_new_historical_heroes
+	cost = 3.00
+	x = 0
+	y = 2
+
+	prerequisite = {
+		focus = BRG_our_brothers_the_french
+		focus = BRG_french_are_not_german
+	}
+	relative_position_id = BRG_our_germanic_hertiage
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_our_lineage_secured"
+		custom_effect_tooltip = BRG_to_the_test
+	}
+}
+
+shared_focus = {
+	id = BRG_a_second_attempt
+	icon = GFX_focus_BRG_the_spartan_phalanx
+	cost = 4.00
+	x = 0
+	y = 1
+	allow_branch = { has_country_flag = BRG_EDUCATION_FAILURE }
+	prerequisite = {
+		focus = BRG_our_lineage_secured
+	}
+	relative_position_id = BRG_our_lineage_secured
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_a_second_attempt"
+		custom_effect_tooltip = BRG_EDUCATION_FAILURE.tt
+		hidden_effect = { country_event = { id = BRG_education.18 days = 3 } }
+	}
+}
+
+shared_focus = {
+	id = BRG_atompshere_of_degeneracy
+	icon = GFX_focus_BRG_atompshere_of_degeneracy
+	cost = 4.00
+	x = -1
+	y = 1
+	prerequisite = {
+		focus = BRG_a_second_attempt
+	}
+	relative_position_id = BRG_a_second_attempt
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_atompshere_of_degeneracy"
+		custom_effect_tooltip = BRG_PP_GAIN_LOSS
+		custom_effect_tooltip = BRG_ED_GAIN_BOOST
+		add_to_variable = { BRG_education_SocDev_variable = 1 }
+		add_to_variable = { BRG_education_tree_pp_factor_variable = -0.05 }
+		TNO_improve_public_meetings_policy_effectiveness_med = yes
+		TNO_improve_security_policy_effectiveness_med = yes
+		#TNO_worsen_minorities_policy_effectiveness_high = yes
+		TNO_worsen_academic_base_low = yes
+	}
+}
+
+shared_focus = {
+	id = BRG_a_culture_of_weakness
+	icon = GFX_focus_BRG_apply_grenzeschild_knowledge
+	cost = 4.00
+	x = 1
+	y = 1
+	prerequisite = {
+		focus = BRG_a_second_attempt
+	}
+	relative_position_id = BRG_a_second_attempt
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_a_culture_of_weakness"
+		custom_effect_tooltip = BRG_PP_GAIN_LOSS
+		add_to_variable = { BRG_education_tree_pp_factor_variable = -0.15 }
+		add_popularity = {
+			ideology = national_socialism
+			popularity = 0.07
+		}
+		country_event = {
+			id = BRG_education.37
+			days = 3
+		}
+		random_owned_state = {
+			BRG_Increase_himmler_support_medium = yes
+			add_building_construction = {
+				type = prisons
+				level = 1
+				instant_build = yes
+			}
+		}
+		random_owned_state = {
+			BRG_Increase_himmler_support_medium = yes
+			add_building_construction = {
+				type = prisons
+				level = 1
+				instant_build = yes
+			}
+		}
+		16 = {
+			BRG_Increase_himmler_support_large = yes
+			add_building_construction = {
+				type = prisons
+				level = 1
+				instant_build = yes
+			}
+			add_building_construction = {
+				type = schools
+				level = 1
+				instant_build = yes
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = BRG_our_ideals_are_forever
+	icon = GFX_focus_HGR_burgundian_ss 
+	cost = 4.00
+	x = -2
+	y = 1
+	prerequisite = {
+		focus = BRG_atompshere_of_degeneracy
+	}
+	relative_position_id = BRG_atompshere_of_degeneracy
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_our_ideals_are_forever"
+		add_to_variable = { BRG_education_tree_research_speed_variable = -0.15 }
+		custom_effect_tooltip = BRG_RS_GAIN_LOSS
+		every_owned_state = {
+			limit = { check_variable = { nationality = 123 } } #french
+			add_to_variable = { THIS.HimmlerSupport = 10 }
+			subtract_from_variable = { THIS.HimmlerSupport = 5 }
+			custom_effect_tooltip = BRG_Will_Convert_State
+		}
+	}
+}
+
+shared_focus = {
+	id = BRG_no_more_second_chances
+	icon = GFX_focus_BRG_no_more_second_chances
+	cost = 4.00
+	x = 0
+	y = 1
+	prerequisite = {
+		focus = BRG_atompshere_of_degeneracy
+	}
+	mutually_exclusive = {
+		focus = BRG_keep_them_in_our_grasp
+	}
+	relative_position_id = BRG_atompshere_of_degeneracy
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_no_more_second_chances"
+		custom_effect_tooltip = BRG_ST_GAIN_LOSS
+		custom_effect_tooltip = BRG_ED_GAIN_LOSS
+		add_to_variable = { BRG_education_tree_stab_factor_variable = -0.1 }
+		add_to_variable = { BRG_education_SocDev_variable = -2 }
+		#TNO_improve_minorities_policy_effectiveness_med = yes
+		TNO_worsen_religious_rights_policy_effectiveness_high = yes
+		every_owned_state = {
+			limit = { check_variable = { nationality = 123 } } #french
+			add_to_variable = { THIS.HimmlerSupport = 30 }
+			subtract_from_variable = { THIS.CharlemagneSupport = 20 }
+			custom_effect_tooltip = BRG_Will_Convert_State
+		}
+		hidden_effect = { country_event = { id = BRG_education.16 days = 8 } }
+	}
+}
+
+shared_focus = {
+	id = BRG_destroy_it_all
+	icon = GFX_focus_BRG_terrorkampagne
+	cost = 4.00
+	x = -1
+	y = 1
+	prerequisite = {
+		focus = BRG_no_more_second_chances
+	}
+	relative_position_id = BRG_no_more_second_chances
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_destroy_it_all"
+		custom_effect_tooltip = BRG_ED_GAIN_LOSS
+		custom_effect_tooltip = BRG_RS_GAIN_LOSS
+		custom_effect_tooltip = BRG_WS_GAIN_LOSS
+		custom_effect_tooltip = BRG_PP_GAIN_LOSS
+		custom_effect_tooltip = BRG_ST_GAIN_LOSS
+		subtract_from_variable = { BRG_education_SocDev_variable = 2 }
+		subtract_from_variable = { BRG_education_tree_research_speed_variable = 0.02 }
+		subtract_from_variable = { BRG_education_tree_pp_factor_variable = 0.015 }
+		subtract_from_variable = { BRG_education_tree_stab_factor_variable = 0.1 }
+		subtract_from_variable = { BRG_education_tree_war_support_factor_variable = 0.15 }
+		every_owned_state = {
+			limit = { check_variable = { nationality = 123 } } #french
+			add_to_variable = { THIS.HimmlerSupport = 30 }
+			subtract_from_variable = { THIS.CharlemagneSupport = 20 }
+			custom_effect_tooltip = BRG_Will_Convert_State
+		}
+
+		custom_effect_tooltip = BRG_destroy_it_all.tt
+	}
+}
+
+shared_focus = {
+	id = BRG_salt_the_earth
+	icon = GFX_focus_BRG_salt_the_earth
+	cost = 4.00
+	x = 2
+	y = 1
+	prerequisite = {
+		focus = BRG_destroy_it_all
+		focus = BRG_make_an_example
+	}
+	relative_position_id = BRG_destroy_it_all
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_salt_the_earth"
+		custom_effect_tooltip = BRG_salt_the_earth.tt
+		clr_country_flag = BRG_EDUCATION_FAILURE
+		clr_country_flag = BRG_education_debug_waiting_on_you_tex
+		mark_focus_tree_layout_dirty = yes
+		set_country_flag = BRG_finished_with_education
+		country_event = {
+			id = BRG_education.37
+			days = 7
+		}
+		hidden_effect = {
+			remove_dynamic_modifier = { modifier = BRG_education_tree_dynamic_modifier }
+		}
+	}
+}
+
+shared_focus = {
+	id = BRG_keep_them_in_our_grasp
+	icon = GFX_focus_BRG_total_darkness
+	cost = 4.00
+	x = 0
+	y = 1
+	prerequisite = {
+		focus = BRG_a_culture_of_weakness
+	}
+	mutually_exclusive = { focus = BRG_no_more_second_chances }
+	relative_position_id = BRG_a_culture_of_weakness
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_keep_them_in_our_grasp"
+		custom_effect_tooltip = BRG_ED_GAIN_BOOST
+		custom_effect_tooltip = BRG_ST_GAIN_BOOST
+		add_to_variable = { BRG_education_SocDev_variable = 3 }
+		add_to_variable = { BRG_education_tree_stab_factor_variable = 0.1 }
+		hidden_effect = { country_event = { id = BRG_education.17 days = 8 } }
+	}
+}
+
+shared_focus = {
+	id = BRG_get_inside_their_heads
+	icon = GFX_focus_BRG_friends_in_high_places
+	cost = 4.00
+	x = 2
+	y = 1
+	prerequisite = {
+		focus = BRG_a_culture_of_weakness
+	}
+
+	relative_position_id = BRG_a_culture_of_weakness
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_get_inside_their_heads"
+		custom_effect_tooltip = BRG_ED_GAIN_BOOST
+		custom_effect_tooltip = BRG_PP_GAIN_BOOST
+		custom_effect_tooltip = BRG_WS_GAIN_LOSS
+		#TNO_improve_minorities_policy_effectiveness_med = yes
+		TNO_improve_religious_rights_policy_effectiveness_med = yes
+		#TNO_improve_press_rights_policy_effectiveness_low = yes
+		add_to_variable = { BRG_education_SocDev_variable = 3 }
+		add_to_variable = { BRG_education_tree_pp_factor_variable = 0.1 }
+		every_owned_state = {
+			limit = { check_variable = { nationality = 123 } }
+			add_to_variable = { BRG_Conversion_Susceptibility = 10 }
+		}
+	}
+}
+
+shared_focus = {
+	id = BRG_make_an_example
+	icon = GFX_focus_BRG_make_an_example
+	cost = 4.00
+	x = 1
+	y = 1
+	prerequisite = {
+		focus = BRG_keep_them_in_our_grasp
+	}
+
+	relative_position_id = BRG_keep_them_in_our_grasp
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_make_an_example"
+		custom_effect_tooltip = BRG_ED_GAIN_BOOST
+		custom_effect_tooltip = BRG_ST_GAIN_BOOST
+		add_to_variable = { BRG_education_SocDev_variable = 1 }
+		add_to_variable = { BRG_education_tree_stab_factor_variable = 0.1 }
+		set_country_flag = BRG_finished_with_education
+		country_event = {
+			id = BRG_education.38
+			days = 8
+		}
+		every_owned_state = {
+			limit = { check_variable = { nationality = 123 } } #french
+			add_to_variable = { THIS.HimmlerSupport = -15 }
+			add_to_variable = { THIS.CharlemagneSupport = 10 }
+			custom_effect_tooltip = BRG_HIMMLER_SUPPORT_3
+		}
+	}
+}

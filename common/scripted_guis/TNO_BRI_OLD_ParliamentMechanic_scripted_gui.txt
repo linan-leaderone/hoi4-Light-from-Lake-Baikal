@@ -1,0 +1,181 @@
+# |===============================================================================================================================| #
+#  ____   ____  ____   _      ____   ____  ___ ___    ___  ____   ______      ___ ___    ___    __  __ __   ____  ____   ____   __  #
+# |    \ /    ||    \ | |    |    | /    ||   |   |  /  _]|    \ |      |    |   |   |  /  _]  /  ]|  |  | /    ||    \ |    | /  ] #
+# |  o  )  o  ||  D  )| |     |  | |  o  || _   _ | /  [_ |  _  ||      |    | _   _ | /  [_  /  / |  |  ||  o  ||  _  | |  | /  /  #
+# |   _/|     ||    / | |___  |  | |     ||  \_/  ||    _]|  |  ||_|  |_|    |  \_/  ||    _]/  /  |  _  ||     ||  |  | |  |/  /   #
+# |  |  |  _  ||    \ |     | |  | |  _  ||   |   ||   [_ |  |  |  |  |      |   |   ||   [_/   \_ |  |  ||  _  ||  |  | |  /   \_  #
+# |  |  |  |  ||  .  \|     | |  | |  |  ||   |   ||     ||  |  |  |  |      |   |   ||     \     ||  |  ||  |  ||  |  | |  \     | #
+# |__|  |__|__||__|\_||_____||____||__|__||___|___||_____||__|__|  |__|      |___|___||_____|\____||__|__||__|__||__|__||____\____| #
+#                                                                                                                                   #
+# |=======================================================| Scripted GUI |========================================================| #
+
+scripted_gui = {
+	TNO_ParliamentMechanic_open = {
+		context_type = player_context
+		parent_window_token = politics_tab
+		window_name = "TNO_ParliamentMechanic_open"
+
+		visible = {
+			OR = { tag = ENG tag = FEN }
+			NOT = { has_country_flag = ENG_Parliament_Disabled }
+			has_global_flag = TNO_BRITAIN_CONTENT_OLD_ENABLED
+		}
+
+		effects = {
+			TNO_ParliamentMechanic_open_button_click = {
+				TNO_Britain_ElectionMap_Setup = yes
+				if = {
+					limit = { NOT = { has_country_flag = ParliamentMechanic_screen_open } }
+
+					ParliamentMechanic_GUIHelper_initialize = yes
+					set_country_flag = ParliamentMechanic_screen_open
+				}
+				else = {
+					ParliamentMechanic_GUIHelper_cleanup = yes
+					clr_country_flag = ParliamentMechanic_screen_open
+				}
+			}
+
+			# Enables Debug Options
+			TNO_ParliamentMechanic_open_button_right_click = {
+				if = {
+					limit = {
+						is_debug = yes
+						NOT = { has_country_flag = DBG_ENG_ParliamentMech }
+					}
+					set_country_flag = DBG_ENG_ParliamentMech
+				}
+				else = { clr_country_flag = DBG_ENG_ParliamentMech }
+			}
+		}
+
+		triggers = {
+			TNO_ParliamentMechanic_open_button_click_enabled = {
+				NOT = { has_country_flag = TNO_ParliamentMechanic_Disabled }
+			}
+		}
+	}
+
+	TNO_ParliamentMechanic = {
+		context_type = player_context
+		parent_window_token = "TNO_ParliamentMechanic_open"
+		window_name = "TNO_ParliamentMechanic_Container"
+
+		visible = {
+			OR = { tag = ENG tag = FEN }
+			has_country_flag = ParliamentMechanic_screen_open
+		}
+
+		dynamic_lists = {
+			# Parliament Display - PD
+			TNO_ParliamentMechanic_PD_Seats_Gov_GridBox = {
+				array = TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Gov
+				index = TNO_PM_GUIHelper_Gov_i
+				change_scope = no
+
+				entry_container = TNO_ParliamentMechanic_Seats_Entry_Gov
+			}
+
+			TNO_ParliamentMechanic_PD_Seats_Opp_GridBox = {
+				array = TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Opp
+				index = TNO_PM_GUIHelper_Opp_i
+				change_scope = no
+
+				entry_container = TNO_ParliamentMechanic_Seats_Entry_Opp
+			}
+
+			TNO_ParliamentMechanic_PD_Seats_Sit_GridBox = {
+				array = TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Sit
+				index = TNO_PM_GUIHelper_Sit_i
+				change_scope = no
+
+				entry_container = TNO_ParliamentMechanic_Seats_Entry_Sit
+			}
+
+			## Parties & Government Stability Display - PGSD
+			# Parties & TopBar - PTB
+			TNO_ParliamentMechanic_PGSD_PTB_Parties_GridBox = {
+				array = TNO_ParliamentMechanic_GUIHelper_PartiesDisp_Array
+				index = TNO_PM_GUIHelper_PartiesDisp_Array_i
+				value = TNO_PM_GUIHelper_PartiesDisp_Array_val
+				change_scope = no
+
+				entry_container = TNO_ParliamentMechanic_Parties_Entry
+			}
+		}
+
+		properties = {
+			TNO_ParliamentMechanic_PD_Portrait_Speaker = {
+				image = "[TNO_ParliamentMechanic_Ideas_Get_Speaker_Picture]"
+			}
+
+			TNO_ParliamentMechanic_PD_Portrait_Monarch = {
+				image = "[TNO_ParliamentMechanic_Ideas_Get_Monarch_Picture]"
+			}
+
+			TNO_ParliamentMechanic_PD_Portrait_OppLeader = {
+				image = "[TNO_ParliamentMechanic_Ideas_Get_OppLeader_Picture]"
+			}
+
+			TNO_ParliamentMechanic_Seats_Entry_Gov_Box = {
+				frame = TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Gov^TNO_PM_GUIHelper_Gov_i
+			}
+
+			TNO_ParliamentMechanic_Seats_Entry_Opp_Box = {
+				frame = TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Opp^TNO_PM_GUIHelper_Opp_i
+			}
+
+			TNO_ParliamentMechanic_Seats_Entry_Sit_Box = {
+				frame = TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Sit^TNO_PM_GUIHelper_Sit_i
+			}
+
+			TNO_ParliamentMechanic_Parties_Entry_SeatColor_Box = {
+				frame = ParliamentMechanic_Party_Identity^TNO_PM_GUIHelper_PartiesDisp_Array_val
+			}
+			#### ElectoralMap ####
+			# Cornwall
+			TNO_ParliamentMechanic_ElectoralMap_123 = {  frame = TNO_Britain_ElectoralMap_Array^0 }
+			TNO_ParliamentMechanic_ElectoralMap_1296 = { frame = TNO_Britain_ElectoralMap_Array^1 }
+
+			# Wales
+			TNO_ParliamentMechanic_ElectoralMap_122 = {  frame = TNO_Britain_ElectoralMap_Array^2 }
+			TNO_ParliamentMechanic_ElectoralMap_1301 = { frame = TNO_Britain_ElectoralMap_Array^3 }
+
+			# England
+			TNO_ParliamentMechanic_ElectoralMap_125 = {  frame = TNO_Britain_ElectoralMap_Array^4 }
+			TNO_ParliamentMechanic_ElectoralMap_126 = {  frame = TNO_Britain_ElectoralMap_Array^5 }
+			TNO_ParliamentMechanic_ElectoralMap_127 = {  frame = TNO_Britain_ElectoralMap_Array^6 }
+			TNO_ParliamentMechanic_ElectoralMap_128 = {  frame = TNO_Britain_ElectoralMap_Array^7 }
+			TNO_ParliamentMechanic_ElectoralMap_129 = {  frame = TNO_Britain_ElectoralMap_Array^8 }
+			TNO_ParliamentMechanic_ElectoralMap_130 = {  frame = TNO_Britain_ElectoralMap_Array^9 }
+			TNO_ParliamentMechanic_ElectoralMap_131 = {  frame = TNO_Britain_ElectoralMap_Array^10 }
+			TNO_ParliamentMechanic_ElectoralMap_132 = {  frame = TNO_Britain_ElectoralMap_Array^11 }
+			TNO_ParliamentMechanic_ElectoralMap_338 = {  frame = TNO_Britain_ElectoralMap_Array^12 }
+			TNO_ParliamentMechanic_ElectoralMap_777 = {  frame = TNO_Britain_ElectoralMap_Array^13 }
+			TNO_ParliamentMechanic_ElectoralMap_885 = {  frame = TNO_Britain_ElectoralMap_Array^14 }
+			TNO_ParliamentMechanic_ElectoralMap_1300 = { frame = TNO_Britain_ElectoralMap_Array^15 }
+
+			# Scotland
+			TNO_ParliamentMechanic_ElectoralMap_120 = {  frame = TNO_Britain_ElectoralMap_Array^16 }
+			TNO_ParliamentMechanic_ElectoralMap_121 = {  frame = TNO_Britain_ElectoralMap_Array^17 }
+			TNO_ParliamentMechanic_ElectoralMap_133 = {  frame = TNO_Britain_ElectoralMap_Array^18 }
+			TNO_ParliamentMechanic_ElectoralMap_136 = {  frame = TNO_Britain_ElectoralMap_Array^19 }
+			TNO_ParliamentMechanic_ElectoralMap_1320 = { frame = TNO_Britain_ElectoralMap_Array^20 }
+			TNO_ParliamentMechanic_ElectoralMap_1321 = { frame = TNO_Britain_ElectoralMap_Array^21 }
+			#### ElectoralMap ####
+		}
+
+		effects = {
+			TNO_ParliamentMechanic_BC_CloseButton_click = {
+				ParliamentMechanic_GUIHelper_cleanup = yes
+				clr_country_flag = ParliamentMechanic_screen_open
+			}
+		}
+
+		triggers = {
+			TNO_ParliamentMechanic_PD_Container_visible = {
+				NOT = { has_country_flag = ParliamentMechanic_Show_BillsDisplay }
+			}
+		}
+	}
+}

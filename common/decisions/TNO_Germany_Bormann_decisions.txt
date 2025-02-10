@@ -1,0 +1,3155 @@
+#██████╗  ██████╗ ██████╗ ███╗   ███╗ █████╗ ███╗   ██╗███╗   ██╗#
+#██╔══██╗██╔═══██╗██╔══██╗████╗ ████║██╔══██╗████╗  ██║████╗  ██║#
+#██████╔╝██║   ██║██████╔╝██╔████╔██║███████║██╔██╗ ██║██╔██╗ ██║#
+#██╔══██╗██║   ██║██╔══██╗██║╚██╔╝██║██╔══██║██║╚██╗██║██║╚██╗██║#
+#██████╔╝╚██████╔╝██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║██║ ╚████║#
+#╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝#
+#Decisions
+
+#Index; Search for these names using ctrl+f and you'll find the section they entitle.
+#	Bormann GCW Decisions
+#	Bormann EconMech Decisions
+#		DOMESTIC DECISIONS
+#		SPECIFIC DECISIONS
+#		GENERIC DECISIONS
+#		DEBUG
+#	Bormann Foreign Policy Decisions
+#	Bormann Sphere Trade Decisions
+
+#########################
+# Bormann GCW Decisions #
+#########################
+GER_Bormann_CW_category = {
+	bormann_rally_the_military_bureaucrats = {
+		icon = GFX_decision_generic_military_parade
+		cost = 25
+		days_re_enable = 25
+		available = { has_completed_focus = BOR_full_political_mobilization }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bormann_rally_the_military_bureaucrats"
+			add_command_power = 25
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	bormann_rally_the_industry_managers = {
+		icon = GFX_decision_generic_industry
+		cost = 100
+		days_re_enable = 120
+		available = { has_completed_focus = BOR_full_political_mobilization }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bormann_rally_the_industry_managers"
+			set_temp_variable = { pus_temp = 1 }
+			econ_pus_change = yes
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	bormann_rally_the_beamtentum = {
+		icon = GFX_decision_generic_civil_support
+		cost = 50
+		days_re_enable = 25
+		available = { has_completed_focus = BOR_the_faith_of_the_people }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bormann_rally_the_beamtentum"
+			add_war_support = 0.03
+			add_stability = 0.03
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	bormann_rally_the_landvolk = {
+		icon = GFX_decision_generic_prepare_civil_war
+		cost = 100
+		days_re_enable = 100
+		available = { has_completed_focus = BOR_the_faith_of_the_people }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bormann_rally_landvolk"
+			add_manpower = 10000
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	bormann_rally_the_old_guard = {
+		icon = GFX_decision_GER_reichskommissariats
+		cost = 75
+		days_re_enable = 150
+		available = { has_completed_focus = BOR_the_faith_of_our_leaders }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bormann_rally_the_old_guard"
+			army_experience = 5
+			air_experience = 5
+			add_popularity = {
+				ideology = national_socialism
+				popularity = 0.025
+			}
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	bormann_rally_the_aristocrats = {
+		icon = GFX_decision_generic_form_nation
+		cost = 15
+		days_re_enable = 120
+		available = { has_completed_focus = BOR_the_faith_of_our_leaders }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bormann_rally_the_aristocrats"
+			add_war_support = 0.01
+		}
+		ai_will_do = { factor = 10 }
+	}
+}
+
+##############################
+# Bormann EconMech Decisions #
+##############################
+GER_Bormann_EconMech_category = {
+	### DOMESTIC DECISIONS ###
+	GER_Bormann_EconMech_show_domestic = {
+		icon = GFX_decision_generic_phone_call
+		visible = {
+			NOT = { has_country_flag = BOR_EconMech_domestic_show }
+			is_ai = no
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_show_domestic"
+			set_country_flag = BOR_EconMech_domestic_show
+		}
+	}
+	GER_Bormann_EconMech_hide_domestic = {
+		icon = GFX_decision_generic_phone_call
+		visible = {
+			has_country_flag = BOR_EconMech_domestic_show
+			is_ai = no
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_hide_domestic"
+			clr_country_flag = BOR_EconMech_domestic_show
+		}
+	}
+
+	GER_Bormann_EconMech_infrastructure_investment = {
+		icon = GFX_decision_generic_industry
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_domestic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_domestic_decisions
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 5
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_200_million
+		days_remove = 90
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_dockyard_investment"
+			set_temp_variable = { temp_econ_spending_amount = 0.2 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = infrastructure
+						size > 2
+					}
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 3
+					instant_build = yes
+				}
+			}
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_oil_investigation = {
+		icon = GFX_decision_generic_oil_extraction
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_domestic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_decisions_debug
+				date > 1969.3.1
+			}
+		}
+
+		custom_cost_text = decision_cost_10_million
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		days_remove = 90
+		fire_only_once = yes
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_oil_investigation"
+			set_temp_variable = { temp_econ_spending_amount = 0.01 }
+			econ_spend_money_once_effect_raw_money = yes
+			country_event = bor_econ.2
+		}
+		remove_effect = {
+			country_event = bormann.1060
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_north_sea_oil_exploration = {
+		icon = GFX_decision_generic_oil_extraction
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_domestic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_ns_oil_found
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 7
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_300_million
+		fire_only_once = yes
+		days_remove = 200
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 56
+			}
+		}
+
+		modifier = { civilian_factory_use = 8 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_north_sea_oil_exploration"
+			set_temp_variable = { temp_econ_spending_amount = 0.3 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			set_country_flag = BOR_EconMech_explored_ns_oil
+			56 = {
+				add_resource = {
+					type = oil
+					amount = 8
+				}
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = fuel_silo
+					level = 2
+					instant_build = yes
+				}
+			}
+			set_temp_variable = { temp_econ_GDP_boost_flat = 0.5 }
+			econ_GDP_boost_once_flat = yes
+			add_to_variable = {
+				BOR_Econ_GER_misc_income_modifier = 0.2
+				tooltip = BOR_EconMech_misc_income_increase_tt
+			}
+			unlock_decision_tooltip = GER_Bormann_EconMech_expand_oil_exploration
+		}
+		ai_will_do = { factor = 30 }
+	}
+
+	GER_Bormann_EconMech_expand_oil_exploration = {
+		icon = GFX_decision_generic_oil_extraction
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_domestic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_ns_oil_found
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			has_country_flag = BOR_EconMech_explored_ns_oil
+			num_of_civilian_factories_available_for_projects > 5
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_200_million
+		days_remove = 90
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 56
+			}
+		}
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_expand_oil_exploration"
+			set_temp_variable = { temp_econ_spending_amount = 0.2 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			add_resource = {
+				type = oil
+				amount = 4
+				state = 56
+			}
+			set_temp_variable = { temp_econ_GDP_boost_flat = 0.3 }
+			econ_GDP_boost_once_flat = yes
+			add_to_variable = {
+				BOR_Econ_GER_misc_income_modifier = 0.125
+				tooltip = BOR_EconMech_misc_income_increase_tt
+			}
+			clr_country_flag = BOR_EconMech_explored_ns_oil
+		}
+		ai_will_do = { factor = 30 }
+	}
+
+	GER_Bormann_EconMech_reactivate_siegfried_line = {
+		icon = GFX_decision_generic_destroy_fort
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_domestic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_siegfried_line_unlocked
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 5
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_150_million
+		days_remove = 120
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 28
+			}
+		}
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_reactivate_siegfried_line"
+			set_temp_variable = { temp_econ_spending_amount = 0.15 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			add_war_support = 0.03
+			every_owned_state = {
+				limit = { any_neighbor_state = { is_owned_by = BRG } }
+				set_building_level = {
+					type = bunker
+					level = 4
+					instant_build = yes
+					province = {
+						all_provinces = yes
+						limit_to_border = yes
+						level < 4
+					}
+				}
+			}
+			28 = {
+				add_building_construction = {
+					type = air_base
+					level = 2
+					instant_build = yes
+				}
+			}
+			set_country_flag = BOR_EconMech_siegfried_line_completed
+			clr_country_flag = BOR_EconMech_siegfried_line_unlocked
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_expand_siegfried_line = {
+		icon = GFX_decision_generic_destroy_fort
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_domestic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_siegfried_line_expansion_unlocked
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			has_country_flag = BOR_EconMech_siegfried_line_completed
+			num_of_civilian_factories_available_for_projects > 7
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_200_million
+		days_remove = 180
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 28
+			}
+		}
+
+		modifier = { civilian_factory_use = 8 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_expand_siegfried_line"
+			set_temp_variable = { temp_econ_spending_amount = 0.2 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			add_war_support = 0.02
+			every_owned_state = {
+				limit = { any_neighbor_state = { is_owned_by = BRG } }
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = {
+						all_provinces = yes
+						limit_to_border = yes
+					}
+				}
+				add_building_construction = {
+					type = anti_air_building
+					level = 1
+					instant_build = yes
+				}
+			}
+			add_equipment_to_stockpile = {
+				type = SRBM_equipment
+				amount = 50
+				producer = GER
+			}
+			clr_country_flag = BOR_EconMech_siegfried_line_completed
+			clr_country_flag = BOR_EconMech_siegfried_line_expansion_unlocked
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_the_indian_ocean_outpost = {
+		icon = GFX_decision_generic_submarines
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_domestic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_mauritius_reunion_decision_unlocked
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 7
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_300_million
+		days_remove = 220
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 706
+			}
+		}
+
+		modifier = { civilian_factory_use = 8 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_the_indian_ocean_outpost"
+			set_temp_variable = { temp_econ_spending_amount = 0.3 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			set_country_flag = BOR_built_up_mauritius_and_reunion
+			BOR_SIG_AP_5_10 = yes
+			706 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 4
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = dockyard
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = anti_air_building
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = naval_base
+					level = 5
+					instant_build = yes
+					province = { all_provinces = yes }
+				}
+				add_building_construction = {
+					type = coastal_bunker
+					level = 5
+					instant_build = yes
+					province = { all_provinces = yes }
+				}
+				add_building_construction = {
+					type = bunker
+					level = 3
+					instant_build = yes
+					province = { all_provinces = yes }
+				}
+			}
+			707 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 4
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = air_base
+					level = 4
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = radar_station
+					level = 2
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = anti_air_building
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = naval_base
+					level = 5
+					instant_build = yes
+					province = { all_provinces = yes }
+				}
+				add_building_construction = {
+					type = coastal_bunker
+					level = 5
+					instant_build = yes
+					province = { all_provinces = yes }
+				}
+				add_building_construction = {
+					type = bunker
+					level = 3
+					instant_build = yes
+					province = { all_provinces = yes }
+				}
+			}
+			clr_country_flag = BOR_EconMech_mauritius_reunion_decision_unlocked
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	### SPECIFIC DECISIONS ###
+	GER_Bormann_EconMech_show_specific = {
+		icon = GFX_decision_generic_phone_call
+		visible = {
+			NOT = { has_country_flag = BOR_EconMech_specific_show }
+			is_ai = no
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_show_specific"
+			set_country_flag = BOR_EconMech_specific_show
+		}
+	}
+	GER_Bormann_EconMech_hide_specific = {
+		icon = GFX_decision_generic_phone_call
+		visible = {
+			has_country_flag = BOR_EconMech_specific_show
+			is_ai = no
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_hide_specific"
+			clr_country_flag = BOR_EconMech_specific_show
+		}
+	}
+
+	GER_Bormann_EconMech_krakow_railway_junction = {
+		icon = GFX_decision_generic_construction
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 5
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_300_million
+		days_remove = 120
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 88
+			}
+		}
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_krakow_railway_junction"
+			set_temp_variable = { temp_econ_spending_amount = 0.3 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			GGN = {
+				add_stability = 0.02
+				88 = { add_extra_state_shared_building_slots = 1 }
+				1382 = { add_extra_state_shared_building_slots = 1 }
+				90 = { add_extra_state_shared_building_slots = 1 }
+				custom_effect_tooltip = BOR_krakow_railway_junction_tt
+				add_to_variable = { BOR_Econ_RK_production_speed_buildings_factor = 0.2 }
+				set_temp_variable = { gdp_growth_temp = 0.6 }
+				econ_gdp_growth_change = yes
+				BOR_EconMech_increase_integration = yes
+			}
+			custom_effect_tooltip = BOR_EconMech_RK_integration_tt_GGN
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_agricultural_modernization = {
+		icon = GFX_decision_generic_industrial_farm
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 5
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_150_million
+		fire_only_once = yes
+		days_remove = 250
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = UKR
+				is_capital = yes
+			}
+		}
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_agricultural_modernization"
+			set_temp_variable = { temp_econ_spending_amount = 0.15 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			custom_effect_tooltip = BOR_agricultural_modernization_tt
+			add_to_variable = { BOR_Econ_GER_consumer_goods_factor = -0.02 }
+			TNO_improve_agriculture_med = yes
+			UKR = {
+				TNO_improve_agriculture_high = yes
+				random_owned_controlled_state = { add_extra_state_shared_building_slots = 1 }
+				random_owned_controlled_state = { add_extra_state_shared_building_slots = 1 }
+				BOR_EconMech_increase_integration = yes
+			}
+			custom_effect_tooltip = BOR_EconMech_RK_integration_tt_UKR
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_expand_manufacturing = {
+		icon = GFX_decision_generic_factory_blue
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 7
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_400_million
+		days_remove = 365
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = OSL
+				is_capital = yes
+			}
+		}
+
+		modifier = { civilian_factory_use = 8 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_expand_manufacturing"
+			set_temp_variable = { temp_econ_spending_amount = 0.4 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			custom_effect_tooltip = BOR_expand_manufacturing_tt
+			add_to_variable = { BOR_Econ_GER_consumer_goods_factor = -0.03 }
+			add_to_variable = { BOR_Econ_GER_industrial_capacity_factory = 0.05 }
+			every_neighbor_country = {
+				limit = { tag = OSL }
+				set_temp_variable = { temp_econ_GDP_boost_percentage = 0.025 }
+				econ_GDP_boost_once_percentage = yes
+				set_temp_variable = { gdp_growth_temp = 0.6 }
+				econ_gdp_growth_change = yes
+				TNO_improve_industrial_expertise_med = yes
+				TNO_improve_industrial_equipment_med = yes
+				190 = { add_resource = { type = steel amount = 11 } }
+				BOR_EconMech_increase_integration = yes
+			}
+			custom_effect_tooltip = BOR_EconMech_RK_integration_tt_OST
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_fortify_moskowien = {
+		icon = GFX_decision_generic_destroy_fort
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 9
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_250_million
+		days_remove = 365
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 1442
+			}
+		}
+
+		modifier = { civilian_factory_use = 10 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_fortify_moskowien"
+			set_temp_variable = { temp_econ_spending_amount = 0.25 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			BOR_SIG_AL_1_2_1 = yes
+			BOR_SIG_AP_4_10 = yes
+			1442 = {
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = barracks
+					level = 2
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = bunker
+					level = 5
+					instant_build = yes
+					province = 6380
+				}
+				add_building_construction = {
+					type = anti_air_building
+					level = 2
+					instant_build = yes
+				}
+			}
+			195 = {
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = barracks
+					level = 2
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = bunker
+					level = 5
+					instant_build = yes
+					province = 3151
+				}
+				add_building_construction = {
+					type = anti_air_building
+					level = 2
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = radar_station
+					level = 4
+					instant_build = yes
+				}
+			}
+			243 = {
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = barracks
+					level = 2
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = bunker
+					level = 5
+					instant_build = yes
+					province = 3529
+				}
+				add_building_construction = {
+					type = anti_air_building
+					level = 2
+					instant_build = yes
+				}
+			}
+			MCW = { BOR_EconMech_increase_integration = yes }
+			custom_effect_tooltip = BOR_EconMech_RK_integration_tt_MCW
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_baku_germania_pipeline = {
+		icon = GFX_decision_generic_construction
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 7
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_400_million
+		days_remove = 250
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 229
+			}
+		}
+
+		modifier = { civilian_factory_use = 8 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_baku_germania_pipeline"
+			set_temp_variable = { temp_econ_spending_amount = 0.4 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			1026 = {
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = fuel_silo
+					level = 2
+					instant_build = yes
+				}
+			}
+			custom_effect_tooltip = BOR_baku_germania_pipeline_GER_tt
+			add_to_variable = { BOR_Econ_GER_fuel_gain_factor = 0.25 }
+			CAU = {
+				add_resource = {
+					type = oil
+					amount = 4
+					state = 229
+				}
+				custom_effect_tooltip = BOR_baku_germania_pipeline_tt
+				add_to_variable = { BOR_Econ_RK_local_resources_factor = 0.05 }
+				BOR_EconMech_increase_integration = yes
+			}
+			custom_effect_tooltip = BOR_EconMech_RK_integration_tt_CAU
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_expand_groningen_gas_fields = {
+		icon = GFX_decision_generic_oil_extraction
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 5
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_200_million
+		days_remove = 180
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 36
+			}
+		}
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_expand_groningen_gas_fields"
+			set_temp_variable = { temp_econ_spending_amount = 0.2 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			add_resource = {
+				type = oil
+				amount = 3
+				state = 36
+			}
+			add_to_variable = {
+				BOR_Econ_GER_misc_income_modifier = 0.15
+				tooltip = BOR_EconMech_misc_income_increase_tt
+			}
+			HOL = {
+				give_resource_rights = { receiver = GER state = 36 resources = { oil } }
+				custom_effect_tooltip = BOR_expand_groningen_gas_fields_tt
+				set_temp_variable = { gdp_growth_temp = 1 }
+				econ_gdp_growth_change = yes
+				add_to_variable = { BOR_Econ_RK_local_resources_factor = 0.05 }
+				BOR_EconMech_increase_integration = yes
+			}
+			custom_effect_tooltip = BOR_EconMech_RK_integration_tt_HOL
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_integrate_netherlands = {
+		icon = GFX_decision_GER_reichskommissariats
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_integration_decisions
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_HOL_suficiently_integrated
+				if = {
+					limit = { is_ai = yes }
+					date > 1969.1.1
+				}
+				else = { HOL = { check_variable = { GER_BOR_Econ_RK_integration = 4 } } }
+			}
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		cost = 100
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = HOL
+				is_capital = yes
+			}
+		}
+
+		modifier = { political_power_cost = 0.25 }
+
+		complete_effect = { log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_integrate_netherlands" }
+		remove_effect = {
+			hidden_effect = {
+				HOL = {
+					every_owned_state = {
+						add_core_of = GER
+					}
+				}
+			}
+			add_stability = -0.03
+			annex_country = { target = HOL transfer_troops = yes }
+			remove_from_array = { BOR_GrossraumCountries = HOL }
+			remove_from_array = { BOR_GrossraumWesternCountries = HOL }
+			set_variable = { BOR_GrossraumRK_ID^6 = 0 }
+			set_variable = { BOR_GrossraumRK_X^6 = 0 }
+			set_variable = { BOR_GrossraumRK_Y^6 = 0 }
+
+			set_variable = { BOR_EconMech_GER_Frame = 2 }
+		}
+		ai_will_do = { factor = 100 }
+	}
+
+	GER_Bormann_EconMech_germania_copenhagen_connection = {
+		icon = GFX_decision_generic_infrastructure
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_integration_decisions
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_75_million
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 37
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_germania_copenhagen_connection"
+			set_temp_variable = { temp_econ_spending_amount = 0.075 }
+			econ_spend_money_once_effect_raw_money = yes
+
+			custom_effect_tooltip = BOR_EconMech_germania_copenhagen_connection_tt
+			set_variable = { BOR_BreitspurbahnDenmarkProgress = BOR_BreitspurbahnProgress }
+			set_temp_variable = { BOR_Breitspurbahn_Progress_Change = -5 }
+			BOR_EconMech_Breitspurbahn_Modify_Progress = yes
+			set_variable = { BOR_BreitspurbahnDenmarkFrame = 2 }
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_integrate_denmark = {
+		icon = GFX_decision_GER_reichskommissariats
+		visible = {
+			DEN = { has_government = despotism }
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_integration_decisions
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_DEN_suficiently_integrated
+				if = {
+					limit = { is_ai = yes }
+					date > 1969.1.1
+				}
+				else = { DEN = { check_variable = { GER_BOR_Econ_RK_integration = 4 } } }
+			}
+			HOL = { exists = no }
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+			NOT = { has_decision = GER_Bormann_EconMech_integrate_netherlands }
+		}
+
+		cost = 100
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = DEN
+				is_capital = yes
+			}
+		}
+
+		modifier = { political_power_cost = 0.25 }
+
+		complete_effect = { log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_integrate_denmark" }
+		remove_effect = {
+			hidden_effect = {
+				DEN = {
+					every_owned_state = {
+						add_core_of = GER
+					}
+				}
+				add_state_core = 744
+			}
+			add_stability = -0.03
+			annex_country = { target = DEN transfer_troops = yes }
+			remove_from_array = { BOR_GrossraumCountries = DEN }
+			remove_from_array = { BOR_GrossraumWesternCountries = DEN }
+			set_variable = { BOR_GrossraumRK_ID^7 = 0 }
+			set_variable = { BOR_GrossraumRK_X^7 = 0 }
+			set_variable = { BOR_GrossraumRK_Y^7 = 0 }
+
+			set_variable = { BOR_EconMech_GER_Frame = 5 }
+		}
+		ai_will_do = { factor = 100 }
+	}
+
+	GER_Bormann_EconMech_integrate_poland = {
+		icon = GFX_decision_GER_reichskommissariats
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_Opulence_integration_decisions
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_GGN_suficiently_integrated
+				if = {
+					limit = { is_ai = yes }
+					date > 1972.1.1
+				}
+				else = { GGN = { check_variable = { GER_BOR_Econ_RK_integration = 4 } } }
+			}
+			HOL = { exists = no }
+			if = {
+				limit = { DEN = { has_government = despotism } }
+				NOT = { has_decision = GER_Bormann_EconMech_integrate_denmark }
+			}
+		}
+
+		cost = 100
+		days_remove = 21
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = GGN
+				is_capital = yes
+			}
+		}
+
+		modifier = { political_power_cost = 0.25 }
+
+		complete_effect = { log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_integrate_poland" }
+		remove_effect = {
+			hidden_effect = {
+				GGN = {
+					every_owned_state = {
+						add_core_of = GER
+					}
+				}
+			}
+			add_stability = -0.05
+			annex_country = { target = GGN transfer_troops = yes }
+			remove_from_array = { BOR_GrossraumCountries = GGN }
+			remove_from_array = { BOR_GrossraumWesternCountries = GGN }
+			set_variable = { BOR_GrossraumRK_ID^1 = 0 }
+			set_variable = { BOR_GrossraumRK_X^1 = 0 }
+			set_variable = { BOR_GrossraumRK_Y^1 = 0 }
+
+			if = {
+				limit = { country_exists = DEN }
+				set_variable = { BOR_EconMech_GER_Frame = 3 }
+			}
+			else = { set_variable = { BOR_EconMech_GER_Frame = 6 } }
+		}
+		ai_will_do = { factor = 100 }
+	}
+
+	GER_Bormann_EconMech_integrate_ostland = {
+		icon = GFX_decision_GER_reichskommissariats
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_Opulence_integration_decisions
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_OST_suficiently_integrated
+				if = {
+					limit = { is_ai = yes }
+					date > 1972.1.1
+				}
+				else = { OSL = { check_variable = { GER_BOR_Econ_RK_integration = 4 } } }
+			}
+			GGN = { exists = no }
+			if = {
+				limit = { DEN = { has_government = despotism } }
+				NOT = { has_decision = GER_Bormann_EconMech_integrate_denmark }
+			}
+		}
+
+		cost = 100
+		days_remove = 21
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = OSL
+				is_capital = yes
+			}
+		}
+
+		modifier = { political_power_cost = 0.25 }
+
+		complete_effect = { log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_integrate_ostland" }
+		remove_effect = {
+			hidden_effect = {
+				OSL = {
+					every_owned_state = {
+						add_core_of = GER
+					}
+				}
+			}
+			add_stability = -0.05
+			annex_country = { target = OSL transfer_troops = yes }
+			remove_from_array = { BOR_GrossraumCountries = OSL }
+			remove_from_array = { BOR_GrossraumWesternCountries = OSL }
+			set_variable = { BOR_GrossraumRK_ID^2 = 0 }
+			set_variable = { BOR_GrossraumRK_X^2 = 0 }
+			set_variable = { BOR_GrossraumRK_Y^2 = 0 }
+
+			if = {
+				limit = { country_exists = DEN }
+				set_variable = { BOR_EconMech_GER_Frame = 4 }
+			}
+			else = { set_variable = { BOR_EconMech_GER_Frame = 7 } }
+		}
+		ai_will_do = { factor = 100 }
+	}
+
+	GER_Bormann_EconMech_continue_nordstern = {
+		icon = GFX_decision_generic_submarines
+		visible = {
+			OR = {
+				AND = {
+					is_in_faction_with = NOR
+					NOR = {
+						OR = {
+							has_government = national_socialism
+							has_government = fascism
+							has_government = despotism
+						}
+					}
+				}
+				owns_state = 94
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+		}
+		available = {
+			num_of_civilian_factories_available_for_projects > 6
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_400_million
+		days_remove = 260
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 94
+			}
+		}
+
+		modifier = { civilian_factory_use = 7 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_continue_nordstern"
+			set_temp_variable = { temp_econ_spending_amount = 0.4 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			94 = {
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = naval_base
+					level = 4
+					instant_build = yes
+					province = 21
+				}
+				add_building_construction = {
+					type = coastal_bunker
+					level = 5
+					instant_build = yes
+					province = 21
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 2
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = anti_air_building
+					level = 2
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = barracks
+					level = 2
+					instant_build = yes
+				}
+				add_manpower = 10000
+			}
+			if = {
+				limit = { is_in_faction_with = NOR }
+				if = {
+					limit = {
+						NOR = {
+							OR = {
+								has_government = national_socialism
+								has_government = fascism
+								has_government = despotism
+							}
+						}
+						NOT = { owns_state = 94 }
+					}
+					transfer_state = 94
+					add_state_core = 94
+				}
+				custom_effect_tooltip = BOR_EconMech_RK_integration_tt_NOR
+				NOR = { BOR_EconMech_increase_integration = yes }
+			}
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_open_ekofisk = {
+		icon = GFX_decision_generic_industry
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			has_country_flag = BOR_NOR_oil_discovered
+		}
+		available = {
+			has_tech = excavation3
+			num_of_civilian_factories_available_for_projects > 5
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_400_million
+		days_remove = 200
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 898
+			}
+		}
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_open_ekofisk"
+			set_temp_variable = { temp_econ_spending_amount = 0.4 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			add_resource = {
+				type = oil
+				amount = 12
+				state = 898
+			}
+			add_to_variable = {
+				BOR_Econ_GER_misc_income_modifier = 0.125
+				tooltip = BOR_EconMech_misc_income_increase_tt
+			}
+			add_to_variable = { BOR_Econ_GER_annual_gdp_growth_factor = 0.02 }
+			NOR = {
+				set_temp_variable = { gdp_growth_temp = 1 }
+				econ_gdp_growth_change = yes
+			}
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	GER_Bormann_EconMech_open_statfjord = {
+		icon = GFX_decision_generic_industry
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_specific_show
+				is_ai = yes
+			}
+			has_country_flag = BOR_NOR_oil_discovered
+		}
+		available = {
+			has_tech = excavation3
+			num_of_civilian_factories_available_for_projects > 5
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_400_million
+		days_remove = 200
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 142
+			}
+		}
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_open_statfjord"
+			set_temp_variable = { temp_econ_spending_amount = 0.4 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+		remove_effect = {
+			add_resource = {
+				type = oil
+				amount = 12
+				state = 142
+			}
+			add_to_variable = {
+				BOR_Econ_GER_misc_income_modifier = 0.125
+				tooltip = BOR_EconMech_misc_income_increase_tt
+			}
+			add_to_variable = { BOR_Econ_GER_annual_gdp_growth_factor = 0.02 }
+			NOR = {
+				set_temp_variable = { gdp_growth_temp = 1 }
+				econ_gdp_growth_change = yes
+			}
+		}
+		ai_will_do = { factor = 10 }
+	}
+
+	### GENERIC DECISIONS ###
+	GER_Bormann_EconMech_show_generic = {
+		icon = GFX_decision_generic_phone_call
+		visible = {
+			NOT = { has_country_flag = BOR_EconMech_generic_show }
+			is_ai = no
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_show_generic"
+			set_country_flag = BOR_EconMech_generic_show
+		}
+	}
+	GER_Bormann_EconMech_hide_generic = {
+		icon = GFX_decision_generic_phone_call
+		visible = {
+			has_country_flag = BOR_EconMech_generic_show
+			is_ai = no
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_hide_generic"
+			clr_country_flag = BOR_EconMech_generic_show
+		}
+	}
+
+	GER_Bormann_EconMech_modernize_infrastructure = {
+		icon = GFX_decision_generic_construction
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_generic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+			any_of_scopes = {
+				array = BOR_GrossraumCountries
+				NOT = { has_country_flag = BOR_EconMech_modernize_infrastructure }
+			}
+		}
+		available = {
+			NOT = { has_country_flag = BOR_EconMech_RK_select }
+			num_of_civilian_factories_available_for_projects > 5
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_150_million
+		days_remove = 150
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_modernize_infrastructure"
+			set_temp_variable = { temp_econ_spending_amount = 0.15 }
+			econ_spend_money_once_effect_raw_money = yes
+			BOR_EconMech_RK_selection_decision = yes
+			set_country_flag = BOR_RK_Selection_modernize_infrastructure
+		}
+		remove_effect = { # I feel so guilty for this code
+			if = {
+				limit = { check_variable = { BOR_Selected_RK_modernize_infrastructure = 0 } }
+				custom_effect_tooltip = BOR_modernize_infrastructure_effects_tt
+				custom_effect_tooltip = BOR_EconMech_RK_integration_tt
+			}
+			else = {
+				var:BOR_Selected_RK_modernize_infrastructure = {
+					set_country_flag = BOR_EconMech_modernize_infrastructure
+					custom_effect_tooltip = BOR_modernize_infrastructure_tt
+					random_owned_controlled_state = {
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+					}
+					random_owned_controlled_state = {
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+					}
+					add_to_variable = { BOR_Econ_RK_local_resources_factor = 0.05 }
+					add_to_variable = { BOR_Econ_RK_production_speed_buildings_factor = 0.15 }
+					if = {
+						limit = {
+							tag = UKR
+							country_exists = CRI
+						}
+						CRI = {
+							set_country_flag = BOR_EconMech_modernize_infrastructure
+							random_owned_controlled_state = {
+								add_building_construction = {
+									type = infrastructure
+									level = 1
+									instant_build = yes
+								}
+							}
+							BOR_EconMech_increase_integration = yes
+							add_to_variable = { BOR_Econ_RK_local_resources_factor = 0.05 }
+							add_to_variable = { BOR_Econ_RK_production_speed_buildings_factor = 0.15 }
+						}
+					}
+					else = {
+						random_owned_controlled_state = {
+							add_building_construction = {
+								type = infrastructure
+								level = 1
+								instant_build = yes
+							}
+						}
+					}
+					custom_effect_tooltip = BOR_EconMech_RK_integration_selected_tt
+					BOR_EconMech_increase_integration = yes
+				}
+				clear_variable = BOR_Selected_RK_modernize_infrastructure
+			}
+		}
+		ai_will_do = { factor = 25 }
+	}
+
+	GER_Bormann_EconMech_expand_resource_extraction = {
+		icon = GFX_decision_generic_increase
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_generic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+			any_of_scopes = {
+				array = BOR_GrossraumEasternCountries
+				NOT = { has_country_flag = BOR_EconMech_expand_resource_extraction }
+			}
+		}
+		available = {
+			NOT = { has_country_flag = BOR_EconMech_RK_select }
+			num_of_civilian_factories_available_for_projects > 5
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_250_million
+		days_remove = 150
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_expand_resource_extraction"
+			set_temp_variable = { temp_econ_spending_amount = 0.25 }
+			econ_spend_money_once_effect_raw_money = yes
+			BOR_EconMech_RK_selection_decision = yes
+			set_country_flag = BOR_RK_Selection_expand_resource_extraction
+			custom_effect_tooltip = GER_Bormann_EconMech_only_available_for_east_tt
+		}
+		remove_effect = {
+			if = {
+				limit = { check_variable = { BOR_Selected_RK_expand_resource_extraction = 0 } }
+				custom_effect_tooltip = BOR_expand_resource_extraction_effects_tt
+				custom_effect_tooltip = BOR_EconMech_RK_integration_tt
+			}
+			else = {
+				# custom_effect_tooltip = BOR_expand_resource_extraction_GER_tt
+				# add_to_variable = { BOR_Econ_GER_min_export = -0.04 }
+				var:BOR_Selected_RK_expand_resource_extraction = {
+					set_country_flag = BOR_EconMech_expand_resource_extraction
+					custom_effect_tooltip = BOR_expand_resource_extraction_tt
+					add_to_variable = { BOR_Econ_RK_local_resources_factor = 0.2 }
+					# add_to_variable = { BOR_Econ_RK_min_export = 0.2 }
+					custom_effect_tooltip = BOR_EconMech_RK_integration_selected_tt
+					BOR_EconMech_increase_integration = yes
+					if = {
+						limit = {
+							tag = UKR
+							country_exists = CRI
+						}
+						CRI = {
+							BOR_EconMech_increase_integration = yes
+							add_to_variable = { BOR_Econ_RK_local_resources_factor = 0.2 }
+							# add_to_variable = { BOR_Econ_RK_min_export = 0.2 }
+						}
+					}
+				}
+				clear_variable = BOR_Selected_RK_expand_resource_extraction
+			}
+		}
+		ai_will_do = { factor = 25 }
+	}
+
+	GER_Bormann_EconMech_eastern_industrial_buildup = {
+		icon = GFX_decision_generic_destroy_city
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_generic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+			any_of_scopes = {
+				array = BOR_GrossraumEasternCountries
+				NOT = { has_country_flag = BOR_EconMech_eastern_industrial_buildup }
+			}
+		}
+		available = {
+			NOT = { has_country_flag = BOR_EconMech_RK_select }
+			num_of_civilian_factories_available_for_projects > 6
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_400_million
+		days_remove = 200
+
+		modifier = { civilian_factory_use = 7 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_eastern_industrial_buildup"
+			set_temp_variable = { temp_econ_spending_amount = 0.4 }
+			econ_spend_money_once_effect_raw_money = yes
+			BOR_EconMech_RK_selection_decision = yes
+			set_country_flag = BOR_RK_Selection_eastern_industrial_buildup
+			custom_effect_tooltip = GER_Bormann_EconMech_only_available_for_east_tt
+		}
+		remove_effect = {
+			if = {
+				limit = { check_variable = { BOR_Selected_RK_eastern_industrial_buildup = 0 } }
+				random_list = {
+					33 = { BOR_SIG_AL_7_1_1 = yes }
+					33 = { BOR_SIG_AL_8_1_1 = yes }
+					33 = { BOR_SIG_AL_9_1_1 = yes }
+				}
+				custom_effect_tooltip = BOR_eastern_industrial_buildup_effects_tt
+				custom_effect_tooltip = BOR_EconMech_RK_integration_tt
+			}
+			else = {
+				random_list = {
+					33 = { BOR_SIG_AL_7_1_1 = yes }
+					33 = { BOR_SIG_AL_8_1_1 = yes }
+					33 = { BOR_SIG_AL_9_1_1 = yes }
+				}
+				custom_effect_tooltip = BOR_eastern_industrial_buildup_GER_tt
+				add_to_variable = { BOR_Econ_GER_consumer_goods_factor = -0.01 }
+				var:BOR_Selected_RK_eastern_industrial_buildup = {
+					set_country_flag = BOR_EconMech_eastern_industrial_buildup
+					set_temp_variable = { temp_econ_GDP_boost_percentage = 0.03 }
+					econ_GDP_boost_once_percentage = yes
+					custom_effect_tooltip = BOR_EconMech_RK_integration_selected_tt
+					BOR_EconMech_increase_integration = yes
+					if = {
+						limit = {
+							tag = UKR
+							country_exists = CRI
+						}
+						CRI = { BOR_EconMech_increase_integration = yes }
+					}
+				}
+				clear_variable = BOR_Selected_RK_eastern_industrial_buildup
+			}
+		}
+		ai_will_do = { factor = 25 }
+	}
+
+	GER_Bormann_EconMech_dockyard_investment = {
+		icon = GFX_decision_generic_shipyard
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_generic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+			any_of_scopes = {
+				array = BOR_GrossraumWesternCountries
+				NOT = { has_country_flag = BOR_EconMech_dockyard_investment }
+			}
+		}
+		available = {
+			NOT = { has_country_flag = BOR_EconMech_RK_select }
+			num_of_civilian_factories_available_for_projects > 5
+			custom_trigger_tooltip = {
+				tooltip = BOR_EconMech_enable_decisions
+				NOT = { has_country_flag = BOR_EconMech_OilCrisis }
+			}
+		}
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_250_million
+		days_remove = 120
+
+		modifier = { civilian_factory_use = 6 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_dockyard_investment"
+			set_temp_variable = { temp_econ_spending_amount = 0.25 }
+			econ_spend_money_once_effect_raw_money = yes
+			BOR_EconMech_RK_selection_decision = yes
+			set_country_flag = BOR_RK_Selection_dockyard_investment
+			custom_effect_tooltip = GER_Bormann_EconMech_only_available_for_west_tt
+		}
+		remove_effect = {
+			if = {
+				limit = { check_variable = { BOR_Selected_RK_dockyard_investment = 0 } }
+				custom_effect_tooltip = BOR_dockyard_investment_effects_tt
+				custom_effect_tooltip = BOR_EconMech_RK_integration_tt
+			}
+			else = {
+				navy_experience = 20
+				custom_effect_tooltip = BOR_dockyard_investment_GER_tt
+				add_to_variable = { BOR_Econ_GER_industrial_capacity_factory = 0.025 }
+				var:BOR_Selected_RK_dockyard_investment = {
+					set_country_flag = BOR_EconMech_dockyard_investment
+					random_owned_controlled_state = {
+						limit = { is_coastal = yes }
+						add_extra_state_shared_building_slots = 2
+						add_building_construction = {
+							type = dockyard
+							level = 2
+							instant_build = yes
+						}
+					}
+					custom_effect_tooltip = BOR_EconMech_RK_integration_selected_tt
+					BOR_EconMech_increase_integration = yes
+				}
+				clear_variable = BOR_Selected_RK_dockyard_investment
+			}
+		}
+		ai_will_do = { factor = 25 }
+	}
+
+	GER_Bormann_EconMech_western_slave_repatriation = {
+		icon = GFX_decision_generic_forced_labor
+		visible = {
+			OR = {
+				has_country_flag = BOR_EconMech_generic_show
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_EconMech_pakt_decisions1
+				has_country_flag = BOR_EconMech_decisions_debug
+			}
+			any_of_scopes = {
+				array = BOR_GrossraumWesternCountries
+				OR = {
+					has_idea = tno_slavery_institutionalized
+					has_idea = tno_slavery_corvee
+				}
+			}
+		}
+		available = { NOT = { has_country_flag = BOR_EconMech_RK_select } }
+
+		custom_cost_trigger = { check_variable = { GDP > 0 } }
+		custom_cost_text = decision_cost_25_million
+		days_remove = 120
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_western_slave_repatriation"
+			set_temp_variable = { temp_econ_spending_amount = 0.025 }
+			econ_spend_money_once_effect_raw_money = yes
+			BOR_EconMech_RK_selection_decision = yes
+			set_country_flag = BOR_RK_Selection_western_slave_repatriation
+			custom_effect_tooltip = GER_Bormann_EconMech_only_available_for_west_tt
+		}
+		remove_effect = {
+			if = {
+				limit = { check_variable = { BOR_Selected_RK_western_slave_repatriation = 0 } }
+				custom_effect_tooltip = BOR_western_slave_repatriation_effects_tt
+				custom_effect_tooltip = BOR_EconMech_RK_integration_tt
+			}
+			else = {
+				set_temp_variable = { gdp_growth_temp = 0.3 }
+				econ_gdp_growth_change = yes
+				var:BOR_Selected_RK_western_slave_repatriation = {
+					set_country_flag = BOR_EconMech_western_slave_repatriation
+					custom_effect_tooltip = BOR_western_slave_repatriation_tt
+					if = {
+						limit = { tag = HOL }
+						GER = {
+							add_to_variable = { BOR_ExtraRepatriatedSlaves = BOR_SlavePop^Netherlands }
+							multiply_variable = { BOR_SlavePop^Netherlands = 0 }
+						}
+					}
+					else_if = {
+						limit = { tag = DEN }
+						GER = {
+							add_to_variable = { BOR_ExtraRepatriatedSlaves = BOR_SlavePop^Denmark }
+							multiply_variable = { BOR_SlavePop^Denmark = 0 }
+						}
+					}
+					else_if = {
+						limit = { tag = NOR }
+						GER = {
+							add_to_variable = { BOR_ExtraRepatriatedSlaves = BOR_SlavePop^Norway }
+							multiply_variable = { BOR_SlavePop^Norway = 0 }
+						}
+					}
+					add_to_variable = { BOR_Econ_RK_industrial_capacity_factory = 0.05 }
+					add_to_variable = { BOR_Econ_RK_stability_factor = 0.05 }
+					TNO_improve_poverty_med = yes
+					if = {
+						limit = { has_idea = tno_slavery_institutionalized }
+						swap_ideas = {
+							remove_idea = tno_slavery_institutionalized
+							add_idea = tno_slavery_penal_labor
+						}
+						set_variable = { tno_slavery_effectiveness = 60 }
+						TNO_update_slavery_policy_effectiveness = yes
+					}
+					else = {
+						swap_ideas = {
+							remove_idea = tno_slavery_corvee
+							add_idea = tno_slavery_penal_labor
+						}
+						set_variable = { tno_slavery_effectiveness = 70 }
+						TNO_update_slavery_policy_effectiveness = yes
+					}
+					custom_effect_tooltip = BOR_EconMech_RK_integration_selected_tt
+					BOR_EconMech_increase_integration = yes
+				}
+				clear_variable = BOR_Selected_RK_western_slave_repatriation
+			}
+		}
+		ai_will_do = { factor = 25 }
+	}
+
+	### DEBUG ###
+	GER_Bormann_EconMech_show_debug = {
+		icon = GFX_decision_generic_phone_call
+		visible = {
+			NOT = { has_country_flag = BOR_EconMech_debug_show }
+			is_ai = no
+			is_debug = yes
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_show_debug"
+			set_country_flag = BOR_EconMech_debug_show
+		}
+	}
+	GER_Bormann_EconMech_hide_debug = {
+		icon = GFX_decision_generic_phone_call
+		visible = { has_country_flag = BOR_EconMech_debug_show }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_hide_debug"
+			clr_country_flag = BOR_EconMech_debug_show
+		}
+	}
+
+	GER_Bormann_EconMech_map_decision_test = {
+		icon = GFX_decision_category_generic_money
+		visible = { has_country_flag = BOR_EconMech_debug_show }
+		available = { NOT = { has_country_flag = BOR_EconMech_RK_select } }
+
+		days_remove = 5
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_map_decision_test"
+			BOR_EconMech_RK_selection_decision = yes
+			set_country_flag = BOR_RK_Selection_map_decision_test
+		}
+		remove_effect = {
+			if = {
+				limit = { check_variable = { BOR_Selected_RK_map_decision_test = 0 } }
+				# custom_effect_tooltip = GER_Bormann_EconMech_RK_selection_complete_tt
+			}
+			else = {
+				var:BOR_Selected_RK_map_decision_test = {
+					add_political_power = 100
+				}
+				clear_variable = BOR_Selected_RK_map_decision_test
+			}
+		}
+	}
+
+	GER_Bormann_EconMech_clear_selection_variables = {
+		icon = GFX_decision_category_generic_money
+		visible = { has_country_flag = BOR_EconMech_debug_show }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_clear_selection_variables"
+			clr_country_flag = BOR_EconMech_RK_select
+			clr_country_flag = BOR_RK_Selection_map_decision_test
+			clr_country_flag = BOR_RK_Selection_modernize_infrastructure
+			clr_country_flag = BOR_RK_Selection_expand_resource_extraction
+			clr_country_flag = BOR_RK_Selection_eastern_industrial_buildup
+			clr_country_flag = BOR_RK_Selection_dockyard_investment
+			clear_variable = BOR_Selected_RK_map_decision_test
+			clear_variable = BOR_Selected_RK_modernize_infrastructure
+			clear_variable = BOR_Selected_RK_expand_resource_extraction
+			clear_variable = BOR_Selected_RK_eastern_industrial_buildup
+			clear_variable = BOR_Selected_RK_dockyard_investment
+		}
+	}
+
+	GER_Bormann_EconMech_integration_variable_set = {
+		icon = GFX_decision_category_generic_money
+		visible = { has_country_flag = BOR_EconMech_debug_show }
+		available = { NOT = { has_country_flag = BOR_EconMech_RK_select } }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_EconMech_integration_variable_set"
+			set_country_flag = BOR_EconMech_RK_select
+			set_country_flag = BOR_EconMech_integration_variable_set
+		}
+	}
+}
+
+####################################
+# Bormann Foreign Policy Decisions #
+####################################
+GER_Bormann_Foreign_Policy_category = {
+	GER_Bormann_Foreign_Policy_Bohemia = {
+		icon = GFX_decision_diplo_bohemia
+
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Bohemia"
+			if = { # Bohemia sided with Bormann but died
+				limit = {
+					CZE = { exists = no }
+					has_country_flag = GER_CZE_joined_bormann
+				}
+				country_event = { id = reich.807 days = 3 }
+			}
+			else_if = { # Bohemia didn't side with Bormann
+				limit = {
+					CZE = { exists = no }
+					NOT = { has_country_flag = GER_CZE_joined_bormann }
+				}
+				country_event = { id = reich.806 days = 3 }
+			}
+			else_if = { # Bohemia sided with Bormann and didn't die
+				limit = {
+					CZE = { exists = yes }
+					has_country_flag = GER_CZE_joined_bormann
+				}
+				country_event = { id = reich.809 days = 3 }
+			}
+			else = { country_event = { id = bormann.600 days = 1 } } # Bohemia is neutral
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Netherlands = {
+		icon = GFX_decision_diplo_netherlands
+
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Netherlands"
+			if = { # SS
+				limit = { HOL = { has_country_flag = HOL_SS_in_power } }
+				country_event = bormann.686
+			}
+			else_if = { # Rochemont
+				limit = { HOL = { has_country_flag = HOL_volkisch_power } }
+				country_event = bormann.679
+			}
+			else_if = { # Geelkerken (Loyalist)
+				limit = { HOL = { has_country_flag = HOL_musserist_rk } }
+				country_event = bormann.678
+			}
+			else_if = { # Geelkerken (Independent)
+				limit = { HOL = { has_country_flag = HOL_fascist_independence } }
+				country_event = bormann.670
+			}
+			else_if = { # Biesheuvel (Authoritarian)
+				limit = { HOL = { has_country_flag = HOL_biesheuvel_government } }
+				country_event = bormann.656
+			}
+			else_if = { # Democracy
+				limit = { HOL = { has_country_flag = HOL_towards_democracy } }
+				country_event = bormann.663
+			}
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Denmark = {
+		icon = GFX_decision_diplo_denmark
+		available = {
+			if = {
+				limit = { DEN = { has_government = conservatism } }
+				DEN = { NOT = { has_government = conservatism } }
+			}
+		}
+
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Denmark"
+			if = { # Best
+				limit = { DEN = { has_government = paternalism } }
+				country_event = bormann.1004
+			}
+			else_if = { # Hanneken
+				limit = { DEN = { has_government = despotism } }
+				country_event = bormann.1000
+			}
+			else_if = { # Martinsen
+				limit = { DEN = { has_government = national_socialism } }
+				country_event = bormann.1006
+			}
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Slovakia = {
+		icon = GFX_decision_diplo_slovakia
+		available = {
+			CZE = { exists = no }
+			HOL = { is_in_faction_with = GER }
+			DEN = { is_in_faction_with = GER }
+		}
+
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Slovakia"
+			country_event = speerslovakia.1
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Poland = {
+		icon = GFX_decision_diplo_poland
+		available = {
+			CZE = { exists = no }
+			HOL = { is_in_faction_with = GER }
+			DEN = { is_in_faction_with = GER }
+		}
+
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Poland"
+			if = {
+				limit = { has_global_flag = POL_victory }
+				country_event = bormann.1500
+			}
+			else_if = {
+				limit = { has_global_flag = GGN_victory }
+				country_event = bormann.1508
+			}
+			else = {
+				country_event = bormann.166
+			}
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Ostland = {
+		icon = GFX_decision_diplo_ostland
+		available = {
+			CZE = { exists = no }
+			HOL = { is_in_faction_with = GER }
+			DEN = { is_in_faction_with = GER }
+			GGN = { is_in_faction_with = GER }
+		}
+
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Ostland"
+			if = {
+				limit = { has_global_flag = OST_OCW_Ongoing	}
+				set_country_flag = GER_Bormann_Ongoing_Ostland
+			}
+			else_if = {
+				limit = { Pakt_OST_OCW_Meyer_Landrut_Victory = yes }
+				set_country_flag = GER_Bormann_Meyer_Ostland
+			}
+			else_if = {
+				limit = { Pakt_OST_OCW_Drechsler_Victory = yes }
+				set_country_flag = GER_Bormann_Drechsler_Ostland
+			}
+			else_if = {
+				limit = { Pakt_OST_OCW_Stahlecker_Victory = yes }
+				set_country_flag = GER_Bormann_Stahlecker_Ostland
+			}
+			else_if = {
+				limit = { Pakt_OST_OCW_Kovner_Victory = yes }
+				set_country_flag = GER_Bormann_Kovner_Ostland
+			}
+			else_if = {
+				limit = { Pakt_OST_OCW_Jeckeln_Victory = yes }
+				set_country_flag = GER_Bormann_Jeckeln_Ostland
+			}
+			else_if = {
+				limit = { Pakt_OST_OCW_Vituska_Victory = yes }
+				set_country_flag = GER_Bormann_Vituska_Ostland
+			}
+			hidden_effect = { reload_GER_bormann_post_cw_tree = yes }
+			custom_effect_tooltip = GER_new_options_focus_tree_linebreak
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Ukraine = {
+		icon = GFX_decision_diplo_ukraine
+		available = {
+			OR = {
+				has_country_flag = BOR_speidel_okw
+				has_country_flag = BOR_schorner_okw
+			}
+			OSL = { is_in_faction_with = GER }
+			GGN = { is_in_faction_with = GER }
+		}
+
+		fire_only_once = yes
+		cost = 50
+		days_remove = 20
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Ukraine"
+		}
+		remove_effect = {
+			if = {
+				limit = {
+					country_exists = UKR
+				}
+				UKR = { save_party_popularities = yes }
+				set_autonomy = {
+					target = UKR
+					autonomy_state = autonomy_autonomous_reichskommissariat
+					end_wars = no
+					end_civil_wars = no
+				}
+				hidden_effect = {
+					UKR = {
+						econ_join_sphere_GER = yes
+						add_ideas = Pakt_Autonomous_Reichskommissariat
+						apply_party_popularities = yes
+						if = {
+							limit = { country_exists = POL }
+							every_owned_state = {
+								limit = { is_core_of = POL }
+								POL = { transfer_state = PREV }
+							}
+						}
+						else = {
+							every_owned_state = {
+								limit = { is_core_of = GGN }
+								GGN = { transfer_state = PREV }
+							}
+						}
+						if = {
+							limit = { UKR = { is_ai = yes } }
+							load_focus_tree = ZZZ_blank_focus
+						}
+					}
+					CRI = {
+						remove_state_core = 137
+						remove_state_core = 196
+						remove_state_core = 1532
+					}
+					add_state_core = 137
+					add_state_core = 196
+					add_state_core = 1532
+				}
+				add_to_faction = UKR
+				CRI = { transfer_navy = { target = GER } }
+				annex_country = { target = CRI transfer_troops = yes }
+			}
+			if = {
+				limit = {
+					country_exists = FUK
+				}
+				GER = { declare_war_on = { target = FUK type = annex_everything } }
+				hidden_effect = { #don't mind me
+					FUK = {
+						country_event = {
+							id = UKR_nuke.0
+							days = 7
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = UKS
+				}
+				GER = { declare_war_on = { target = UKS type = annex_everything } }
+				hidden_effect = { #don't mind me
+					UKS = {
+						country_event = {
+							id = UKR_nuke.0
+							days = 7
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = BOV
+				}
+				GER = { declare_war_on = { target = BOV type = annex_everything } }
+				hidden_effect = { #don't mind me
+					BOV = {
+						country_event = {
+							id = UKR_nuke.0
+							days = 7
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Moskowien = {
+		icon = GFX_decision_diplo_moskowien
+		available = {
+			OR = {
+				has_country_flag = BOR_speidel_okw
+				has_country_flag = BOR_schorner_okw
+			}
+			UKR = { is_in_faction_with = GER }
+		}
+
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Moskowien"
+			country_event = {
+				id = bormann.1131
+				days = 1
+			}
+			# country_event = { id = bormann.1132 days = 2 }
+			activate_mission = BGR_Take_Moskowien
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	#Moskowien taking timer
+	BGR_Take_Moskowien = {
+		icon = GFX_decision_diplo_moskowien
+		fire_only_once = yes
+		activation = {
+			always = no
+		}
+		available = {
+			always = no
+		}
+		is_good = yes
+		days_mission_timeout = 20
+		timeout_effect = {
+			MSK_Dissolution_DeclareWarOnEveryoneThere = yes
+			set_country_flag = BGR_Open_Reorg
+		}
+	}
+
+	#Reorganize Moskowien
+	BGR_Moskowien_Setup = {
+		icon = GFX_decision_diplo_moskowien
+		fire_only_once = yes
+		cost = 20
+		visible = {
+			has_country_flag = BGR_Open_Reorg
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GER_moskowien_conquered_trigger_tt
+				NOT = {
+					country_exists = TVR
+					country_exists = LUF
+					country_exists = RZH
+					country_exists = NTI
+					country_exists = OZM
+					country_exists = SNP
+					country_exists = OZL
+					country_exists = VVV
+					country_exists = PSK
+					country_exists = PFT
+					country_exists = SHI
+					country_exists = OZT
+					country_exists = NTA
+					country_exists = ORL
+					country_exists = RFS
+					country_exists = OZO
+					country_exists = POV
+					country_exists = POP
+					country_exists = OZP
+					country_exists = OZA
+					country_exists = PAU
+				}
+			}
+		}
+		complete_effect = {
+			country_event = {
+				id = bormann.1128
+				days = 1
+			}
+			add_command_power = 25
+			custom_effect_tooltip = BGR_Moskowien_Setup_tt
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Kaukasien = {
+		icon = GFX_decision_diplo_kaukasien
+		available = {
+			OR = {
+				has_country_flag = BOR_speidel_okw
+				has_country_flag = BOR_schorner_okw
+			}
+			MCW = { is_in_faction_with = GER }
+			UKR = { is_in_faction_with = GER }
+		}
+
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Kaukasien"
+			set_country_flag = GER_Bormann_Kaukasien_Tree
+			if = {
+				limit = {
+					CAU = {
+						has_country_leader = {
+							character = CAU_paul_pleiger
+							ruling_only = yes
+						}
+						NOT = {
+							has_country_flag = CAU_caucasian_revolt
+							has_country_flag = CAU_caucasian_anarchy
+						}
+					}
+				}
+				if = {
+					limit = { CAU = { has_country_flag = CAU_policy_business_bormann } }
+					set_country_flag = GER_BOR_KAU_business_plot_bormann
+				}
+				else = { set_country_flag = GER_BOR_KAU_business_plot_goering }
+			}
+			else_if = {
+				limit = {
+					CAU = {
+						NOT = {
+							has_country_flag = CAU_caucasian_revolt
+							has_country_flag = CAU_caucasian_anarchy
+						}
+					}
+				}
+				set_country_flag = GER_BOR_KAU_josias
+			}
+			else = { set_country_flag = GER_BOR_KAU_revolt }
+			hidden_effect = { reload_GER_bormann_post_cw_tree = yes }
+			custom_effect_tooltip = GER_new_options_focus_tree_linebreak
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Norway = {
+		icon = GFX_decision_diplo_norway
+		available = { has_country_flag = BOR_Phase2 }
+
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Norway"
+			set_country_flag = GER_Bormann_Norway_Tree
+			hidden_effect = { reload_GER_bormann_post_cw_tree = yes }
+			custom_effect_tooltip = GER_new_options_focus_tree_linebreak
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Sweden = {
+		icon = GFX_decision_diplo_sweden
+		available = {
+			has_country_flag = BOR_Phase2
+			custom_trigger_tooltip = {
+				tooltip = BOR_NOR_dealt_with_tt
+				OR = {
+					NOR = { is_in_faction_with = GER }
+					has_completed_focus = BOR_well_we_tried
+					has_completed_focus = BOR_back_to_the_pakt
+				}
+			}
+		}
+
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Sweden"
+			country_event = bormann.1512
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Finland = {
+		icon = GFX_decision_diplo_finland
+		available = {
+			has_country_flag = BOR_Phase2
+			has_country_flag = BOR_SWE_negotiations
+			FIN = { NOT = { is_in_faction_with = GER } }
+			country_exists = FIN
+			NOT = {
+				FIN = {
+					has_country_leader = {
+						character = FIN_Karl_August_Fagerholm
+						ruling_only = yes
+					}
+				}
+			}
+		}
+		
+		fire_only_once = yes
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Finland"
+			country_event = bormann.1600
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Mauritius_and_Reunion = {
+		icon = GFX_decision_generic_military_parade
+		visible = { has_country_flag = BOR_JAP_mauritius_reunion_operation_unlocked }
+		available = {
+			if = {
+				limit = { is_ai = yes } # Because the AI is dumb and we can't make it send fleets to that location, they get to do it for free
+				always = yes
+			}
+			else = { ships_in_area = { area = 85 size > 11 } } # But if you're a player you have to do the long route, no easy stuff for you lol
+		}
+
+		custom_cost_trigger = {
+			has_political_power > 49.99
+			command_power > 24.99
+		}
+		custom_cost_text = decision_cost_25_cp_50_pp
+		days_remove = 7
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 706
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Mauritius_and_Reunion"
+			hidden_effect = {
+				add_political_power = -50
+				add_command_power = -25
+			}
+		}
+		remove_effect = {
+			set_country_flag = BOR_indian_ocean_exercise_success
+			country_event = bormann.1814
+			set_temp_variable = { SeaZone_ID = 6 } # 6; Indian Ocean
+			Cold_War_GUI_PowerProjection_AddSeaZone = yes
+		}
+		ai_will_do = { factor = 200 }
+	}
+
+	GER_Bormann_Foreign_Policy_Italy_Fucked_Up = {
+		activation = {
+			has_country_flag = BOR_minor_faux_pas_flag
+		}
+		available = {
+			has_completed_focus = BOR_just_more_of_the_same
+		}
+		is_good = no
+		days_mission_timeout = 60
+		selectable_mission = no
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Foreign_Policy_Italy_Fucked_Up"
+		}
+
+		timeout_effect = {
+			country_event = { id = bormann.3916 }
+		}
+	}
+
+	GER_Bohemia_Reconstruction_BGR_A = {
+		icon = GFX_decision_diplo_bohemia
+		available = { hidden_trigger = { always = no } }
+		activation = { always = no }
+
+		is_good = yes
+		days_mission_timeout = 120
+		priority = 100
+		fire_only_once = yes
+
+		timeout_effect = {
+			country_event = reich.808
+		}
+	}
+	GER_Bohemia_Reconstruction_BGR_B = {
+		icon = GFX_decision_diplo_bohemia
+		available = { hidden_trigger = { always = no } }
+		activation = { always = no }
+
+		is_good = yes
+		days_mission_timeout = 30
+		priority = 100
+		fire_only_once = yes
+
+		timeout_effect = {
+			country_event = reich.811
+		}
+	}
+
+	GER_Bormann_Foreign_Policy_Burgundy_Collapse_Intervention = {
+		icon = GFX_decision_diplo_burgundy
+		available = { hidden_trigger = { always = no } }
+		activation = { always = no }
+
+		is_good = yes
+		days_mission_timeout = 90
+		priority = 100
+		fire_only_once = yes
+
+		war_with_on_timeout = BRG
+		war_with_on_timeout = PIC
+		war_with_on_timeout = BEL
+		war_with_on_timeout = FLR
+		war_with_on_timeout = RPY
+
+		timeout_effect = {
+			BRG = { set_country_flag = TNO_nuke_disabled }
+
+			if = { ### Pakt France
+				limit = { FRA = { is_in_faction_with = GER } }
+				set_global_flag = BRG_AI_Collapse_Pakt_France
+
+				country_event = BRG_ai_collapse.2
+				FRA = {
+					if = { limit = { country_exists = BRG } declare_war_on = { target = BRG type = annex_everything } }
+					if = { limit = { country_exists = PIC } declare_war_on = { target = PIC type = annex_everything } }
+					if = { limit = { country_exists = BEL } declare_war_on = { target = BEL type = annex_everything } }
+					if = { limit = { country_exists = FLR } declare_war_on = { target = FLR type = annex_everything } }
+					if = { limit = { country_exists = RPY } declare_war_on = { target = RPY type = annex_everything } }
+				}
+			}
+			else_if = { ### OFN France
+				limit = { FRA = { is_in_faction_with = USA } }
+				set_global_flag = BRG_AI_Collapse_OFN_France
+				USA = { country_event = { id = BRG_ai_collapse.4 days = 1 } }
+			}
+			else_if = { ### Italian/Iberian France
+				limit = { 
+					FRA = { 
+						has_country_flag = FRA_Italy_Aligned
+						has_country_flag = FRA_Iberia_Aligned
+					} 
+				}
+				set_global_flag = BRG_AI_Collapse_Italy_France
+			}
+			else = { ### Neutral France
+				set_global_flag = BRG_AI_Collapse_Neutral_France
+			}
+
+			if = { limit = { country_exists = BRG } declare_war_on = { target = BRG type = annex_everything } }
+			if = { limit = { country_exists = PIC } declare_war_on = { target = PIC type = annex_everything } }
+			if = { limit = { country_exists = BEL } declare_war_on = { target = BEL type = annex_everything } }
+			if = { limit = { country_exists = FLR } declare_war_on = { target = FLR type = annex_everything } }
+			if = { limit = { country_exists = RPY } declare_war_on = { target = RPY type = annex_everything } }
+
+			hidden_effect = { every_country = { news_event = WORLD_REICH.2303 } }
+		}
+	}
+}
+
+##################################
+# Bormann Sphere Trade Decisions #
+##################################
+GER_Bormann_Sphere_Trade_category = {
+	GER_Bormann_Sphere_Trade_open_to_zaibatsus_mission = {
+		icon = GFX_decision_generic_phone_call
+		activation = {
+			check_variable = { BOR_Sphere_Trade_japan_opinion > 3 }
+			NOT = { has_country_flag = GER_BOR_ST_opened_to_zaibatsu }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GER_Bormann_Sphere_Trade_open_to_zaibatsus_mission_trigger_tt
+				has_country_flag = GER_BOR_ST_opened_to_zaibatsu
+				check_variable = { BOR_Sphere_Trade_japan_opinion > 3 }
+			}
+		}
+
+		is_good = no
+		days_mission_timeout = 30
+		fire_only_once = yes
+		priority = 100
+
+		timeout_effect = {
+			add_political_power = -20
+			GER_Bormann_Sphere_Trade_decrease_opinion_med = yes
+		}
+	}
+
+	GER_Bormann_Sphere_Trade_encourage_trade_mission = {
+		icon = GFX_decision_generic_phone_call
+		activation = {
+			check_variable = { BOR_Sphere_Trade_japan_opinion > 5 }
+			NOT = { has_country_flag = GER_BOR_ST_encouraged_trade }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GER_Bormann_Sphere_Trade_encourage_trade_mission_trigger_tt
+				has_country_flag = GER_BOR_ST_encouraged_trade
+				check_variable = { BOR_Sphere_Trade_japan_opinion > 5 }
+			}
+		}
+
+		is_good = no
+		days_mission_timeout = 30
+		fire_only_once = yes
+		priority = 100
+
+		timeout_effect = {
+			add_political_power = -20
+			GER_Bormann_Sphere_Trade_decrease_opinion_med = yes
+		}
+	}
+
+	GER_Bormann_Sphere_Trade_stop_spying_mission = {
+		icon = GFX_decision_generic_phone_call
+		activation = {
+			check_variable = { BOR_Sphere_Trade_japan_opinion > 7 }
+			NOT = { has_country_flag = GER_BOR_ST_stopped_syping }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GER_Bormann_Sphere_Trade_stop_spying_mission_trigger_tt
+				has_country_flag = GER_BOR_ST_stopped_syping
+				check_variable = { BOR_Sphere_Trade_japan_opinion > 7 }
+			}
+		}
+
+		is_good = no
+		days_mission_timeout = 30
+		fire_only_once = yes
+		priority = 100
+
+		timeout_effect = {
+			add_political_power = -20
+			GER_Bormann_Sphere_Trade_decrease_opinion_high = yes
+		}
+	}
+
+	GER_Bormann_Sphere_Trade_officialize_thaw = {
+		icon = GFX_decision_generic_pakt_business
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GER_BOR_sphere_trading_relations_at_max_tt
+				check_variable = { BOR_Sphere_Trade_japan_opinion = 10 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = GER_Bormann_Sphere_Trade_open_to_zaibatsus_mission_trigger_tt
+				has_country_flag = GER_BOR_ST_opened_to_zaibatsu
+			}
+			custom_trigger_tooltip = {
+				tooltip = GER_Bormann_Sphere_Trade_encourage_trade_mission_trigger_tt
+				has_country_flag = GER_BOR_ST_encouraged_trade
+			}
+			custom_trigger_tooltip = {
+				tooltip = GER_Bormann_Sphere_Trade_stop_spying_mission_trigger_tt
+				has_country_flag = GER_BOR_ST_stopped_syping
+			}
+		}
+
+		cost = 100
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 282
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Sphere_Trade_officialize_thaw"
+			country_event = bormann.1821
+			hidden_effect = { JAP = { country_event = bormann.1821 } }
+			set_temp_variable = { tension_WT = -25 }
+			set_temp_variable = { tension_superpower_1 = GER }
+			set_temp_variable = { tension_superpower_2 = JAP }
+			set_temp_variable = { tension_id = 28 }
+			TNO_change_tension = yes
+			BOR_SIG_SL_0_5_2 = yes
+			BOR_SIG_SL_1_5_2 = yes
+			BOR_SIG_SL_4_5_2 = yes
+			BOR_SIG_SL_5_5_2 = yes
+			BOR_SIG_SP_4_20 = yes
+			BOR_SIG_SP_5_20 = yes
+		}
+		ai_will_do = { factor = 20 }
+	}
+
+	GER_Bormann_Sphere_Trade_suck_up_to_japan = {
+		icon = GFX_decision_generic_political_action
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GER_BOR_sphere_trading_relations_not_already_at_max_tt
+				check_variable = { BOR_Sphere_Trade_japan_opinion < 10 }
+			}
+		}
+
+		cost = var:BOR_Sphere_Trade_suck_up_cost
+		days_re_enable = 30
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 282
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Sphere_Trade_suck_up_to_japan"
+			GER_Bormann_Sphere_Trade_increase_opinion_low = yes
+			BOR_SIG_SP_0_3 = yes
+			custom_effect_tooltip = GER_BOR_sphere_trading_suck_up_cost_increase_tt
+			add_to_variable = { BOR_Sphere_Trade_suck_up_cost = 15 }
+		}
+		ai_will_do = { factor = 1 }
+	}
+
+	GER_Bormann_Sphere_Trade_open_to_zaibatsus = {
+		icon = GFX_decision_generic_luxury_trade_increase
+		visible = { check_variable = { BOR_Sphere_Trade_japan_opinion > 3 } }
+
+		cost = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 282
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Sphere_Trade_open_to_zaibatsus"
+			set_country_flag = GER_BOR_ST_opened_to_zaibatsu
+			custom_effect_tooltip = GER_BOR_sphere_trading_increase_effects_tt
+			add_to_variable = { BOR_Sphere_Trade_gdp_growth_modifier_base = 0.002 }
+			TNO_worsen_trade_laws_policy_effectiveness_med = yes
+			BOR_SIG_SP_7_5 = yes
+			BOR_SIG_SL_7_3_1 = yes
+			BOR_SIG_SP_8_5 = yes
+			BOR_SIG_SL_8_3_1 = yes
+			BOR_SIG_SP_9_5 = yes
+			BOR_SIG_SL_9_3_1 = yes
+			GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+		}
+		ai_will_do = { factor = 20 }
+	}
+
+	GER_Bormann_Sphere_Trade_encourage_trade = {
+		icon = GFX_decision_generic_shipyard
+		visible = { check_variable = { BOR_Sphere_Trade_japan_opinion > 5 } }
+
+		cost = 60
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 282
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Sphere_Trade_encourage_trade"
+			set_country_flag = GER_BOR_ST_encouraged_trade
+			JAP = {
+				set_temp_variable = { temp_econ_GDP_boost_flat = 0.25 }
+				econ_GDP_boost_once_flat = yes
+				# custom_effect_tooltip = GER_BOR_sphere_trading_misc_income_add_medium_increase
+				# add_to_variable = { misc_income = 0.25 } #already converted to billion
+			}
+			custom_effect_tooltip = GER_BOR_sphere_trading_increase_effects_tt
+			add_to_variable = { BOR_Sphere_Trade_research_speed_factor_base = 0.02 }
+			add_to_variable = { BOR_Sphere_Trade_gdp_growth_modifier_base = 0.002 }
+			TNO_improve_industrial_expertise_low = yes
+			custom_effect_tooltip = GER_BOR_sphere_trading_grossraum_effects_tt
+			add_to_variable = { BOR_Econ_GER_political_power_gain = -0.1 }
+			# add_to_variable = { BOR_Econ_GER_min_export = 0.1 }
+			add_to_variable = { BOR_Econ_GER_industrial_capacity_factory = -0.05 }
+			GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+		}
+		ai_will_do = { factor = 20 }
+	}
+
+	GER_Bormann_Sphere_Trade_stop_spying = {
+		icon = GFX_decision_generic_decrease
+		visible = { check_variable = { BOR_Sphere_Trade_japan_opinion > 7 } }
+
+		cost = 50
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 282
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Sphere_Trade_stop_spying"
+			set_country_flag = GER_BOR_ST_stopped_syping
+			JAP = { add_stability = 0.03 }
+			custom_effect_tooltip = GER_BOR_sphere_trading_increase_effects_tt
+			custom_effect_tooltip = GER_BOR_sphere_trading_stop_spying_effects_tt
+			set_temp_variable = { NetworkChange = -5 } Espionage_AddNetworkStrength_EastAsia = yes
+			set_temp_variable = { NetworkChange = -5 } Espionage_AddNetworkStrength_SouthEastAsia = yes
+			add_to_variable = { BOR_Sphere_Trade_research_speed_factor_base = 0.025 }
+			add_to_variable = { BOR_Sphere_Trade_production_factory_efficiency_gain_factor_base = 0.01 }
+			add_to_variable = { BOR_Sphere_Trade_political_power_gain = -0.04 }
+			TNO_worsen_security_policy_effectiveness_med = yes
+			BOR_SIG_SL_6_4_1 = yes
+			BOR_SIG_SP_6_10 = yes
+			BOR_SIG_SP_0_5 = yes
+			GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+		}
+		ai_will_do = { factor = 20 }
+	}
+
+	GER_Bormann_Sphere_Trade_negotiate_presence_in_country = {
+		icon = GFX_decision_generic_phone_call
+		targets = { THA AZH INS FRI } # SHO, CHI
+		visible = {
+			FROM = {
+				exists = yes
+				has_war = no
+				NOT = {
+					has_idea = GER_BOR_sphere_megacorp_presence
+					has_idea = GER_BOR_sphere_megacorp_presence_1
+				}
+			}
+		}
+		available = { NOT = { has_country_flag = GER_Bormann_sphere_establishing_presence } }
+
+		custom_cost_trigger = { has_political_power > 24.99 }
+		custom_cost_text = decision_cost_25_pp_10_m
+		days_remove = 90
+		fixed_random_seed = no
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = FROM
+				is_capital = yes
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Sphere_Trade_negotiate_presence_in_country"
+			set_temp_variable = { temp_econ_spending_amount = 0.01 }
+			econ_spend_money_once_effect_raw_money = yes
+			hidden_effect = { add_political_power = -25 }
+			random_list = {
+				33 = { BOR_SIG_AL_7_1_1 = yes }
+				33 = { BOR_SIG_AL_8_1_1 = yes }
+				33 = { BOR_SIG_AL_9_1_1 = yes }
+			}
+			set_country_flag = GER_Bormann_sphere_establishing_presence
+		}
+		remove_effect = {
+			FROM = { add_ideas = GER_BOR_sphere_megacorp_presence }
+			custom_effect_tooltip = GER_BOR_sphere_trading_increase_effects_tt
+			add_to_variable = { BOR_Sphere_Trade_political_power_gain = -0.02 }
+			add_to_variable = { BOR_Sphere_Trade_research_speed_factor_base = 0.008 }
+			add_to_variable = { BOR_Sphere_Trade_production_factory_efficiency_gain_factor_base = 0.005 }
+			set_temp_variable = { BOR_Sphere_Trade_gdp_growth_modifier_temp = 0.002 }
+			divide_temp_variable = { BOR_Sphere_Trade_gdp_growth_modifier_temp = 10 }
+			add_to_variable = { BOR_Sphere_Trade_gdp_growth_modifier_base = BOR_Sphere_Trade_gdp_growth_modifier_temp }
+			GER_Bormann_Sphere_Trade_calculate_relationship_effects = yes
+			clr_country_flag = GER_Bormann_sphere_establishing_presence
+		}
+		ai_will_do = { factor = 20 }
+	}
+
+	GER_Bormann_Sphere_Trade_invest_in_manufacturing = {
+		icon = GFX_decision_generic_industry
+		targets = { THA AZH INS FRI } # SHO, CHI
+		visible = {
+			FROM = {
+				exists = yes
+				has_war = no
+				OR = {
+					has_idea = GER_BOR_sphere_megacorp_presence
+					has_idea = GER_BOR_sphere_megacorp_presence_1
+				}
+			}
+		}
+		available = { num_of_civilian_factories_available_for_projects > 4 }
+
+		custom_cost_trigger = { has_political_power > 24.99 }
+		custom_cost_text = decision_cost_25_pp_150_m
+		days_remove = 120
+		fire_only_once = yes
+		fixed_random_seed = no
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = FROM
+				is_capital = yes
+			}
+		}
+
+		modifier = { civilian_factory_use = 5 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Sphere_Trade_invest_in_manufacturing"
+			set_temp_variable = { temp_econ_spending_amount = 0.15 }
+			econ_spend_money_once_effect_raw_money = yes
+			hidden_effect = { add_political_power = -25 }
+			random_list = {
+				33 = { BOR_SIG_AP_7_4 = yes }
+				33 = { BOR_SIG_AP_8_4 = yes }
+				33 = { BOR_SIG_AP_9_4 = yes }
+			}
+		}
+		remove_effect = {
+			FROM = {
+				set_temp_variable = { temp_econ_GDP_boost_percentage = 0.03 }
+				econ_GDP_boost_once_percentage = yes
+			}
+			add_to_variable = { BOR_Sphere_Trade_misc_income_modifier = 0.025 }
+			GER_Bormann_Sphere_Trade_increase_opinion_low = yes
+			force_update_dynamic_modifier = yes
+		}
+		ai_will_do = { factor = 20 }
+	}
+
+	GER_Bormann_Sphere_Trade_invest_in_extraction = {
+		icon = GFX_decision_generic_decision
+		targets = { THA AZH INS FRI } # SHO, CHI
+		visible = {
+			FROM = {
+				exists = yes
+				has_war = no
+				has_idea = GER_BOR_sphere_megacorp_presence
+			}
+		}
+		available = { num_of_civilian_factories_available_for_projects > 4 }
+
+		custom_cost_trigger = { has_political_power > 24.99 }
+		custom_cost_text = decision_cost_25_pp_150_m
+		days_remove = 120
+		fire_only_once = yes
+		fixed_random_seed = no
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = FROM
+				is_capital = yes
+			}
+		}
+
+		modifier = { civilian_factory_use = 5 }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Bormann_Sphere_Trade_invest_in_extraction"
+			set_temp_variable = { temp_econ_spending_amount = 0.15 }
+			econ_spend_money_once_effect_raw_money = yes
+			hidden_effect = { add_political_power = -25 }
+			random_list = {
+				33 = { BOR_SIG_AP_7_4 = yes }
+				33 = { BOR_SIG_AP_8_4 = yes }
+				33 = { BOR_SIG_AP_9_4 = yes }
+			}
+		}
+		remove_effect = {
+			FROM = {
+				swap_ideas = {
+					remove_idea = GER_BOR_sphere_megacorp_presence
+					add_idea = GER_BOR_sphere_megacorp_presence_1
+				}
+			}
+			random_list = {
+				33 = {
+					custom_effect_tooltip = GER_BOR_sphere_trading_resource_rubber
+					add_to_variable = { BOR_Sphere_Trade_country_resource_rubber = 3 }
+				}
+				33 = {
+					custom_effect_tooltip = GER_BOR_sphere_trading_resource_chromium
+					add_to_variable = { BOR_Sphere_Trade_country_resource_chromium = 3 }
+				}
+				33 = {
+					custom_effect_tooltip = GER_BOR_sphere_trading_resource_tungsten
+					add_to_variable = { BOR_Sphere_Trade_country_resource_tungsten = 3 }
+				}
+			}
+			GER_Bormann_Sphere_Trade_increase_opinion_low = yes
+		}
+		ai_will_do = { factor = 20 }
+	}
+}

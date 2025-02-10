@@ -1,0 +1,1975 @@
+#
+# ███████╗███╗   ███╗██╗   ██╗████████╗ █████╗ 
+# ██╔════╝████╗ ████║██║   ██║╚══██╔══╝██╔══██╗
+# ███████╗██╔████╔██║██║   ██║   ██║   ███████║
+# ╚════██║██║╚██╔╝██║██║   ██║   ██║   ██╔══██║
+# ███████║██║ ╚═╝ ██║╚██████╔╝   ██║   ██║  ██║
+# ╚══════╝╚═╝     ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝
+#
+# |====| Scripted Effects |====|
+#
+## MAIN ##
+# RUS_Smuta_Enable
+# RUS_Smuta_Disable
+## BACKEND ##
+# RUS_Smuta_Contenders_Setup
+# RUS_Smuta_Chaos_Modifier_Setup
+## FRONTEND ##
+# RUS_Smuta_Chaos_Add_Y
+# RUS_Smuta_Supplies_Add_Y
+# RUS_Smuta_SuppliesWeeklyGain_Add_Y
+# RUS_Smuta_Chaos_Mission_Cost_Add_Y
+# RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y
+# RUS_Smuta_Expansion_TargetTag_Generic_Complete
+# RUS_Smuta_Expansion_TargetTag_Generic_Remove
+## UNIQUE OCCUPATION EFFECTS ##
+# WEST RUSSIA
+# WEST SIBERIA
+# CENTRAL SIBERIA
+# FAR EAST
+## CONSOLE COMMANDS ##
+# d_smuta_chaos
+# d_smuta_supplies
+# d_smuta_suppliesgain
+# d_smuta_chaosmissioncost
+# d_smuta_coringcost
+
+####################
+## |=={ MAIN }==| ##
+####################
+
+RUS_Smuta_Enable = {
+
+	log = "[GetDateText]: [Root.GetName]: RUS_Smuta_Enable; Executing"
+
+	custom_effect_tooltip = RUS_Smuta_Enable_Tt
+	set_country_flag = RUS_Smuta_Enabled
+	set_variable = { Smuta_Dirty = 0 }
+
+	set_variable = { Smuta_ContendersReal_Num = 0 }
+	RUS_Smuta_Contenders_Setup = yes
+
+	set_variable = { Smuta_Chaos = 150 }
+	set_variable = { Smuta_Supplies = 0.8 }
+	set_variable = { Smuta_SuppliesWeeklyGain = 0.03 }
+	set_variable = { Smuta_Chaos_Mission_Cost = 40 }
+	set_variable = { Smuta_SuppliesMultipliedBy100 = Smuta_Supplies }
+	multiply_variable = { Smuta_SuppliesMultipliedBy100 = 100 }
+
+	set_temp_variable = { alert_id = token:Alert_RUS_Smuta_Supplies }
+	add_TNO_alert = yes
+
+	set_variable = { Smuta_Chaos_Modifier_conscription_factor = 0 }
+	set_variable = { Smuta_Chaos_Modifier_training_time_army_factor = 0 }
+	set_variable = { Smuta_Chaos_Modifier_org_loss_when_moving = 0 }
+	set_variable = { Smuta_Chaos_Modifier_stability_factor = 0 }
+	set_variable = { Smuta_Chaos_Modifier_war_support_factor = 0 }
+	set_variable = { Smuta_Chaos_Modifier_out_of_supply_factor = 0 }
+	set_variable = { Smuta_Chaos_Modifier_experience_gain_army = 0 }
+	RUS_Smuta_Chaos_Modifier_Setup = yes
+
+	if = {
+		limit = {
+			OR = {
+				AND = {
+					has_game_rule = {
+						rule = west_russia_unification_outcome
+						option = WEST_RUSSIA_UNIFICATION_OUTCOME_KOM_KOMI
+					}
+					tag = KOM
+				}
+				AND = {
+					has_game_rule = {
+						rule = far_east_unification_outcome
+						option = FAR_EAST_UNIFICATION_OUTCOME_CHT_CHITA
+					}
+					tag = CHT
+				}
+			}
+		}
+		set_variable = { Smuta_CoringCost = 5 }
+	}
+	else = {
+		set_variable = { Smuta_CoringCost = 40 }
+	}
+
+	hidden_effect = {
+		activate_mission = RUS_Mission_Smuta_Pulse_Supplies
+		add_dynamic_modifier = { modifier = RUS_Smuta_DynamicModifier_Chaos }
+	}
+
+	log = "[GetDateText]: [Root.GetName]: RUS_Smuta_Enable; Finished execution"
+
+}
+
+RUS_Smuta_Disable = {
+
+	custom_effect_tooltip = RUS_Smuta_Disable_Tt
+	clr_country_flag = RUS_Smuta_Enabled
+	clear_variable = Smuta_Dirty
+	clear_array = Smuta_Contenders
+	clear_variable = Smuta_ContendersReal_Num
+	clr_country_flag = Smuta_Decisions_ExpansionShown
+	clr_country_flag = Smuta_Decisions_OccupationShown
+	clear_array = Smuta_PrepareWarOn
+
+	clear_variable = Smuta_Chaos_Modifier_conscription_factor
+	clear_variable = Smuta_Chaos_Modifier_training_time_army_factor
+	clear_variable = Smuta_Chaos_Modifier_org_loss_when_moving
+	clear_variable = Smuta_Chaos_Modifier_stability_factor
+	clear_variable = Smuta_Chaos_Modifier_war_support_factor
+	clear_variable = Smuta_Chaos_Modifier_out_of_supply_factor
+	clear_variable = Smuta_Chaos_Modifier_experience_gain_army
+	hidden_effect = {
+		remove_dynamic_modifier = { modifier = RUS_Smuta_DynamicModifier_Chaos }
+	}
+
+	set_temp_variable = { alert_id = token:Alert_RUS_Smuta_Chaos }
+	remove_TNO_alert = yes
+	set_temp_variable = { alert_id = token:Alert_RUS_Smuta_Supplies }
+	remove_TNO_alert = yes
+	set_temp_variable = { alert_id = token:Alert_RUS_Smuta_War }
+	remove_TNO_alert = yes
+
+	set_country_flag = RUS_Smuta_Ended # Indicator that this tag has went through regional unification wars. Cleared by on_action effect if the tag just died
+
+	# Unique Variables #
+	clear_variable = AMR_AvengingExile_ManpowerDecrease
+	clear_variable = Smuta_ChitaModelMode
+
+}
+
+#######################
+## |=={ BACKEND }==| ##
+#######################
+
+RUS_Smuta_Contenders_Setup = {
+	hidden_effect = {
+		set_variable = { Smuta_ContendersReal_Num = 0 }
+		if = {
+			limit = { is_central_russian_nation = yes }
+			add_to_array = { Smuta_Contenders = WRS }
+			if = {
+				limit = { WRS = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = KOM }
+			if = {
+				limit = { KOM = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = SAM }
+			if = {
+				limit = { SAM = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = GOR }
+			if = {
+				limit = { GOR = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = VOL }
+			if = {
+				limit = { VOL = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = VYT }
+			if = {
+				limit = { VYT = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = TAR }
+			if = {
+				limit = { TAR = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = PRM }
+			if = {
+				limit = { PRM = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = GAY }
+			if = {
+				limit = { GAY = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = BKR }
+			if = {
+				limit = { BKR = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+		}
+		else_if = {
+			limit = { is_west_siberian_nation = yes }
+			add_to_array = { Smuta_Contenders = OMS }
+			if = {
+				limit = { OMS = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = FAV }
+			if = {
+				limit = { FAV = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = ZLT }
+			if = {
+				limit = { ZLT = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = SVR }
+			if = {
+				limit = { SVR = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = TYM }
+			if = {
+				limit = { TYM = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = YGR }
+			if = {
+				limit = { YGR = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = VOR }
+			if = {
+				limit = { VOR = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+		}
+		else_if = {
+			limit = { is_central_siberian_nation = yes }
+			add_to_array = { Smuta_Contenders = TOM }
+			if = {
+				limit = { TOM = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = SBA }
+			if = {
+				limit = { SBA = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = ALT }
+			if = {
+				limit = { ALT = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = KEM }
+			if = {
+				limit = { KEM = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = NOV }
+			if = {
+				limit = { NOV = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = PRC }
+			if = {
+				limit = { PRC = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = KRS }
+			if = {
+				limit = { KRS = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+		}
+		else_if = {
+			limit = { is_far_eastern_nation = yes }
+			add_to_array = { Smuta_Contenders = IRK }
+			if = {
+				limit = { IRK = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = BRY }
+			if = {
+				limit = { BRY = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = CHT }
+			if = {
+				limit = { CHT = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = AMR }
+			if = {
+				limit = { AMR = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = MAG }
+			if = {
+				limit = { MAG = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = YAK }
+			if = {
+				limit = { YAK = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = KMC }
+			if = {
+				limit = { KMC = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+			add_to_array = { Smuta_Contenders = OMO }
+			if = {
+				limit = { OMO = { exists = yes } }
+				add_to_variable = { Smuta_ContendersReal_Num = 1 }
+			}
+		}
+		if = {
+			limit = {
+				AND = {
+					CHT = {
+						is_ai = yes
+					}
+					OR = {
+						IRK = {
+							is_ai = yes
+						}
+						BRY = {
+							is_ai = yes
+						}
+					}
+					check_variable = { global.smuta_decider = 0 }
+				}
+			}
+			ZZZ = { 
+				country_event = { id = RUS.smuta.debug.1 }	
+				add_to_variable = { global.smuta_decider = 1 }
+			}
+		}
+	}
+}
+
+RUS_Smuta_Chaos_Modifier_Setup = {
+	if = {
+		limit = { check_variable = { Smuta_Chaos > 239 } }
+		set_variable = { Smuta_Chaos_Modifier_conscription_factor = -0.3 }
+		set_variable = { Smuta_Chaos_Modifier_training_time_army_factor = 0.3 }
+		set_variable = { Smuta_Chaos_Modifier_org_loss_when_moving = 0.3 }
+		set_variable = { Smuta_Chaos_Modifier_stability_factor = -0.5 }
+		set_variable = { Smuta_Chaos_Modifier_war_support_factor = -0.5 }
+		set_variable = { Smuta_Chaos_Modifier_out_of_supply_factor = 0.3 }
+		set_variable = { Smuta_Chaos_Modifier_experience_gain_army = -0.5 }
+	}
+	else_if = {
+		limit = { check_variable = { Smuta_Chaos > 179 } }
+		set_variable = { Smuta_Chaos_Modifier_conscription_factor = -0.15 }
+		set_variable = { Smuta_Chaos_Modifier_training_time_army_factor = 0.15 }
+		set_variable = { Smuta_Chaos_Modifier_org_loss_when_moving = 0.15 }
+		set_variable = { Smuta_Chaos_Modifier_stability_factor = -0.25 }
+		set_variable = { Smuta_Chaos_Modifier_war_support_factor = -0.25 }
+		set_variable = { Smuta_Chaos_Modifier_out_of_supply_factor = 0.15 }
+		set_variable = { Smuta_Chaos_Modifier_experience_gain_army = -0.25 }
+	}
+	else_if = {
+		limit = { check_variable = { Smuta_Chaos > 119 } }
+		set_variable = { Smuta_Chaos_Modifier_conscription_factor = 0 }
+		set_variable = { Smuta_Chaos_Modifier_training_time_army_factor = 0 }
+		set_variable = { Smuta_Chaos_Modifier_org_loss_when_moving = 0 }
+		set_variable = { Smuta_Chaos_Modifier_stability_factor = 0 }
+		set_variable = { Smuta_Chaos_Modifier_war_support_factor = 0 }
+		set_variable = { Smuta_Chaos_Modifier_out_of_supply_factor = 0 }
+		set_variable = { Smuta_Chaos_Modifier_experience_gain_army = 0 }
+	}
+	else_if = {
+		limit = { check_variable = { Smuta_Chaos > 59 } }
+		set_variable = { Smuta_Chaos_Modifier_conscription_factor = 0.15 }
+		set_variable = { Smuta_Chaos_Modifier_training_time_army_factor = -0.15 }
+		set_variable = { Smuta_Chaos_Modifier_org_loss_when_moving = -0.15 }
+		set_variable = { Smuta_Chaos_Modifier_stability_factor = 0.25 }
+		set_variable = { Smuta_Chaos_Modifier_war_support_factor = 0.25 }
+		set_variable = { Smuta_Chaos_Modifier_out_of_supply_factor = -0.15 }
+		set_variable = { Smuta_Chaos_Modifier_experience_gain_army = 0.25 }
+	}
+	else = {
+		set_variable = { Smuta_Chaos_Modifier_conscription_factor = 0.3 }
+		set_variable = { Smuta_Chaos_Modifier_training_time_army_factor = -0.3 }
+		set_variable = { Smuta_Chaos_Modifier_org_loss_when_moving = -0.3 }
+		set_variable = { Smuta_Chaos_Modifier_stability_factor = 0.5 }
+		set_variable = { Smuta_Chaos_Modifier_war_support_factor = 0.5 }
+		set_variable = { Smuta_Chaos_Modifier_out_of_supply_factor = -0.3 }
+		set_variable = { Smuta_Chaos_Modifier_experience_gain_army = 0.5 }
+	}
+	force_update_dynamic_modifier = yes
+}
+
+RUS_Smuta_YeetAContender = {
+	add_to_variable = { Smuta_ContendersReal_Num = -1 }
+	clamp_variable = { var = Smuta_ContendersReal_Num min = 1 }
+	add_to_variable = { Smuta_Dirty = 1 }
+}
+
+########################
+## |=={ FRONTEND }==| ##
+########################
+
+RUS_Smuta_Chaos_Add_Y = {
+	custom_effect_tooltip = RUS_Smuta_Chaos_Add_Y_Tt
+	add_to_variable = { Smuta_Chaos = Y }
+	clamp_variable = { var = Smuta_Chaos min = 0 max = 300 }
+	if = {
+		limit = { check_variable = { Smuta_Chaos > 249 } }
+		if = {
+			limit = { is_ai = no }
+			set_temp_variable = { alert_id = token:Alert_RUS_Smuta_Chaos }
+			add_TNO_alert_unless_exists = yes
+		}
+		else = {
+			set_variable = { Smuta_Chaos = 0 }
+		}
+	}
+	else = {
+		set_temp_variable = { alert_id = token:Alert_RUS_Smuta_Chaos }
+		remove_TNO_alert = yes
+	}
+	RUS_Smuta_Chaos_Modifier_Setup = yes
+	add_to_variable = { Smuta_Dirty = 1 }
+}
+
+RUS_Smuta_Supplies_Add_Y = {
+	custom_effect_tooltip = RUS_Smuta_Supplies_Add_Y_Tt
+	add_to_variable = { Smuta_Supplies = Y }
+	clamp_variable = { var = Smuta_Supplies min = 0 max = 1 }
+	set_variable = { Smuta_SuppliesMultipliedBy100 = Smuta_Supplies }
+	multiply_variable = { Smuta_SuppliesMultipliedBy100 = 100 }
+	if = {
+		limit = { check_variable = { Smuta_Supplies > 0.79 } }
+		set_temp_variable = { alert_id = token:Alert_RUS_Smuta_Supplies }
+		add_TNO_alert_unless_exists = yes
+	}
+	else = {
+		set_temp_variable = { alert_id = token:Alert_RUS_Smuta_Supplies }
+		remove_TNO_alert = yes
+	}
+	add_to_variable = { Smuta_Dirty = 1 }
+}
+
+RUS_Smuta_SuppliesWeeklyGain_Add_Y = {
+	custom_effect_tooltip = RUS_Smuta_SuppliesWeeklyGain_Add_Y_Tt
+	add_to_variable = { Smuta_SuppliesWeeklyGain = Y }
+	clamp_variable = { var = Smuta_SuppliesWeeklyGain min = 0.01 max = 1 }
+	add_to_variable = { Smuta_Dirty = 1 }
+}
+
+RUS_Smuta_Chaos_Mission_Cost_Add_Y = {
+	custom_effect_tooltip = RUS_Smuta_Chaos_Mission_Cost_Add_Y_Tt
+	add_to_variable = { Smuta_Chaos_Mission_Cost = Y }
+	clamp_variable = { var = Smuta_Chaos_Mission_Cost min = 1 }
+}
+
+RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y = {
+	custom_effect_tooltip = RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y_Tt
+	multiply_variable = { Smuta_CoringCost = Y }
+	round_variable = Smuta_CoringCost
+	clamp_variable = { var = Smuta_CoringCost min = 1 }
+}
+
+RUS_Smuta_Expansion_TargetTag_Generic_Complete = {
+	hidden_effect = {
+		if = {
+			limit = { var:TargetTag = { has_country_flag = RUS_Smuta_Enabled } }
+			var:TargetTag = {
+				add_to_variable = { Smuta_Dirty = 1 }
+			}
+		}
+		add_to_array = { Smuta_PrepareWarOn = var:TargetTag }
+		var:TargetTag = {
+			set_temp_variable = { alert_id = token:Alert_RUS_Smuta_War }
+			add_TNO_alert = yes
+		}
+		set_temp_variable = { Y = -0.7 }
+		RUS_Smuta_Supplies_Add_Y = yes
+	}
+}
+
+RUS_Smuta_Expansion_TargetTag_Generic_Remove = {
+	if = {
+		limit = {
+			var:TargetTag = {
+				has_country_flag = RUS_Smuta_Enabled
+				is_in_array = { array = Smuta_PrepareWarOn value = FROM }
+			}
+		}
+		var:TargetTag = { add_to_variable = { Smuta_Dirty = 1 } }
+		set_temp_variable = { Y = -30 }
+		RUS_Smuta_Chaos_Add_Y = yes
+	}
+	if = {
+		limit = {
+			ROOT = { NOT = { has_war_with = var:TargetTag } }
+		}
+		declare_war_on = { target = var:TargetTag type = annex_everything }
+	}	
+	remove_from_array = { Smuta_PrepareWarOn = var:TargetTag }
+	add_to_variable = { Smuta_Dirty = 1 }
+}
+
+RUS_Smuta_Occupation_Generic = {
+	set_temp_variable = { Y = -10 }
+	RUS_Smuta_Chaos_Add_Y = yes
+	set_temp_variable = { gdp_growth_temp = 0.01 }
+	econ_gdp_growth_change = yes
+	TNO_improve_admin_efficiency_really_low = yes
+	if = {
+		limit = { check_variable = { Smuta_Supplies < 0.50 } }
+		set_temp_variable = { Y = 0.10 }
+		RUS_Smuta_Supplies_Add_Y = yes
+	}
+}
+
+RUS_Smuta_Chaos_Weekly = {
+	if = {
+		limit = {
+			has_country_flag = RUS_Smuta_Enabled
+			NOT = { has_decision = RUS_Decision_Smuta_Chaos_Decrease }
+			NOT = { has_decision = RUS_Decision_Smuta_Chaos_Decrease_FuckFuckFUck }
+		}
+		if = {
+			limit = { RUS_Smuta_ScriptedTrigger_OnlyOneContenderLeft = yes }
+			set_temp_variable = { Y = 2 }
+			RUS_Smuta_Chaos_Add_Y = yes
+		}
+		else_if = {
+			limit = { RUS_Smuta_ScriptedTrigger_Chaos_Bad = yes }
+			set_temp_variable = { Y = 4 }
+			RUS_Smuta_Chaos_Add_Y = yes
+		}
+		else = {
+			set_temp_variable = { Y = 8 }
+			RUS_Smuta_Chaos_Add_Y = yes
+		}
+	}
+}
+
+#########################################
+## |=={ UNIQUE OCCUPATION EFFECTS }==| ##
+#########################################
+
+## WEST RUSSIA
+
+RUS_Smuta_Occupation_Unique_WRS = {
+	if = {
+		limit = { tag = SAM }
+		if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_stability = 0.1
+			add_war_support = 0.1
+			tno_press_rights_improve = yes
+			TNO_improve_press_rights_policy_effectiveness_monthly_med = yes
+			tno_religious_rights_improve = yes
+			TNO_improve_religious_rights_policy_effectiveness_monthly_med = yes
+			TNO_gender_rights_improve = yes
+			TNO_improve_gender_rights_policy_effectiveness_monthly_med = yes
+			set_variable = { tno_gender_rights_effectiveness = 60 }
+		}
+		if = {
+			limit = {
+				has_government = despotism
+			}
+			add_political_power = -25
+			add_popularity = {
+				ideology = communist
+				popularity = -0.05
+			}
+			set_temp_variable = { Y = 0.9 }
+			RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y = yes
+			SAM_increase_military_morale_small = yes
+			add_timed_idea = { idea = SAM_Private_Enterprise days = 720 }
+			set_temp_variable = { gdp_growth_temp = 0.5 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = 0.3 }
+			econ_inflation_change = yes
+			set_temp_variable = { money_reserves_temp = 0.3 }
+			econ_money_reserves_change_raw_money = yes
+			set_temp_variable = { econ_centralization_temp = -5 }
+			econ_centralization_change = yes
+			hidden_effect = {
+				SAM_change_military_spirit = yes
+			}
+		}
+		if = {
+			limit = {
+				has_government = national_socialism
+			}
+			add_stability = -0.05
+			add_war_support = 0.05
+			add_political_power = 25
+			add_manpower = -2500
+			set_temp_variable = { Y = 0.95 }
+			RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y = yes
+		}
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_left_government = yes
+			NOT = { has_character = WRS_Georgy_Zhukov } #Prevents if peaceful integration
+		}
+		country_event = { id = KOM.428 days = 21 }
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_right_government = yes
+		}
+		country_event = { id = KOM.372 days = 21 }
+	}
+	else_if = {
+		limit = {
+			tag = VYT
+		}
+		country_event = { id = vyatkaexp.15 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = PRM
+		}
+		country_event = { id = PRM_expansion.10 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_KOM = {
+	if = {
+		limit = { tag = SAM }
+		if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_political_power = 50
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.02
+			}
+			add_popularity = {
+				ideology = liberalism
+				popularity = 0.01
+			}
+			add_popularity = {
+				ideology = socialist
+				popularity = 0.01
+			}
+			add_popularity = {
+				ideology = communist
+				popularity = 0.01
+			}
+			add_popularity = {
+				ideology = ultranationalism
+				popularity = 0.02
+			}
+			TNO_improve_political_parties_policy_effectiveness_low = yes
+		}
+		if = {
+			limit = {
+				has_government = despotism
+			}
+			add_stability = 0.05
+			TNO_improve_security_policy_effectiveness_high = yes
+			TNO_improve_political_parties_policy_effectiveness_med = yes
+			add_popularity = {
+				ideology = national_socialism
+				popularity = 0.01
+			}
+			add_popularity = {
+				ideology = communist
+				popularity = 0.02
+			}
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.01
+			}
+			add_popularity = {
+				ideology = ultranationalism
+				popularity = 0.02
+			}
+		}
+		if = {
+			limit = {
+				has_government = national_socialism
+			}
+			add_stability = 0.05
+			TNO_improve_political_parties_policy_effectiveness_monthly_med = yes
+			add_popularity = {
+				ideology = national_socialism
+				popularity = 0.10
+			}
+			add_popularity = {
+				ideology = ultranationalism
+				popularity = 0.05
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Mikhail_Tukhachevsky
+				ruling_only = yes
+			}
+		}
+		country_event = { id = tukha.71 days = 7 }
+	}
+	else_if = {
+		limit = {
+			tag = VYT
+		}
+		country_event = { id = vyatkaexp.12 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = PRM
+		}
+		country_event = { id = PRM_expansion.7 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_SAM = {
+	if = {
+		limit = {
+			tag = KOM
+			KOM_has_right_government = yes
+		}
+		country_event = { id = KOM.432 days = 21 }
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Georgy_Zhukov
+				ruling_only = yes
+			}
+		}
+		country_event = { id = zhukov.30 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Mikhail_Tukhachevsky
+				ruling_only = yes
+			}
+		}
+		country_event = { id = tukha.77 days = 7 }
+	}
+	else_if = {
+		limit = {
+			tag = VYT
+		}
+		country_event = { id = vyatkaexp.13 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = PRM
+		}
+		country_event = { id = PRM_expansion.8 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_GOR = {
+	if = {
+		limit = { tag = WRS }
+		add_popularity = {
+			ideology = communist
+			popularity = 0.05
+		}
+		add_equipment_to_stockpile = {
+			type = MBT_chassis
+			amount = 100
+			producer = GOR
+		}
+		add_manpower = 1000
+	}
+	if = {
+		limit = { tag = SAM }
+		if = {
+			limit = {
+				has_government = paternalism
+			}
+			random_owned_controlled_state = {
+				limit = {
+					state = 252
+				}
+				set_temp_variable = { temp_state_value_addition = 0.55 }
+				econ_state_value_change_addition = yes
+			}
+			set_temp_variable = { temp_econ_spending_amount = 0.025 }
+			econ_spend_money_once_effect_raw_money = yes
+			SAM_increase_civilian_morale_small = yes
+			hidden_effect = {
+				SAM_change_civilian_spirit = yes
+			}
+			if = { 
+				limit = { 
+					has_dlc = "No Step Back"
+				}
+				add_equipment_to_stockpile = {
+					type = APC_chassis_1
+					amount = 200
+					producer = GOR
+				}
+				add_equipment_to_stockpile = {
+					type = IFV_chassis_1
+					amount = 200
+					producer = GOR
+				}
+			}
+			else = {
+				add_equipment_to_stockpile = {
+					type = APC_equipment_1
+					amount = 250
+					producer = GOR
+				}
+				add_equipment_to_stockpile = {
+					type = IFV_equipment_1
+					amount = 200
+					producer = GOR
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_government = despotism
+			}
+			add_stability = -0.05
+			add_war_support = 0.05
+			add_political_power = 100
+			set_temp_variable = { temp_econ_spending_amount = 0.01 }
+			econ_spend_money_once_effect_raw_money = yes
+			SAM_increase_military_morale_medium = yes
+			hidden_effect = {
+				SAM_change_military_spirit = yes
+			}
+		}
+		if = {
+			limit = {
+				has_government = national_socialism
+			}
+			TNO_improve_industrial_expertise_med = yes
+			set_temp_variable = { money_reserves_temp = 0.05 }
+			econ_money_reserves_change_raw_money = yes
+			if = { 
+				limit = { 
+					has_dlc = "No Step Back"
+				}
+				add_equipment_to_stockpile = {
+					type = MBT_chassis_0
+					amount = 50
+					producer = GOR
+				}
+				add_equipment_to_stockpile = {
+					type = IFV_chassis_0
+					amount = 100
+					producer = GOR
+				}
+				add_equipment_to_stockpile = {
+					type = APC_chassis_1
+					amount = 200
+					producer = GOR
+				}
+			}
+			else = {
+				add_equipment_to_stockpile = {
+					type = MBT_equipment
+					amount = 50
+					producer = GOR
+				}
+				add_equipment_to_stockpile = {
+					type = IFV_equipment
+					amount = 100
+					producer = GOR
+				}
+				add_equipment_to_stockpile = {
+					type = APC_equipment
+					amount = 200
+					producer = GOR
+				}
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_left_government = yes
+			NOT = { has_character = GOR_Ivan_Chernyakhovsky } #Prevents if peaceful integration
+		}
+		country_event = { id = KOM.429 days = 21 }
+	}
+	else_if = {
+		limit = {
+			tag = PRM
+		}
+		country_event = { id = PRM_expansion.9 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_VOL = {
+	if = {
+		limit = { tag = SAM }
+		if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_timed_idea = { idea = SAM_Vologdan_Tactics days = 365 }
+			TNO_improve_training_policy_effectiveness_monthly_low = yes
+			set_temp_variable = { Y = 0.9 }
+			RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y = yes
+		}
+		if = {
+			limit = {
+				has_government = despotism
+			}
+			add_timed_idea = { idea = SAM_The_Trade_of_Kostroma days = 365 }
+			TNO_improve_press_rights_policy_effectiveness_low = yes
+			TNO_improve_public_meetings_policy_effectiveness_low = yes
+			TNO_improve_political_parties_policy_effectiveness_low = yes
+			TNO_improve_vote_franchise_policy_effectiveness_low = yes
+			set_temp_variable = { Y = 0.9 }
+			RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y = yes
+		}
+		if = {
+			limit = {
+				has_government = national_socialism
+			}
+			add_political_power = 25
+			add_timed_idea = { idea = SAM_The_Rape_of_Kostroma_idea days = 90 }
+			set_temp_variable = { money_reserves_temp = 0.25 }
+			econ_money_reserves_change_raw_money = yes
+			SAM_increase_military_morale_medium = yes
+			SAM_increase_corruption_small = yes
+			set_temp_variable = { Y = 0.9 }
+			RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y = yes
+			hidden_effect = {
+				SAM_change_corruption_spirit = yes
+				SAM_change_military_spirit = yes
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_center_government = yes
+			NOT = { has_character = VOL_Vasily_Ivanov } #Prevents if peaceful integration
+		}
+		country_event = { id = KOM.423 days = 21 }
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_right_government = yes
+			NOT = { has_character = VOL_Vasily_Ivanov } #Prevents if peaceful integration
+		}
+		country_event = { id = KOM.430 days = 21 }
+	}
+	else_if = {
+		limit = {
+			tag = PRM
+		}
+		country_event = { id = PRM_expansion.6 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_VYT = {
+	if = {
+		limit = { tag = SAM }
+		country_event = { id = SAM.35 days = 4 }
+		if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_stability = -0.05
+			add_political_power = 75
+			add_timed_idea = { idea = SAM_The_Kirov_Distillery days = 720 }
+			TNO_improve_agriculture_med = yes
+			SAM_increase_civilian_morale_small = yes
+			hidden_effect = {
+				SAM_change_civilian_spirit = yes
+			}
+		}
+		if = {
+			limit = {
+				has_government = despotism
+			}
+			army_experience = 25
+			add_timed_idea = { idea = SAM_White_Army_Training days = 365 }
+			TNO_improve_army_professionalism_med = yes
+			TNO_improve_training_policy_effectiveness_monthly_low = yes
+		}
+		if = {
+			limit = {
+				has_government = national_socialism
+			}
+			add_political_power = 75
+			add_popularity = {
+				ideology = despotism
+				popularity = -0.05
+			}
+			add_popularity = {
+				ideology = paternalism
+				popularity = -0.05
+			}
+			add_ideas = SAM_Kormchiy_Guard
+			set_temp_variable = { temp_econ_spending_amount = 0.005 }
+			econ_spend_money_once_effect_raw_money = yes
+			TNO_improve_training_policy_effectiveness_monthly_med = yes
+			SAM_increase_military_morale_small = yes
+			hidden_effect = {
+				SAM_change_military_spirit = yes
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Georgy_Zhukov
+				ruling_only = yes
+			}
+		}
+		country_event = { id = zhukov.24 days = 3 }
+		country_event = { id = zhukov.23 days = 14 }
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Mikhail_Tukhachevsky
+				ruling_only = yes
+			}
+		}
+		country_event = { id = tukha.72 days = 3 }
+		country_event = { id = tukha.83 days = 14 }
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_center_government = yes
+		}
+		country_event = { id = KOM.424 days = 21 }
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_right_government = yes
+		}
+		country_event = { id = KOM.373 days = 3 }
+		country_event = { id = KOM.431 days = 21 }
+	}
+	else_if = {
+		limit = {
+			tag = PRM
+		}
+		country_event = { id = PRM_expansion.3 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_TAR = {
+	if = {
+		limit = { tag = SAM }
+		if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_timed_idea = { idea = SAM_Tartar_Horsemen days = 365 }
+			TNO_minorities_improve = yes
+			TNO_improve_training_policy_effectiveness_monthly_low = yes
+			SAM_increase_ROA_officers_small = yes
+			SAM_increase_civilian_morale_small = yes
+			SAM_increase_military_morale_small = yes
+			hidden_effect = {
+				SAM_change_civilian_spirit = yes
+				SAM_change_officers_spirit = yes
+				SAM_change_military_spirit = yes
+			}
+		}
+		if = {
+			limit = {
+				has_government = despotism
+			}
+			TNO_improve_immigration_policy_effectiveness_low = yes
+			set_temp_variable = { gdp_growth_temp = 0.5 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { inflation_temp = 0.2 }
+			econ_inflation_change = yes
+			add_timed_idea = { idea = SAM_Tatar_Subsidies days = 365 }
+			SAM_increase_civilian_morale_small = yes
+			TNO_improve_training_policy_effectiveness_monthly_low = yes
+			SAM_increase_ROA_officers_small = yes
+			SAM_increase_military_morale_small = yes
+			hidden_effect = {
+				SAM_change_civilian_spirit = yes
+				SAM_change_officers_spirit = yes
+				SAM_change_military_spirit = yes
+			}
+		}
+		if = {
+			limit = {
+				has_government = national_socialism
+			}
+			add_political_power = 15
+			add_manpower = -1000
+			swap_ideas = {
+				remove_idea = tno_minorities_institutional_discrimination
+				add_idea = tno_minorities_oppression
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Georgy_Zhukov
+				ruling_only = yes
+			}
+		}
+		country_event = { id = zhukov.29 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Mikhail_Tukhachevsky
+				ruling_only = yes
+			}
+		}
+		country_event = { id = tukha.75 days = 7 }
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_center_government = yes
+			NOT = { has_character = TAR_Farakh_Kamaldinov } #Prevents if peaceful integration
+		}
+		country_event = { id = KOM.426 days = 21 }
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_right_government = yes
+			NOT = { has_character = TAR_Farakh_Kamaldinov } #Prevents if peaceful integration
+		}
+		country_event = { id = KOM.375 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = VYT
+		}
+		country_event = { id = vyatkaexp.10 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = PRM
+		}
+		country_event = { id = PRM_expansion.4 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_PRM = {
+	if = {
+		limit = { tag = SAM }
+		if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_stability = 0.1
+			add_war_support = 0.05
+			TNO_improve_immigration_policy_effectiveness_monthly_low = yes
+			SAM_increase_civilian_morale_medium = yes
+			hidden_effect = {
+				SAM_change_civilian_spirit = yes
+			}
+			add_popularity = {
+				ideology = national_socialism
+				popularity = -0.10
+			}
+			country_event = {
+				id = SAM.39
+				days = 7
+			}
+		}
+		if = {
+			limit = {
+				has_government = despotism
+			}
+			add_stability = 0.05
+			add_popularity = {
+				ideology = national_socialism
+				popularity = -0.1
+			}
+			add_manpower = -500
+		}
+		if = {
+			limit = {
+				has_government = national_socialism
+			}
+			add_popularity = {
+				ideology = national_socialism
+				popularity = 0.05
+			}
+			add_war_support = 0.05
+		}
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Georgy_Zhukov
+				ruling_only = yes
+			}
+		}
+		country_event = { id = zhukov.28 days = 7 }
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Mikhail_Tukhachevsky
+				ruling_only = yes
+			}
+		}
+		country_event = { id = tukha.84 days = 7 }
+	}
+	else_if = {
+		limit = {
+			tag = VYT
+		}
+		country_event = { id = vyatkaexp.9 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_GAY = {
+	if = {
+		limit = { tag = SAM }
+		if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_stability = 0.03
+			TNO_improve_religious_rights_policy_effectiveness_low = yes
+			set_temp_variable = { Y = 0.9 }
+			RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y = yes
+		}
+		if = {
+			limit = {
+				has_government = despotism
+			}
+			add_war_support = 0.05
+			add_manpower = 750
+			TNO_improve_army_professionalism_low = yes
+		}
+		if = {
+			limit = {
+				has_government = national_socialism
+			}
+			add_stability = 0.05
+			add_manpower = -250
+		}
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Georgy_Zhukov
+				ruling_only = yes
+			}
+		}
+		country_event = { id = zhukov.14 days = 7 }
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Mikhail_Tukhachevsky
+				ruling_only = yes
+			}
+		}
+		country_event = { id = tukha.82 days = 7 }
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_right_government = yes
+		}
+		country_event = { id = KOM.371 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = VYT
+		}
+		country_event = { id = vyatkaexp.6 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = PRM
+		}
+		country_event = { id = PRM_expansion.5 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_BKR = {
+	if = {
+		limit = { tag = SAM }
+		if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_political_power = 50
+			TNO_improve_religious_rights_policy_effectiveness_med = yes
+			set_temp_variable = { Y = 0.95 }
+			RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y = yes
+		}
+		if = {
+			limit = {
+				has_government = despotism
+			}
+			army_experience = 15
+			TNO_improve_religious_rights_policy_effectiveness_med = yes
+		}
+		if = {
+			limit = {
+				has_government = national_socialism
+			}
+			add_stability = 0.05
+			TNO_worsen_religious_rights_policy_effectiveness_high = yes
+		}
+	}
+	else_if = {
+		limit = {
+			tag = WRS
+			has_country_leader = {
+				character = WRS_Mikhail_Tukhachevsky
+				ruling_only = yes
+			}
+		}
+		country_event = { id = tukha.76 days = 3 }
+		country_event = { id = tukha.85 days = 14 }
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_center_government = yes
+			NOT = { has_character = BKR_Tagir_Kusimov } #Prevents if peaceful integration
+		}
+		country_event = { id = KOM.425 days = 21 }
+	}
+	else_if = {
+		limit = {
+			tag = KOM
+			KOM_has_right_government = yes
+			NOT = { has_character = BKR_Tagir_Kusimov } #Prevents if peaceful integration
+		}
+		country_event = { id = KOM.376 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = VYT
+		}
+		country_event = { id = vyatkaexp.11 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = PRM
+		}
+		country_event = { id = PRM_expansion.1 days = 3 }
+	}
+}
+
+## WEST SIBERIA
+
+RUS_Smuta_Occupation_Unique_OMS = {
+	# FILLME
+}
+
+RUS_Smuta_Occupation_Unique_FAV = {
+	# FILLME
+}
+
+RUS_Smuta_Occupation_Unique_ZLT = {
+	if = {
+		limit = {
+			tag = TYM
+		}
+		country_event = { id = TYM.156 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_SVR = {
+	if = {
+		limit = {
+			tag = OMS
+		}
+		country_event = { id = omskexp.16 days = 3 }
+		country_event = { id = omskexp.14 days = 14 }
+	}
+	else_if = {
+		limit = {
+			tag = TYM
+		}
+		country_event = { id = TYM.113 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_TYM = {
+	if = {
+		limit = {
+			tag = OMS
+		}
+		country_event = { id = omskexp.17 days = 3 }
+		country_event = { id = omskexp.4 days = 14 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_YGR = {
+	if = {
+		limit = {
+			tag = OMS
+		}
+		country_event = { id = omskexp.11 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_VOR = {
+	if = {
+		limit = {
+			tag = OMS
+		}
+		country_event = { id = omskexp.12 days = 3 }
+	}
+}
+
+## CENTRAL SIBERIA
+
+RUS_Smuta_Occupation_Unique_TOM = {
+	if = {
+		limit = {
+			tag = SBA
+		}
+		country_event = { id = SBA.29 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = NOV
+		}
+		country_event = { id = NOV_expansion.1 days = 3 }
+		country_event = { id = NOV_expansion.2 days = 14 }
+	}
+	else_if = {
+		limit = {
+			tag = KEM
+		}
+		if = {
+			limit = { check_variable = { KEM_yuriy_influence < KEM_lydia_influence } }
+			country_event = { id = kemexp.10 days = 3 }
+		}
+		if = {
+			limit = { check_variable = { KEM_yuriy_influence > KEM_lydia_influence } }
+			country_event = { id = kemexp.9 days = 3 }
+		}
+		country_event = { id = kemexp.13 days = 14 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_SBA = {
+	if = {
+		limit = {
+			tag = NOV
+		}
+		country_event = { id = NOV_expansion.6 days = 3 }
+		country_event = { id = NOV_expansion.7 days = 14 }
+	}
+	else_if = {
+		limit = {
+			tag = TOM
+		}
+		country_event = { id = TOM.44 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = KEM
+		}
+		country_event = { id = kemexp.16 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_KEM = {
+	if = {
+		limit = {
+			tag = SBA
+		}
+		country_event = { id = SBA.25 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = NOV
+		}
+		569 = {
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+		}
+		569 = {
+			set_temp_variable = { temp_state_value_addition = 0.03 }
+			econ_state_value_change_addition = yes
+		}
+		country_event = { id = NOV_expansion.3 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = TOM
+		}
+		SIB_increase_resources_med = yes
+		569 = {
+			set_temp_variable = { state_value_multiplier_temp = 1.07 }
+			econ_state_value_change_multiply = yes
+		}
+		country_event = { id = TOM.35 days = 3 }
+		if = {
+			limit = {
+				NOT = { 569 = { has_state_flag = TOM_election_state } }
+			}
+			TOM_setup_kemerovo_variables = yes
+		}
+	}
+}
+
+RUS_Smuta_Occupation_Unique_NOV = {
+	if = {
+		limit = {
+			tag = SBA
+		}
+		country_event = { id = SBA.33 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = TOM
+		}
+		570 = {
+			add_building_construction = {
+				type = air_base
+				level = 2
+				instant_build = yes
+			}
+		}
+		country_event = { id = TOM.14 days = 3 }
+		if = {
+			limit = {
+				NOT = { 570 = { has_state_flag = TOM_election_state } }
+			}
+			TOM_setup_novosibirsk_variables = yes
+		}
+	}
+	else_if = {
+		limit = {
+			tag = KEM
+		}
+		country_event = { id = kemexp.18 days = 3 }
+		country_event = { id = kemexp.12 days = 14 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_PRC = {
+	if = {
+		limit = {
+			tag = SBA
+		}
+		country_event = { id = SBA.26 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = NOV
+		}
+		country_event = { id = NOV_expansion.8 days = 3 }
+		country_event = { id = NOV_expansion.9 days = 14 }
+	}
+	else_if = {
+		limit = {
+			tag = TOM
+		}
+		country_event = { id = TOM.46 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = KEM
+		}
+		country_event = { id = kemexp.17 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_KRS = {
+	if = {
+		limit = {
+			tag = SBA
+		}
+		if = {
+			limit = {
+				OR = {
+					has_idea = SBA_black_army_administration_5
+					has_idea = SBA_black_army_administration_4
+					has_idea = SBA_black_army_administration_3
+				}
+			}
+			country_event = { id = SBA.22 days = 3 }
+		}
+		else = {
+			country_event = { id = SBA.24 days = 3 }
+		}
+	}
+	else_if = {
+		limit = {
+			tag = NOV
+		}
+		add_equipment_to_stockpile = {
+			type = anti_tank_equipment
+			amount = 150
+			producer = NOV
+		}
+		add_equipment_to_stockpile = {
+			type = artillery_equipment
+			amount = 75
+			producer = NOV
+		}
+		add_equipment_to_stockpile = {
+			type = infantry_equipment
+			amount = 400
+			producer = NOV
+		}
+		add_equipment_to_stockpile = {
+			type = support_equipment
+			amount = 60
+			producer = NOV
+		}
+		country_event = { id = NOV_expansion.5 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = TOM
+		}
+		757 = {
+			add_extra_state_shared_building_slots = 1
+			add_building_construction = {
+				type = thermoelectric_plant
+				level = 1
+				instant_build = yes
+			}
+			set_temp_variable = { state_value_multiplier_temp = 1.05 }
+			econ_state_value_change_multiply = yes
+		}
+		set_temp_variable = { pus_temp = 1 }
+		econ_pus_change = yes
+		country_event = { id = TOM.39 days = 3 }
+		if = {
+			limit = {
+				NOT = { 757 = { has_state_flag = TOM_election_state } }
+			}
+			TOM_setup_krasnoyarsk_variables = yes
+		}
+	}
+	else_if = {
+		limit = {
+			tag = KEM
+		}
+		country_event = { id = kemexp.4 days = 3 }
+		country_event = { id = kemexp.3 days = 7 }
+		country_event = { id = kemexp.14 days = 14 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_ALT = {
+	if = {
+		limit = {
+			tag = SBA
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = 0.025
+		}
+		add_popularity = {
+			ideology = socialist
+			popularity = 0.025
+		}
+		add_manpower = 2500
+	}
+	else_if = {
+		limit = {
+			tag = NOV
+		}
+		country_event = { id = NOV_expansion.4 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = TOM
+		}
+		RUS_integration_cost_days_decrease = yes
+		set_temp_variable = { money_reserves_temp = 0.03 }
+		econ_money_reserves_change_raw_money = yes
+	}
+}
+
+## FAR EAST
+
+RUS_Smuta_Occupation_Unique_MAG = {
+	if = {
+		limit = {
+			tag = AMR
+		}
+		country_event = { id = amur.20 days = 3 }
+		AMR_integrate_magadan_generals = yes
+	}
+	if = {
+		limit = {
+			tag = CHT
+		}
+		country_event = { id = CHT.17 days = 3 }
+		CHT_integrate_magadan_generals = yes
+	}
+	if = {
+		limit = {
+			tag = IRK
+		}
+		country_event = { id = IRK.20 days = 3 }
+	}
+	if = {
+		limit = {
+			tag = BRY
+		}
+		country_event = { id = BRY.20 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_KMC = {
+	# FILLME
+}
+
+RUS_Smuta_Occupation_Unique_IRK = {
+	if = {
+		limit = {
+			tag = MAG
+			has_country_flag = MAG_merc
+		}
+		country_event = { id = westalaska.6 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = MAG
+		}
+		country_event = { id = magexp.10 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = AMR
+		}
+		country_event = { id = amur.25 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = CHT
+		}
+		country_event = { id = CHT.24 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_BRY = {
+	if = {
+		limit = {
+			tag = MAG
+			has_country_flag = MAG_merc
+		}
+		country_event = { id = westalaska.7 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = MAG
+		}
+		country_event = { id = magexp.7 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = AMR
+		}
+		country_event = { id = amur.24 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = CHT
+		}
+		country_event = { id = CHT.13 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_CHT = {
+	if = {
+		limit = {
+			tag = MAG
+			has_country_flag = MAG_merc
+		}
+		country_event = { id = westalaska.2 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = MAG
+		}
+		country_event = { id = magexp.1 days = 3 }
+		MAG_integrate_chita_generals = yes
+	}
+	else_if = {
+		limit = {
+			tag = AMR
+		}
+		country_event = { id = amur.19 days = 3 }
+		AMR_integrate_chita_generals = yes
+	}
+	else_if = {
+		limit = {
+			tag = IRK
+		}
+		country_event = { id = IRK.22 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = BRY
+		}
+		country_event = { id = BRY.21 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_AMR = {
+	if = {
+		limit = {
+			tag = MAG
+			has_country_flag = MAG_merc
+		}
+		country_event = { id = MAG.16 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = MAG
+		}
+		country_event = { id = MAG.14 days = 3 }
+		MAG_integrate_amur_generals = yes
+	}
+	else_if = {
+		limit = {
+			tag = CHT
+		}
+		country_event = { id = CHT.9 days = 3 }
+		country_event = { id = CHT.37 days = 7 }
+		country_event = { id = CHT.10 days = 14 }
+	}
+	else_if = {
+		limit = {
+			tag = IRK
+		}
+		country_event = { id = IRK.21 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = BRY
+		}
+		country_event = { id = BRY.22 days = 3 }
+		country_event = { id = BRY.23 days = 7 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_OMO = {
+	if = {
+		limit = {
+			tag = MAG
+			has_country_flag = MAG_merc
+		}
+		country_event = { id = westalaska.9 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = MAG
+		}
+		country_event = { id = magexp.9 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = AMR
+		}
+		country_event = { id = amur.27 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = CHT
+		}
+		country_event = { id = CHT.25 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = IRK
+		}
+		country_event = { id = IRK.78 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = BRY
+		}
+		country_event = { id = BRY.24 days = 3 }
+	}
+}
+
+RUS_Smuta_Occupation_Unique_YAK = {
+	if = {
+		limit = {
+			tag = MAG
+			has_country_flag = MAG_merc
+		}
+		574 = {
+			add_building_construction = {
+				type = infrastructure
+				level = 2
+				instant_build = yes
+			}
+		}
+		set_temp_variable = { pus_temp = 2 }
+		econ_pus_change = yes
+	}
+	else_if = {
+		limit = {
+			tag = CHT
+		}
+		country_event = { id = CHT.11 days = 3 }
+	}
+	else_if = {
+		limit = {
+			tag = IRK
+		}
+		country_event = { id = IRK.79 days = 3 }
+	}
+}
+
+################################
+## |=={ CONSOLE COMMANDS }==| ##
+################################
+
+d_smuta_chaos = {
+	set_temp_variable = { Y = args^0 }
+	RUS_Smuta_Chaos_Add_Y = yes
+}
+
+d_smuta_supplies = {
+	set_temp_variable = { Y = args^0 }
+	RUS_Smuta_Supplies_Add_Y = yes
+}
+
+d_smuta_suppliesgain = {
+	set_temp_variable = { Y = args^0 }
+	RUS_Smuta_SuppliesWeeklyGain_Add_Y = yes
+}
+
+d_smuta_chaosmissioncost = {
+	set_temp_variable = { Y = args^0 }
+	RUS_Smuta_Chaos_Mission_Cost_Add_Y = yes
+}
+
+d_smuta_coringcost = {
+	set_temp_variable = { Y = args^0 }
+	RUS_Smuta_Smuta_CoringCost_MultiplyBy_Y = yes
+}

@@ -1,0 +1,58 @@
+scripted_gui = {
+	TNO_Country_Closing_Screen = {
+		context_type = player_context
+		window_name = "TNO_Country_Closing_Screen"
+		dirty = CountryClosing_dirty
+		visible = {
+			has_country_flag = TNO_Country_Closing_Screen_Visible
+		}
+		dynamic_lists = {
+			credits_pages = {
+				array = CountryClosing_array_credits_pages
+				index = i
+				change_scope = no
+				entry_container = TNO_Country_Closing_Screen_Credits_Pages_Enry
+			}
+		}
+		triggers = {
+			epilogue_visible = { check_variable = { CountryClosing_array_buttons^0 = 2 } }
+			credits_visible = { check_variable = { CountryClosing_array_buttons^1 = 2 } }
+		}
+		effects = {
+			select_btn_epilogue_click = {
+				set_variable = { CountryClosing_array_buttons^0 = 2 }
+				set_variable = { CountryClosing_array_buttons^1 = 1 }
+				TNO_Country_Closing_Screen_CreditsPages_Hide = yes
+				add_to_variable = { CountryClosing_dirty = 1 }
+			}
+			select_btn_credits_click = {
+				set_variable = { CountryClosing_array_buttons^0 = 1 }
+				set_variable = { CountryClosing_array_buttons^1 = 2 }
+				TNO_Country_Closing_Screen_CreditsPages_Show = yes
+				add_to_variable = { CountryClosing_dirty = 1 }
+			}
+			page_btn_click = {
+				set_temp_variable = { neededPage = i }
+				for_each_loop = {
+					array = CountryClosing_array_credits_pages
+					set_variable = { CountryClosing_array_credits_pages^i = 1 }
+				}
+				set_variable = { CountryClosing_array_credits_pages^neededPage = 2 }
+				add_to_variable = { CountryClosing_dirty = 1 }
+			}
+			close_btn_click = {
+				clr_country_flag = TNO_Country_Closing_Screen_Visible
+				clear_array = CountryClosing_array_buttons
+				TNO_Country_Closing_Screen_CreditsPages_Hide = yes
+				clear_variable = CountryClosing_dirty
+				set_country_flag = TNO_ArcadeMode_enable
+			}
+		}
+		properties = {
+			select_btn_epilogue = { frame = CountryClosing_array_buttons^0 }
+			select_btn_credits = { frame = CountryClosing_array_buttons^1 }
+			page_btn = { frame = CountryClosing_array_credits_pages^i }
+			picture = { image = "[Get_TNO_CountryClosing_picture]" }
+		}
+	}
+}

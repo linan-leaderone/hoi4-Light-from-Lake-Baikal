@@ -1,0 +1,43 @@
+scripted_gui = {
+	TNO_econ_sphere_mapmode_mapicons = {
+		context_type = country_mapicon
+		window_name = "TNO_econ_sphere_mapmode_mapicons"
+		mapmode = tno_econ_sphere_map_mode
+		visible = { always = yes }
+		mapicon_targets = {
+			target_array = global.countries
+			target_trigger = {
+				FROM = {
+					has_country_flag = HAS_ECON_SPHERE
+					NOT = {
+						original_tag = CME
+						original_tag = ADN
+					}
+				}
+			}
+		}
+		properties = {
+			econ_sphere_leader_icon = {
+				image = "[FROM.GetSphereIcon]"
+			}
+		}
+		effects = {
+			econ_sphere_leader_icon_click = {
+				# Tooltip is displayed using the [! function
+				if = {
+					limit = {
+						check_variable = { FROM.econ_sphere_members^num = 1 }
+					}
+					custom_effect_tooltip = econ_sphere_map_mode_mapicon_tooltip_alone
+				}
+				else = {
+					custom_effect_tooltip = econ_sphere_map_mode_mapicon_tooltip_filled
+					
+					# Text gridbox
+					set_temp_variable = { temp_sphere_idx = 0 }
+					econ_sphere_mapmode_get_sphere_members = yes
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,1390 @@
+
+
+###################################################################
+###################################################################
+## MARKET - Trade Code, I use this to traverse VSC ################
+###################################################################
+###################################################################
+## Consumer Goods
+
+calculate_consumer_goods_need = {
+
+	set_variable = { consumer_goods_base_needs = production_units_raw }
+	divide_variable = { consumer_goods_base_needs = 5 }
+
+	set_variable = { consumer_goods_monthly_use = consumer_goods_base_needs }
+	set_temp_variable = { consumer_goods_total_modifier = 1 }
+	add_to_temp_variable = { consumer_goods_total_modifier = modifier@consumer_goods_use_modifier }
+
+	set_temp_variable = { consumer_goods_slider_impact = econ_consumer_goods_slider_pct }
+	subtract_from_temp_variable = { consumer_goods_slider_impact = 50 }
+	divide_temp_variable = { consumer_goods_slider_impact = 100 }
+	add_to_temp_variable = { consumer_goods_total_modifier = consumer_goods_slider_impact }
+
+	multiply_variable = { consumer_goods_monthly_use = consumer_goods_total_modifier }
+	multiply_variable = { consumer_goods_monthly_use = 10 }
+
+	
+
+	round_variable = consumer_goods_monthly_use
+
+	#Calculate benefits from slider position
+
+	divide_temp_variable = { consumer_goods_slider_impact = 5 }
+
+	set_variable = { PU_consumer_goods_stability_impact = consumer_goods_slider_impact }
+
+	set_variable = { PU_consumer_goods_gdp_impact = consumer_goods_slider_impact }
+}
+
+
+# Initializes the market at game start for each nation
+setup_market = {
+	set_variable = { TNO_market_oil = 0 }
+	set_variable = { TNO_market_aluminium = 0 }
+	set_variable = { TNO_market_rubber = 0 }
+	set_variable = { TNO_market_tungsten = 0 }
+	set_variable = { TNO_market_steel = 0 }
+	set_variable = { TNO_market_chromium = 0 }
+	set_variable = { TNO_market_uranium = 0 }
+	set_variable = { TNO_market_consumer_goods = 0 }
+	add_dynamic_modifier = { modifier = TNO_market_dynamic_modifier }
+	add_dynamic_modifier = { modifier = TNO_stockpile_dynamic_modifier }
+
+	clear_array = trade_screen_resources
+	add_to_array = { trade_screen_resources = 1 }
+	add_to_array = { trade_screen_resources = 2 }
+	add_to_array = { trade_screen_resources = 3 }
+	add_to_array = { trade_screen_resources = 4 }
+	add_to_array = { trade_screen_resources = 5 }
+	add_to_array = { trade_screen_resources = 6 }
+	add_to_array = { trade_screen_resources = 7 }
+	add_to_array = { trade_screen_resources = 8 }
+
+	clear_array = trade_screen_resource_stockpiles
+	add_to_array = { trade_screen_resource_stockpiles = 2 }
+	add_to_array = { trade_screen_resource_stockpiles = 3 }
+	add_to_array = { trade_screen_resource_stockpiles = 4 }
+	add_to_array = { trade_screen_resource_stockpiles = 5 }
+	add_to_array = { trade_screen_resource_stockpiles = 6 }
+	add_to_array = { trade_screen_resource_stockpiles = 7 }
+
+	set_variable = { TNO_stockpile^2 = resource_produced@aluminium }
+	set_variable = { TNO_stockpile^3 = resource_produced@rubber }
+	set_variable = { TNO_stockpile^4 = resource_produced@tungsten }
+	set_variable = { TNO_stockpile^5 = resource_produced@steel }
+	set_variable = { TNO_stockpile^6 = resource_produced@chromium }
+	set_variable = { TNO_stockpile^7 = resource_produced@uranium }
+	
+	add_to_variable = { TNO_stockpile^2 = 100 }
+	add_to_variable = { TNO_stockpile^3 = 100 }
+	add_to_variable = { TNO_stockpile^4 = 100 }
+	add_to_variable = { TNO_stockpile^5 = 100 }
+	add_to_variable = { TNO_stockpile^6 = 100 }
+	add_to_variable = { TNO_stockpile^7 = 100 }
+	
+	clear_array = TNO_recurring_trade_pus
+	clear_array = TNO_recurring_trade_res
+	clear_array = TNO_recurring_trade_res_import
+	clear_array = TNO_recurring_trade_res_export
+
+	resize_array = { array = TNO_fulfilled_exports value = 0 size = 9 }
+	resize_array = { array = TNO_fulfilled_imports value = 0 size = 9 }
+
+	resize_array = { array = TNO_recurring_trade_pus value = 0 size = 9 }
+	resize_array = { array = TNO_recurring_trade_res value = 0 size = 9 }
+	resize_array = { array = TNO_recurring_trade_res_import value = 0 size = 9 }
+	resize_array = { array = TNO_recurring_trade_res_export value = 0 size = 9 }
+
+	clear_array = TNO_unfulfilled_exports
+	clear_array = TNO_unfulfilled_imports
+	resize_array = { array = TNO_unfulfilled_exports value = 0 size = 9 }
+	resize_array = { array = TNO_unfulfilled_imports value = 0 size = 9 }
+
+	clear_array = TNO_trade_ai_on
+	resize_array = { array = TNO_trade_ai_on value = 2 size = 9 }
+
+
+	set_variable = { TNO_market_selected_resource = 1 }
+
+	clear_array = resource_production
+	resize_array = { array = resource_production value = 0 size = 9 }
+	clear_array = TNO_recurring_trade_temp
+	resize_array = { array = TNO_recurring_trade_temp value = 0 size = 9 }
+
+	auto_set_trade_pus_ai = yes
+
+	update_market_recurring_trade = yes
+	create_sorted_trade_array = yes
+	add_to_variable = { TNO_trade_gui_dirty = 1 }
+}
+
+
+# Called when the number of PU a country would like to gain or lose via recurring trade changes
+# Updates the number of desired goods to be bought or sold along with some GUI variables
+update_market_recurring_trade = {
+	set_variable = { PU_trade_balance_ideal = PU_exports }
+	subtract_from_variable = { PU_trade_balance_ideal = PU_imports }
+
+	for_loop_effect = {
+		start = 1
+		end = 9
+		value = resource_type
+
+		set_variable = { TNO_recurring_trade_res^resource_type = TNO_recurring_trade_pus^resource_type  }
+		multiply_variable = { TNO_recurring_trade_res^resource_type = -1 }
+		multiply_variable = { TNO_recurring_trade_res^resource_type = ZZZ.TNO_export_size^resource_type }
+
+		set_variable = { TNO_recurring_trade_res_import^resource_type = TNO_recurring_trade_res^resource_type  }
+		clamp_variable = { var = TNO_recurring_trade_res_import^resource_type min = 0 }
+
+		set_variable = { TNO_recurring_trade_res_export^resource_type = TNO_recurring_trade_res^resource_type  }
+		clamp_variable = { var = TNO_recurring_trade_res_export^resource_type max = 0 }
+		multiply_variable = { TNO_recurring_trade_res_export^resource_type = -1 }
+
+		add_to_variable = { PU_trade_balance_ideal = TNO_recurring_trade_pus^resource_type }
+	}
+}
+
+# Called when the selected tab on the market tab changes
+update_market_selected_tab = {
+	clear_array = TNO_market_tab_selected
+	resize_array = { array = TNO_market_tab_selected value = 1 size = 10 }
+	set_variable = { TNO_market_tab_selected^TNO_market_selected_resource = 2 }
+	update_sorting_tade_tab = yes
+}
+
+# Gets the total resource delta for the current tag and `resource_type`
+get_resource_production = {
+	set_variable = { resource_production^1 = resource@oil }
+	set_variable = { resource_production^2 = resource@aluminium }
+	set_variable = { resource_production^3 = resource@rubber }
+	set_variable = { resource_production^4 = resource@tungsten }
+	set_variable = { resource_production^5 = resource@steel }
+	set_variable = { resource_production^6 = resource@chromium }
+	set_variable = { resource_production^7 = resource@uranium }
+	set_variable = { resource_production^8 = resource@consumer_goods }
+
+	add_to_variable = { resource_production^1 = TNO_market_oil }
+	add_to_variable = { resource_production^2 = TNO_market_aluminium }
+	add_to_variable = { resource_production^3 = TNO_market_rubber }
+	add_to_variable = { resource_production^4 = TNO_market_tungsten }
+	add_to_variable = { resource_production^5 = TNO_market_steel }
+	add_to_variable = { resource_production^6 = TNO_market_chromium }
+	add_to_variable = { resource_production^7 = TNO_market_uranium }
+	add_to_variable = { resource_production^8 = TNO_market_consumer_goods }
+
+	add_to_variable = { resource_production^2 = TNO_stockpile_aluminium }
+	add_to_variable = { resource_production^3 = TNO_stockpile_rubber }
+	add_to_variable = { resource_production^4 = TNO_stockpile_tungsten }
+	add_to_variable = { resource_production^5 = TNO_stockpile_steel }
+	add_to_variable = { resource_production^6 = TNO_stockpile_chromium }
+	add_to_variable = { resource_production^7 = TNO_stockpile_uranium }
+}
+
+# AI to set resources buy/sold based on current production
+# Used by the game's AI and player-assist trade AI
+auto_set_trade_pus = {
+	get_resource_production = yes
+	set_variable = { TNO_recurring_trade_temp^1 = resource_production^1 }
+	set_variable = { TNO_recurring_trade_temp^2 = resource_production^2 }
+	set_variable = { TNO_recurring_trade_temp^3 = resource_production^3 }
+	set_variable = { TNO_recurring_trade_temp^4 = resource_production^4 }
+	set_variable = { TNO_recurring_trade_temp^5 = resource_production^5 }
+	set_variable = { TNO_recurring_trade_temp^6 = resource_production^6 }
+	set_variable = { TNO_recurring_trade_temp^7 = resource_production^7 }
+
+	divide_variable = { TNO_recurring_trade_temp^1 = ZZZ.TNO_export_size^1 }
+	divide_variable = { TNO_recurring_trade_temp^2 = ZZZ.TNO_export_size^2 }
+	divide_variable = { TNO_recurring_trade_temp^3 = ZZZ.TNO_export_size^3 }
+	divide_variable = { TNO_recurring_trade_temp^4 = ZZZ.TNO_export_size^4 }
+	divide_variable = { TNO_recurring_trade_temp^5 = ZZZ.TNO_export_size^5 }
+	divide_variable = { TNO_recurring_trade_temp^6 = ZZZ.TNO_export_size^6 }
+	divide_variable = { TNO_recurring_trade_temp^7 = ZZZ.TNO_export_size^7 }
+
+	if = { # If stockpile < 100
+		limit = { check_variable = { fuel_ratio < 0.1 } }
+		subtract_from_variable = { TNO_recurring_trade_temp^1 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { fuel_ratio > 0.9 } }
+		add_to_variable = { TNO_recurring_trade_temp^1 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_temp^1 = 0.45 }
+	}
+
+	if = { # If stockpile < 100
+		limit = { check_variable = { TNO_stockpile^2 < 100 } }
+		subtract_from_variable = { TNO_recurring_trade_temp^2 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { TNO_stockpile^2 > 8000 } }
+		add_to_variable = { TNO_recurring_trade_temp^2 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_temp^2 = 0.45 }
+	}
+
+	if = { # If stockpile < 100
+		limit = { check_variable = { TNO_stockpile^3 < 100 } }
+		subtract_from_variable = { TNO_recurring_trade_temp^3 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { TNO_stockpile^3 > 8000 } }
+		add_to_variable = { TNO_recurring_trade_temp^3 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_temp^3 = 0.45 }
+	}
+	
+	if = { # If stockpile < 100
+		limit = { check_variable = { TNO_stockpile^4 < 100 } }
+		subtract_from_variable = { TNO_recurring_trade_temp^4 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { TNO_stockpile^4 > 8000 } }
+		add_to_variable = { TNO_recurring_trade_temp^4 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_temp^4 = 0.45 }
+	}
+	
+	if = { # If stockpile < 100
+		limit = { check_variable = { TNO_stockpile^5 < 100 } }
+		subtract_from_variable = { TNO_recurring_trade_temp^5 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { TNO_stockpile^5 > 8000 } }
+		add_to_variable = { TNO_recurring_trade_temp^5 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_temp^5 = 0.45 }
+	}
+	
+	if = { # If stockpile < 100
+		limit = { check_variable = { TNO_stockpile^6 < 100 } }
+		subtract_from_variable = { TNO_recurring_trade_temp^6 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { TNO_stockpile^6 > 8000 } }
+		add_to_variable = { TNO_recurring_trade_temp^6 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_temp^6 = 0.45 }
+	}
+	
+	subtract_from_variable = { TNO_recurring_trade_temp^7 = 0.45 }
+
+	round_variable = TNO_recurring_trade_temp^1
+	round_variable = TNO_recurring_trade_temp^2
+	round_variable = TNO_recurring_trade_temp^3
+	round_variable = TNO_recurring_trade_temp^4
+	round_variable = TNO_recurring_trade_temp^5
+	round_variable = TNO_recurring_trade_temp^6
+	round_variable = TNO_recurring_trade_temp^7
+
+	if = { limit = { check_variable = { TNO_trade_ai_on^1 = 2 } } 
+		set_variable = { TNO_recurring_trade_pus^1 = TNO_recurring_trade_temp^1 }
+	}
+	if = { limit = { check_variable = { TNO_trade_ai_on^2 = 2 } } 
+		set_variable = { TNO_recurring_trade_pus^2 = TNO_recurring_trade_temp^2 }
+	}
+	if = { limit = { check_variable = { TNO_trade_ai_on^3 = 2 } } 
+		set_variable = { TNO_recurring_trade_pus^3 = TNO_recurring_trade_temp^3 }
+	}
+	if = { limit = { check_variable = { TNO_trade_ai_on^4 = 2 } } 
+		set_variable = { TNO_recurring_trade_pus^4 = TNO_recurring_trade_temp^4 }
+	}
+	if = { limit = { check_variable = { TNO_trade_ai_on^5 = 2 } } 
+		set_variable = { TNO_recurring_trade_pus^5 = TNO_recurring_trade_temp^5 }
+	}
+	if = { limit = { check_variable = { TNO_trade_ai_on^6 = 2 } } 
+		set_variable = { TNO_recurring_trade_pus^6 = TNO_recurring_trade_temp^6 }
+	}
+	if = { limit = { check_variable = { TNO_trade_ai_on^7 = 2 } } 
+		set_variable = { TNO_recurring_trade_pus^7 = TNO_recurring_trade_temp^7 }
+	}
+
+	set_variable = { TNO_desired_cg_trade = consumer_goods_monthly_use }
+	multiply_variable = { TNO_desired_cg_trade = tno_trade_laws_consumer_goods_trade_desire_modifier }
+	if = {
+		limit = { check_variable = { modifier@consumer_goods_production_factor < ZZZ.world_cg_ratio } }
+		multiply_variable = { TNO_desired_cg_trade = -1 }
+	}
+
+	set_variable = { TNO_recurring_trade_pus^8 = TNO_desired_cg_trade }
+	divide_variable = { TNO_recurring_trade_pus^8 = ZZZ.TNO_export_size^8 }
+	round_variable = TNO_recurring_trade_pus^8
+	round_variable = TNO_desired_cg_trade
+}
+
+auto_set_trade_pus_ai = {
+	get_resource_production = yes
+	set_variable = { TNO_recurring_trade_pus^1 = resource_production^1 }
+	set_variable = { TNO_recurring_trade_pus^2 = resource_production^2 }
+	set_variable = { TNO_recurring_trade_pus^3 = resource_production^3 }
+	set_variable = { TNO_recurring_trade_pus^4 = resource_production^4 }
+	set_variable = { TNO_recurring_trade_pus^5 = resource_production^5 }
+	set_variable = { TNO_recurring_trade_pus^6 = resource_production^6 }
+	set_variable = { TNO_recurring_trade_pus^7 = resource_production^7 }
+
+	divide_variable = { TNO_recurring_trade_pus^1 = ZZZ.TNO_export_size^1 }
+	divide_variable = { TNO_recurring_trade_pus^2 = ZZZ.TNO_export_size^2 }
+	divide_variable = { TNO_recurring_trade_pus^3 = ZZZ.TNO_export_size^3 }
+	divide_variable = { TNO_recurring_trade_pus^4 = ZZZ.TNO_export_size^4 }
+	divide_variable = { TNO_recurring_trade_pus^5 = ZZZ.TNO_export_size^5 }
+	divide_variable = { TNO_recurring_trade_pus^6 = ZZZ.TNO_export_size^6 }
+	divide_variable = { TNO_recurring_trade_pus^7 = ZZZ.TNO_export_size^7 }
+	
+	if = { # If stockpile < 100
+		limit = { check_variable = { fuel_ratio < 0.1 } }
+		subtract_from_variable = { TNO_recurring_trade_pus^1 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { fuel_ratio > 0.9 } }
+		add_to_variable = { TNO_recurring_trade_pus^1 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_pus^1 = 0.45 }
+	}
+	
+	if = { # If stockpile < 100
+		limit = { check_variable = { TNO_stockpile^2 < 100 } }
+		subtract_from_variable = { TNO_recurring_trade_pus^2 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { TNO_stockpile^2 > 8000 } }
+		add_to_variable = { TNO_recurring_trade_pus^2 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_pus^2 = 0.45 }
+	}
+
+	if = { # If stockpile < 100
+		limit = { check_variable = { TNO_stockpile^3 < 100 } }
+		subtract_from_variable = { TNO_recurring_trade_pus^3 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { TNO_stockpile^3 > 8000 } }
+		add_to_variable = { TNO_recurring_trade_pus^3 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_pus^3 = 0.45 }
+	}
+	
+	if = { # If stockpile < 100
+		limit = { check_variable = { TNO_stockpile^4 < 100 } }
+		subtract_from_variable = { TNO_recurring_trade_pus^4 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { TNO_stockpile^4 > 8000 } }
+		add_to_variable = { TNO_recurring_trade_pus^4 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_pus^4 = 0.45 }
+	}
+	
+	if = { # If stockpile < 100
+		limit = { check_variable = { TNO_stockpile^5 < 100 } }
+		subtract_from_variable = { TNO_recurring_trade_pus^5 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { TNO_stockpile^5 > 8000 } }
+		add_to_variable = { TNO_recurring_trade_pus^5 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_pus^5 = 0.45 }
+	}
+	
+	if = { # If stockpile < 100
+		limit = { check_variable = { TNO_stockpile^6 < 100 } }
+		subtract_from_variable = { TNO_recurring_trade_pus^6 = 1.45 }
+	} else_if = { # Sell if stockpile > 8000
+		limit = { check_variable = { TNO_stockpile^6 > 8000 } }
+		add_to_variable = { TNO_recurring_trade_pus^6 = 0.5 }
+	} else = { # rounding error
+		subtract_from_variable = { TNO_recurring_trade_pus^6 = 0.45 }
+	}
+	
+	subtract_from_variable = { TNO_recurring_trade_pus^7 = 0.45 }
+
+	round_variable = TNO_recurring_trade_pus^1
+	round_variable = TNO_recurring_trade_pus^2
+	round_variable = TNO_recurring_trade_pus^3
+	round_variable = TNO_recurring_trade_pus^4
+	round_variable = TNO_recurring_trade_pus^5
+	round_variable = TNO_recurring_trade_pus^6
+	round_variable = TNO_recurring_trade_pus^7
+
+	set_variable = { TNO_desired_cg_trade = consumer_goods_monthly_use }
+	multiply_variable = { TNO_desired_cg_trade = tno_trade_laws_consumer_goods_trade_desire_modifier }
+	if = {
+		limit = { check_variable = { modifier@consumer_goods_production_factor < ZZZ.world_cg_ratio } }
+		multiply_variable = { TNO_desired_cg_trade = -1 }
+	}
+
+	set_variable = { TNO_recurring_trade_pus^8 = TNO_desired_cg_trade }
+	divide_variable = { TNO_recurring_trade_pus^8 = ZZZ.TNO_export_size^8 }
+	round_variable = TNO_recurring_trade_pus^8
+	round_variable = TNO_desired_cg_trade
+}
+
+clear_array_tp = {
+	clear_array = TNO_trade_partners
+}
+
+calculate_base_trade_influence = {
+	for_each_scope_loop = {
+		array = ZZZ.TNO_trade_nations
+		
+		single_base_trade_influence = yes
+		PREV = { single_base_trade_influence = yes }
+		binary_insert = yes
+		PREV = { binary_insert = yes }
+		recalculate_trade_position = yes
+	}
+	recalculate_trade_position = yes
+}
+
+binary_insert = {
+	set_temp_variable = { i_start = 0 }
+	set_temp_variable = { i_end = PREV.TNO_trade_partners^num }
+
+	set_temp_variable = { idx = i_end }
+	divide_temp_variable = { idx = 2 }
+	subtract_from_temp_variable = { idx = 0.25 }
+	round_temp_variable = idx
+
+	while_loop_effect = {
+		limit = {
+			check_variable = { i_end > i_start }
+		}
+
+		set_temp_variable = { partner_i = PREV.TNO_trade_partners^idx }
+
+		if = {
+			limit = { check_variable = { PREV.trade_opinion@THIS > PREV.trade_opinion@var:partner_i } }
+			set_temp_variable = { i_end = idx }
+		} else = {
+			set_temp_variable = { i_start = idx }
+			add_to_temp_variable = { i_start = 1 }
+		}
+
+		set_temp_variable = { idx = i_end }
+		add_to_temp_variable = { idx = i_start }
+		divide_temp_variable = { idx = 2 }
+		subtract_from_temp_variable = { idx = 0.25 }
+		round_temp_variable = idx
+	}
+	
+	PREV = { 
+		add_to_array = { array = TNO_trade_partners value = PREV index = idx }
+	}
+}
+
+reload_trade_influence_on_war = {
+	every_enemy_country = {
+		every_enemy_country = {
+			single_base_trade_influence = yes
+		}
+	}
+	every_enemy_country = {
+		recalculate_trade_influence = yes
+		recalculate_trade_position = yes
+	}
+	random_enemy_country = {
+		every_enemy_country = {
+			recalculate_trade_influence = yes
+			recalculate_trade_position = yes
+		}
+	}
+}
+
+# Needs to be called from one TAG to the other
+single_base_trade_influence = {
+	PREV = {
+		var:PREV.capital = {
+			var:PREV.capital = {
+				set_temp_variable = { distance_t = distance_to@PREV }
+			}
+		}
+		set_temp_variable = { opinion_t = opinion@PREV }
+		divide_temp_variable = { distance_t = -50 }
+		set_variable = { trade_opinion@PREV = 50 }
+		add_to_variable = { trade_opinion@PREV = opinion_t }
+		set_variable = { trade_opinion_opinion@PREV = opinion_t }
+		add_to_variable = { trade_opinion@PREV = distance_t }
+		set_variable = { trade_opinion_distance@PREV = distance_t }
+		add_to_variable = { trade_opinion@PREV = trade_opinion_modifier@PREV }
+
+		if = {
+			limit = {
+				has_variable = ECON_SPHERE_LEADER
+				NOT = { check_variable = { ECON_SPHERE_LEADER = PREV.ECON_SPHERE_LEADER } } 
+			}
+			subtract_from_variable = { trade_opinion@PREV = ECON_SPHERE_LEADER:SPHERE_INSULARITY }
+		}
+
+		set_temp_variable = { temp_trade_opinion_factor = PREV.modifier@trade_opinion_factor }
+		add_to_temp_variable = { temp_trade_opinion_factor = 1 }
+		multiply_variable = { trade_opinion@PREV = temp_trade_opinion_factor }
+		if = {
+			limit = {  
+				OR = { 
+					check_variable = { trade_opinion_embargo@PREV = 1 } 
+					check_variable = { PREV.trade_opinion_embargo@THIS = 1 } 
+				}
+			}
+			set_variable = { trade_opinion@PREV = -200 }
+		}
+		if = {
+			limit = { has_war_with = PREV }
+			set_variable = { trade_opinion@PREV = -1000 }
+		}
+	}
+}
+
+# Prev Scope FROM This scope target
+set_embargo_PREV = {
+	custom_effect_tooltip = set_embargo_PREV_tt
+	PREV = { 
+		set_variable = { trade_opinion_embargo@PREV = 1 }
+		recalculate_trade_influence = yes
+	}
+	recalculate_trade_influence = yes
+}
+
+# Prev Scope FROM This scope target
+clear_embargo_PREV = {
+	custom_effect_tooltip = clear_embargo_PREV_tt
+	PREV = { 
+		set_variable = { trade_opinion_embargo@PREV = 0 }
+		recalculate_trade_influence = yes
+	}
+	recalculate_trade_influence = yes
+}
+
+# Set embargoes between the superpowers' factions based on the global flags:
+# ofn_cps_embargo
+# ofn_pakt_embargo
+# pakt_cps_embargo
+# pakt_italy_embargo
+# cps_italy_embargo
+# ofn_italy_embargo
+
+update_superpower_embargoes = {
+	ZZZ = {
+		log = "[GetDateText]: [Root.GetName]: Updating embaroes between superpowers"
+		# fill the temp array embargoes with values for which combinations are embargoed
+		clear_temp_array = embargoes
+		if = {
+			limit = { has_global_flag = ofn_cps_embargo }
+			add_to_temp_array = { embargoes = 1 }
+		}
+		else = { add_to_temp_array = { embargoes = 0 } }
+		if = {
+			limit = { has_global_flag = ofn_pakt_embargo }
+			add_to_temp_array = { embargoes = 1 }
+		}
+		else = { add_to_temp_array = { embargoes = 0 } }
+		if = {
+			limit = { has_global_flag = pakt_cps_embargo }
+			add_to_temp_array = { embargoes = 1 }
+		}
+		else = { add_to_temp_array = { embargoes = 0 } }
+		if = {
+			limit = { has_global_flag = pakt_italy_embargo }
+			add_to_temp_array = { embargoes = 1 }
+		}
+		else = { add_to_temp_array = { embargoes = 0 } }
+		if = {
+			limit = { has_global_flag = cps_italy_embargo }
+			add_to_temp_array = { embargoes = 1 }
+		}
+		else = { add_to_temp_array = { embargoes = 0 } }
+		if = {
+			limit = { has_global_flag = ofn_italy_embargo }
+			add_to_temp_array = { embargoes = 1 }
+		}
+		else = { add_to_temp_array = { embargoes = 0 } }
+
+		# what tag to use to set / unset embargoes between theese factions
+		clear_temp_array = tag_1_to_use
+		add_to_temp_array = { tag_1_to_use = "USA" }
+		add_to_temp_array = { tag_1_to_use = "USA" }
+		add_to_temp_array = { tag_1_to_use = "GER" }
+		add_to_temp_array = { tag_1_to_use = "GER" }
+		add_to_temp_array = { tag_1_to_use = "JAP" }
+		add_to_temp_array = { tag_1_to_use = "USA" }
+		clear_temp_array = tag_2_to_use
+		add_to_temp_array = { tag_2_to_use = "JAP" }
+		add_to_temp_array = { tag_2_to_use = "GER" }
+		add_to_temp_array = { tag_2_to_use = "JAP" }
+		add_to_temp_array = { tag_2_to_use = "ITA" }
+		add_to_temp_array = { tag_2_to_use = "ITA" }
+		add_to_temp_array = { tag_2_to_use = "ITA" }
+
+		for_each_loop = {
+			array = embargoes
+
+			if = {
+				# if the current status of embargo flags is different to how it was the last time,
+				# go and update the changed ones
+				limit = {
+					NOT = {
+						AND = {
+							check_variable = { current_superpower_embargoes^i = v }
+							var:tag_1_to_use^i = {
+								check_variable = { ZZZ.current_faction_size_1^i = THIS.faction_members^num }
+							}
+							var:tag_2_to_use^i = {
+								check_variable = { ZZZ.current_faction_size_2^i = THIS.faction_members^num }
+							}
+						}
+					}
+				}
+
+				var:tag_1_to_use^i = {
+					var:tag_2_to_use^i = {
+						for_each_scope_loop = {
+							array = PREV.faction_members
+							for_each_scope_loop = {
+								array = PREV.faction_members
+								set_variable = { trade_opinion_embargo@PREV = v }
+								set_variable = { PREV.trade_opinion_embargo@THIS = v }
+							}
+							recalculate_trade_influence = yes
+						}
+						# this is faster than doing it in the effect above because 
+						# you avoid repeating this effect PREV.faction_members times
+						for_each_scope_loop = {
+							array = THIS.faction_members
+							recalculate_trade_influence = yes
+						}
+					}
+				}
+
+				# mark that embargoes between theese two superpowers have been synched
+				# with what the global flags say
+				set_variable = { current_superpower_embargoes^i = v }
+
+				# set faction sizes so that you can fire this effect if they've changes since last time
+				var:tag_1_to_use^i = {
+					set_variable = { ZZZ.current_faction_size_1^i = THIS.faction_members^num }
+				}
+				var:tag_2_to_use^i = {
+					set_variable = { ZZZ.current_faction_size_2^i = THIS.faction_members^num }
+				}
+			}
+		}
+	}
+}
+
+# To be called when you want a country to cancel embargoes with supoerpower spheres, for example when
+# England leaves the pakt
+clear_superpower_embargoes = {
+	for_each_scope_loop = {
+		array = USA.faction_members
+		clear_embargo_PREV = yes
+	}
+	for_each_scope_loop = {
+		array = JAP.faction_members
+		clear_embargo_PREV = yes
+	}
+	for_each_scope_loop = {
+		array = GER.faction_members
+		clear_embargo_PREV = yes
+	}
+	for_each_scope_loop = {
+		array = ITA.faction_members
+		clear_embargo_PREV = yes
+	}
+}
+# Used for getting rid of embargoes between 1 nation and an entire sphere, called on the singular nation with the target var set to the sphere leader
+clear_embargo_with_target_sphere = {
+	var:target = {
+		for_each_scope_loop = {
+			array = THIS.faction_members
+			FROM = {
+				set_variable = { trade_opinion_embargo@PREV = 0 }
+				set_variable = { PREV.trade_opinion_embargo@THIS = 0 }
+			}
+			recalculate_trade_influence = yes
+		}
+		set_variable = { trade_opinion_embargo@PREV = 0 }
+		set_variable = { PREV.trade_opinion_embargo@THIS = 0 }
+		recalculate_trade_influence = yes
+	}
+	recalculate_trade_influence = yes
+}
+
+# Prev Scope FROM This scope target amount to change temp_modifier
+add_to_trade_modifier_PREV = {
+	custom_effect_tooltip = add_to_trade_modifier_PREV_tt
+	PREV = { 
+		add_to_variable = { trade_opinion_modifier@PREV = temp_modifier }
+		recalculate_trade_influence = yes
+	}
+	recalculate_trade_influence = yes
+}
+
+# Prev Scope FROM This scope target amount to change temp_modifier
+# Use if PREV is more than one country scope e.g. PREV is an every_country scope.
+add_to_trade_modifier_PREV_multiple = {
+	custom_effect_tooltip = add_to_trade_modifier_PREV_multiple_tt
+	PREV = { 
+		add_to_variable = { trade_opinion_modifier@PREV = temp_modifier }
+		recalculate_trade_influence = yes
+	}
+	recalculate_trade_influence = yes
+}
+
+insert_sort_trade_partners = {
+	set_temp_variable = { flag = 0 }
+	set_temp_variable = { previous_value = 10000 }
+	
+	for_each_scope_loop = {
+		array = TNO_trade_partners
+		break = flag
+
+		if = {
+			limit = {
+				check_variable = { previous_value > trade_opinion@PREV }
+			}
+			set_temp_variable = { flag = 1 }
+		}
+		set_temp_variable = { previous_value = trade_opinion@PREV }
+	}
+
+	if = { 
+		limit = { check_variable = { flag = 1 } }
+
+		set_temp_variable = { i_insert = 1 }
+
+		while_loop_effect = {
+			limit = { check_variable = { i_insert < TNO_trade_partners^num } }
+			
+			set_temp_variable = { j_insert = i_insert }
+			set_temp_variable = { k_insert = j_insert } # k always less -1 than j
+			subtract_from_temp_variable = { k_insert = 1 }
+
+			set_temp_variable = { partner_k = TNO_trade_partners^k_insert }
+			set_temp_variable = { partner_j = TNO_trade_partners^j_insert }
+
+			var:partner_k = { PREV = { set_temp_variable = { trade_opinion_k = trade_opinion@PREV } } }
+			var:partner_j = { PREV = { set_temp_variable = { trade_opinion_j = trade_opinion@PREV } } }
+
+			while_loop_effect = {
+				limit = { 
+					check_variable = { j_insert > 0 } 
+					check_variable = { trade_opinion_k < trade_opinion_j }
+				}
+
+				remove_from_array = { array = TNO_trade_partners index = k_insert }
+				remove_from_array = { array = TNO_trade_partners index = k_insert }
+
+				add_to_array = { array = TNO_trade_partners index = k_insert value = partner_k }
+				add_to_array = { array = TNO_trade_partners index = k_insert value = partner_j }
+
+				subtract_from_temp_variable = { j_insert = 1 }
+				subtract_from_temp_variable = { k_insert = 1 }
+				
+				set_temp_variable = { partner_k = TNO_trade_partners^k_insert }
+				set_temp_variable = { partner_j = TNO_trade_partners^j_insert }
+
+				var:partner_k = { PREV = { set_temp_variable = { trade_opinion_k = trade_opinion@PREV } } }
+				var:partner_j = { PREV = { set_temp_variable = { trade_opinion_j = trade_opinion@PREV } } }
+
+			}
+			
+			add_to_temp_variable = { i_insert = 1 }
+		}
+	}
+}
+
+recalculate_world_trade_influence = {
+	get_sorted_scored_countries = {
+		scorer = TNO_trade_priority_scorer
+		array = ZZZ.TNO_trade_nations
+	}
+	for_each_scope_loop = {
+		array = ZZZ.TNO_trade_nations
+
+		recalculate_trade_influence = yes
+	}
+}
+
+recalculate_trade_influence = {
+	for_each_scope_loop = {
+		array = TNO_trade_partners
+
+		single_base_trade_influence = yes
+	}
+	set_temp_variable = { tos_target = THIS }
+	get_sorted_scored_countries = {
+		scorer = TNO_trade_opinion_scorer
+		array = TNO_trade_partners
+	}
+	recalculate_trade_position = yes
+}
+
+recalculate_trade_position = {
+	set_temp_variable = { position = 0 }
+	for_each_scope_loop = {
+		array = TNO_trade_partners
+
+		add_to_temp_variable = { position = 1 }
+		set_variable = { PREV.trade_position@THIS = position }
+	}
+}
+
+insert_sort_trade_nations = {
+	set_temp_variable = { i_insert = 1 }
+	while_loop_effect = {
+		limit = { check_variable = { i_insert < TNO_trade_nations^num } }
+		
+		set_temp_variable = { j_insert = i_insert }
+		set_temp_variable = { k_insert = j_insert } # k always less -1 than j
+		subtract_from_temp_variable = { k_insert = 1 }
+
+		set_temp_variable = { nation_k = TNO_trade_nations^k_insert }
+		set_temp_variable = { nation_j = TNO_trade_nations^j_insert }
+
+		var:nation_k = { set_temp_variable = { cgpf_k = modifier@consumer_goods_production_factor } }
+		var:nation_j = { set_temp_variable = { cgpf_j = modifier@consumer_goods_production_factor } }
+
+		while_loop_effect = {
+			limit = { 
+				check_variable = { j_insert > 0 } 
+				check_variable = { cgpf_k < cgpf_j }
+			}
+
+			remove_from_array = { array = TNO_trade_nations index = k_insert }
+			remove_from_array = { array = TNO_trade_nations index = k_insert }
+
+			add_to_array = { array = TNO_trade_nations index = k_insert value = nation_k }
+			add_to_array = { array = TNO_trade_nations index = k_insert value = nation_j }
+
+			subtract_from_temp_variable = { j_insert = 1 }
+			subtract_from_temp_variable = { k_insert = 1 }
+			
+			set_temp_variable = { nation_k = TNO_trade_nations^k_insert }
+			set_temp_variable = { nation_j = TNO_trade_nations^j_insert }
+
+			var:nation_k = { set_temp_variable = { cgpf_k = modifier@consumer_goods_production_factor } }
+			var:nation_j = { set_temp_variable = { cgpf_j = modifier@consumer_goods_production_factor } }
+		}
+		
+		add_to_temp_variable = { i_insert = 1 }
+	}
+}
+
+log_trade_partners = {
+	log = "Trade Partners"
+	for_each_scope_loop = {
+		array = TNO_trade_partners
+		PREV = { log = "Trade Partner: [PREV.GetTag] [?trade_opinion@PREV]" }
+	}
+}
+
+log_trade_nations = {
+	ZZZ = {
+		log = "Trade Nations"
+		for_each_scope_loop = {
+			array = TNO_trade_nations
+			log = "Trade Partner: [THIS.GetTag] [?modifier@consumer_goods_production_factor]"
+		}
+	}
+}
+
+log_trade_partners_construct = {
+	log = "PYTHON_Trade_Partners;[?THIS.GetTag]"
+	for_each_scope_loop = {
+		array = TNO_trade_partners
+		log = "PYTHON_Trade_Opinion;[PREV.GetTag];[THIS.GetTag];[?PREV.trade_opinion@THIS];[?PREV.trade_opinion_distance@THIS];[?PREV.trade_opinion_opinion@THIS];[?PREV.trade_opinion_modifier@THIS];[?ECON_SPHERE_LEADER:SPHERE_INSULARITY|0]"
+	}
+}
+
+log_trade_nations_construct = {
+	ZZZ = {
+		clear_array = TNO_trade_nations
+		every_other_country = {
+			limit = { econ_can_use_economy_system = yes }
+			add_to_array = { ZZZ.TNO_trade_nations = THIS }
+		}
+		for_each_scope_loop = {
+			array = TNO_trade_nations
+			clear_array = TNO_trade_partners
+			for_each_scope_loop = {
+				array = ZZZ.TNO_trade_nations
+				if = {
+					limit = { NOT = { check_variable = { THIS.id = PREV.id } } }
+					single_base_trade_influence = yes
+					binary_insert = yes
+				}
+			}
+		}
+		for_each_scope_loop = {
+			array = TNO_trade_nations
+			log_trade_partners_construct = yes
+		}
+	}
+}
+
+# This should be run by ZZZ
+setup_market_ZZZ = {
+	# Starting Insularities
+	USA = { set_variable = { SPHERE_INSULARITY = 5 } }
+	GER = { set_variable = { SPHERE_INSULARITY = 25 } }
+	JAP = { set_variable = { SPHERE_INSULARITY = 15 } }
+	IBR = { set_variable = { SPHERE_INSULARITY = 10 } }
+	TUR = { set_variable = { SPHERE_INSULARITY = 10 } }
+	ITA = { set_variable = { SPHERE_INSULARITY = 10 } }
+	ARG = { set_variable = { SPHERE_INSULARITY = 10 } }
+	BRA = { set_variable = { SPHERE_INSULARITY = 10 } }
+	ADN = { set_variable = { SPHERE_INSULARITY = 10 } }
+	CME = { set_variable = { SPHERE_INSULARITY = 15 } }
+	WOL = { set_variable = { SPHERE_INSULARITY = 10 } }
+	FFR = { set_variable = { SPHERE_INSULARITY = 10 } }
+	CAO = { set_variable = { SPHERE_INSULARITY = 15 } }
+	ENG = { set_variable = { SPHERE_INSULARITY = 5 } }
+
+	ZZZ = {
+		every_other_country = {
+			limit = { econ_can_use_economy_system = yes }
+			every_other_country = {
+				limit = { econ_can_use_economy_system = yes }
+				add_to_array = { PREV.TNO_trade_partners = THIS }
+			}
+		}
+	}
+
+	every_other_country = {
+		limit = { econ_can_use_economy_system = yes }
+		recalculate_trade_position = yes
+		add_to_array = { PREV.TNO_trade_nations = THIS }
+	}
+	recalculate_world_trade_influence = yes
+	insert_sort_trade_nations = yes
+	set_temp_variable = { trade_sort_var = 1 }
+}
+
+# This should be run by ZZZ
+update_market = {
+
+	every_other_country = {
+		limit = { 
+			econ_can_use_economy_system = yes
+			NOT = { ZZZ = {  is_in_array = { array = TNO_trade_nations value = PREV } } }
+		}
+		TNO_startup_nation = yes
+		log = "added country to TNO_trade_nations, [?THIS.GetTag]"
+		calculate_base_trade_influence = yes
+		ZZZ = { add_to_array = { TNO_trade_nations = PREV } }
+	}
+
+	set_variable = { world_cg_ratio = 0 }
+	set_temp_variable = { world_desired_cg_trade = 0 }
+	for_each_scope_loop = {
+		array = TNO_trade_nations
+			
+		set_temp_variable = { temp_desired_cg_trade = consumer_goods_monthly_use }
+		divide_temp_variable = { temp_desired_cg_trade = 10 }
+		multiply_temp_variable = { temp_desired_cg_trade = tno_trade_laws_consumer_goods_trade_desire_modifier }
+		round_temp_variable = temp_desired_cg_trade
+
+		set_temp_variable = { country_cg_ratio = modifier@consumer_goods_production_factor }
+		multiply_temp_variable = { country_cg_ratio = temp_desired_cg_trade }
+			
+		add_to_variable = { PREV.world_cg_ratio = country_cg_ratio }
+		add_to_temp_variable = { PREV.world_desired_cg_trade = temp_desired_cg_trade }
+	}
+	divide_variable = { world_cg_ratio = world_desired_cg_trade }
+	set_variable = { TNO_export_size^8 = 10 }
+	multiply_variable = { TNO_export_size^8 = world_cg_ratio }
+	add_to_variable = { TNO_export_size^8 = 10 }
+
+	for_each_scope_loop = {
+		array = TNO_trade_nations
+
+		update_market_recurring_trade = yes
+		
+		set_variable = { PU_imports_m = 0 }
+		set_variable = { PU_exports_m = 0 }
+
+		clear_array = TNO_fulfilled_exports
+		resize_array = { array = TNO_fulfilled_exports value = 0 size = 9 }
+		clear_array = TNO_fulfilled_imports
+		resize_array = { array = TNO_fulfilled_imports value = 0 size = 9 }
+
+		clear_array = TNO_unfulfilled_trade
+		resize_array = { array = TNO_unfulfilled_trade value = 0 size = 9 }
+		clear_bilateral_trade = yes
+
+		clear_array = TNO_possible_stockpile
+		resize_array = { array = TNO_unfulfilled_trade value = 0 size = 9 }
+
+		if = {
+			limit = { is_ai = no }
+			auto_set_trade_pus = yes
+		} else = {
+			auto_set_trade_pus_ai = yes
+		}
+
+		for_loop_effect = {
+			start = 1
+			end = 9
+			value = resource_type
+			set_variable = { TNO_possible_stockpile^resource_type = resource_production^resource_type }
+			set_variable = { TNO_unfulfilled_trade^resource_type = TNO_recurring_trade_pus^resource_type }
+			multiply_variable = { TNO_unfulfilled_trade^resource_type = -1 }
+		}
+
+		subtract_from_variable = { TNO_possible_stockpile^2 = resource_produced@aluminium }
+		subtract_from_variable = { TNO_possible_stockpile^3 = resource_produced@rubber }
+		subtract_from_variable = { TNO_possible_stockpile^4 = resource_produced@tungsten }
+		subtract_from_variable = { TNO_possible_stockpile^5 = resource_produced@steel }
+		subtract_from_variable = { TNO_possible_stockpile^6 = resource_produced@chromium }
+		subtract_from_variable = { TNO_possible_stockpile^7 = resource_produced@uranium }
+
+		add_to_variable = { TNO_possible_stockpile^2 = resource@aluminium }
+		add_to_variable = { TNO_possible_stockpile^3 = resource@rubber }
+		add_to_variable = { TNO_possible_stockpile^4 = resource@tungsten }
+		add_to_variable = { TNO_possible_stockpile^5 = resource@steel }
+		add_to_variable = { TNO_possible_stockpile^6 = resource@chromium }
+		add_to_variable = { TNO_possible_stockpile^7 = resource@uranium }
+	}
+	
+	for_loop_effect = {
+		start = 1
+		end = 9
+		value = resource_type
+
+		set_temp_variable = { resource_import_t = 0 }
+		set_temp_variable = { resource_export_t = 0 }
+		for_each_scope_loop = {
+			array = TNO_trade_nations
+
+			if = { limit = { check_variable = { TNO_unfulfilled_trade^resource_type > 0 } } 
+				add_to_temp_variable = { resource_import_t = TNO_unfulfilled_trade^resource_type }
+			} else = {
+				add_to_temp_variable = { resource_export_t = TNO_unfulfilled_trade^resource_type }
+			}
+		}
+	}
+
+	insert_sort_trade_nations = yes
+
+	for_each_scope_loop = {
+		array = TNO_trade_nations
+		break = trade_nation_break
+
+		for_loop_effect = {
+			start = 1
+			end = 8
+			value = resource_type
+
+			if = {
+				limit = { check_variable = { TNO_unfulfilled_trade^resource_type > 0 } }
+
+				for_each_scope_loop = {
+					array = TNO_trade_partners
+					break = trade_break
+
+					if = {
+						limit = { PREV = { check_variable = { trade_opinion@PREV < 0 } } }
+						add_to_temp_variable = { trade_break = 1 }
+					} else_if = {
+						limit = {
+							check_variable = { TNO_unfulfilled_trade^resource_type < 0 }
+							check_variable = { trade_opinion@PREV > 0 } 
+						}
+
+						set_temp_variable = { trade_amount = TNO_unfulfilled_trade^resource_type }  # amount TNO_trade_partner wants to export
+						set_temp_variable = { trade_break_adder = 0 }
+						multiply_temp_variable = { trade_amount = -1 }
+						if = {
+							limit = { PREV = { check_variable = { trade_amount > TNO_unfulfilled_trade^resource_type } } }
+							PREV = { set_temp_variable = { trade_amount = TNO_unfulfilled_trade^resource_type } }
+							set_temp_variable = { trade_break_adder = 1 }
+						}
+
+						add_to_variable = { TNO_fulfilled_exports^resource_type = trade_amount }
+						add_to_variable = { TNO_unfulfilled_trade^resource_type = trade_amount }
+						PREV = { add_to_variable = { TNO_fulfilled_imports^resource_type = trade_amount } }
+						PREV = { subtract_from_variable = { TNO_unfulfilled_trade^resource_type = trade_amount } }
+
+						add_to_variable = { PU_exports_m = trade_amount }
+						PREV = { add_to_variable = { PU_imports_m = trade_amount } }
+						bilateral_trade_indicator = yes
+						
+						add_to_temp_variable = { trade_break = trade_break_adder }
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = { check_variable = { TNO_unfulfilled_trade^8 < 0 } }
+
+			for_each_scope_loop = {
+				array = TNO_trade_partners
+				break = trade_break
+
+				if = {
+					limit = { PREV = { check_variable = { trade_opinion@PREV < 0 } } }
+					add_to_temp_variable = { trade_break = 1 }
+				} else_if = {
+					limit = {
+						check_variable = { TNO_unfulfilled_trade^8 > 0 }
+						check_variable = { trade_opinion@PREV > 0 } 
+					}
+
+					set_temp_variable = { trade_amount = TNO_unfulfilled_trade^8 }
+					multiply_temp_variable = { trade_amount = -1 }
+					set_temp_variable = { trade_break_adder = 0 }
+					if = {
+						limit = { 
+							PREV = { 
+								check_variable = { 
+									var = trade_amount 
+									value = TNO_unfulfilled_trade^8 
+									compare = less_than_or_equals 
+								}
+							}
+						}
+						PREV = { set_temp_variable = { trade_amount = TNO_unfulfilled_trade^8 } }
+						set_temp_variable = { trade_break_adder = 1 }
+					}
+					multiply_temp_variable = { trade_amount = -1 }
+
+					add_to_variable = { TNO_fulfilled_imports^8 = trade_amount }
+					subtract_from_variable = { TNO_unfulfilled_trade^8 = trade_amount }
+					PREV = { add_to_variable = { TNO_fulfilled_exports^8 = trade_amount } }
+					PREV = { add_to_variable = { TNO_unfulfilled_trade^8 = trade_amount } }
+					add_to_variable = { PU_imports_m = trade_amount }
+					PREV = { add_to_variable = { PU_exports_m = trade_amount } }
+
+					set_variable = { trade_consumer_goods@PREV = trade_amount }
+					PREV = { set_variable = { trade_consumer_goods@PREV = trade_amount } }
+
+					PREV = { add_to_array = { TNO_trade_partners_active = PREV } } 
+
+					add_to_temp_variable = { trade_break = trade_break_adder }
+				}
+			}
+		}
+	}
+	
+	for_loop_effect = {
+		start = 1
+		end = 9
+		value = resource_type
+
+		set_temp_variable = { resource_import_t = 0 }
+		set_temp_variable = { resource_export_t = 0 }
+		for_each_scope_loop = {
+			array = TNO_trade_nations
+
+			if = { limit = { check_variable = { TNO_unfulfilled_trade^resource_type > 0 } } 
+				add_to_temp_variable = { resource_import_t = TNO_unfulfilled_trade^resource_type }
+			} else = {
+				add_to_temp_variable = { resource_export_t = TNO_unfulfilled_trade^resource_type }
+			}
+		}
+		log = "Total [Get_resource_name] not traded resource_import_t [?resource_import_t] resource_export_t [?resource_export_t]"
+	}
+
+
+	for_each_scope_loop = {
+		array = TNO_trade_nations
+		for_loop_effect = {
+			start = 1
+			end = 9
+			value = resource_type
+
+			multiply_variable = { TNO_fulfilled_imports^resource_type = ZZZ.TNO_export_size^resource_type }
+			multiply_variable = { TNO_fulfilled_exports^resource_type = ZZZ.TNO_export_size^resource_type }
+		}
+		
+		set_variable = { TNO_market_oil = TNO_fulfilled_exports^1 }
+		set_variable = { TNO_market_aluminium = TNO_fulfilled_exports^2 }
+		set_variable = { TNO_market_rubber = TNO_fulfilled_exports^3 }
+		set_variable = { TNO_market_tungsten = TNO_fulfilled_exports^4 }
+		set_variable = { TNO_market_steel = TNO_fulfilled_exports^5 }
+		set_variable = { TNO_market_chromium = TNO_fulfilled_exports^6 }
+		set_variable = { TNO_market_uranium = TNO_fulfilled_exports^7 }
+		set_variable = { TNO_market_consumer_goods = TNO_fulfilled_exports^8 }
+
+		subtract_from_variable = { TNO_market_oil = TNO_fulfilled_imports^1 }
+		subtract_from_variable = { TNO_market_aluminium = TNO_fulfilled_imports^2 }
+		subtract_from_variable = { TNO_market_rubber = TNO_fulfilled_imports^3 }
+		subtract_from_variable = { TNO_market_tungsten = TNO_fulfilled_imports^4 }
+		subtract_from_variable = { TNO_market_steel = TNO_fulfilled_imports^5 }
+		subtract_from_variable = { TNO_market_chromium = TNO_fulfilled_imports^6 }
+		subtract_from_variable = { TNO_market_uranium = TNO_fulfilled_imports^7 }
+		subtract_from_variable = { TNO_market_consumer_goods = TNO_fulfilled_imports^8 }
+
+		set_variable = { TNO_stockpile_aluminium = TNO_possible_stockpile^2 }
+		set_variable = { TNO_stockpile_rubber = TNO_possible_stockpile^3 }
+		set_variable = { TNO_stockpile_tungsten = TNO_possible_stockpile^4 }
+		set_variable = { TNO_stockpile_steel = TNO_possible_stockpile^5 }
+		set_variable = { TNO_stockpile_chromium = TNO_possible_stockpile^6 }
+		set_variable = { TNO_stockpile_uranium = TNO_possible_stockpile^7 }
+		
+		subtract_from_variable = { TNO_stockpile_aluminium = TNO_market_aluminium }
+		subtract_from_variable = { TNO_stockpile_rubber = TNO_market_rubber }
+		subtract_from_variable = { TNO_stockpile_tungsten = TNO_market_tungsten }
+		subtract_from_variable = { TNO_stockpile_steel = TNO_market_steel }
+		subtract_from_variable = { TNO_stockpile_chromium = TNO_market_chromium }
+		subtract_from_variable = { TNO_stockpile_uranium = TNO_market_uranium }
+
+		clamp_variable = { var = TNO_stockpile_aluminium max = TNO_stockpile^2 }
+		clamp_variable = { var = TNO_stockpile_rubber max = TNO_stockpile^3 }
+		clamp_variable = { var = TNO_stockpile_tungsten max = TNO_stockpile^4 }
+		clamp_variable = { var = TNO_stockpile_steel max = TNO_stockpile^5 }
+		clamp_variable = { var = TNO_stockpile_chromium max = TNO_stockpile^6 }
+		clamp_variable = { var = TNO_stockpile_uranium max = TNO_stockpile^7 }
+
+		set_variable = { buildings_uranium_missing_demand = TNO_stockpile_uranium }
+		subtract_from_variable = { buildings_uranium_missing_demand = TNO_stockpile^7 }
+		clamp_variable = { var = buildings_uranium_missing_demand min = 0 max = num_of_nuclear_reactors_uranium_demand }
+		multiply_variable = { buildings_uranium_missing_demand = 4 }
+
+		add_to_variable = { TNO_stockpile^2 = TNO_stockpile_aluminium }
+		add_to_variable = { TNO_stockpile^3 = TNO_stockpile_rubber }
+		add_to_variable = { TNO_stockpile^4 = TNO_stockpile_tungsten }
+		add_to_variable = { TNO_stockpile^5 = TNO_stockpile_steel }
+		add_to_variable = { TNO_stockpile^6 = TNO_stockpile_chromium }
+		add_to_variable = { TNO_stockpile^7 = TNO_stockpile_uranium }
+
+		round_variable = TNO_stockpile^2
+		round_variable = TNO_stockpile^3
+		round_variable = TNO_stockpile^4
+		round_variable = TNO_stockpile^5
+		round_variable = TNO_stockpile^6
+		round_variable = TNO_stockpile^7
+		round_variable = TNO_stockpile^8
+
+		for_loop_effect = {
+			start = 2
+			end = 8
+			value = resource_type
+
+			clamp_variable = { var = TNO_stockpile^resource_type min = 0 max = 9999 }
+		}
+
+		set_variable = { net_put_trade = PU_exports_m }
+		subtract_from_variable = { net_put_trade = PU_imports_m  }
+		add_to_array = { TNO_net_pu_trade = net_put_trade }
+
+		add_to_array = { TNO_pu_trade_imports = PU_imports_m }
+		add_to_array = { TNO_pu_trade_exports = PU_exports_m }
+		
+		calculate_consumer_goods_need = yes
+		update_prod_units_trade = yes
+		add_to_variable = { TNO_trade_gui_dirty = 1 }
+
+		add_to_array = { TNO_cg_production = PU_consumer_goods_desired }
+	}
+}
+
+clear_bilateral_trade = {
+	for_each_scope_loop = {
+		array = TNO_trade_partners_active
+		set_variable = { PREV.trade_oil@THIS = 0 }
+		set_variable = { PREV.trade_aluminium@THIS = 0 }
+		set_variable = { PREV.trade_rubber@THIS = 0 }
+		set_variable = { PREV.trade_tungsten@THIS = 0 }
+		set_variable = { PREV.trade_steel@THIS = 0 }
+		set_variable = { PREV.trade_chromium@THIS = 0 }
+		set_variable = { PREV.trade_uranium@THIS = 0 }
+		set_variable = { PREV.trade_consumer_goods@THIS = 0 }
+	}
+	clear_array = TNO_trade_partners_active
+}
+
+bilateral_trade_indicator = {
+	if = {
+		limit = { check_variable = { resource_type = 1 } }
+		set_variable = { trade_oil@PREV = trade_amount }
+		PREV = { set_variable = { trade_oil@PREV = trade_amount } }
+	} else_if = {
+		limit = { check_variable = { resource_type = 2 } }
+		set_variable = { trade_aluminium@PREV = trade_amount }
+		PREV = { set_variable = { trade_aluminium@PREV = trade_amount } }
+	} else_if = {
+		limit = { check_variable = { resource_type = 3 } }
+		set_variable = { trade_rubber@PREV = trade_amount }
+		PREV = { set_variable = { trade_rubber@PREV = trade_amount } }
+	} else_if = {
+		limit = { check_variable = { resource_type = 4 } }
+		set_variable = { trade_tungsten@PREV = trade_amount }
+		PREV = { set_variable = { trade_tungsten@PREV = trade_amount } }
+	} else_if = {
+		limit = { check_variable = { resource_type = 5 } }
+		set_variable = { trade_steel@PREV = trade_amount }
+		PREV = { set_variable = { trade_steel@PREV = trade_amount } }
+	} else_if = {
+		limit = { check_variable = { resource_type = 6 } }
+		set_variable = { trade_chromium@PREV = trade_amount }
+		PREV = { set_variable = { trade_chromium@PREV = trade_amount } }
+	} else_if = {
+		limit = { check_variable = { resource_type = 7 } }
+		set_variable = { trade_uranium@PREV = trade_amount }
+		PREV = { set_variable = { trade_uranium@PREV = trade_amount } }
+	}
+	add_to_array = { TNO_trade_partners_active = PREV }
+	PREV = { add_to_array = { TNO_trade_partners_active = PREV } } 
+}
+
+log_cg_desired_trade = {
+	ZZZ = {
+		every_other_country = {
+			log = "[THIS.GetName]:[?TNO_desired_cg_trade]"
+		}
+	}
+}
+
+update_sorting_tade_tab = {
+	set_temp_variable = { trade_sort_var = 2 }
+	set_variable = { 1:trade_qs_compare = 1 }
+	set_variable = { 2:trade_qs_compare = 1 }
+	create_sorted_trade_array = yes
+}
+
+# ===================================== #
+# Sorted system done by paradox
+create_sorted_trade_array = {
+	clear_array = TNO_trade_partners_display
+	for_each_loop = {
+		array = TNO_trade_partners
+		add_to_array = { TNO_trade_partners_display = v }
+	}
+	set_temp_variable = { tos_target = THIS }
+	get_sorted_scored_countries = {
+		scorer = TNO_trade_opinion_display_array_scorer
+		array = TNO_trade_partners_display
+	}
+	if = {
+		limit = {
+			check_variable = { trade_sort_var:trade_qs_compare = 2 }
+		}
+		set_variable = { trade_sort_var:trade_qs_compare = 1 }
+		set_variable = { middle = TNO_trade_partners_display^num }
+		set_temp_variable = { len = TNO_trade_partners_display^num }
+		subtract_from_temp_variable = { len = 1 }
+		divide_variable = { middle = 2 }
+		round_variable = middle
+		for_loop_effect = {
+			start = 0
+			end = middle
+
+			set_temp_variable = { reverse = len }
+			subtract_from_temp_variable = { reverse = v }
+			set_temp_variable = { swap = TNO_trade_partners_display^v }
+			set_variable = { TNO_trade_partners_display^v = TNO_trade_partners_display^reverse }
+			set_variable = { TNO_trade_partners_display^reverse = swap }
+		}
+		clear_variable = middle
+	}
+	else = {
+		set_variable = { trade_sort_var:trade_qs_compare = 2 }
+	}
+}
+
+
+log_country_modifiers = {
+	every_country = {
+		limit = {
+			NOT = { has_country_flag = TNO_eliminate_building_demand }
+			OR = {
+				check_variable = { TNO_school_coverage_percent_gui > 75 }
+				check_variable = { TNO_hospital_coverage_percent_gui > 75 }
+				check_variable = { TNO_office_coverage_percent_gui > 75 }
+				check_variable = { TNO_barrack_coverage_percent_gui > 75 }
+				check_variable = { TNO_prison_coverage_percent_gui > 75 }
+			}
+		}
+		log = "[?THIS.GetTag] TNO_schools [?TNO_school_coverage_percent_gui] TNO_hospitals [?TNO_hospital_coverage_percent_gui] TNO_offices [?TNO_office_coverage_percent_gui] TNO_barracks [?TNO_barrack_coverage_percent_gui] TNO_prisons [?TNO_prison_coverage_percent_gui]"
+	}
+}

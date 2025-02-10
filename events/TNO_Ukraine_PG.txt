@@ -1,0 +1,1474 @@
+#Post-War General Events
+add_namespace = FUK_civ_war
+add_namespace = FUK_post_war
+add_namespace = FUK_election
+add_namespace = FUK_election_spiva
+add_namespace = FUK_election_cultur
+add_namespace = FUK_election_us
+add_namespace = FUK_culturalists
+add_namespace = FUK_debug
+add_namespace = FUK_epilogue
+
+country_event = { # 1917 Shall Commence Once Again
+	id = FUK_civ_war.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_civ_war.1" }
+	title = FUK_civ_war.1.t
+	desc = FUK_civ_war.1.desc
+	picture = GFX_report_event_UKR_Cossack_Picket
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_civ_war.1.a
+		
+	}
+}
+
+country_event = { # Scramble the Forces event choices
+	id = FUK_civ_war.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_civ_war.2" }
+	title = FUK_civ_war.2.t
+	desc = FUK_civ_war.2.desc
+	picture = GFX_report_event_UKR_victims_of_fanaticism
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { # Side with the Culturalists
+		name = FUK_civ_war.2.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = FUK_LEADER_PATH
+					option = FUK_LEADER_PATH_PARTISAN
+				}
+			}
+		}
+		random_owned_controlled_state = {
+			create_unit = {
+				division = "name = \"Partyzans'ka Dyviziya\" division_template = \"Partyzans'ka Dyviziya\" start_experience_factor = 0.8 start_equipment_factor = 1"
+				owner = PREV
+			}
+			create_unit = {
+				division = "name = \"Partyzans'ka Dyviziya\" division_template = \"Partyzans'ka Dyviziya\" start_experience_factor = 0.8 start_equipment_factor = 1"
+				owner = PREV
+			}
+		}
+		set_temp_variable = { var_populist_support_temp = 10 }
+		FUK_populist_support_change = yes
+	}
+	option = { # Side with the Partisans
+		name = FUK_civ_war.2.b
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = FUK_LEADER_PATH
+					option = FUK_LEADER_PATH_POPULIST
+				}
+			}
+		}
+		random_owned_controlled_state = {
+			create_unit = {
+				division = "name = \"Strilets'ka Dyviziya\" division_template = \"Strilets'ka Dyviziya\" start_experience_factor = 0.8 start_equipment_factor = 1"
+				owner = PREV
+			}
+		}
+		set_temp_variable = { var_partisan_support_temp = 10 }
+		FUK_partisan_support_change = yes
+	}
+}
+
+country_event = { # The Masses Behind Us
+	id = FUK_civ_war.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_civ_war.3" }
+	title = FUK_civ_war.3.t
+	desc = FUK_civ_war.3.desc
+	picture = GFX_report_event_generic_hitler_portrait_partisans
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_civ_war.3.a
+		
+	}
+}
+
+country_event = { # A New Job for Ohloblyn's Men
+	id = FUK_civ_war.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_civ_war.4" }
+	title = FUK_civ_war.4.t
+	desc = FUK_civ_war.4.desc
+	picture = GFX_report_event_UKR_collab_parade
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { # Don't integrate collaborators further into the administration
+		name = FUK_civ_war.4.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = FUK_LEADER_PATH
+					option = FUK_LEADER_PATH_COLLABORATOR
+				}
+			}
+		}
+		set_temp_variable = { var_collaborator_support_temp = -10 }
+		FUK_collaborator_support_change = yes
+		set_temp_variable = { var_populist_support_temp = 5 }
+		FUK_populist_support_change = yes
+		set_temp_variable = { var_partisan_support_temp = 5 }
+		FUK_partisan_support_change = yes
+		add_stability = -0.05
+		add_war_support = 0.05
+		add_political_power = -40
+		add_popularity = {
+			ideology = fascism
+			popularity = -0.01
+		}
+		TNO_worsen_admin_efficiency_low = yes
+	}
+	option = { # Integrate some collaborators into the administration
+		name = FUK_civ_war.4.b
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = {
+						rule = FUK_LEADER_PATH
+						option = FUK_LEADER_PATH_COLLABORATOR
+					}
+					has_game_rule = {
+						rule = FUK_LEADER_PATH
+						option = FUK_LEADER_PATH_PARTISAN
+					}
+					has_game_rule = {
+						rule = FUK_LEADER_PATH
+						option = FUK_LEADER_PATH_POPULIST
+					}
+				}
+			}
+		}
+		set_temp_variable = { var_collaborator_support_temp = 5 }
+		FUK_collaborator_support_change = yes
+		set_temp_variable = { var_populist_support_temp = -2.5 }
+		FUK_populist_support_change = yes
+		set_temp_variable = { var_partisan_support_temp = -2.5 }
+		FUK_partisan_support_change = yes
+		add_stability = 0.025
+		add_war_support = -0.025
+		add_political_power = 20
+		add_popularity = {
+			ideology = fascism
+			popularity = 0.005
+		}
+		TNO_improve_admin_efficiency_low = yes
+	}
+	option = { # Integrate as many collaborators into the administration as are willing
+		name = FUK_civ_war.4.c
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = {
+						rule = FUK_LEADER_PATH
+						option = FUK_LEADER_PATH_PARTISAN
+					}
+					has_game_rule = {
+						rule = FUK_LEADER_PATH
+						option = FUK_LEADER_PATH_POPULIST
+					}
+				}
+			}
+		}
+		set_temp_variable = { var_collaborator_support_temp = 10 }
+		FUK_collaborator_support_change = yes
+		set_temp_variable = { var_populist_support_temp = -5 }
+		FUK_populist_support_change = yes
+		set_temp_variable = { var_partisan_support_temp = -5 }
+		FUK_partisan_support_change = yes
+		add_stability = 0.05
+		add_war_support = -0.05
+		add_political_power = 50
+		add_popularity = {
+			ideology = fascism
+			popularity = 0.01
+		}
+		TNO_improve_admin_efficiency_med = yes
+	}
+}
+
+country_event = { # UNRA, United and Strong
+	id = FUK_civ_war.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_civ_war.5" }
+	title = FUK_civ_war.5.t
+	desc = FUK_civ_war.5.desc
+	picture = GFX_report_event_generic_crate_of_guns_2
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { # Flavor?
+		name = FUK_civ_war.5.a
+		
+	}
+}
+
+country_event = { # Drop the Hammer, Win the War
+	id = FUK_civ_war.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_civ_war.6" }
+	title = FUK_civ_war.6.t
+	desc = FUK_civ_war.6.desc
+	picture = GFX_report_event_UKR_peasants_and_smoke
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { # GRAIN
+		name = FUK_civ_war.6.a
+		
+	}
+}
+
+country_event = { # Deal With Dissent
+	id = FUK_civ_war.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_civ_war.7" }
+	title = FUK_civ_war.7.t
+	desc = FUK_civ_war.7.desc
+	picture = GFX_report_event_UKR_reeds_on_dnieper
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { # GRAIN
+		name = FUK_civ_war.7.a
+		
+	}
+}
+
+country_event = { # The Cure to Fascist Rot
+	id = FUK_civ_war.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_civ_war.8" }
+	title = FUK_civ_war.8.t
+	desc = FUK_civ_war.8.desc
+	picture = GFX_report_event_UKR_collabs_stamped_tryzub
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { # BULLETS
+		name = FUK_civ_war.8.a
+		
+	}
+}
+
+country_event = { # Faustian Bargain
+	id = FUK_civ_war.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_civ_war.9" }
+	title = FUK_civ_war.9.t
+	desc = FUK_civ_war.9.desc
+	picture = GFX_report_event_UKR_storm_on_dnieper
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { # friendship :)
+		name = FUK_civ_war.9.a
+		
+	}
+}
+
+country_event = { # Freedom to Ukraine or Death
+	id = FUK_civ_war.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_civ_war.10" }
+	title = FUK_civ_war.10.t
+	desc = FUK_civ_war.10.desc
+	picture = GFX_report_event_UKR_Gopak
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { # 
+		name = FUK_civ_war.10.a
+		
+	}
+}
+
+country_event = {
+	id = FUK_post_war.1 #Neo-Greeners are made
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.1" }
+	title = FUK_post_war.1.t
+	desc = FUK_post_war.1.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_post_war.1.a
+		set_variable = { var = FUKR_green_leniency value = 0 }
+		country_event = { id = FUK_post_war.2 days = 5 }	
+	}
+}
+country_event = {
+	id = FUK_post_war.2 #Negotiate or no
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.2" }
+	title = FUK_post_war.2.t
+	desc = FUK_post_war.2.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_post_war.2.a
+		country_event = { id = FUK_post_war.3 days = 5 }
+	}
+	option = { 
+		name = FUK_post_war.2.b
+		country_event = { id = FUK_post_war.9 days = 5 }
+	}
+}
+country_event = {
+	id = FUK_post_war.3 #Negotiate (soy)
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.3" }
+	title = FUK_post_war.3.t
+	desc = FUK_post_war.3.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_post_war.3.a
+		country_event = { id = FUK_post_war.4 days = 5 }
+	}
+}
+country_event = {
+	id = FUK_post_war.4 #Fate of the looters 
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.4" }
+	title = FUK_post_war.4.t
+	desc = FUK_post_war.4.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { #Amnesty
+		name = FUK_post_war.4.a
+		add_stability = -0.05
+		add_political_power = -15
+		country_event = { id = FUK_post_war.5 days = 5 }
+	}
+	option = { #Incarceration
+		name = FUK_post_war.4.b
+		add_stability = 0.05
+		add_manpower = -782
+		country_event = { id = FUK_post_war.5 days = 5 }
+		add_to_variable = { var = FUKR_green_leniency value = 1 }
+	}
+}
+country_event = {
+	id = FUK_post_war.5 #Fate of the commies
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.5" }
+	title = FUK_post_war.5.t
+	desc = FUK_post_war.5.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { #Limited Political Freedoms
+		name = FUK_post_war.5.a
+		add_popularity = {
+			ideology = communist
+			popularity = 0.325
+		}
+		add_stability = -0.02
+		add_manpower = 2893
+		country_event = { id = FUK_post_war.6 days = 5 }
+	}
+	option = { #Amnesty for Standing Down
+		name = FUK_post_war.6.b
+		add_stability = -0.02
+		add_manpower = 1322
+		country_event = { id = FUK_post_war.6 days = 5 }
+	}	
+	option = { #Promise Nothing
+		name = FUK_post_war.6.c
+		add_stability = 0.05
+		add_manpower = -844
+		add_popularity = {
+			ideology = communist
+			popularity = -0.07
+		}
+		country_event = { id = FUK_post_war.6 days = 5 }
+		add_to_variable = { var = FUKR_green_leniency value = 1 }
+	}
+}
+country_event = {
+	id = FUK_post_war.6 #Fate of the UPA 
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.6" }
+	title = FUK_post_war.6.t
+	desc = FUK_post_war.6.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { #Allow Integration
+		name = FUK_post_war.6.a
+		add_popularity = {
+			ideology = conservatism
+			popularity = 0.05
+		}
+		add_popularity = {
+			ideology = ultranationalism
+			popularity = 0.02
+		}
+		add_stability = -0.05
+		add_political_power = -20
+		add_manpower = 13011
+		country_event = { id = FUK_post_war.7 days = 5 }
+	}
+	option = { #Amnesty and Cutting lose
+		name = FUK_post_war.6.b
+		add_stability = 0.025
+		add_political_power = -5
+		add_manpower = 7921
+		country_event = { id = FUK_post_war.7 days = 5 }
+	}
+	option = { #Arresting 
+		trigger = {
+			check_variable = {
+				var = FUKR_green_leniency
+				value = 2
+				compare = greater_than_or_equals
+			}
+		}
+		name = FUK_post_war.6.c
+		add_stability = 0.05
+		add_political_power = 25
+		add_manpower = -5299
+		add_to_variable = { var = FUKR_green_leniency value = 1 }
+		country_event = { id = FUK_post_war.8 days = 5 }
+	}
+	option = { #Arresting
+		trigger = {
+			check_variable = {
+				var = FUKR_green_leniency
+				value = 2
+				compare = not_equals
+			}
+		}
+		name = FUK_post_war.6.d
+		add_stability = 0.05
+		add_political_power = 25
+		add_manpower = -5299
+		add_to_variable = { var = FUKR_green_leniency value = 1 }
+		country_event = { id = FUK_post_war.7 days = 5 }		
+	}
+}
+country_event = {
+	id = FUK_post_war.7 #Lenient Actions were taken
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.7" }
+	title = FUK_post_war.7.t
+	desc = FUK_post_war.7.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_post_war.7.a
+		add_stability = 0.07
+		add_political_power = 50
+	}
+}
+country_event = {
+	id = FUK_post_war.8 #Not Lenient Enough
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.8" }
+	title = FUK_post_war.8.t
+	desc = FUK_post_war.8.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_post_war.8.a
+		add_stability = -0.05
+		add_political_power = -25
+	}
+}
+country_event = {
+	id = FUK_post_war.9 #No negotiations and stormed
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.9" }
+	title = FUK_post_war.9.t
+	desc = FUK_post_war.9.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_post_war.9.a
+		country_event = { id = FUK_post_war.10 days = 5 }
+	}
+}
+country_event = {
+	id = FUK_post_war.10 #Fate of the Looters (stormed)
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.10" }
+	title = FUK_post_war.10.t
+	desc = FUK_post_war.10.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { #Reconciliation
+		name = FUK_post_war.10.a
+		add_stability = 0.05
+		country_event = { id = FUK_post_war.11 days = 5 }
+	}
+	option = { #Incarceration
+		name = FUK_post_war.10.b
+		add_stability = -0.05
+		add_manpower = -782
+		country_event = { id = FUK_post_war.11 days = 5 }
+	}
+}
+country_event = {
+	id = FUK_post_war.11 #Fate of the Communists (stormed)
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.11" }
+	title = FUK_post_war.11.t
+	desc = FUK_post_war.11.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { #Amnesty
+		name = FUK_post_war.11.a
+		add_stability = -0.02
+		add_manpower = 1322
+		country_event = { id = FUK_post_war.12 days = 5 }
+	}
+	option = { #Arrests
+		name = FUK_post_war.11.b
+		add_popularity = {
+			ideology = communist
+			popularity = -0.07
+		}
+		add_stability = 0.5
+		add_manpower = -844
+		country_event = { id = FUK_post_war.12 days = 5 }
+	}
+}
+country_event = {
+	id = FUK_post_war.12 #Fate of the UPA (stormed)
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.12" }
+	title = FUK_post_war.12.t
+	desc = FUK_post_war.12.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { #Amnesty
+		name = FUK_post_war.12.a
+		add_stability = -0.025
+		add_political_power = -5
+		add_manpower = 7921
+		country_event = { id = FUK_post_war.13 days = 5 }
+	}
+	option = { 
+		name = FUK_post_war.12.a
+		add_stability = 0.05
+		add_political_power = 25
+		add_manpower = -5299
+		country_event = { id = FUK_post_war.13 days = 5 }
+	}
+}
+country_event = {
+	id = FUK_post_war.13 #Trials (stormed)
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_post_war.13" }
+	title = FUK_post_war.13.t
+	desc = FUK_post_war.13.desc
+	#picture = 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_post_war.13.a
+	}
+}
+#Post-War Election Events
+
+country_event = {
+	id = FUK_election.0
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election.0" }
+	title = FUK_election.0.t
+	desc = FUK_election.0.desc
+	picture = GFX_report_event_IBR_candle
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election.0.a
+		trigger = {
+			OR = {
+				AND = {
+					check_variable = { spivavtor_expected_seats > culturalists_expected_seats }
+					check_variable = { spivavtor_expected_seats > populists_expected_seats }
+					has_game_rule = {
+						rule = FUK_LEADER_PATH
+						option = DEFAULT
+					}
+				}
+				has_game_rule = {
+					rule = FUK_LEADER_PATH
+					option = FUK_LEADER_PATH_COLLABORATOR
+				}
+			}
+		}
+		custom_effect_tooltip = FUK_ohloblyn_elected_tt
+		hidden_effect = {
+			FUK_Oleksander_Ohloblyn = {
+				promote_character = paternalism_national_conservatism_subtype
+			}
+			set_politics = {
+				ruling_party = paternalism
+				last_election = "1960.12.9"
+				election_frequency = 36
+				elections_allowed = yes
+			}
+			country_event = {
+				id = FUK_epilogue.4
+				days = 3
+			}
+		}
+	}
+	option = { 
+		name = FUK_election.0.b
+		trigger = {
+			OR = {
+				AND = {
+					check_variable = { culturalists_expected_seats > spivavtor_expected_seats }
+					check_variable = { culturalists_expected_seats > populists_expected_seats }
+					has_game_rule = {
+						rule = FUK_LEADER_PATH
+						option = DEFAULT
+					}
+				}
+				has_game_rule = {
+					rule = FUK_LEADER_PATH
+					option = FUK_LEADER_PATH_POPULIST
+				}
+			}
+		}
+		custom_effect_tooltip = FUK_dziuba_elected_tt
+		hidden_effect = {
+			FUK_Ivan_Dzubia = {
+				promote_character = socialist_left_wing_nationalism_subtype
+			}
+			set_politics = {
+				ruling_party = socialist
+				last_election = "1960.12.9"
+				election_frequency = 36
+				elections_allowed = yes
+			}
+			country_event = {
+				id = FUK_epilogue.1
+				days = 3
+			}
+		}
+	}
+	option = { 
+		name = FUK_election.0.c
+		trigger = { 
+			OR = {
+				AND = {
+					check_variable = { populists_expected_seats > spivavtor_expected_seats }
+					check_variable = { populists_expected_seats > culturalists_expected_seats }
+					has_game_rule = {
+						rule = FUK_LEADER_PATH
+						option = DEFAULT
+					}
+				}
+				has_game_rule = {
+					rule = FUK_LEADER_PATH
+					option = FUK_LEADER_PATH_PARTISAN
+				}
+			}
+		}
+		custom_effect_tooltip = FUK_stus_elected_tt
+		hidden_effect = {
+			FUK_Vasyl_Stus = {
+				promote_character = progressivism_popular_front_subtype
+			}
+			set_politics = {
+				ruling_party = progressivism
+				last_election = "1960.12.9"
+				election_frequency = 36
+				elections_allowed = yes
+			}
+			country_event = {
+				id = FUK_epilogue.7
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = {
+	id = FUK_election.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election.1" }
+	title = FUK_election.1.t
+	desc = FUK_election.1.desc
+	picture = GFX_report_event_UKR_flag
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election.1.a
+	}
+}
+
+country_event = {
+	id = FUK_election.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election.2" }
+	title = FUK_election.2.t
+	desc = FUK_election.2.desc
+	picture = GFX_report_event_UKR_dinner_table
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election.2.a
+	}
+}
+
+country_event = {
+	id = FUK_election.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election.3" }
+	title = FUK_election.3.t
+	desc = FUK_election.3.desc
+	picture = GFX_report_event_generic_gallows
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election.3.a
+	}
+}
+
+country_event = {
+	id = FUK_election.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election.4" }
+	title = FUK_election.4.t
+	desc = FUK_election.4.desc
+	picture = GFX_report_event_UKR_ohloblyn_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election.4.a
+	}
+}
+
+#Spivavtor Election Events
+country_event = {
+	id = FUK_election_spiva.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_spiva.1" }
+	title = FUK_election_spiva.1.t
+	desc = FUK_election_spiva.1.desc
+	picture = GFX_report_event_generic_ruins
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_spiva.1.a
+	}
+}
+
+country_event = {
+	id = FUK_election_spiva.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_spiva.2" }
+	title = FUK_election_spiva.2.t
+	desc = FUK_election_spiva.2.desc
+	picture = GFX_report_event_GER_documents
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_spiva.2.a
+		complete_national_focus = FUK_faces_of_fascism
+	}
+}
+
+country_event = {
+	id = FUK_election_spiva.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_spiva.3" }
+	title = FUK_election_spiva.3.t
+	desc = FUK_election_spiva.3.desc
+	picture = GFX_report_event_generic_street_fight
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_spiva.3.a
+		complete_national_focus = FUK_a_deal
+	}
+}
+
+country_event = {
+	id = FUK_election_spiva.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_spiva.4" }
+	title = FUK_election_spiva.4.t
+	desc = FUK_election_spiva.4.desc
+	picture = GFX_report_event_IBR_election_line_inside
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_spiva.4.a
+		set_temp_variable = { t_region = var:East_region }
+		set_temp_variable = { t_target = target_culturalist }
+		set_temp_variable = { t_val = -0.03 }
+		FUK_election_change_pop = yes
+		set_temp_variable = { t_region = var:Central_region }
+		set_temp_variable = { t_target = target_culturalist }
+		set_temp_variable = { t_val = -0.03 }
+		FUK_election_change_pop = yes
+		set_temp_variable = { t_region = var:West_region }
+		set_temp_variable = { t_target = target_populist }
+		set_temp_variable = { t_val = -0.03 }
+		FUK_election_change_pop = yes
+		set_temp_variable = { t_region = var:Central_region }
+		set_temp_variable = { t_target = target_populist }
+		set_temp_variable = { t_val = -0.03 }
+		FUK_election_change_pop = yes
+	}
+}
+
+country_event = {
+	id = FUK_election_spiva.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_spiva.5" }
+	title = FUK_election_spiva.5.t
+	desc = FUK_election_spiva.5.desc
+	picture = GFX_report_event_UKR_city
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_spiva.5.a
+		add_popularity = { ideology = paternalism_1 popularity = 0.015 }
+		add_popularity = { ideology = fascism popularity = 0.01 }
+		set_temp_variable = { t_region = var:East_region }
+		set_temp_variable = { t_target = target_culturalist }
+		set_temp_variable = { t_val = -0.05 }
+		FUK_election_change_pop = yes
+		set_temp_variable = { t_region = var:Central_region }
+		set_temp_variable = { t_target = target_culturalist }
+		set_temp_variable = { t_val = -0.05 }
+		FUK_election_change_pop = yes
+		set_temp_variable = { t_region = var:West_region }
+		set_temp_variable = { t_target = target_populist }
+		set_temp_variable = { t_val = -0.05 }
+		FUK_election_change_pop = yes
+		set_temp_variable = { t_region = var:Central_region }
+		set_temp_variable = { t_target = target_populist }
+		set_temp_variable = { t_val = -0.05 }
+		FUK_election_change_pop = yes
+	}
+}
+
+country_event = {
+	id = FUK_election_spiva.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_spiva.6" }
+	title = FUK_election_spiva.6.t
+	desc = FUK_election_spiva.6.desc
+	picture = GFX_report_event_GNG_university_generic_4 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_spiva.6.a
+	}
+}
+
+country_event = {
+	id = FUK_election_spiva.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_spiva.7" }
+	title = FUK_election_spiva.7.t
+	desc = FUK_election_spiva.7.desc
+	picture = GFX_report_event_ENG_abandoned_store
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_spiva.7.a
+	}
+}
+
+country_event = {
+	id = FUK_election_spiva.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_spiva.8" }
+	title = FUK_election_spiva.8.t
+	desc = FUK_election_spiva.8.desc
+	picture = GFX_report_event_ENG_soldiers_in_pub 
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_spiva.8.a
+	}
+}
+
+#Culturalist election events
+country_event = {
+	id = FUK_election_cultur.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_cultur.1" }
+	title = FUK_election_cultur.1.t
+	desc = FUK_election_cultur.1.desc
+	picture = GFX_report_event_UKR_ohloblyn_2
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_cultur.1.a
+	}
+}
+
+country_event = {
+	id = FUK_election_cultur.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_cultur.2" }
+	title = FUK_election_cultur.2.t
+	desc = FUK_election_cultur.2.desc
+	picture = GFX_report_event_KAZ_kazakh_crowd
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_cultur.2.a
+		complete_national_focus = FUK_the_blood_they_shed
+	}
+}
+
+country_event = {
+	id = FUK_election_cultur.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_cultur.3" }
+	title = FUK_election_cultur.3.t
+	desc = FUK_election_cultur.3.desc
+	picture = GFX_report_event_IND_tractor
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_cultur.3.a
+	}
+}
+
+country_event = {
+	id = FUK_election_cultur.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_cultur.4" }
+	title = FUK_election_cultur.4.t
+	desc = FUK_election_cultur.4.desc
+	picture = GFX_report_event_UKR_writing_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_cultur.4.a
+	}
+}
+
+country_event = {
+	id = FUK_election_cultur.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_cultur.5" }
+	title = FUK_election_cultur.5.t
+	desc = FUK_election_cultur.5.desc
+	picture = GFX_report_event_UKR_kyiv_ruins
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_cultur.5.a
+	}
+}
+
+country_event = {
+	id = FUK_election_cultur.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_cultur.6" }
+	title = FUK_election_cultur.6.t
+	desc = FUK_election_cultur.6.desc
+	picture = GFX_report_event_GER_documents
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_cultur.6.a
+		complete_national_focus = FUK_never_ever_again
+	}
+	
+	option = { 
+		name = FUK_election_cultur.6.b
+		complete_national_focus = FUK_no_one_is_sacred
+	}
+}
+
+country_event = {
+	id = FUK_election_cultur.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_cultur.7" }
+	title = FUK_election_cultur.7.t
+	desc = FUK_election_cultur.7.desc
+	picture = GFX_report_event_UKR_ohloblyn_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_cultur.7.a
+	}
+}
+
+country_event = {
+	id = FUK_election_cultur.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_cultur.8" }
+	title = FUK_election_cultur.8.t
+	desc = FUK_election_cultur.8.desc
+	picture = GFX_report_event_UKR_stus_7
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_cultur.8.a
+	}
+}
+
+country_event = {
+	id = FUK_election_cultur.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_cultur.9" }
+	title = FUK_election_cultur.9.t
+	desc = FUK_election_cultur.9.desc
+	picture = GFX_report_event_UKR_dzubia_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_cultur.9.a
+	}
+}
+
+
+#United Struggle Election Trees 
+#Events 1-9 are all focus-related, 10 and up are usable for any flavor events
+country_event = { 
+	id = FUK_election_us.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_us.1" }
+	title = FUK_election_us.1.t
+	desc = FUK_election_us.1.desc
+	picture = GFX_report_event_RUS_soviet_map
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_us.1.a
+	}
+}
+
+country_event = { 
+	id = FUK_election_us.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_us.2" }
+	title = FUK_election_us.2.t
+	desc = FUK_election_us.2.desc
+	picture = GFX_report_event_generic_court_case_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_us.2.a
+		complete_national_focus = FUK_water_with_the_tyrants_blood
+	}
+}
+
+country_event = { 
+	id = FUK_election_us.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_us.3" }
+	title = FUK_election_us.3.t
+	desc = FUK_election_us.3.desc
+	picture = GFX_report_event_ENG_crowd_field
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_us.3.a
+		complete_national_focus = FUK_the_freedom_we_have_gained
+	}
+}
+
+country_event = { 
+	id = FUK_election_us.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_us.4" }
+	title = FUK_election_us.4.t
+	desc = FUK_election_us.4.desc
+	picture = GFX_report_event_generic_paper_bundle
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_us.4.a
+	}
+}
+
+country_event = { 
+	id = FUK_election_us.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_us.5" }
+	title = FUK_election_us.5.t
+	desc = FUK_election_us.5.desc
+	picture = GFX_report_event_UKR_UPA_CivilWar.2
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_us.5.a
+	}
+}
+
+country_event = { 
+	id = FUK_election_us.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_us.6" }
+	title = FUK_election_us.6.t
+	desc = FUK_election_us.6.desc
+	picture = GFX_report_event_UKR_shukhevych_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_us.6.a
+	}
+}
+
+country_event = { 
+	id = FUK_election_us.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_us.7" }
+	title = FUK_election_us.7.t
+	desc = FUK_election_us.7.desc
+	picture = GFX_report_event_UKR_partisan_meal
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_us.7.a
+	}
+}
+
+country_event = { 
+	id = FUK_election_us.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_us.8" }
+	title = FUK_election_us.8.t
+	desc = FUK_election_us.8.desc
+	picture = GFX_report_event_IRE_protestants_attacked
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_us.8.a
+	}
+}
+
+country_event = { 
+	id = FUK_election_us.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_election_us.9" }
+	title = FUK_election_us.9.t
+	desc = FUK_election_us.9.desc
+	picture = GFX_report_event_UKR_stus_12
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { 
+		name = FUK_election_us.9.a
+	}
+}
+
+### Epilogue Events
+
+# Dziuba
+
+country_event = { 
+	id = FUK_epilogue.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_epilogue.1" }
+	title = FUK_epilogue.1.t
+	desc = FUK_epilogue.1.desc
+	picture = GFX_report_event_UKR_dzubia_6
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = FUK_epilogue.1.a
+		country_event = {
+			id = FUK_epilogue.2
+			days = 3
+		}
+	}
+}
+
+country_event = { 
+	id = FUK_epilogue.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_epilogue.2" }
+	title = FUK_epilogue.2.t
+	desc = FUK_epilogue.2.desc
+	picture = GFX_report_event_UKR_ukrainian_home
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = FUK_epilogue.2.a
+		country_event = {
+			id = FUK_epilogue.3
+			days = 3
+		}
+	}
+}
+
+country_event = { 
+	id = FUK_epilogue.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_epilogue.3" }
+	title = FUK_epilogue.3.t
+	desc = FUK_epilogue.3.desc
+	picture = GFX_report_event_generic_night_sky
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = FUK_epilogue.3.a
+		set_country_flag = UKR_Dziuba_Ending
+		custom_effect_tooltip = UKR_FUK_dziuba_epilogue_tt
+		TNO_Country_Closing_Screen_Show = yes
+	}
+}
+
+# Ohloblyn
+
+country_event = { 
+	id = FUK_epilogue.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_epilogue.4" }
+	title = FUK_epilogue.4.t
+	desc = FUK_epilogue.4.desc
+	picture = GFX_report_event_UKR_ohloblyn_2
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = FUK_epilogue.4.a
+		country_event = {
+			id = FUK_epilogue.5
+			days = 3
+		}
+	}
+}
+
+country_event = { 
+	id = FUK_epilogue.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_epilogue.5" }
+	title = FUK_epilogue.5.t
+	desc = FUK_epilogue.5.desc
+	picture = GFX_report_event_UKR_melnykites_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = FUK_epilogue.5.a
+		country_event = {
+			id = FUK_epilogue.6
+			days = 3
+		}
+	}
+}
+
+country_event = { 
+	id = FUK_epilogue.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_epilogue.6" }
+	title = FUK_epilogue.6.t
+	desc = FUK_epilogue.6.desc
+	picture = GFX_report_event_GNG_office_generic_5
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = FUK_epilogue.6.a
+		set_country_flag = UKR_Ohloblyn_Ending
+		custom_effect_tooltip = UKR_FUK_ohloblyn_epilogue_tt
+		TNO_Country_Closing_Screen_Show = yes
+		hidden_effect = { # Ohloblyn massively weakens the military
+			add_ideas = FUK_Ohloblyn_military_nerfs
+		}
+	}
+}
+
+ # Stus 
+ 
+country_event = { 
+	id = FUK_epilogue.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_epilogue.7" }
+	title = FUK_epilogue.7.t
+	desc = FUK_epilogue.7.desc
+	picture = GFX_report_event_UKR_stus_12
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = FUK_epilogue.7.a
+		country_event = {
+			id = FUK_epilogue.8
+			days = 3
+		}
+	}
+}
+
+country_event = { 
+	id = FUK_epilogue.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_epilogue.8" }
+	title = FUK_epilogue.8.t
+	desc = FUK_epilogue.8.desc
+	picture = GFX_report_event_DRL_strike_orenburg
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = FUK_epilogue.8.a
+		country_event = {
+			id = FUK_epilogue.9
+			days = 3
+		}
+	}
+}
+
+country_event = { 
+	id = FUK_epilogue.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_epilogue.9" }
+	title = FUK_epilogue.9.t
+	desc = FUK_epilogue.9.desc
+	picture = GFX_report_event_UKR_stus_9
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = FUK_epilogue.9.a
+		set_country_flag = UKR_Stus_Ending
+		custom_effect_tooltip = UKR_FUK_stus_epilogue_tt
+		TNO_Country_Closing_Screen_Show = yes
+		hidden_effect = { # Stus gives some bonuses to the military
+			random_owned_controlled_state = {
+				create_unit = {
+					division = "name = \"Strilets'ka Dyviziya\" division_template = \"Strilets'ka Dyviziya\" start_experience_factor = 0.8 start_equipment_factor = 1"
+					owner = PREV
+				}
+			}
+			random_owned_controlled_state = {
+				create_unit = {
+					division = "name = \"Strilets'ka Dyviziya\" division_template = \"Strilets'ka Dyviziya\" start_experience_factor = 0.8 start_equipment_factor = 1"
+					owner = PREV
+				}
+			}
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 2000
+			}
+			add_equipment_to_stockpile = {
+				type = anti_tank_equipment
+				amount = 750
+			}
+			add_equipment_to_stockpile = {
+				type = support_equipment
+				amount = 750
+			}
+			add_manpower = 20000
+			add_war_support = 0.1
+		}
+	}
+}
+
+# Load Election
+country_event = {
+	id = FUK_debug.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FUK_culturalists.32" }
+	title = "DBG - FUK Election Load"
+	desc = "Choose the player's coalition."
+	picture = GFX_event_debug
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = { # Spivavtor
+		name = "Spivavtor"
+		FUK_election_clear = yes
+		set_variable = { FUK_election_protagonist = target_spivavtor }
+		FUK_election_init = yes
+	}
+
+	option = { # Culturalist
+		name = "Culturalist"
+		FUK_election_clear = yes
+		set_variable = { FUK_election_protagonist = target_culturalist }
+		FUK_election_init = yes
+	}
+
+	option = { # Populist
+		name = "United Struggle"
+		FUK_election_clear = yes
+		set_variable = { FUK_election_protagonist = target_populist }
+		FUK_election_init = yes
+	}
+}

@@ -1,0 +1,710 @@
+SAF_pakt_anger_change = {
+	add_to_variable = { SAF_Pakt_Displeasure = SAF_Pakt_Displeasure_temp }
+	multiply_temp_variable = { SAF_Pakt_Displeasure_temp = 100 }
+	custom_effect_tooltip = TNO_SAF_Pakt_displeasure_tt
+	clamp_variable = {
+		var = SAF_Pakt_Displeasure
+		min = 0 
+		max = 1
+	}
+}
+
+SAF_GUI_initial_values = {
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = SAF_REFERENDUM
+				option = SAF_REFERENDUM_REPUBLIC
+			}
+		}
+		set_variable = { SAF_monarchy_support = 49 }
+	}
+	else = {
+		set_variable = { SAF_monarchy_support = 53 }
+	}
+	set_variable = { SAF_ANC_power = 43 }
+	set_variable = { SAF_Boers_power = 32 }
+}
+
+SAF_increase_monarchy_support_button = {
+	add_to_variable = { SAF_monarchy_support = 5 }
+	clamp_variable = {
+		var = SAF_monarchy_support
+		min = 0
+		max = 100
+	}
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { SAF_monarchy_support < 50 }
+			}
+			has_game_rule = {
+				rule = SAF_REFERENDUM
+				option = SAF_REFERENDUM_REPUBLIC
+			}
+		}
+		set_variable = { SAF_monarchy_support = 49 }
+	}
+	add_political_power = -30
+	country_event = { id = SAF.200 } 
+}
+
+SAF_GUI_second_button = { #i don't know how to name my effects 
+	set_temp_variable = { SAF_monarchy_support_temp = SAF_monarchy_support } 
+	multiply_temp_variable = { SAF_monarchy_support_temp = 0.1 }
+	add_to_variable = { SAF_monarchy_support = SAF_monarchy_support_temp }
+	add_political_power = -50
+	country_event = { id = SAF.202 } 
+	clamp_variable = {
+		var = SAF_monarchy_support
+		min = 0 
+		max = 100
+	}
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { SAF_monarchy_support < 50 }
+			}
+			has_game_rule = {
+				rule = SAF_REFERENDUM
+				option = SAF_REFERENDUM_REPUBLIC
+			}
+		}
+		set_variable = { SAF_monarchy_support = 49 }
+	}
+}
+
+SAF_GUI_third_button = {
+	set_temp_variable = { SAF_monarchy_support_temp = SAF_monarchy_support }
+	subtract_from_temp_variable = { SAF_monarchy_support_temp = 50 }
+	divide_temp_variable = { SAF_monarchy_support_temp = 2 }
+	multiply_temp_variable = { SAF_monarchy_support_temp = -1 }
+	add_to_variable = { SAF_monarchy_support = SAF_monarchy_support_temp }
+	add_political_power = -80
+	country_event = { id = SAF.204 } 
+	clamp_variable = {
+		var = SAF_monarchy_support
+		min = 0 
+		max = 100
+	}
+	if = {
+		limit = {
+			check_variable = { SAF_monarchy_support < 50 }
+			has_game_rule = {
+				rule = SAF_REFERENDUM
+				option = SAF_REFERENDUM_MONARCHIST
+			}
+		}
+		set_variable = { SAF_monarchy_support = 50 }
+	}
+	else_if = {
+		limit = {
+			NOT = {
+				check_variable = { SAF_monarchy_support < 50 }
+			}
+			has_game_rule = {
+				rule = SAF_REFERENDUM
+				option = SAF_REFERENDUM_REPUBLIC
+			}
+		}
+		set_variable = { SAF_monarchy_support = 49 }
+	}
+}
+
+SAF_GUI_ANC_button = { 
+	add_to_variable = { SAF_monarchy_support = 2.5 }
+	add_to_variable = { SAF_ANC_power = 5 }
+	TNO_improve_vote_franchise_policy_effectiveness_low = yes
+	add_political_power = -50
+	country_event = { id = SAF.206 }
+	clamp_variable = {
+		var = SAF_ANC_power
+		min = 0 
+		max = 100
+	}
+	clamp_variable = {
+		var = SAF_monarchy_support
+		min = 0 
+		max = 100
+	}
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { SAF_monarchy_support < 50 }
+			}
+			has_game_rule = {
+				rule = SAF_REFERENDUM
+				option = SAF_REFERENDUM_REPUBLIC
+			}
+		}
+		set_variable = { SAF_monarchy_support = 49 }
+	}
+}
+
+SAF_GUI_Boers_button = {
+	set_temp_variable = { SAF_ANC_power_temp = SAF_ANC_power }
+	set_temp_variable = { SAF_Boers_power_temp = SAF_Boers_power }
+	multiply_temp_variable = { SAF_ANC_power_temp = 0.15 }
+	multiply_temp_variable = { SAF_Boers_power_temp = 0.15 } 
+	subtract_from_variable = { SAF_ANC_power = SAF_Boers_power_temp }
+	subtract_from_variable = { SAF_Boers_power = SAF_ANC_power_temp }
+	add_political_power = -50
+	country_event = { id = SAF.208 }
+	clamp_variable = {
+		var = SAF_ANC_power
+		min = 0 
+		max = 100
+	}
+	clamp_variable = {
+		var = SAF_Boers_power
+		min = 0 
+		max = 100
+	}
+}
+
+SAF_monarchy_support_change = {
+	custom_effect_tooltip = SAF_monarchy_support_change_tt
+	multiply_temp_variable = { SAF_monarchy_support_temp = 100 }
+	add_to_variable = { SAF_monarchy_support = SAF_monarchy_support_temp }
+	clamp_variable = {
+		var = SAF_monarchy_support
+		min = 0 
+		max = 100
+	}
+	if = {
+		limit = {
+			check_variable = { SAF_monarchy_support < 50 }
+			has_game_rule = {
+				rule = SAF_REFERENDUM
+				option = SAF_REFERENDUM_MONARCHIST
+			}
+		}
+		set_variable = { SAF_monarchy_support = 50 }
+	}
+	else_if = {
+		limit = {
+			NOT = {
+				check_variable = { SAF_monarchy_support < 50 }
+			}
+			has_game_rule = {
+				rule = SAF_REFERENDUM
+				option = SAF_REFERENDUM_REPUBLIC
+			}
+		}
+		set_variable = { SAF_monarchy_support = 49 }
+	}
+}
+
+SAF_ANC_power_change = {
+	custom_effect_tooltip = SAF_ANC_power_change_tt
+	multiply_temp_variable = { SAF_ANC_power_temp = 100 }
+	add_to_variable = { SAF_ANC_power = SAF_ANC_power_temp }
+	clamp_variable = {
+		var = SAF_ANC_power
+		min = 0 
+		max = 100
+	}
+}
+
+SAF_Boers_power_change = {
+	custom_effect_tooltip = SAF_Boers_power_change_tt
+	multiply_temp_variable = { SAF_Boers_power_temp = 100 }
+	add_to_variable = { SAF_Boers_power = SAF_Boers_power_temp }
+	clamp_variable = {
+		var = SAF_Boers_power
+		min = 0 
+		max = 100
+	}
+}
+
+SAF_referendum_results = {
+	if = {
+		limit = {
+			check_variable = { var = SAF_monarchy_support value = 50 compare = greater_than_or_equals }
+		}
+		set_global_flag = SAF_monarchy_won
+		country_event = { id = SAF.3 days = 3 }
+	}
+	else = {
+		set_global_flag = SAF_republic_won
+		country_event = { id = SAF.2 days = 3 }
+	}
+}
+
+SAF_remove_terrain_traits = {
+	if = {
+		limit = { has_country_flag = SAF_desert_terrain_focus }
+		every_unit_leader = {
+			limit = {
+				NOT = { SAF_is_desert_unit_leader = yes }
+			}
+			remove_unit_leader_trait = desert_fox
+			custom_effect_tooltip = remove_desert_fox
+		}
+		clr_country_flag = SAF_desert_terrain_focus
+	}
+	if = {
+		limit = { has_country_flag = SAF_hill_terrain_focus }
+		every_unit_leader = {
+			limit = {
+				NOT = { SAF_is_hill_unit_leader = yes }
+			}
+			remove_unit_leader_trait = hill_fighter
+			custom_effect_tooltip = remove_hill_fighter
+		}
+		clr_country_flag = SAF_hill_terrain_focus
+	}
+	if = {
+		limit = { has_country_flag = SAF_jungle_terrain_focus }
+		every_unit_leader = {
+			remove_unit_leader_trait = jungle_rat
+			custom_effect_tooltip = remove_jungle_rat
+		}
+		clr_country_flag = SAF_jungle_terrain_focus
+	}
+}
+
+SAF_increase_RK_debuff = {
+	if = {
+		limit = { has_idea = USA_wervolf_6 }
+		add_war_support = -0.01
+		add_political_power = -10
+	}
+	else_if = {
+		limit = { has_idea = USA_wervolf_5 }
+		swap_ideas = {
+			remove_idea = USA_wervolf_5
+			add_idea = USA_wervolf_6
+		}
+	}
+	else_if = {
+		limit = { has_idea = USA_wervolf_4 }
+		swap_ideas = {
+			remove_idea = USA_wervolf_4
+			add_idea = USA_wervolf_6
+		}
+	}
+	else_if = {
+		limit = { has_idea = USA_wervolf_3 }
+		swap_ideas = {
+			remove_idea = USA_wervolf_3
+			add_idea = USA_wervolf_5
+		}
+	}
+	else_if = {
+		limit = { has_idea = USA_wervolf_2 }
+		swap_ideas = {
+			remove_idea = USA_wervolf_2
+			add_idea = USA_wervolf_4
+		}
+	}
+	else_if = {
+		limit = { has_idea = USA_wervolf_1 }
+		swap_ideas = {
+			remove_idea = USA_wervolf_1
+			add_idea = USA_wervolf_3
+		}
+	}
+	else = {
+		add_ideas = USA_wervolf_2
+	}
+}
+
+
+SAF_decrease_RK_debuff = {
+	if = {
+		limit = { has_idea = USA_wervolf_6 }
+		swap_ideas = {
+			remove_idea = USA_wervolf_6
+			add_idea = USA_wervolf_5
+		}
+	}
+	else_if = {
+		limit = { has_idea = USA_wervolf_5 }
+		swap_ideas = {
+			remove_idea = USA_wervolf_5
+			add_idea = USA_wervolf_4
+		}
+	}
+	else_if = {
+		limit = { has_idea = USA_wervolf_4 }
+		swap_ideas = {
+			remove_idea = USA_wervolf_4
+			add_idea = USA_wervolf_3
+		}
+	}
+	else_if = {
+		limit = { has_idea = USA_wervolf_3 }
+		swap_ideas = {
+			remove_idea = USA_wervolf_3
+			add_idea = USA_wervolf_2
+		}
+	}
+	else_if = {
+		limit = { has_idea = USA_wervolf_2 }
+		swap_ideas = {
+			remove_idea = USA_wervolf_2
+			add_idea = USA_wervolf_1
+		}
+	}
+	else = {
+		remove_ideas = USA_wervolf_1
+	}
+}
+
+SAW_rubberband_effect = {
+	if = {
+		limit = {
+			surrender_progress < 0.01
+		}
+		set_variable = { THIS.SAW_surrender_buff = 0 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.05
+		}
+		set_variable = { THIS.SAW_surrender_buff = 1 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.1
+		}
+		set_variable = { THIS.SAW_surrender_buff = 2 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.15
+		}
+		set_variable = { THIS.SAW_surrender_buff = 3 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.2
+		}
+		set_variable = { THIS.SAW_surrender_buff = 4 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.25
+		}
+		set_variable = { THIS.SAW_surrender_buff = 5 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.3
+		}
+		set_variable = { THIS.SAW_surrender_buff = 6 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.35
+		}
+		set_variable = { THIS.SAW_surrender_buff = 7 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.4
+		}
+		set_variable = { THIS.SAW_surrender_buff = 8 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.45
+		}
+		set_variable = { THIS.SAW_surrender_buff = 9 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.50
+		}
+		set_variable = { THIS.SAW_surrender_buff = 10 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.55
+		}
+		set_variable = { THIS.SAW_surrender_buff = 11 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.6
+		}
+		set_variable = { THIS.SAW_surrender_buff = 12 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.65
+		}
+		set_variable = { THIS.SAW_surrender_buff = 13 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.7
+		}
+		set_variable = { THIS.SAW_surrender_buff = 14 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.75
+		}
+		set_variable = { THIS.SAW_surrender_buff = 15 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.8
+		}
+		set_variable = { THIS.SAW_surrender_buff = 16 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.85
+		}
+		set_variable = { THIS.SAW_surrender_buff = 17 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.9
+		}
+		set_variable = { THIS.SAW_surrender_buff = 18 }
+	}
+	else_if = {
+		limit = {
+			surrender_progress < 0.95
+		}
+		set_variable = { THIS.SAW_surrender_buff = 19 }
+	}
+	divide_variable = { THIS.SAW_surrender_buff = 100 }
+	#log = "[This.GetName]: Surrender bonus is [?This.SAW_surrender_buff]"
+}
+
+SAW_update_rubberband = {
+	set_variable = { SAF.SAW_bounus = SAF.SAW_surrender_buff }
+	multiply_variable = { SAF.SAW_bounus = 2.5 }
+
+	set_variable = { GRO.SAW_bounus = GRO.SAW_surrender_buff }
+	multiply_variable = { GRO.SAW_bounus = 2.5 }
+
+	set_variable = { ANG.SAW_bounus = ANG.SAW_surrender_buff }
+	multiply_variable = { ANG.SAW_bounus = 2.5 }
+
+	set_variable = { COG.SAW_bounus = COG.SAW_surrender_buff }
+	multiply_variable = { COG.SAW_bounus = 2.5 }
+
+	set_variable = { BOR.SAW_bounus = BOR.SAW_surrender_buff }
+	multiply_variable = { BOR.SAW_bounus = 2.5 }
+}
+
+SAW_rubberband_update_effect = { #Nation scope
+	ANG = {
+		SAW_rubberband_effect = yes
+	}
+	GRO = {
+		SAW_rubberband_effect = yes
+	}
+	COG = {
+		SAW_rubberband_effect = yes
+	}
+	SAF = {
+		SAW_rubberband_effect = yes
+	}
+	BOR = {
+		SAW_rubberband_effect = yes
+	}
+	ANC = {
+		SAW_rubberband_effect = yes
+	}
+	SAW_update_rubberband = yes
+	log = "Rubberband updated, if this shows up a ton, ping Curvinghawk_5."
+}
+
+SAF_gain_mothly_diamonds_1 = {
+	add_to_variable = { SAF_diamond_gain = 1 }
+	custom_effect_tooltip = SAF_diamond_gain_boost_1
+}
+
+SAF_gain_mothly_diamonds_2 = {
+	add_to_variable = { SAF_diamond_gain = 2 }
+	custom_effect_tooltip = SAF_diamond_gain_boost_2
+}
+
+SAF_gain_5_diamonds = {
+	add_to_variable = { SAF_diamond_count = 5 }
+	custom_effect_tooltip = SAF_plus_5_diamonds
+}
+
+SAF_lose_mothly_diamonds_1 = {
+	add_to_variable = { SAF_diamond_gain = -1 }
+	custom_effect_tooltip = SAF_diamond_lose_boost_1
+}
+
+SAF_lose_mothly_diamonds_2 = {
+	add_to_variable = { SAF_diamond_gain = -2 }
+	custom_effect_tooltip = SAF_diamond_lose_boost_2
+}
+
+SAF_lose_mothly_diamonds = {
+	add_to_variable = { SAF_diamond_count = -5 }
+	custom_effect_tooltip = SAF_diamond_lose_boost_5
+}
+
+SAF_Pakt_Anger_Raise_5 = {
+	add_to_variable = { SAF_Pakt_Displeasure = 0.15 }
+	clamp_variable = {
+		var = SAF_Pakt_Displeasure
+		min = 0
+		max = 1
+	}
+	custom_effect_tooltip = SAF_PAKT_MAD_5
+}
+
+SAF_Pakt_Anger_Raise_10 = {
+	add_to_variable = { SAF_Pakt_Displeasure = 0.30 }
+	clamp_variable = {
+		var = SAF_Pakt_Displeasure
+		min = 0
+		max = 1
+	}
+	custom_effect_tooltip = SAF_PAKT_MAD_10
+}
+
+SAF_Pakt_Anger_Raise_20 = {
+	add_to_variable = { SAF_Pakt_Displeasure = 0.50 }
+	clamp_variable = {
+		var = SAF_Pakt_Displeasure
+		min = 0
+		max = 1
+	}
+	custom_effect_tooltip = SAF_PAKT_MAD_20
+}
+
+SAF_Pakt_Anger_Lower_3 = {
+	add_to_variable = { SAF_Pakt_Displeasure = -0.03 }
+	clamp_variable = {
+		var = SAF_Pakt_Displeasure
+		min = 0
+		max = 1
+	}
+	custom_effect_tooltip = SAF_PAKT_MAD_LESS_3
+}
+
+SAF_Pakt_Anger_Lower_6 = {
+	add_to_variable = { SAF_Pakt_Displeasure = -0.06 }
+	clamp_variable = {
+		var = SAF_Pakt_Displeasure
+		min = 0
+		max = 1
+	}
+	custom_effect_tooltip = SAF_PAKT_MAD_LESS_6
+}
+
+SAF_end_pakt_trade = {
+	add_to_variable = { SAF_Pakt_Displeasure = 1 }
+	clamp_variable = {
+		var = SAF_Pakt_Displeasure
+		min = 0
+		max = 1
+	}
+	hidden_effect = {
+		GER = { set_embargo_PREV = yes }
+		GGR = { set_embargo_PREV = yes }
+		BGR = { set_embargo_PREV = yes }
+		HGR = { set_embargo_PREV = yes }
+		SGR = { set_embargo_PREV = yes }
+		CZE = { set_embargo_PREV = yes }
+		GGN = { set_embargo_PREV = yes }
+		SLO = { set_embargo_PREV = yes }
+		UKR = { set_embargo_PREV = yes }
+		MCW = { set_embargo_PREV = yes }
+		OST = { set_embargo_PREV = yes }
+		COG = { set_embargo_PREV = yes }
+		CAU = { set_embargo_PREV = yes }
+		SER = { set_embargo_PREV = yes }
+		DEN = { set_embargo_PREV = yes }
+		HOL = { set_embargo_PREV = yes }
+		NOR = { set_embargo_PREV = yes }
+		CRN = { set_embargo_PREV = yes }
+		MAD = { set_embargo_PREV = yes }
+		GRO = { set_embargo_PREV = yes }
+		ANG = { set_embargo_PREV = yes }
+		HOL = { set_embargo_PREV = yes }
+		BRG = { set_embargo_PREV = yes }
+		BUL = { set_embargo_PREV = yes }
+		ENG = { set_embargo_PREV = yes }
+		FRA = { set_embargo_PREV = yes }
+		IRE = { set_embargo_PREV = yes }
+	}
+	custom_effect_tooltip = SAF_no_pakt_trade
+}
+
+#SAF_initialize_referendum = {
+#	681 = { #Cape
+#		set_state_flag = SAF_election_state
+#		set_variable = { SAF_voter_percent = 35 }
+#		set_variable = { SAF_monarchy_support = 59 }
+#	}
+#	719 = { #Natal
+#		set_state_flag = SAF_election_state
+#		set_variable = { SAF_voter_percent = 10 }
+#		set_variable = { SAF_monarchy_support = 79 }
+#	}
+#	275 = { #Orange Free State
+#		set_state_flag = SAF_election_state
+#		set_variable = { SAF_voter_percent = 9 }
+#		set_variable = { SAF_monarchy_support = 24 }
+#	}
+#	940 = { #Transvaal
+#		set_state_flag = SAF_election_state
+#		set_variable = { SAF_voter_percent = 44 }
+#		set_variable = { SAF_monarchy_support = 44 }
+#	}
+#	1050 = { #Bechuanaland
+#		set_state_flag = SAF_election_state
+#		set_variable = { SAF_voter_percent = 2 }
+#		set_variable = { SAF_monarchy_support = 48 }
+#	}
+#	set_country_flag = SAF_referendum
+#}
+#
+#SAF_calculate_referendum_winner = {
+#	set_variable = { SAF_monarchy_percent_total = 0 }
+#	hidden_effect = {
+#		every_owned_state = {
+#			limit = { has_state_flag = SAF_election_state }
+#			set_variable = { SAF_monarchy_percent_2 = SAF_monarchy_support }
+#			multiply_variable = { SAF_monarchy_percent_2 = SAF_voter_percent }
+#			multiply_variable = { SAF_monarchy_percent_2 = 0.01 }
+#			log = "THIS_IS_SAFELEC_DATA,\"[GetDateText]\",[THIS.GetName],[?THIS.SAF_monarchy_support],[?THIS.SAF_voter_percent],[?THIS.SAF_monarchy_percent_2]"
+#			add_to_variable = { SAF.SAF_monarchy_percent_total = SAF_monarchy_percent_2 }
+#		}
+#	}
+#	log = "THIS_IS_SAFELEC_DATA_2,\"[GetDateText]\",[?THIS.SAF_monarchy_percent_total]"
+#	if = {
+#		limit = {
+#			check_variable = { var = SAF_monarchy_percent_total value = 50 compare = greater_than_or_equals }
+#		}
+#		hidden_effect = {
+#			set_global_flag = SAF_monarchy_won
+#			country_event = {
+#				id = SAF.3
+#				days = 1
+#			}
+#			set_variable = { SAF_winner_percent = SAF_monarchy_percent_total }
+#			remove_ideas = SAF_The_Empty_Throne
+#		}
+#	}
+#	else = {
+#		hidden_effect ={
+#			set_global_flag = SAF_republic_won
+#			country_event = {
+#				id = SAF.2
+#				days = 1
+#			}
+#			set_variable = { SAF_winner_percent = 100 }
+#			subtract_from_variable = { SAF_winner_percent = SAF_monarchy_percent_total }
+#			set_cosmetic_tag = SAF_REP
+#			remove_ideas = SAF_The_Empty_Throne
+#		}
+#	}
+#	set_country_flag = SAF_referendum_over
+#}
+#

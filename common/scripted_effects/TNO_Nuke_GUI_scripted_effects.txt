@@ -1,0 +1,95 @@
+calculate_strike_capability = {
+	# Setting up specific triad quantities
+	get_number_of_silos = yes
+	set_temp_variable = { SiloContribution = num_of_silos }
+	set_temp_variable = { SubmarineContribution = num_ships_with_type@submarine }
+	set_temp_variable = { StratBomberContribution = num_deployed_planes_with_type@strat_bomber_equipment }
+	set_temp_variable = { StealthStratContribution = num_deployed_planes_with_type@strat_stealth_equipment }
+
+	# Calculating the specific contributions
+	multiply_temp_variable = { SiloContribution         = 1000 }
+	multiply_temp_variable = { SubmarineContribution    = 10   }
+	multiply_temp_variable = { StratBomberContribution  = 3    }
+	multiply_temp_variable = { StealthStratContribution = 6    }
+
+	# Calculating the Strike Capability percentage
+	set_variable = { nuclear_strike_capability = 0 }
+	add_to_variable = { nuclear_strike_capability = SiloContribution }
+	add_to_variable = { nuclear_strike_capability = SubmarineContribution }
+	add_to_variable = { nuclear_strike_capability = StratBomberContribution }
+	add_to_variable = { nuclear_strike_capability = StealthStratContribution }
+	divide_variable = { nuclear_strike_capability = nuclear_stockpile }
+	add_to_variable = { nuclear_strike_capability = BonusContribution }
+	clamp_variable = { var = nuclear_strike_capability min = 0 max = 1 }
+}
+
+# Returns the country's quantity of Enrichment Plants in the num_of_enrichment_plants variable
+get_number_of_enrichment_plants = {
+	clear_variable = num_of_enrichment_plants
+	every_owned_state = {
+		limit = { enrichment_plant > 0 }
+		add_to_variable = { PREV.num_of_enrichment_plants = building_level@enrichment_plant }
+	}
+}
+
+# Returns the country's quantity of Missile Silos in the num_of_silos variable
+get_number_of_silos = {
+	clear_variable = num_of_silos
+	every_owned_state = {
+		limit = { missile_silo > 0 }
+		add_to_variable = { PREV.num_of_silos = building_level@missile_silo }
+	}
+}
+
+## Modifies the nuclear global coverage variable
+# Arguments: global_coverage_change_temp
+# Default value: 0.05 (5%)
+nuclear_global_coverage_change = {
+	# Defining the tooltip
+	if = {
+		limit = { check_variable = { global_coverage_change_temp?0.05 > 0 } }
+		custom_effect_tooltip = nuclear_global_coverage_change_add_tt
+	}
+	else = {
+		custom_effect_tooltip = nuclear_global_coverage_change_sub_tt
+	}
+
+	# The actual math
+	add_to_variable = { nuclear_global_coverage = global_coverage_change_temp?0.05 }
+	clamp_variable = { var = nuclear_global_coverage max = 1 min = 0 }
+}
+
+generate_nuclear_powers_array = {
+	every_country = {
+		limit = {
+			has_nuclear_arsenal = yes
+			NOT = { is_in_array = { global.nuclear_powers_array = THIS } }
+		}
+		add_to_array = { global.nuclear_powers_array = THIS }
+	}
+	get_sorted_scored_countries = {
+		scorer = nuclear_arsenal_scorer
+		array = global.nuclear_powers_array
+	}
+}
+
+monthly_nuclear_production = {
+	if = {
+		limit = {
+			has_nuclear_arsenal = yes
+			NOT = { check_variable = { nuclear_stockpile_change = 0 } }
+		}
+		add_to_variable = { nuclear_stockpile = nuclear_stockpile_change }
+		if = {
+			limit = { has_country_flag = nuclear_decommissioning_active }
+			clamp_variable = { var = nuclear_stockpile min = nuclear_stockpile_min_cap }
+			if = {
+				limit = { check_variable = { nuclear_stockpile = nuclear_stockpile_min_cap } }
+				clear_variable = nuclear_stockpile_change
+			}
+		}
+		set_variable = { nuclear_stockpile_k = nuclear_stockpile }
+		divide_variable = { nuclear_stockpile_k = 1000 }
+		calculate_strike_capability = yes
+	}
+}

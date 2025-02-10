@@ -1,0 +1,56 @@
+on_actions = {
+	#CHANNEL CRISIS
+	on_daily_ENG = {
+		effect = {
+			if = {
+				limit = { has_global_flag = channel_crisis_ongoing_buildup }
+				set_temp_variable = { buildup_temp = CC_buildup_rate }
+				CC_progress_buildup_meter = yes
+			}
+			else_if = {
+				limit = { 
+					has_global_flag = channel_crisis_ongoing_confrontation 
+					NOT = { has_global_flag = channel_crisis_happened_before }
+				}
+				add_to_variable = { ENG.CC_negotiation_decision_cost = -2.5 }
+				clamp_variable = {
+					var = ENG.CC_negotiation_decision_cost
+					min = 50
+				}
+				add_to_variable = { ENG.CC_confrontation_time_passed = 1 }
+				#uncertainty tick
+				add_to_variable = { ENG.CC_current_uncertainty = 0.75 }
+				clamp_variable = {
+					var = ENG.CC_current_uncertainty
+					max = 100
+				}
+				set_temp_variable = { temp_high = ENG.CC_possible_readiness_max }
+				set_temp_variable = { temp_low = ENG.CC_possible_readiness_min }
+				add_to_temp_variable = { temp_high = 1 }
+				add_to_temp_variable = { temp_low = -1 }
+				CC_apply_updated_certainty = yes
+				GER = {
+					add_to_variable = { GER.CC_current_uncertainty = 0.75 }
+					clamp_variable = {
+						var = GER.CC_current_uncertainty
+						max = 100
+					}
+					set_temp_variable = { temp_high = GER.CC_possible_readiness_max }
+					set_temp_variable = { temp_low = GER.CC_possible_readiness_min }
+					add_to_temp_variable = { temp_high = 1 }
+					add_to_temp_variable = { temp_low = -1 }
+					CC_apply_updated_certainty = yes
+				}
+				if = {
+					limit = {
+						OR = {
+							check_variable = { ENG.CC_readiness_actual < 0.5 }
+							check_variable = { GER.CC_readiness_actual < 0.5 }
+						}
+					}
+					CC_end_effects = yes
+				}
+			}
+		}
+	}
+}

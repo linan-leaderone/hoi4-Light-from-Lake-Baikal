@@ -1,0 +1,58 @@
+#on_actions = {
+#	on_monthly = {
+#		effect = {
+#			if = { # Check for Fiscal Crisis, skip all other blocks if this is true
+#				limit = {
+#					check_variable = {
+#						var = debt_to_GDP_ratio
+#						value = modifier@debt_to_GDP_ceiling_modifier
+#						compare = less_than
+#					}
+#					NOT = {
+#						has_country_flag = Fiscal_Crisis_Active_Timer
+#					}
+#				}
+#				log = "[?debt_to_GDP_ratio] debt to GDP is lower than [?modifier@debt_to_GDP_ceiling_modifier] debt ceiling. No need to trigger alert"
+#			}
+#			else_if = {
+#				limit = {
+#					check_variable = { debt_to_GDP_ratio > modifier@debt_to_GDP_ceiling_modifier }
+#					NOT = {
+#						has_country_flag = Fiscal_Crisis_Active_Timer
+#					}
+#				}
+#				Start_Fiscal_Crisis_Alert = yes
+#				log = "Started fiscal crisis alert for [THIS.GetTag] as [?debt_to_GDP_ratio] debt to GDP is higher than [?modifier@debt_to_GDP_ceiling_modifier] debt ceiling"
+#			}
+#			else_if = {
+#				limit = {
+#					has_country_flag = {
+#						flag = Fiscal_Crisis_Active_Timer
+#						days > 182
+#					}
+#				}
+#				Start_Fiscal_Crisis = yes
+#				log =  "[?debt_to_GDP_ratio] debt to GDP is higher than [?modifier@debt_to_GDP_ceiling_modifier] debt ceiling after six month warning and triggered fiscal crisis proper"
+#			}
+#			else_if = {
+#				limit = {
+#					has_country_flag = Fiscal_Crisis_Active_Timer
+#				}
+#				add_to_variable = { Months_Till_Fiscal = -1 }
+#				log =  "[?debt_to_GDP_ratio] debt to GDP is still higher than [?modifier@debt_to_GDP_ceiling_modifier] debt ceiling after six month warning and incremented warning variable by -1, variable is now [?Months_Till_Fiscal]"
+#			}
+#			else_if = {
+#				limit = {
+#					has_country_flag = Fiscal_Crisis_Active_Timer
+#					check_variable = {
+#						var = debt_to_GDP_ratio
+#						value = modifier@debt_to_GDP_ceiling_modifier
+#						compare = less_than
+#					}
+#				}
+#				log =  "[?debt_to_GDP_ratio] debt to GDP is lower than [?modifier@debt_to_GDP_ceiling_modifier] debt ceiling after triggering alert, ended alert"
+#				End_Fiscal_Crisis_Alert = yes
+#			}
+#		}
+#	}
+#}

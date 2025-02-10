@@ -1,0 +1,599 @@
+add_namespace = GAZ
+add_namespace = GAZ.fallof
+
+# Civil War Starts
+country_event = {
+	id = GAZ.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.1" }
+	title = GAZ.1.t
+	desc = GAZ.1.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		NOT = {
+			has_global_flag = SAF_OFN_Victory
+			has_global_flag = SAF_OFN_Ceasefire
+		}
+	}
+
+	option = { #uhoh
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.1.a
+		TNO_start_mozambique_civil_war = yes
+		ZZZ = {
+			TNO_start_devastation_calculation = yes
+		}
+		ZZZ = { country_event = { id = GAZ.100 days = 1 } }
+	}
+}
+#US Notification
+country_event = {
+	id = GAZ.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.2" }
+	title = GAZ.2.t
+	desc = GAZ.2.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Sure we'll support him
+		ai_chance = {
+			factor = 60
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = GAZ_USA_PATH option = GAZ_USA_PATH_SUPPORT_PUPPET }
+			}
+		}
+		name = GAZ.2.a
+		custom_effect_tooltip = USA_can_send_aid_mozambique_troops
+		set_country_flag = US_aid_mozambique_mondlane
+
+		set_temp_variable = { target = GZO }
+		TNO_increase_volunteer_cap_1 = yes
+
+		TNO_fopo_add_mozambique_civil_war_tab = yes
+		hidden_effect = {
+			country_event = {
+				id = GAZ.13
+				days = 5
+			}
+		}
+	}
+	option = { #Actually we want a more pliable puppet
+		ai_chance = {
+			factor = 40
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = GAZ_USA_PATH option = GAZ_USA_PATH_SUPPORT_SOCIALIST }
+			}
+		}
+		name = GAZ.2.b
+		custom_effect_tooltip = USA_wild_card_bitches
+		set_country_flag = US_aid_mozambique_simango
+
+		hidden_effect = {
+			GZS = {
+				TNO_startup_nation = yes
+				transfer_state = 1071
+				transfer_state = 1072
+				every_owned_state = {
+					add_core_of = GZS
+					remove_core_of = GZO
+				}
+				load_oob = GZS_civil_war
+				declare_war_on = {
+					target = GAZ
+					type = civil_war
+				}
+				declare_war_on = {
+					target = GZO
+					type = civil_war
+				}
+				if = {
+					limit = {
+						has_game_rule = {
+							rule = MOZAMBIQUE_CIVIL_WAR_OUTCOME
+							option = MOZAMBIQUE_CIVIL_WAR_OUTCOME_GZS
+						}
+					}
+					apply_war_buff_with_10_divisions = yes
+				}
+				set_politics = { ruling_party = progressivism }
+				inherit_technology = GAZ
+			}
+		}
+
+		set_temp_variable = { target = GZS }
+		TNO_increase_volunteer_cap_1 = yes
+
+		TNO_fopo_add_mozambique_civil_war_tab = yes
+
+		hidden_effect = {
+			country_event = {
+				id = GAZ.14
+				days = 5
+			}
+		}
+	}
+}
+
+country_event = { #Japan notification event
+	id = GAZ.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.3" }
+	title = GAZ.3.t
+	desc = GAZ.3.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.3.a
+		custom_effect_tooltip = JAP_can_send_aid_mozambique_troops
+		set_country_flag = JAP_aid_mozambique
+
+		set_temp_variable = { target = GAZ }
+		TNO_increase_volunteer_cap_1 = yes
+
+		TNO_fopo_add_mozambique_civil_war_tab = yes
+		hidden_effect = {
+			country_event = {
+				id = GAZ.20
+				days = 60
+			}
+		}
+	}
+}
+
+country_event = { #Mondlane wins w. USA, USA side
+	id = GAZ.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.4" }
+	title = GAZ.4.t
+	desc = GAZ.4.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = { set_country_flag = conclusion_victory }
+
+	option = { #US doesn't get much out of it
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.4.a
+		add_political_power = 50
+		TNO_fopo_remove_mozambique_civil_war_tab = yes
+		set_temp_variable = { conclusion_weeks = 4 }
+		set_temp_variable = { conclusion_bonus = 0.01 }
+		GZO = {
+			econ_join_sphere_USA = yes
+			add_ideas = OFN_observer
+			set_cosmetic_tag = GZO_post_war
+		}
+		USA_proxy_conclusion_effect = yes
+		USA = {
+			set_temp_variable = { Victory_ID = 21 }
+			set_temp_variable = { Victory_Outcome = 4 }
+			set_temp_variable = { Victory_Points = 25 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		JAP = {
+			set_temp_variable = { Victory_ID = 21 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -25 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+	}
+}
+country_event = { #Mondlane wins w. USA, Japan side
+	id = GAZ.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.5" }
+	title = GAZ.5.t
+	desc = GAZ.5.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #RIP but could've been worse
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.5.a
+		TNO_fopo_remove_mozambique_civil_war_tab = yes
+	}
+}
+
+country_event = { #Mondlane wins w/o USA, USA side
+	id = GAZ.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.6" }
+	title = GAZ.6.t
+	desc = GAZ.6.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #US doesn't get much out of it
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.6.a
+		TNO_fopo_remove_mozambique_civil_war_tab = yes
+		USA = {
+			set_temp_variable = { Victory_ID = 21 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -25 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		JAP = {
+			set_temp_variable = { Victory_ID = 21 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -25 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		GZO = {
+			set_cosmetic_tag = GZO_post_war
+		}
+		if = {
+			limit = {
+				GZO = { 
+					has_country_flag = GZO_post_war_rejoining
+				}
+			}
+			GZO = {
+				econ_join_sphere_CAO = yes
+			}
+		}
+	}
+}
+country_event = { #Mondlane wins w/o USA, Japan side
+	id = GAZ.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.7" }
+	title = GAZ.7.t
+	desc = GAZ.7.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #RIP but could've been worse
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.7.a
+		TNO_fopo_remove_mozambique_civil_war_tab = yes
+	}
+}
+
+country_event = { #Simango wins USA side
+	id = GAZ.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.8" }
+	title = GAZ.8.t
+	desc = GAZ.8.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = { set_country_flag = conclusion_victory }
+
+	option = { #uhoh
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.8.a
+		TNO_fopo_remove_mozambique_civil_war_tab = yes
+		add_political_power = 100
+		set_temp_variable = { conclusion_weeks = 4 }
+		set_temp_variable = { conclusion_bonus = 0.01 }
+		USA_proxy_conclusion_effect = yes
+		USA = { add_to_faction = GZS }
+		add_to_array = {
+			global.OFN_members = GZS
+		}
+		GZS = {
+			econ_join_sphere_USA = yes
+			add_ideas = OFN_Dependent_Member
+		}
+		USA = {
+			set_temp_variable = { Victory_ID = 21 }
+			set_temp_variable = { Victory_Outcome = 5 }
+			set_temp_variable = { Victory_Points = 75 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		JAP = {
+			set_temp_variable = { Victory_ID = 21 }
+			set_temp_variable = { Victory_Outcome = 1 }
+			set_temp_variable = { Victory_Points = -75 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+	}
+}
+country_event = { #Simango wins Japan side
+	id = GAZ.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.9" }
+	title = GAZ.9.t
+	desc = GAZ.9.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Sucks to suck
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.9.a
+		TNO_fopo_remove_mozambique_civil_war_tab = yes
+	}
+
+}
+
+country_event = { #Machel wins Japan side
+	id = GAZ.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.10" }
+	title = GAZ.10.t
+	desc = GAZ.10.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #epic
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.10.a
+		TNO_fopo_remove_mozambique_civil_war_tab = yes
+		add_political_power = 100
+		GAZ = {
+			econ_join_sphere_JAP = yes
+			add_ideas = Sphere_Observer
+		}
+		USA = {
+			set_temp_variable = { Victory_ID = 21 }
+			set_temp_variable = { Victory_Outcome = 1 }
+			set_temp_variable = { Victory_Points = -50 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		JAP = {
+			set_temp_variable = { Victory_ID = 21 }
+			set_temp_variable = { Victory_Outcome = 5 }
+			set_temp_variable = { Victory_Points = 50 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+	}
+}
+country_event = { #Machel wins USA side
+	id = GAZ.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.11" }
+	title = GAZ.11.t
+	desc = GAZ.11.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Yankee go home
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.11.a
+		TNO_fopo_remove_mozambique_civil_war_tab = yes
+		set_temp_variable = { conclusion_weeks = 4 }
+		set_temp_variable = { conclusion_bonus = 0.01 }
+		USA_proxy_conclusion_effect = yes
+	}
+}
+
+country_event = { #Mozambique Devastation Holy Shit You Actually Did It :tm:
+	id = GAZ.12
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event GAZ.12"
+		hidden_effect = {
+			recall_volunteers_from = GAZ
+			recall_volunteers_from = GZO
+			recall_volunteers_from = GZS
+		}
+	}
+	title = GAZ.12.t
+	desc = GAZ.12.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #uhoh
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.12.a
+		TNO_fopo_remove_mozambique_civil_war_tab = yes
+		USA = {
+			set_temp_variable = { target = GZO }
+			TNO_clear_num_volunteers = yes
+			set_temp_variable = { target = GZS }
+			TNO_clear_num_volunteers = yes
+			set_temp_variable = { Victory_ID = 21 }
+			set_temp_variable = { Victory_Outcome = 3 }
+			set_temp_variable = { Victory_Points = 0 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		JAP = {
+			set_temp_variable = { target = GAZ }
+			TNO_clear_num_volunteers = yes
+			set_temp_variable = { Victory_ID = 21 }
+			set_temp_variable = { Victory_Outcome = 3 }
+			set_temp_variable = { Victory_Points = 0 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+	}
+}
+
+country_event = { #Mondlane Flavour Event
+	id = GAZ.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.13" }
+	title = GAZ.13.t
+	desc = GAZ.13.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Yankee go home
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.13.a
+	}
+}
+
+country_event = { #Simango Flavour Event
+	id = GAZ.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.14" }
+	title = GAZ.14.t
+	desc = GAZ.14.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Yankee go home
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.14.a
+	}
+}
+
+#Japanese flavour events
+country_event = { #Concentration camp remnant
+	id = GAZ.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.20" }
+	title = GAZ.20.t
+	desc = GAZ.20.desc
+	picture = GFX_report_event_generic_ruins
+	trigger = { has_country_flag = JAP_aid_mozambique }
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { 
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.20.a
+		add_manpower = -2
+	}
+}
+
+country_event = { #Mozambique War Vibe Check
+	id = GAZ.100
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event GAZ.100"
+
+		ZZZ = {
+			TNO_devastation_calculation = yes
+		}
+		if = {
+			limit = {
+				check_variable = { ZZZ.mozambique_devastation > 100 }
+				NOT = {
+					has_global_flag = mozambique_civil_war_active
+				}
+			}
+			every_country = {
+				limit = {
+					OR = {
+						tag = USA
+						tag = JAP
+					}
+				}
+				country_event = GAZ.12 #Mozambique Devastation, how the fuck you fuck this country even more
+				news_event = WORLD.18147
+			}
+		}
+		else = {
+			country_event = {
+				id = GAZ.100
+				days = 21
+			}
+		}
+	}
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+	trigger = {
+		AND = {
+			has_global_flag = mozambique_civil_war_active
+			NOT = {
+				has_global_flag = mozambican_cw_devastated
+			}
+		}
+	}
+
+	hidden = yes
+}
+country_event = { # Fall of Nampula
+	id = GAZ.fallof.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.fallof.1" }
+	title = GAZ.fallof.1.t
+	desc = GAZ.fallof.1.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_global_flag = mozambique_civil_war_active
+	}
+
+	immediate = {
+		GAZ = {
+			TNO_devastation_calculation = yes
+		}
+	}
+
+	option = { #it fell
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.fallof.1.a
+	}
+}
+country_event = { # Fall of Mabote
+	id = GAZ.fallof.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event GAZ.fallof.2" }
+	title = GAZ.fallof.2.t
+	desc = GAZ.fallof.2.desc
+	picture = GFX_report_event_GER_germania_tank
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_global_flag = mozambique_civil_war_active
+	}
+
+	immediate = {
+		GAZ = {
+			TNO_devastation_calculation = yes
+		}
+	}
+
+	option = { #it fell
+		ai_chance = {
+			factor = 100
+		}
+		name = GAZ.fallof.2.a
+	}
+}

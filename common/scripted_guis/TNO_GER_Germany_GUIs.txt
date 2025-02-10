@@ -1,0 +1,1801 @@
+scripted_gui = {
+
+	TNO_Germany_GUIs_open = {
+		context_type = player_context
+		parent_window_token = politics_tab
+		window_name = "TNO_Germany_GUIs_open"
+
+		visible = {
+			tag = GER
+			NOT = {
+				has_global_flag = german_civil_war_heydrichvic
+				has_global_flag = german_civil_war_bormannvic
+			}
+		}
+
+		triggers = {
+			ger_economy_menu_open_visible = {
+				has_global_flag = german_civil_war_speervic
+			}
+
+			gui_alert_visible = {
+				has_country_flag = gui_alert_visible
+			}
+		}
+
+		effects = {
+			ger_economy_menu_open_click = {
+				if = {
+					limit = { NOT = { has_country_flag = GER_Economy_GUI_open_flag } }
+					set_country_flag = GER_Economy_GUI_open_flag
+					calculate_Reich_GDP = yes
+				}
+				else_if = {
+					limit = { has_country_flag = GER_Economy_GUI_open_flag }
+					clr_country_flag = GER_Economy_GUI_open_flag
+				}
+				clr_country_flag = gui_alert_visible
+			}
+		}
+
+		ai_enabled = { original_tag = GER }
+		ai_check = {
+			check_variable = { WWSControl > 0 }
+		}
+
+		ai_test_interval = 168
+		ai_max_weight_taken_per_test = 1
+
+		ai_weights = {
+			ger_economy_menu_open_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = GER_Economy_GUI_open_flag }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+		}
+	}
+
+	TNO_Speer_Party_Ministry_open = {
+		context_type = player_context
+		parent_window_token = politics_tab
+		window_name = "TNO_Speer_Party_Ministry"
+
+		visible = {
+			always = no
+		}
+	}
+
+	TNO_Germany_SGR_Decisions = {
+		context_type = decision_category
+		window_name = "TNO_SGR_Decisions_GUI"
+
+		visible = {
+			always = yes
+		}
+
+		triggers = {
+			#Speerdometer flag
+			SGR_speerdometer_flag1_visible = {
+				check_variable = { SGR_Alignment < 0 }
+			}
+			SGR_speerdometer_flag2_visible = {
+				check_variable = { SGR_Alignment = 0 }
+			}
+			SGR_speerdometer_flag3_visible = {
+				check_variable = { SGR_Alignment > 0 }
+			}
+			#Speerdometer
+			SGR_speerdometer_meter1_visible = {
+				check_variable = { SGR_Alignment = -5 }
+			}
+			SGR_speerdometer_text1_visible = {
+				check_variable = { SGR_Alignment = -5 }
+			}
+
+			SGR_speerdometer_meter2_visible = {
+				check_variable = { SGR_Alignment = -2 }
+			}
+			SGR_speerdometer_text2_visible = {
+				check_variable = { SGR_Alignment = -2 }
+			}
+
+			SGR_speerdometer_meter3_visible = {
+				check_variable = { SGR_Alignment = 0 }
+			}
+			SGR_speerdometer_text3_visible = {
+				check_variable = { SGR_Alignment = 0 }
+			}
+
+			SGR_speerdometer_meter4_visible = {
+				check_variable = { SGR_Alignment = 2 }
+			}
+			SGR_speerdometer_text4_visible = {
+				check_variable = { SGR_Alignment = 2 }
+			}
+
+			SGR_speerdometer_meter5_visible = {
+				check_variable = { SGR_Alignment = 5 }
+			}
+			SGR_speerdometer_text5_visible = {
+				check_variable = { SGR_Alignment = 5 }
+			}
+
+			SGR_speerdometer_arrow_down1_visible = {
+				has_country_flag = SGR_Reich_FashTrendSmall
+			}
+			SGR_speerdometer_arrow_down2_visible = {
+				has_country_flag = SGR_Reich_FashTrendMed
+			}
+			SGR_speerdometer_arrow_down3_visible = {
+				has_country_flag = SGR_Reich_FashTrendLarge
+			}
+			SGR_speerdometer_arrow_up1_visible = {
+				has_country_flag = SGR_Reich_AuthTrendSmall
+			}
+			SGR_speerdometer_arrow_up2_visible = {
+				has_country_flag = SGR_Reich_AuthTrendMed
+			}
+			SGR_speerdometer_arrow_up3_visible = {
+				has_country_flag = SGR_Reich_AuthTrendLarge
+			}
+
+			SGR_speerdometer_tick_1_visible = {
+				check_variable = { LeaningPivot = -100 }
+			}
+			SGR_speerdometer_tick_2_visible = {
+				check_variable = { LeaningPivot = -50 }
+			}
+			SGR_speerdometer_tick_3_visible = {
+				check_variable = { LeaningPivot = 0 }
+			}
+			SGR_speerdometer_tick_4_visible = {
+				check_variable = { LeaningPivot = 50 }
+			}
+			SGR_speerdometer_tick_5_visible = {
+				check_variable = { LeaningPivot = 100 }
+			}
+
+			SGR_speerdometer_reformist_button_visible = {
+				OR = {
+					has_country_flag = SGR_GUI_reformist_focus
+					NOT = { has_country_flag = SGR_GUI_position_chosen }
+				}
+			}
+			SGR_speerdometer_conservative_button_visible = {
+				OR = {
+					has_country_flag = SGR_GUI_conservative_focus
+					NOT = { has_country_flag = SGR_GUI_position_chosen }
+				}
+			}
+			SGR_speerdometer_launch_button_visible = {
+				has_country_flag = SGR_GUI_position_chosen
+				OR = {
+					has_country_flag = SGR_GUI_conservative_focus
+					has_country_flag = SGR_GUI_reformist_focus
+				}
+				NOT = {
+					check_variable = { SGRPPInvestment = 0 }
+					check_variable = { SGRUSDInvestment = 0 }
+				}
+			}
+			SGR_speerdometer_reformist_under_button_visible = {
+				has_country_flag = SGR_GUI_conservative_focus
+			}
+			SGR_speerdometer_conservative_under_button_visible = {
+				has_country_flag = SGR_GUI_reformist_focus
+			}
+			SGR_speerdometer_launch_under_button_visible = {
+				OR = {
+					NOT = {
+						has_country_flag = SGR_GUI_position_chosen
+						OR = {
+							has_country_flag = SGR_GUI_conservative_focus
+							has_country_flag = SGR_GUI_reformist_focus
+						}
+					}
+					check_variable = { SGRPPInvestment = 0 }
+					check_variable = { SGRUSDInvestment = 0 }
+				}
+			}
+			Increase_pp_button_click_enabled = {
+				set_temp_variable = { tempPPInvestment = SGRPPInvestment }
+				add_to_temp_variable = { tempPPInvestment = 20 }
+				has_political_power > tempPPInvestment
+				check_variable = { tempPPInvestment < 120 }
+			}
+			Increase_pp_button_visible = {
+				NOT = { has_country_flag = SGR_GUI_propaganda_in_progress }
+			}
+			Decrease_pp_button_visible = {
+				NOT = { has_country_flag = SGR_GUI_propaganda_in_progress }
+			}
+			Increase_usd_button_visible = {
+				NOT = { has_country_flag = SGR_GUI_propaganda_in_progress }
+			}
+			Decrease_usd_button_visible = {
+				NOT = { has_country_flag = SGR_GUI_propaganda_in_progress }
+			}
+		}
+
+		effects = {
+			SGR_speerdometer_reformist_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = SGR_GUI_propaganda_in_progress }
+					}
+					set_country_flag = SGR_GUI_reformist_focus
+					set_country_flag = SGR_GUI_position_chosen
+				}
+				precalculate_propaganda_effects = yes
+			}
+			SGR_speerdometer_conservative_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = SGR_GUI_propaganda_in_progress }
+					}
+					set_country_flag = SGR_GUI_conservative_focus
+					set_country_flag = SGR_GUI_position_chosen
+				}
+				precalculate_propaganda_effects = yes
+			}
+			SGR_speerdometer_reformist_under_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = SGR_GUI_propaganda_in_progress }
+					}
+					clr_country_flag = SGR_GUI_conservative_focus
+					set_country_flag = SGR_GUI_reformist_focus
+				}
+				precalculate_propaganda_effects = yes
+			}
+			SGR_speerdometer_conservative_under_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = SGR_GUI_propaganda_in_progress }
+					}
+					clr_country_flag = SGR_GUI_reformist_focus
+					set_country_flag = SGR_GUI_conservative_focus
+				}
+				precalculate_propaganda_effects = yes
+			}
+			SGR_speerdometer_launch_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = SGR_GUI_propaganda_in_progress }
+					}
+					precalculate_propaganda_effects = yes
+					set_country_flag = SGR_GUI_propaganda_in_progress
+					launch_propaganda_campaign = yes
+				}
+			}
+			Increase_pp_button_click = {
+				increase_propaganda_pp = yes
+				precalculate_propaganda_effects = yes
+			}
+			Decrease_pp_button_click = {
+				decrease_propaganda_pp = yes
+				precalculate_propaganda_effects = yes
+			}
+			Increase_usd_button_click = {
+				increase_propaganda_budget = yes
+				precalculate_propaganda_effects = yes
+			}
+			Decrease_usd_button_click = {
+				decrease_propaganda_budget = yes
+				precalculate_propaganda_effects = yes
+			}
+		}
+
+		ai_enabled = { original_tag = GER }
+		ai_check = { has_global_flag = german_civil_war_speervic }
+
+		ai_test_interval = 48
+		ai_max_weight_taken_per_test = 8
+
+		ai_weights = {
+			SGR_speerdometer_launch_button_click = {
+				ai_will_do = { base = 10 }
+				weight = 0
+			}
+			SGR_speerdometer_reformist_button_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						check_variable = { SGRRegimeStability < stability } # Not currently dying
+						add = -5
+					}
+					modifier = {
+						check_variable = { alignment_var < -19 } # Aligning Fash
+						NOT = { has_country_flag = SGR_GUI_position_chosen }
+						add = 5
+					}
+				}
+				weight = 1
+			}
+			SGR_speerdometer_conservative_button_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						check_variable = { SGRRegimeStability < stability } # Not currently dying
+						add = -5
+					}
+					modifier = {
+						check_variable = { alignment_var > 19 } # Aligning AuthDem
+						NOT = { has_country_flag = SGR_GUI_position_chosen }
+						add = 5
+					}
+					modifier = {
+						has_game_rule = {
+							rule = GER_SPEER_PATH
+							option = GER_SPEER_PATH_REFORMER
+						}
+						factor = 0
+					}
+				}
+				weight = 1
+			}
+			Increase_pp_button_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						has_country_flag = SGR_GUI_position_chosen
+						add = 5
+					}
+				}
+				weight = 1
+			}
+			Increase_usd_button_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						has_country_flag = SGR_GUI_position_chosen
+						add = 5
+					}
+				}
+				weight = 1
+			}
+		}
+	}
+
+	TNO_Germany_SGR_economy_main_open = {
+		context_type = player_context
+		parent_window_token = TNO_Germany_GUIs_open
+		window_name = "TNO_SGR_Economy_GUI"
+
+		visible = {
+			has_country_flag = GER_Economy_GUI_open_flag
+			has_global_flag = german_civil_war_speervic
+		}
+
+		triggers = {
+			Farben_dismantle_button_visible = {
+				check_variable = { IGFarbenPower = 0 }
+				NOT = { has_country_flag = IGFarben_dismantled } 
+				has_country_flag = Dismantle_IGFarben
+			}
+
+			Reichswerke_dismantle_button_visible = {
+				check_variable = { ReichswerkePower = 0 }
+				NOT = { has_country_flag = Reichswerke_dismantled } 
+				has_country_flag = Dismantle_Reichswerke
+			}
+
+			Benz_dismantle_button_visible = {
+				check_variable = { DaimlerPower = 0 }
+				NOT = { has_country_flag = Daimler_dismantled } 
+				has_country_flag = Dismantle_Daimler
+			}
+
+			Siemens_dismantle_button_visible = {
+				check_variable = { SiemensPower = 0 }
+				NOT = { has_country_flag = Siemens_dismantled } 
+				has_country_flag = Dismantle_Siemens
+			}
+
+			Farben_dismantle_overlay_visible = {
+				has_country_flag = IGFarben_dismantled
+			}
+			Reichswerke_dismantle_overlay_visible = {
+				has_country_flag = Reichswerke_dismantled
+			}
+			Benz_dismantle_overlay_visible = {
+				has_country_flag = Daimler_dismantled
+			}
+			Siemens_dismantle_overlay_visible = {
+				has_country_flag = Siemens_dismantled
+			}
+
+			Notification_window_visible = {
+				has_country_flag = GER_Economy_GUI_notif
+			}
+			Notification_text_visible = {
+				has_country_flag = GER_Economy_GUI_notif
+			}
+			Notification_close_button_visible = {
+				has_country_flag = GER_Economy_GUI_notif
+			}
+			SGR_project_button_train_visible = {
+				has_country_flag = SGR_RSFSTP_started
+			}
+			SGR_railway_map_visible = {
+				has_country_flag = SGR_RSFSTP_started_dummy_railway
+			}
+			SGR_railwaymap_krakau_visible = {
+				has_country_flag = SGR_RSFSTP_started_krakau_connection_dummy
+			}
+			SGR_russian_wall_map_visible = {
+				has_country_flag = SGR_russian_wall_started_dummy
+			}
+		}
+
+		effects = {
+			close_button2_click = {
+				clr_country_flag = GER_Economy_GUI_open_flag
+			}
+			Notification_close_button_click = {
+				clr_country_flag = GER_Economy_GUI_notif
+			}
+
+			SGR_info_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = SGR_info_window_open }
+					}
+					set_country_flag = SGR_info_window_open
+					if = {
+						limit = {
+							NOT = { check_variable = { SGR_infowindow_page_count = 2 } }
+						}
+						determine_top_economies = yes
+						clear_array = ZV_members
+					}
+				}
+				else = {
+					clr_country_flag = SGR_info_window_open
+				}
+			}
+
+			Farben_info_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = SGR_Farben_info_window_open }
+					}
+					clearSGRCorporationInfoWindowFlags = yes
+					set_country_flag = SGR_Farben_info_window_open
+					set_country_flag = SGR_corp_info_window_open
+				}
+				else = {
+					clr_country_flag = SGR_Farben_info_window_open
+					clr_country_flag = SGR_corp_info_window_open
+				}
+			}
+
+			Reichswerke_info_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = SGR_Reichswerke_info_window_open }
+					}
+					clearSGRCorporationInfoWindowFlags = yes
+					set_country_flag = SGR_Reichswerke_info_window_open
+					set_country_flag = SGR_corp_info_window_open
+				}
+				else = {
+					clr_country_flag = SGR_Reichswerke_info_window_open
+					clr_country_flag = SGR_corp_info_window_open
+				}
+			}
+
+			Benz_info_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = SGR_Benz_info_window_open }
+					}
+					clearSGRCorporationInfoWindowFlags = yes
+					set_country_flag = SGR_Benz_info_window_open
+					set_country_flag = SGR_corp_info_window_open
+				}
+				else = {
+					clr_country_flag = SGR_Benz_info_window_open
+					clr_country_flag = SGR_corp_info_window_open
+				}
+			}
+
+			Siemens_info_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = SGR_Siemens_info_window_open }
+					}
+					clearSGRCorporationInfoWindowFlags = yes
+					set_country_flag = SGR_Siemens_info_window_open
+					set_country_flag = SGR_corp_info_window_open
+				}
+				else = {
+					clr_country_flag = SGR_Siemens_info_window_open
+					clr_country_flag = SGR_corp_info_window_open
+				}
+			}
+
+			Farben_dismantle_button_click = {
+				country_event = {
+					id = speer.413
+					days = 2
+				}
+				set_country_flag = IGFarben_dismantled
+			}
+
+			Reichswerke_dismantle_button_click = {
+				country_event = {
+					id = speer.414
+					days = 2
+				}
+				set_country_flag = Reichswerke_dismantled
+			}
+
+			Benz_dismantle_button_click = {
+				country_event = {
+					id = speer.415
+					days = 2
+				}
+				set_country_flag = Daimler_dismantled
+			}
+
+			Siemens_dismantle_button_click = {
+				country_event = {
+					id = speer.416
+					days = 2
+				}
+				set_country_flag = Siemens_dismantled
+			}
+
+			SGR_Germany1_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Germany1_state_info_window_open
+			}
+			SGR_Germany2_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Germany2_state_info_window_open
+			}
+			SGR_Germany3_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Germany3_state_info_window_open
+			}
+			SGR_Germany4_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Germany4_state_info_window_open
+			}
+			SGR_Germany5_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Germany5_state_info_window_open
+			}
+			SGR_Germany6_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Germany6_state_info_window_open
+			}
+			SGR_Germany7_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Germany7_state_info_window_open
+			}
+			SGR_Bohemia_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Bohemia_state_info_window_open
+			}
+			SGR_GGN_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_GGN_state_info_window_open
+			}
+			SGR_Crimea_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Crimea_state_info_window_open
+			}
+			SGR_Ostland1_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Ostland1_state_info_window_open
+			}
+			SGR_Ostland2_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Ostland2_state_info_window_open
+			}
+			SGR_Ostland3_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Ostland3_state_info_window_open
+			}
+			SGR_Ukraine1_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Ukraine1_state_info_window_open
+			}
+			SGR_Ukraine2_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Ukraine2_state_info_window_open
+			}
+			SGR_Ukraine3_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Ukraine3_state_info_window_open
+			}
+			SGR_Denmark_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Denmark_state_info_window_open
+			}
+			SGR_Holland_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Holland_state_info_window_open
+			}
+			SGR_Holland_Small_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Holland_state_info_window_open
+			}
+			SGR_Norway1_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Norway1_state_info_window_open
+			}
+			SGR_Norway2_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Norway2_state_info_window_open
+			}
+			SGR_Leningrad_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Leningrad_state_info_window_open
+			}
+			SGR_Wolga1_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Wolga1_state_info_window_open
+			}
+			SGR_Wolga2_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Wolga2_state_info_window_open
+			}
+			SGR_Cau1_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Cau1_state_info_window_open
+			}
+			SGR_Cau2_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Cau2_state_info_window_open
+			}
+			SGR_Cau3_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Cau3_state_info_window_open
+			}
+			SGR_Romania_click = {
+				clearSGRStateInfoWindowFlags = yes
+				set_country_flag = SGR_state_info_window_open_flag
+				set_country_flag = SGR_Romania_state_info_window_open
+			}
+			SGR_project_button_train_click = {
+				if = {
+					limit = { NOT = { has_country_flag = SGR_project_info_window_open } }
+					set_country_flag = SGR_project_info_window_open
+				}
+				else_if = {
+					limit = { has_country_flag = SGR_project_info_window_open }
+					clr_country_flag = SGR_project_info_window_open
+				}
+			}
+		}
+
+		properties = {
+			SGR_Germany1 = {
+				image = "[getGermany1Controller]"
+			}
+			SGR_Germany2 = {
+				image = "[getGermany2Controller]"
+			}
+			SGR_Germany3 = {
+				image = "[getGermany3Controller]"
+			}
+			SGR_Germany4 = {
+				image = "[getGermany4Controller]"
+			}
+			SGR_Germany5 = {
+				image = "[getGermany5Controller]"
+			}
+			SGR_Germany6 = {
+				image = "[getGermany6Controller]"
+			}
+			SGR_Germany7 = {
+				image = "[getGermany7Controller]"
+			}
+			SGR_Bohemia = {
+				image = "[getBohemiaController]"
+			}
+			SGR_GGN = {
+				image = "[getGGNController]"
+			}
+			SGR_Crimea = {
+				image = "[getCrimeaController]"
+			}
+			SGR_Ostland1 = {
+				image = "[getOstland1Controller]"
+			}
+			SGR_Ostland2 = {
+				image = "[getOstland2Controller]"
+			}
+			SGR_Ostland3 = {
+				image = "[getOstland3Controller]"
+			}
+			SGR_Ukraine1 = {
+				image = "[getUkraine1Controller]"
+			}
+			SGR_Ukraine2 = {
+				image = "[getUkraine2Controller]"
+			}
+			SGR_Ukraine3 = {
+				image = "[getUkraine3Controller]"
+			}
+			SGR_Denmark = {
+				image = "[getDenmarkController]"
+			}
+			SGR_Holland_Frame = {
+				image = "[getHollandFrame]"
+			}
+			SGR_Holland = {
+				image = "[getHollandController]"
+			}
+			SGR_Holland_Small = {
+				image = "[getHollandSmallController]"
+			}
+			SGR_Norway1 = {
+				image = "[getNorway1Controller]"
+			}
+			SGR_Norway2 = {
+				image = "[getNorway2Controller]"
+			}
+			SGR_Leningrad = {
+				image = "[getLeningradController]"
+			}
+			SGR_Wolga1 = {
+				image = "[getWolga1Controller]"
+			}
+			SGR_Wolga2 = {
+				image = "[getWolga2Controller]"
+			}
+			SGR_Cau1 = {
+				image = "[getCau1Controller]"
+			}
+			SGR_Cau2 = {
+				image = "[getCau2Controller]"
+			}
+			SGR_Cau3 = {
+				image = "[getCau3Controller]"
+			}
+			SGR_Romania = {
+				image = "[getRomaniaController]"
+			}
+
+			Farben_progressbar_left = {
+				frame = IGFarbenBarDisplay
+			}
+			Farben_progressbar_right = {
+				frame = IGFarbenBarDisplay
+			}
+			Reichswerke_progressbar_left = {
+				frame = ReichswerkeBarDisplay
+			}
+			Reichswerke_progressbar_right = {
+				frame = ReichswerkeBarDisplay
+			}
+			Benz_progressbar_left = {
+				frame = DaimlerBarDisplay
+			}
+			Benz_progressbar_right = {
+				frame = DaimlerBarDisplay
+			}
+			Siemens_progressbar_left = {
+				frame = SiemensBarDisplay
+			}
+			Siemens_progressbar_right = {
+				frame = SiemensBarDisplay
+			}
+			SGR_railway_map = {
+				frame = SGR_railway_frame_progress
+			}
+			SGR_railwaymap_krakau = {
+				frame = SGR_railway_krakau_frame_progress
+			}
+			SGR_russian_wall_map = {
+				frame = SGR_russian_wall_frame_progress
+			}
+		}
+
+		ai_enabled = { original_tag = GER }
+		ai_check = {
+			check_variable = { WWSControl > 0 }
+		}
+
+		ai_test_interval = 168
+		ai_max_weight_taken_per_test = 1
+
+		ai_weights = {
+			SGR_Germany1_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Germany1_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Germany2_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Germany2_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Germany3_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Germany3_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Germany4_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Germany4_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Germany5_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Germany5_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Germany6_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Germany6_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Germany7_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Germany7_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Bohemia_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Bohemia_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_GGN_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_GGN_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Crimea_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Crimea_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Ostland1_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Ostland1_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Ostland2_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Ostland2_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Ostland3_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Ostland3_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Ukraine1_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Ukraine1_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Ukraine2_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Ukraine2_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Ukraine3_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Ukraine3_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Denmark_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Denmark_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Holland_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Holland_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Holland_Small_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Holland_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Norway1_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Norway1_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Norway2_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Norway2_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Leningrad_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Leningrad_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Wolga1_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Wolga1_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Wolga2_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Wolga2_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Cau1_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Cau1_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Cau2_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Cau2_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Cau3_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						NOT = { has_country_flag = SGR_Cau3_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+			SGR_Romania_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						UKR = {
+							owns_state = 198
+							owns_state = 192
+							is_in_faction_with = GER
+						}
+						NOT = { has_country_flag = SGR_Romania_state_info_window_open }
+						add = 10
+					}
+				}
+				weight = 1
+			}
+		}
+	}
+
+	TNO_Germany_SGR_info_window_open = {
+		context_type = player_context
+		#parent_window_name = "TNO_SGR_Economy_GUI"
+		window_name = "TNO_Germany_SGR_info_window"
+
+		visible = {
+			has_country_flag = SGR_info_window_open
+		}
+
+		triggers = {
+			SGR_econgui_button_prev_page_visible = {
+				NOT = { check_variable = { SGR_infowindow_page_count = 1 } }
+			}
+			SGR_econgui_button_next_page_visible = {
+				NOT = { check_variable = { SGR_infowindow_page_count = 2 } }
+			}
+			GUI_Info_Textbox_visible = {
+				NOT = { check_variable = { SGR_infowindow_page_count = 2 } }
+			}
+			GUI_ZVMembers_Textbox_visible = {
+				NOT = { check_variable = { SGR_infowindow_page_count = 1 } }
+			}
+		}
+
+
+		dynamic_lists = {
+			TNO_Germany_SGR_info_window_G5 = {
+				array = arr_econ
+				index = i
+				entry_container = TNO_Germany_SGR_info_window_G5_entry
+			}
+		}
+
+		dynamic_lists = {
+			TNO_Germany_SGR_info_window_ZVmembers = {
+				array = ZV_members
+				index = i
+				entry_container = TNO_Germany_SGR_info_window_ZVmembers_entry
+				change_scope = yes
+			}
+		}
+
+		properties = {
+			SGR_economy_country_flag = {
+				image = "[?arr_econ^i.GetFlag]"
+			}
+			SGR_ZV_country_flag = {
+				image = "[THIS.GetFlag]"
+			}
+		}
+
+		effects = {
+			SGR_econgui_button_next_page_click = {
+				add_to_variable = { SGR_infowindow_page_count = 1 }
+				clear_array = arr_econ
+				SGR_recompile_ZV_array = yes
+			}
+			SGR_econgui_button_prev_page_click = {
+				subtract_from_variable = { SGR_infowindow_page_count = 1 }
+				clear_array = ZV_members
+				determine_top_economies = yes
+			}
+			SGR_info_close_button_click = {
+				if = {
+					limit = {
+						check_variable = { SGR_infowindow_page_count = 1 }
+					}
+					SGR_recompile_ZV_array = yes
+				}
+				if = {
+					limit = { NOT = { has_country_flag = SGR_info_window_open } }
+					set_country_flag = SGR_info_window_open
+				}
+				else_if = {
+					limit = { has_country_flag = SGR_info_window_open }
+					clr_country_flag = SGR_info_window_open
+				}
+			}
+		}
+	}
+
+	TNO_Germany_SGR_corporation_info_window_open = {
+		context_type = player_context
+		#parent_window_name = "TNO_SGR_Economy_GUI"
+		window_name = "TNO_Germany_SGR_corporation_info_window"
+
+		visible = {
+			has_country_flag = SGR_corp_info_window_open
+		}
+
+		triggers = {
+			Farben_diplo_info_portrait_visible = {
+				has_country_flag = SGR_Farben_info_window_open
+			}
+			Farben_Name_Title_Textbox_visible = {
+				has_country_flag = SGR_Farben_info_window_open
+			}
+			Farben_Info_Textbox_visible = {
+				has_country_flag = SGR_Farben_info_window_open
+			}
+
+			Reichswerke_diplo_info_portrait_visible = {
+				has_country_flag = SGR_Reichswerke_info_window_open
+			}
+			Reichswerke_Name_Title_Textbox_visible = {
+				has_country_flag = SGR_Reichswerke_info_window_open
+			}
+			Reichswerke_Info_Textbox_visible = {
+				has_country_flag = SGR_Reichswerke_info_window_open
+			}
+
+			Benz_diplo_info_portrait_visible = {
+				has_country_flag = SGR_Benz_info_window_open
+			}
+			Benz_Name_Title_Textbox_visible = {
+				has_country_flag = SGR_Benz_info_window_open
+			}
+			Benz_Info_Textbox_visible = {
+				has_country_flag = SGR_Benz_info_window_open
+			}
+
+			Siemens_diplo_info_portrait_visible = {
+				has_country_flag = SGR_Siemens_info_window_open
+			}
+			Siemens_Name_Title_Textbox_visible = {
+				has_country_flag = SGR_Siemens_info_window_open
+			}
+			Siemens_Info_Textbox_visible = {
+				has_country_flag = SGR_Siemens_info_window_open
+			}
+		}
+
+		effects = {
+			SGR_corp_close_button_click = {
+				if = {
+					limit = { NOT = { has_country_flag = SGR_corp_info_window_open } }
+					set_country_flag = SGR_corp_info_window_open
+				}
+				else_if = {
+					limit = { has_country_flag = SGR_corp_info_window_open }
+					clr_country_flag = SGR_corp_info_window_open
+				}
+			}
+		}
+	}
+
+	TNO_SGR_project_info_window = {
+		context_type = player_context
+		#parent_window_name = "TNO_SGR_Economy_GUI"
+		window_name = "TNO_SGR_project_info"
+
+		visible = {
+			has_country_flag = SGR_project_info_window_open
+		}
+
+		triggers = {
+			SGR_project_investment_count_add_button_click_enabled = {
+				has_political_power > 19
+				AND = {
+					check_variable = { SGR_Project_PU_Investment^RSFSTP < 16 }
+					check_variable = { SGR_Project_Progress^SGR_project_start_temp < 100 }
+				}
+				NOT = {
+					has_country_flag = SGR_RSFSTP_OC
+				}
+			}
+			SGR_project_investment_count_subtract_button_click_enabled = {
+				has_political_power > 19
+				AND = {
+					check_variable = { SGR_Project_PU_Investment^RSFSTP > 2 }
+					check_variable = { SGR_Project_Progress^SGR_project_start_temp < 100 }
+				}
+				NOT = {
+					has_country_flag = SGR_RSFSTP_OC
+				}
+			}
+			SGR_project_investment_count_add_button_debug_visible = {
+				is_ai = no
+				is_debug = yes
+			}
+		}
+
+		effects = {
+			SGR_project_info_close_button_click = {
+				clr_country_flag = SGR_project_info_window_open
+			}
+			SGR_project_investment_count_add_button_click = {
+				add_political_power = -20
+				add_to_variable = { SGR_Project_PU_Cost^RSFSTP = -2 }
+				add_to_variable = { SGR_Project_PU_Investment^RSFSTP = 2 }
+				add_to_variable = { SGR_Project_Progress_Monthly^RSFSTP = 0.2 }
+				add_to_variable = { SGR_Project_Cost_Temp^RSFSTP = 0.125 }
+				add_to_variable = { SGR_Project_PP_Cost^RSFSTP = -0.05 }
+				SGR_calculate_efficiency = yes
+				recalculate_PUs_on_demand = yes
+				update_economy_tab = yes
+			}
+			SGR_project_investment_count_subtract_button_click = {
+				add_political_power = -20
+				add_to_variable = { SGR_Project_PU_Cost^RSFSTP = 2 }
+				add_to_variable = { SGR_Project_PU_Investment^RSFSTP = -2 }
+				add_to_variable = { SGR_Project_Progress_Monthly^RSFSTP = -0.2 }
+				add_to_variable = { SGR_Project_Cost_Temp^RSFSTP = -0.125 }
+				add_to_variable = { SGR_Project_PP_Cost^RSFSTP = 0.05 }
+				SGR_calculate_efficiency = yes
+				recalculate_PUs_on_demand = yes
+				clamp_variable = { var = SGR_Project_Progress_Monthly^RSFSTP min = 0 }
+				clamp_variable = { var = SGR_Project_Cost_Temp^RSFSTP min = 0 }
+				update_economy_tab = yes
+			}
+			SGR_project_investment_count_add_button_debug_click = {
+				SGR_prog_test = yes
+			}
+		}
+		properties = {
+			SGR_project_meter_progbar = {
+				frame = SGR_Project_Progress^RSFSTP
+			}
+		}
+	}
+
+	TNO_Germany_SGR_state_info_window_open = {
+		context_type = player_context
+		#parent_window_name = "TNO_SGR_Economy_GUI"
+		window_name = "TNO_Germany_SGR_state_info_window"
+
+		visible = {
+			has_country_flag = SGR_state_info_window_open_flag
+		}
+
+		triggers = {
+			SGR_state_info_window_button_1_visible = {
+				has_global_flag = SGR_repatriation_started
+				has_political_power > 4.99
+				OR = {
+					AND = {
+						has_country_flag = SGR_Germany2_state_info_window_open
+						NOT = { has_country_flag = SGR_Rhineland_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^0 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany1_state_info_window_open
+						NOT = { has_country_flag = SGR_Northgermany_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^1 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany6_state_info_window_open
+						NOT = { has_country_flag = SGR_Centralgermany_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^2 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany3_state_info_window_open
+						NOT = { has_country_flag = SGR_Sachsenanhalt_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^3 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany7_state_info_window_open
+						NOT = { has_country_flag = SGR_Prussia_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^4 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Bohemia_state_info_window_open
+						NOT = { has_country_flag = SGR_Bohemia_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^5 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany4_state_info_window_open
+						NOT = { has_country_flag = SGR_Southgermany_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^6 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany5_state_info_window_open
+						NOT = { has_country_flag = SGR_Austria_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^7 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_GGN_state_info_window_open
+						NOT = { has_country_flag = SGR_Poland_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^8 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ostland2_state_info_window_open
+						NOT = { has_country_flag = SGR_Belarus_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^9 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ostland3_state_info_window_open
+						NOT = { has_country_flag = SGR_Lithuania_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^10 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ostland1_state_info_window_open
+						NOT = { has_country_flag = SGR_Estonia_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^11 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ukraine1_state_info_window_open
+						NOT = { has_country_flag = SGR_Kyiv_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^12 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ukraine3_state_info_window_open
+						NOT = { has_country_flag = SGR_Southukraine_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^13 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ukraine2_state_info_window_open
+						NOT = { has_country_flag = SGR_Northukraine_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^14 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Cau3_state_info_window_open
+						NOT = { has_country_flag = SGR_Azerbaijan_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^15 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Cau2_state_info_window_open
+						NOT = { has_country_flag = SGR_Georgia_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^16 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Cau1_state_info_window_open
+						NOT = { has_country_flag = SGR_Katharinastadt_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^17 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Leningrad_state_info_window_open
+						NOT = { has_country_flag = SGR_Leningrad_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^18 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Holland_state_info_window_open
+						NOT = { has_country_flag = SGR_Holland_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^19 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Denmark_state_info_window_open
+						NOT = { has_country_flag = SGR_Denmark_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^20 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Norway2_state_info_window_open
+						NOT = { has_country_flag = SGR_Oslo_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^21 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Norway1_state_info_window_open
+						NOT = { has_country_flag = SGR_Westnorway_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^22 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Crimea_state_info_window_open
+						NOT = { has_country_flag = SGR_Crimea_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^23 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Wolga2_state_info_window_open
+						NOT = { has_country_flag = SGR_Uppervolga_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^24 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Wolga1_state_info_window_open
+						NOT = { has_country_flag = SGR_Lowervolga_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^25 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Romania_state_info_window_open
+						NOT = { has_country_flag = SGR_Romania_middleclass_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^26 = 0 } }
+					}
+				}
+			}
+			SGR_state_info_window_button_2_visible = {
+				has_global_flag = SGR_repatriation_started
+				has_political_power > 9.99
+				command_power > 29.99
+				OR = {
+					AND = {
+						has_country_flag = SGR_Germany2_state_info_window_open
+						NOT = { has_country_flag = SGR_Rhineland_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^0 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany1_state_info_window_open
+						NOT = { has_country_flag = SGR_Northgermany_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^1 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany6_state_info_window_open
+						NOT = { has_country_flag = SGR_Centralgermany_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^2 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany3_state_info_window_open
+						NOT = { has_country_flag = SGR_Sachsenanhalt_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^3 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany7_state_info_window_open
+						NOT = { has_country_flag = SGR_Prussia_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^4 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Bohemia_state_info_window_open
+						NOT = { has_country_flag = SGR_Bohemia_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^5 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany4_state_info_window_open
+						NOT = { has_country_flag = SGR_Southgermany_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^6 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Germany5_state_info_window_open
+						NOT = { has_country_flag = SGR_Austria_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^7 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_GGN_state_info_window_open
+						NOT = { has_country_flag = SGR_Poland_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^8 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ostland2_state_info_window_open
+						NOT = { has_country_flag = SGR_Belarus_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^9 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ostland3_state_info_window_open
+						NOT = { has_country_flag = SGR_Lithuania_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^10 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ostland1_state_info_window_open
+						NOT = { has_country_flag = SGR_Estonia_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^11 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ukraine1_state_info_window_open
+						NOT = { has_country_flag = SGR_Kyiv_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^12 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ukraine3_state_info_window_open
+						NOT = { has_country_flag = SGR_Southukraine_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^13 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Ukraine2_state_info_window_open
+						NOT = { has_country_flag = SGR_Northukraine_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^14 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Cau3_state_info_window_open
+						NOT = { has_country_flag = SGR_Azerbaijan_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^15 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Cau2_state_info_window_open
+						NOT = { has_country_flag = SGR_Georgia_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^16 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Cau1_state_info_window_open
+						NOT = { has_country_flag = SGR_Katharinastadt_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^17 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Leningrad_state_info_window_open
+						NOT = { has_country_flag = SGR_Leningrad_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^18 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Holland_state_info_window_open
+						NOT = { has_country_flag = SGR_Holland_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^19 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Denmark_state_info_window_open
+						NOT = { has_country_flag = SGR_Denmark_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^20 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Norway2_state_info_window_open
+						NOT = { has_country_flag = SGR_Oslo_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^21 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Norway1_state_info_window_open
+						NOT = { has_country_flag = SGR_Westnorway_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^22 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Crimea_state_info_window_open
+						NOT = { has_country_flag = SGR_Crimea_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^23 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Wolga2_state_info_window_open
+						NOT = { has_country_flag = SGR_Uppervolga_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^24 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Wolga1_state_info_window_open
+						NOT = { has_country_flag = SGR_Lowervolga_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^25 = 0 } }
+					}
+					AND = {
+						has_country_flag = SGR_Romania_state_info_window_open
+						NOT = { has_country_flag = SGR_Romania_decrease_taken }
+						NOT = { check_variable = { SGR_WWS_Megacorps_Power^26 = 0 } }
+					}
+				}
+			}
+			SGR_state_info_window_button_3_visible = {
+				has_global_flag = SGR_repatriation_started
+				has_political_power > 24.99
+				OR = {
+					AND = {
+						has_country_flag = SGR_Germany2_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^0 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^0 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Germany1_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^1 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^1 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Germany6_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^2 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^2 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Germany3_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^3 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^3 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Germany7_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^4 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^4 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Bohemia_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^5 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^5 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Germany4_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^6 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^6 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Germany5_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^7 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^7 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_GGN_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^8 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^8 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Ostland2_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^9 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^9 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Ostland3_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^10 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^10 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Ostland1_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^11 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^11 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Ukraine1_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^12 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^12 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Ukraine3_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^13 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^13 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Ukraine2_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^14 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^14 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Cau3_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^15 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^15 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Cau2_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^16 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^16 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Cau1_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^17 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^17 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Leningrad_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^18 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^18 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Holland_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^19 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^19 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Denmark_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^20 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^20 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Norway2_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^21 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^21 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Norway1_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^22 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^22 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Crimea_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^23 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^23 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Wolga2_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^24 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^24 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Wolga1_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^25 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^25 = 0 }
+					}
+					AND = {
+						has_country_flag = SGR_Romania_state_info_window_open
+						NOT = { check_variable = { SGR_WWS_Megacorps^26 = 0 } }
+						check_variable = { SGR_WWS_Megacorps_Power^26 = 0 }
+					}
+				}
+			}
+		}
+
+		effects = {
+			SGR_state_info_close_button_click = {
+				clr_country_flag = SGR_state_info_window_open_flag
+				clearSGRStateInfoWindowFlags = yes
+			}
+			SGR_state_info_window_button_1_click = {
+				increase_middleclass_power = yes
+			}
+			SGR_state_info_window_button_2_click = {
+				decrease_megacorp_power = yes
+			}
+			SGR_state_info_window_button_3_click = {
+				abolish_local_megacorp = yes
+			}
+		}
+	}
+}

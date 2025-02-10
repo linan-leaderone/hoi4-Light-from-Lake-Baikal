@@ -1,0 +1,746 @@
+scripted_gui = {
+	TNO_MEX_DW_Button = {
+		window_name = "TNO_MEX_DW_Button"
+		context_type = player_context
+		parent_window_token = politics_tab
+
+		visible = {
+			has_country_flag = TNO_MEX_DW_Available
+		}
+
+		effects = {
+			TNO_MEX_DW_Open_Button_click = {
+				if = {
+					limit = { NOT = { has_country_flag = MEX_DW_open } }
+					set_country_flag = MEX_DW_open
+					if = {
+						limit = { check_variable = { STRONGHOLD < 2 } }
+						MEX_initialize_new_DW = yes
+					}
+					MEX_setup_new_dw_map_editor = yes
+				}
+				else_if = {
+					limit = { has_country_flag = MEX_DW_open }
+					clr_country_flag = MEX_DW_open
+				}
+
+				clr_country_flag = gui_alert_visible
+			}
+		}
+
+		triggers = {
+			gui_alert_visible = {
+				has_country_flag = gui_alert_visible
+			}
+		}
+	}
+
+	TNO_MEX_Dirty_War = {
+		context_type = player_context
+		window_name = "TNO_MEX_Dirty_War"
+
+		visible = {
+			has_country_flag = MEX_DW_open
+		}
+
+		effects = {
+			zoom_in_click = {
+				if = {
+					limit = {
+						check_variable = { MEX_DW_zoom_array^0 < 3 }
+					}
+					add_to_variable = { MEX_DW_zoom_array^0 = 1 }
+				}
+			}
+			zoom_out_click = {
+				if = {
+					limit = {
+						check_variable = { MEX_DW_zoom_array^0 > 0}
+					}
+					subtract_from_variable = { MEX_DW_zoom_array^0 = 1 }
+				}
+			}
+			close_button_click = {
+				clr_country_flag = MEX_DW_open
+			}
+			events_background_mission_list_btn_click = {
+				set_variable = { MEX_DW_ev_ac_click = 0 }
+				MEX_DW_filter_actions_or_events = yes
+			}
+			actions_background_mission_list_btn_click = {
+				set_variable = { MEX_DW_ev_ac_click = 1 }
+				MEX_DW_filter_actions_or_events = yes
+			}
+			recruit_unit_add_button_click = {
+				set_temp_variable = { modif_change = 10 }
+
+				DW_MEX_modify_recruitment_size = yes
+			}
+			recruit_unit_add_button_shift_click = {
+				set_temp_variable = { modif_change = 50 }
+				DW_MEX_modify_recruitment_size = yes
+			}
+			recruit_unit_subtract_button_click = {
+				set_temp_variable = { modif_change = -10 }
+
+				DW_MEX_modify_recruitment_size = yes
+			}
+			recruit_unit_subtract_button_shift_click = {
+				set_temp_variable = { modif_change = -50 }
+				DW_MEX_modify_recruitment_size = yes
+			}
+		}
+
+		dynamic_lists = {
+
+			action_log_gridbox = {
+				array = MEX_DW_action_log_times
+				change_scope = no
+				entry_container = TNO_MEX_Dirty_War_Action_Log_Entry
+				index = action_idx
+				value = display_date
+			}
+			event_log_gridbox = {
+				array = MEX_DW_event_log_times
+				change_scope = no
+				entry_container = TNO_MEX_Dirty_War_Event_Log_Entry
+				index = event_idx
+				value = display_date
+			}
+			node_unit_showcase_battle = {
+				array = MEX_DW_selected_location:Node_In_Battle
+				change_scope = no
+				entry_container = MEX_DW_Node_Is_In_Battle_Container
+
+			}
+			node_unit_showcase_units = {
+				array = MEX_DW_selected_location:Node_Not_Battle
+				change_scope = no
+				entry_container = MEX_DW_Node_Is_Not_In_Battle_Container
+			}
+			unit_showcase_gridbox = {
+				array = MEX_DW_selected_location:MEX_DW_node_units
+				change_scope = yes
+				entry_container = TNO_MEX_Dirty_War_Units_Entry
+				index = action_idx
+				value = display_unit
+			}
+			recruit_unit_gridbox = {
+				array = MEX_DW_recruit_unit_box
+				change_scope = no
+				entry_container = dw_recruit_units_container
+			}
+			node_info_tab_gridbox = {
+				array = MEX_DW_node_info_box
+				change_scope = no
+				entry_container = dw_node_info_tab_container
+			}
+			dw_gen_info_tab_gridbox = {
+				array = MEX_DW_gen_info_box
+				change_scope = no
+				entry_container = dw_dw_info_tab_container
+			}
+			dw_more_info_tab_gridbox = {
+				array = MEX_DW_more_info_box
+				change_scope = no
+				entry_container = dw_dw_gen_tab_container
+			}
+			dw_node_info_pie_chart_gridbox = {
+				array = MEX_DW_is_city
+				change_scope = no
+				entry_container = dw_node_info_pie_chart
+			}
+			dw_node_info_town_factional_inf_gridbox = {
+				array = MEX_DW_is_town
+				change_scope = no
+				entry_container = dw_node_info_factions_chart
+			}
+			recruit_unit_required_arms_gridbox = {
+				array = equipment_required_name@var:MEX_DW_recruit_unit_button_array_value
+				change_scope = no
+				entry_container = dw_recruit_unit_text_box_container
+				value = eq_required_v
+				index = eq_required_i
+			}
+			dw_recruit_units_unit_gridbox = {
+				array = MEX_DW_recruitable_units_box
+				change_scope = no
+				entry_container = dw_recruit_units_unit_entry_container
+				value = unit_idx
+			}
+			dw_leftist_guerilla_gridbox = {
+				array = MEX_DW_leftist_guerilla_array
+				change_scope = no
+				entry_container = dw_leftist_guerilla_container
+				value = MEX_DW_leftist_guerilla_value
+				index = MEX_DW_leftist_guerilla_index
+			}
+			dw_government_forces_gridbox = {
+				array = MEX_DW_government_forces_array
+				change_scope = no
+				entry_container = dw_government_forces_container
+				value = MEX_DW_government_forces_value
+				index = MEX_DW_government_forces_index
+			}
+			leftist_guerilla_info_gridbox = {
+				array = MEX_DW_left_guerillas_found
+				change_scope = no
+				entry_container = dw_left_guerilla_found_grid_containerwindow
+				value = MEX_DW_guerillas_found_v
+			}
+			govn_guerilla_info_gridbox = {
+				array = MEX_DW_govn_guerillas_found
+				change_scope = no
+				entry_container = dw_govn_guerilla_found_grid_containerwindow
+				value = MEX_DW_guerillas_found_v
+			}
+			rightest_guerilla_info_gridbox = {
+				array = MEX_DW_right_guerillas_found
+				change_scope = no
+				entry_container = dw_right_guerilla_found_grid_containerwindow
+				value = MEX_DW_guerillas_found_v
+			}
+			dw_rightist_guerilla_gridbox = {
+				array = MEX_DW_rightist_guerilla_array
+				change_scope = no
+				entry_container = dw_rightist_guerilla_container
+				value = MEX_DW_rightist_guerilla_value
+				index = MEX_DW_rightist_guerilla_index
+			}
+			recruit_unit_button_gridbox = {
+				array = MEX_DW_recruit_unit_button_array
+				entry_container = dw_recruitment_tabs_gridbox_container
+				value = MEX_DW_recruit_unit_button_array_value
+				index = MEX_DW_recruit_unit_button_array_index
+			}
+			dw_node_city_faction_pie_chart = {
+				array = MEX_DW_ALL_GROUPS
+				change_scope = no
+				entry_container = dw_node_city_faction_slice_container
+				value = MEX_DW_ALL_GROUPS_v
+			}
+			dw_node_town_faction_chart = {
+				array = Factions_Influencing@var:MEX_DW_selected_location
+				change_scope = no
+				entry_container = dw_node_town_faction_slice_container
+				value = MEX_DW_GROUP_v
+			}
+		}
+
+		properties = {
+			dw_unit_outline_entry = {
+				frame = is_unit_selected
+			}
+			recruit_unit_background = {
+				image = "GFX_[?MEX_DW_recruit_unit_button_array_value.GetTokenKey]_Recruitment_Background"
+			}
+			dw_node_town_faction_outline = {
+				image = "GFX_MEX_DW_[MEX_DW_Get_Factional_Allignment]_group_node"
+			}
+			faction_control_pie = {
+				image = "GFX_[?MEX_DW_ALL_GROUPS_v.GetTokenKey]_control_pie"
+				frame = control_frame@var:MEX_DW_ALL_GROUPS_v
+			}
+			dw_unit_icon_entry = {
+				image = "GFX_[?MEX_DW_UNIT_TYPE.GetTokenKey]"
+			}
+			faction_icon = {
+				image = "[MEX_DW_faction_icon]"
+			}
+			unit_identifier_icon = {
+				image = "[MEX_DW_Get_Unit_icon]"
+			}
+			inactive_leftist_guerrillas = {
+				frame = active_leftist_guerrillas
+			}
+			inactive_rightist_guerrillas = {
+				frame = active_rightist_guerrillas
+			}
+			DW_intensity_bar = {
+				frame = dw_intensity
+			}
+
+			node_intel_progbar = {
+				frame = MEX_DW_intel_animprog
+			}
+
+		}
+		effects = {
+			dw_unit_regiment_select_btn_click = {
+				if = {
+					limit = {
+						is_in_array = {
+							array = MEX.selected_regiments
+							value = display_unit
+						}
+					}
+					remove_from_array = {
+						array = MEX.selected_regiments
+						value = display_unit
+					}
+					set_variable = { is_unit_selected = 1 }
+				}
+				else_if = {
+					limit = {
+						NOT = { check_variable = { MEX_DW_NODES_TRAVELABLE = 0 } }
+					}
+					add_to_array = { MEX.selected_regiments = display_unit }
+					set_variable = { is_unit_selected = 2 }
+
+				}
+			}
+			recruit_unit_decrease_regiment_size_click = {
+				set_temp_variable = { modif_change = MEX_DW_Recruit_Click_Change }
+				multiply_temp_variable = { modif_change = -1 }
+				DW_MEX_modify_recruitment_size = yes
+				log = "CLICKED [?unit_idx]"
+			}
+			recruit_unit_increase_regiment_size_click = {
+				set_temp_variable = { modif_change = MEX_DW_Recruit_Click_Change }
+				DW_MEX_modify_recruitment_size = yes
+				log = "CLICKED [?unit_idx]"
+			}
+			action_log_desc_tooltip_click = {
+				log = "CLICKED [?action_idx] [?MEX_DW_action_log_targets^action_idx]"
+				set_variable = { MEX.MEX_DW_selected_location = MEX_DW_action_log_targets^action_idx }
+			}
+			DFS_info_button_click = {
+				MEX_DW_clear_all_top_arrs = yes
+				if = {
+					limit = {
+						check_variable = { MEX_DW_gen_info_box^num < 1 }
+					}
+					add_to_array = { MEX_DW_gen_info_box = 0 }
+				}
+
+
+			}
+			node_info_button_click = {
+				MEX_DW_clear_all_top_arrs = yes
+				if = {
+					limit = {
+						check_variable = { MEX_DW_node_info_box^num < 1 }
+					}
+					add_to_array = { MEX_DW_node_info_box = 0 }
+					MEX_DW_update_gui_elements = yes
+				}
+
+			}
+			dw_info_button_click = {
+				MEX_DW_clear_all_top_arrs = yes
+				if = {
+					limit = {
+						check_variable = { MEX_DW_more_info_box^num < 1 }
+					}
+					add_to_array = { MEX_DW_more_info_box = 0 }
+				}
+			}
+			recruit_unit_button_click = {
+				MEX_DW_clear_all_top_arrs = yes
+				if = {
+					limit = {
+						check_variable = { MEX_DW_recruit_unit_box^num < 1 }
+					}
+					add_to_array = { MEX_DW_recruit_unit_box = 0 }
+				}
+
+
+			}
+			recruit_unit_button_thingy_click = {
+				MEX_DW_Recruit_Unit_Clear_Everything = yes
+			}
+		}
+		triggers = {
+			recruit_unit_button_thingy_click_enabled = {
+				check_variable = { MEX_DW_Can_Recruit_Unit = 1 }
+			}
+			recruit_unit_background_visible = {
+				NOT = { check_variable = { MEX_DW_recruit_unit_button_array_value = 0 } }
+			}
+			recruit_unit_subtract_button_visible = {
+				NOT = { check_variable = { MEX_DW_recruit_unit_button_array_value = 0 } }
+			}
+			recruit_unit_add_button_visible = {
+				NOT = { check_variable = { MEX_DW_recruit_unit_button_array_value = 0 } }
+			}
+			recruit_unit_type_title_visible = {
+				NOT = { check_variable = { MEX_DW_recruit_unit_button_array_value = 0 } }
+			}
+			recruit_unit_cost_title_visible = {
+				NOT = { check_variable = { MEX_DW_recruit_unit_button_array_value = 0 } }
+			}
+
+			node_intel_progbar_click_enabled = {
+				check_variable = { intel_progbar_anim_update = 1 }
+			}
+			dw_node_town_faction_name_visible = {
+				NOT = { check_variable = { MEX_DW_GROUP_v = 3 } }
+			}
+			node_info_button_click_enabled = {
+				check_variable = { MEX_DW_selected_location > 0 }
+			}
+			recruit_unit_button_click_enabled = {
+				check_variable = { MEX_DW_selected_location > 0 }
+				var:MEX_DW_selected_location = {
+					MEX_dw_is_node_allegence_known = yes
+					check_variable = { MEX_DW_controller = token:MEX_Faction_GOVERNMENT }
+				}
+
+
+
+			}
+			recruit_unit_gridbox_visible = {
+				check_variable = { MEX_DW_recruit_unit_box^num = 1 }
+			}
+			node_info_tab_gridbox_visible = {
+				check_variable = { MEX_DW_node_info_box^num = 1 }
+			}
+			dw_gen_info_tab_gridbox_visible = {
+				check_variable = { MEX_DW_gen_info_box^num = 1 }
+			}
+			dw_more_info_tab_gridbox_visible = {
+				check_variable = { MEX_DW_more_info_box^num = 1 }
+			}
+		}
+	}
+
+	#TNO_MEX_Dirty_War_Editor = {
+		#window_name = "TNO_MEX_Dirty_War_Editor"
+		#context_type = player_context
+		#parent_window_name = TNO_MEX_Dirty_War
+		#
+		#visible = {
+		#	has_country_flag = MEX_DW_editor_active
+		#}
+		#
+		#properties = {
+		#	toggle_fow_button = {
+		#		frame = MEX_DW_fog_of_war_enabled
+		#	}
+		#}
+		#
+		#
+		#effects = {
+		#	close_map_editor_click = {
+		#		MEX_close_dw_map_editor = yes
+		#	}
+		#
+		#	cursor_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 0 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	add_node_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 1 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	move_node_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 7 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	delete_node_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 2 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	add_link_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 3 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	remove_link_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 5 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	make_govt_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 9 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	make_gpg_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 10 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	toggle_fow_button_click = {
+		#		if = {
+		#			limit = { check_variable = { MEX_DW_fog_of_war_enabled < 2 } }
+		#			set_variable = { MEX_DW_fog_of_war_enabled = 2 }
+		#		}
+		#		else = {
+		#			set_variable = { MEX_DW_fog_of_war_enabled = 1 }
+		#		}
+		#	}
+		#	convert_to_town_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 11 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	convert_to_city_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 12 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	convert_to_stronghold_button_click = {
+		#		set_variable = { MEX_DW_editor_mode = 13 }
+		#		set_variable = { MEX.MEX_DW_selected_location = 0 }
+		#	}
+		#	export_to_console_button_click = {
+		#		MEX_dw_print_nodes = yes
+		#	}
+		#}
+		#
+		#triggers = {
+		#	cursor_button_click_enabled = {
+		#		NOT = { check_variable = { MEX_DW_editor_mode = 0 } }
+		#	}
+		#	add_node_button_click_enabled = {
+		#		NOT = { check_variable = { MEX_DW_editor_mode = 1 } }
+		#	}
+		#	delete_node_button_click_enabled = {
+		#		NOT = { check_variable = { MEX_DW_editor_mode = 2 } }
+		#	}
+		#	move_node_button_click_enabled = {
+		#		NOT = { OR = {
+		#			check_variable = { MEX_DW_editor_mode = 7 }
+		#			check_variable = { MEX_DW_editor_mode = 8 }
+		#		} }
+		#	}
+		#	add_link_button_click_enabled = {
+		#		NOT = { OR = {
+		#			check_variable = { MEX_DW_editor_mode = 3 }
+		#			check_variable = { MEX_DW_editor_mode = 4 }
+		#		} }
+		#	}
+		#	remove_link_button_click_enabled = {
+		#		NOT = { OR = {
+		#			check_variable = { MEX_DW_editor_mode = 5 }
+		#			check_variable = { MEX_DW_editor_mode = 6 }
+		#		} }
+		#	}
+		#	make_govt_button_click_enabled = {
+		#		NOT = { check_variable = { MEX_DW_editor_mode = 9 } }
+		#	}
+		#	make_gpg_button_click_enabled = {
+		#		NOT = { check_variable = { MEX_DW_editor_mode = 10 } }
+		#	}
+		#	convert_to_town_button_click_enabled = {
+		#		NOT = { check_variable = { MEX_DW_editor_mode = 11 } }
+		#	}
+		#	convert_to_city_button_click_enabled = {
+		#		NOT = { check_variable = { MEX_DW_editor_mode = 12 } }
+		#	}
+		#	convert_to_stronghold_button_click_enabled = {
+		#		NOT = { check_variable = { MEX_DW_editor_mode = 13 } }
+		#	}
+		#}
+	#}
+
+	TNO_MEX_Dirty_War_Draggable = {
+		window_name = "TNO_MEX_Dirty_War_Draggable"
+		context_type = player_context
+		parent_window_name = TNO_MEX_DW_Dirty_War_Draggable_Container
+
+		visible = {
+			always = yes
+		}
+
+
+		dynamic_lists = {
+			editor_tile_gridbox = {
+				array = MEX_DW_editor_tile_x
+				change_scope = no
+				entry_container = TNO_MEX_Dirty_War_Tile
+				index = tile_idx
+			}
+
+		}
+		properties = {
+			dw_tile = {
+				x = MEX_DW_editor_tile_x^tile_idx
+				y = MEX_DW_editor_tile_y^tile_idx
+			}
+
+
+		}
+		effects = {
+			dw_tile_click = {
+				set_temp_variable = { new_node_x = MEX_DW_editor_tile_x^tile_idx }
+				set_temp_variable = { new_node_y = MEX_DW_editor_tile_y^tile_idx }
+
+				if = {
+					limit = { check_variable = { MEX_DW_EDITOR_MODE = 8 } }
+					set_variable = { MEX_DW_editor_mode = 7 }
+					var:MEX_DW_editor_last_location = {
+						set_variable = { MEX_DW_x = new_node_x }
+						set_variable = { MEX_DW_y = new_node_y }
+					}
+					MEX_setup_DW_connections = yes
+					set_variable = { MEX.MEX_DW_selected_location = 0 }
+				} else = {
+					MEX_dw_place_new_node = yes
+				}
+			}
+		}
+		triggers = {
+			dw_tile_visible = {
+				OR = {
+					check_variable = { MEX_DW_editor_mode = 1 }
+					check_variable = { MEX_DW_editor_mode = 8 }
+				}
+			}
+		}
+
+
+		dynamic_lists = {
+			map_gridbox = {
+				array = MEX_DW_locations
+				change_scope = yes
+				entry_container = TNO_MEX_Dirty_War_Node
+				value = location_id
+			}
+
+
+
+		}
+
+		triggers = {
+			reticle_visible = {
+				check_variable = { MEX_DW_selected_location > 0 }
+			}
+
+			unit_node_overlay_visible = {
+				check_variable = { MEX_DW_node_units^num > 0 }
+			}
+		}
+
+		properties = {
+			node_icon = {
+				x = MEX_DW_x
+				y = MEX_DW_y
+				image = "[MEX_DW_location_icon]"
+			}
+			unit_node_overlay = {
+				x = MEX_DW_x
+				y = MEX_DW_y
+			}
+			reticle = {
+				x = MEX_DW_selected_location:MEX_DW_x
+				y = MEX_DW_selected_location:MEX_DW_y
+			}
+
+		}
+
+		effects = {
+			node_icon_click = {
+				if = {
+					limit = { check_variable = { MEX.MEX_DW_editor_mode > 0 } }
+					MEX_DW_editor_node_click = yes
+				} else = {
+					if = {
+						limit = { check_variable = { MEX.MEX_DW_selected_location = location_id } }
+						set_variable = { MEX.MEX_DW_selected_location = 0 }
+
+						MEX = {
+							if = {
+								limit = {
+									OR = {
+										check_variable = { MEX_DW_node_info_box^num > 0 }
+										check_variable = { MEX_DW_recruit_unit_box^num > 0 }
+									}
+
+								}
+								MEX_DW_clear_all_top_arrs = yes
+								add_to_array = { MEX_DW_gen_info_box = 0 }
+
+							}
+
+						}
+
+					} else = {
+						set_variable = { MEX.MEX_DW_selected_location = location_id }
+						if = {
+							limit = {
+								OR = {
+									NOT = { check_variable = { location_id:MEX_DW_controller = MEX_Faction_GOVERNMENT } }
+									NOT = { MEX_dw_is_node_allegence_known = yes }
+								}
+								MEX = {
+									check_variable = { MEX_DW_recruit_unit_box^num > 0 }
+								}
+
+							}
+							MEX = {
+								MEX_DW_clear_all_top_arrs = yes
+								add_to_array = { MEX_DW_gen_info_box = 0 }
+							}
+						}
+						for_each_loop = {
+							array = MEX.selected_regiments
+							value = units_clear_sel
+
+							set_variable = { units_clear_sel:is_unit_selected = 1 }
+
+						}
+						clear_array = MEX.selected_regiments
+						MEX = {
+							MEX_DW_update_gui_elements = yes
+						}
+
+
+					}
+				}
+			}
+			node_icon_shift_click = {
+				set_temp_variable = { node_From = MEX.MEX_DW_selected_location }
+				set_temp_variable = { node_To = location_id }
+				for_each_loop = {
+					array = MEX.selected_regiments
+					value = units_clear_sel
+
+					set_variable = { units_clear_sel:is_unit_selected = 1 }
+
+				}
+				MEX = {
+					MEX_DW_move_regiment = yes
+					clear_array = selected_regiments
+					MEX_DW_Should_Battle_Start = yes
+				}
+			}
+		}
+
+
+		properties = {
+			node_connection = {
+				x = MEX_DW_rendered_connections_diff_x^connection_idx
+				y = MEX_DW_rendered_connections_diff_y^connection_idx
+				frame = MEX_DW_rendered_connections_frame^connection_idx
+				image = "[MEX_DW_connection]"
+			}
+
+		}
+		dynamic_lists = {
+			connection_gridbox = {
+				array = MEX_DW_rendered_connections_start
+				entry_container = TNO_MEX_Dirty_War_Node_Connection
+				index = connection_idx
+			}
+
+		}
+
+		dynamic_lists = {
+			map_contents = {
+				array = MEX_DW_placeholder
+				entry_container = TNO_MEX_Dirty_War_Map_Contents
+			}
+			zoom_level = {
+				array = MEX_DW_zoom_array
+				entry_container = "[MEX_DW_zoom_level]"
+			}
+
+		}
+
+
+		dynamic_lists = {
+		}
+
+		properties = {
+		}
+
+
+	}
+
+}

@@ -1,0 +1,233 @@
+UAR_formation_category = {
+	uas_form_the_faction = {
+		#The UAS is can be formed by any tag with the UAR_can_form tag.
+		#Also the only countries who can ever join are in the decision category's allowed block
+
+		allowed = { NOT = { tag = UAR } }
+
+		visible = {
+			has_war = no
+			has_country_flag = UAR_can_form
+			NOT = { has_global_flag = UAS_formed }
+		}
+		
+		ai_will_do = { base = 100 }
+
+		fire_only_once = yes
+
+		complete_effect = {
+			if = { #Syria can form the UAS, but not the UAR on its own.
+				limit = { tag = SYR } 
+				clr_country_flag = UAR_can_form
+			}
+
+			#Create the faction. For now, it's just you.
+			set_rule = {
+				can_create_factions = yes
+			}
+			create_faction = United_Arab_States
+			add_ideas = UAS_Member
+			every_country = {
+				limit = { is_subject_of = ROOT }
+				add_ideas = UAS_Member
+			}
+
+			#Then set important variables for the UAS.
+			set_global_flag = UAS_formed
+			set_variable = { global.UAS_leader = ROOT } #Stores a variable of the country mechanically leading the faction.
+
+			set_global_flag = { 
+				flag = UAS_formed_cooldown
+				days = 387 #The time between the formation of the UAS and the formation of the UAR.
+				value = 1 
+			}
+		}
+	}
+	uas_join_the_faction = {
+		visible = {
+			has_war = no
+			NOT = { is_in_faction_with = var:global.UAS_leader } #Cannot already be in the UAS
+			has_global_flag = UAS_formed
+			has_country_flag = UAR_can_join
+		}
+
+		ai_will_do = { base = 100 }
+		
+		complete_effect = {
+			leave_faction = yes
+			var:global.UAS_leader = {
+				add_to_faction = ROOT
+			}
+			add_ideas = UAS_Member
+			every_country = {
+				limit = { is_subject_of = ROOT }
+				add_ideas = UAS_Member
+			}
+			if = {
+				limit = { GER = { has_country_flag = uar_will_join_ger_econ_sphere } }
+				econ_join_sphere_GER = yes
+				if = {
+					limit = { has_global_flag = german_civil_war_speervic }
+					join_zollverein = yes
+				}
+			}
+		}
+	}
+
+	uar_form_the_tag = {
+		visible = {
+			has_country_flag = UAR_can_form
+			has_global_flag = UAS_formed
+			NOT = { has_global_flag = UAS_formed_cooldown }
+			has_war = no #don't form if scorza's actively invading you
+		}
+
+		ai_will_do = { base = 100 }
+		
+		fire_only_once = yes
+
+		complete_effect = { 
+			#First, give the UAR cores on all your states to avoid econ bugs.
+			every_owned_state = {
+				limit = { is_core_of = PREV }
+				add_core_of = UAR
+			}
+			#Then, spawn the UAR so they can join the UAS faction without accidentally deleting it.
+			random_owned_state = {
+				UAR = { transfer_state = PREV }
+			}
+			var:global.UAS_leader = {
+				add_to_faction = UAR
+			}
+			UAR = { 
+				add_ideas = UAS_Member
+				set_faction_leader = yes
+			
+				set_variable = { global.UAS_leader = UAR }
+			
+				#Then, change the UAR's ideology depending on who formed it.
+				if = { #Nasserist
+					limit = {
+						is_in_faction_with = EGB
+						NOT = { 
+							PAL = { has_country_flag = PAL_APR }
+							is_in_faction_with = PAL 
+						}
+						NOT = { is_in_faction_with = BIR }
+						NOT = { is_in_faction_with = NYM }
+					}
+
+					UAR_National_Assembly = {
+						remove_country_leader_role = { ideology = socialist_baathism_subtype }
+						add_country_leader_role = {
+							promote_leader = yes
+							country_leader = {
+								ideology = socialist_left_wing_nationalism_subtype
+								expire = "1999.1.1"
+								traits = { }
+							}
+						}
+					}
+				}
+				else_if = { #Habash's Arab Communism
+					limit = {
+						PAL = { has_country_flag = PAL_APR }
+						is_in_faction_with = PAL 
+						NOT = { is_in_faction_with = EGB }
+						NOT = { is_in_faction_with = BIR }
+						NOT = { is_in_faction_with = NYM }
+					}
+					set_politics = { ruling_party = communist }
+					set_capital = { state = 554 }
+				}
+			
+				#Then, the UAR gets to annex the country that spawned it.
+			
+				annex_country = {
+					target = PREV
+					transfer_troops = yes
+				}
+				change_tag_from = PREV
+			}
+
+			UAR = {
+				#Then set the starting state of the UAR.
+				add_ideas = {
+					UAR_disunited_armies
+					UAR_chaotic_politics
+				}
+
+				if = {
+					limit = { GER = { has_country_flag = uar_will_join_ger_econ_sphere } }
+					econ_join_sphere_GER = yes
+					if = {
+						limit = { has_global_flag = german_civil_war_speervic }
+						join_zollverein = yes
+					}
+				}
+				if = {
+					limit = {
+						has_global_flag = OC_over_in_middle_east
+						has_global_flag = german_civil_war_bormannvic
+					}
+					country_event = { id = bormann.1213 days = 4 }
+				}
+			}
+		}
+	}
+	uar_join_the_tag = {
+		visible = {
+			has_war = no
+			UAR = { exists = yes }
+			has_country_flag = UAR_can_join
+			OR = { #Sudan will only join if egypt has
+				NOT = { tag = SDS }
+				UAR = { owns_state = 446 } #Cairo
+			}
+			OR = { #The Gulf will only join if yemen(arabia) or iraq has
+				NOT = { tag = GUL }
+				UAR = { owns_state = 291 } #Baghdad
+				UAR = { owns_state = 919 } #Riyadh
+			}
+			OR = { #Dhofar will only join if yemen(arabia) has
+				NOT = { tag = OMB }
+				#UAR = { owns_state = 658 } #Abu Dhabi #uncomment this for them to join if GUL has
+				UAR = { owns_state = 919 } #Riyadh
+			}
+		}
+
+		ai_will_do = { base = 100 }
+
+		complete_effect = { 
+			#First, give the UAR cores on all your states to avoid econ bugs.
+			every_owned_state = {
+				limit = { is_core_of = PREV }
+				add_core_of = UAR
+			}
+			UAR = { #Then join the UAR.
+				annex_country = {
+					target = ROOT
+					transfer_troops = yes
+				}
+			}
+		}
+	}
+
+	uar_dismantle_the_faction = { #Don't end the game with a faction of only 1 member on the map...
+		allowed = { tag = UAR }
+
+		ai_will_do = { base = 100 }
+
+		visible = { #Available if the UAR has formed, and it's the only nation in its faction
+			exists = yes
+			num_faction_members < 2
+			OMB = { exists = no } #Don't delete faction if there are still people who
+			SDS = { exists = no } #...might eventually want to join it
+		}
+
+		complete_effect = {
+			clr_global_flag = UAS_formed
+			dismantle_faction = yes
+		}
+	}
+}

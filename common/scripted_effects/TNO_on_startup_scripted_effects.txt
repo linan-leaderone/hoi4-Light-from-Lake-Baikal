@@ -1,0 +1,253 @@
+# ███████╗████████╗ █████╗ ██████╗ ████████╗██╗   ██╗██████╗     ███████╗███████╗███████╗███████╗ ██████╗████████╗███████╗ #
+# ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██║   ██║██╔══██╗    ██╔════╝██╔════╝██╔════╝██╔════╝██╔════╝╚══██╔══╝██╔════╝ #
+# ███████╗   ██║   ███████║██████╔╝   ██║   ██║   ██║██████╔╝    █████╗  █████╗  █████╗  █████╗  ██║        ██║   ███████╗ #
+# ╚════██║   ██║   ██╔══██║██╔══██╗   ██║   ██║   ██║██╔═══╝     ██╔══╝  ██╔══╝  ██╔══╝  ██╔══╝  ██║        ██║   ╚════██║ #
+# ███████║   ██║   ██║  ██║██║  ██║   ██║   ╚██████╔╝██║         ███████╗██║     ██║     ███████╗╚██████╗   ██║   ███████║ #
+# ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝         ╚══════╝╚═╝     ╚═╝     ╚══════╝ ╚═════╝   ╚═╝   ╚══════╝ #
+# Scripted effects
+
+# This is a list of things that need to be setup for every nation on order for them to work with our new systems
+# HAS TO BE MANUALLY RUN ON EVERY NEW TAG SPAWNED ON THE MAP AFTER GAME STARTUP, IF NOT THEN THEY'LL NOT WORK CORRECTLY
+TNO_startup_nation = {
+	log = "[GetDateText]: [This.GetName]: TNO_startup_nation; Executing"
+	if = {
+		limit = {
+			NOT = {
+				has_country_flag = TNO_has_started_up #prevents starting up twice
+			}
+		}
+	
+		### TAG-SPECIFIC DEFINES ###
+		hidden_effect = {
+			TNO_is_russian_nation_initialize = yes
+			TNO_is_kazakh_nation_initialize = yes
+			TNO_is_iberian_nation_initialize = yes
+
+			### BASE IDEAS & MODIFIERS ###
+			
+			add_ideas = economy_multiplicative_modifiers_base
+			add_dynamic_modifier = { modifier = TNO_consumer_goods_production_dynamic_modifier }
+			add_dynamic_modifier = { modifier = TNO_base_econ_shit_dynamic_modifier }
+			add_dynamic_modifier = { modifier = TNO_factory_multiplier }
+			add_dynamic_modifier = { modifier = TNO_inflation_dynamic_modifier }
+			#add_dynamic_modifier = { modifier = TNO_economy_type_capitalism_dynamic_modifier }
+			add_dynamic_modifier = { modifier = TNO_vol_troops_modifier }
+			if = {
+				limit = { NOT = { is_russian_nation = yes } }
+				add_dynamic_modifier = { modifier = TNO_deficit_effects_modifier }
+			}
+
+			### POLICY EFFECTIVENESS ###
+			TNO_sliders_initialize = yes
+			TNO_policy_effectiveness_starting_single_country = yes
+		
+			### SOCIETAL DEVELOPMENT ###
+			TNO_startup_econ_type = yes
+			if = {
+				limit = { check_variable = { poverty_rate = 0 } }
+				set_variable = { poverty_rate = 20 }
+			}
+			#############################
+			## HOW THESE COUNTERS WORK ##
+			#############################
+
+			# Each variable starts at 0, and at 0 change
+			# Changes are applied monthly
+			# Once a counter reaches 240, the respective Societal Development law increases and resets back to 0
+			# Once a counter reaches -240, the respective Societal Development law decreases, and resets back to 0
+
+			#NOTE: When a counter resets, the monthly change is multiplied by 0.25
+			set_variable = { admin_efficiency_counter = 0 }
+			set_variable = { admin_efficiency_monthly_change = 0 }
+
+			set_variable = { academic_base_counter = 0 }
+			set_variable = { academic_base_monthly_change = 0 }
+
+			set_variable = { agriculture_counter = 0 }
+			set_variable = { agriculture_monthly_change = 0 }
+
+			set_variable = { healthcare_counter = 0 }
+			set_variable = { healthcare_monthly_change = 0 }
+
+			set_variable = { army_professionalism_counter = 0 }
+			set_variable = { army_professionalism_monthly_change = 0 }
+
+			set_variable = { research_facilities_counter = 0 }
+			set_variable = { research_facilities_monthly_change = 0 }
+		
+			set_variable = { industrial_equipment_counter = 0 }
+			set_variable = { industrial_equipment_monthly_change = 0 }
+
+			set_variable = { industrial_expertise_counter = 0 }
+			set_variable = { industrial_expertise_monthly_change = 0 }
+
+			### BUILDINGS ###
+			get_number_of_silos = yes
+			get_number_of_enrichment_plants = yes
+
+			if = {
+				limit = { 
+					OR = {
+						econ_can_use_economy_system = yes 
+						NOT = { has_country_flag = starting_tag }
+						tag = NRL
+						tag = OMO
+					}
+				}
+			
+				### ECON GUI ###
+				every_owned_state = {
+					generate_state_gdps = yes
+					log = "[GetDateText]: [THIS.Owner.GetName]:  [THIS.GetName]: ran autogeneration script - state GDP is [?state_value] - state value factor is [?state_value_factor]"
+
+					set_temp_variable = { spm = state_population_k }
+					divide_temp_variable = { spm = 1000 }
+					add_to_variable = { PREV.total_pop_m = spm }
+					if = {
+						limit = { is_core_of = PREV }
+						add_to_variable = { PREV.total_core_pop_m = spm }
+					}
+					if = { # sets state value to a defined value if one is set
+						limit = { check_variable = { defined_state_value > 0 } }
+						set_variable = { state_value = defined_state_value }
+					}
+				}
+
+				set_variable = { total_ncore_pop_m = total_pop_m }
+				subtract_from_variable = { total_ncore_pop_m = total_core_pop_m }
+
+				#set_variable = { economic_centralization = 0 }
+
+				## calculate_total_state_gdp needs to be run twice or state GDPs will not generate correctly
+				# Why? No clue, it's just how it is
+				calculate_total_state_gdp = yes
+				resolve_excessive_state_gdp = yes
+				calculate_total_state_gdp = yes
+				
+				setup_production_units = yes
+				set_temp_variable = { temp_consumer_goods_production_factor = 1 }
+				add_to_temp_variable = { temp_consumer_goods_production_factor = modifier@consumer_goods_production_factor }
+				set_temp_variable = { temp_starting_cg_production = PU_consumer_goods_desired }
+				divide_temp_variable = { temp_starting_cg_production = temp_consumer_goods_production_factor }
+				add_to_array = { TNO_cg_production = temp_starting_cg_production }
+				PU_trade_integration_calculation = yes
+				# set_variable = { default_PU_to_GDP_ratio = 0.5 } # Seems to be unused rn
+
+				set_variable = { TNO_last_month_GDP_contribution_to_inflation = 0.01 }
+
+				## Econ arrays
+				for_loop_effect = {
+					start = 1
+					end = 11
+					value = i
+		
+					add_to_array = { credit_rating_ladder = i index = 0 }
+				}
+				for_loop_effect = {
+					start = 0
+					end = 61
+					value = i
+
+					add_to_array = { expenditures_set_buttons = i }
+				}
+				for_loop_effect = {
+					start = 0
+					end = 21
+					value = i
+
+					add_to_array = { expenditures_set_buttons_construction = i }
+				}
+				
+				if = {
+					limit = { check_variable = { credit_rating = 0 } }
+					set_variable = { temp_credit_rating = 5 }
+					set_variable = { temp_credit_rating_max = 10 }
+					set_variable = { temp_credit_rating_min = 1 }
+					econ_initialize_credit_rating_system = yes
+				}
+				
+				## Display calc
+				apply_credit_rating_effects = yes
+				startup_central_bank = yes
+				update_economy_tab = yes
+				calculate_funding_effects = yes
+				econ_backfill_graphs = yes
+
+				if = { #Ensure the player country does not start with the "you have lost PUs" alert
+					limit = { is_ai = no }
+					set_temp_variable = { alert_id = token:Alert_LostPU }
+					remove_TNO_alert = yes
+				}
+				
+				### MARKET ###
+				setup_market = yes
+			}
+
+			### DIVISION LIMITER ###
+			set_variable = { DivLimiterEscalatorPerm = 1 }
+			TNO_div_limiter_calculate_unit_cap = yes
+
+			### COLD WAR GUI ###
+			set_variable = { Cold_War_GUI_SeaZone_SelectedSuperpower = var:global.TNO_Superpowers^0 }
+			set_variable = { Cold_War_GUI_SeaZone_SelectedSuperpower_Frame = 1 }
+			set_variable = { TNO_Cold_War_GUI_Tab = 1 }
+			set_rule = {
+				desc = rule_blank
+				can_create_collaboration_government = no
+			}
+			set_rule = {
+				desc = rule_blank
+				can_force_government = no
+			}
+			set_rule = {
+				desc = rule_blank
+				can_puppet = no
+			}
+			set_rule = {
+				desc = rule_blank
+				can_join_factions = no
+			}
+			set_rule = {
+				desc = rule_blank
+				can_send_volunteers = yes
+			}
+
+			log = "[GetDateText]: [This.GetName]: TNO_startup_nation; Completed execution."
+
+			if = {
+				limit = { 
+					AND = {
+						is_russian_nation = yes
+						is_ai = yes
+					}
+				}
+				add_ideas = RUS_stupid_ai_econ
+			}
+		
+			#test due to weird shit
+			set_country_flag = TNO_has_started_up
+			initiate_display_vars = yes
+			misc_law_array_startup = yes
+			calculate_building_variables = yes
+			TNO_update_policy_effectiveness = yes 
+			TNO_calculate_actual_policy_effectiveness = yes 
+			
+			set_country_flag = econ_debt_auto_payment
+			set_variable = { econ_debt_auto_payment_var = 2 }
+
+			if = { 
+				limit = { is_ai = no }
+				startup_social_arrays = yes
+			}
+			update_economy_tab = yes 
+		}
+		add_to_variable = { TNO_laws_dirty = 1 }
+	}
+}
+
+startup_central_bank = {
+	add_to_array = { central_bank_policies_array = 0 }
+	add_to_array = { central_bank_policies_array = 1 }
+	add_to_array = { central_bank_policies_array = 2 }
+	add_to_array = { central_bank_policies_array = 3 }
+}

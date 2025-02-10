@@ -1,0 +1,915 @@
+########################################################################
+##  ██████╗  ██████╗ ██████╗ ███╗   ███╗ █████╗ ███╗   ██╗███╗   ██╗  ##
+##  ██╔══██╗██╔═══██╗██╔══██╗████╗ ████║██╔══██╗████╗  ██║████╗  ██║  ##
+##  ██████╔╝██║   ██║██████╔╝██╔████╔██║███████║██╔██╗ ██║██╔██╗ ██║  ##
+##  ██╔══██╗██║   ██║██╔══██╗██║╚██╔╝██║██╔══██║██║╚██╗██║██║╚██╗██║  ##
+##  ██████╔╝╚██████╔╝██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║██║ ╚████║  ##
+##  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝  ##
+########################################################################
+
+############################
+# Economy Mechanic Effects #
+############################
+
+#Index; Search for these names using ctrl+f and you'll find the section they entitle.
+#	Base Effects
+#		BOR_EconMech_activate
+#		BOR_EconMech_disable
+#		BOR_EconMech_add_country
+#		BOR_EconMech_MonthlyPulse
+#		BOR_EconMech_increase_integration
+#		BOR_EconMech_RK_selection_map
+#		BOR_EconMech_RK_selection_decision
+#		BOR_EconMech_RK_selection_complete
+#
+#	Update Equations
+#		BOR_EconMech_update_workforce
+#		BOR_EconMech_update_workforce_values
+#		BOR_EconMech_update_slave_pop
+#		BOR_EconMech_RK_SlavePop_effect_update
+#		BOR_EconMech_update_cost_display
+#		BOR_EconMech_update_breitspurbahn_progress
+#
+#	Modifier Effects
+#		BOR_EconMech_Ausgrenzung_Modify_Progress
+#		BOR_EconMech_Breitspurbahn_Modify_Progress
+#		BOR_EconMech_Ausgrenzung_Modify_MonthlyProgress
+#		BOR_EconMech_Breitspurbahn_Modify_MonthlyProgress
+
+####################
+### BASE EFFECTS ###
+####################
+
+# Activate economy mechanic
+BOR_EconMech_activate = {
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_activate; Bormann EconMech startup"
+	custom_effect_tooltip = GER_Bormann_EconMech_startup_tt
+	unlock_decision_category_tooltip = GER_Bormann_EconMech_category
+	set_country_flag = BOR_EconomyMechanic_Active
+	
+	hidden_effect = {
+		## Set up the dynamic modifiers
+		# Grossraum/Main
+		add_ideas = GER_BOR_Econ_GER_idea
+		set_variable = { BOR_Econ_GER_political_power_gain = 0.1 }
+		set_variable = { BOR_Econ_GER_consumer_goods_factor = 0 }
+		set_variable = { BOR_Econ_GER_industrial_capacity_factory = 0 }
+		set_variable = { BOR_Econ_GER_production_factory_start_efficiency_factor = 0 }
+		set_variable = { BOR_Econ_GER_production_speed_buildings_factor = 0 }
+		set_variable = { BOR_Econ_GER_fuel_gain_factor = 0 }
+		set_variable = { BOR_Econ_GER_annual_gdp_growth_factor = 0 }
+		set_variable = { BOR_Econ_GER_misc_income_modifier = 0 }
+		add_dynamic_modifier = { modifier = GER_BOR_Econ_GER_dynamic_modifier }
+
+		# Ausgrenzung
+		add_ideas = GER_BOR_Ausgrenzung_idea
+		set_variable = { BOR_AusgrenzungCost = 0.03 } # 3% of total GDP
+		set_variable = { BOR_AusgrenzungProgress = 7.2 }
+		set_variable = { BOR_AusgrenzungProgressMonthly = 1.3 }
+		set_variable = { BOR_Ausgrenzung_political_power_gain = -0.3 }
+		set_variable = { BOR_Ausgrenzung_gdp_growth_modifier = 0 }
+		set_variable = { BOR_Ausgrenzung_industrial_equipment_monthly_rate = 0 }
+		set_variable = { BOR_Ausgrenzung_industrial_expertise_monthly_rate = 0 }
+		add_dynamic_modifier = { modifier = GER_BOR_Ausgrenzung_dynamic_modifier }
+
+		# Breitspurbahn
+		add_ideas = GER_BOR_Breitspurbahn_idea
+		set_variable = { BOR_BreitspurbahnCost = 0.5 } # 500M USD
+		set_variable = { BOR_BreitspurbahnProgress = 6.2 }
+		set_variable = { BOR_BreitspurbahnProgressMonthly = 0.8 }
+		set_variable = { BOR_Breitspurbahn_political_power_gain = -0.2 }
+		set_variable = { BOR_BreitspurbahnInvestment = -8 }
+		set_variable = { BOR_BreitspurbahnInvestmentDisplay = 8 }
+		add_dynamic_modifier = { modifier = GER_BOR_Breitspurbahn_dynamic_modifier }
+		
+		## Set up RKs
+		clear_array = BOR_GrossraumCountries
+		clear_array = BOR_GrossraumEasternCountries # Separate array for the eastern RKs
+		clear_array = BOR_GrossraumWesternCountries # And another one for the western RKs
+
+		clear_array = BOR_GrossraumRK_ID
+		add_to_array = { BOR_GrossraumRK_ID = 0 }
+		resize_array = { BOR_GrossraumRK_ID = 9 }
+
+		clear_array = BOR_GrossraumRK_X
+		add_to_array = { BOR_GrossraumRK_X = 0 }
+		resize_array = { BOR_GrossraumRK_X = 9 }
+
+		clear_array = BOR_GrossraumRK_Y
+		add_to_array = { BOR_GrossraumRK_Y = 0 }
+		resize_array = { BOR_GrossraumRK_Y = 9 }
+
+		clear_array = BOR_GrossraumRK_Frame
+		add_to_array = { BOR_GrossraumRK_Frame = 0 }
+		resize_array = { BOR_GrossraumRK_Frame = 9 }
+
+		for_each_scope_loop = {
+			array = faction_members
+			if = {
+				limit = {
+					OR = {
+						tag = GGN
+						tag = OSL
+						tag = UKR
+						tag = CRI
+						tag = CAU
+						tag = MCW
+						tag = HOL
+						tag = DEN
+						AND = {
+							tag = NOR
+							OR = {
+								has_government = national_socialism
+								has_government = fascism
+								has_government = despotism
+							}
+						}
+					}
+				}
+				BOR_EconMech_add_country = yes
+			}
+		}
+
+		## Set up variables
+		# Slave Population array definition
+		clear_array = BOR_SlavePop
+		add_to_array = { BOR_SlavePop = 0 }
+		resize_array = { BOR_SlavePop = 10 }
+
+		# Germany
+		set_variable = { Germany		= 0 }
+		set_variable = { BOR_SlavePop^0 = 19.847 }
+
+		# Poland/GGN
+		set_variable = { Poland			= 1 }
+		set_variable = { BOR_SlavePop^1 = 3.577 }
+
+		# Ostland
+		set_variable = { Ostland		= 2 }
+		set_variable = { BOR_SlavePop^2 = 5.231 }
+
+		# Ukraine
+		set_variable = { Ukraine		= 3 }
+		set_variable = { BOR_SlavePop^3 = 5.948 }
+
+		# Kaukasien
+		set_variable = { Kaukasien		= 4 }
+		set_variable = { BOR_SlavePop^4 = 5.245 }
+
+		# Moskowien
+		set_variable = { Moskowien		= 5 }
+		set_variable = { BOR_SlavePop^5 = 0.162 }
+
+		# Netherlands
+		set_variable = { Netherlands	= 6 }
+		set_variable = { BOR_SlavePop^6 = 0.112 }
+
+		# Denmark
+		set_variable = { Denmark		= 7 }
+		set_variable = { BOR_SlavePop^7 = 0.041 }
+
+		# Norway, if they are in the Pakt
+		set_variable = { Norway			= 8 }
+		if = {
+			limit = {
+				NOR = {
+					is_in_faction_with = GER
+					OR = {
+						has_government = national_socialism
+						has_government = fascism
+						has_government = despotism
+					}
+				}
+			}
+			set_variable = { BOR_SlavePop^8 = 0.030 }
+		}
+
+		# Calculate the total amount of slaves across the Reich
+		set_variable = { Total			    = 9 }
+		set_variable = { BOR_SlavePop^Total = 0 }
+		for_each_loop = {
+			array = BOR_SlavePop
+			if = {
+				limit = { check_variable = { i < Total } }
+				add_to_variable = { BOR_SlavePop^Total = v }
+			}
+		}
+
+		## Set up workforce values
+		BOR_EconMech_update_workforce_values = yes
+
+		## Set up display
+		BOR_EconMech_update_cost_display = yes
+
+		set_variable = { BOR_EconMech_SelectedProject = 0 }
+		set_variable = { BOR_ProjectMeter_Frame = BOR_AusgrenzungProgress }
+		set_variable = { BOR_Ausgrenzung_Button_Frame = 2 }
+		set_variable = { BOR_Breitspurbahn_Button_Frame = 1 }
+
+		set_variable = { BOR_EconMech_GER_Frame = 1 }
+		set_variable = { BOR_BreitspurbahnFrame = 1 }
+		set_variable = { BOR_BreitspurbahnDenmarkFrame = 1 }
+
+		## Update econ
+		recalculate_PUs_on_demand = yes
+		update_economy_tab = yes
+
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_activate; Max Workforce: [?BOR_MaxWorkforce] Workforce: [?BOR_Workforce] Workforce Factor: [?BOR_AusgrenzungProgress]"
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_activate; GDP Growth Bonus: [?BOR_Ausgrenzung_gdp_growth_modifier]"
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_activate; Slave Population (Germany): [?BOR_SlavePop^Germany] Slave Population (Total): [?BOR_SlavePop^Total]"
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_activate; Completed execution."
+	}
+}
+
+# Disable the mechanic once it is done
+BOR_EconMech_disable = {
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_disable; Bormann EconMech disabled"
+	clr_country_flag = BOR_EconomyMechanic_Active
+	clr_country_flag = BOR_EconMech_RK_select
+	clear_variable = BOR_Workforce
+	clear_variable = BOR_MaxWorkforce
+	clear_variable = BOR_RepatriatedSlaves
+
+	clear_variable = BOR_AusgrenzungCost
+	clear_variable = BOR_AusgrenzungCost_Display
+	clear_variable = BOR_AusgrenzungProgress
+	clear_variable = BOR_AusgrenzungProgressMonthly
+	clear_variable = BOR_Ausgrenzung_political_power_gain
+	clear_variable = BOR_Ausgrenzung_gdp_growth_modifier
+	clear_variable = BOR_Ausgrenzung_industrial_equipment_monthly_rate
+	clear_variable = BOR_Ausgrenzung_industrial_expertise_monthly_rate
+	hidden_effect = {
+		remove_ideas = GER_BOR_Ausgrenzung_idea
+		remove_dynamic_modifier = { modifier = GER_BOR_Ausgrenzung_dynamic_modifier }
+	}
+
+	clear_variable = BOR_BreitspurbahnCost
+	clear_variable = BOR_BreitspurbahnProgress
+	clear_variable = BOR_BreitspurbahnProgressMonthly
+	clear_variable = BOR_Breitspurbahn_political_power_gain
+	clear_variable = BOR_BreitspurbahnInvestment
+	clear_variable = BOR_BreitspurbahnInvestmentDisplay
+	hidden_effect = {
+		remove_ideas = GER_BOR_Breitspurbahn_idea
+		remove_dynamic_modifier = { modifier = GER_BOR_Breitspurbahn_dynamic_modifier }
+	}
+
+	for_each_scope_loop = {
+		array = BOR_GrossraumCountries
+		clr_country_flag = BOR_EconMech_modernize_infrastructure
+		clr_country_flag = BOR_EconMech_expand_resource_extraction
+		clr_country_flag = BOR_EconMech_eastern_industrial_buildup
+		clr_country_flag = BOR_EconMech_dockyard_investment
+	}
+	clear_array = BOR_GrossraumCountries
+	clear_array = BOR_GrossraumEasternCountries
+	clear_array = BOR_GrossraumWesternCountries
+	clear_array = BOR_SlavePop
+	clear_array = BOR_SlaveRepatriation
+
+	clear_variable = Germany
+	clear_variable = Poland
+	clear_variable = Ostland
+	clear_variable = Ukraine
+	clear_variable = Kaukasien
+	clear_variable = Moskowien
+	clear_variable = Netherlands
+	clear_variable = Denmark
+	clear_variable = Norway
+	clear_variable = Total
+
+	clear_variable = BOR_EconMech_SelectedProject
+	clear_variable = BOR_ProjectMeter_Frame
+	clear_variable = BOR_Ausgrenzung_Button_Frame
+	clear_variable = BOR_Breitspurbahn_Button_Frame
+
+	clear_variable = BOR_EconMech_GER_Frame
+	clear_variable = BOR_BreitspurbahnFrame
+	clear_variable = BOR_BreitspurbahnDenmarkFrame
+
+	clear_array = BOR_GrossraumRK_ID
+	clear_array = BOR_GrossraumRK_X
+	clear_array = BOR_GrossraumRK_Y
+	clear_array = BOR_GrossraumRK_Frame
+}
+
+BOR_EconMech_add_country = {
+	log = "[GetDateText]: [ROOT.GetName]: BOR_EconMech_add_country; Adding [THIS.GetName] to Großraum Kontinentaleuropa"
+	
+	set_variable = { BOR_Econ_RK_political_power_gain = -0.1 }
+	set_variable = { BOR_Econ_RK_stability_factor = 0 }
+	set_variable = { BOR_Econ_RK_industrial_capacity_factory = 0 }
+	set_variable = { BOR_Econ_RK_production_speed_buildings_factor = 0 }
+	set_variable = { BOR_Econ_RK_local_resources_factor = 0 }
+	set_variable = { BOR_Econ_RK_poverty_monthly_rate = 0 }
+	set_variable = { BOR_Econ_RK_GDP_to_sphere_leader_modifier = 0.025 }
+	add_dynamic_modifier = { modifier = GER_BOR_Econ_RK_dynamic_modifier }
+	add_ideas = GER_BOR_Econ_RK_idea
+
+	#### FULL REGIONAL X/Y VALUES LIST ####
+	# GGN (1) - { x = 191 y = 195 }
+	# OST (2) - { x = 202 y = 92  }
+	# UKR (3) - { x = 229 y = 193 }
+	# MCW (4) - { x = 273 y = 71  }
+	# CAU (5) - { x = 371 y = 266 }
+	# HOL (6) - { x = 16  y = 185 }
+	# DEN (7) - { x = 67  y = 121 }
+	# NOR (8) - { x = 32  y = 25  }
+
+	add_to_array = { GER.BOR_GrossraumCountries = THIS }
+	if = { # Poland/Generalgouvernment
+		limit = { tag = GGN }
+		add_to_array = { GER.BOR_GrossraumEasternCountries = THIS }
+		set_variable = { GER.BOR_GrossraumRK_ID^1 = THIS }
+		set_variable = { GER.BOR_GrossraumRK_X^1 = 191 }
+		set_variable = { GER.BOR_GrossraumRK_Y^1 = 195 }
+		set_variable = { GER.BOR_GrossraumRK_Frame^1 = 2 }
+	}
+	else_if = { # Ostland
+		limit = { tag = OSL }
+		add_to_array = { GER.BOR_GrossraumEasternCountries = THIS }
+		set_variable = { GER.BOR_GrossraumRK_ID^2 = THIS }
+		set_variable = { GER.BOR_GrossraumRK_X^2 = 202 }
+		set_variable = { GER.BOR_GrossraumRK_Y^2 = 92 }
+		set_variable = { GER.BOR_GrossraumRK_Frame^2 = 3 }
+	}
+	else_if = { # Ukraine
+		limit = { tag = UKR }
+		add_to_array = { GER.BOR_GrossraumEasternCountries = THIS }
+		set_variable = { GER.BOR_GrossraumRK_ID^3 = THIS }
+		set_variable = { GER.BOR_GrossraumRK_X^3 = 229 }
+		set_variable = { GER.BOR_GrossraumRK_Y^3 = 193 }
+		set_variable = { GER.BOR_GrossraumRK_Frame^3 = 4 }
+	}
+	else_if = { # Kaukasien
+		limit = { tag = CAU }
+		add_to_array = { GER.BOR_GrossraumEasternCountries = THIS }
+		set_variable = { GER.BOR_GrossraumRK_ID^4 = THIS }
+		set_variable = { GER.BOR_GrossraumRK_X^4 = 371 }
+		set_variable = { GER.BOR_GrossraumRK_Y^4 = 266 }
+		set_variable = { GER.BOR_GrossraumRK_Frame^4 = 3 }
+	}
+	else_if = { # Moskowien
+		limit = { tag = MCW }
+		add_to_array = { GER.BOR_GrossraumEasternCountries = THIS }
+		set_variable = { GER.BOR_GrossraumRK_ID^5 = THIS }
+		set_variable = { GER.BOR_GrossraumRK_X^5 = 273 }
+		set_variable = { GER.BOR_GrossraumRK_Y^5 = 71 }
+		set_variable = { GER.BOR_GrossraumRK_Frame^5 = 2 }
+	}
+	else_if = { # Netherlands
+		limit = { tag = HOL }
+		add_to_array = { GER.BOR_GrossraumWesternCountries = THIS }
+		set_variable = { GER.BOR_GrossraumRK_ID^6 = THIS }
+		set_variable = { GER.BOR_GrossraumRK_X^6 = 16 }
+		set_variable = { GER.BOR_GrossraumRK_Y^6 = 185 }
+		set_variable = { GER.BOR_GrossraumRK_Frame^6 = 2 }
+	}
+	else_if = { # Denmark
+		limit = { tag = DEN }
+		add_to_array = { GER.BOR_GrossraumWesternCountries = THIS }
+		set_variable = { GER.BOR_GrossraumRK_ID^7 = THIS }
+		set_variable = { GER.BOR_GrossraumRK_X^7 = 67 }
+		set_variable = { GER.BOR_GrossraumRK_Y^7 = 121 }
+		set_variable = { GER.BOR_GrossraumRK_Frame^7 = 3 }
+	}
+	else_if = { # Norway
+		limit = { tag = NOR }
+		add_to_array = { GER.BOR_GrossraumWesternCountries = THIS }
+		set_variable = { GER.BOR_GrossraumRK_ID^8 = THIS }
+		set_variable = { GER.BOR_GrossraumRK_X^8 = 32 }
+		set_variable = { GER.BOR_GrossraumRK_Y^8 = 25 }
+		set_variable = { GER.BOR_GrossraumRK_Frame^8 = 4 }
+	}
+}
+
+BOR_EconMech_MonthlyPulse = {
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_MonthlyPulse; Monthly Bormann EconMech update"
+	# Ausgrenzung Pulse
+	if = {
+		limit = { check_variable = { BOR_AusgrenzungProgress < 100 } }
+		# Monthly slave population change
+		BOR_EconMech_update_slave_pop = yes
+		# Monthly workforce change
+		BOR_EconMech_update_workforce = yes
+
+		# Progressbar frame calc
+		if = {
+			limit = { check_variable = { BOR_EconMech_SelectedProject = 0 } }
+			set_variable = { BOR_ProjectMeter_Frame = BOR_AusgrenzungProgress }
+		}
+	}
+
+	# Breitspurbahn pulse
+	if = {
+		limit = { check_variable = { BOR_BreitspurbahnProgress < 100 } }
+		# Monthly Breitspurbahn progress
+		BOR_EconMech_update_breitspurbahn_progress = yes
+
+		# Progressbar frame calc
+		if = {
+			limit = { check_variable = { BOR_EconMech_SelectedProject = 1 } }
+			set_variable = { BOR_ProjectMeter_Frame = BOR_BreitspurbahnProgress }
+		}
+	}
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_MonthlyPulse; Completed execution."
+}
+
+# Used to increase the integration of a single RK
+# Needs to be used at the respective RK's country scope!
+BOR_EconMech_increase_integration = {
+	add_to_variable = { BOR_Econ_RK_political_power_gain = -0.1 }
+	if = {
+		limit = { check_variable = { GER_BOR_Econ_RK_integration = 1 } }
+		log = "[GetDateText]: [THIS.GetName]: BOR_EconMech_increase_integration; Großraum integration increased - Old: 1 New: 2"
+		add_to_variable = { GER_BOR_Econ_RK_integration = 1 }
+		add_to_variable = { BOR_Econ_RK_GDP_to_sphere_leader_modifier = 0.025 }
+	}
+	else_if = {
+		limit = { check_variable = { GER_BOR_Econ_RK_integration = 2 } }
+		log = "[GetDateText]: [THIS.GetName]: BOR_EconMech_increase_integration; Großraum integration increased - Old: 2 New: 3"
+		add_to_variable = { GER_BOR_Econ_RK_integration = 1 }
+		add_to_variable = { BOR_Econ_RK_GDP_to_sphere_leader_modifier = 0.025 }
+	}
+	else_if = {
+		limit = { check_variable = { GER_BOR_Econ_RK_integration = 3 } }
+		log = "[GetDateText]: [THIS.GetName]: BOR_EconMech_increase_integration; Großraum integration increased - Old: 3 New: 4"
+		add_to_variable = { GER_BOR_Econ_RK_integration = 1 }
+		add_to_variable = { GER.BOR_Econ_GER_political_power_gain = 0.05 }
+		add_to_variable = { BOR_Econ_RK_GDP_to_sphere_leader_modifier = 0.025 }
+	}
+	else_if = {
+		limit = { check_variable = { GER_BOR_Econ_RK_integration = 4 } }
+		log = "[GetDateText]: [THIS.GetName]: BOR_EconMech_increase_integration; Großraum integration ERROR - already has full integration"
+		# do nothing
+	}
+	else = {
+		log = "[GetDateText]: [THIS.GetName]: BOR_EconMech_increase_integration; Großraum integration increased - Old: N/A New: 1"
+		set_variable = { GER_BOR_Econ_RK_integration = 1 }
+		add_to_variable = { BOR_Econ_RK_GDP_to_sphere_leader_modifier = 0.025 }
+	}
+}
+
+# Generic effect used by button presses in the map
+# Needs to be used at the respective RK's country scope!
+BOR_EconMech_RK_selection_map = {
+	GER = { clr_country_flag = BOR_EconMech_RK_select }
+	if = {
+		limit = { GER = { has_country_flag = BOR_RK_Selection_modernize_infrastructure } }
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_map; Großraum selection: [THIS.GetName]"
+		set_variable = { GER.BOR_Selected_RK_modernize_infrastructure = THIS.id }
+		GER = { clr_country_flag = BOR_RK_Selection_modernize_infrastructure }
+	}
+	else_if = {
+		limit = { GER = { has_country_flag = BOR_RK_Selection_expand_resource_extraction } }
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_map; Großraum selection: [THIS.GetName]"
+		set_variable = { GER.BOR_Selected_RK_expand_resource_extraction = THIS.id }
+		GER = { clr_country_flag = BOR_RK_Selection_expand_resource_extraction }
+	}
+	else_if = {
+		limit = { GER = { has_country_flag = BOR_RK_Selection_eastern_industrial_buildup } }
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_map; Großraum selection: [THIS.GetName]"
+		set_variable = { GER.BOR_Selected_RK_eastern_industrial_buildup = THIS.id }
+		GER = { clr_country_flag = BOR_RK_Selection_eastern_industrial_buildup }
+	}
+	else_if = {
+		limit = { GER = { has_country_flag = BOR_RK_Selection_dockyard_investment } }
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_map; Großraum selection: [THIS.GetName]"
+		set_variable = { GER.BOR_Selected_RK_dockyard_investment = THIS.id }
+		GER = { clr_country_flag = BOR_RK_Selection_dockyard_investment }
+	}
+	else_if = {
+		limit = { GER = { has_country_flag = BOR_RK_Selection_western_slave_repatriation } }
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_map; Großraum selection: [THIS.GetName]"
+		set_variable = { GER.BOR_Selected_RK_western_slave_repatriation = THIS.id }
+		GER = { clr_country_flag = BOR_RK_Selection_western_slave_repatriation }
+	}
+
+	# Debug stuff
+	else_if = {
+		limit = { GER = { has_country_flag = BOR_RK_Selection_map_decision_test } }
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_map; Großraum selection: [THIS.GetName]"
+		set_variable = { GER.BOR_Selected_RK_map_decision_test = THIS.id }
+		GER = { clr_country_flag = BOR_RK_Selection_map_decision_test }
+	}
+	else_if = {
+		limit = { GER = { has_country_flag = BOR_EconMech_integration_variable_set } }
+		log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_map; Großraum selection: [THIS.GetName]"
+		BOR_EconMech_increase_integration = yes
+		GER = { clr_country_flag = BOR_EconMech_integration_variable_set }
+	}
+}
+
+#  Used by decisions to activate RK selection in the map
+BOR_EconMech_RK_selection_decision = {
+	custom_effect_tooltip = GER_Bormann_EconMech_RK_selection_tt
+	set_country_flag = BOR_EconMech_RK_select
+	hidden_effect = { country_event = { id = bor_econ.1 days = 3 } } # If a RK has not been chosen by 3 days, choose one randomly
+}
+
+# Fired by the above hidden event, clears selection of RK and chooses one randomly
+BOR_EconMech_RK_selection_complete = {
+	if = {
+		limit = { has_country_flag = BOR_RK_Selection_modernize_infrastructure }
+		random_scope_in_array = {
+			array = BOR_GrossraumCountries
+			limit = { NOT = { has_country_flag = BOR_EconMech_modernize_infrastructure } }
+			log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_complete; Großraum selection: [THIS.GetName]"
+			set_variable = { GER.BOR_Selected_RK_modernize_infrastructure = THIS.id }
+		}
+		clr_country_flag = BOR_RK_Selection_modernize_infrastructure
+	}
+	else_if = {
+		limit = { has_country_flag = BOR_RK_Selection_expand_resource_extraction }
+		random_scope_in_array = {
+			array = BOR_GrossraumEasternCountries
+			limit = { NOT = { has_country_flag = BOR_EconMech_expand_resource_extraction } }
+			log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_complete; Großraum selection: [THIS.GetName]"
+			set_variable = { GER.BOR_Selected_RK_expand_resource_extraction = THIS.id }
+		}
+		clr_country_flag = BOR_RK_Selection_expand_resource_extraction
+	}
+	else_if = {
+		limit = { has_country_flag = BOR_RK_Selection_eastern_industrial_buildup }
+		random_scope_in_array = {
+			array = BOR_GrossraumEasternCountries
+			limit = { NOT = { has_country_flag = BOR_EconMech_eastern_industrial_buildup } }
+			log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_complete; Großraum selection: [THIS.GetName]"
+			set_variable = { GER.BOR_Selected_RK_eastern_industrial_buildup = THIS.id }
+		}
+		clr_country_flag = BOR_RK_Selection_eastern_industrial_buildup
+	}
+	else_if = {
+		limit = { has_country_flag = BOR_RK_Selection_dockyard_investment }
+		random_scope_in_array = {
+			array = BOR_GrossraumWesternCountries
+			limit = { NOT = { has_country_flag = BOR_EconMech_dockyard_investment } }
+			log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_complete; Großraum selection: [THIS.GetName]"
+			set_variable = { GER.BOR_Selected_RK_dockyard_investment = THIS.id }
+		}
+		clr_country_flag = BOR_RK_Selection_dockyard_investment
+	}
+	else_if = {
+		limit = { has_country_flag = BOR_RK_Selection_western_slave_repatriation }
+		random_scope_in_array = {
+			array = BOR_GrossraumWesternCountries
+			limit = { NOT = { has_country_flag = BOR_EconMech_western_slave_repatriation } }
+			log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_complete; Großraum selection: [THIS.GetName]"
+			set_variable = { GER.BOR_Selected_RK_western_slave_repatriation = THIS.id }
+		}
+		clr_country_flag = BOR_RK_Selection_western_slave_repatriation
+	}
+
+	# Debug stuff
+	else_if = {
+		limit = { has_country_flag = BOR_RK_Selection_map_decision_test }
+		random_scope_in_array = {
+			array = BOR_GrossraumCountries
+			log = "[GetDateText]: [Root.GetName]: BOR_EconMech_RK_selection_complete; Großraum selection: [THIS.GetName]"
+			set_variable = { GER.BOR_Selected_RK_map_decision_test = THIS.id }
+		}
+		clr_country_flag = BOR_RK_Selection_map_decision_test
+	}
+	clr_country_flag = BOR_EconMech_RK_select
+}
+
+########################
+### UPDATE EQUATIONS ###
+########################
+
+### Monthly workforce number update
+## Equations:
+# Max Workforce = (German Population - German Slave Population) * 0.7
+# Workforce = Max Workforce * Total Progress / 100
+
+## Notes:
+# Both population numbers are given in millions
+BOR_EconMech_update_workforce = {
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_update_workforce; Bormann Workforce update"
+
+	add_to_variable = { BOR_AusgrenzungProgress = BOR_AusgrenzungProgressMonthly }
+	clamp_variable = { var = BOR_AusgrenzungProgress max = 100 }
+
+	# Update values and effects
+	BOR_EconMech_update_workforce_values = yes
+
+	# Check to see if the program has finished
+	if = {
+		limit = { check_variable = { BOR_AusgrenzungProgress = 100 } }
+		clear_variable = BOR_AusgrenzungCost_Display
+		clear_variable = BOR_AusgrenzungProgressMonthly
+		set_variable = { BOR_AusgrenzungCost = 0 }
+		set_variable = { BOR_Ausgrenzung_political_power_gain = 0 }
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_update_workforce; Max Workforce: [?BOR_MaxWorkforce] Workforce: [?BOR_Workforce] Workforce Factor: [?BOR_AusgrenzungProgress]%"
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_update_workforce; GDP Growth Bonus: [?BOR_Ausgrenzung_gdp_growth_modifier]"
+}
+
+BOR_EconMech_update_workforce_values = {
+	clear_variable = BOR_MaxWorkforce
+	clear_variable = BOR_Workforce
+
+	# Calculate max workforce
+	set_variable = { BOR_MaxWorkforce = max_manpower_k }
+	divide_variable = { BOR_MaxWorkforce = 1000 }
+	subtract_from_variable = { BOR_MaxWorkforce = BOR_SlavePop^Germany }
+	multiply_variable = { BOR_MaxWorkforce = 0.7 }
+
+	# Calculate civilian workforce number
+	set_variable = { BOR_Workforce = BOR_MaxWorkforce }
+	multiply_variable = { BOR_Workforce = BOR_AusgrenzungProgress }
+	divide_variable = { BOR_Workforce = 100 }
+
+	# Update economical bonus
+	set_variable = { BOR_Ausgrenzung_gdp_growth_modifier = BOR_AusgrenzungProgress }
+	multiply_variable = { BOR_Ausgrenzung_gdp_growth_modifier = 0.05 }
+
+	# Update socdev bonus
+	set_variable = { BOR_Ausgrenzung_industrial_equipment_monthly_rate = BOR_AusgrenzungProgress }
+	multiply_variable = { BOR_Ausgrenzung_industrial_equipment_monthly_rate = 0.05 }
+
+	set_variable = { BOR_Ausgrenzung_industrial_expertise_monthly_rate = BOR_AusgrenzungProgress }
+	multiply_variable = { BOR_Ausgrenzung_industrial_expertise_monthly_rate = 0.05 }
+
+	# Update efficiency bonus
+	set_variable = { BOR_Econ_GER_production_factory_start_efficiency_factor = BOR_AusgrenzungProgress }
+	divide_variable = { BOR_Econ_GER_production_factory_start_efficiency_factor = 100 }
+	multiply_variable = { BOR_Econ_GER_production_factory_start_efficiency_factor = 0.15 }
+}
+
+### Monthly slave population number update
+## Equations:
+# Population Change Factor = ((Monthly Progress - 1) * 0.008) + 0.008
+# Population Change Multiplier = 1 - Population Change Factor
+# Repatriated Slaves = Slave Population * Population Change Factor * 1000
+# Slave Population(new) = Slave Population(old) * Population Change Multiplier
+
+## Notes:
+# Slave Population(new) is the updated value, Slave Population(old) is the value it had in the previous month
+# 0.008 is the minimum base value, resulting in a 38.3% reduction in the number of slaves in Germany in 5 years. By default (considering only direct investment changes) it can be increased to up to double that amount
+BOR_EconMech_update_slave_pop = {
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_update_slave_pop; Bormann Slave Population update"
+	
+	set_temp_variable = { BOR_SlavePopChange = BOR_AusgrenzungProgressMonthly } # Repatriation amount is determined by the amount of money invested into the Ausgrenzung project
+	add_to_temp_variable = { BOR_SlavePopChange = -1 }
+	multiply_temp_variable = { BOR_SlavePopChange = 0.008 }
+	add_to_temp_variable = { BOR_SlavePopChange = 0.008 }
+	set_temp_variable = { BOR_SlavePopChangeFactor = 1 }
+	subtract_from_temp_variable = { BOR_SlavePopChangeFactor = BOR_SlavePopChange }
+
+	# Sets the amount of repatriated slaves to be redistributed to the eastern RKs
+	set_variable = { BOR_RepatriatedSlaves = BOR_SlavePop^Germany }
+	multiply_variable = { BOR_RepatriatedSlaves = BOR_SlavePopChange }
+	add_to_variable = { BOR_RepatriatedSlaves = BOR_ExtraRepatriatedSlaves } # An additional number of slaves to be deported, currently added by the Western Slave Repatriation generic decision
+	clear_variable = BOR_ExtraRepatriatedSlaves
+	
+	multiply_variable = { BOR_RepatriatedSlaves = 1000 } # Multiply it to get the number of slaves in thousands
+	round_variable = BOR_RepatriatedSlaves
+	
+	# Break up the repatriated slave amount into smaller chunks of one thousand slaves each and randomly distribute these chunks into the eastern RKs
+	add_to_temp_array = { BOR_SlaveRepatriationPackets = 0 } # Need to set up a temp array because for loops are only available inside arrays
+	resize_temp_array = { BOR_SlaveRepatriationPackets = BOR_RepatriatedSlaves }
+
+	clear_array = BOR_SlaveRepatriation
+	add_to_array = { BOR_SlaveRepatriation = 0 }
+	resize_array = { BOR_SlaveRepatriation = 6 }
+
+	for_each_loop = {
+		array = BOR_SlaveRepatriationPackets
+		random_list = {
+			15 = { add_to_variable = { BOR_SlaveRepatriation^Poland = 0.001 } }
+			10 = { add_to_variable = { BOR_SlaveRepatriation^Ostland = 0.001 } }
+			25 = { add_to_variable = { BOR_SlaveRepatriation^Ukraine = 0.001 } }
+			20 = { add_to_variable = { BOR_SlaveRepatriation^Kaukasien = 0.001 } }
+			30 = { add_to_variable = { BOR_SlaveRepatriation^Moskowien = 0.001 } }
+		}
+	}
+
+	# Off to the east you go
+	add_to_variable = { BOR_SlavePop^Poland = BOR_SlaveRepatriation^Poland }
+	add_to_variable = { BOR_SlavePop^Ostland = BOR_SlaveRepatriation^Ostland }
+	add_to_variable = { BOR_SlavePop^Ukraine = BOR_SlaveRepatriation^Ukraine }
+	add_to_variable = { BOR_SlavePop^Kaukasien = BOR_SlaveRepatriation^Kaukasien }
+	add_to_variable = { BOR_SlavePop^Moskowien = BOR_SlaveRepatriation^Moskowien }
+
+	for_each_loop = {
+		array = BOR_SlaveRepatriation
+		multiply_variable = { BOR_SlaveRepatriation^i = 1000 }
+	}
+
+	# Update the population effects
+	for_each_scope_loop = {
+		array = BOR_GrossraumEasternCountries
+		BOR_EconMech_RK_SlavePop_effect_update = yes
+	}
+
+	# Reduce the amount of slaves in Germany
+	multiply_variable = { BOR_SlavePop^Germany = BOR_SlavePopChangeFactor }
+
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_update_slave_pop; Slave Population: [?BOR_SlavePop^Germany] Repatriated Slaves: [?BOR_RepatriatedSlaves]"
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_update_slave_pop; Slaves to Poland: [?BOR_SlaveRepatriation^Poland] Slaves to Ostland: [?BOR_SlaveRepatriation^Ostland] Slaves to Ukraine: [?BOR_SlaveRepatriation^Ukraine] Slaves to Kaukasien: [?BOR_SlaveRepatriation^Kaukasien] Slaves to Moskowien: [?BOR_SlaveRepatriation^Moskowien]"
+}
+
+### Monthly update for the repatriated slave population effects on the RKs
+BOR_EconMech_RK_SlavePop_effect_update = {
+	# Set up temp variables
+	if = {
+		limit = { tag = GGN }
+		set_temp_variable = { BOR_SlavePopEffects = GER.BOR_SlaveRepatriation^GER.Poland }
+	}
+	else_if = {
+		limit = { tag = OSL }
+		set_temp_variable = { BOR_SlavePopEffects = GER.BOR_SlaveRepatriation^GER.Ostland }
+	}
+	else_if = {
+		limit = { tag = UKR }
+		set_temp_variable = { BOR_SlavePopEffects = GER.BOR_SlaveRepatriation^GER.Ukraine }
+	}
+	else_if = {
+		limit = { tag = CAU }
+		set_temp_variable = { BOR_SlavePopEffects = GER.BOR_SlaveRepatriation^GER.Kaukasien }
+	}
+	else_if = {
+		limit = { tag = MCW }
+		set_temp_variable = { BOR_SlavePopEffects = GER.BOR_SlaveRepatriation^GER.Moskowien }
+	}
+
+	# Apply the values in the dynamic modifier
+	divide_temp_variable = { BOR_SlavePopEffects = 7500 }
+	subtract_from_variable = { BOR_Econ_RK_stability_factor = BOR_SlavePopEffects }
+	add_to_variable = { BOR_Econ_RK_industrial_capacity_factory = BOR_SlavePopEffects }
+
+	# Also apply on the autonomies
+	if = {
+		limit = { tag = UKR }
+		subtract_from_variable = { CRI.BOR_Econ_RK_stability_factor = UKR.BOR_SlavePopEffects }
+		add_to_variable = { CRI.BOR_Econ_RK_industrial_capacity_factory = UKR.BOR_SlavePopEffects }
+	}
+}
+
+### Update the display variable
+BOR_EconMech_update_cost_display = {
+	set_variable = { BOR_AusgrenzungCost_Display = GDP }
+	multiply_variable = { BOR_AusgrenzungCost_Display = BOR_AusgrenzungCost }
+}
+
+### Monthly progress update for the Breitspurbahn
+BOR_EconMech_update_breitspurbahn_progress = {
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_update_breitspurbahn_progress; Bormann Breitspurbahn progress update"
+
+	add_to_variable = { BOR_BreitspurbahnProgress = BOR_BreitspurbahnProgressMonthly }
+	clamp_variable = { var = BOR_BreitspurbahnProgress max = 100 }
+
+	## Progress Milestone events
+	# Main
+	if = { # Katharinastadt-Baku (final)
+		limit = { check_variable = { BOR_BreitspurbahnProgress = 100 } }
+		country_event = { id = bor_econ.311 days = 3 }
+		clear_variable = BOR_BreitspurbahnCost
+		clear_variable = BOR_BreitspurbahnProgressMonthly
+		clear_variable = BOR_BreitspurbahnInvestment
+		clear_variable = BOR_BreitspurbahnInvestmentDisplay
+		clear_variable = BOR_Breitspurbahn_political_power_gain
+		remove_dynamic_modifier = { modifier = GER_BOR_Breitspurbahn_dynamic_modifier }
+	}
+	else_if = { # Rostau-Katharinastadt
+		limit = { check_variable = { BOR_BreitspurbahnProgress > 91.5 } }
+		country_event = { id = bor_econ.310 days = 3 }
+	}
+	else_if = { # Rostau-Paulusburg
+		limit = { check_variable = { BOR_BreitspurbahnProgress > 83 } }
+		country_event = { id = bor_econ.309 days = 3 }
+	}
+	else_if = { # Kiew-Rostau
+		limit = { check_variable = { BOR_BreitspurbahnProgress > 74.5 } }
+		country_event = { id = bor_econ.308 days = 3 }
+	}
+	else_if = { # Minsk-Sankt Peterburg
+		limit = { check_variable = { BOR_BreitspurbahnProgress > 66 } }
+		country_event = { id = bor_econ.307 days = 3 }
+	}
+	else_if = { # Minsk-Moskau
+		limit = { check_variable = { BOR_BreitspurbahnProgress > 57.5 } }
+		country_event = { id = bor_econ.306 days = 3 }
+	}
+	else_if = { # Minsk-Riga
+		limit = { check_variable = { BOR_BreitspurbahnProgress > 49 } }
+		country_event = { id = bor_econ.305 days = 3 }
+	}
+	else_if = { # Krakau-Minsk
+		limit = { check_variable = { BOR_BreitspurbahnProgress > 40.5 } }
+		country_event = { id = bor_econ.304 days = 3 }
+	}
+	else_if = { # Krakau-Kiew
+		limit = { check_variable = { BOR_BreitspurbahnProgress > 32 } }
+		country_event = { id = bor_econ.303 days = 3 }
+	}
+	else_if = { # Germania-Krakau
+		limit = { check_variable = { BOR_BreitspurbahnProgress > 23.5 } }
+		country_event = { id = bor_econ.302 days = 3 }
+	}
+	else_if = { # Amsterdam-Hamburg-Germania
+		limit = { check_variable = { BOR_BreitspurbahnProgress > 15 } }
+		country_event = { id = bor_econ.301 days = 3 }
+	}
+
+	# Extra
+	if = { # Germania-Copenhagen
+		limit = {
+			has_variable = BOR_BreitspurbahnDenmarkProgress
+			OR = {
+				check_variable = { BOR_BreitspurbahnProgress > BOR_BreitspurbahnDenmarkProgress }
+				check_variable = { BOR_BreitspurbahnProgress = BOR_BreitspurbahnDenmarkProgress }
+			}
+		}
+		country_event = { id = bor_econ.312 days = 3 }
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_update_breitspurbahn_progress; Monthly progress: [?BOR_BreitspurbahnProgressMonthly]"
+	log = "[GetDateText]: [Root.GetName]: BOR_EconMech_update_breitspurbahn_progress; Current progress: [?BOR_BreitspurbahnProgress]"
+}
+
+########################
+### MODIFIER EFFECTS ###
+########################
+
+## Modify the Ausgrenzungsprogramm's progress directly
+# Arguments: BOR_Ausgrenzung_Progress_Change
+# Default value: 4
+BOR_EconMech_Ausgrenzung_Modify_Progress = {
+	# Defining the tooltip
+	set_temp_variable = { BOR_AusgrenzungProgress_temp = BOR_AusgrenzungProgress }
+	add_to_temp_variable = { BOR_AusgrenzungProgress_temp = BOR_Ausgrenzung_Progress_Change?4 }
+	if = {
+		limit = { check_variable = { BOR_Ausgrenzung_Progress_Change?4 > 0 } }
+		custom_effect_tooltip = BOR_EconMech_Ausgrenzung_Modify_Progress_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BOR_EconMech_Ausgrenzung_Modify_Progress_sub_tt
+	}
+
+	# The actual math
+	add_to_variable = { BOR_AusgrenzungProgress = BOR_Ausgrenzung_Progress_Change?4 }
+	clamp_variable = { var = BOR_AusgrenzungProgress max = 100 min = 0 }
+}
+
+## Modify the Breitspurbahn's progress directly
+# Arguments: BOR_Breitspurbahn_Progress_Change
+# Default value: 4
+BOR_EconMech_Breitspurbahn_Modify_Progress = {
+	# Defining the tooltip
+	set_temp_variable = { BOR_BreitspurbahnProgress_temp = BOR_BreitspurbahnProgress }
+	add_to_temp_variable = { BOR_BreitspurbahnProgress_temp = BOR_Breitspurbahn_Progress_Change?4 }
+	if = {
+		limit = { check_variable = { BOR_Breitspurbahn_Progress_Change?4 > 0 } }
+		custom_effect_tooltip = BOR_EconMech_Breitspurbahn_Modify_Progress_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BOR_EconMech_Breitspurbahn_Modify_Progress_sub_tt
+	}
+
+	# The actual math
+	add_to_variable = { BOR_BreitspurbahnProgress = BOR_Breitspurbahn_Progress_Change?4 }
+	clamp_variable = { var = BOR_BreitspurbahnProgress max = 100 min = 0 }
+}
+
+## Modify the Ausgrenzungsprogramm's monthly progress
+# Arguments: BOR_Ausgrenzung_MonthlyProgress_Change
+# Default value: 0.1
+BOR_EconMech_Ausgrenzung_Modify_MonthlyProgress = {
+	# Defining the tooltip
+	set_temp_variable = { BOR_AusgrenzungMonthlyProgress_temp = BOR_AusgrenzungProgressMonthly }
+	add_to_temp_variable = { BOR_AusgrenzungMonthlyProgress_temp = BOR_Ausgrenzung_MonthlyProgress_Change?0.1 }
+	if = {
+		limit = { check_variable = { BOR_Ausgrenzung_MonthlyProgress_Change?0.1 > 0 } }
+		custom_effect_tooltip = BOR_EconMech_Ausgrenzung_Modify_MonthlyProgress_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BOR_EconMech_Ausgrenzung_Modify_MonthlyProgress_sub_tt
+	}
+
+	# The actual math
+	add_to_variable = { BOR_AusgrenzungProgressMonthly = BOR_Ausgrenzung_MonthlyProgress_Change?0.1 }
+	clamp_variable = { var = BOR_AusgrenzungProgressMonthly min = 0 }
+}
+
+## Modify the Breitspurbahn's monthly progress
+# Arguments: BOR_Breitspurbahn_MonthlyProgress_Change
+# Default value: 0.1
+BOR_EconMech_Breitspurbahn_Modify_MonthlyProgress = {
+	# Defining the tooltip
+	set_temp_variable = { BOR_BreitspurbahnMonthlyProgress_temp = BOR_BreitspurbahnProgressMonthly }
+	add_to_temp_variable = { BOR_BreitspurbahnMonthlyProgress_temp = BOR_Breitspurbahn_MonthlyProgress_Change?0.1 }
+	if = {
+		limit = { check_variable = { BOR_Breitspurbahn_MonthlyProgress_Change?0.1 > 0 } }
+		custom_effect_tooltip = BOR_EconMech_Breitspurbahn_Modify_MonthlyProgress_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BOR_EconMech_Breitspurbahn_Modify_MonthlyProgress_sub_tt
+	}
+
+	# The actual math
+	add_to_variable = { BOR_BreitspurbahnProgressMonthly = BOR_Breitspurbahn_MonthlyProgress_Change?0.1 }
+	clamp_variable = { var = BOR_BreitspurbahnProgressMonthly min = 0 }
+}

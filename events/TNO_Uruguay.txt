@@ -1,0 +1,1770 @@
+add_namespace = URG_scripted
+add_namespace = URG_marzist
+add_namespace = URG_aguerrondo
+
+country_event = { #1962 HOG Rotation
+	id = URG_scripted.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event URG_scripted.1" }
+	title = URG_scripted.1.t
+	desc = URG_scripted.1.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_scripted.1.a
+		remove_ideas = URG_Victor_Haedo_hog
+		add_ideas = URG_Faustino_Harrison_hog
+	}
+}
+
+country_event = { #1962 General Election
+	id = URG_scripted.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event URG_scripted.2" }
+	title = URG_scripted.2.t
+	desc = URG_scripted.2.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#Herrerism
+		name = URG_scripted.2.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_UBD }
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_UCB }
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_BATLLISM }
+				}
+			}
+		}
+		trigger = {
+			NOT = {
+				has_country_flag = URG_62_PN_Banned
+			}
+		}
+		set_country_flag = URG_62_con
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.117 }
+			}
+		}
+	}
+
+	option = {#UBD
+		name = URG_scripted.2.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_HERRERISM }
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_UCB }
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_BATLLISM }
+				}
+			}
+		}
+		trigger = {
+			NOT = {
+				has_country_flag = URG_62_PN_Banned
+			}
+		}
+		add_popularity = {
+			ideology = liberal_conservatism
+			popularity = 0.02
+		}
+		set_country_flag = URG_62_libcon
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.118 }
+			}
+		}
+	}
+
+	option = {#UCB
+		name = URG_scripted.2.c
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_HERRERISM }
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_UBD }
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_BATLLISM }
+				}
+			}
+		}
+		add_popularity = {
+			ideology = paternalism
+			popularity = 0.02
+		}
+		set_country_flag = URG_62_pat
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.119 }
+			}
+		}
+	}
+
+	option = {#Batllism
+		name = URG_scripted.2.d
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_HERRERISM }
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_UBD }
+					has_game_rule = { rule = URG_62_ELECTION_PATH option = URG_62_ELECTION_PATH_UCB }
+				}
+			}
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = 0.02
+		}
+		set_country_flag = URG_62_prog
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.120 }
+			}
+		}
+	}
+}
+
+country_event = { #1963 Governments Taking Power
+	id = URG_scripted.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event URG_scripted.3" }
+	title = URG_scripted.3.t
+	desc = URG_scripted.3.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_scripted.3.a
+		remove_all_ministers = yes
+		if = {
+			limit = {
+				has_country_flag = URG_62_prog
+			}
+			URG_Consejo_Nacional_de_Gobierno = {
+				promote_character = progressivism_social_radicalism_subtype
+			}
+			URG_Martin_Echegoyen = {
+				promote_character = conservatism_subtype
+			}
+			set_politics = {
+				ruling_party = progressivism
+				last_election = "1962.11.25"
+				election_frequency = 48
+				elections_allowed = yes
+			}
+			add_ideas = {
+				URG_Luis_Batlle_Berres_hog
+				URG_Francisco_Forteza_for
+				URG_Arturo_Lezama_eco
+				URG_Glauco_Segovia_sec
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URG_62_pat
+			}
+			URG_Consejo_Nacional_de_Gobierno = {
+				promote_character = paternalism_social_nationalism_subtype
+			}
+			URG_Martin_Echegoyen = {
+				promote_character = conservatism_subtype
+			}
+			set_politics = {
+				ruling_party = paternalism
+				last_election = "1962.11.25"
+				election_frequency = 48
+				elections_allowed = yes
+			}
+			add_ideas = {
+				URG_Oscar_Diego_Gestido_hog
+				URG_Cesar_Charlone_for
+				URG_Luis_Alberto_Brause_eco
+				URG_Antonio_Francese_sec
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URG_62_con
+			}
+			add_ideas = {
+				URG_Alberto_Arocena_hog
+				URG_Juan_Felipe_Yriart_for
+				URG_Juan_Eduardo_Azzini_eco
+				URG_Modesto_Rebollo_sec
+			}
+		}
+		else = {
+			URG_Consejo_Nacional_de_Gobierno = {
+				promote_character = liberal_conservatism_subtype
+			}
+			URG_Martin_Echegoyen = {
+				promote_character = conservatism_subtype
+			}
+			set_politics = {
+				ruling_party = liberal_conservatism
+				last_election = "1962.11.25"
+				election_frequency = 48
+				elections_allowed = yes
+			}
+			add_ideas = {
+				URG_Daniel_Fernandez_Crespo_hog
+				URG_Alejandro_Zorilla_de_San_Martin_for
+				URG_Generic_Vacant_eco
+				URG_Salvador_Ferrer_Serra_eco
+			}
+		}
+		country_event = { id = URG_scripted.3000 days = 365 }
+	}
+}
+
+country_event = { #1964 Routine
+	id = URG_scripted.3000
+	immediate = { log = "[GetDateText]: [Root.GetName]: event URG_scripted.3000" }
+	title = URG_scripted.3000.t
+	desc = URG_scripted.3000.desc
+	trigger = {
+		NOT = {
+			has_government = despotism
+			has_government = fascism
+			has_government = ultranationalism
+		}
+	}
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_scripted.3000.a
+		remove_ideas_with_trait = head_of_government
+		if = {
+			limit = {
+				has_government = progressivism
+			}
+			add_ideas = {
+				URG_Amilcar_Vasconcellos_hog
+			}
+		}
+		else_if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_ideas = {
+				URG_Augusto_Legnani_hog
+			}
+		}
+		else_if = {
+			limit = {
+				has_government = conservatism
+			}
+			add_ideas = {
+				URG_Juan_Jose_Gari_hog
+			}
+		}
+		else = {
+			add_ideas = {
+				URG_Dardo_Ortiz_hog
+			}
+		}
+		country_event = { id = URG_scripted.3001 days = 365 }
+	}
+}
+
+country_event = { #1965 Routine
+	id = URG_scripted.3001
+	immediate = { log = "[GetDateText]: [Root.GetName]: event URG_scripted.3001" }
+	title = URG_scripted.3001.t
+	desc = URG_scripted.3001.desc
+	trigger = {
+		NOT = {
+			has_government = despotism
+			has_government = fascism
+			has_government = ultranationalism
+		}
+	}
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_scripted.3001.a
+		remove_ideas_with_trait = head_of_government
+		if = {
+			limit = {
+				has_government = progressivism
+			}
+			add_ideas = {
+				URG_Alberto_Abdala_hog
+			}
+		}
+		else_if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_ideas = {
+				URG_Carlos_Manini_Rios_hog
+			}
+		}
+		else_if = {
+			limit = {
+				has_government = conservatism
+			}
+			add_ideas = {
+				URG_Francisco_Gilmet_hog
+			}
+		}
+		else = {
+			add_ideas = {
+				URG_Washington_Beltran_Mullin_hog
+			}
+		}
+		country_event = { id = URG_scripted.3002 days = 365 }
+	}
+}
+
+country_event = { #1966 Routine
+	id = URG_scripted.3002
+	immediate = { log = "[GetDateText]: [Root.GetName]: event URG_scripted.3002" }
+	title = URG_scripted.3002.t
+	desc = URG_scripted.3002.desc
+	trigger = {
+		NOT = {
+			has_government = despotism
+			has_government = fascism
+			has_government = ultranationalism
+		}
+	}
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_scripted.3002.a
+		remove_ideas_with_trait = head_of_government
+		if = {
+			limit = {
+				has_government = progressivism
+			}
+			add_ideas = {
+				URG_Jose_Acquistapace_hog
+			}
+		}
+		else_if = {
+			limit = {
+				has_government = paternalism
+			}
+			add_ideas = {
+				URG_Tabare_Berreta_hog
+			}
+		}
+		else_if = {
+			limit = {
+				has_government = conservatism
+			}
+			add_ideas = {
+				URG_Nicolas_Storace_Arrosa_hog
+			}
+		}
+		else = {
+			add_ideas = {
+				URG_Eduardo_Rodriguez_Larreta_hog
+			}
+		}
+	}
+}
+
+country_event = { #1965 Lista 15 Primary
+	id = URG_scripted.4
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_scripted.4"
+		URG_Jorge_Batlle = {
+			promote_character = liberalism_liberal_radicalism_subtype
+		}
+	}
+	title = URG_scripted.4.t
+	desc = URG_scripted.4.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#Batlle (LibDem)
+		name = URG_scripted.4.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = URG_65_LISTA_PRIMARY option = URG_65_LISTA_PRIMARY_LEFT_WING }
+			}
+		}
+		set_country_flag = URG_66_Batlle
+		set_party_name = {
+			ideology = progressivism
+			long_name = URG_orthodox_batllism_party_long
+			name = URG_orthodox_batllism_party
+		}
+		set_party_name = {
+			ideology = liberalism
+			long_name = URG_progressivism_party_long
+			name = URG_progressivism_party
+		}
+	}
+
+	option = {#Vasconcellos/Flores (SocDem)
+		name = URG_scripted.4.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = URG_65_LISTA_PRIMARY option = URG_65_LISTA_PRIMARY_BATTLE }
+			}
+		}
+		set_party_name = {
+			ideology = liberalism
+			long_name = URG_ud_party_long
+			name = URG_ud_party
+		}
+	}
+}
+
+country_event = { #1966 Election
+	id = URG_scripted.5
+	immediate = {#The Council is no more
+		log = "[GetDateText]: [Root.GetName]: event URG_scripted.5"
+		promote_character = URG_Amilcar_Vasconcellos
+		promote_character = {
+			character = URG_Jorge_Batlle
+			ideology = liberalism_liberal_radicalism_subtype
+		}
+		promote_character = URG_Jorge_Pacheco_Areco
+		promote_character = URG_Martin_Echegoyen
+		set_party_name = {
+			ideology = liberal_conservatism
+			long_name = URG_mnr_rb_party_long
+			name = URG_mnr_rb_party
+		}
+		set_party_name = { #In case that paternalist party name is changed to something else
+			ideology = paternalism
+			long_name = URG_paternalism_party_long
+			name = URG_paternalism_party
+		}
+	}
+	title = URG_scripted.5.t
+	desc = URG_scripted.5.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		NOT = {
+			AND = {
+				has_government = despotism
+				NOT = {
+					has_country_leader = {
+						character = URG_Oscar_Diego_Gestido
+						ruling_only = yes
+					}
+				}
+			}
+			has_government = fascism
+		}
+	}
+
+	option = {#Batllism
+		name = URG_scripted.5.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_HERRERISM }
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_UCB }
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_MNR }
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_country_flag = URG_66_Batlle
+			}
+			set_politics = {
+				ruling_party = liberalism
+				last_election = "1966.11.27"
+				election_frequency = 60
+				elections_allowed = yes
+			}
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.04
+			}
+			add_popularity = {
+				ideology = liberalism
+				popularity = 0.05
+			}
+			add_popularity = {
+				ideology = paternalism
+				popularity = 0.01
+			}
+			hidden_effect = {
+				if = {
+					limit = {
+						has_country_flag = URG_Aguerrondo_Path
+					}
+					every_country = {
+						limit = { is_ai = no }
+						news_event = { id = LATAM_news.166 }
+					}
+				}
+				else_if = {
+					limit = {
+						has_country_flag = URG_Marzist_Path
+					}
+					every_country = {
+						limit = { is_ai = no }
+						news_event = { id = LATAM_news.174 }
+					}
+				}
+				else = {
+					every_country = {
+						limit = { is_ai = no }
+						news_event = { id = LATAM_news.123 }
+					}
+				}
+			}
+		}
+		else = {
+			if = {
+				limit = {
+					has_government = progressivism
+				}
+				promote_character = URG_Manuel_Flores_Mora
+				hidden_effect = {
+					every_country = {
+						limit = { is_ai = no }
+						news_event = { id = LATAM_news.122 }
+					}
+				}
+			}
+			else = {
+				hidden_effect = {
+					if = {
+						limit = {
+							has_country_flag = URG_Aguerrondo_Path
+						}
+						every_country = {
+							limit = { is_ai = no }
+							news_event = { id = LATAM_news.165 }
+						}
+					}
+					else_if = {
+						limit = {
+							has_country_flag = URG_Marzist_Path
+						}
+						every_country = {
+							limit = { is_ai = no }
+							news_event = { id = LATAM_news.173 }
+						}
+					}
+					else = {
+						every_country = {
+							limit = { is_ai = no }
+							news_event = { id = LATAM_news.121 }
+						}
+					}
+				}
+			}
+			set_politics = {
+				ruling_party = progressivism
+				last_election = "1966.11.27"
+				election_frequency = 60
+				elections_allowed = yes
+			}
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.05
+			}
+			add_popularity = {
+				ideology = liberalism
+				popularity = 0.04
+			}
+			add_popularity = {
+				ideology = paternalism
+				popularity = 0.01
+			}
+		}
+	}
+
+	option = {#UCB
+		name = URG_scripted.5.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_HERRERISM }
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_MNR }
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_BATLLISM }
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					has_government = paternalism
+					has_country_leader = {
+						character = URG_Oscar_Diego_Gestido
+						ruling_only = yes
+					}
+					has_country_flag = URG_Marzist_Path
+				}
+				NOT = {
+					has_country_flag = URG_Aguerrondo_Path
+				}
+			}
+			hidden_effect = {
+				if = {
+					limit = {
+						has_country_flag = URG_Marzist_Path
+					}
+					every_country = {
+						limit = { is_ai = no }
+						news_event = { id = LATAM_news.175 }
+					}
+				}
+				else = {
+					every_country = {
+						limit = { is_ai = no }
+						news_event = { id = LATAM_news.125 }
+					}
+				}
+			}
+		}
+		else = {
+			promote_character = {
+				character = URG_Oscar_Diego_Gestido
+				ideology = paternalism_social_nationalism_subtype
+			}
+			hidden_effect = {
+				if = {
+					limit = {
+						has_country_flag = URG_Aguerrondo_Path
+					}
+					every_country = {
+						limit = { is_ai = no }
+						news_event = { id = LATAM_news.167 }
+					}
+				}
+				else = {
+					every_country = {
+						limit = { is_ai = no }
+						news_event = { id = LATAM_news.124 }
+					}
+				}
+			}
+		}
+		set_politics = {
+			ruling_party = paternalism
+			last_election = "1966.11.27"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = 0.02
+		}
+		add_popularity = {
+			ideology = liberalism
+			popularity = 0.02
+		}
+		add_popularity = {
+			ideology = paternalism
+			popularity = 0.06
+		}
+	}
+
+	option = {#MNR
+		name = URG_scripted.5.c
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_HERRERISM }
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_UCB }
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_BATLLISM }
+				}
+			}
+			modifier = {
+				factor = 1.2
+				has_country_flag = URG_Aguerrondo_Path
+			}
+			modifier = {
+				factor = 0.8
+				has_country_flag = URG_Marzist_Path
+			}
+		}
+		promote_character = URG_Alberto_Gallinal_Heber
+		set_politics = {
+			ruling_party = liberal_conservatism
+			last_election = "1966.11.27"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = liberal_conservatism
+			popularity = 0.1
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					has_country_flag = URG_Aguerrondo_Path
+				}
+				every_country = {
+					limit = { is_ai = no }
+					news_event = { id = LATAM_news.168 }
+				}
+			}
+			else_if = {
+				limit = {
+					has_country_flag = URG_Marzist_Path
+				}
+				every_country = {
+					limit = { is_ai = no }
+					news_event = { id = LATAM_news.176 }
+				}
+			}
+			else = {
+				every_country = {
+					limit = { is_ai = no }
+					news_event = { id = LATAM_news.126 }
+				}
+			}
+		}
+	}
+
+	option = {#Herrerism
+		name = URG_scripted.5.d
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_UCB }
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_MNR }
+					has_game_rule = { rule = URG_66_ELECTION_PATH option = URG_66_ELECTION_PATH_BATLLISM }
+				}
+			}
+		}
+		trigger = {
+			NOT = {
+				has_country_flag = URG_66_Herrerism_Banned
+				has_country_flag = URG_Aguerrondo_Path
+				has_country_flag = URG_Marzist_Path
+			}
+		}
+		set_politics = {
+			ruling_party = conservatism
+			last_election = "1966.11.27"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = conservatism
+			popularity = 0.1
+		}
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.127 }
+			}
+		}
+	}
+}
+
+country_event = { #1964 coup trigger
+	id = URG_scripted.6
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_scripted.6"
+	}
+	title = URG_scripted.6.t
+	desc = URG_scripted.6.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#Nothing Happens
+		name = URG_scripted.6.a
+		ai_chance = {
+			factor = 2
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_TERRIST }
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_AGUERRONDO }
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_GESTIDO_FAILED_FASH }
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_GESTIDO_SUCCESS_FASH }
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_country_leader_ideology = conservatism_subtype
+			}
+			country_event = { id = URG_scripted.10 days = 700 }
+		}
+	}
+
+	option = {#Terrist Coup
+		name = URG_scripted.6.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_NO }
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_HERRERIST_NO }
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_AGUERRONDO }
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_GESTIDO_FAILED_FASH }
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_GESTIDO_SUCCESS_FASH }
+				}
+			}
+		}
+		trigger = {
+			NOT = {
+				ARG = {
+					has_country_leader = {
+						character = ARG_Juan_Domingo_Peron
+						ruling_only = yes
+					}
+				}
+			}
+		}
+		remove_ideas = OFN_Observer
+		promote_character = {
+			character = URG_Juan_Pedro_Ribas
+			ideology = despotism_interim_government_subtype
+		}
+		set_politics = {
+			ruling_party = despotism
+			elections_allowed = no
+		}
+		add_popularity = {
+			ideology = despotism
+			popularity = 0.25
+		}
+		set_party_name = {
+			ideology = despotism
+			long_name = URG_ce_party_long
+			name = URG_ce_party
+		}
+		country_event = { id = URG_marzist.1 days = 180 }
+		set_country_flag = URG_Marzist_Path
+		remove_ideas = URG_the_lost_limb
+		URG_Ventura_Rodriguez = {
+			remove_advisor_role = {
+				slot = head_of_government
+			}
+			add_advisor_role = {
+				advisor = {
+					slot = head_of_government
+					idea_token = URG_Ventura_Rodriguez_marzist_hog
+					traits = {
+						head_of_government
+						hog_silent_workhorse
+					}
+					ledger = civilian
+					cost = -1
+					can_be_fired = no
+					ai_will_do = { factor = 0 }
+				}
+			}
+		}
+		URG_Juan_Carlos_Quagliotti = {
+			remove_advisor_role = {
+				slot = foreign_minister
+			}
+			add_advisor_role = {
+				advisor = {
+					slot = foreign_minister
+					idea_token = URG_Juan_Carlos_Quagliotti_marzist_for
+					traits = {
+						foreign_minister
+						for_loose_lips
+					}
+					ledger = civilian
+					cost = -1
+					can_be_fired = no
+					ai_will_do = { factor = 0 }
+				}
+			}
+		}
+		URG_Pablo_Moratorio = {
+			remove_advisor_role = {
+				slot = security_minister
+			}
+			add_advisor_role = {
+				advisor = {
+					slot = security_minister
+					idea_token = URG_Pablo_Moratorio_marzist_sec
+					traits = {
+						security_minister
+						sec_back_stabber
+					}
+					ledger = civilian
+					cost = -1
+					can_be_fired = no
+					ai_will_do = { factor = 0 }
+				}
+			}
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			URG_Ventura_Rodriguez_marzist_hog
+			URG_Juan_Carlos_Quagliotti_marzist_for
+			URG_Cesar_Charlone_eco
+			URG_Pablo_Moratorio_marzist_sec
+		}
+		swap_ideas = {
+			remove_idea = URG_switzerland_mirage_2
+			add_idea = URG_switzerland_mirage_3
+		}
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.129 }
+			}
+		}
+	}
+
+	option = {#Aguerrondo Coup
+		name = URG_scripted.6.c
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 1.5
+				has_government = conservatism
+			}
+			modifier = {
+				factor = 1.2
+				has_government = liberal_conservatism
+			}
+			modifier = {
+				factor = 0.7
+				has_government = paternalism
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_NO }
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_HERRERIST_NO }
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_TERRIST }
+				}
+			}
+		}
+		trigger = {
+			ARG = {
+				has_country_leader = {
+					character = ARG_Juan_Domingo_Peron
+					ruling_only = yes
+				}
+			}
+		}
+		remove_ideas = OFN_Observer
+		random_list = {
+			1 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_GESTIDO_FAILED_FASH }
+						has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_GESTIDO_SUCCESS_FASH }
+					}
+				}
+				promote_character = {
+					character = URG_Mario_Oscar_Aguerrondo
+					ideology = despotism_interim_government_subtype
+				}
+				URG_Mario_Oscar_Aguerrondo = {
+					set_portraits = {
+						civilian = {
+							large = "gfx/leaders/URG/Portrait_URG_Oscar_Aguerrondo_military.dds"
+						}
+					}
+				}
+				set_politics = {
+					ruling_party = despotism
+					elections_allowed = no
+				}
+				add_popularity = {
+					ideology = despotism
+					popularity = 0.25
+				}
+				set_party_name = {
+					ideology = despotism
+					long_name = URG_ce_party_long
+					name = URG_ce_party
+				}
+				remove_ideas = URG_the_lost_limb
+				remove_all_ministers = yes
+				add_ideas = {
+					URG_Ventura_Rodriguez_hog
+					URG_Omar_Diaz_for
+					URG_Juan_Jose_Gari_eco
+					URG_Pablo_Moratorio_sec
+				}
+				country_event = { id = URG_aguerrondo.1 days = 180 }
+				set_country_flag = URG_Aguerrondo_Path
+				swap_ideas = {
+					remove_idea = URG_switzerland_mirage_2
+					add_idea = URG_switzerland_mirage_3
+				}
+				hidden_effect = {
+					every_country = {
+						limit = { is_ai = no }
+						news_event = { id = LATAM_news.128 }
+					}
+				}
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					has_game_rule = { rule = URG_64_COUP option = URG_64_COUP_AGUERRONDO }
+				}
+				country_event = { id = URG_scripted.7 }
+				country_event = { id = URG_scripted.8 days = 42 }
+				hidden_effect = {
+					every_country = {
+						limit = { is_ai = no }
+						news_event = { id = LATAM_news.131 }
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { #Sad Gestido Coup Trigger
+	id = URG_scripted.7
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_scripted.7"
+	}
+	title = URG_scripted.7.t
+	desc = URG_scripted.7.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#Nothing Happens
+		name = URG_scripted.7.a
+		trigger = {
+			NOT = {
+				has_country_leader_ideology = conservatism_subtype
+			}
+		}
+	}
+
+	option = {#Gestido Coup
+		name = URG_scripted.7.b
+		trigger = {
+			has_country_leader_ideology = conservatism_subtype
+		}
+		promote_character = URG_Supreme_Corte_de_Justicia
+		set_politics = {
+			ruling_party = despotism
+			last_election = "1962.11.25"
+			election_frequency = 48
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = despotism
+			popularity = 0.1
+		}
+		set_party_name = {
+			ideology = despotism
+			long_name = URG_gscj_party_long
+			name = URG_gscj_party
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			URG_Generic_Vacant_hog
+			URG_Generic_Vacant_eco
+			URG_Generic_Vacant_for
+			URG_Generic_Vacant_sec
+		}
+		country_event = { id = URG_scripted.701 days = 14 }
+	}
+}
+
+country_event = { #Sad Gestido
+	id = URG_scripted.701
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_scripted.701"
+	}
+	title = URG_scripted.701.t
+	desc = URG_scripted.701.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#Nothing Happens
+		name = URG_scripted.701.a
+		promote_character = {
+			character = URG_Oscar_Diego_Gestido
+			ideology = despotism_interim_government_subtype
+		}
+		set_country_leader_portrait = {
+			ideology = despotism
+			portrait = "gfx/leaders/URG/Portrait_URG_Oscar_Diego_Gestido_Coup.dds"
+		}
+		set_party_name = {
+			ideology = despotism
+			long_name = URG_gun_party_long
+			name = URG_gun_party
+		}
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.149 }
+			}
+		}
+	}
+}
+
+country_event = { #Platinean Blitz
+	id = URG_scripted.8
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_scripted.8"
+	}
+	title = URG_scripted.8.t
+	desc = URG_scripted.8.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_scripted.8.a
+		add_popularity = {
+			ideology = fascism
+			popularity = 0.03
+		}
+		country_event = { id = URG_scripted.9 days = 42 }
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.132 }
+			}
+		}
+	}
+}
+
+country_event = { #Fascist Coup Trigger
+	id = URG_scripted.9
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_scripted.9"
+	}
+	title = URG_scripted.9.t
+	desc = URG_scripted.9.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#Nothing Happens
+		name = URG_scripted.9.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = URG_64_COUP
+					option = URG_64_COUP_GESTIDO_SUCCESS_FASH
+				}
+			}
+		}
+		set_country_flag = URG_66_Herrerism_Banned
+	}
+
+	option = {#Fascist Coup
+		name = URG_scripted.9.b
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = URG_64_COUP
+					option = URG_64_COUP_GESTIDO_FAILED_FASH
+				}
+			}
+		}
+		promote_character = {
+			character = URG_Juan_Pedro_Ribas
+			ideology = fascism_subtype
+		}
+		set_politics = {
+			ruling_party = fascism
+			elections_allowed = no
+		}
+		add_popularity = {
+			ideology = fascism
+			popularity = 0.3
+		}
+		set_party_name = {
+			ideology = fascism
+			long_name = URG_dan_party_long
+			name = URG_dan_party
+		}
+		remove_ideas = OFN_Observer
+		swap_ideas = {
+			remove_idea = URG_switzerland_mirage_2
+			add_idea = URG_switzerland_mirage_4
+		}
+		URG_Pablo_Moratorio = {
+			remove_advisor_role = {
+				slot = security_minister
+			}
+			add_advisor_role = {
+				advisor = {
+					slot = security_minister
+					idea_token = URG_Pablo_Moratorio_falangist_sec
+					traits = {
+						security_minister
+						sec_back_stabber
+					}
+					ledger = civilian
+					cost = -1
+					can_be_fired = no
+					ai_will_do = { factor = 0 }
+				}
+			}
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			URG_Julio_Cesar_Ribas_hog
+			URG_Armando_Acosta_y_Lara_for
+			URG_Mario_Garbarino_eco
+			URG_Pablo_Moratorio_falangist_sec
+		}
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.130 }
+			}
+		}
+	}
+}
+
+country_event = { #1966 Failed Herrerist Coup
+	id = URG_scripted.10
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_scripted.10"
+	}
+	title = URG_scripted.10.t
+	desc = URG_scripted.10.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#Nothing Happens
+		name = URG_scripted.10.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = URG_64_COUP
+					option = URG_64_COUP_HERRERIST_FAILED
+				}
+			}
+		}
+	}
+
+	option = {#Failed Coup
+		name = URG_scripted.10.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = URG_64_COUP
+					option = URG_64_COUP_HERRERIST_NO
+				}
+			}
+		}
+		set_country_flag = URG_66_Herrerism_Banned
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.133 }
+			}
+		}
+	}
+}
+
+country_event = { #Antisemitic Campaign
+	id = URG_scripted.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event URG_scripted.11" }
+	title = URG_scripted.11.t
+	desc = URG_scripted.11.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#Contained
+		name = URG_scripted.11.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = URG_ANTISEMITISM
+					option = URG_ANTISEMITISM_YES
+				}
+			}
+		}
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.146 }
+			}
+		}
+	}
+
+	option = {#Not Contained
+		name = URG_scripted.11.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = URG_ANTISEMITISM
+					option = URG_ANTISEMITISM_NO
+				}
+			}
+		}
+		add_popularity = {
+			ideology = conservatism
+			popularity = -0.05
+		}
+		add_popularity = {
+			ideology = liberal_conservatism
+			popularity = -0.05
+		}
+		set_country_flag = URG_62_PN_Banned
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.147 }
+			}
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.157 days = 304 }
+			}
+		}
+	}
+}
+
+country_event = { #Pablo Moratorio Coup
+	id = URG_aguerrondo.1
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_aguerrondo.1"
+	}
+	title = URG_aguerrondo.1.t
+	desc = URG_aguerrondo.1.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_aguerrondo.1.a
+		ai_chance = {
+			base = 25
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = URG_MORATORIO_COUP
+					option = URG_MORATORIO_COUP_NO
+				}
+			}
+		}
+		trigger = {
+			ARG = {
+				is_ai = yes
+			}
+		}
+		promote_character = {
+			character = URG_Pablo_Moratorio
+			ideology = despotism_military_junta_subtype
+		}
+		add_popularity = {
+			ideology = despotism
+			popularity = -0.1
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			URG_Ventura_Rodriguez_hog
+			URG_Cesar_Charlone_for
+			URG_Juan_Eduardo_Azzini_eco
+			URG_Juan_Pedro_Ribas_sec
+		}
+		country_event = { id = URG_aguerrondo.2 days = 280 }
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.163 }
+			}
+		}
+	}
+
+	option = {
+		name = URG_aguerrondo.1.b
+		ai_chance = {
+			base = 75
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = URG_MORATORIO_COUP
+					option = URG_MORATORIO_COUP_YES
+				}
+			}
+		}
+		country_event = { id = URG_aguerrondo.3 days = 572 }
+		set_politics = {
+			ruling_party = despotism
+			last_election = "1961.11.25"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+	}
+}
+
+country_event = { #Ventura Rodriguez Coup
+	id = URG_aguerrondo.2
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_aguerrondo.2"
+	}
+	title = URG_aguerrondo.2.t
+	desc = URG_aguerrondo.2.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_aguerrondo.2.a
+		set_politics = {
+			ruling_party = paternalism
+			last_election = "1962.11.25"
+			election_frequency = 48
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = despotism
+			popularity = -0.15
+		}
+		promote_character = {
+			character = URG_Ventura_Rodriguez
+			ideology = paternalism_transitioning_democracy_subtype
+		}
+		set_party_name = {
+			ideology = paternalism
+			long_name = URG_ce_party_long
+			name = URG_ce_party
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			URG_Adolfo_Tejera_hog
+			URG_Cesar_Charlone_for
+			URG_Juan_Eduardo_Azzini_eco
+			URG_Modesto_Rebollo_sec
+		}
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.164 }
+			}
+		}
+	}
+}
+
+country_event = { #Very democractic 1966 election, Aguerrondo ver.
+	id = URG_aguerrondo.3
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_aguerrondo.3"
+	}
+	title = URG_aguerrondo.3.t
+	desc = URG_aguerrondo.3.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {# Aguerrondo wins a landslide!
+		name = URG_aguerrondo.3.a
+		promote_character = {
+			character = URG_Mario_Oscar_Aguerrondo
+			ideology = despotism_aristocratic_conservatism_subtype
+		}
+		add_popularity = {
+			ideology = despotism
+			popularity = 0.05
+		}
+		URG_Mario_Oscar_Aguerrondo = {
+			set_portraits = {
+				civilian = {
+					large = "gfx/leaders/URG/Portrait_URG_Oscar_Aguerrondo.dds"
+				}
+			}
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			URG_Aparicio_Mendez_hog
+			URG_Juan_Carlos_Quagliotti_for
+			URG_Juan_Jose_Gari_eco
+			URG_Pablo_Moratorio_sec
+		}
+		set_party_name = {
+			ideology = despotism
+			long_name = URG_conservatism_party_long
+			name = URG_conservatism_party
+		}
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.169 }
+			}
+		}
+	}
+}
+
+country_event = { #Ribas Gets Replaced
+	id = URG_marzist.1
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_marzist.1"
+	}
+	title = URG_marzist.1.t
+	desc = URG_marzist.1.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_marzist.1.a
+		promote_character = {
+			character = URG_Pablo_Moratorio
+			ideology = despotism_interim_government_subtype
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			URG_Gabriel_Terra_Ilarraz_hog
+			URG_Juan_Carlos_Quagliotti_marzist_for
+			URG_Cesar_Charlone_eco
+			URG_Alberto_Demicheli_sec
+		}
+		country_event = { id = URG_marzist.2 days = 190 }
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.162 }
+			}
+		}
+	}
+}
+
+country_event = { #Gestido's Revolution
+	id = URG_marzist.2
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_marzist.2"
+	}
+	title = URG_marzist.2.t
+	desc = URG_marzist.2.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_marzist.2.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = URG_GESTIDO_REVOLUTION
+					option = URG_GESTIDO_REVOLUTION_NO
+				}
+			}
+		}
+		promote_character = {
+			character = URG_Oscar_Diego_Gestido
+			ideology = paternalism_transitioning_democracy_subtype
+		}
+		add_popularity = {
+			ideology = despotism
+			popularity = -0.2
+		}
+		URG_Oscar_Diego_Gestido = {
+			set_portraits = {
+				civilian = {
+					large = "gfx/leaders/URG/Portrait_URG_Oscar_Diego_Gestido_Coup_2.dds"
+				}
+			}
+		}
+		set_politics = {
+			ruling_party = paternalism
+			last_election = "1962.11.25"
+			election_frequency = 48
+			elections_allowed = yes
+		}
+		set_party_name = {
+			ideology = paternalism
+			long_name = URG_gun_party_long
+			name = URG_gun_party
+		}
+		set_party_name = {
+			ideology = despotism
+			long_name = URG_despotism_party_long
+			name = URG_despotism_party
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			URG_Generic_Vacant_hog
+			URG_Generic_Vacant_eco
+			URG_Generic_Vacant_for
+			URG_Generic_Vacant_sec
+		}
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.170 }
+			}
+		}
+	}
+
+	option = {
+		name = URG_marzist.2.b
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = URG_GESTIDO_REVOLUTION
+					option = URG_GESTIDO_REVOLUTION_YES
+				}
+			}
+		}
+		set_politics = {
+			ruling_party = despotism
+			last_election = "1961.11.25"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		country_event = { id = URG_marzist.3 days = 476 }#382 days to election
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.171 }
+			}
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = LATAM_news.172 days = 382 }
+			}
+		}
+	}
+}
+
+country_event = { #Territa Takeover
+	id = URG_marzist.3
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event URG_marzist.3"
+	}
+	title = URG_marzist.3.t
+	desc = URG_marzist.3.desc
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = URG_marzist.3.a
+		set_politics = {
+			ruling_party = paternalism
+			last_election = "1966.11.27"
+			election_frequency = 60
+			elections_allowed = yes
+		}
+		promote_character = {
+			character = URG_Gabriel_Terra_Ilarraz
+			ideology = paternalism_controlled_democracy_subtype
+		}
+		promote_character = {
+			character = URG_Echegoyen_and_Haedo
+			ideology = conservatism_subtype
+		}
+		promote_character = {
+			character = URG_Juan_Pedro_Ribas
+			ideology = fascism_subtype
+		}
+		promote_character = {
+			character = URG_Agorio_and_Bosch
+			ideology = national_socialism_subtype
+		}
+		promote_character = {
+			character = URG_Raul_Sendic
+			ideology = socialist_revolutionary_frontism_subtype
+		}
+		promote_character = {
+			character = URG_Mario_Echenique
+			ideology = communist_amazonism_subtype
+		}
+		set_party_name = {
+			ideology = paternalism
+			long_name = URG_concertacion_paternalism_party_long
+			name = URG_concertacion_paternalism_party
+		}
+		set_party_name = {
+			ideology = conservatism
+			long_name = URG_concertacion_conservatism_party_long
+			name = URG_concertacion_conservatism_party
+		}
+		set_party_name = {
+			ideology = fascism
+			long_name = URG_concertacion_fascism_party_long
+			name = URG_concertacion_fascism_party
+		}
+		set_party_name = {
+			ideology = national_socialism
+			long_name = URG_concertacion_national_socialism_party_long
+			name = URG_concertacion_national_socialism_party
+		}
+		set_party_name = {
+			ideology = socialist
+			long_name = URG_tupamaros_party_long
+			name = URG_tupamaros_party
+		}
+		set_party_name = {
+			ideology = communist
+			long_name = URG_tupamaros_mir_party_long
+			name = URG_tupamaros_mir_party
+		}
+		set_popularities = {
+			communist = 1
+			socialist = 3
+			progressivism = 15
+			liberalism = 7
+			liberal_conservatism = 14
+			conservatism = 20
+			paternalism = 30
+			fascism = 5
+			national_socialism = 5
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			URG_Alberto_Demicheli_hog
+			URG_Juan_Carlos_Blanco_for
+			URG_Cesar_Charlone_eco
+			URG_Tydeo_Larre_Borges_sec
+		}
+		econ_leave_sphere = yes
+		if = {
+			limit = {
+				NOT = {
+					has_global_flag = german_civil_war_heydrichvic
+				}
+			}
+			econ_join_sphere_GER = yes
+		}
+		if = {
+			limit = {
+				NOT = {
+					has_global_flag = german_civil_war_heydrichvic
+				}
+				country_exists = URP
+			}
+			URP = { econ_join_sphere_GER = yes }
+		}
+	}
+}

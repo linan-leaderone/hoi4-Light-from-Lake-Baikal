@@ -1,0 +1,1783 @@
+﻿add_namespace = OST
+add_namespace = OST_news
+
+
+################
+# DEBUG EVENTS #
+################
+
+#OST_contenders dump
+country_event = {
+	id = OST.2000
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.2000" }
+	title = OST.2000.t
+	desc = OST.2000.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+
+	option = {
+		name = OST.2000.a
+
+		log = "The following are in OST_contenders: "
+		for_each_scope_loop = {
+			array = global.OST_contenders
+			log = "[THIS.GetName], [ROOT.GetName]"
+		}
+		if = {
+			limit = {
+				has_global_flag = OST_OCW_Ongoing
+			}
+			add_political_power = -25
+		}
+		if = {
+			limit = {
+				has_global_flag = OST_OCW_Stahlecker_Victory
+			}
+			add_political_power = 30
+		}
+
+	}
+}
+
+#OST_contenders check
+country_event = {
+	id = OST.2001
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.2001" }
+	title = OST.2001.t
+	desc = OST.2001.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+
+	option = {
+		name = OST.2001.a
+	}
+}
+
+#OST_contenders off a fucker debug
+country_event = {
+	id = OST.2002
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.2002" }
+	title = OST.2002.t
+	desc = OST.2002.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+
+	option = {
+		name = OST.2002.a
+		set_global_flag = OST_stahlecker_dead
+	}
+	option = {
+		name = OST.2002.b
+		set_global_flag = OST_drechsler_dead
+	}
+	option = {
+		name = OST.2002.c
+		set_global_flag = OST_jeckeln_dead
+	}
+	option = {
+		name = OST.2002.d
+		set_global_flag = OST_meyer_landrut_dead
+	}
+}
+
+#OST_contenders clear death flags
+country_event = {
+	id = OST.2003
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.2003" }
+	title = OST.2003.t
+	desc = OST.2003.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+
+	option = {
+		name = OST.2003.a
+		clr_global_flag = OST_stahlecker_dead
+		clr_global_flag = OST_drechsler_dead
+		clr_global_flag = OST_jeckeln_dead
+		clr_global_flag = OST_meyer_landrut_dead
+	}
+}
+
+##########################
+# Your Usual Programming #
+##########################
+
+country_event = {#The model colony
+	id = OST.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.1" }
+	title = OST.1.t
+	desc = OST.1.desc
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.1.a
+	}
+}
+
+country_event = {#The reichskommissar fades
+	id = OST.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.2" }
+	title = OST.2.t
+	desc = OST.2.desc
+	picture = GFX_report_event_OST_gaut
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.2.a
+
+		remove_ideas = OST_Hinrich_Lohse_hog
+		hidden_effect = {
+			add_ideas = OST_Generic_Vacant_hog
+			country_event = { id = OST.56 days = 540 }
+		}
+	}
+}
+
+#The Reichskommissar is dead!
+country_event = {
+	id = OST.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.3" }
+	title = OST.3.t
+	desc = OST.3.desc
+	picture = GFX_report_event_OST_gaut
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	#immediate = { hidden_effect = { remove_ideas = OST_Hinrich_Lohse_hog } }
+
+	option = {
+		name = OST.3.a
+		retire_character = OST_Hinrich_Lohse
+	}
+}
+
+country_event = {#Civil war
+	id = OST.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.4" }
+	title = OST.4.t
+	desc = OST.4.desc
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.4.a
+		custom_effect_tooltip = OST_shattered
+		remove_ideas ={
+			OST_model_colony
+			OST_model_colony2
+			OST_unusual_quiet
+		} 
+		hidden_effect = {
+			set_global_flag = OST_OCW_Ongoing
+			set_country_flag = OST_minister_has_left_government
+
+			#Set up OST_contenders
+			add_to_array = { global.OST_contenders = OST } #Stahlecker
+			add_to_array = { global.OST_contenders = DST } #Drechsler
+			add_to_array = { global.OST_contenders = JST } #Jeckeln
+			add_to_array = { global.OST_contenders = MST } #Meyer-Landrut
+			add_to_array = { global.OST_contenders = UPO } #Kovner
+			add_to_array = { global.OST_contenders = BLR } #Vituska
+
+			load_oob = OST_war
+			country_event = { id = OST.11 days = 6 }
+			retire_character = OST_Hinrich_Lohse
+			promote_character = OST_Franz_Walter_Stahlecker
+			DST = {
+				transfer_state = 190
+				transfer_state = 189
+				transfer_state = 11
+				190 = {
+					add_core_of = DST }
+				189 = {
+					add_core_of = DST }
+				11 = {
+					add_core_of = DST }
+				inherit_technology = PREV
+				load_oob = DST
+			}
+			MST = {
+				transfer_state = 96
+				inherit_technology = PREV
+				load_oob = MST
+			}
+			JST = {
+				94 = {
+					add_core_of = JST
+				}
+				transfer_state = 94
+				inherit_technology = PREV
+				load_oob = JST
+			}
+			UPO = {
+				943 = {
+					add_core_of = UPO
+				}
+				13 = {
+					add_core_of = UPO
+				}
+				191 = {
+					add_core_of = UPO
+				}
+				12 = {
+					add_core_of = UPO
+				}
+				190 = {
+					add_core_of = UPO
+				}
+				189 = {
+					add_core_of = UPO
+				}
+				transfer_state = 943
+				inherit_technology = PREV
+				load_oob = UPO
+			}
+			BLR = {
+				set_cosmetic_tag = BLR_partisan
+				207 = { add_core_of = BLR }
+				206 = { add_core_of = BLR }
+				95 = { add_core_of = BLR }
+				204 = { add_core_of = BLR }
+				11 = { add_core_of = BLR }
+				#country_event = { id = OST.46 days = 1 }
+				transfer_state = 207
+				load_oob = BLR
+				inherit_technology = PREV
+			}
+			every_unit_leader = {
+				limit = {
+					OR = {
+						has_id = 151
+						has_id = 152
+					}
+				}
+				set_nationality = JST
+			}
+			every_unit_leader = {
+				limit = {
+					has_id = 150
+				}
+				set_nationality = DST
+			}
+			add_ideas = {
+				OST_Friedrich_Karl_Vialon_eco
+				# OST_Hans_Cramer_for
+				OST_Franz_Baeke_sec
+				OST_Theodor_Frundt_hog
+			}
+		}
+	}
+}
+
+country_event = {#Our knives are longer
+	id = OST.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.5" }
+	title = OST.5.t
+	desc = OST.5.d
+	picture = GFX_report_event_OST_partisan
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.5.a
+		UPO = { change_tag_from = OST }
+		UPO = { country_event = { id = OST.19 days = 14 } country_event = { id = OST.12 days = 4 } }
+		UPO = { add_ideas = OST_United_partisans }
+		OST = { add_ideas = OST_the_long_knives	}
+		JST = { add_ideas = OST_the_long_knives	}
+		MST = { add_ideas = OST_the_long_knives	}
+		DST = { add_ideas = OST_the_long_knives	}
+	}
+}
+
+country_event = {#A better world
+	id = OST.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.6" }
+	title = OST.6.t
+	desc = OST.6.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.6.a
+		MST = { change_tag_from = OST }
+		MST = { country_event = { id = OST.17 days = 4 }
+			MST = { add_ideas = OST_A_better_world }
+			MST = { add_ideas = OST_A_united_left }
+		}
+	}
+}
+
+country_event = {#Freinds in the council
+	id = OST.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.7" }
+	title = OST.7.t
+	desc = OST.7.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.7.a
+		country_event = { id = OST.16 days = 4 }
+	}
+}
+
+country_event = {#Draft our blood
+	id = OST.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.8" }
+	title = OST.8.t
+	desc = OST.8.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.8.a
+		DST = { change_tag_from = OST }
+		DST = { country_event = { id = OST.15 days = 4 }
+			DST = { add_ideas = OST_United_garrison }
+			DST = { add_ideas = OST_Draft_our_blood }
+		}
+	}
+}
+country_event = {#Contacts in Burgundy
+	id = OST.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.9" }
+	title = OST.9.t
+	desc = OST.9.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.9.a
+		JST = { change_tag_from = OST }
+		JST = { country_event = { id = OST.18 days = 4 }
+			JST = { add_ideas = OST_Might_of_Jeckeln }
+			UPO = { add_ideas = OST_Neutralized_natives }
+			BLR = { add_ideas = OST_Neutralized_natives }
+		}
+	}
+}
+country_event = {#Twist the council
+	id = OST.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.10" }
+	title = OST.10.t
+	desc = OST.10.d
+	picture = GFX_report_event_OST_partisan
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+
+	option = {
+		name = OST.10.a
+		BLR = { change_tag_from = OST }
+		BLR = { country_event = { id = OST.20 days = 4 }
+			OST = { add_ideas = OST_United_Bellarussians }
+			JST = { add_ideas = OST_The_Twisted_Council	}
+			MST = { add_ideas = OST_The_Twisted_Council	}
+			DST = { add_ideas = OST_The_Twisted_Council	}
+
+		}
+	}
+}
+country_event = {#The war begins
+	id = OST.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.11" }
+	title = OST.11.t
+	desc = OST.11.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.11.a
+		set_global_flag = Ostland_war
+
+		BLR = {
+			declare_war_on = {
+				target = OST
+				type = civil_war
+			}
+			declare_war_on = {
+				target = JST
+				type = civil_war
+			}
+			declare_war_on = {
+				target = DST
+				type = civil_war
+			}
+			declare_war_on = {
+				target = MST
+				type = civil_war
+			}
+			hidden_effect = { country_event = { id = OST.14 days = 5 random_hours = 120 } }
+		}
+		OST = {
+			declare_war_on = {
+				target = JST
+				type = civil_war
+			}
+			declare_war_on = {
+				target = DST
+				type = civil_war
+			}
+			declare_war_on = {
+				target = MST
+				type = civil_war
+			}
+			declare_war_on = {
+				target = UPO
+				type = civil_war
+			}
+		}
+		DST = {
+			declare_war_on = {
+				target = JST
+				type = civil_war
+			}
+			declare_war_on = {
+				target = MST
+				type = civil_war
+			}
+		}
+		JST = {
+			declare_war_on = {
+				target = MST
+				type = civil_war
+			}
+		}
+		UPO = {
+			declare_war_on = {
+				target = OST
+				type = civil_war
+			}
+			declare_war_on = {
+				target = JST
+				type = civil_war
+			}
+			declare_war_on = {
+				target = DST
+				type = civil_war
+			}
+			declare_war_on = {
+				target = MST
+				type = civil_war
+			}
+			hidden_effect = { country_event = { id = OST.13 days = 20 random_hours = 480 } }
+			hidden_effect = { country_event = { id = OST.47 days = 60 random_hours = 960 } }
+		}
+		hidden_effect = {
+			MST = { country_event = { id = OST.21 days = 12 random_hours = 72 } }
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = WORLD_REICH.1200
+				days = 1
+			}
+		}
+	}
+}
+country_event = {#Riga Uprising
+	id = OST.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.12" }
+	title = OST.12.t
+	desc = OST.12.d
+	picture = GFX_report_event_OST_partisan
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+
+	option = {
+		name = OST.12.a
+		UPO = { load_oob = OST_Riga	}
+
+	}
+}
+country_event = {#UPO Partisans
+	id = OST.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.13" }
+	title = OST.13.t
+	desc = OST.13.d
+	picture = GFX_report_event_OST_partisans
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = OST.13.a
+		UPO = { load_oob = OST_Partisans	}
+
+	}
+}
+country_event = {#Riga Uprising
+	id = OST.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.14" }
+	title = OST.14.t
+	desc = OST.14.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.14.a
+		BLR = { load_oob = BLR_Riga	}
+
+	}
+}
+country_event = {#DST support
+	id = OST.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.15" }
+	title = OST.15.t
+	desc = OST.15.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.15.a
+		DST = { load_oob = DST_Bonus }
+
+	}
+}
+country_event = {#Loyalist bonus
+	id = OST.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.16" }
+	title = OST.16.t
+	desc = OST.16.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.16.a
+		OST = { load_oob = OST_Bonus	}
+
+	}
+}
+country_event = {#Speer
+	id = OST.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.17" }
+	title = OST.17.t
+	desc = OST.17.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.17.a
+		MST = { load_oob = MST_Bonus	}
+
+	}
+}
+country_event = {#SS
+	id = OST.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.18" }
+	title = OST.18.t
+	desc = OST.18.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.18.a
+		JST = { load_oob = JST_Bonus	}
+
+	}
+}
+country_event = {#UPO
+	id = OST.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.19" }
+	title = OST.19.t
+	desc = OST.19.d
+	picture = GFX_report_event_OST_partisans
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.19.a
+		UPO = { load_oob = OST_Bonus }
+		add_manpower = 3000
+	}
+}
+country_event = {#BLR
+	id = OST.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.20" }
+	title = OST.20.t
+	desc = OST.20.d
+	picture = GFX_report_event_OST_partisans
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.20.a
+		BLR = { load_oob = BLR_Bonus }
+
+	}
+}
+country_event = {#SPEER SS Peace
+	id = OST.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.21" }
+	title = OST.21.t
+	desc = OST.21.d
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.21.a
+		MST = { white_peace = JST }
+		country_event = { id = OST.22 days = 60 }
+		OST = {
+			country_event = {
+				id = OST.55
+				} }
+		DST = {
+			country_event = {
+				id = OST.55
+			}
+		}
+		BLR = {
+			country_event = {
+				id = OST.55
+			}
+		}
+		UPO = {
+			country_event = {
+				id = OST.55
+				} }
+
+	}
+
+}
+
+country_event = {#BLR
+	id = OST.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.22" }
+	title = OST.22.t
+	desc = OST.22.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.22.a
+		MST = { declare_war_on = {
+				target = JST
+				type = civil_war
+			}
+		}
+	}
+}
+
+country_event = {#New partisan activity
+	id = OST.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.23" }
+	title = OST.23.t
+	desc = OST.23.d
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+
+	option = {
+		name = OST.23.a
+
+		hidden_effect = {
+			country_event = { id = OST.24 days = 10 }
+			country_event = { id = OST.25 days = 15 }
+			country_event = { id = OST.26 days = 25 }
+			country_event = { id = OST.27 days = 40 }
+		}
+	}
+}
+
+country_event = {#UPO 1
+	id = OST.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.24" }
+	title = OST.24.t
+	desc = OST.24.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.24.a
+	}
+}
+
+country_event = {#UPO 2
+	id = OST.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.25" }
+	title = OST.25.t
+	desc = OST.25.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.25.a
+	}
+}
+country_event = {#UPO 3
+	id = OST.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.26" }
+	title = OST.26.t
+	desc = OST.26.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.26.a
+		random_owned_controlled_state = {
+			damage_building = {
+				type = infrastructure
+				damage = 1
+			}
+		}
+	}
+}
+
+country_event = {#UPO 4
+	id = OST.27
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.27" }
+	title = OST.27.t
+	desc = OST.27.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+
+	option = {
+		name = OST.27.a
+	}
+}
+
+country_event = {#Stahlecker campaigns for Unity
+	id = OST.28
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.28" }
+	title = OST.28.t
+	desc = OST.28.d
+	picture = GFX_report_event_OST_stahlecker
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+	option = {
+		name = OST.28.a
+		add_political_power = 25
+		hidden_effect = {
+			country_event = {
+				id = OST.29
+				days = 40
+			}
+			country_event = {
+				id = OST.30
+				days = 80
+			}
+			country_event = {
+				id = OST.31
+				days = 100
+			}
+		}
+	}
+}
+country_event = {#Stahlecker meets with Vituska
+	id = OST.29
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.29" }
+	title = OST.29.t
+	desc = OST.29.d
+	picture = GFX_report_event_OST_stahlecker
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.29.a
+	}
+}
+
+country_event = {#Stahlecker meets with garrison leaders
+	id = OST.30
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.30" }
+	title = OST.30.t
+	desc = OST.30.d
+	picture = GFX_report_event_OST_stahlecker
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.30.a
+	}
+}
+
+country_event = {#Stahlecker meets with hinirich loshe
+	id = OST.31
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.31" }
+	title = OST.31.t
+	desc = OST.31.d
+	picture = GFX_report_event_GER_army_1
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.31.a
+	}
+}
+
+country_event = {#Drechsler announces new military aims
+	id = OST.32
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.32" }
+	title = OST.32.t
+	desc = OST.32.d
+	picture = GFX_report_event_OST_drechsler
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			country_event = {
+				id = OST.33
+				days = 50
+			}
+			country_event = {
+				id = OST.34
+				days = 120
+			}
+			country_event = {
+				id = OST.35
+				days = 180
+			}
+		}
+	}
+
+	option = {
+		name = OST.32.a
+		add_stability = -0.05
+		tno_conscription_worsen = yes
+	}
+	option = {
+		name = OST.32.b
+		add_war_support = -0.05
+		add_political_power = -100
+		custom_effect_tooltip = OST_weaken_drechsler_tt
+		set_variable = { OST_weak_drechsler = 1 }
+	}
+}
+
+country_event = {#Army conducts military exersises
+	id = OST.33
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.33" }
+	title = OST.33.t
+	desc = OST.33.d
+	picture = GFX_report_event_GER_march
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.33.a
+		army_experience = 10
+	}
+}
+
+country_event = {#Drechsler proposes focus on army development
+	id = OST.34
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.34" }
+	title = OST.34.t
+	desc = OST.34.d
+	picture = GFX_report_event_GER_training
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.34.a
+		army_funding_maximal_increase_med = yes
+		social_funding_maximal_decrease_med = yes
+		admin_funding_maximal_decrease_med = yes
+	}
+	option = {
+		name = OST.34.b
+		add_war_support = -0.05
+		add_political_power = -100
+		custom_effect_tooltip = OST_weaken_drechsler_tt
+		add_to_variable = { OST_weak_drechsler = 1 }
+	}
+}
+
+country_event = {#Drechsler demands increased arms production
+	id = OST.35
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.35" }
+	title = OST.35.t
+	desc = OST.35.d
+	picture = GFX_report_event_GER_arms
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.35.a
+		set_temp_variable = { gdp_growth_temp = -0.2 }
+		econ_gdp_growth_change = yes
+		add_timed_idea = { idea = OST_increased_arms_prodution days = 90 }
+	}
+	option = {
+		name = OST.35.b
+		add_war_support = -0.05
+		add_political_power = -100
+		custom_effect_tooltip = OST_weaken_drechsler_tt
+		add_to_variable = { OST_weak_drechsler = 1 }
+	}
+}
+
+country_event = {#Stahlecker and Drechsler Clash!
+	id = OST.36
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.36" }
+	title = OST.36.t
+	desc = OST.36.d
+	#picture = 
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	trigger = { 
+		check_variable = {
+			var = OST_weak_drechsler
+			value = 2
+			compare = greater_than_or_equals
+		}
+	}
+
+	option = {
+		name = OST.36.a
+		add_political_power = -200
+		add_stability = -0.10
+		add_war_support = -0.10
+	}
+}
+
+
+country_event = {#Jeckeln returns from visit to Burgundy
+	id = OST.37
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.37" }
+	title = OST.37.t
+	desc = OST.37.d
+	picture = GFX_report_event_OST_jeckeln
+	fire_only_once = yes
+	is_triggered_only = yes
+
+
+	option = {
+		name = OST.37.a
+		hidden_effect = {
+			country_event = {
+				id = OST.38
+				days = 60
+			}
+			country_event = {
+				id = OST.39
+				days = 130
+			}
+			country_event = {
+				id = OST.40
+				days = 190
+			}
+		}
+	}
+}
+
+country_event = {#Jeckeln advocates for increased Germanization
+	id = OST.38
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.38" }
+	title = OST.38.t
+	desc = OST.38.d
+	picture = GFX_report_event_OST_jeckeln
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.38.a
+		943 = { add_manpower = 2500 }
+		1402 = { add_manpower = 2500 }
+	}
+}
+
+country_event = {#Jeckeln announces new purity initiative
+	id = OST.39
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.39" }
+	title = OST.39.t
+	desc = OST.39.d
+	picture = GFX_report_event_OST_jeckeln
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.39.a
+		army_experience = -20
+	}
+}
+
+country_event = {#SS conducts unauthorized maneuvers
+	id = OST.40
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.40" }
+	title = OST.40.t
+	desc = OST.40.d
+	picture = GFX_report_event_GER_firing_squad
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.40.a
+		random_owned_state = {
+			limit = {
+				OR = {
+				state = 207
+				state = 1403
+				state = 1405
+				}
+			}
+		}
+		add_manpower = -5000
+	}
+}
+
+country_event = {#Meyerlandrut meets with speer
+	id = OST.41
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.41" }
+	title = OST.41.t
+	desc = OST.41.d
+	picture = GFX_report_event_GER_albert_speer_intro
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.41.a
+		hidden_effect = {
+			country_event = {
+				id = OST.42
+				days = 60
+			}
+			country_event = {
+				id = OST.43
+				days = 70
+			}
+			country_event = {
+				id = OST.44
+				days = 80
+			}
+			country_event = {
+				id = OST.45
+				days = 100
+			}
+		}
+	}
+}
+
+country_event = {#Subversive Literature discovered in schools
+	id = OST.42
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.42" }
+	title = OST.42.t
+	desc = OST.42.d
+	picture = GFX_report_event_generic_novel
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.42.a
+		add_stability = -0.02
+	}
+}
+
+country_event = {#Meyerlandrut lays out reform plan
+	id = OST.43
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.43" }
+	title = OST.43.t
+	desc = OST.43.d
+	picture = GFX_report_event_OST_meyer_landrut
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.43.a
+	}
+}
+
+country_event = {#Student protests start!
+	id = OST.44
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.44" }
+	title = OST.44.t
+	desc = OST.44.d
+	picture = GFX_report_event_GER_riot
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.44.a
+	}
+}
+
+country_event = {#Students clash with Orpo!
+	id = OST.45
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.45" }
+	title = OST.45.t
+	desc = OST.45.d
+	picture = GFX_report_event_GER_riotpolice
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.45.a
+		add_stability = -0.05
+	}
+}
+
+country_event = {#debug event
+	id = OST.46
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.46" }
+	title = OST.46.t
+	desc = OST.46.d
+	picture = GFX_report_event_OST_tank
+	fire_only_once = yes
+	is_triggered_only = yes
+	hidden = yes
+
+	option = {
+		name = OST.45.a
+		load_oob = BLR
+	}
+}
+country_event = {#UPO Partisans
+	id = OST.47
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.47" }
+	title = OST.13.t
+	desc = OST.13.d
+	picture = GFX_report_event_OST_partisans
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.13.a
+		UPO = { load_oob = OST_Partisans }
+	}
+}
+
+country_event = {#UPO Partisans
+	id = OST.48
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.48" }
+	title = OST.48.t
+	desc = OST.48.d
+	picture = GFX_report_event_OST_partisans
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.48.a
+		ai_chance = { factor = 100 }
+	}
+}
+
+country_event = {#UPO Partisans
+	id = OST.49
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.49" }
+	title = OST.49.t
+	desc = OST.49.d
+	picture = GFX_report_event_OST_partisans
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = OST.49.a
+		ai_chance = { factor = 100 }
+		UPO = {
+			declare_war_on = {
+				target = BLR
+				type = civil_war
+			}
+		}
+	}
+}
+
+country_event = {#Vituska controls Belarussian Central Rada
+	id = OST.50
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.50" }
+	title = OST.50.t
+	desc = OST.50.d
+	picture = GFX_report_event_OST_partisans #temporary, please replace
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.50.a
+		add_political_power = -50
+	}
+}
+country_event = {#Vituska petition for more funding for Bylorussian Home Guard
+	id = OST.51
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.51" }
+	title = OST.51.t
+	desc = OST.51.d
+	picture = GFX_report_event_OST_partisans #temporary, please replace
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = { #agree
+		name = OST.51.a
+		add_manpower = 5000
+		add_political_power = -25
+	}
+
+	option = { #disagree
+		name = OST.51.b
+	}
+}
+country_event = {#Belerussian Auxillery Police gain power
+	id = OST.52
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.52" }
+	title = OST.52.t
+	desc = OST.52.d
+	picture = GFX_report_event_OST_partisans #temporary, please replace
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+
+	option = {
+		name = OST.52.a
+		add_political_power = -50
+	}
+}
+country_event = {#Vituska requests autonomy
+	id = OST.53
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.53" }
+	title = OST.53.t
+	desc = OST.53.d
+	picture = GFX_report_event_OST_partisans #temporary, please replace
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = { #agree
+		name = OST.53.a
+		add_political_power = -50
+		add_manpower = -10000
+	}
+
+	option = { #disagree
+		name = OST.53.b
+		add_political_power = -100
+	}
+}
+
+country_event = {#SS MEYER PEACE
+	id = OST.55
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.55" }
+	title = OST.55.t
+	desc = OST.55.d
+	picture = GFX_report_event_OST_partisan
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.55.a.ost
+		trigger = { tag = OST }
+	}
+	option = {
+		name = OST.55.a.dst
+		trigger = { tag = DST }
+	}
+	option = {
+		name = OST.55.a.blr
+		trigger = { tag = BLR }
+	}
+	option = {
+		name = OST.55.a.lit
+		trigger = { tag = UPO }
+	}
+}
+
+country_event = {#They send a guy lol
+	id = OST.56
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.56" }
+	title = OST.56.t
+	desc = OST.56.d
+	picture = GFX_report_event_OST_partisan
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = OST.56.a.stahl
+		#trigger = { has_completed_focus = OST_the_unity_of_stahlecker }
+		hidden_effect = { country_event = { id = OST.57 days = 20 } }
+	}
+
+	option = {
+		name = OST.56.a.meyer
+		#trigger = { has_completed_focus = OST_the_reforms_of_meyerlandrut }
+		hidden_effect = { country_event = { id = OST.57 days = 20 } }
+	}
+
+	option = {
+		name = OST.56.a.drech
+		#trigger = { has_completed_focus = OST_the_power_of_drechsler }
+		hidden_effect = { country_event = { id = OST.57 days = 20 } }
+	}
+
+	option = {
+		name = OST.56.a.jeck
+		#trigger = { has_completed_focus = OST_the_might_of_Jeckeln_ss }
+		hidden_effect = { country_event = { id = OST.57 days = 20 } }
+	}
+
+	option = {
+		name = OST.56.a.vit
+		#trigger = { has_completed_focus = OST_the_subversion_of_vituska }
+		hidden_effect = { country_event = { id = OST.57 days = 20 } }
+	}
+
+	option = {
+		name = OST.56.a.kov
+		#trigger = { has_completed_focus = OST_the_degenerecy_of_kovner }
+		hidden_effect = { country_event = { id = OST.57 days = 20 } }
+	}
+}
+
+country_event = {#He got shot down lol
+	id = OST.57
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.57" }
+	title = OST.57.t
+	desc = OST.57.d
+	picture = GFX_report_event_OST_partisan
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	immediate = { hidden_effect = { country_event = { id = OST.3 days = 4 } } }
+
+	option = {
+		name = OST.57.a.stahl
+		#trigger = { has_completed_focus = OST_unite_the_people }
+	}
+	option = {
+		name = OST.57.a.meyer
+		#trigger = { has_completed_focus = OST_unite_the_left }
+	}
+	option = {
+		name = OST.57.a.drech
+		#trigger = { has_completed_focus = OST_unite_the_garrison }
+	}
+	option = {
+		name = OST.57.a.jeck
+		#trigger = { has_completed_focus = OST_unite_the_SS }
+	}
+	option = {
+		name = OST.57.a.vit
+		#trigger = { has_completed_focus = OST_unite_the_belarussians }
+	}
+	option = {
+		name = OST.57.a.kov
+		#trigger = { has_completed_focus = OST_unite_the_partisans }
+	}
+}
+
+country_event = {#Choose
+	id = OST.58
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.58" }
+	title = OST.58.t
+	desc = OST.58.d
+	picture = GFX_report_event_OST_partisans #temporary, please replace
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = { #Drechsler
+		name = OST.58.a
+		hidden_effect = { remove_ideas_with_trait = security_minister }
+		add_ideas = DST_Otto_Heinrich_Drechsler_sec
+	}
+	option = { #Jeckeln
+		name = OST.58.b
+		hidden_effect = { remove_ideas_with_trait = security_minister }
+		add_ideas = JST_Friedrich_Jeckeln_sec
+	}
+	option = { #Nobody
+		name = OST.58.c
+		add_ideas = OST_No_head
+	}
+}
+
+
+### News Events ###
+news_event = { #Stahlecker wins
+	id = OST_news.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST_news.1" }
+	title = OST_news.1.t
+	desc = OST_news.1.d
+	picture = GFX_news_event_OST_stahlecker_victory
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = OST_news.1.a
+	}
+}
+
+news_event = { #Kovner wins
+	id = OST_news.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST_news.2" }
+	title = OST_news.2.t
+	desc = OST_news.2.d
+	picture = GFX_news_event_OST_kovner_victory
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = OST_news.2.a
+	}
+}
+
+news_event = { #Landrut wins
+	id = OST_news.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST_news.3" }
+	title = OST_news.3.t
+	desc = OST_news.3.d
+	picture = GFX_news_event_OST_meyerlandrut_victory
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = OST_news.3.a
+	}
+}
+
+news_event = { #Jeckeln wins
+	id = OST_news.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST_news.4" }
+	title = OST_news.4.t
+	desc = OST_news.4.d
+	picture = GFX_news_event_OST_jeckeln_victory
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = OST_news.4.a
+	}
+}
+
+news_event = { #Vituska wins
+	id = OST_news.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST_news.5" }
+	title = OST_news.5.t
+	desc = OST_news.5.d
+	picture = GFX_news_event_OST_vituska_victory
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = OST_news.5.a
+	}
+}
+
+news_event = { #Drechsler wins
+	id = OST_news.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST_news.6" }
+	title = OST_news.6.t
+	desc = OST_news.6.d
+	picture = GFX_news_event_OST_drechsler_victory
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = OST_news.6.a
+	}
+}
+
+#####################################
+### Contender Death/Escape Events ###
+#####################################
+
+##Stahlecker Escapes
+country_event = {
+	id = OST.200
+	title = OST.200.t
+	desc = OST.200.desc
+	picture = GFX_report_event_OST_stahlecker
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.200" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.200.a
+	}
+}
+
+##Stahlecker Dies
+country_event = {
+	id = OST.201
+	title = OST.201.t
+	desc = OST.201.desc
+	picture = GFX_report_event_OST_stahlecker
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.201" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.201.a
+	}
+}
+
+##Dreschler Escapes
+country_event = {
+	id = OST.202
+	title = OST.202.t
+	desc = OST.202.desc
+	picture = GFX_report_event_OST_drechsler
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.202" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.202.a
+	}
+}
+
+##Dreschler Dies
+country_event = {
+	id = OST.203
+	title = OST.203.t
+	desc = OST.203.desc
+	picture = GFX_report_event_OST_drechsler
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.203" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.203.a
+	}
+}
+
+##Jeckeln Escapes
+country_event = {
+	id = OST.204
+	title = OST.204.t
+	desc = OST.204.desc
+	picture = GFX_report_event_OST_jeckeln
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.204" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.204.a
+	}
+}
+
+##Jeckeln Dies
+country_event = {
+	id = OST.205
+	title = OST.205.t
+	desc = OST.205.desc
+	picture = GFX_report_event_OST_jeckeln 
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.205" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.205.a
+	}
+}
+
+##Meyer-Landrut Escapes
+country_event = {
+	id = OST.206
+	title = OST.206.t
+	desc = OST.206.desc
+	picture = GFX_report_event_OST_meyer_landrut
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.206" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.206.a
+	}
+}
+
+##Meyer-Landrut Dies
+country_event = {
+	id = OST.207
+	title = OST.207.t
+	desc = OST.207.desc
+	picture = GFX_report_event_OST_meyer_landrut
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.207" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.207.a
+	}
+}
+
+##Vituska Escapes
+country_event = {
+	id = OST.208
+	title = OST.208.t
+	desc = OST.208.desc
+	picture = GFX_report_event_OST_vituska
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.208" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.208.a
+	}
+}
+
+##Vituska Dies
+country_event = {
+	id = OST.209
+	title = OST.209.t
+	desc = OST.209.desc
+	picture = GFX_report_event_OST_vituska
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.209" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.209.a
+	}
+}
+
+##Kovner Escapes
+country_event = {
+	id = OST.210
+	title = OST.210.t
+	desc = OST.210.desc
+	picture = GFX_report_event_OST_kovner
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.210" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.210.a
+	}
+}
+
+##Kovner Dies
+country_event = {
+	id = OST.211
+	title = OST.211.t
+	desc = OST.211.desc
+	picture = GFX_report_event_OST_kovner
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OST.211" }
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OST.211.a
+	}
+}

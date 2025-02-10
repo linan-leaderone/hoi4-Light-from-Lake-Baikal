@@ -1,0 +1,1161 @@
+scripted_gui = {
+
+	TNO_MEX_Succession_GUI_2 = {
+		context_type = decision_category
+		window_name = "TNO_MEX_Succession_GUI_2_window"
+		parent_window_token = decision_tab
+
+		visible = { always = yes }
+
+		effects = {
+			gbp_plus_lozano_click = { add_to_variable = { MEX_Lozano_gbp = 1 } }
+			gbp_minus_lozano_click = { subtract_from_variable = { MEX_Lozano_gbp = 1} }
+			gbp_plus_ordaz_click = { add_to_variable = { MEX_Ordaz_gbp = 1 } }
+			gbp_minus_ordaz_click = { subtract_from_variable = { MEX_Ordaz_gbp = 1 } }
+			gbp_plus_madrazo_click = { add_to_variable = { MEX_Madrazo_gbp = 1 } }
+			gbp_minus_madrazo_click = { subtract_from_variable = { MEX_Madrazo_gbp = 1 } }
+
+			MEX_et_notepad_open_button_click = {
+				if = {
+					limit = { has_country_flag = MEX_El_Tapado_notepad_Visible }
+					clr_country_flag = MEX_El_Tapado_notepad_Visible
+					clr_country_flag = ordaz_page_turned
+					clr_country_flag = lozano_page_turned
+					clr_country_flag = madrazo_page_turned
+					clr_country_flag = summary_page_turned
+				}
+				else = {
+					set_country_flag = MEX_El_Tapado_notepad_Visible
+					set_country_flag = summary_page_turned
+				}
+				add_to_variable = { MEX_et_notepad_dirty = 0.01 }
+			}
+		}
+	}
+
+	TNO_MEX_et_notepad = {
+		context_type = player_context
+		window_name = "MEX_el_tapado_notepad_container"
+
+		visible = {
+			has_country_flag = MEX_El_Tapado_notepad_Visible
+		}
+
+		dynamic_lists = {
+			ordaz_gbp_gridbox = {
+				array = GBP_ordaz_array
+				entry_container = MEX_el_tapado_ordaz_gbp
+				value = GBP_ordaz_array_v
+				index = GBP_ordaz_array_i
+			}
+			lozano_gbp_gridbox = {
+				array = GBP_lozano_array
+				entry_container = MEX_el_tapado_lozano_gbp
+				value = GBP_lozano_array_v
+				index = GBP_lozano_array_i
+			}
+			lan_gbp_gridbox = {
+				array = GBP_lan_array
+				entry_container = MEX_el_tapado_lan_gbp
+				value = GBP_lan_array_v
+				index = GBP_lan_array_i
+			}
+			ordaz_kabuki_gbp_gridbox = {
+				array = GBP_ordaz_kabuki_array
+				entry_container = MEX_el_tapado_kabuki_ordaz_gbp
+				value = GBP_ordaz_kabuki_array_v
+				index = GBP_ordaz_kabuki_array_i
+			}
+			lozano_kabuki_gbp_gridbox = {
+				array = GBP_lozano_kabuki_array
+				entry_container = MEX_el_tapado_kabuki_lozano_gbp
+				value = GBP_lozano_kabuki_array_v
+				index = GBP_lozano_kabuki_array_i
+			}
+			lan_kabuki_gbp_gridbox = {
+				array = GBP_lan_kabuki_array
+				entry_container = MEX_el_tapado_kabuki_lan_gbp
+				value = GBP_lan_kabuki_array_v
+				index = GBP_lan_kabuki_array_i
+			}
+		}
+
+		triggers = {
+			GBP_ordaz_all_visible = {
+				has_country_flag = ordaz_page_turned
+				NOT = { has_country_flag = kabuki_page_turned }
+			}
+			GBP_lozano_all_visible = {
+				has_country_flag = lozano_page_turned
+				NOT = { has_country_flag = kabuki_page_turned }
+			}
+			GBP_lan_all_visible = {
+				has_country_flag = madrazo_page_turned
+				NOT = { has_country_flag = kabuki_page_turned }
+			}
+			GBP_ordaz_kabuki_all_visible = {
+				AND = {
+					has_country_flag = ordaz_page_turned
+					has_country_flag = kabuki_page_turned
+				}
+			}
+			GBP_lozano_kabuki_all_visible = {
+				AND = {
+					has_country_flag = lozano_page_turned
+					has_country_flag = kabuki_page_turned
+				}
+			}
+			GBP_lan_kabuki_all_visible = {
+				AND = {
+					has_country_flag = madrazo_page_turned
+					has_country_flag = kabuki_page_turned
+				}
+			}
+			el_tapado_background_visible = {
+				NOT = { has_country_flag = summary_page_turned }
+			}
+			kabuki_turn_background_visible = {
+				NOT = { has_country_flag = summary_page_turned }
+				OR = {
+					has_country_flag = gbp_olympics
+					has_country_flag = gbp_olympics_2
+					has_country_flag = gbp_olympics_3
+					has_country_flag = gbp_olympics_4
+					has_country_flag = gbp_olympics_5
+					has_country_flag = gbp_olympics_6
+				}
+			}
+			el_tapado_successor_portrait_visible = {
+				OR = {
+					has_country_flag = ordaz_page_turned
+					has_country_flag = lozano_page_turned
+					has_country_flag = madrazo_page_turned
+				}
+			}
+			MEX_successor_name_visible = {
+				OR = {
+					has_country_flag = ordaz_page_turned
+					has_country_flag = lozano_page_turned
+					has_country_flag = madrazo_page_turned
+				}
+			}
+			el_tapado_successor_desc_visible = {
+				OR = {
+					has_country_flag = ordaz_page_turned
+					has_country_flag = lozano_page_turned
+					has_country_flag = madrazo_page_turned
+				}
+			}
+			el_tapado_successor_portrait_summary_visible = {
+				has_country_flag = summary_page_turned
+			}
+			new_ordaz_visible = {
+				has_country_flag = MEX_new_ordaz_stuff
+			}
+			el_tapado_ordaz_desc_visible = {
+				has_country_flag = ordaz_page_turned
+			}
+			new_ordaz_stuff_visible = {
+				has_country_flag = new_ordaz_stuff
+				NOT = { has_country_flag = ordaz_page_turned }
+			}
+			turn_page_pressed_ordaz_visible = {
+				has_country_flag = ordaz_page_turned
+			}
+			turn_page_pressed_lozano_visible = {
+				has_country_flag = lozano_page_turned
+			}
+			turn_page_pressed_madrazo_visible = {
+				has_country_flag = madrazo_page_turned
+			}
+			turn_page_pressed_summary_visible = {
+				has_country_flag = summary_page_turned
+			}
+			el_tapado_ordaz_summary_desc_visible = {
+				has_country_flag = summary_page_turned
+			}
+			el_tapado_ordaz_summary_opinion_visible = {
+				has_country_flag = summary_page_turned
+			}
+			el_tapado_ordaz_summary_overview_visible = {
+				has_country_flag = summary_page_turned
+			}
+			el_tapado_lozano_summary_desc_visible = {
+				has_country_flag = summary_page_turned
+			}
+			el_tapado_lozano_summary_opinion_visible = {
+				has_country_flag = summary_page_turned
+			}
+			new_lozano_stuff_visible = {
+				has_country_flag = new_lozano_stuff
+				NOT = { has_country_flag = lozano_page_turned }
+			}
+			new_madrazo_stuff_visible = {
+				has_country_flag = new_madrazo_stuff
+				NOT = { has_country_flag = madrazo_page_turned }
+			}
+			el_tapado_lan_summary_desc_visible = {
+				has_country_flag = summary_page_turned
+			}
+			el_tapado_lan_summary_opinion_visible = {
+				has_country_flag = summary_page_turned
+			}
+			el_tapado_ordaz_special_gbp_frame_visible = {
+				has_country_flag = ordaz_page_turned
+			}
+			el_tapado_lozano_special_gbp_frame_visible = {
+				has_country_flag = lozano_page_turned
+			}
+			el_tapado_lan_special_gbp_frame_visible = {
+				has_country_flag = madrazo_page_turned
+			}
+			el_tapado_ordaz_proposal_visible = {
+				has_country_flag = ordaz_page_turned
+			}
+			el_tapado_ordaz_stewardship_visible = {
+				has_country_flag = ordaz_page_turned
+			}
+			el_tapado_ordaz_puerto_plata_visible = {
+				AND = {
+					has_country_flag = ordaz_page_turned
+					has_country_flag = MEX_succession_puerto_plata
+				}
+			}
+			el_tapado_ordaz_puerto_plata_ending_visible = {
+				AND = {
+					has_country_flag = ordaz_page_turned
+					has_country_flag = MEX_succession_puerto_plata
+				}
+			}
+			el_tapado_lozano_proposal_visible = {
+				has_country_flag = lozano_page_turned
+			}
+			el_tapado_lozano_stewardship_visible = {
+				has_country_flag = lozano_page_turned
+			}
+			el_tapado_lozano_puerto_plata_visible = {
+				AND = {
+					has_country_flag = lozano_page_turned
+					has_country_flag = MEX_succession_puerto_plata
+				}
+			}
+			el_tapado_lozano_puerto_plata_ending_visible = {
+				AND = {
+					has_country_flag = lozano_page_turned
+					has_country_flag = MEX_succession_puerto_plata
+				}
+			}
+			el_tapado_lan_puerto_plata_visible = {
+				AND = {
+					has_country_flag = madrazo_page_turned
+					has_country_flag = MEX_succession_puerto_plata
+				}
+			}
+			el_tapado_lan_puerto_plata_ending_visible = {
+				AND = {
+					has_country_flag = madrazo_page_turned
+					has_country_flag = MEX_succession_puerto_plata
+				}
+			}
+		}
+		effects = {
+			MEX_notepad_GUI_Close_Button_click = {
+				clr_country_flag = MEX_El_Tapado_notepad_Visible
+				clr_country_flag = ordaz_page_turned
+				clr_country_flag = lozano_page_turned
+				clr_country_flag = madrazo_page_turned
+				clr_country_flag = summary_page_turned
+			}
+			kabuki_turn_background_click = {
+				if = {
+					limit = { has_country_flag = kabuki_page_turned }
+					clr_country_flag = kabuki_page_turned
+					set_variable = { MEX_kabuki_turn_background_var = 1 }
+					set_variable = { MEX_el_tapado_background_var = 1 }
+				}
+				else_if = {
+					limit = { NOT = { has_country_flag = kabuki_effect_tree_flag } }
+					set_country_flag = kabuki_page_turned
+					set_variable = { MEX_kabuki_turn_background_var = 2 }
+					set_variable = { MEX_el_tapado_background_var = 2 }
+				}
+				else = {
+					set_country_flag = kabuki_page_turned
+					set_variable = { MEX_kabuki_turn_background_var = 2 }
+					set_variable = { MEX_el_tapado_background_var = 3 }
+				}
+			}
+			ordaz_turn_page_click = {
+				clr_country_flag = lozano_page_turned
+				clr_country_flag = madrazo_page_turned
+				clr_country_flag = summary_page_turned
+				clr_country_flag = new_ordaz_stuff
+				set_country_flag = ordaz_page_turned
+				set_variable = { MEX_successor_portrait_var = 1 }
+			}
+			lozano_turn_page_click = {
+				clr_country_flag = ordaz_page_turned
+				clr_country_flag = madrazo_page_turned
+				clr_country_flag = summary_page_turned
+				clr_country_flag = new_lozano_stuff
+				set_country_flag = lozano_page_turned
+				set_variable = { MEX_successor_portrait_var = 2 }
+			}
+
+			madrazo_turn_page_click = {
+				clr_country_flag = lozano_page_turned
+				clr_country_flag = ordaz_page_turned
+				clr_country_flag = summary_page_turned
+				clr_country_flag = new_madrazo_stuff
+				set_country_flag = madrazo_page_turned
+				if = {
+					limit = {
+						not = { has_country_flag = madrazo_unites }
+					}
+					set_variable = { MEX_successor_portrait_var = 3 }
+				}
+				else = {
+					set_variable = { MEX_successor_portrait_var = 4 }
+				}
+			}
+
+			summary_turn_page_click = {
+				clr_country_flag = lozano_page_turned
+				clr_country_flag = ordaz_page_turned
+				clr_country_flag = madrazo_page_turned
+				set_country_flag = summary_page_turned
+				if = {
+					limit = {
+						not = { has_country_flag = madrazo_unites }
+					}
+					set_variable = { MEX_successor_portrait_summary_var = 1 }
+				}
+				else = {
+					set_variable = { MEX_successor_portrait_summary_var = 2 }
+				}
+			}
+		}
+		properties = {
+			GBP_ordaz_all = {
+				frame = GBP_ordaz_array_v
+			}
+			GBP_lozano_all = {
+				frame = GBP_lozano_array_v
+			}
+			GBP_lan_all = {
+				frame = GBP_lan_array_v
+			}
+			GBP_ordaz_kabuki_all = {
+				frame = GBP_ordaz_kabuki_array_v
+			}
+			GBP_lozano_kabuki_all = {
+				frame = GBP_lozano_kabuki_array_v
+			}
+			GBP_lan_kabuki_all = {
+				frame = GBP_lan_kabuki_array_v
+			}
+			el_tapado_background = {
+				frame = MEX_el_tapado_background_var
+			}
+			el_tapado_successor_portrait = {
+				frame = MEX_successor_portrait_var
+			}
+			el_tapado_successor_portrait_summary = {
+				frame = MEX_successor_portrait_summary_var
+			}
+			kabuki_turn_background = {
+				frame = MEX_kabuki_turn_background_var
+			}
+			el_tapado_ordaz_proposal = {
+				frame = MEX_el_tapado_ordaz_proposal_frame_var
+			}
+			el_tapado_ordaz_stewardship = {
+				frame = MEX_el_tapado_ordaz_stewardship_frame_var
+			}
+			el_tapado_ordaz_puerto_plata = {
+				frame = MEX_el_tapado_ordaz_puerto_plata_frame_var
+			}
+			el_tapado_ordaz_puerto_plata_ending = {
+				frame = MEX_el_tapado_ordaz_puerto_plata_ending_frame_var
+			}
+			el_tapado_lozano_proposal = {
+				frame = MEX_el_tapado_lozano_proposal_frame_var
+			}
+			el_tapado_lozano_stewardship = {
+				frame = MEX_el_tapado_lozano_stewardship_frame_var
+			}
+			el_tapado_lozano_puerto_plata = {
+				frame = MEX_el_tapado_lozano_puerto_plata_frame_var
+			}
+			el_tapado_lozano_puerto_plata_ending = {
+				frame = MEX_el_tapado_lozano_puerto_plata_ending_frame_var
+			}
+			el_tapado_lan_puerto_plata = {
+				frame = MEX_el_tapado_lan_puerto_plata_frame_var
+			}
+			el_tapado_lan_puerto_plata_ending = {
+				frame = MEX_el_tapado_lan_puerto_plata_ending_frame_var
+			}
+			el_tapado_lan_summary_opinion = {
+				y = dynamic_lan_summary_opinion_y
+			}
+		}
+	}
+	TNO_MEX_el_tapado_2 = {
+		context_type = decision_category
+		window_name = "TNO_MEX_el_tapado_2"
+		parent_window_token = decision_tab
+
+		visible = { always = yes }
+
+		effects = {
+			MEX_el_tapado_2_button_click = {
+				if = {
+					limit = { has_country_flag = el_tapado_2_project_visible }
+					clr_country_flag = el_tapado_2_project_visible
+					set_variable = { MEX_furnance_selected = 1 }
+					set_variable = { MEX_tap2_variable = 0 }
+					set_variable = { el_tapado_2_display_factions_frame_var = 1 }
+				}
+				else = { set_country_flag = el_tapado_2_project_visible }
+			}
+		}
+	}
+	MEX_el_tapado_2_project = {
+		context_type = player_context
+		window_name = "MEX_el_tapado_2_project"
+
+		visible = { has_country_flag = el_tapado_2_project_visible }
+
+		triggers = {
+			el_tapado_2_campaign_preparation_visible = {
+				check_variable = { MEX_furnance_selected = 2 }
+				NOT = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			}
+			el_tapado_2_campaign_unselected_visible = {
+				check_variable = { MEX_furnance_selected = 1 }
+				NOT = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			}
+			el_tapado_2_button1_visible = {
+				check_variable = { MEX_furnance_selected = 2 }
+				NOT = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			}
+			el_tapado_2_button2_visible = {
+				check_variable = { MEX_furnance_selected = 2 }
+				NOT = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			}
+			el_tapado_2_button3_visible = {
+				check_variable = { MEX_furnance_selected = 2 }
+				NOT = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			}
+			el_tapado_left_furnace_selected_visible = {
+				check_variable = { MEX_tap2_variable = 1 }
+			}
+			el_tapado_middle_furnace_selected_visible = {
+				check_variable = { MEX_tap2_variable = 2 }
+			}
+			el_tapado_right_furnace_selected_visible = {
+				check_variable = { MEX_tap2_variable = 3 }
+			}
+			el_tapado_2_button1_lock_visible = {
+				OR = {
+					AND = {
+						check_variable = { MEX_tap2_variable = 1 }
+						check_variable = { MEX_tap2_legacy_button1_variable > 0 }
+					}
+					AND = {
+						check_variable = { MEX_tap2_variable = 2 }
+						check_variable = { MEX_tap2_construction_button1_variable > 0 }
+					}
+					AND = {
+						check_variable = { MEX_tap2_variable = 3 }
+						check_variable = { MEX_tap2_perception_button1_variable > 0 }
+					}
+				}
+				NOT = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			}
+			el_tapado_2_button2_lock_visible = {
+				OR = {
+					AND = {
+						check_variable = { MEX_tap2_variable = 1 }
+						check_variable = { MEX_tap2_legacy_button2_variable > 0 }
+					}
+					AND = {
+						check_variable = { MEX_tap2_variable = 2 }
+						check_variable = { MEX_tap2_construction_button2_variable > 0 }
+					}
+					AND = {
+						check_variable = { MEX_tap2_variable = 3 }
+						check_variable = { MEX_tap2_perception_button2_variable > 0 }
+					}
+				}
+				NOT = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			}
+			el_tapado_2_button3_lock_visible = {
+				OR = {
+					AND = {
+						check_variable = { MEX_tap2_variable = 1 }
+						check_variable = { MEX_tap2_legacy_button3_variable > 0 }
+					}
+					AND = {
+						check_variable = { MEX_tap2_variable = 2 }
+						check_variable = { MEX_tap2_construction_button3_variable > 0 }
+					}
+					AND = {
+						check_variable = { MEX_tap2_variable = 3 }
+						check_variable = { MEX_tap2_perception_button3_variable > 0 }
+					}
+				}
+				NOT = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			}
+			MEX_el_tapado_left_furnace_switch_inactive_visible = {
+				OR = {
+					has_political_power < 5
+					check_variable = { MEX_legacy_preparation < 5 }
+					check_variable = { MEX_left_furnance_switch_var = 2 }
+				}
+			}
+			MEX_el_tapado_middle_furnace_switch_inactive_visible = {
+				OR = {
+					has_political_power < 5
+					check_variable = { MEX_construction_preparation < 5 }
+					check_variable = { MEX_middle_furnance_switch_var = 2 }
+				}
+			}
+			MEX_el_tapado_right_furnace_switch_inactive_visible = {
+				OR = {
+					has_political_power < 5
+					check_variable = { MEX_perception_preparation < 5 }
+					check_variable = { MEX_right_furnance_switch_var = 2 }
+				}
+			}
+			MEX_el_tapado_left_furnace_logs_visible = { check_variable = { MEX_legacy_preparation > 0 } }
+			MEX_el_tapado_middle_furnace_logs_visible = { check_variable = { MEX_construction_preparation > 0 } }
+			MEX_el_tapado_right_furnace_logs_visible = { check_variable = { MEX_perception_preparation > 0 } }
+			MEX_el_tapado_left_furnace_fire_visible = {
+				AND = {
+					has_country_flag = MEX_legacy_campaign_enabled
+					check_variable = { MEX_legacy_preparation > 0 }
+				}
+			}
+			MEX_el_tapado_middle_furnace_fire_visible = {
+				AND = {
+					has_country_flag = MEX_construction_campaign_enabled
+					check_variable = { MEX_construction_preparation > 0 }
+				}
+			}
+			MEX_el_tapado_right_furnace_fire_visible = {
+				AND = {
+					has_country_flag = MEX_perception_campaign_enabled
+					check_variable = { MEX_perception_preparation > 0 }
+				}
+			}
+			el_tapado_2_faction_frame_visible = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			el_tapado_2_campaign_frame_visible = { check_variable = { el_tapado_2_display_factions_frame_var = 1 } }
+			el_tapado_2_workers_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable = 3 }
+				}
+			}
+			el_tapado_2_peasants_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable = 1 }
+				}
+			}
+			el_tapado_2_dfs_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable = 2 }
+				}
+			}
+			el_tapado_2_intellectuals_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable = 1 }
+				}
+			}
+			el_tapado_2_businessmen_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable = 3 }
+				}
+			}
+			el_tapado_2_officials_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable = 2 }
+				}
+			}
+			el_tapado_2_left_loyalty_visible = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			el_tapado_2_left_power_visible = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			el_tapado_2_left_corruption_visible = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			el_tapado_2_right_loyalty_visible = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			el_tapado_2_right_power_visible = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			el_tapado_2_right_corruption_visible = { check_variable = { el_tapado_2_display_factions_frame_var = 2 } }
+			el_tapado_left_faction_loyalty_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable > 0 }
+				}
+			}
+			el_tapado_left_faction_corruption_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable > 0 }
+				}
+			}
+			el_tapado_left_faction_power_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable > 0 }
+				}
+			}
+			el_tapado_right_faction_loyalty_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable > 0 }
+				}
+			}
+			el_tapado_right_faction_corruption_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable > 0 }
+				}
+			}
+			el_tapado_right_faction_power_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable > 0 }
+				}
+			}
+			el_tapado_2_faction_group_unselected_visible = {
+				AND = {
+					check_variable = { el_tapado_2_display_factions_frame_var = 2 }
+					check_variable = { MEX_tap2_variable = 0 }
+				}
+			}
+		}
+		effects = {
+			MEX_el_tapado_2_close_click = {
+				clr_country_flag = el_tapado_2_project_visible
+				set_variable = { MEX_furnance_selected = 1 }
+				set_variable = { MEX_tap2_variable = 0 }
+				set_variable = { el_tapado_2_display_factions_frame_var = 2 }
+			}
+			MEX_el_tapado_left_furnace_click = {
+				if = { limit = { check_variable = { MEX_tap2_variable = 1 } }
+					set_variable = { MEX_furnance_selected = 1 }
+					set_variable = { MEX_tap2_variable = 0 }
+				}
+				else = {
+					set_variable = { MEX_furnance_selected = 2 }
+					set_variable = { MEX_tap2_variable = 1 }
+				}
+			}
+			MEX_el_tapado_middle_furnace_click = {
+				if = { limit = { check_variable = { MEX_tap2_variable = 2 } }
+					set_variable = { MEX_furnance_selected = 1 }
+					set_variable = { MEX_tap2_variable = 0 }
+				}
+				else = {
+					set_variable = { MEX_furnance_selected = 2 }
+					set_variable = { MEX_tap2_variable = 2 }
+				}
+			}
+			MEX_el_tapado_right_furnace_click = {
+				if = { limit = { check_variable = { MEX_tap2_variable = 3 } }
+					set_variable = { MEX_furnance_selected = 1 }
+					set_variable = { MEX_tap2_variable = 0 }
+				}
+				else= {
+					set_variable = { MEX_furnance_selected = 2 }
+					set_variable = { MEX_tap2_variable = 3 }
+				}
+			}
+			el_tapado_2_button1_click = {
+				if = {
+					limit = {
+						AND = {
+							has_political_power > 9
+							check_variable = { MEX_tap2_variable = 1 }
+						}
+					}
+					set_variable = { MEX_tap2_legacy_button1_variable = 35 }
+					add_to_variable = { MEX_legacy_preparation = 1 }
+					hidden_effect = { add_political_power = -10 }
+					clamp_variable = { var = MEX_legacy_preparation max = 5 min = 0 }
+				}
+				if = {
+					limit = {
+						AND = {
+							has_political_power > 9
+							check_variable = { MEX_tap2_variable = 2 }
+						}
+					}
+					set_variable = { MEX_tap2_construction_button1_variable = 35 }
+					if = { limit = { has_completed_focus = MEX_the_federal_republic }
+						add_to_variable = { MEX_construction_preparation = 2 }
+					}
+					else = { add_to_variable = { MEX_construction_preparation = 1 } }
+					hidden_effect = { add_political_power = -10 }
+					clamp_variable = { var = MEX_construction_preparation max = 5 min = 0 }
+				}
+				if = {
+					limit = {
+						AND = {
+							has_political_power > 9
+							check_variable = { MEX_tap2_variable = 3 }
+						}
+					}
+					set_variable = { MEX_tap2_perception_button1_variable = 35 }
+					if = { limit = { has_completed_focus = MEX_a_unified_revolution }
+						add_to_variable = { MEX_perception_preparation = 2 }
+					}
+					else = { add_to_variable = { MEX_perception_preparation = 1 } }
+					hidden_effect = { add_political_power = -10 }
+					clamp_variable = { var = MEX_perception_preparation max = 5 min = 0 }
+				}
+			}
+			el_tapado_2_button2_click = {
+				if = {
+					limit = {
+						AND = {
+							has_political_power > 19
+							check_variable = { MEX_tap2_variable = 1 }
+							NOT = { has_country_flag = MEX_construction_penalty_prevented }
+							NOT = { has_country_flag = MEX_perception_penalty_prevented }
+						}
+					}
+					set_variable = { MEX_tap2_legacy_button2_variable = 21 }
+					set_country_flag = MEX_legacy_penalty_prevented
+					hidden_effect = { add_political_power = -20 }
+				}
+				if = {
+					limit = {
+						AND = {
+							has_political_power > 19
+							check_variable = { MEX_tap2_variable = 2 }
+							NOT = { has_country_flag = MEX_legacy_penalty_prevented }
+							NOT = { has_country_flag = MEX_perception_penalty_prevented }
+						}
+					}
+					set_variable = { MEX_tap2_construction_button2_variable = 21 }
+					set_country_flag = MEX_construction_penalty_prevented
+					hidden_effect = { add_political_power = -20 }
+				}
+				if = {
+					limit = {
+						AND = {
+							has_political_power > 19
+							check_variable = { MEX_tap2_variable = 3 }
+							NOT = { has_country_flag = MEX_legacy_penalty_prevented }
+							NOT = { has_country_flag = MEX_construction_penalty_prevented }
+						}
+					}
+					set_variable = { MEX_tap2_perception_button2_variable = 21 }
+					set_country_flag = MEX_perception_penalty_prevented
+					hidden_effect = { add_political_power = -20 }
+				}
+			}
+			el_tapado_2_button3_click = {
+				if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 1 }
+							has_political_power > 9
+						}
+					}
+					if = { limit = { check_variable = { MEX_construction_preparation > 0 } }
+						subtract_from_variable = { MEX_construction_preparation = 1 }
+						add_to_variable = { MEX_legacy_preparation = 1 }
+					}
+					if = { limit = { check_variable = { MEX_perception_preparation > 0 } }
+						subtract_from_variable = { MEX_perception_preparation = 1 }
+						add_to_variable = { MEX_legacy_preparation = 1 }
+					}
+					set_variable = { MEX_tap2_legacy_button3_variable = 7 }
+					hidden_effect = { add_political_power = -10 }
+					clamp_variable = { var = MEX_legacy_preparation max = 5 min = 0 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 2 }
+							has_political_power > 9
+						}
+					}
+					if = { limit = { check_variable = { MEX_legacy_preparation > 0 } }
+						subtract_from_variable = { MEX_legacy_preparation = 1 }
+						add_to_variable = { MEX_construction_preparation = 1 }
+					}
+					if = { limit = { check_variable = { MEX_perception_preparation > 0 } }
+						subtract_from_variable = { MEX_perception_preparation = 1 }
+						add_to_variable = { MEX_construction_preparation = 1 }
+					}
+					set_variable = { MEX_tap2_construction_button3_variable = 7 }
+					hidden_effect = { add_political_power = -10 }
+					clamp_variable = { var = MEX_construction_preparation max = 5 min = 0 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 3 }
+							has_political_power > 9
+						}
+					}
+					if = { limit = { check_variable = { MEX_legacy_preparation > 0 } }
+						subtract_from_variable = { MEX_legacy_preparation = 1 }
+						add_to_variable = { MEX_perception_preparation = 1 }
+					}
+					if = { limit = { check_variable = { MEX_construction_preparation > 0 } }
+						subtract_from_variable = { MEX_construction_preparation = 1 }
+						add_to_variable = { MEX_perception_preparation = 1 }
+					}
+					set_variable = { MEX_tap2_perception_button3_variable = 7 }
+					hidden_effect = { add_political_power = -10 }
+					clamp_variable = { var = MEX_perception_preparation max = 5 min = 0 }
+				}
+			}
+			MEX_el_tapado_left_furnace_switch_click = {
+				add_political_power = -5
+				set_temp_variable = { temp_econ_spending_amount = 0.025 }
+				econ_spend_money_once_effect_raw_money = yes
+				set_variable = { MEX_left_furnance_switch_var = 2 }
+				set_country_flag = MEX_legacy_campaign_enabled
+			}
+			MEX_el_tapado_middle_furnace_switch_click = {
+				add_political_power = -5
+				set_temp_variable = { temp_econ_spending_amount = 0.025 }
+				econ_spend_money_once_effect_raw_money = yes
+				set_variable = { MEX_middle_furnance_switch_var = 2 }
+				set_country_flag = MEX_construction_campaign_enabled
+			}
+			MEX_el_tapado_right_furnace_switch_click = {
+				add_political_power = -5
+				set_temp_variable = { temp_econ_spending_amount = 0.025 }
+				econ_spend_money_once_effect_raw_money = yes
+				set_variable = { MEX_right_furnance_switch_var = 2 }
+				set_country_flag = MEX_perception_campaign_enabled
+			}
+			el_tapado_2_display_factions_click = {
+				if = { limit = { check_variable = { el_tapado_2_display_factions_frame_var = 1 } }
+					set_variable = { el_tapado_2_display_factions_frame_var = 2 }
+				}
+				else = { set_variable = { el_tapado_2_display_factions_frame_var = 1 } }
+			}
+			el_tapado_left_faction_loyalty_click = {
+				if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 1 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_peasants_frame_var = 1 }
+							check_variable = { MEX_tap2_legacy > 0 }
+							has_country_flag = MEX_legacy_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_loyalty_peasants_med = yes
+					subtract_from_variable = { MEX_tap2_legacy = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_peasants_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 2 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_dfs_frame_var = 1 }
+							check_variable = { MEX_tap2_construction > 0 }
+							has_country_flag = MEX_construction_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_loyalty_dfs_med = yes
+					subtract_from_variable = { MEX_tap2_construction = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_dfs_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 3 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_workers_frame_var = 1 }
+							check_variable = { MEX_tap2_perception > 0 }
+							has_country_flag = MEX_perception_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_loyalty_workers_med = yes
+					subtract_from_variable = { MEX_tap2_perception = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_workers_frame_var = 2 }
+				}
+			}
+			el_tapado_left_faction_power_click = {
+				if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 1 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_peasants_frame_var = 1 }
+							check_variable = { MEX_tap2_legacy > 0 }
+							has_country_flag = MEX_legacy_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_power_peasants_med = yes
+					subtract_from_variable = { MEX_tap2_legacy = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_peasants_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 2 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_dfs_frame_var = 1 }
+							check_variable = { MEX_tap2_construction > 0 }
+							has_country_flag = MEX_construction_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_power_dfs_med = yes
+					subtract_from_variable = { MEX_tap2_construction = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_dfs_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 3 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_workers_frame_var = 1 }
+							check_variable = { MEX_tap2_perception > 0 }
+							has_country_flag = MEX_perception_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_power_workers_med = yes
+					subtract_from_variable = { MEX_tap2_perception = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_workers_frame_var = 2 }
+				}
+			}
+			el_tapado_left_faction_corruption_click = {
+				if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 1 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_peasants_frame_var = 1 }
+							check_variable = { MEX_tap2_legacy > 0 }
+							has_country_flag = MEX_legacy_campaign_enabled
+						}
+					}
+					MEX_PRI_decrease_corruption_peasants_med = yes
+					subtract_from_variable = { MEX_tap2_legacy = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_peasants_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 2 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_dfs_frame_var = 1 }
+							check_variable = { MEX_tap2_construction > 0 }
+							has_country_flag = MEX_construction_campaign_enabled
+						}
+					}
+					MEX_PRI_decrease_corruption_dfs_med = yes
+					subtract_from_variable = { MEX_tap2_construction = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_dfs_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 3 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_workers_frame_var = 1 }
+							check_variable = { MEX_tap2_perception > 0 }
+							has_country_flag = MEX_perception_campaign_enabled
+						}
+					}
+					MEX_PRI_decrease_corruption_workers_med = yes
+					subtract_from_variable = { MEX_tap2_perception = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_workers_frame_var = 2 }
+				}
+			}
+			el_tapado_right_faction_loyalty_click = {
+				if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 1 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_intellectuals_frame_var = 1 }
+							check_variable = { MEX_tap2_legacy > 0 }
+							has_country_flag = MEX_legacy_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_loyalty_intellectuals_med = yes
+					subtract_from_variable = { MEX_tap2_legacy = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_intellectuals_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 2 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_officials_frame_var = 1 }
+							check_variable = { MEX_tap2_construction > 0 }
+							has_country_flag = MEX_construction_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_loyalty_officials_med = yes
+					subtract_from_variable = { MEX_tap2_construction = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_officials_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 3 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_businessmen_frame_var = 1 }
+							check_variable = { MEX_tap2_perception > 0 }
+							has_country_flag = MEX_perception_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_loyalty_businessmen_med = yes
+					subtract_from_variable = { MEX_tap2_perception = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_businessmen_frame_var = 2 }
+				}
+			}
+			el_tapado_right_faction_power_click = {
+				if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 1 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_intellectuals_frame_var = 1 }
+							check_variable = { MEX_tap2_legacy > 0 }
+							has_country_flag = MEX_legacy_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_power_intellectuals_med = yes
+					subtract_from_variable = { MEX_tap2_legacy = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_intellectuals_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 2 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_officials_frame_var = 1 }
+							check_variable = { MEX_tap2_construction > 0 }
+							has_country_flag = MEX_construction_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_power_officials_med = yes
+					subtract_from_variable = { MEX_tap2_construction = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_officials_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 3 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_businessmen_frame_var = 1 }
+							check_variable = { MEX_tap2_perception > 0 }
+							has_country_flag = MEX_perception_campaign_enabled
+						}
+					}
+					MEX_PRI_increase_power_businessmen_med = yes
+					subtract_from_variable = { MEX_tap2_perception = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_businessmen_frame_var = 2 }
+				}
+			}
+			el_tapado_right_faction_corruption_click = {
+				if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 1 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_intellectuals_frame_var = 1 }
+							check_variable = { MEX_tap2_legacy > 0 }
+							has_country_flag = MEX_legacy_campaign_enabled
+						}
+					}
+					MEX_PRI_decrease_corruption_intellectuals_med = yes
+					subtract_from_variable = { MEX_tap2_legacy = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_intellectuals_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 2 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_officials_frame_var = 1 }
+							check_variable = { MEX_tap2_construction > 0 }
+							has_country_flag = MEX_construction_campaign_enabled
+						}
+					}
+					MEX_PRI_decrease_corruption_officials_med = yes
+					subtract_from_variable = { MEX_tap2_construction = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_officials_frame_var = 2 }
+				}
+				else_if = {
+					limit = {
+						AND = {
+							check_variable = { MEX_tap2_variable = 3 }
+							has_political_power > 4
+							check_variable = { el_tapado_2_businessmen_frame_var = 1 }
+							check_variable = { MEX_tap2_perception > 0 }
+							has_country_flag = MEX_perception_campaign_enabled
+						}
+					}
+					MEX_PRI_decrease_corruption_businessmen_med = yes
+					subtract_from_variable = { MEX_tap2_perception = 5 }
+					add_political_power = -5
+					set_variable = { el_tapado_2_businessmen_frame_var = 2 }
+				}
+			}
+		}
+		properties = {
+			left_pri_progbar = { frame = MEX_tap2_legacy }
+			middle_pri_progbar = { frame = MEX_tap2_construction }
+			right_pri_progbar = { frame = MEX_tap2_perception }
+			el_tapado_2_campaign_frame = { frame = MEX_furnance_selected }
+			el_tapado_2_button1 = { frame = MEX_tap2_variable }
+			el_tapado_2_button2 = { frame = MEX_tap2_variable }
+			el_tapado_2_button3 = { frame = MEX_tap2_variable }
+			MEX_el_tapado_left_furnace_switch = { frame = MEX_left_furnance_switch_var }
+			MEX_el_tapado_middle_furnace_switch = { frame = MEX_middle_furnance_switch_var }
+			MEX_el_tapado_right_furnace_switch = { frame = MEX_right_furnance_switch_var }
+			MEX_el_tapado_left_furnace_switch_inactive = { frame = MEX_left_furnance_switch_var }
+			MEX_el_tapado_middle_furnace_switch_inactive = { frame = MEX_middle_furnance_switch_var }
+			MEX_el_tapado_right_furnace_switch_inactive = { frame = MEX_right_furnance_switch_var }
+			MEX_el_tapado_left_pipe = { frame = MEX_left_furnance_switch_var }
+			MEX_el_tapado_middle_pipe = { frame = MEX_middle_furnance_switch_var }
+			MEX_el_tapado_right_pipe = { frame = MEX_right_furnance_switch_var }
+			MEX_el_tapado_left_furnace_logs = { frame = MEX_legacy_preparation }
+			MEX_el_tapado_middle_furnace_logs = { frame = MEX_construction_preparation }
+			MEX_el_tapado_right_furnace_logs = { frame = MEX_perception_preparation }
+			el_tapado_2_display_factions = { frame = el_tapado_2_display_factions_frame_var }
+			el_tapado_2_faction_frame = { frame = MEX_furnance_selected }
+			el_tapado_2_businessmen = { frame = el_tapado_2_businessmen_frame_var }
+			el_tapado_2_officials = { frame = el_tapado_2_officials_frame_var }
+			el_tapado_2_intellectuals = { frame = el_tapado_2_intellectuals_frame_var }
+			el_tapado_2_dfs = { frame = el_tapado_2_dfs_frame_var }
+			el_tapado_2_peasants = { frame = el_tapado_2_peasants_frame_var }
+			el_tapado_2_workers = { frame = el_tapado_2_workers_frame_var }
+		}
+	}
+}

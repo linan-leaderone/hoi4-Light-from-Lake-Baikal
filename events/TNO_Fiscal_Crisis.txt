@@ -1,0 +1,254 @@
+add_namespace = fiscal_crisis
+
+country_event = {
+	id = fiscal_crisis.0
+	immediate = { log = "[GetDateText]: [Root.GetName]: event fiscal_crisis.0" }
+	title = fiscal_crisis.0.t
+	desc = fiscal_crisis.0.desc
+	picture = GFX_report_event_generic_money
+
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			OR = {
+				is_ai = no
+				AND = {
+					TNO_has_content = yes
+					NOT = {
+						TAG = SAF
+						TAG = ONG
+					}
+				}
+			}
+		}
+		name = fiscal_crisis.0.a
+		if = {
+			limit = {
+				TNO_has_content = yes
+			}
+			set_country_flag = ECON_ONGOING_FISCAL_CRISIS
+			custom_effect_tooltip = econ_fiscal_crisis_deccat_available
+			set_variable = { TNO_fiscal_crisis_gdp_growth_effect = -5 }
+			set_variable = { TNO_fiscal_crisis_gdp_growth_multiplier_effect = -0.75 }
+			set_variable = { TNO_fiscal_crisis_inflation_rate_effect = 0 }
+			set_variable = { TNO_fiscal_crisis_stability_effect = -0.005 }
+			set_variable = { TNO_fiscal_crisis_war_support_effect = -0.2 }
+			set_variable = { TNO_fiscal_crisis_pp_effect = -0.05 }
+			set_variable = { TNO_fiscal_crisis_reinforce_effect = ROOT.modifier@land_reinforce_rate }
+			multiply_variable = { TNO_fiscal_crisis_reinforce_effect = -0.8 }
+			set_variable = { TNO_fiscal_crisis_army_attack_factor = -0.1 }
+			set_variable = { TNO_fiscal_crisis_army_defence_factor = -0.1 }
+			set_variable = { TNO_fiscal_crisis_army_org_factor = -0.1 }
+			set_variable = { TNO_fiscal_crisis_factory_output = -0.05 }
+			THIS = { add_dynamic_modifier = { modifier = TNO_fiscal_crisis_modifier } }
+			THIS = { add_dynamic_modifier = { modifier = combatting_fiscal_crisis } }
+			set_variable = { fiscal_crisis_counter_to_bankruptcy = 0 }
+
+			if = { # Special Fiscal Crisis effects
+				limit = {
+					tag = GRO
+				}
+				meta_effect = {
+					debug = yes
+					text = {
+						TNO_[TAG]_fiscal_crisis = yes
+					}
+					TAG = "[?THIS.original_tag.GetTag]"
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = fiscal_crisis.10
+				days = 30
+			}
+		}
+	}
+	option = {
+		trigger = {
+			is_ai = yes
+			OR = {
+				TNO_has_content = no
+				TAG = SAF
+				TAG = ONG
+			}
+		}
+		multiply_variable = { national_debt = 0.7 }
+		update_economy_tab = yes
+		log = "[GetDateText]: [Root.GetName]: contentless AI fiscal crisis prevention"
+	}
+}
+country_event = {
+	id = fiscal_crisis.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event fiscal_crisis.1" }
+	title = fiscal_crisis.1.t
+	desc = fiscal_crisis.1.desc
+	picture = GFX_report_event_generic_money
+
+	is_triggered_only = yes
+
+		option = {
+		name = fiscal_crisis.1.a
+		THIS = {
+			clr_country_flag = ECON_ONGOING_FISCAL_CRISIS
+			THIS = { remove_dynamic_modifier = { modifier = TNO_fiscal_crisis_modifier } }
+			country_event = { id = fiscal_crisis.2 days = 180 }
+			if = { 
+				limit = {
+					OR = { #just add tags that have special fiscal crises scripted effects here so that the error log doesn't keep spitting errors out
+						tag = GRO
+						tag = CHI
+					}
+				}
+				meta_effect = {
+					debug = yes
+					text = {
+						TNO_[TAG]_fiscal_crisis_out = yes
+					}
+					TAG = "[?THIS.original_tag.GetTag]"
+				}
+			}
+			clear_variable = TNO_fiscal_crisis_gdp_growth_effect
+			clear_variable = TNO_fiscal_crisis_gdp_growth_multiplier_effect
+			clear_variable = TNO_fiscal_crisis_inflation_rate_effect
+			clear_variable = TNO_fiscal_crisis_stability_effect
+			clear_variable = TNO_fiscal_crisis_war_support_effect
+			clear_variable = TNO_fiscal_crisis_pp_effect
+			clear_variable = TNO_fiscal_crisis_reinforce_effect
+			clear_variable = TNO_fiscal_crisis_army_attack_factor
+			clear_variable = TNO_fiscal_crisis_army_defence_factor
+			clear_variable = TNO_fiscal_crisis_army_org_factor
+			clear_variable = TNO_fiscal_crisis_factory_output
+			if = {
+				limit = { has_country_flag = FC_frozen_research_funding }
+				research_funding_minimal_set_position_5 = yes
+				research_funding_maximal_set_position_15 = yes
+				clr_country_flag = FC_frozen_research_funding
+			}
+			if = {
+				limit = { has_country_flag = FC_cut_military_spending }
+				army_funding_minimal_set_position_5 = yes
+				army_funding_maximal_set_position_15 = yes
+				naval_funding_minimal_set_position_5 = yes
+				naval_funding_maximal_set_position_15 = yes
+				clr_country_flag = FC_cut_military_spending
+			}
+		}
+	}
+}
+
+
+country_event = {
+	id = fiscal_crisis.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event fiscal_crisis.2" }
+	title = fiscal_crisis.2.t
+	desc = fiscal_crisis.2.desc
+	trigger = { not = { has_country_flag = ECON_ONGOING_FISCAL_CRISIS } }
+	picture = GFX_report_event_generic_money
+
+	is_triggered_only = yes
+	option = {
+		name = fiscal_crisis.2.a
+		end_fiscal_crisis = yes
+	}
+}
+
+
+country_event = {
+	id = fiscal_crisis.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event fiscal_crisis.10" }
+	trigger = { has_country_flag = ECON_ONGOING_FISCAL_CRISIS }
+	hidden = yes
+
+	is_triggered_only = yes
+	option = {
+		trigger = {
+			check_variable = { debt_to_GDP_ratio < debt_ceiling }
+		}
+		country_event = {
+			id = fiscal_crisis.1
+			days = 10
+		}
+	}
+	option = {
+		trigger = {
+			check_variable = { debt_to_GDP_ratio > debt_ceiling }
+			check_variable = { fiscal_crisis_counter_to_bankruptcy < 9 }
+		}
+		country_event = {
+			id = fiscal_crisis.20
+			days = 1
+		}
+		add_to_variable = { fiscal_crisis_counter_to_bankruptcy = 1 }
+	}
+	option = {
+		trigger = {
+			check_variable = { debt_to_GDP_ratio > debt_ceiling }
+			check_variable = { fiscal_crisis_counter_to_bankruptcy > 8 }
+		}
+		country_event = {
+			id = fiscal_crisis.12
+		}
+
+	}
+}
+
+
+country_event = {
+	id = fiscal_crisis.11 #Post bankruptcy "recovery"
+	immediate = { log = "[GetDateText]: [Root.GetName]: event fiscal_crisis.11" }
+	title = fiscal_crisis.11.t
+	desc = fiscal_crisis.11.desc
+	trigger = { not = { has_country_flag = ECON_ONGOING_FISCAL_CRISIS } }
+	is_triggered_only = yes
+	picture = GFX_report_event_IRE_stock_exchange
+	option = {
+		name = fiscal_crisis.11.a
+		set_temp_variable = { gdp_growth_temp = 4 }
+		econ_gdp_growth_change = yes
+		set_temp_variable = { inflation_temp = -8 }
+		econ_inflation_change = yes
+		set_temp_variable = { temp_credit_rating_min = prebankruptcy_min_rating }
+		set_temp_variable = { temp_credit_rating_max = prebankruptcy_max_rating }
+		clear_variable = prebankruptcy_min_rating
+		clear_variable = prebankruptcy_max_rating
+		hidden_effect = {
+			econ_initialize_credit_rating_system = yes
+		}
+		econ_raise_credit_rating = yes
+	}
+}
+
+country_event = {
+	id = fiscal_crisis.12 #POV: You are playing Argentina
+	immediate = { log = "[GetDateText]: [Root.GetName]: event fiscal_crisis.12" }
+	title = fiscal_crisis.12.t
+	desc = fiscal_crisis.12.desc
+	is_triggered_only = yes
+	picture = GFX_report_event_YUN_battle
+	option = {
+		name = fiscal_crisis.12.a
+		custom_effect_tooltip = TNO_bankruptcy
+		fiscal_crisis_bankruptcy = yes
+
+	}
+}
+
+country_event = {
+	id = fiscal_crisis.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event fiscal_crisis.20" }
+	title = fiscal_crisis.20.t
+	is_triggered_only = yes
+	desc = fiscal_crisis.20.desc
+	picture = GFX_report_event_generic_stock_market
+	option = {
+		name = fiscal_crisis.20.a
+		hidden_effect = {
+			country_event = {
+				id = fiscal_crisis.10
+				days = 20
+			}
+		}
+	}
+}

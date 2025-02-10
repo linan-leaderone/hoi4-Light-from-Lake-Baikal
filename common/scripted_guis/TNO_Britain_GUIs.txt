@@ -1,0 +1,764 @@
+# ██████╗ ██████╗ ██╗████████╗ █████╗ ██╗███╗   ██╗ #
+# ██╔══██╗██╔══██╗██║╚══██╔══╝██╔══██╗██║████╗  ██║ #
+# ██████╔╝██████╔╝██║   ██║   ███████║██║██╔██╗ ██║ #
+# ██╔══██╗██╔══██╗██║   ██║   ██╔══██║██║██║╚██╗██║ #
+# ██████╔╝██║  ██║██║   ██║   ██║  ██║██║██║ ╚████║ #
+# ╚═════╝ ╚═╝  ╚═╝╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ #
+# GUIs & Mechanics
+
+# 1. WORKSHOP GUI
+# 2. PARTY MECHANIC
+# 3. MANN MECHANIC
+# 4. MIDNIGHT MECHANIC
+
+scripted_gui = { # |=[ 1. WORKSHOP GUI ]=|
+	#################################################
+	#            Politics Screen Button             #
+	#################################################
+	BRI_Workshop_OpenButtonContainer = {
+		window_name = "TNO_BRI_Workshop_AccessButton"
+		context_type = player_context
+		parent_window_token = politics_tab
+
+		visible = {
+			tag = ENG
+			has_country_flag = BRI_WorkshopMechanic_Active
+		}
+		triggers = { gui_alert_visible = { has_country_flag = gui_alert_visible } }
+
+		effects = {
+			TNO_BRI_Workshop_OpenButton_click = {
+				if = {
+					limit = { NOT = { has_country_flag = BRI_Workshop_Open } }
+					set_country_flag = BRI_Workshop_Open
+					BRI_Workshop_DisplayUpdate = yes
+				}
+				else = {
+					clr_country_flag = BRI_Workshop_Open
+				}
+				clr_country_flag = gui_alert_visible
+			}
+			TNO_BRI_Workshop_OpenButton_right_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = BRI_Workshop_Debug }
+						is_debug = yes
+					}
+					set_country_flag = BRI_Workshop_Debug
+				}
+				else = { clr_country_flag = BRI_Workshop_Debug }
+				add_to_variable = { BRI_Workshop_Dirty = 1 }
+			}
+		}
+	}
+
+	#################################################
+	#                   Main GUI                    #
+	#################################################
+	BRI_Workshop_DisplayContainer = {
+		context_type = player_context
+		parent_window_token = "BRI_Workshop_OpenButtonContainer"
+		window_name = "TNO_BRI_Workshop_Display"
+		dirty = BRI_Workshop_Dirty
+
+		visible = { has_country_flag = BRI_Workshop_Open }
+
+		#|=|========[ MAIN ]========|=|#
+		triggers = {
+			Workshop_BlockedOverlay_visible = { has_country_flag = BRI_WorkshopMechanic_Block }
+			Workshop_Map_Regions_Outline_visible = { check_variable = { BRI_Workshop_SelectedRegion = Region_v } }
+
+			Workshop_Map_Selection_click_enabled = {
+				set_temp_variable = { BRI_Workshop_Mapmode_Frame = BRI_Workshop_Mapmode }
+				add_to_temp_variable = { BRI_Workshop_Mapmode_Frame = 1 }
+			}
+		}
+
+		effects = {
+			Workshop_CloseBtn_click = { clr_country_flag = BRI_Workshop_Open }
+
+			## Category tab selection
+			Workshop_CategoryRegional_click = {
+				set_variable = { BRI_Workshop_SelectedTab^0 = 0 }
+				set_variable = { BRI_Workshop_SelectedTabFrame^0 = 2 }
+				set_variable = { BRI_Workshop_SelectedTabFrame^1 = 0 }
+				add_to_variable = { BRI_Workshop_Dirty = 1 }
+			}
+			Workshop_CategoryNational_click = {
+				set_variable = { BRI_Workshop_SelectedTab^0 = 1 }
+				set_variable = { BRI_Workshop_SelectedTabFrame^0 = 0 }
+				set_variable = { BRI_Workshop_SelectedTabFrame^1 = 2 }
+				BRI_Workshop_FindDominant = yes
+				add_to_variable = { BRI_Workshop_Dirty = 1 }
+			}
+
+			## Region selection
+			Workshop_Map_Regions_Button_click = {
+				set_variable = { BRI_Workshop_SelectedRegion = Region_v }
+				BRI_Workshop_GenerateBars = yes
+			}
+
+			## Mapmode selection
+			Workshop_Map_Selection_click = {
+				if = {
+					limit = { check_variable = { BRI_Workshop_Mapmode = 0 } }
+					set_variable = { BRI_Workshop_Mapmode = 1 }
+				}
+				else = { set_variable = { BRI_Workshop_Mapmode = 0 } }
+				BRI_Workshop_GenerateFrames = yes
+			}
+		}
+		
+		dynamic_lists = {
+			Workshop_TabDisplay = {
+				array = BRI_Workshop_SelectedTab
+				entry_container = "[BRI_Workshop_GetTabGUI]"
+			}
+			Workshop_Map_Regions = {
+				array = BRI_Workshop_Regions
+				value = Region_v
+				entry_container = TNO_BRI_Workshop_Regions_Container
+			}
+			Workshop_Map_RegionOutlines = { # Outlines are a separate gridbox because otherwise they get overlayed by the other region assets themselves
+				array = BRI_Workshop_Regions
+				value = Region_v
+				entry_container = TNO_BRI_Workshop_Regions_OutlineOffset
+			}
+		}
+
+		properties = {
+			# Map assets
+			Workshop_Map_Regions = {
+				image = "GFX_[?Region_v.GetTokenKey]_[?BRI_Workshop_Mapmode]"
+				frame = BRI_Workshop_RegionFrames@var:Region_v
+				x = BRI_Workshop_RegionX@var:Region_v
+				y = BRI_Workshop_RegionY@var:Region_v
+			}
+			Workshop_Map_Regions_Button = {
+				image = "GFX_[?Region_v.GetTokenKey]_Button"
+				x = BRI_Workshop_RegionX@var:Region_v
+				y = BRI_Workshop_RegionY@var:Region_v
+			}
+			Workshop_Map_Regions_Outline = {
+				image = "GFX_[?Region_v.GetTokenKey]_Outline"
+				x = BRI_Workshop_RegionX@var:Region_v
+				y = BRI_Workshop_RegionY@var:Region_v
+			}
+
+			# Category tabs
+			Workshop_CategoryRegional = { frame = BRI_Workshop_SelectedTabFrame^0 }
+			Workshop_CategoryNational    = { frame = BRI_Workshop_SelectedTabFrame^1 }
+
+			# Mapmode
+			Workshop_Map_Selection = { frame = BRI_Workshop_Mapmode_Frame }
+		}
+
+		#|=|========[ REGIONAL TAB ]========|=|#
+		@Action1Cooldown = 21
+		@Action2Cooldown = 40
+		@Action3Cooldown = 365
+		@Action4Cooldown = 30
+		@Action5Cooldown = 60
+
+		triggers = {
+			Workshop_CorpoSelection_Selected_visible = {
+				check_variable = { BRI_Workshop_SelectedCorpo = CorpoID }
+			}
+			Workshop_Regional_Actions_1_click_enabled = { # Carte-Blanche Selloffs
+				## Costs
+				NOT = { has_political_power < var:BRI_Workshop_Action1_CostPP_tt }
+				NOT = { command_power < 5 }
+
+				## Cooldown status
+				set_temp_variable = { M = BRI_Workshop_Action1_Cooldown@var:BRI_Workshop_SelectedRegion }
+				custom_trigger_tooltip = {
+					tooltip = BRI_Workshop_Action_Cooldown_tt
+					check_variable = { BRI_Workshop_Action1_Cooldown@var:BRI_Workshop_SelectedRegion = 0 }
+				}
+			}
+			Workshop_Regional_Actions_2_click_enabled = { # Regulatory Enforcement
+				## Costs
+				NOT = { has_political_power < var:BRI_Workshop_Action2_CostPP_tt }
+				NOT = { command_power < 25 }
+
+				## Cooldown & Action num status
+				set_temp_variable = { M = BRI_Workshop_Action2_Cooldown@var:BRI_Workshop_SelectedRegion }
+				custom_trigger_tooltip = {
+					tooltip = BRI_Workshop_Action_Cooldown_tt
+					check_variable = { BRI_Workshop_Action2_Cooldown@var:BRI_Workshop_SelectedRegion = 0 }
+				}
+				custom_trigger_tooltip = {
+					tooltip = BRI_Workshop_Actions_2_trigger_tt
+					check_variable = { BRI_Workshop_Action2_Uses > 0 }
+				}
+			}
+			Workshop_Regional_Actions_3_click_enabled = { # Debt Moratorium
+				## Costs
+				NOT = { has_political_power < var:BRI_Workshop_Action3_CostPP_tt }
+				NOT = { command_power < 30 }
+
+				## Cooldown status
+				set_temp_variable = { M = BRI_Workshop_Action3_Cooldown@var:BRI_Workshop_SelectedRegion }
+				custom_trigger_tooltip = {
+					tooltip = BRI_Workshop_Action_Cooldown_tt
+					check_variable = { BRI_Workshop_Action3_Cooldown@var:BRI_Workshop_SelectedRegion = 0 }
+				}
+			}
+			Workshop_Regional_Actions_4_click_enabled = { # Contract Permits
+				## Cooldown status
+				set_temp_variable = { M = BRI_Workshop_Action4_Cooldown@var:BRI_Workshop_SelectedRegion }
+				custom_trigger_tooltip = {
+					tooltip = BRI_Workshop_Action_Cooldown_tt
+					check_variable = { BRI_Workshop_Action4_Cooldown@var:BRI_Workshop_SelectedRegion = 0 }
+				}
+			}
+			Workshop_Regional_Actions_5_click_enabled = { # Commons Finance Investigations
+				## Cooldown status
+				set_temp_variable = { M = BRI_Workshop_Action5_Cooldown@var:BRI_Workshop_SelectedRegion }
+				custom_trigger_tooltip = {
+					tooltip = BRI_Workshop_Action_Cooldown_tt
+					check_variable = { BRI_Workshop_Action5_Cooldown@var:BRI_Workshop_SelectedRegion = 0 }
+				}
+			}
+			Workshop_Regional_Actions_6_click_enabled = { # Emergency Takeovers
+				## Costs
+				NOT = { has_political_power < var:BRI_Workshop_Action6_CostPP_tt }
+
+				## Corpo num status
+				custom_trigger_tooltip = {
+					tooltip = BRI_Workshop_Actions_6_trigger_tt
+					count_triggers = {
+						amount = 3
+						check_variable = { BRI_Workshop_DeutscheBankInfl@var:BRI_Workshop_SelectedRegion > 0 }
+						check_variable = { BRI_Workshop_ReichswerkeInfl@var:BRI_Workshop_SelectedRegion > 0 }
+						check_variable = { BRI_Workshop_BlohmVossInfl@var:BRI_Workshop_SelectedRegion > 0 }
+						check_variable = { BRI_Workshop_AEGInfl@var:BRI_Workshop_SelectedRegion > 0 }
+						check_variable = { BRI_Workshop_VolkswagenInfl@var:BRI_Workshop_SelectedRegion > 0 }
+					}
+				}
+			}
+		}
+
+		effects = {
+			Workshop_CorpoSelection_Button_click = {
+				set_variable = { BRI_Workshop_SelectedCorpo = CorpoID }
+				add_to_variable = { BRI_Workshop_Dirty = 1 }
+			}
+
+			Workshop_Regional_Actions_1_click = { # Carte-Blanche Selloffs
+				## Costs
+				add_political_power = var:BRI_Workshop_Action1_CostPP
+				add_command_power = -5
+
+				## Effects
+				# Add Influence to chosen corpo
+				set_temp_variable = { Region_v = BRI_Workshop_SelectedRegion }
+				set_temp_variable = { CorpoID = BRI_Workshop_SelectedCorpo }
+				set_temp_variable = { Influence = 2.5 }
+				BRI_Workshop_AddInfluence = yes
+
+				# Remove State Ownership
+				set_temp_variable = { Region_v = BRI_Workshop_SelectedRegion }
+				set_temp_variable = { GroupID = 1 }
+				set_temp_variable = { Ownership = -2.5 }
+				BRI_Workshop_AddOwnership = yes
+
+				## Cooldown & GUI update
+				set_variable = { BRI_Workshop_Action1_Cooldown@var:BRI_Workshop_SelectedRegion = @Action1Cooldown }
+
+				for_each_loop = {
+					array = BRI_Workshop_Goals
+					BRI_Workshop_CheckObjectives = yes
+				}
+
+				add_to_variable = { BRI_Workshop_Dirty = 1 }
+			}
+			Workshop_Regional_Actions_2_click = { # Regulatory Enforcement
+				## Costs
+				add_political_power = var:BRI_Workshop_Action2_CostPP
+				add_command_power = -25
+
+				## Effects
+				# Sub Monthly Influence to chosen corpo
+				set_temp_variable = { CorpoID = BRI_Workshop_SelectedCorpo }
+				set_variable = { BRI_Workshop_InflMonthly_ID@var:BRI_Workshop_SelectedRegion = CorpoID }
+				set_variable = { BRI_Workshop_InflMonthly_Val@var:BRI_Workshop_SelectedRegion = -0.6 tooltip = BRI_Workshop_MonthlyInfluence_tt }
+
+				## Cooldown & GUI update
+				set_variable = { BRI_Workshop_Action2_Cooldown@var:BRI_Workshop_SelectedRegion = @Action2Cooldown }
+				add_to_variable = { BRI_Workshop_Action2_Uses = -1 }
+				add_to_variable = { BRI_Workshop_Dirty = 1 }
+			}
+			Workshop_Regional_Actions_3_click = { # Debt Moratorium
+				## Costs
+				add_political_power = var:BRI_Workshop_Action3_CostPP
+				add_command_power = -30
+				
+				## Effects
+				# Remove Corporate Ownership
+				set_temp_variable = { Region_v = BRI_Workshop_SelectedRegion }
+				set_temp_variable = { GroupID = 2 }
+				set_temp_variable = { Ownership = -5 }
+				BRI_Workshop_AddOwnership = yes
+
+				# Add Monthly Influence to chosen corpo
+				set_temp_variable = { CorpoID = BRI_Workshop_SelectedCorpo }
+				set_variable = { BRI_Workshop_InflMonthly_ID@var:BRI_Workshop_SelectedRegion = CorpoID }
+				set_variable = { BRI_Workshop_InflMonthly_Val@var:BRI_Workshop_SelectedRegion = 0.6 tooltip = BRI_Workshop_MonthlyInfluence_tt }
+
+				## Cooldown & GUI update
+				set_variable = { BRI_Workshop_Action3_Cooldown@var:BRI_Workshop_SelectedRegion = @Action3Cooldown }
+
+				for_each_loop = {
+					array = BRI_Workshop_Goals
+					BRI_Workshop_CheckObjectives = yes
+				}
+
+				add_to_variable = { BRI_Workshop_Dirty = 1 }
+			}
+			Workshop_Regional_Actions_4_click = { # Contract Permits
+				## Costs
+
+				## Effects
+				# Add Influence to chosen corpo
+				set_temp_variable = { Region_v = BRI_Workshop_SelectedRegion }
+				set_temp_variable = { GroupID = 2 }
+				set_temp_variable = { Ownership = 1.5 }
+				BRI_Workshop_AddOwnership = yes
+				
+				## Cooldown & GUI update
+				set_variable = { BRI_Workshop_Action4_Cooldown@var:BRI_Workshop_SelectedRegion = @Action4Cooldown }
+
+				## Cooldown & GUI update
+				add_to_variable = { BRI_Workshop_Dirty = 1 }
+			}
+			Workshop_Regional_Actions_5_click = { # Commons Finance Investigations
+				## Effects
+				# Reduce Corporate Ownership
+				set_temp_variable = { Region_v = BRI_Workshop_SelectedRegion }
+				set_temp_variable = { GroupID = 2 }
+				set_temp_variable = { Ownership = -3 }
+				BRI_Workshop_AddOwnership = yes
+
+				## Costs
+				# Increase PP cost for a while
+				add_to_variable = { BRI_Workshop_Action5_Check@var:BRI_Workshop_SelectedRegion = 1 }
+				add_to_variable = { BRI_Workshop_Action5_PP_Cost = 0.15 tooltip = BRI_Workshop_Actions_5_effect_tt }
+				force_update_dynamic_modifier = yes
+
+				## Cooldown & GUI update
+				set_variable = { BRI_Workshop_Action5_Cooldown@var:BRI_Workshop_SelectedRegion = @Action5Cooldown }
+
+				for_each_loop = {
+					array = BRI_Workshop_Goals
+					BRI_Workshop_CheckObjectives = yes
+				}
+
+				add_to_variable = { BRI_Workshop_Dirty = 1 }
+			}
+			Workshop_Regional_Actions_6_click = { # Emergency Takeovers
+				## Costs
+				add_political_power = var:BRI_Workshop_Action6_CostPP				
+
+				## Effects
+				set_temp_variable = { Region_v = BRI_Workshop_SelectedRegion }
+				set_temp_variable = { CorpoID = BRI_Workshop_SelectedCorpo }
+				set_temp_variable = { GroupID = 1 }
+
+				if = { limit = { check_variable = { BRI_Workshop_SelectedCorpo = 1 } } set_temp_variable = { Influence = BRI_Workshop_DeutscheBankInfl@var:BRI_Workshop_SelectedRegion } }
+				else_if = { limit = { check_variable = { BRI_Workshop_SelectedCorpo = 2 } } set_temp_variable = { Influence = BRI_Workshop_ReichswerkeInfl@var:BRI_Workshop_SelectedRegion } }
+				else_if = { limit = { check_variable = { BRI_Workshop_SelectedCorpo = 3 } } set_temp_variable = { Influence = BRI_Workshop_BlohmVossInfl@var:BRI_Workshop_SelectedRegion } }
+				else_if = { limit = { check_variable = { BRI_Workshop_SelectedCorpo = 4 } } set_temp_variable = { Influence = BRI_Workshop_AEGInfl@var:BRI_Workshop_SelectedRegion } }
+				else_if = { limit = { check_variable = { BRI_Workshop_SelectedCorpo = 5 } } set_temp_variable = { Influence = BRI_Workshop_VolkswagenInfl@var:BRI_Workshop_SelectedRegion } }
+				multiply_temp_variable = { Influence = -1 }
+				set_temp_variable = { Ownership = Influence }
+				divide_temp_variable = { Ownership = -3 }
+
+				# Remove chosen corpo influence and Corporate Ownership
+				BRI_Workshop_AddInfluence = yes
+				BRI_Workshop_AddOwnership = yes
+
+				for_each_loop = {
+					array = BRI_Workshop_Goals
+					BRI_Workshop_CheckObjectives = yes
+				}
+
+				## Cooldown & GUI update
+				add_to_variable = { BRI_Workshop_Dirty = 1 }
+			}
+		}
+
+		dynamic_lists = {
+			Workshop_Regional_CorpoSelection_List = {
+				array = BRI_Workshop_Corporations
+				value = CorpoID
+				entry_container = TNO_BRI_Workshop_Regional_CorpoSelection_Container
+			}
+		}
+
+		properties = {
+			Workshop_Regional_Image = {
+				image = "GFX_[?BRI_Workshop_SelectedRegion.GetTokenKey]_Image"
+			}
+
+			Workshop_CorpoSelection_Button = {
+				frame = CorpoID
+			}
+		}
+
+		#|=|========[ OWNERSHIP AND CORPORATE PROGBARS ]========|=|#
+		triggers = {
+			Workshop_OwnershipBar = { check_variable = { BRI_Workshop_OwnershipDisp^b_idx > 0 } }
+			Workshop_CorporateBar = { check_variable = { BRI_Workshop_CorpoDisp^b_idx > 0 } }
+		}
+		dynamic_lists = {
+			Workshop_Regional_OwnershipBars = {
+				array = BRI_Workshop_OwnershipDisp
+				index = b_idx
+				entry_container = TNO_BRI_Workshop_OwnershipBar_Container
+			}
+			Workshop_Regional_CorpoBars = {
+				array = BRI_Workshop_CorpoDisp
+				index = b_idx
+				entry_container = TNO_BRI_Workshop_CorporateBar_Container
+			}
+		}
+		properties = {
+			Workshop_OwnershipBar = {
+				image = "[BRI_Workshop_GetOwnershipBar]"
+				frame = BRI_Workshop_OwnershipDisp^b_idx
+			}
+			Workshop_CorporateBar = {
+				image = "[BRI_Workshop_GetCorpoBar]"
+				frame = BRI_Workshop_CorpoDisp^b_idx
+			}
+		}
+		
+		#|=|========[ LINE GRAPH & INFO ]========|=|#
+		triggers = {
+			BRI_target_icon_visible = {
+				has_country_flag = ENG_budget_visible
+			}
+			LineGraph_Segment_Target_visible = {
+				set_temp_variable = { test = segment_idx }
+				modulo_temp_variable = { test = 2 }
+				check_variable = { test = 0 }
+			}
+		}
+		effects = {
+			Workshop_Regional_Info_GDPGrowth_click	  = { set_variable = { BRI_Workshop_GraphSelection = 0 } BRI_Workshop_GenerateGraph = yes }
+			Workshop_Regional_Info_Inflation_click	  = { set_variable = { BRI_Workshop_GraphSelection = 1 } BRI_Workshop_GenerateGraph = yes }
+			Workshop_Regional_Info_Unemployment_click = { set_variable = { BRI_Workshop_GraphSelection = 2 } BRI_Workshop_GenerateGraph = yes }
+		}
+
+		dynamic_lists = {
+			Workshop_Regional_LineGraph_Segments = {
+				array = BRI_Workshop_GraphOffsets
+				index = segment_idx
+				entry_container = Workshop_Regional_LineGraph_Segment
+			}
+			Workshop_Regional_LineGraph_Target_Segments = {
+				array = BRI_Workshop_Target_GraphOffsets
+				index = segment_idx
+				entry_container = Workshop_Regional_LineGraph_Target_Segment
+			}
+			Workshop_Regional_LineGraph_VBars = {
+				array = BRI_Workshop_GraphVBars
+				index = vbar_idx
+				entry_container = Workshop_Regional_LineGraph_VBar
+			}
+		}
+
+		properties = {
+			LineGraph_Segment = {
+				frame = BRI_Workshop_GraphDeltas^segment_idx
+				y = BRI_Workshop_GraphOffsets^segment_idx
+				image = "[BRI_Change_line_seg_colour]"
+			}
+			LineGraph_Segment_Target = {
+				frame = BRI_Workshop_Target_GraphDeltas^segment_idx
+				y = BRI_Workshop_Target_GraphOffsets^segment_idx
+				image = "[BRI_is_line_seg_visible]"
+			}
+			LineGraph_HorizontalBar = {
+				y = BRI_Workshop_GraphVBarOffsets^vbar_idx
+			}
+			LineGraph_Y_Label = {
+				y = BRI_Workshop_GraphVBarOffsets^vbar_idx
+			}
+			BRI_icon = {
+				y = BRI_texticon_graph_actual_y
+				image = "[BRI_Change_graph_icon]"
+			}
+			BRI_target_icon = {
+				y = BRI_target_texticon_graph_actual_y
+			}
+
+			# Graph selection buttons
+			Workshop_Regional_Info_GDPGrowth    = { frame = BRI_Workshop_GraphButtonSelection^0 }
+			Workshop_Regional_Info_Inflation    = { frame = BRI_Workshop_GraphButtonSelection^1 }
+			Workshop_Regional_Info_Unemployment = { frame = BRI_Workshop_GraphButtonSelection^2 }
+		}
+
+		
+		#|=|========[ NATIONAL TAB ]========|=|#
+		triggers = {
+			Workshop_Goals_Timer_visible = {
+				set_temp_variable = { circle_frame_phase = BRI_Workshop_GoalDuration@var:goal_v }
+				divide_temp_variable = { circle_frame_phase = BRI_Workshop_GoalDuration@var:goal_v }
+				multiply_temp_variable = { circle_frame_phase = 100 }
+			}
+
+			Workshop_Goals_CompletionButtonDecrease_click_enabled = {
+				check_variable = { BRI_Workshop_GoalPUInvestment@var:goal_v > 0 }
+			}
+
+			Workshop_Goals_CompletionButtonIncrease_click_enabled = {
+				check_variable = { BRI_Workshop_GoalCompletion@var:goal_v < 100 }
+				check_variable = { BRI_Workshop_GoalPUInvestment@var:goal_v < 8 }
+				#set_temp_variable = { check_pus = BRI_Workshop_GoalPUInvestmentsTotal }
+				#if = {
+				#	limit = { check_variable = { check_pus < 0 } }
+				#	multiply_temp_variable = { check_pus = -1 }
+				#}
+				#multiply_temp_variable = { check_pus = -1 }
+				check_variable = { production_units > 0 }
+			}
+
+			# Objectives
+			Workshop_Goals_Objectives_Checkbox_1_visible = { check_variable = { BRI_Workshop_GoalObjective_1@var:goal_v > 0 } }
+			Workshop_Goals_Objectives_Text_1_visible     = { check_variable = { BRI_Workshop_GoalObjective_1@var:goal_v > 0 } }
+			Workshop_Goals_Objectives_Checkbox_2_visible = { check_variable = { BRI_Workshop_GoalObjective_2@var:goal_v > 0 } }
+			Workshop_Goals_Objectives_Text_2_visible     = { check_variable = { BRI_Workshop_GoalObjective_2@var:goal_v > 0 } }
+			Workshop_Goals_Objectives_Checkbox_3_visible = { check_variable = { BRI_Workshop_GoalObjective_3@var:goal_v > 0 } }
+			Workshop_Goals_Objectives_Text_3_visible     = { check_variable = { BRI_Workshop_GoalObjective_3@var:goal_v > 0 } }
+			Workshop_Goals_Objectives_Checkbox_4_visible = { check_variable = { BRI_Workshop_GoalObjective_4@var:goal_v > 0 } }
+			Workshop_Goals_Objectives_Text_4_visible     = { check_variable = { BRI_Workshop_GoalObjective_4@var:goal_v > 0 } }
+		}
+
+		dynamic_lists = {
+			Workshop_National_Goals = {
+				array = BRI_Workshop_Goals
+				index = goal_i
+				value = goal_v
+				entry_container = TNO_BRI_Workshop_National_Goals_Container
+			}
+		}
+
+		properties = { 
+			Workshop_Goals_Image = {
+				image = "GFX_[?goal_v.GetTokenKey]"
+			}
+			Workshop_Goals_Timer = {
+				frame = circle_frame_phase
+			}
+			Workshop_Goals_CompletionBar = {
+				frame = BRI_Workshop_GoalCompletion@var:goal_v
+			}
+			# Objectives
+			Workshop_Goals_Objectives_Checkbox_1 = { frame = BRI_Workshop_GoalObjective_1@var:goal_v }
+			Workshop_Goals_Objectives_Checkbox_2 = { frame = BRI_Workshop_GoalObjective_2@var:goal_v }
+			Workshop_Goals_Objectives_Checkbox_3 = { frame = BRI_Workshop_GoalObjective_3@var:goal_v }
+			Workshop_Goals_Objectives_Checkbox_4 = { frame = BRI_Workshop_GoalObjective_4@var:goal_v }
+		}
+
+		effects = {
+			Workshop_Goals_CompletionButtonDecrease_click = {
+				add_to_variable = { BRI_Workshop_GoalPUInvestment@var:goal_v = -1 }
+				set_temp_variable = { v = goal_v }
+				BRI_Workshop_GoalCompletionGainCalc = yes
+			}
+			Workshop_Goals_CompletionButtonIncrease_click = {
+				add_to_variable = { BRI_Workshop_GoalPUInvestment@var:goal_v = 1 }
+				set_temp_variable = { v = goal_v }
+				BRI_Workshop_GoalCompletionGainCalc = yes
+			}
+		}
+
+		#|=|========[ DEBUG ]========|=|#
+		triggers = {
+			Workshop_Reset_Debug_visible = { has_country_flag = BRI_Workshop_Debug }
+			Workshop_Randomize_Debug_visible = { has_country_flag = BRI_Workshop_Debug }
+		}
+		effects = {
+			Workshop_Reset_Debug_click = {
+				BRI_Workshop_Disable = yes
+				BRI_Workshop_Activate = yes
+			}
+			Workshop_Randomize_Debug_click = {
+				BRI_Workshop_GenerateValues = yes
+				BRI_Workshop_DisplayUpdate = yes
+			}
+		}
+	}
+}
+
+scripted_gui = { # |=[ 2. PARTY MECHANIC ]=|
+	TNO_BRI_Party_DecisionGui = {
+		context_type = decision_category
+		window_name = "TNO_BRI_Party_GUI"
+		dirty = BRI_Party_Dirty
+
+		triggers = {
+			TNO_BRI_Party_ChaosBar_ThresholdIcon_click_enabled = {
+				set_temp_variable = { ThresholdFrame = threshold_idx }
+				add_to_temp_variable = { ThresholdFrame = 1 }
+			}
+		}
+
+		effects = {
+			## Group Selection
+			TNO_BRI_Party_Peers_click        = { set_variable = { BRI_Party_CategorySelection = 0 } add_to_variable = { BRI_Party_Dirty = 0 } }
+			TNO_BRI_Party_Garrison_click     = { set_variable = { BRI_Party_CategorySelection = 1 } add_to_variable = { BRI_Party_Dirty = 0 } }
+			TNO_BRI_Party_Corporations_click = { set_variable = { BRI_Party_CategorySelection = 2 } add_to_variable = { BRI_Party_Dirty = 0 } }
+			TNO_BRI_Party_Party_click        = { set_variable = { BRI_Party_CategorySelection = 3 } add_to_variable = { BRI_Party_Dirty = 0 } }
+
+			## Threshold effects
+			TNO_BRI_Party_ChaosBar_ThresholdIcon_Base_click = {
+				# This is a button but its actually never meant to do anything when clicked
+				# We just use it for the [! loc command, to auto-generate effect tooltips for the milestones
+				effect_tooltip = {
+					set_temp_variable = { ThresholdID = threshold_idx }
+					BRI_Party_ThresholdEffect = yes
+				}
+			}
+		}
+
+		dynamic_lists = {
+			TNO_BRI_Party_ChaosBar_Threshold = {
+				array = BRI_ChaosThreshold
+				index = threshold_idx
+				entry_container = TNO_BRI_Party_ChaosBar_Threshold_Container
+			}
+		}
+
+		properties = {
+			## Pie Charts
+			TNO_BRI_Party_Peers_Pie = { frame = BRI_Party_CategoryInfluence^0 }
+			TNO_BRI_Party_Garrison_Pie= { frame = BRI_Party_CategoryInfluence^1 }
+			TNO_BRI_Party_Corporations_Pie = { frame = BRI_Party_CategoryInfluence^2 }
+			TNO_BRI_Party_Party_Pie = { frame = BRI_Party_CategoryInfluence^3 }
+
+			## Chaos Bar
+			# ProgressBars
+			TNO_BRI_Party_ChaosBar = {
+				frame = BRI_Chaos
+			}
+
+			# Threshold
+			TNO_BRI_Party_ChaosBar_ThresholdIcon_Base = {
+				x = BRI_ChaosThreshold_X^threshold_idx
+			}
+			TNO_BRI_Party_ChaosBar_ThresholdIcon = {
+				frame = ThresholdFrame
+				x = BRI_ChaosThreshold_X^threshold_idx
+			}
+		}
+	}
+}
+
+scripted_gui = { # |=[ 3. MANN MECHANIC ]=|
+	BRI_Mann_DecisionGui = {
+		context_type = decision_category
+		window_name = "BRI_Mann_DecisionGui"
+		dirty = BRI_Mann_Dirty
+
+		dynamic_lists = {
+			BRI_Mann_States_List = {
+				array = BRI_Mann_State
+				value = State_v
+				entry_container = BRI_Mann_States_List_Entry
+			}
+		}
+
+		triggers = {
+			BRI_Mann_State_InvasionAlert_visible = { check_variable = { BRI_Mann_StateStatus@var:State_v = token:BRI_Mann_StateTargeted } }
+			BRI_Mann_State_Button_Selected_visible = { check_variable = { BRI_Mann_StateSelected = State_v } }
+		}
+
+		effects = {
+			BRI_Mann_State_Button_click = {
+				set_variable = { BRI_Mann_StateSelected = State_v }
+				add_to_variable = { BRI_Mann_Dirty = 1 }
+			}
+		}
+
+		properties = {
+			BRI_Mann_Intel_Bar = { frame = BRI_Mann_Intel }
+			BRI_Mann_Weaponry_Bar = { frame = BRI_Mann_Weaponry }
+			BRI_Mann_State_Image = {
+				image = "GFX_[?State_v.GetTokenKey]"
+			}
+			BRI_Mann_State_Frame = {
+				image = [BRI_Mann_GetStateFrame]
+			}
+			BRI_Mann_State_Defensiveness_Bar = { frame = BRI_Mann_StateDefensiveness@var:State_v }
+		}
+	}
+}
+
+scripted_gui = { # |=[ 4. MIDNIGHT MECHANIC ]=|
+	BRI_Midnight_DecisionGUI = {
+		context_type = decision_category
+		window_name = "BRI_Midnight_DecisionGUI"
+		dirty = BRI_Midnight_Dirty
+
+		#|=|========[ MAIN ]========|=|#
+		properties = {
+			# Bars
+			BRI_Midnight_ConfidenceBar 	= { frame = BRI_Midnight_Confidence }
+			BRI_Midnight_AcclimationBar = { frame = BRI_Midnight_Acclimation }
+			BRI_Midnight_ExhaustionBar 	= { frame = BRI_Midnight_Exhaustion }
+		}
+
+		#|=|========[ DEBUG ]========|=|#
+		triggers = {
+			BRI_Midnight_ConfidenceDebugButton_visible = { has_country_flag = BRI_Mechanics_Debug }
+			BRI_Midnight_AcclimationDebugButton_visible = { has_country_flag = BRI_Mechanics_Debug }
+			BRI_Midnight_ExhaustionDebugButton_visible = { has_country_flag = BRI_Mechanics_Debug }
+		}
+		effects = {
+			## Military Confidence
+			BRI_Midnight_ConfidenceDebugButton_click = {
+				set_temp_variable = { Confidence = 5 }
+				BRI_Midnight_ConfidenceAdd = yes
+			}
+			BRI_Midnight_ConfidenceDebugButton_shift_click = {
+				set_temp_variable = { Confidence = -5 }
+				BRI_Midnight_ConfidenceAdd = yes
+			}
+
+			## Combat Aclimation
+			BRI_Midnight_AcclimationDebugButton_click = {
+				set_temp_variable = { Acclimation = 5 }
+				BRI_Midnight_AcclimationAdd = yes
+			}
+			BRI_Midnight_AcclimationDebugButton_shift_click = {
+				set_temp_variable = { Acclimation = -5 }
+				BRI_Midnight_AcclimationAdd = yes
+			}
+			BRI_Midnight_AcclimationDebugButton_control_click = {
+				set_temp_variable = { Acclimation = this.modifier@BRI_Midnight_AcclimationGain }
+				log = "Base: [?BRI_Midnight_AcclimationGain]"
+				log = "Modifier: [?this.modifier@BRI_Midnight_AcclimationGain]"
+				BRI_Midnight_AcclimationAdd = yes
+			}
+			
+			## Structural Exhaustion
+			BRI_Midnight_ExhaustionDebugButton_click = {
+				set_temp_variable = { Exhaustion = 5 }
+				BRI_Midnight_ExhaustionAdd = yes
+			}
+			BRI_Midnight_ExhaustionDebugButton_shift_click = {
+				set_temp_variable = { Exhaustion = -5 }
+				BRI_Midnight_ExhaustionAdd = yes
+			}
+			BRI_Midnight_ExhaustionDebugButton_control_click = {
+				set_temp_variable = { Exhaustion = this.modifier@BRI_Midnight_ExhaustionGain }
+				log = "Base: [?BRI_Midnight_ExhaustionGain]"
+				log = "Modifier: [?this.modifier@BRI_Midnight_ExhaustionGain]"
+				BRI_Midnight_ExhaustionAdd = yes
+			}
+		}
+	}
+}

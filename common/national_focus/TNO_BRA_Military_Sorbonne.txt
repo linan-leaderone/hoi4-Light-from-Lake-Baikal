@@ -1,0 +1,554 @@
+shared_focus = {
+	id = BRA_humberto_stands_defiant
+	icon = GFX_focus_BRA_humberto_stands_defiant
+	cost = 2
+	x = 6
+	y = 0
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_humberto_stands_defiant"
+		country_event = { id = brazil.369 }
+		BRA_military_increase_loyalty_med = yes
+		BRA_military_increase_power_sorbonne_low = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_use_the_crows_charisma
+	icon = GFX_focus_BRA_crow_takes_flight
+	cost = 2
+	prerequisite = { focus = BRA_humberto_stands_defiant }
+	relative_position_id = BRA_humberto_stands_defiant
+	x = -2
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_use_the_crows_charisma"
+		country_event = { id = brazil.370 }
+		custom_effect_tooltip = BRA_use_the_crows_charisma_tooltip
+		add_to_variable = { BRA_pres_support^7 = 2.5 }
+		add_to_variable = { BRA_pres_support^10 = 2.5 }
+		add_to_variable = { BRA_pres_support^13 = 2.5 }
+		BRA_redraw_pres_info = yes
+		BRA_pres_select_region = yes
+		add_political_power = 15
+	}
+}
+
+shared_focus = {
+	id = BRA_utilise_adhemars_contacts
+	icon = GFX_focus_BRA_adhemars_proposal
+	cost = 2
+	prerequisite = { focus = BRA_humberto_stands_defiant }
+	relative_position_id = BRA_humberto_stands_defiant
+	x = 2
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_utilise_adhemars_contacts"
+		BRA_military_increase_nepotism_low = yes
+		BRA_military_increase_power_sorbonne_low = yes
+		country_event = { id = brazil.371 }
+	}
+}
+
+shared_focus = {
+	id = BRA_fire_costa_e_silva
+	icon = GFX_focus_BRA_fire_costa_silva
+	cost = 2
+	prerequisite = { focus = BRA_use_the_crows_charisma }
+	prerequisite = { focus = BRA_utilise_adhemars_contacts }
+	relative_position_id = BRA_humberto_stands_defiant
+	x = 0
+	y = 2
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_fire_costa_e_silva"
+		effect_tooltip = {
+			country_event = { id = brazil.372 }
+		}
+		BRA_military_decrease_power_hardliners_low = yes
+		hidden_effect = {
+			if = {
+				limit = {
+					check_variable = { BRA_military_sorbonne_power > BRA_military_hardliners_power }
+				}
+				set_country_flag = BRA_sorbonne_military_wins
+				remove_unit_leader_role = BRA_Costa_e_Silva
+				BRA_military_decrease_loyalty_low = yes
+				BRA_military_decrease_power_hardliners_low = yes
+				BRA_military_increase_power_sorbonne_low = yes
+				country_event = { id = brazil.372 }
+				remove_ideas = {
+					BRA_Costa_e_Silva_high_command
+					BRA_Costa_e_Silva_sec
+				}
+				add_ideas = {
+					BRA_Ernesto_Geisel_high_command
+					BRA_Ernesto_Geisel_sec
+				}
+			}
+			else = {
+				set_country_flag = BRA_hardline_military_wins
+				promote_character = BRA_Costa_e_Silva
+				load_focus_tree = BRA_Hardliner_Silva_tree
+				BRA_reload_tree = yes
+				remove_ideas = {
+					BRA_Odilio_Denys_army_chief
+					BRA_Odilio_Denys_high_command
+					BRA_Costa_e_Silva_sec
+				}
+				add_ideas = {
+					BRA_Emilio_Medici_army_chief
+					BRA_Emilio_Medici_high_command
+					BRA_Siseno_Ramos_Sarmento_sec
+				}
+				country_event = { id = brazil.373 }
+			}
+			set_country_flag = BRA_military_power_struggle_over
+			clr_country_flag = BRA_military_category_allowed
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_proceeding_as_planned
+	icon = GFX_focus_BRA_proceeding_as_planned
+	cost = 2
+	prerequisite = { focus = BRA_fire_costa_e_silva }
+	relative_position_id = BRA_humberto_stands_defiant
+	x = 0
+	y = 3
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_proceeding_as_planned"
+		country_event = { id = BRA_military_elections.1 days = 7 }
+		add_ideas = {
+			tno_vote_franchise_registered_voting
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_keeping_everything_under_control
+	icon = GFX_focus_generic_restrict_the_protests
+	cost = 2
+	prerequisite = { focus = BRA_proceeding_as_planned }
+	relative_position_id = BRA_humberto_stands_defiant
+	x = 0
+	y = 4
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_keeping_everything_under_control"
+		add_stability = 0.05
+	}
+}
+
+shared_focus = {
+	id = BRA_discussing_with_the_crow
+	icon = GFX_focus_BRA_lacerdas_gambit
+	cost = 2
+	prerequisite = { focus = BRA_keeping_everything_under_control }
+	relative_position_id = BRA_keeping_everything_under_control
+	x = 0
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_discussing_with_the_crow"
+		add_political_power = 30
+		country_event = { id = brazil.374 }
+	}
+}
+
+
+## === Let the Election play out Branch == ##
+
+shared_focus = {
+	id = BRA_let_the_election_play_out
+	icon = GFX_focus_generic_elections_1
+	cost = 2
+	prerequisite = { focus = BRA_discussing_with_the_crow }
+	relative_position_id = BRA_discussing_with_the_crow
+	mutually_exclusive = { focus = BRA_keep_an_eye_on_things }
+	x = -4
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_let_the_election_play_out"
+		add_political_power = 20
+		country_event = { id = brazil.375 }
+	}
+}
+
+shared_focus = {
+	id = BRA_minimal_interference
+	icon = GFX_focus_generic_hands_off_the_vote
+	cost = 1
+	prerequisite = { focus = BRA_let_the_election_play_out }
+	relative_position_id = BRA_let_the_election_play_out
+	x = 0
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_minimal_interference"
+		TNO_improve_political_parties_policy_effectiveness_low = yes
+		custom_effect_tooltip = BRA_minimal_interference_tt
+		add_to_variable = { BRA_pres_support^22 = 5 }
+		BRA_redraw_pres_info = yes
+		BRA_pres_select_region = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_keep_the_bull_out
+	icon = GFX_focus_BRA_adhemars_corruption
+	cost = 2
+	prerequisite = { focus = BRA_minimal_interference }
+	relative_position_id = BRA_minimal_interference
+	mutually_exclusive = { focus = BRA_allow_adhemar }
+	x = -1
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_keep_the_bull_out"
+		country_event = { id = brazil.245 }
+		TNO_improve_political_parties_policy_effectiveness_low = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_allow_adhemar
+	icon = GFX_focus_BRA_adhemars_plan
+	cost = 2
+	prerequisite = { focus = BRA_minimal_interference }
+	relative_position_id = BRA_minimal_interference
+	mutually_exclusive = { focus = BRA_keep_the_bull_out }
+	x = 1
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_allow_adhemar"
+		country_event = { id = brazil.266 }
+		TNO_worsen_political_parties_policy_effectiveness_low = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_aid_the_crow
+	icon = GFX_focus_generic_shady_deal
+	cost = 2
+	prerequisite = {
+		focus = BRA_keep_the_bull_out
+		focus = BRA_allow_adhemar
+	}
+	relative_position_id = BRA_keep_the_bull_out
+	mutually_exclusive = { focus = BRA_fine_on_his_own }
+	x = 0
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_aid_the_crow"
+		add_political_power = -10
+		custom_effect_tooltip = BRA_aid_the_crow_tt
+		add_to_variable = { BRA_pres_support^7 = 5 }
+		BRA_redraw_pres_info = yes
+		BRA_pres_select_region = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_fine_on_his_own
+	icon = GFX_focus_BRA_larcedas_speeches
+	cost = 2
+	prerequisite = {
+		focus = BRA_keep_the_bull_out
+		focus = BRA_allow_adhemar
+	}
+	relative_position_id = BRA_allow_adhemar
+	mutually_exclusive = { focus = BRA_aid_the_crow }
+	x = 0
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_fine_on_his_own"
+		add_stability = 0.03
+		add_political_power = 30
+	}
+}
+
+shared_focus = {
+	id = BRA_allow_a_debate
+	icon = GFX_focus_generic_change_law_speech
+	cost = 2
+	prerequisite = { 
+		focus = BRA_cool_down_the_north
+	}
+	prerequisite = { 
+		focus = BRA_fine_on_his_own
+		focus = BRA_aid_the_crow
+	}
+	relative_position_id = BRA_allow_adhemar
+	x = 2
+	y = 2
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_allow_a_debate"
+		country_event = { id = brazil.61 }
+	}
+}
+
+#### Keep an Eye on things Branch
+
+
+shared_focus = {
+	id = BRA_keep_an_eye_on_things
+	icon = GFX_focus_generic_get_our_hands_dirty_2
+	cost = 2
+	prerequisite = { focus = BRA_discussing_with_the_crow }
+	relative_position_id = BRA_discussing_with_the_crow
+	mutually_exclusive = { focus = BRA_let_the_election_play_out }
+	
+	x = 4
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_keep_an_eye_on_things"
+		country_event = { id = brazil.376 }
+		TNO_improve_political_parties_policy_effectiveness_med = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_the_crow_new_look
+	icon = GFX_focus_BRA_crow_takes_flight
+	cost = 2
+	prerequisite = { focus = BRA_keep_an_eye_on_things }
+	relative_position_id = BRA_keep_an_eye_on_things
+	x = 0
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_the_crow_new_look"
+		custom_effect_tooltip = BRA_the_crow_new_look_tt
+		add_to_variable = { BRA_pres_support^1 = 10 }
+		add_to_variable = { BRA_pres_support^4 = 10 }
+		add_to_variable = { BRA_pres_support^7 = 10 }
+		add_to_variable = { BRA_pres_support^10 = 10 }
+		add_to_variable = { BRA_pres_support^13 = 10 }
+		add_to_variable = { BRA_pres_support^16 = 10 }
+		add_to_variable = { BRA_pres_support^19 = 10 }
+		add_to_variable = { BRA_pres_support^22 = 10 }
+		add_to_variable = { BRA_pres_support^25 = 10 }
+		BRA_redraw_pres_info = yes
+		BRA_pres_select_region = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_use_them_to_our_advantage
+	icon = GFX_focus_generic_cooperate_with_the_socialists
+	cost = 2
+	prerequisite = { focus = BRA_the_crow_new_look }
+	relative_position_id = BRA_the_crow_new_look
+	mutually_exclusive = { focus = BRA_suppress_the_left }
+	x = -1
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_use_them_to_our_advantage"
+		custom_effect_tooltip = BRA_use_them_to_our_advantage_tt
+		add_to_variable = { BRA_pres_support^5 = 5 }
+		BRA_redraw_pres_info = yes
+		BRA_pres_select_region = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_suppress_the_left 
+	icon = GFX_focus_generic_the_left
+	cost = 2
+	prerequisite = { focus = BRA_the_crow_new_look }
+	relative_position_id = BRA_the_crow_new_look
+	mutually_exclusive = { focus = BRA_use_them_to_our_advantage }
+	x = 1
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_suppress_the_left"
+		custom_effect_tooltip = BRA_suppress_the_left_tt
+		subtract_from_variable = { BRA_pres_support^2 = 5 }
+		subtract_from_variable = { BRA_pres_support^5 = 5 }
+		subtract_from_variable = { BRA_pres_support^8 = 5 }
+		subtract_from_variable = { BRA_pres_support^11 = 5 }
+		subtract_from_variable = { BRA_pres_support^14 = 5 }
+		subtract_from_variable = { BRA_pres_support^17 = 5 }
+		subtract_from_variable = { BRA_pres_support^20 = 5 }
+		subtract_from_variable = { BRA_pres_support^23 = 5 }
+		BRA_redraw_pres_info = yes
+		BRA_pres_select_region = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_a_bridge_too_far
+	icon = GFX_focus_BRA_meet_with_kubitschek
+	cost = 2
+	prerequisite = {
+		focus = BRA_suppress_the_left
+		focus = BRA_use_them_to_our_advantage
+	}
+	relative_position_id = BRA_use_them_to_our_advantage
+	mutually_exclusive = { focus = BRA_work_against_kubitscheck }
+	x = 0
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_a_bridge_too_far"
+		country_event = { id = brazil.377 }
+		add_political_power = 20
+	}
+}
+
+shared_focus = {
+	id = BRA_work_against_kubitscheck
+	icon = GFX_focus_BRA_kubitschek_last_focus
+	cost = 2
+	prerequisite = {
+		focus = BRA_suppress_the_left
+		focus = BRA_use_them_to_our_advantage
+	}
+	relative_position_id = BRA_suppress_the_left 
+	mutually_exclusive = { focus = BRA_a_bridge_too_far }
+	x = 0
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_work_against_kubitscheck"
+		custom_effect_tooltip = BRA_work_against_kubitscheck_tt
+		subtract_from_variable = { BRA_pres_support^0 = 5 }
+		subtract_from_variable = { BRA_pres_support^3 = 5 }
+		subtract_from_variable = { BRA_pres_support^6 = 5 }
+		subtract_from_variable = { BRA_pres_support^9 = 5 }
+		subtract_from_variable = { BRA_pres_support^12 = 5 }
+		subtract_from_variable = { BRA_pres_support^15 = 5 }
+		subtract_from_variable = { BRA_pres_support^18 = 5 }
+		subtract_from_variable = { BRA_pres_support^21 = 5 }
+		subtract_from_variable = { BRA_pres_support^24 = 5 }
+		BRA_redraw_pres_info = yes
+		BRA_pres_select_region = yes
+		add_political_power = -20
+	}
+}
+
+shared_focus = {
+	id = BRA_use_the_envelope_system
+	icon = GFX_focus_generic_bribe_their_leaders
+	cost = 2
+	prerequisite = { 
+		focus = BRA_cool_down_the_north
+	}
+	prerequisite = {
+		focus = BRA_work_against_kubitscheck
+		focus = BRA_a_bridge_too_far
+	}
+	relative_position_id = BRA_a_bridge_too_far
+
+	x = -2
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_use_the_envelope_system"
+		BRA_military_increase_nepotism_low = yes
+		add_popularity = {
+			ideology = conservatism
+			popularity = 0.01
+		}
+	}
+}
+
+## === Central Tree === ##
+
+shared_focus = {
+	id = BRA_eternal_vigilance
+	icon = GFX_focus_generic_eternal_vigilance
+	cost = 2
+	prerequisite = {
+		focus = BRA_let_the_election_play_out
+		focus = BRA_keep_an_eye_on_things
+	}
+	relative_position_id = BRA_discussing_with_the_crow
+	x = 0
+	y = 2
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_eternal_vigilance"
+		country_event = { id = brazil.378 }
+		add_stability = 0.02
+	}
+}
+
+shared_focus = {
+	id = BRA_keep_the_integralists_happy
+	icon = GFX_focus_BRA_approach_the_prp
+	cost = 2
+	prerequisite = { focus = BRA_eternal_vigilance }
+	relative_position_id = BRA_eternal_vigilance
+	x = -1
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_keep_the_integralists_happy"
+		add_popularity = {
+			ideology = fascism
+			popularity = 0.01
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_and_the_communists_quiet
+	icon = GFX_focus_generic_smash_communism
+	cost = 2
+	prerequisite = { focus = BRA_eternal_vigilance }
+	relative_position_id = BRA_eternal_vigilance
+	x = 1
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_and_the_communists_quiet"
+		add_popularity = {
+			ideology = communist
+			popularity = -0.01
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_cool_down_the_north
+	icon = GFX_focus_BRA_end_the_marches
+	cost = 2
+	prerequisite = { 
+		focus = BRA_keep_the_integralists_happy 
+	}
+	prerequisite = { 
+		focus = BRA_and_the_communists_quiet 
+	}
+	relative_position_id = BRA_eternal_vigilance
+	x = 0
+	y = 2
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_cool_down_the_north"
+		custom_effect_tooltip = BRA_cool_down_the_north_tt
+		subtract_from_variable = { BRA_pres_support^2 = 5 }
+		BRA_redraw_pres_info = yes
+		BRA_pres_select_region = yes
+	}
+}
+
+## Epilogue
+
+
+shared_focus = {
+	id = BRA_guard_the_polling_stations
+	icon = GFX_focus_generic_elections_rigged_1
+	cost = 2
+	prerequisite = { focus = BRA_allow_a_debate focus = BRA_use_the_envelope_system }
+	relative_position_id = BRA_cool_down_the_north
+	x = 0
+	y = 2
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_guard_the_polling_stations"
+		add_stability = 0.03
+	}
+}
+
+shared_focus = {
+	id = BRA_soldiers_on_high_alert
+	icon = GFX_focus_generic_new_model_army
+	cost = 2
+	prerequisite = { focus = BRA_guard_the_polling_stations }
+	relative_position_id = BRA_guard_the_polling_stations
+	x = 0
+	y = 1
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_soldiers_on_high_alert"
+		country_event = { id = brazil.267 }
+	}
+}
+

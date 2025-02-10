@@ -1,0 +1,199 @@
+scripted_gui = {
+	TNO_Bormann_EconMech_DecisionGui = {
+		window_name = "TNO_Bormann_EconMech_GUI"
+		context_type = decision_category
+
+		visible = {
+			tag = GER
+			has_country_flag = BOR_EconomyMechanic_Active
+		}
+
+		triggers = {
+			TNO_Bormann_EconMech_RKs_Entry_Button_visible = {
+				NOT = { check_variable = { GER.BOR_GrossraumRK_ID^RK_i = 0 } }
+			}
+			TNO_Bormann_EconMech_RKs_Entry_Icon_visible = {
+				NOT = {
+					check_variable = { GER.BOR_GrossraumRK_ID^RK_i = 0 }
+					BOR_EconMech_RKSelect_Enabled = yes
+				}
+			}
+
+			TNO_Bormann_EconMech_Projects_Data_SlavePop_visible = {
+				check_variable = { BOR_EconMech_SelectedProject = 0 }
+			}
+			TNO_Bormann_EconMech_Projects_Data_Workforce_visible = {
+				check_variable = { BOR_EconMech_SelectedProject = 0 }
+			}
+
+			TNO_Bormann_EconMech_Projects_Add_Button_click_enabled = {
+				has_political_power > 19
+				if = {
+					limit = { check_variable = { BOR_EconMech_SelectedProject = 0 } }
+					check_variable = { BOR_AusgrenzungCost < 0.1 }
+					check_variable = { BOR_AusgrenzungProgress < 100 }
+				}
+				else_if = {
+					limit = { check_variable = { BOR_EconMech_SelectedProject = 1 } }
+					check_variable = { BOR_BreitspurbahnInvestmentDisplay < 16 }
+				}
+			}
+			TNO_Bormann_EconMech_Projects_Sub_Button_click_enabled = {
+				has_political_power > 19
+				if = {
+					limit = { check_variable = { BOR_EconMech_SelectedProject = 0 } }
+					check_variable = { BOR_AusgrenzungCost > 0.005 }
+					check_variable = { BOR_AusgrenzungProgress < 100 }
+				}
+				else_if = {
+					limit = { check_variable = { BOR_EconMech_SelectedProject = 1 } }
+					check_variable = { BOR_BreitspurbahnInvestmentDisplay > 0 }
+				}
+			}
+
+			BOR_econ_debug_visible = {
+				is_debug = yes
+			}
+		}
+
+		effects = {
+			TNO_Bormann_EconMech_RKs_Entry_Button_click = {
+				BOR_EconMech_RK_selection_map = yes
+			}
+
+			TNO_Bormann_EconMech_Ausgrenzung_Button_click = {
+				set_variable = { BOR_EconMech_SelectedProject = 0 }
+				set_variable = { BOR_ProjectMeter_Frame = BOR_AusgrenzungProgress }
+				set_variable = { BOR_Ausgrenzung_Button_Frame = 2 }
+				set_variable = { BOR_Breitspurbahn_Button_Frame = 1 }
+			}
+			TNO_Bormann_EconMech_Breitspurbahn_Button_click = {
+				set_variable = { BOR_EconMech_SelectedProject = 1 }
+				set_variable = { BOR_ProjectMeter_Frame = BOR_BreitspurbahnProgress }
+				set_variable = { BOR_Ausgrenzung_Button_Frame = 1 }
+				set_variable = { BOR_Breitspurbahn_Button_Frame = 2 }
+			}
+
+			TNO_Bormann_EconMech_Projects_Add_Button_click = {
+				add_political_power = -20
+				if = {
+					limit = { check_variable = { BOR_EconMech_SelectedProject = 0 } } # Ausgrenzung
+					add_to_variable = { BOR_AusgrenzungCost = 0.005 }
+					add_to_variable = { BOR_AusgrenzungProgressMonthly = 0.05 }
+					add_to_variable = { BOR_Ausgrenzung_political_power_gain = -0.05 }
+					BOR_EconMech_update_cost_display = yes
+				}
+				else_if = {
+					limit = { check_variable = { BOR_EconMech_SelectedProject = 1 } } # Breitspurbahn
+					add_to_variable = { BOR_BreitspurbahnInvestment = -2 }
+					add_to_variable = { BOR_BreitspurbahnInvestmentDisplay = 2 }
+					add_to_variable = { BOR_BreitspurbahnProgressMonthly = 0.2 }
+					add_to_variable = { BOR_BreitspurbahnCost = 0.125 }
+					add_to_variable = { BOR_Breitspurbahn_political_power_gain = -0.05 }
+					recalculate_PUs_on_demand = yes
+				}
+				update_economy_tab = yes
+			}
+			TNO_Bormann_EconMech_Projects_Sub_Button_click = {
+				add_political_power = -20
+				if = {
+					limit = { check_variable = { BOR_EconMech_SelectedProject = 0 } } # Ausgrenzung
+					add_to_variable = { BOR_AusgrenzungCost = -0.005 }
+					add_to_variable = { BOR_AusgrenzungProgressMonthly = -0.05 }
+					add_to_variable = { BOR_Ausgrenzung_political_power_gain = 0.05 }
+					clamp_variable = { var = BOR_AusgrenzungProgressMonthly min = 0 }
+					BOR_EconMech_update_cost_display = yes
+				}
+				else_if = {
+					limit = { check_variable = { BOR_EconMech_SelectedProject = 1 } } # Breitspurbahn
+					add_to_variable = { BOR_BreitspurbahnInvestment = 2 }
+					add_to_variable = { BOR_BreitspurbahnInvestmentDisplay = -2 }
+					add_to_variable = { BOR_BreitspurbahnProgressMonthly = -0.2 }
+					add_to_variable = { BOR_BreitspurbahnCost = -0.125 }
+					add_to_variable = { BOR_Breitspurbahn_political_power_gain = 0.05 }
+					clamp_variable = { var = BOR_BreitspurbahnProgressMonthly min = 0 }
+					clamp_variable = { var = BOR_BreitspurbahnCost min = 0 }
+					recalculate_PUs_on_demand = yes
+				}
+				update_economy_tab = yes
+			}
+
+			BOR_econ_debug_click = {
+				BOR_EconMech_MonthlyPulse = yes
+			}
+		}
+
+		dynamic_lists = {
+			TNO_Bormann_EconMech_RKs = {
+				array = BOR_GrossraumRK_ID
+				index = RK_i
+				change_scope = yes
+				entry_container = TNO_Bormann_EconMech_RKs_Container
+			}
+		}
+
+		properties = {
+			TNO_Bormann_EconMech_GER = {
+				frame = BOR_EconMech_GER_Frame
+			}
+			TNO_Bormann_EconMech_RKs_Entry_Button = {
+				image = "[BOR_EconMech_button_image]"
+				frame = GER.BOR_GrossraumRK_Frame^RK_i
+				x = GER.BOR_GrossraumRK_X^RK_i
+				y = GER.BOR_GrossraumRK_Y^RK_i
+			}
+			TNO_Bormann_EconMech_RKs_Entry_Icon = {
+				image = "[BOR_EconMech_button_image]"
+				frame = GER.BOR_GrossraumRK_Frame^RK_i
+				x = GER.BOR_GrossraumRK_X^RK_i
+				y = GER.BOR_GrossraumRK_Y^RK_i
+			}
+
+			TNO_Bormann_EconMech_Breitspurbahn = {
+				frame = BOR_BreitspurbahnFrame
+			}
+			TNO_Bormann_EconMech_Breitspurbahn_Denmark = {
+				frame = BOR_BreitspurbahnDenmarkFrame
+			}
+
+			TNO_Bormann_EconMech_Ausgrenzung_Button = {
+				frame = BOR_Ausgrenzung_Button_Frame
+			}
+			TNO_Bormann_EconMech_Breitspurbahn_Button = {
+				frame = BOR_Breitspurbahn_Button_Frame
+			}
+			TNO_Bormann_EconMech_Projects_Meter = {
+				frame = BOR_ProjectMeter_Frame
+			}
+		}
+
+		ai_enabled = { original_tag = GER }
+		ai_check = { has_country_flag = BOR_EconomyMechanic_Active }
+
+		ai_test_interval = 168
+		ai_max_weight_taken_per_test = 2
+
+		ai_weights = {
+			TNO_Bormann_EconMech_Projects_Add_Button_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						check_variable = { political_power_daily > 0.35 }
+						add = 2
+					}
+				}
+				weight = 1
+			}
+			TNO_Bormann_EconMech_Projects_Sub_Button_click = {
+				ai_will_do = {
+					base = -1
+					modifier = {
+						check_variable = { political_power_daily < 0.35 }
+						add = 4
+					}
+				}
+				weight = 1
+			}
+		}
+	}
+}

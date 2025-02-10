@@ -1,0 +1,1034 @@
+﻿##############################################
+#The Part Of A Cold War That Actually Matters#
+#    Also made by Exocamp, code slave <3     #
+##############################################
+
+add_namespace = nuclearwar
+
+#What is being targetted?
+country_event = {
+	id = nuclearwar.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.1" }
+	title = nuclearwar.1.t
+	desc = nuclearwar.1.de
+	picture = GFX_report_event_generic_missile
+
+	is_triggered_only = yes
+
+	#Attack the armies directly
+	option = {
+		name = nuclearwar.1.a
+		set_country_flag = army_nuclearstrike
+		every_country = {
+			limit = {
+				AND = {
+					has_war_with = ROOT
+					has_nuclear_arsenal = yes
+				}
+			}
+			country_event = {
+				id = nuclearwar.2
+				days = 1
+			}
+		}
+		ai_chance = {
+			factor = 25
+		}
+		custom_effect_tooltip = nuclear_ultimatum
+	}
+	#Bomb the occupied territory of the enemy
+	option = {
+		name = nuclearwar.1.b
+		set_country_flag = tactical_nuclearstrike
+		every_country = {
+			limit = {
+				AND = {
+					has_war_with = ROOT
+					has_nuclear_arsenal = yes
+				}
+			}
+			country_event = {
+				id = nuclearwar.2
+				days = 1
+			}
+		}
+		ai_chance = {
+			factor = 25
+		}
+		custom_effect_tooltip = nuclear_ultimatum
+	}
+	#Destroy their home!
+	option = {
+		name = nuclearwar.1.c
+		set_country_flag = home_nuclearstrike
+		every_country = {
+			limit = {
+				AND = {
+					has_war_with = ROOT
+					has_nuclear_arsenal = yes
+				}
+			}
+			country_event = {
+				id = nuclearwar.2
+				days = 1
+			}
+		}
+		ai_chance = {
+			factor = 25
+		}
+		custom_effect_tooltip = nuclear_ultimatum
+	}
+	#EVERYTHING POSSIBLE!
+	option = {
+		trigger = {
+			NOT = {
+				has_country_flag = nuclear_armed-one
+			}
+		}
+		name = nuclearwar.1.d
+		set_country_flag = allout_nuclearstrike
+		every_country = {
+			limit = {
+				AND = {
+					has_war_with = ROOT
+					has_nuclear_arsenal = yes
+				}
+			}
+			country_event = {
+				id = nuclearwar.2
+				days = 1
+			}
+		}
+		ai_chance = {
+			factor = 25
+		}
+		custom_effect_tooltip = nuclear_ultimatum
+	}
+}
+
+#The Ultimate Demand
+country_event = {
+	id = nuclearwar.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.2" }
+	title = nuclearwar.2.t
+	desc = nuclearwar.2.d
+	picture = GFX_report_event_generic_missile
+
+	is_triggered_only = yes
+	timeout_days = 2
+
+	#They are bluffing.
+	option = {
+		name = nuclearwar.2.b
+		ai_chance = { factor = 80 }
+		FROM = {
+			country_event = {
+				id = nuclearwar.4
+				days = 1
+			}
+		}
+	}
+	#We shall make peace.
+	option = {
+		name = nuclearwar.2.a
+		trigger = { NOT = { has_global_flag = TNO_world_tension_WW3 } }
+		ai_chance = { factor = 0 }
+		FROM = {
+			country_event = {
+				id = nuclearwar.3
+				days = 1
+			}
+		}
+		every_country = {
+			limit = {
+				has_war_with = PREV.PREV
+			}
+			white_peace = PREV.PREV
+		}
+	}
+}
+
+#Peace Assured
+country_event = {
+	id = nuclearwar.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.3" }
+	title = nuclearwar.3.t
+	desc = nuclearwar.3.d
+	picture = GFX_report_event_generic_missile
+
+	is_triggered_only = yes
+	timeout_days = 2
+
+	#We shall make peace.
+	option = {
+		name = nuclearwar.3.a
+		ai_chance = { factor = 50 }
+		FROM = {
+			country_event = {
+				id = nuclearwar.7
+				days = 1
+			}
+		}
+		every_country = {
+			limit = {
+				has_war_with = FROM
+			}
+			white_peace = FROM
+		}
+	}
+}
+
+#The Final Decision
+country_event = {
+	id = nuclearwar.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.4" }
+	title = nuclearwar.4.t
+	desc = nuclearwar.4.d
+	picture = GFX_report_event_generic_missile
+
+	is_triggered_only = yes
+	timeout_days = 2
+
+	#Destroy them.
+	option = {
+		name = nuclearwar.4.a
+		ai_chance = { factor = 100 }
+		every_country = {
+			limit = {
+				AND = {
+					has_nuclear_arsenal = yes
+					has_war_with = ROOT
+				}
+			}
+			country_event = {
+				id = nuclearwar.5
+				days = 1
+			}
+		}
+	}
+	#We shall not.
+	option = {
+		name = nuclearwar.4.b
+		ai_chance = { factor = 0 }
+		every_country = {
+			limit = {
+				AND = {
+					has_nuclear_arsenal = yes
+					has_war_with = ROOT
+				}
+			}
+			country_event = {
+				id = nuclearwar.6
+				days = 2
+			}
+		}
+	}
+}
+
+#Response
+country_event = {
+	id = nuclearwar.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.5" }
+	title = nuclearwar.5.t
+	desc = nuclearwar.5.d
+	picture = GFX_report_event_generic_missile
+
+	is_triggered_only = yes
+	timeout_days = 2
+
+	#Destroy them back.
+	option = {
+		name = nuclearwar.5.a
+		FROM = {
+			country_event = {
+				id = nuclearwar.6
+				hours = 1
+			}
+		}
+	}
+}
+
+#Nuclear annihilation
+country_event = {
+	id = nuclearwar.6
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event nuclearwar.6"
+		set_global_flag = tno_speed_warning
+	}
+	title = nuclearwar.6.t
+	desc = nuclearwar.6.d
+	picture = GFX_report_event_generic_missile
+
+	is_triggered_only = yes
+	timeout_days = 2
+	trigger = { NOT = { has_global_flag = nukes_disabled } }
+
+	#Destroy them.
+	option = {
+		name = nuclearwar.6.a
+		hidden_effect = {
+			if = {
+				limit = {
+					NOT = { has_global_flag = TNO_my_world_is_on_fire_how_about_yours }
+				}
+				fire_nuclear_war = yes
+			}
+		}
+	}
+}
+
+#The world is saved
+country_event = {
+	id = nuclearwar.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.7" }
+	title = nuclearwar.7.t
+	desc = nuclearwar.7.d
+	picture = GFX_report_event_generic_missile
+
+	is_triggered_only = yes
+
+	#One for the history books
+	option = {
+		name = nuclearwar.7.a
+	}
+}
+
+#Are you sure you want to do this?
+country_event = {
+	id = nuclearwar.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.8" }
+	title = nuclearwar.8.t
+	desc = nuclearwar.8.d
+	picture = GFX_report_event_generic_car_austin_cambridge
+
+	is_triggered_only = yes
+	timeout_days = 2
+
+	#Do it
+	option = {
+		name = nuclearwar.8.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			country_event = {
+				id = nuclearwar.1
+				hours = 1
+			}
+		}
+	}
+	#Fuck go back
+	option = {
+		name = nuclearwar.8.b
+		ai_chance = { factor = 0 }
+		add_political_power = 10
+	}
+}
+
+country_event = { #its time
+	id = nuclearwar.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.9" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+
+	}
+}
+
+country_event = { #capitals hit
+	id = nuclearwar.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.10" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		nuke_enclave = yes
+	}
+}
+country_event = { #megalopoli hit
+	id = nuclearwar.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.11" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		nuke_megalopolis = yes
+	}
+}
+country_event = { #metropoli hit
+	id = nuclearwar.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.12" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		nuke_metropolis = yes
+	}
+}
+country_event = { #large cities hit
+	id = nuclearwar.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.13" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		nuke_large_city = yes
+	}
+}
+country_event = { #cities hit
+	id = nuclearwar.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.14" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		nuke_city = yes
+	}
+}
+country_event = { #large towns hit
+	id = nuclearwar.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.15" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		nuke_large_town = yes
+	}
+}
+country_event = { #towns hit
+	id = nuclearwar.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.16" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		nuke_town = yes
+	}
+}
+country_event = { #rural hit
+	id = nuclearwar.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.17" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		nuke_rural = yes
+	}
+}
+country_event = { #pastoral and wasteland hit
+	id = nuclearwar.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.18" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		nuke_pastoral = yes
+		nuke_wasteland = yes
+	}
+}
+country_event = { #islands hit
+	id = nuclearwar.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.19" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		nuke_small_island = yes
+		nuke_tiny_island = yes
+	}
+}
+
+#country_event = { #nuke graphics
+#	id = nuclearwar.100
+#	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.100" }
+#	hidden = yes
+# 	is_triggered_only = yes
+#
+#	immediate = {
+#		set_temp_variable = { rand_state = random }
+#		multiply_temp_variable = { rand_state = 1368 } #num of states
+#		round_temp_variable = rand_state
+#		launch_nuke = {
+#			state = rand_state
+#		}
+#		#var:rand_state = { log = "[GetDateText]: [This.GetName]([?rand_state]) was nuked." }
+#	}
+#	immediate = {
+#		set_temp_variable = { rand_state = random }
+#		multiply_temp_variable = { rand_state = 1368 } #num of states
+#		round_temp_variable = rand_state
+#		launch_nuke = {
+#			state = rand_state
+#		}
+#		#var:rand_state = { log = "[GetDateText]: [This.GetName]([?rand_state]) was nuked." }
+#	}
+#	immediate = {
+#		set_temp_variable = { rand_state = random }
+#		multiply_temp_variable = { rand_state = 1368 } #num of states
+#		round_temp_variable = rand_state
+#		launch_nuke = {
+#			state = rand_state
+#		}
+#		#var:rand_state = { log = "[GetDateText]: [This.GetName]([?rand_state]) was nuked." }
+#	}
+#	immediate = {
+#		set_temp_variable = { rand_state = random }
+#		multiply_temp_variable = { rand_state = 1368 } #num of states
+#		round_temp_variable = rand_state
+#		launch_nuke = {
+#			state = rand_state
+#		}
+#		#var:rand_state = { log = "[GetDateText]: [This.GetName]([?rand_state]) was nuked." }
+#	}
+#}
+country_event = { #aftermath
+	id = nuclearwar.101
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.101" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fire_nuclear_aftermath = yes
+		country_event = { id = nuclearwar.21 days = 1 }
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.21" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_global_flag = NUCLEAR_WAR
+		ZZZ = {
+			country_event = { id = nuclearwar.22 days = 1 }
+		}
+		every_state = {
+			limit = {
+				OR = {
+					is_owned_by = JAP
+					is_owned_by = TUR
+					is_owned_by = USA
+					is_owned_by = GER
+					is_owned_by = IND
+					is_owned_by = ITA
+					is_owned_by = SAF
+					is_owned_by = CHI
+					is_owned_by = ENG
+					is_owned_by = FEN
+					is_owned_by = BRA
+					is_owned_by = IBR
+					is_owned_by = RUS
+					is_owned_by = BRG
+
+				}
+				OR = {
+					OR = {
+						has_state_category = metropolis
+						has_state_category = megalopolis
+						has_state_category = large_city
+					}
+					is_capital = yes
+				}
+			}
+			ZZZ = {
+				transfer_state = PREV
+			}
+			ZZZ = {
+				transfer_state = 784
+				transfer_state = 458
+				transfer_state = 448
+				transfer_state = 114
+				transfer_state = 450
+				transfer_state = 461
+				transfer_state = 118
+				transfer_state = 290
+				transfer_state = 341
+				transfer_state = 658
+				transfer_state = 12
+				transfer_state = 202
+				transfer_state = 897
+				transfer_state = 388
+				transfer_state = 381
+				transfer_state = 389
+				transfer_state = 390
+				transfer_state = 384
+				transfer_state = 307
+				transfer_state = 544
+				transfer_state = 295
+				transfer_state = 778
+				transfer_state = 275
+				transfer_state = 934
+				transfer_state = 729
+				transfer_state = 326
+				transfer_state = 289
+				transfer_state = 137
+				transfer_state = 1532
+				transfer_state = 685
+				transfer_state = 965
+				transfer_state = 1160
+				transfer_state = 774
+				transfer_state = 779
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.22" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.23 days = 1 }
+		every_state = {
+			limit = {
+				any_neighbor_state = {
+					is_owned_by = ZZZ
+				}
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			set_state_flag = ADJACENT_TO_ANARCHY
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.23" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.24 hours = 12 }
+		every_state = {
+			limit = {
+				has_state_flag = ADJACENT_TO_ANARCHY
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			ZZZ = {
+				transfer_state = PREV
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.24" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.25 hours = 12 }
+		every_state = {
+			limit = {
+				any_neighbor_state = {
+					is_owned_by = ZZZ
+				}
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			set_state_flag = ADJACENT_TO_ANARCHY
+		}
+		every_state = {
+			limit = {
+				OR = {
+					is_owned_by = VIN
+					is_owned_by = AST
+					is_owned_by = RUS
+					is_owned_by = WRS
+					is_owned_by = KAZ
+					is_owned_by = KZR
+					is_owned_by = AMR
+					is_owned_by = KMC
+					is_owned_by = NZL
+					is_owned_by = ROM
+					is_owned_by = EGY
+					is_owned_by = CAO
+					is_owned_by = IEA
+					is_owned_by = WOL
+					is_owned_by = PER
+					is_owned_by = INS
+					is_owned_by = BUR
+					is_owned_by = AZH
+					is_owned_by = CAN
+					is_owned_by = GUY
+					is_owned_by = QIN
+					is_owned_by = MEX
+					is_owned_by = ARG
+					is_owned_by = UKR
+					is_owned_by = TOM
+					is_owned_by = OMS
+					is_owned_by = TYM
+					is_owned_by = MCW
+					is_owned_by = PER
+					is_owned_by = SAU
+					is_owned_by = OST
+					is_owned_by = FRA
+					is_owned_by = IRE
+				}
+				OR = {
+					AND = {
+						OR = {
+							has_state_category = metropolis
+							has_state_category = megalopolis
+							has_state_category = large_city
+						}
+						state_population > 2000000
+					}
+					is_capital = yes
+				}
+			}
+			ZZZ = {
+				transfer_state = PREV
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.25" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.26 hours = 12 }
+		every_state = {
+			limit = {
+				has_state_flag = ADJACENT_TO_ANARCHY
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			ZZZ = {
+				transfer_state = PREV
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.26" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.27 days = 1 }
+		every_state = {
+			limit = {
+				any_neighbor_state = {
+					is_owned_by = ZZZ
+				}
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			set_state_flag = ADJACENT_TO_ANARCHY
+		}
+		ZZZ = {
+			transfer_state = 334
+			transfer_state = 817
+			transfer_state = 820
+			transfer_state = 669
+			transfer_state = 327
+			transfer_state = 628
+			transfer_state = 627
+			transfer_state = 945
+			transfer_state = 944
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.27
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.27" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.28 days = 1 }
+		every_state = {
+			limit = {
+				has_state_flag = ADJACENT_TO_ANARCHY
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			ZZZ = {
+				transfer_state = PREV
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.28
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.28" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.29 days = 1 }
+		every_state = {
+			limit = {
+				any_neighbor_state = {
+					is_owned_by = ZZZ
+				}
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			set_state_flag = ADJACENT_TO_ANARCHY
+		}
+		every_state = {
+			limit = {
+				OR = {
+					is_owned_by = INS
+					is_owned_by = ROM
+					is_owned_by = MST
+					is_owned_by = MOS
+					is_owned_by = PAU
+					is_owned_by = IRQ
+					is_owned_by = YEM
+					is_owned_by = VEN
+				}
+				OR = {
+					AND = {
+						OR = {
+							has_state_category = metropolis
+							has_state_category = megalopolis
+							has_state_category = large_city
+						}
+						state_population > 2000000
+					}
+					is_capital = yes
+				}
+			}
+			ZZZ = {
+				transfer_state = PREV
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.29
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.29" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.30 days = 1 }
+		every_state = {
+			limit = {
+				has_state_flag = ADJACENT_TO_ANARCHY
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			ZZZ = {
+				transfer_state = PREV
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.30
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.30" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.31 days = 1 }
+		every_state = {
+			limit = {
+				any_neighbor_state = {
+					is_owned_by = ZZZ
+				}
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			set_state_flag = ADJACENT_TO_ANARCHY
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.31
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.31" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.32 days = 1 }
+		every_state = {
+			limit = {
+				has_state_flag = ADJACENT_TO_ANARCHY
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			ZZZ = {
+				transfer_state = PREV
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.32
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.32" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.33 days = 1 }
+		every_state = {
+			limit = {
+				any_neighbor_state = {
+					is_owned_by = ZZZ
+				}
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			set_state_flag = ADJACENT_TO_ANARCHY
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.33
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.33" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.34 days = 1 }
+		every_state = {
+			limit = {
+				has_state_flag = ADJACENT_TO_ANARCHY
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			ZZZ = {
+				transfer_state = PREV
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.34
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.34" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.35 days = 1 }
+		every_state = {
+			limit = {
+				any_neighbor_state = {
+					is_owned_by = ZZZ
+				}
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			set_state_flag = ADJACENT_TO_ANARCHY
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.35
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.35" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.36 days = 1 }
+		every_state = {
+			limit = {
+				has_state_flag = ADJACENT_TO_ANARCHY
+				NOT = {
+					is_owned_by = ZZZ
+				}
+			}
+			ZZZ = {
+				transfer_state = PREV
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.36
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.36" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.37 days = 1 }
+		every_state = {
+			ZZZ = {
+				transfer_state = PREV
+			}
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.37
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.37" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.38 days = 1 }
+		for_each_loop = {
+			array = global.anarchy_states_17
+			log = "[GetDateText]: [?v.GetName] was lost to Anarchy"
+			var:v = { ZZZ = { transfer_state = PREV } }
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.38
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.38" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.39 days = 1 }
+		for_each_loop = {
+			array = global.anarchy_states_18
+			log = "[GetDateText]: [?v.GetName] was lost to Anarchy"
+			var:v = { ZZZ = { transfer_state = PREV } }
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.39
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.39" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = nuclearwar.40 days = 1 }
+		for_each_loop = {
+			array = global.anarchy_states_19
+			log = "[GetDateText]: [?v.GetName] was lost to Anarchy"
+			var:v = { ZZZ = { transfer_state = PREV } }
+		}
+	}
+}
+country_event = { #anarchy annexation events
+	id = nuclearwar.40
+	immediate = { log = "[GetDateText]: [Root.GetName]: event nuclearwar.40" }
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		for_each_loop = {
+			array = global.anarchy_states_20
+			log = "[GetDateText]: [?v.GetName] was lost to Anarchy"
+			var:v = { ZZZ = { transfer_state = PREV } }
+		}
+	}
+}

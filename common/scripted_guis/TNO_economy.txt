@@ -1,0 +1,4099 @@
+## Overview ##
+# Please maintain this listing for ease of use.
+# ==
+# - Utility / General
+#   - GDP State Display
+#   - Econ Topbar
+#
+# - Econ Base Menu
+#   - Main
+#   - Production Units Submenu
+#   - Credit Ratings Submenu
+#   - Econ Sphere Submenu
+#
+# - Econ Macro Menu
+#   - Main
+#   - Central Bank Policies Dropdown
+#   - Burgundy Econ Cover
+#
+# - Econ Social Menu
+#
+# - Econ Trade Menu
+#   - Main
+#   - Trade Partners Window
+#   - Trade Table
+#
+# - Construction Menu
+#   - Building Satisfaction
+#   - Production Units Button
+#   - Production Units Submenu
+#
+# - Production Menu
+#   - Production Units Button
+#   - Production Units Submenu
+#
+# - Deprecated / Unused
+## ======== ##
+
+# # Utility / General
+scripted_gui = {
+	# # GDP State Display
+	gdp_state_display = {
+		context_type = selected_state_context
+
+		window_name = "state_view_dynamic_gdp_display"
+		parent_window_token = selected_state_view
+		dirty = state_value
+	}
+
+	# # Electricity State Button
+	TNO_electricity_toggle = {
+		context_type = selected_state_context
+
+		window_name = "state_view_electricity_toggle_display"
+		parent_window_token = selected_state_view
+
+		visible = {
+			is_controlled_by = ROOT
+		}
+
+		properties = {
+			electricity_toggle_button = { frame = TNO_lights }
+		}
+
+		effects = {
+			electricity_toggle_button_click = {
+				if = {
+					limit = {
+						check_variable = { TNO_lights = 2 }
+					}
+					set_variable = { TNO_lights = 1 }
+				} 
+				else = {
+					set_variable = { TNO_lights = 2 }
+				}
+				ROOT = { calculate_building_variables = yes }
+			}
+		}
+	}
+	# # Econ Topbar
+	TNO_economy_top_bar = {
+		window_name = "topbar_economy"
+		context_type = player_context
+		parent_window_token = top_bar
+		# dirty = ECON_SPHERE_LEADER # Oopsie.
+
+		triggers = {
+			intel_button_dummy_visible = {
+				NOT = { has_dlc = "La Resistance" }
+			}
+		}
+	}
+
+	TNO_economy_top_bar_power = {
+		window_name = "topbar_economy_power"
+		context_type = player_context
+		parent_window_token = top_bar
+		dirty = resource@power
+
+		visible = {
+			NOT = {
+				has_global_flag = TNO_my_world_is_on_fire_how_about_yours
+			}
+		}
+
+		effects = {
+			power_bg_click = {
+				effect_tooltip = {
+					if = {
+						limit = {
+							is_ai = no
+						}
+						set_temp_variable = { current_state = 0 }
+						grid_power_production_tt_effect = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+# # Econ Base Menu
+scripted_gui = {
+	# # Main
+	TNO_economy_base = {
+		window_name = "EconBase"
+		context_type = player_context
+		parent_window_token = trade_tab
+
+		visible = {
+			always = yes
+		}
+
+		### Tabs / Base
+		properties = {
+			EconBase_InactiveTabs      = { frame = TT_EconBase_activetab?1 }
+			EconBase_InactiveTabsMask  = { frame = TT_EconBase_activetab?1 }
+			EconBase_ActiveTabs_Header = { frame = TT_EconBase_activetab?1 }
+		}
+
+		effects = {
+			EconBase_Button_Macro_click = {
+				set_variable = { TT_EconBase_activetab = 1 }
+				update_economy_tab = yes
+
+				## Clear Submenu stuff
+				# Social
+
+				# Trade
+
+				# Dirty Loading
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+
+			EconBase_Button_Social_click = {
+				set_variable = { TT_EconBase_activetab = 2 }
+
+				## Clear Submenu stuff
+				# Macro
+				clr_country_flag = central_bank_policies_tab_open
+				set_variable = { econ_sliders_grid_array^0 = 0 }
+
+				# Trade
+
+				# Dirty Loading
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+
+			EconBase_Button_Trade_click = {
+				set_variable = { TT_EconBase_activetab = 3 }
+				if = {
+					limit = { NOT = { has_variable = TNO_trade_partners_display^0 } }
+					for_each_loop = {
+						array = TNO_trade_partners
+						add_to_array = { TNO_trade_partners_display = v }
+					}
+				}
+
+				## Clear Submenu stuff
+				# Macro
+				clr_country_flag = central_bank_policies_tab_open
+				set_variable = { econ_sliders_grid_array^0 = 0 }
+
+				# Trade
+
+				# Dirty Loading
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+		}
+
+		triggers = {
+			### Tabs Text Visibility
+			## Inactive
+			EconBase_Inactive_Macro_visible = {
+				NOT = { econ_macroView = yes }
+			}
+
+			EconBase_Inactive_Social_visible = {
+				NOT = { econ_socialView = yes }
+			}
+
+			EconBase_Inactive_Trade_visible = {
+				NOT = { econ_tradeView = yes }
+			}
+
+			## Active
+			EconBase_Active_Macro_visible = {
+				econ_macroView = yes
+			}
+
+			EconBase_Active_Social_visible = {
+				econ_socialView = yes
+			}
+
+			EconBase_Active_Trade_visible = {
+				econ_tradeView = yes
+			}
+		}
+
+		### Production Units
+		triggers = {
+			production_units_toggle_alert_visible = {
+				NOT = { has_country_flag = has_opened_pu_menu }
+			}
+		}
+
+		dynamic_lists = {
+			stockpile_boxes = {
+				array = trade_screen_resource_stockpiles
+				value = resource_type
+				entry_container = stockpile_entry
+			}
+			market_tabs = {
+				array = trade_screen_resources
+				value = resource_type
+				entry_container = TNO_trade_market_tab
+			}
+		}
+
+		effects = {
+			econ_help_toggle_click = {
+				if = {
+					limit = { has_country_flag = TNO_economy_help_open }
+					clr_country_flag = TNO_economy_help_open
+				}
+				else = {
+					set_country_flag = TNO_economy_help_open
+					TNO_redraw_tutorial = yes
+				}
+				set_country_flag = TNO_econ_help_arrows_dismissed
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+
+			production_units_toggle_click = {
+				if = {
+					limit = { has_country_flag = economy_production_units_open }
+					clr_country_flag = economy_production_units_open
+				}
+				else = {
+					set_country_flag = economy_production_units_open
+				}
+				clr_country_flag = Econ_Sphere_Info_Tab_Open
+				clr_country_flag = Credit_Ladder_Tab_Open
+				set_country_flag = has_opened_pu_menu
+				update_production_unit_allocation = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+		}
+
+		## Econ Ledger ##
+		effects = {
+			econ_ledger_toggle_click = {
+				if = {
+					limit = { has_country_flag = economics_expenses_ledger_show }
+					clr_country_flag = economics_expenses_ledger_show
+				}
+				else = {
+					set_country_flag = economics_expenses_ledger_show
+				}
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+		}
+
+		### Shoulder - EconSphere / Credit Rating
+		#triggers = {
+		#	Econ_Sphere_Button_visible = {
+		#		has_variable = ECON_SPHERE_LEADER
+		#	}
+		#}
+
+		properties = {
+			Econ_Sphere_Button = { image = "[GetSphereIcon]" } # Replace with Econ Sphere scope whenever
+			Credit_Rating_Icon = {
+				frame = credit_rating
+				image = "[GetSphereCreditRatingType]"
+			}
+
+			# Credit_Rating_Icon = { frame = credit_rating }
+		}
+
+		effects = {
+			Econ_Sphere_Button_click = {
+				if = {
+					limit = { has_country_flag = Econ_Sphere_Info_Tab_Open }
+					clr_country_flag = Econ_Sphere_Info_Tab_Open
+				}
+				else = {
+					set_country_flag = Econ_Sphere_Info_Tab_Open
+					econ_recompile_all_spheres = yes
+					update_economy_tab = yes
+					add_to_variable = { TNO_economy_GUI_dirty = 1 }
+				}
+				clr_country_flag = economy_production_units_open
+				clr_country_flag = Credit_Ladder_Tab_Open
+			}
+
+			Credit_Rating_Icon_click = {
+				if = {
+					limit = { has_country_flag = Credit_Ladder_Tab_Open }
+					clr_country_flag = Credit_Ladder_Tab_Open
+				}
+				else = {
+					set_country_flag = Credit_Ladder_Tab_Open
+				}
+				clr_country_flag = economy_production_units_open
+				clr_country_flag = Econ_Sphere_Info_Tab_Open
+			}
+		}
+	}
+
+	# # Production Units Submenu
+	TNO_production_units_info_tab_2_parent = {
+		window_name = "production_units_info_tab_2_parent"
+		context_type = player_context
+		parent_window_token = trade_tab
+	}
+	
+	TNO_production_units_info_tab_2 = {
+		window_name = "production_units_info_tab_2"
+		context_type = player_context
+		parent_window_name = production_units_info_tab_2_parent_instance
+		dirty = TNO_production_gui_dirty
+
+		visible = {
+			has_country_flag = economy_production_units_open
+		}
+
+		dynamic_lists = {
+			production_squares = {
+				array = prod_units_production_display
+				change_scope = no
+				entry_container = production_units_production_square
+				index = square_idx
+			}
+		}
+
+		dynamic_lists = {
+			allocation_boxes = {
+				array = prod_units_allocation_types
+				value = good_type
+				entry_container = production_units_allocation_box
+			}
+		}
+
+		properties = {
+			box_pus = { frame = prod_units_display_amounts_frame^good_type }
+			box_pus_unfulfilled = { frame = prod_units_display_amounts_frame^good_type }
+			display_5_btn = { frame = prod_units_displaying_5^good_type }
+			display_10_btn = { frame = prod_units_displaying_10^good_type }
+			allocation_type_icon = {
+				image = "[Get_allocation_type_icon]"
+				frame = mils_mult
+			}
+			mini_workshop_icon_2 = { image = "GFX_production_units_mini_workshop_[?mils_mult]" }
+			tokenizer_btn_2 = { frame = mils_mult }
+			Econ_consumer_goods_slider_dot = { x = econ_consumer_goods_slider_dot_x }
+			Econ_consumer_goods_slider_limit_left = { x = econ_consumer_goods_maximal_x }
+			Econ_consumer_goods_slider_limit_right = { x = econ_consumer_goods_minimal_x }
+		}
+
+		triggers = {
+			box_pus_visible = {
+				set_temp_variable = { thresh = square_idx }
+				multiply_temp_variable = { thresh = prod_units_display_amounts^good_type }
+
+				set_temp_variable = { amnt = PU_consumer_goods }
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_temp_variable = { amnt = PU_civilian_factories }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_temp_variable = { amnt = PU_military_factories }
+				}
+
+				check_variable = { amnt > thresh }
+			}
+			box_pus_unfulfilled_visible = {
+				set_temp_variable = { thresh = square_idx }
+				multiply_temp_variable = { thresh = prod_units_display_amounts^good_type }
+
+				set_temp_variable = { amnt = PU_consumer_goods }
+				set_temp_variable = { wanted = PU_consumer_goods_desired }
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_temp_variable = { amnt = PU_civilian_factories }
+					set_temp_variable = { wanted = PU_civilian_factories_desired }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_temp_variable = { amnt = PU_military_factories }
+					set_temp_variable = { wanted = PU_military_factories_desired }
+				}
+
+				NOT = { check_variable = { amnt > thresh } }
+				check_variable = { wanted > thresh }
+			}
+
+			Econ_consumer_goods_slider_left_click_enabled = {
+				has_political_power > 29
+				check_variable = { econ_consumer_goods_slider_pct > econ_consumer_goods_minimal_pct }
+			}
+			Econ_consumer_goods_slider_right_click_enabled = {
+				has_political_power > 29
+				check_variable = { econ_consumer_goods_slider_pct < econ_consumer_goods_maximal_pct }
+			}
+			add_pus_btn_click_enabled = {
+				NOT = { check_variable = { good_type = 2 } }
+			}
+			sub_pus_btn_click_enabled = {
+				NOT = { check_variable = { good_type = 2 } }
+			}
+		}
+
+		effects = {
+			tokenizer_btn_2_click = {
+				if = {
+					limit = { has_country_flag = tokenizer_flag_enabled }
+					clr_country_flag = tokenizer_flag_enabled
+					subtract_from_variable = { mils_mult = 1 }
+					update_production_unit_allocation = yes
+				}
+				else = {
+					set_country_flag = tokenizer_flag_enabled
+					add_to_variable = { mils_mult = 1 }
+					update_production_unit_allocation = yes
+				}
+			}
+			production_units_close_btn_click = {
+				clr_country_flag = economy_production_units_open
+			}
+			add_pus_btn_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					add_to_variable = { PU_civilian_factories_desired = 1 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					add_to_variable = { PU_military_factories_desired = 1 }
+				}
+				else = {
+					add_to_variable = { PU_consumer_goods_desired = 1 }
+				}
+				update_production_unit_allocation = yes
+			}
+			add_pus_btn_control_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					add_to_variable = { PU_civilian_factories_desired = 5 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					add_to_variable = { PU_military_factories_desired = 5 }
+				}
+				else = {
+					add_to_variable = { PU_consumer_goods_desired = 5 }
+				}
+				update_production_unit_allocation = yes
+			}
+			add_pus_btn_shift_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					add_to_variable = { PU_civilian_factories_desired = 10 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					add_to_variable = { PU_military_factories_desired = 10 }
+				}
+				else = {
+					add_to_variable = { PU_consumer_goods_desired = 10 }
+				}
+				update_production_unit_allocation = yes
+			}
+			sub_pus_btn_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					subtract_from_variable = { PU_civilian_factories_desired = 1 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					subtract_from_variable = { PU_military_factories_desired = 1 }
+				}
+				else = {
+					subtract_from_variable = { PU_consumer_goods_desired = 1 }
+				}
+				update_production_unit_allocation = yes
+			}
+			sub_pus_btn_control_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					subtract_from_variable = { PU_civilian_factories_desired = 5 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					subtract_from_variable = { PU_military_factories_desired = 5 }
+				}
+				else = {
+					subtract_from_variable = { PU_consumer_goods_desired = 5 }
+				}
+				update_production_unit_allocation = yes
+			}
+			sub_pus_btn_shift_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					subtract_from_variable = { PU_civilian_factories_desired = 10 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					subtract_from_variable = { PU_military_factories_desired = 10 }
+				}
+				else = {
+					subtract_from_variable = { PU_consumer_goods_desired = 10 }
+				}
+				update_production_unit_allocation = yes
+			}
+
+			display_5_btn_click = {
+				if = {
+					limit = { check_variable = { prod_units_display_amounts^good_type = 5 } }
+					set_variable = { prod_units_display_amounts^good_type = 1 }
+					update_prod_units_display = yes
+				}
+				else = {
+					set_variable = { prod_units_display_amounts^good_type = 5 }
+					update_prod_units_display = yes
+				}
+			}
+			display_10_btn_click = {
+				if = {
+					limit = { check_variable = { prod_units_display_amounts^good_type = 10 } }
+					set_variable = { prod_units_display_amounts^good_type = 1 }
+					update_prod_units_display = yes
+				}
+				else = {
+					set_variable = { prod_units_display_amounts^good_type = 10 }
+					update_prod_units_display = yes
+				}
+			}
+
+			production_box_click = {
+				set_variable = { desired = square_idx }
+				add_to_variable = { desired = 1 }
+				multiply_variable = { desired = prod_units_display_amounts^good_type }
+				clamp_variable = { var = desired min = 0 }
+
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_variable = { PU_civilian_factories_desired = desired }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_variable = { PU_military_factories_desired = desired }
+				}
+
+				update_production_unit_allocation = yes
+			}
+
+			production_box_right_click = {
+				set_variable = { desired = square_idx }
+				multiply_variable = { desired = prod_units_display_amounts^good_type }
+				clamp_variable = { var = desired min = 0 }
+
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_variable = { PU_civilian_factories_desired = desired }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_variable = { PU_military_factories_desired = desired }
+				}
+
+				update_production_unit_allocation = yes
+			}
+
+			Econ_consumer_goods_slider_left_click = {
+				add_political_power = -30
+				subtract_from_variable = { econ_consumer_goods_slider_pct = 10 }
+				update_prod_units_display = yes
+				calculate_consumer_goods_need = yes
+
+				update_production_unit_allocation = yes
+			}
+			Econ_consumer_goods_slider_left_shift_click = {
+				add_political_power = -30
+				subtract_from_variable = { econ_consumer_goods_slider_pct = 10 }
+				update_prod_units_display = yes
+				calculate_consumer_goods_need = yes
+
+				update_production_unit_allocation = yes
+			}
+			Econ_consumer_goods_slider_left_control_click = {
+				add_political_power = -30
+				set_variable = { econ_consumer_goods_slider_pct = econ_consumer_goods_minimal_pct }
+				update_prod_units_display = yes
+				calculate_consumer_goods_need = yes
+
+				update_production_unit_allocation = yes
+			}
+			Econ_consumer_goods_slider_right_click = {
+				add_political_power = -30
+				add_to_variable = { econ_consumer_goods_slider_pct = 10 }
+				update_prod_units_display = yes
+				calculate_consumer_goods_need = yes
+
+				update_production_unit_allocation = yes
+			}
+			Econ_consumer_goods_slider_right_shift_click = {
+				add_political_power = -30
+				add_to_variable = { econ_consumer_goods_slider_pct = 10 }
+				update_prod_units_display = yes
+				calculate_consumer_goods_need = yes
+
+				update_production_unit_allocation = yes
+			}
+			Econ_consumer_goods_slider_right_control_click = {
+				add_political_power = -30
+				set_variable = { econ_consumer_goods_slider_pct = econ_consumer_goods_maximal_pct }
+				update_prod_units_display = yes
+				calculate_consumer_goods_need = yes
+
+				update_production_unit_allocation = yes
+			}
+			Econ_consumer_goods_set_button_real_click = {
+				if = {
+					limit = { has_political_power > 29 }
+					add_political_power = -30
+					set_variable = { econ_consumer_goods_slider_pct = button_idx }
+					multiply_variable = { econ_consumer_goods_slider_pct = 5 }
+					update_prod_units_display = yes
+					calculate_consumer_goods_need = yes
+
+					update_production_unit_allocation = yes
+				}
+			}
+		}
+	}
+
+	# # Credit Ratings Submenu
+	TNO_credit_ladder_tab = {
+		window_name = "credit_ladder_tab"
+		parent_window_token = trade_tab
+		context_type = player_context
+	}
+
+	TNO_credit_ladder_tab_inner = {
+		window_name = "credit_ladder_tab_inner"
+		parent_window_name = "credit_ladder_tab_instance"
+		context_type = player_context
+		dirty = TNO_economy_GUI_dirty
+
+		# ! TODO - Rough job, may need optimization
+		# | Commented out `econ_view_visible` flag requirement for now.
+		# | May be an issue, works for now.
+		# - Calph
+		visible = {
+			has_country_flag = Credit_Ladder_Tab_Open
+		}
+
+		effects = {
+			credit_ladder_tab_close_button_click = {
+				clr_country_flag = Credit_Ladder_Tab_Open
+			}
+		}
+
+		properties = {
+			Credit_Rating_Icon ={
+				frame = ladder_credit_rating
+				image = "[GetSphereCreditRatingType]"
+			}
+			credit_rating_box = {
+				image = "[GetCreditRatingLadderColor]"
+			}
+			credit_rating_bracket = {
+				image = "[GetCreditRatingLadderBracket]"
+			}
+			econ_credit_rating_bar = {
+				frame = credit_rating_progress
+			}
+		}
+
+		dynamic_lists = {
+			credit_rating_ladder = {
+				array = credit_rating_ladder
+				entry_container = credit_ladder_entry
+				value = ladder_credit_rating
+			}
+		}
+	}
+
+	# # Econ Sphere Submenu
+	TNO_economic_sphere_info_tab = {
+		window_name = "economic_sphere_info_tab"
+		parent_window_token = trade_tab #this absolutely fucks it up
+		context_type = player_context
+	}
+
+	TNO_economic_sphere_info_tab_inner = {
+		window_name = "economic_sphere_info_tab_inner"
+		parent_window_name = "economic_sphere_info_tab_instance"
+		context_type = player_context
+		dirty = TNO_economy_GUI_dirty
+
+		# ! TODO - Rough job, may need optimization
+		# | Commented out `econ_view_visible` flag requirement for now.
+		# | May be an issue, works for now.
+		# - Calph
+		visible = {
+			has_country_flag = Econ_Sphere_Info_Tab_Open
+			has_variable = ECON_SPHERE_LEADER
+		}
+
+		effects = {
+			econ_sphere_tab_close_button_click = {
+				clr_country_flag = Econ_Sphere_Info_Tab_Open
+			}
+		}
+
+		triggers = {
+
+		}
+
+		dynamic_lists = {
+			econ_sphere_members = {
+				array = ECON_SPHERE_LEADER:econ_sphere_members
+				change_scope = yes
+				entry_container = econ_sphere_members_entry
+			}
+			econ_sphere_top_10 = {
+				array = global.econ_countries
+				change_scope = yes
+				entry_container = econ_sphere_members_entry
+			}
+		}
+
+		properties = {
+			econ_sphere_entry_flag = {
+				image = "[This.GetFlag]"
+			}
+		}
+	}
+	TNO_economic_sphere_sphereless_info_tab = {
+		window_name = "economic_sphere_sphereless_info_tab"
+		#parent_window_token = trade_tab #this absolutely fucks it up
+		context_type = player_context
+		dirty = TNO_economy_GUI_dirty
+
+		# ! TODO - Rough job, may need optimization
+		# | Commented out `econ_view_visible` flag requirement for now.
+		# | May be an issue, works for now.
+		# - Calph
+		visible = {
+			has_country_flag = Econ_Sphere_Info_Tab_Open
+			not = { has_variable = ECON_SPHERE_LEADER }
+		}
+
+		effects = {
+			econ_sphere_tab_close_button_click = {
+				clr_country_flag = Econ_Sphere_Info_Tab_Open
+			}
+		}
+
+		triggers = {
+
+		}
+
+		dynamic_lists = {
+			econ_sphere_members = {
+				array = ECON_SPHERE_LEADER:econ_sphere_members
+				change_scope = yes
+				entry_container = econ_sphere_members_entry
+			}
+			econ_sphere_top_10 = {
+				array = global.econ_countries
+				change_scope = yes
+				entry_container = econ_sphere_members_entry
+			}
+		}
+
+		properties = {
+			econ_sphere_entry_flag = {
+				image = "[This.GetFlag]"
+			}
+		}
+	}
+}
+
+# # Econ Macro Menu
+scripted_gui = {
+	# # Main
+	TNO_economy = {
+		window_name = "economy_view"
+		#context_type = player_context
+		#parent_window_token = top_bar
+		#dirty = TNO_economy_GUI_dirty
+		context_type = player_context
+		parent_window_token = trade_tab
+
+		visible = {
+			econ_macroView = yes
+			econ_can_use_economy_system = yes
+		}
+
+		### | INDEX | ###
+		# | Top
+		# | Alerts
+		# | Line Graphs
+		# | Deficit/Surplus
+		# | Central Bank
+		# | Reserves
+		# | War Taxes
+		# | Econ Type
+		# | Sliders
+
+		### Alerts
+		triggers = {
+			alerts_realGrowth_active_icon_visible = {
+				check_variable = {
+					var = GDP_growth_real
+					value = 0
+					compare = less_than
+				}
+			}
+			alerts_inflation_active_icon_visible = {
+				check_variable = {
+					var = clamped_inflation_rate
+					value = 10
+					compare = greater_than_or_equals
+				}
+			}
+			alerts_deficit_active_icon_visible = {
+				check_variable = { deficit_to_GDP_ratio < -9.999 }
+			}
+			alerts_debt_active_icon_visible = {
+				set_temp_variable = { temp_debt_ceiling = debt_ceiling }
+				subtract_from_temp_variable = { temp_debt_ceiling = debt_to_GDP_ratio }
+
+				check_variable = { temp_debt_ceiling < 0.099 }
+			}
+			alerts_reserves_active_icon_visible = {
+				check_variable = { reserves_as_GDP_percent > 0.1 }
+			}
+			alerts_crisis_active_icon_visible = {
+				has_country_flag = ECON_ONGOING_FISCAL_CRISIS
+			}
+		}
+
+
+		### Line Graphs
+		dynamic_lists = {
+			# Inflation
+			inflation_line_segments = {
+				array = inflation_graph_frames
+				entry_container = econ_line_segment_red
+				value = segment_frame
+				index = segment_idx
+			}
+			inflation_value_labels = {
+				array = inflation_y_label
+				entry_container = econ_line_labels_inflation
+			}
+
+			# GDP
+			gdp_line_segments = {
+				array = gdp_graph_frames
+				entry_container = econ_line_segment_green
+				value = segment_frame
+				index = segment_idx
+			}
+			gdp_value_labels = {
+				array = GDP_y_label
+				entry_container = econ_line_labels_gdp
+			}
+
+			# Debt
+			debt_to_gdp_line_segments = {
+				array = debt_to_gdp_frames
+				entry_container = econ_line_segment_red
+				value = segment_frame
+				index = segment_idx
+			}
+			debt_value_labels = {
+				array = debt_y_label
+				entry_container = econ_line_labels_debt
+			}
+		}
+
+		properties = {
+			line_segment = { frame = segment_frame }
+			econ_freedom_index_bar = {
+				frame = economic_centralization
+			}
+			econ_type_icon = {
+				image = "[GetEconomyTypeGFX]"
+			}
+		}
+
+		triggers = {
+			label_y_visible = {
+				set_temp_variable = { si = segment_idx }
+				modulo_temp_variable = { si = 4 }
+				check_variable = { si = 3 }
+			}
+		}
+
+
+		### Central Bank
+		dynamic_lists = {
+			Econ_deficit_monetization_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = deficit_monetization_set_button
+				value = button_idx
+			}
+		}
+
+		properties = {
+			Econ_deficit_monetization_slider_dot = { x = econ_deficit_monetization_slider_dot_x }
+
+			Econ_deficit_monetization_slider_limit_left = { x = econ_deficit_monetization_maximal_x }
+
+			Econ_deficit_monetization_slider_limit_right = { x = econ_deficit_monetization_minimal_x }
+
+			econ_tab_central_bank_display_policy_btn = { frame = econ_tab_central_bank_display_policy_btn_frame }
+
+			# Fix later
+			centralBank_policyDisplay_lineTimer = { frame = central_bank_effectiveness_display }
+
+			centralBank_policyDisplay_icon = {
+				image = "[Get_Central_Bank_Policy_icon]"
+			}
+		}
+
+		triggers = {
+			Econ_deficit_monetization_slider_left_click_enabled = {
+				check_variable = { deficit > -0.001 }
+				check_variable = { econ_deficit_monetization_maximal_pct > 0 }
+			}
+			Econ_deficit_monetization_slider_right_click_enabled = {
+				check_variable = { deficit > -0.001 }
+				check_variable = { econ_deficit_monetization_maximal_pct > 0 }
+			}
+			Econ_deficit_monetization_set_button_real_click_enabled = {
+				check_variable = { deficit > -0.001 }
+				check_variable = { econ_deficit_monetization_maximal_pct > 0 }
+			}
+
+			centralBank_policyDisplay_lineTimer_complete_visible = {
+				always = no
+			}
+		}
+
+		effects = {
+			Econ_deficit_monetization_slider_left_click = {
+				set_variable = { econ_deficit_monetization_before_pct = econ_deficit_monetization_slider_pct }
+				subtract_from_variable = { econ_deficit_monetization_slider_pct = 1 }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_deficit_monetization_slider_button_left_tt
+			}
+			Econ_deficit_monetization_slider_left_shift_click = {
+				set_variable = { econ_deficit_monetization_before_pct = econ_deficit_monetization_slider_pct }
+				subtract_from_variable = { econ_deficit_monetization_slider_pct = 10 }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_deficit_monetization_slider_button_left_tt
+			}
+			Econ_deficit_monetization_slider_left_control_click = {
+				set_variable = { econ_deficit_monetization_before_pct = econ_deficit_monetization_slider_pct }
+				set_variable = { econ_deficit_monetization_slider_pct = econ_deficit_monetization_minimal_pct }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_deficit_monetization_slider_button_left_tt
+			}
+			Econ_deficit_monetization_slider_right_click = {
+				set_variable = { econ_deficit_monetization_before_pct = econ_deficit_monetization_slider_pct }
+				add_to_variable = { econ_deficit_monetization_slider_pct = 1 }
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_deficit_monetization_slider_right_shift_click = {
+				set_variable = { econ_deficit_monetization_before_pct = econ_deficit_monetization_slider_pct }
+				add_to_variable = { econ_deficit_monetization_slider_pct = 10 }
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_deficit_monetization_slider_right_control_click = {
+				set_variable = { econ_deficit_monetization_before_pct = econ_deficit_monetization_slider_pct }
+				set_variable = { econ_deficit_monetization_slider_pct = econ_deficit_monetization_maximal_pct }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_deficit_monetization_slider_button_left_tt
+			}
+			Econ_deficit_monetization_set_button_real_click = {
+				set_variable = { econ_deficit_monetization_before_pct = econ_deficit_monetization_slider_pct }
+				set_variable = { econ_deficit_monetization_slider_pct = button_idx }
+				multiply_variable = { econ_deficit_monetization_slider_pct = 5 }
+				divide_variable = { econ_deficit_monetization_slider_pct = 3 }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_deficit_monetization_slider_button_left_tt
+			}
+			centralBank_policyDisplay_selector_click = {
+				if = {
+					limit = { has_country_flag = central_bank_policies_tab_open }
+					set_variable = { econ_tab_central_bank_display_policy_btn_frame = 1 }
+					clr_country_flag = central_bank_policies_tab_open
+				} else = {
+					set_variable = { econ_tab_central_bank_display_policy_btn_frame = 2 }
+					set_country_flag = central_bank_policies_tab_open
+				}
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+		}
+		
+		effects = {
+			econ_pie_num_exp_toggle_click = {
+				if = {
+					limit = {
+						check_variable = { exp_show_pct = 2 }
+					}
+					set_variable = { exp_show_pct = 1 }
+				}
+				else = {
+					set_variable = { exp_show_pct = 2 }
+				}
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			econ_pie_num_rev_toggle_click = {
+				if = {
+					limit = {
+						check_variable = { rev_show_pct = 2 }
+					}
+					set_variable = { rev_show_pct = 1 }
+				}
+				else = {
+					set_variable = { rev_show_pct = 2 }
+				}
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+		}
+		
+		triggers = {
+			@x_amplitude = 25
+			@y_amplitude = -25
+		
+			economic_military_expenditures_txt_visible = {
+				set_temp_variable = { angle = expenditures_mil_pie }
+				divide_temp_variable = { angle = 2 }
+				multiply_temp_variable = { angle = 3.6 }
+				
+				TNO_trig_run_sin = yes
+				set_temp_variable = { expenditures_mil_pie_x = result_s }
+				multiply_temp_variable = { expenditures_mil_pie_x = @x_amplitude }
+				add_to_temp_variable = { expenditures_mil_pie_x = 32 }
+				
+				TNO_trig_run_cos = yes
+				set_temp_variable = { expenditures_mil_pie_y = result_c }
+				multiply_temp_variable = { expenditures_mil_pie_y = @y_amplitude }
+				add_to_temp_variable = { expenditures_mil_pie_y = 32 }
+				
+				check_variable = { var = military_expenditures_percent value = 5 compare = greater_than_or_equals }
+				check_variable = { exp_show_pct = 2 }
+			}
+			economic_civilian_expenditures_txt_visible = {
+				set_temp_variable = { angle = expenditures_civ_pie }
+				subtract_from_temp_variable = { angle = expenditures_mil_pie }
+				divide_temp_variable = { angle = 2 }
+				add_to_temp_variable = { angle = expenditures_mil_pie }
+				multiply_temp_variable = { angle = 3.6 }
+				
+				TNO_trig_run_sin = yes
+				set_temp_variable = { expenditures_civ_pie_x = result_s }
+				multiply_temp_variable = { expenditures_civ_pie_x = @x_amplitude }
+				add_to_temp_variable = { expenditures_civ_pie_x = 32 }
+				
+				TNO_trig_run_cos = yes
+				set_temp_variable = { expenditures_civ_pie_y = result_c }
+				multiply_temp_variable = { expenditures_civ_pie_y = @y_amplitude }
+				add_to_temp_variable = { expenditures_civ_pie_y = 32 }
+				
+				check_variable = { var = civilian_expenditures_percent value = 5 compare = greater_than_or_equals }
+				check_variable = { exp_show_pct = 2 }
+			}
+			economic_debt_expenditures_txt_visible = {
+				set_temp_variable = { angle = expenditures_debt_pie }
+				subtract_from_temp_variable = { angle = expenditures_civ_pie }
+				divide_temp_variable = { angle = 2 }
+				add_to_temp_variable = { angle = expenditures_civ_pie }
+				multiply_temp_variable = { angle = 3.6 }
+				
+				TNO_trig_run_sin = yes
+				set_temp_variable = { expenditures_debt_pie_x = result_s }
+				multiply_temp_variable = { expenditures_debt_pie_x = @x_amplitude }
+				add_to_temp_variable = { expenditures_debt_pie_x = 32 }
+				
+				TNO_trig_run_cos = yes
+				set_temp_variable = { expenditures_debt_pie_y = result_c }
+				multiply_temp_variable = { expenditures_debt_pie_y = @y_amplitude }
+				add_to_temp_variable = { expenditures_debt_pie_y = 32 }
+				
+				check_variable = { var = debt_servicing_expenditures_percent value = 5 compare = greater_than_or_equals }
+				check_variable = { exp_show_pct = 2 }
+			}
+			economic_misc_expenditures_txt_visible = {
+				set_temp_variable = { angle = expenditures_mis_pie }
+				subtract_from_temp_variable = { angle = expenditures_debt_pie }
+				divide_temp_variable = { angle = 2 }
+				add_to_temp_variable = { angle = expenditures_debt_pie }
+				multiply_temp_variable = { angle = 3.6 }
+				
+				TNO_trig_run_sin = yes
+				set_temp_variable = { expenditures_mis_pie_x = result_s }
+				multiply_temp_variable = { expenditures_mis_pie_x = @x_amplitude }
+				add_to_temp_variable = { expenditures_mis_pie_x = 32 }
+				
+				TNO_trig_run_cos = yes
+				set_temp_variable = { expenditures_mis_pie_y = result_c }
+				multiply_temp_variable = { expenditures_mis_pie_y = @y_amplitude }
+				add_to_temp_variable = { expenditures_mis_pie_y = 32 }
+				
+				check_variable = { var = misc_expenditures_percent value = 5 compare = greater_than_or_equals }
+				check_variable = { exp_show_pct = 2 }
+			}
+		
+			economic_income_revenue_txt_visible = {
+				set_temp_variable = { angle = revenue_income_pie }
+				divide_temp_variable = { angle = 2 }
+				multiply_temp_variable = { angle = 3.6 }
+				
+				TNO_trig_run_sin = yes
+				set_temp_variable = { revenue_income_pie_x = result_s }
+				multiply_temp_variable = { revenue_income_pie_x = @x_amplitude }
+				add_to_temp_variable = { revenue_income_pie_x = 32 }
+				
+				TNO_trig_run_cos = yes
+				set_temp_variable = { revenue_income_pie_y = result_c }
+				multiply_temp_variable = { revenue_income_pie_y = @y_amplitude }
+				add_to_temp_variable = { revenue_income_pie_y = 32 }
+				
+				check_variable = { var = income_revenue_percent value = 5 compare = greater_than_or_equals }
+				check_variable = { rev_show_pct = 2 }
+			}
+			economic_business_revenue_txt_visible = {
+				set_temp_variable = { angle = revenue_business_pie }
+				subtract_from_temp_variable = { angle = revenue_income_pie }
+				divide_temp_variable = { angle = 2 }
+				add_to_temp_variable = { angle = revenue_income_pie }
+				multiply_temp_variable = { angle = 3.6 }
+				
+				TNO_trig_run_sin = yes
+				set_temp_variable = { revenue_business_pie_x = result_s }
+				multiply_temp_variable = { revenue_business_pie_x = @x_amplitude }
+				add_to_temp_variable = { revenue_business_pie_x = 32 }
+				
+				TNO_trig_run_cos = yes
+				set_temp_variable = { revenue_business_pie_y = result_c }
+				multiply_temp_variable = { revenue_business_pie_y = @y_amplitude }
+				add_to_temp_variable = { revenue_business_pie_y = 32 }
+				
+				check_variable = { var = business_revenue_percent value = 5 compare = greater_than_or_equals }
+				check_variable = { rev_show_pct = 2 }
+			}
+			economic_excise_revenue_txt_visible = {
+				set_temp_variable = { angle = revenue_excise_pie }
+				subtract_from_temp_variable = { angle = revenue_business_pie }
+				divide_temp_variable = { angle = 2 }
+				add_to_temp_variable = { angle = revenue_business_pie }
+				multiply_temp_variable = { angle = 3.6 }
+				
+				TNO_trig_run_sin = yes
+				set_temp_variable = { revenue_excise_pie_x = result_s }
+				multiply_temp_variable = { revenue_excise_pie_x = @x_amplitude }
+				add_to_temp_variable = { revenue_excise_pie_x = 32 }
+				
+				TNO_trig_run_cos = yes
+				set_temp_variable = { revenue_excise_pie_y = result_c }
+				multiply_temp_variable = { revenue_excise_pie_y = @y_amplitude }
+				add_to_temp_variable = { revenue_excise_pie_y = 32 }
+				
+				check_variable = { var = excise_revenue_percent value = 5 compare = greater_than_or_equals }
+				check_variable = { rev_show_pct = 2 }
+			}
+			economic_other_revenue_percent_txt_visible = {
+				set_temp_variable = { angle = revenue_other_pie }
+				subtract_from_temp_variable = { angle = revenue_excise_pie }
+				divide_temp_variable = { angle = 2 }
+				add_to_temp_variable = { angle = revenue_excise_pie }
+				multiply_temp_variable = { angle = 3.6 }
+				
+				TNO_trig_run_sin = yes
+				set_temp_variable = { revenue_other_pie_x = result_s }
+				multiply_temp_variable = { revenue_other_pie_x = @x_amplitude }
+				add_to_temp_variable = { revenue_other_pie_x = 32 }
+				
+				TNO_trig_run_cos = yes
+				set_temp_variable = { revenue_other_pie_y = result_c }
+				multiply_temp_variable = { revenue_other_pie_y = @y_amplitude }
+				add_to_temp_variable = { revenue_other_pie_y = 32 }
+				
+				check_variable = { var = other_revenue_percent value = 5 compare = greater_than_or_equals }
+				check_variable = { rev_show_pct = 2 }
+			}
+		}
+
+		### Deficit/Surplus
+		properties = {
+			economic_military_expenditures_pie = { frame = expenditures_mil_pie }
+			economic_civilian_expenditures_pie = { frame = expenditures_civ_pie }
+			economic_debt_expenditures_pie = { frame = expenditures_debt_pie }
+			economic_misc_expenditures_pie = { frame = expenditures_mis_pie }
+			
+			economic_military_expenditures_txt = {
+				x = expenditures_mil_pie_x
+				y = expenditures_mil_pie_y
+			}
+			economic_civilian_expenditures_txt = {
+				x = expenditures_civ_pie_x
+				y = expenditures_civ_pie_y
+			}
+			economic_debt_expenditures_txt = {
+				x = expenditures_debt_pie_x
+				y = expenditures_debt_pie_y
+			}
+			economic_misc_expenditures_txt = {
+				x = expenditures_mis_pie_x
+				y = expenditures_mis_pie_y
+			}
+
+			economic_income_revenue_pie = { frame = revenue_income_pie }
+			economic_business_revenue_pie = { frame = revenue_business_pie }
+			economic_excise_revenue_pie = { frame = revenue_excise_pie }
+			economic_other_revenue_pie = { frame = revenue_other_pie }
+			
+			economic_income_revenue_txt = {
+				x = revenue_income_pie_x
+				y = revenue_income_pie_y
+			}
+			economic_business_revenue_txt = {
+				x = revenue_business_pie_x
+				y = revenue_business_pie_y
+			}
+			economic_excise_revenue_txt = {
+				x = revenue_excise_pie_x
+				y = revenue_excise_pie_y
+			}
+			economic_other_revenue_percent_txt = {
+				x = revenue_other_pie_x
+				y = revenue_other_pie_y
+			}
+			
+			econ_pie_num_exp_toggle = {
+				frame = exp_show_pct
+			}
+			econ_pie_num_rev_toggle = {
+				frame = rev_show_pct
+			}
+		}
+
+		triggers = {
+			civ_austerity_button_click_enabled = {
+				NOT = {
+					has_idea = civilian_budget_cuts
+				}
+				has_political_power > 15
+			}
+			mil_austerity_button_click_enabled = {
+				NOT = {
+					has_idea = military_budget_cuts
+				}
+				has_political_power > 15
+			}
+
+
+			tax_cuts_button_click_enabled = {
+				custom_trigger_tooltip = {
+					not = { has_country_flag = temp_tax_change }
+					tooltip = recent_tax_button_used
+				}
+			}
+			tax_hike_button_click_enabled = {
+				custom_trigger_tooltip = {
+					not = { has_country_flag = temp_tax_change }
+					tooltip = recent_tax_button_used
+				}
+				has_political_power > 49.99
+			}
+		}
+
+		effects = {
+			civ_austerity_button_click = {
+				add_timed_idea = {
+					idea = civilian_budget_cuts
+					days = 180
+				}
+				add_political_power = -15
+				update_economy_tab = yes
+			}
+
+			mil_austerity_button_click = {
+				add_timed_idea = {
+					idea = military_budget_cuts
+					days = 180
+				}
+				add_political_power = -15
+				update_economy_tab = yes
+			}
+			tax_hike_button_click = {
+				set_variable = { tax_hike_value_income = modifier@income_tax_rate_modifier_factor }
+				add_to_variable = { tax_hike_value_income = income_tax_rate }
+				multiply_variable = { tax_hike_value_income = 0.15 }
+
+				set_variable = { tax_hike_value_business = modifier@business_tax_rate_modifier }
+				add_to_variable = { tax_hike_value_business = business_tax_rate }
+				multiply_variable = { tax_hike_value_business = 0.15 }
+
+				set_variable = { tax_hike_value_sales = modifier@sales_tax_rate_modifier }
+				add_to_variable = { tax_hike_value_sales = sales_tax_rate }
+				multiply_variable = { tax_hike_value_sales = 0.15 }
+
+				if = { limit = { check_variable = { tax_hike_value_sales < 0.02 } }
+					set_variable = { tax_hike_value_sales = 0.02 }
+				}
+
+				if = { limit = { check_variable = { tax_hike_value_business < 0.02 } }
+					set_variable = { tax_hike_value_business = 0.02 }
+				}
+
+				if = { limit = { check_variable = { tax_hike_value_income < 0.02 } }
+					set_variable = { tax_hike_value_income = 0.02 }
+				}
+				add_dynamic_modifier = {
+					modifier = tax_hike_dynmod
+					days = 180
+				}
+				set_country_flag = {
+					flag = temp_tax_change
+					days = 180
+					value = 1
+				}
+				add_political_power = -50
+				update_economy_tab = yes
+			}
+			tax_cuts_button_click = {
+				set_variable = { tax_cut_value_income = modifier@income_tax_rate_modifier_factor }
+				add_to_variable = { tax_cut_value_income = income_tax_rate }
+				multiply_variable = { tax_cut_value_income = 0.15 }
+
+				set_variable = { tax_cut_value_business = modifier@business_tax_rate_modifier }
+				add_to_variable = { tax_cut_value_business = business_tax_rate }
+				multiply_variable = { tax_cut_value_business = 0.15 }
+
+				set_variable = { tax_cut_value_sales = modifier@sales_tax_rate_modifier }
+				add_to_variable = { tax_cut_value_sales = sales_tax_rate }
+				multiply_variable = { tax_cut_value_sales = 0.15 }
+
+				if = { limit = { check_variable = { tax_cut_value_sales < 0.02 } }
+					set_variable = { tax_cut_value_sales = 0.02 }
+				}
+
+				if = { limit = { check_variable = { tax_cut_value_business < 0.02 } }
+					set_variable = { tax_cut_value_business = 0.02 }
+				}
+
+				if = { limit = { check_variable = { tax_cut_value_income < 0.02 } }
+					set_variable = { tax_cut_value_income = 0.02 }
+				}
+				multiply_variable = { tax_cut_value_income = -1 }
+				multiply_variable = { tax_cut_value_business = -1 }
+				multiply_variable = { tax_cut_value_sales = -1 }
+				add_dynamic_modifier = {
+					modifier = tax_cut_dynmod
+					days = 180
+				}
+				set_country_flag = {
+					flag = temp_tax_change
+					days = 180
+					value = 1
+				}
+				add_political_power = 20
+				update_economy_tab = yes
+			}
+		}
+
+
+		### Reserves
+		triggers = {
+			reserves_actions_buttonPlus_click_enabled = {
+				NOT = {
+					check_variable = { money_reserves = 0 }
+				}
+			}
+			reserves_actions_buttonMinus_click_enabled = {
+				NOT = {
+					check_variable = { money_reserves = 0 }
+				}
+			}
+			reserves_actions_button0_click_enabled = {
+				NOT = {
+					check_variable = { money_reserves = 0 }
+				}
+			}
+			reserves_actions_buttonInf_click_enabled = {
+				NOT = {
+					check_variable = { money_reserves = 0 }
+				}
+			}
+			reserves_actions_buttonPayDebt_click_enabled = {
+				NOT = {
+					check_variable = { reserves_management_amount = 0 }
+				}
+				NOT = {
+					check_variable = { national_debt = 0 }
+				}
+			}
+			reserves_actions_buttonInvest_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Econ_Stimulus_Active_tt
+					NOT = {
+						has_dynamic_modifier = { modifier = econ_stimulus_dynamic_modifier }
+					}
+				}
+				NOT = {
+					check_variable = { reserves_management_amount = 0 }
+				}
+			}
+		}
+
+		effects = {
+			reserves_actions_buttonPlus_control_click = {
+				add_to_variable = { reserves_management_amount = 0.01 }
+				clamp_variable = { var = reserves_management_amount max = money_reserves }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_buttonPlus_right_click = {
+				add_to_variable = { reserves_management_amount = 0.1 }
+				clamp_variable = { var = reserves_management_amount max = money_reserves }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_buttonPlus_click = {
+				add_to_variable = { reserves_management_amount = 1 }
+				clamp_variable = { var = reserves_management_amount max = money_reserves }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_buttonPlus_shift_click = {
+				add_to_variable = { reserves_management_amount = 10 }
+				clamp_variable = { var = reserves_management_amount max = money_reserves }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_buttonPlus_alt_click = {
+				add_to_variable = { reserves_management_amount = 100 }
+				clamp_variable = { var = reserves_management_amount max = money_reserves }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_buttonMinus_control_click = {
+				add_to_variable = { reserves_management_amount = -0.01 }
+				clamp_variable = { var = reserves_management_amount min = 0 }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_buttonMinus_right_click = {
+				add_to_variable = { reserves_management_amount = -0.1 }
+				clamp_variable = { var = reserves_management_amount min = 0 }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_buttonMinus_click = {
+				add_to_variable = { reserves_management_amount = -1 }
+				clamp_variable = { var = reserves_management_amount min = 0 }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_buttonMinus_shift_click = {
+				add_to_variable = { reserves_management_amount = -10 }
+				clamp_variable = { var = reserves_management_amount min = 0 }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_buttonMinus_alt_click = {
+				add_to_variable = { reserves_management_amount = -100 }
+				clamp_variable = { var = reserves_management_amount min = 0 }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_button0_click = {
+				set_variable = { reserves_management_amount = 0 }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			reserves_actions_buttonInf_click = {
+				set_variable = { reserves_management_amount = money_reserves }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+
+			reserves_actions_buttonPayDebt_click = {
+				if = {
+					limit = {
+						check_variable = {
+							var = reserves_management_amount
+							value = national_debt
+							compare = less_than_or_equals
+						}
+					}
+					subtract_from_variable = { national_debt = reserves_management_amount }
+					subtract_from_variable = { money_reserves = reserves_management_amount }
+				}
+				else = {
+					clamp_variable = { var = reserves_management_amount max = national_debt }
+					subtract_from_variable = { money_reserves = national_debt }
+					set_variable = { national_debt = 0 }
+				}
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+				set_variable = { reserves_management_amount = 0 }
+				update_economy_tab = yes
+			}
+
+			reserves_actions_buttonInvest_click = {
+				if = {
+					limit = {
+						check_variable = { reserves_management_amount > 0 }
+						NOT = { has_dynamic_modifier = { modifier = econ_stimulus_dynamic_modifier } }
+					}
+					set_temp_variable = { reserves_GDP_effect = reserves_management_amount }
+					divide_temp_variable = { reserves_GDP_effect = GDP } # how much reserves a % of GDP are we planning on spending
+
+					set_temp_variable = { temp_reserves_construction_speed_effect = reserves_GDP_effect }
+					multiply_temp_variable = { reserves_GDP_effect = 5 } # maths time (this is cheap way of making it 500% more expensive)
+					add_to_temp_variable = { reserves_GDP_effect = 10 }
+					set_temp_variable = { reserves_GDP_effect_final = -150 }
+					divide_temp_variable = { reserves_GDP_effect_final = reserves_GDP_effect }
+					add_to_temp_variable = { reserves_GDP_effect_final = 15 }
+					set_variable = { reserves_stimuli_effect = reserves_GDP_effect_final }
+
+					multiply_temp_variable = { temp_reserves_construction_speed_effect = 50 } #maths time (this is a cheap way of making it 500% more expensive)
+					add_to_temp_variable = { temp_reserves_construction_speed_effect = 20 }
+					set_temp_variable = { temp_reserves_construction_speed_effect_final = -1000 }
+					divide_temp_variable = { temp_reserves_construction_speed_effect_final = temp_reserves_construction_speed_effect }
+					add_to_temp_variable = { temp_reserves_construction_speed_effect_final = 50 }
+					divide_temp_variable = { temp_reserves_construction_speed_effect_final = 100 }
+
+					set_variable = { reserves_construction_speed_effect = temp_reserves_construction_speed_effect_final }
+					custom_effect_tooltip = econ_stimulus_effect_calculation_tt
+					hidden_effect = { add_dynamic_modifier = { modifier = econ_stimulus_dynamic_modifier days = 91 } }
+					subtract_from_variable = { money_reserves = reserves_management_amount }
+
+					add_to_variable = { TNO_economy_GUI_dirty = 1 }
+					set_variable = { reserves_management_amount = 0 }
+					update_economy_tab = yes
+				}
+
+				if = {
+					limit = {
+						check_variable = {
+							var = reserves_management_amount
+							value = 0
+							compare = greater_than_or_equals
+						}
+						has_dynamic_modifier = { modifier = econ_stimulus_dynamic_modifier }
+					}
+					custom_effect_tooltip = econ_stimulus_effect_post_application_calculation_tt
+					add_to_variable = { TNO_economy_GUI_dirty = 1 }
+				}
+			}
+
+			debt_autopayment_checkmark_click = {
+				if = {
+					limit = {
+						has_country_flag = econ_debt_auto_payment
+					}
+					set_variable = { econ_debt_auto_payment_var = 1 }
+					clr_country_flag = econ_debt_auto_payment
+				}
+				else = {
+					set_country_flag = econ_debt_auto_payment
+					set_variable = { econ_debt_auto_payment_var = 2 }
+				}
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+				update_economy_tab = yes
+			}
+		}
+
+		properties = {
+			debt_autopayment_checkmark = { frame = econ_debt_auto_payment_var }
+		}
+
+		### War Taxes
+		triggers = {
+			wt_actions_activate_button_click_enabled = {
+				if = {
+					limit = { NOT = { has_country_flag = war_taxes_enabled } }
+					has_political_power > 49.99
+					has_war = yes
+				}
+				else_if = {
+					limit = { has_country_flag = war_taxes_enabled }
+					has_war = yes
+				}
+			}
+		}
+		effects = {
+			wt_actions_activate_button_click = {
+				if = {
+					limit = { NOT = { has_country_flag = war_taxes_enabled } }
+					set_country_flag = war_taxes_enabled
+					add_political_power = -50
+					set_variable = { wt_status_frame = 2 }
+				}
+				else = {
+					clr_country_flag = war_taxes_enabled
+					set_variable = { wt_status_frame = 1 }
+				}
+				war_taxes_check = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+		}
+		properties = {
+			wt_actions_activate_button = {
+				frame = wt_status_frame
+			}
+			wt_icon = {
+				frame = wt_status_frame
+			}
+		}
+		### Sliders
+		triggers = {
+			Econ_nuclear_expenditures_slider_right_click_enabled = {
+				has_nuclear_arsenal = yes
+			}
+			Econ_nuclear_expenditures_slider_left_click_enabled = {
+				has_nuclear_arsenal = yes
+			}
+			Econ_nuclear_expenditures_set_button_real_click_enabled = {
+				has_nuclear_arsenal = yes
+			}
+			Econ_naval_expenditures_set_button_real_click_enabled = {
+				NOT = {
+					check_variable = { num_ships = 0 }
+				}
+			}
+			Econ_naval_expenditures_slider_left_click_enabled = {
+				NOT = {
+					check_variable = { num_ships = 0 }
+				}
+			}
+			Econ_naval_expenditures_slider_right_click_enabled = {
+				NOT = {
+					check_variable = { num_ships = 0 }
+				}
+			}
+		}
+
+		dynamic_lists = {
+			economy_sliders_grid = {
+				array = econ_sliders_grid_array
+				entry_container = "economy_slides_gui_[?econ_sliders_grid_array^0]"
+			}
+			Econ_army_expenditures_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = army_expenditures_set_button
+				value = button_idx
+			}
+			Econ_army_maintenance_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = army_maintenance_set_button
+				value = button_idx
+			}
+			Econ_army_R_D_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = army_R_D_set_button
+				value = button_idx
+			}
+			econ_army_logistics_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = army_training_set_button
+				value = button_idx
+			}
+			econ_army_procurement_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = army_supervision_set_button
+				value = button_idx
+			}
+
+			Econ_naval_expenditures_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = naval_expenditures_set_button
+				value = button_idx
+			}
+			Econ_nuclear_expenditures_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = nuclear_expenditures_set_button
+				value = button_idx
+			}
+
+			Econ_social_expenditures_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = social_expenditures_set_button
+				value = button_idx
+			}
+			Econ_social_healthcare_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = social_healthcare_set_button
+				value = button_idx
+			}
+			Econ_social_pensions_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = social_pensions_set_button
+				value = button_idx
+			}
+			Econ_social_education_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = social_education_set_button
+				value = button_idx
+			}
+			Econ_social_unemployment_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = social_unemployment_set_button
+				value = button_idx
+			}
+
+			Econ_admin_expenditures_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = admin_expenditures_set_button
+				value = button_idx
+			}
+			Econ_admin_security_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = admin_security_set_button
+				value = button_idx
+			}
+			Econ_admin_regulations_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = admin_regulations_set_button
+				value = button_idx
+			}
+			Econ_admin_bureaucracy_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = admin_bureaucracy_set_button
+				value = button_idx
+			}
+
+			Econ_research_expenditures_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = research_expenditures_set_button
+				value = button_idx
+			}
+			Econ_research_science_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = research_science_set_button
+				value = button_idx
+			}
+			Econ_research_facilities_set_buttons = {
+				array = expenditures_set_buttons
+				change_scope = no
+				entry_container = research_facilities_set_button
+				value = button_idx
+			}
+		}
+
+		effects = {
+			close_economy_slides_click = {
+				set_variable = { econ_sliders_grid_array^0 = 0 }
+				add_to_variable = { TNO_economy_GUI_dirty = 0.01 }
+			}
+			Econ_army_expenditures_details_button_click = {
+				set_variable = { econ_sliders_grid_array^0 = 1 }
+				scoped_sound_effect = "click_default"
+				add_to_variable = { TNO_economy_GUI_dirty = 0.01 }
+			}
+			Econ_social_expenditures_details_button_click = {
+				set_variable = { econ_sliders_grid_array^0 = 2 }
+				scoped_sound_effect = "click_default"
+				add_to_variable = { TNO_economy_GUI_dirty = 0.01 }
+			}
+			Econ_admin_expenditures_details_button_click = {
+				set_variable = { econ_sliders_grid_array^0 = 3 }
+				scoped_sound_effect = "click_default"
+				add_to_variable = { TNO_economy_GUI_dirty = 0.01 }
+			}
+			Econ_research_expenditures_details_button_click = {
+				set_variable = { econ_sliders_grid_array^0 = 4 }
+				scoped_sound_effect = "click_default"
+				add_to_variable = { TNO_economy_GUI_dirty = 0.01 }
+			}
+			Econ_army_expenditures_slider_left_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_expenditures_slider_pct }
+				subtract_from_variable = { econ_army_expenditures_slider_pct = 1 }
+				update_army_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_expenditures_slider_button_left_tt
+			}
+			Econ_army_expenditures_slider_left_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_expenditures_slider_pct }
+				subtract_from_variable = { econ_army_expenditures_slider_pct = 10 }
+				update_army_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_expenditures_slider_button_left_tt
+			}
+			Econ_army_expenditures_slider_left_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_expenditures_slider_pct }
+				set_variable = { econ_army_expenditures_slider_pct = econ_army_expenditures_minimal_pct }
+				update_army_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_expenditures_slider_button_left_tt
+			}
+			Econ_army_expenditures_slider_right_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_expenditures_slider_pct }
+				add_to_variable = { econ_army_expenditures_slider_pct = 1 }
+				update_army_subsliders = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_army_expenditures_slider_right_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_expenditures_slider_pct }
+				add_to_variable = { econ_army_expenditures_slider_pct = 10 }
+				update_army_subsliders = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_army_expenditures_slider_right_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_expenditures_slider_pct }
+				set_variable = { econ_army_expenditures_slider_pct = econ_army_expenditures_maximal_pct }
+				update_army_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_expenditures_slider_button_left_tt
+			}
+			Econ_army_expenditures_set_button_real_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_expenditures_slider_pct }
+				set_variable = { econ_army_expenditures_slider_pct = button_idx }
+				multiply_variable = { econ_army_expenditures_slider_pct = 5 }
+				divide_variable = { econ_army_expenditures_slider_pct = 3 }
+				update_army_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_expenditures_slider_button_left_tt
+			}
+
+			Econ_army_maintenance_slider_left_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_maintenance_slider_pct }
+				subtract_from_variable = { econ_army_maintenance_slider_pct = 1 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_maintenance_slider_button_left_tt
+			}
+			Econ_army_maintenance_slider_left_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_maintenance_slider_pct }
+				subtract_from_variable = { econ_army_maintenance_slider_pct = 10 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_maintenance_slider_button_left_tt
+			}
+			Econ_army_maintenance_slider_left_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_maintenance_slider_pct }
+				set_variable = { econ_army_maintenance_slider_pct = econ_army_maintenance_minimal_pct }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_maintenance_slider_button_left_tt
+			}
+			Econ_army_maintenance_slider_right_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_maintenance_slider_pct }
+				add_to_variable = { econ_army_maintenance_slider_pct = 1 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_army_maintenance_slider_right_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_maintenance_slider_pct }
+				add_to_variable = { econ_army_maintenance_slider_pct = 10 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_army_maintenance_slider_right_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_maintenance_slider_pct }
+				set_variable = { econ_army_maintenance_slider_pct = econ_army_maintenance_maximal_pct }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_maintenance_slider_button_left_tt
+			}
+			Econ_army_maintenance_set_button_real_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_army_maintenance_slider_pct }
+				set_variable = { econ_army_maintenance_slider_pct = button_idx }
+				multiply_variable = { econ_army_maintenance_slider_pct = 5 }
+				divide_variable = { econ_army_maintenance_slider_pct = 3 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_maintenance_slider_button_left_tt
+			}
+
+			Econ_army_R_D_slider_left_click = {
+				subtract_from_variable = { econ_army_R_D_slider_pct = 1 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_R_D_slider_button_left_tt
+			}
+			Econ_army_R_D_slider_left_shift_click = {
+				subtract_from_variable = { econ_army_R_D_slider_pct = 10 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_R_D_slider_button_left_tt
+			}
+			Econ_army_R_D_slider_left_control_click = {
+				set_variable = { econ_army_R_D_slider_pct = econ_army_R_D_minimal_pct }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_R_D_slider_button_left_tt
+			}
+			Econ_army_R_D_slider_right_click = {
+				add_to_variable = { econ_army_R_D_slider_pct = 1 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_army_R_D_slider_right_shift_click = {
+				add_to_variable = { econ_army_R_D_slider_pct = 10 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_army_R_D_slider_right_control_click = {
+				set_variable = { econ_army_R_D_slider_pct = econ_army_R_D_maximal_pct }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_R_D_slider_button_left_tt
+			}
+			Econ_army_R_D_set_button_real_click = {
+				set_variable = { econ_army_R_D_slider_pct = button_idx }
+				multiply_variable = { econ_army_R_D_slider_pct = 5 }
+				divide_variable = { econ_army_R_D_slider_pct = 3 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_R_D_slider_button_left_tt
+			}
+
+			econ_army_logistics_slider_left_click = {
+				subtract_from_variable = { econ_army_logistics_slider_pct = 1 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_logistics_slider_button_left_tt
+			}
+			econ_army_logistics_slider_left_shift_click = {
+				subtract_from_variable = { econ_army_logistics_slider_pct = 10 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_logistics_slider_button_left_tt
+			}
+			econ_army_logistics_slider_left_control_click = {
+				set_variable = { econ_army_logistics_slider_pct = econ_army_logistics_minimal_pct }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_logistics_slider_button_left_tt
+			}
+			econ_army_logistics_slider_right_click = {
+				add_to_variable = { econ_army_logistics_slider_pct = 1 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			econ_army_logistics_slider_right_shift_click = {
+				add_to_variable = { econ_army_logistics_slider_pct = 10 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			econ_army_logistics_slider_right_control_click = {
+				set_variable = { econ_army_logistics_slider_pct = econ_army_logistics_maximal_pct }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_logistics_slider_button_left_tt
+			}
+			econ_army_logistics_set_button_real_click = {
+				set_variable = { econ_army_logistics_slider_pct = button_idx }
+				multiply_variable = { econ_army_logistics_slider_pct = 5 }
+				divide_variable = { econ_army_logistics_slider_pct = 3 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_logistics_slider_button_left_tt
+			}
+
+			econ_army_procurement_slider_left_click = {
+				subtract_from_variable = { econ_army_procurement_slider_pct = 1 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_procurement_slider_button_left_tt
+			}
+			econ_army_procurement_slider_left_shift_click = {
+				subtract_from_variable = { econ_army_procurement_slider_pct = 10 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_procurement_slider_button_left_tt
+			}
+			econ_army_procurement_slider_left_control_click = {
+				set_variable = { econ_army_procurement_slider_pct = econ_army_procurement_minimal_pct }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_procurement_slider_button_left_tt
+			}
+			econ_army_procurement_slider_right_click = {
+				add_to_variable = { econ_army_procurement_slider_pct = 1 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			econ_army_procurement_slider_right_shift_click = {
+				add_to_variable = { econ_army_procurement_slider_pct = 10 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			econ_army_procurement_slider_right_control_click = {
+				set_variable = { econ_army_procurement_slider_pct = econ_army_procurement_maximal_pct }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_procurement_slider_button_left_tt
+			}
+			econ_army_procurement_set_button_real_click = {
+				set_variable = { econ_army_procurement_slider_pct = button_idx }
+				multiply_variable = { econ_army_procurement_slider_pct = 5 }
+				divide_variable = { econ_army_procurement_slider_pct = 3 }
+				update_army_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_army_procurement_slider_button_left_tt
+			}
+
+			Econ_naval_expenditures_slider_left_click = {
+				subtract_from_variable = { econ_naval_expenditures_slider_pct = 1 }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_naval_expenditures_slider_button_left_tt
+			}
+			Econ_naval_expenditures_slider_left_shift_click = {
+				subtract_from_variable = { econ_naval_expenditures_slider_pct = 10 }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_naval_expenditures_slider_button_left_tt
+			}
+			Econ_naval_expenditures_slider_left_control_click = {
+				set_variable = { econ_naval_expenditures_slider_pct = econ_naval_expenditures_minimal_pct }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_naval_expenditures_slider_button_left_tt
+			}
+			Econ_naval_expenditures_slider_right_click = {
+				add_to_variable = { econ_naval_expenditures_slider_pct = 1 }
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_naval_expenditures_slider_right_shift_click = {
+				add_to_variable = { econ_naval_expenditures_slider_pct = 10 }
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_naval_expenditures_slider_right_control_click = {
+				set_variable = { econ_naval_expenditures_slider_pct = econ_naval_expenditures_maximal_pct }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_naval_expenditures_slider_button_left_tt
+			}
+			Econ_naval_expenditures_set_button_real_click = {
+				set_variable = { econ_naval_expenditures_slider_pct = button_idx }
+				multiply_variable = { econ_naval_expenditures_slider_pct = 5 }
+				divide_variable = { econ_naval_expenditures_slider_pct = 3 }
+				if = {
+					limit = {
+						check_variable = { num_ships = 0 }
+					}
+					set_variable = { econ_naval_expenditures_slider_pct = 50 }
+				}
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_naval_expenditures_slider_button_left_tt
+			}
+
+			Econ_nuclear_expenditures_slider_left_click = {
+				subtract_from_variable = { econ_nuclear_expenditures_slider_pct = 1 }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_nuclear_expenditures_slider_button_left_tt
+			}
+			Econ_nuclear_expenditures_slider_left_shift_click = {
+				subtract_from_variable = { econ_nuclear_expenditures_slider_pct = 10 }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_nuclear_expenditures_slider_button_left_tt
+			}
+			Econ_nuclear_expenditures_slider_left_control_click = {
+				set_variable = { econ_nuclear_expenditures_slider_pct = econ_nuclear_expenditures_minimal_pct }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_nuclear_expenditures_slider_button_left_tt
+			}
+			Econ_nuclear_expenditures_slider_right_click = {
+				add_to_variable = { econ_nuclear_expenditures_slider_pct = 1 }
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_nuclear_expenditures_slider_right_shift_click = {
+				add_to_variable = { econ_nuclear_expenditures_slider_pct = 10 }
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_nuclear_expenditures_slider_right_control_click = {
+				set_variable = { econ_nuclear_expenditures_slider_pct = econ_nuclear_expenditures_maximal_pct }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_nuclear_expenditures_slider_button_left_tt
+			}
+			Econ_nuclear_expenditures_set_button_real_click = {
+				set_variable = { econ_nuclear_expenditures_slider_pct = button_idx }
+				multiply_variable = { econ_nuclear_expenditures_slider_pct = 5 }
+				divide_variable = { econ_nuclear_expenditures_slider_pct = 3 }
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_nuclear_expenditures_slider_button_left_tt
+			}
+
+			Econ_social_expenditures_slider_left_click = {
+				subtract_from_variable = { econ_social_expenditures_slider_pct = 1 }
+				update_social_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_expenditures_slider_button_left_tt
+			}
+			Econ_social_expenditures_slider_left_shift_click = {
+				subtract_from_variable = { econ_social_expenditures_slider_pct = 10 }
+				update_social_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_expenditures_slider_button_left_tt
+			}
+			Econ_social_expenditures_slider_left_control_click = {
+				set_variable = { econ_social_expenditures_slider_pct = econ_social_expenditures_minimal_pct }
+				update_social_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_expenditures_slider_button_left_tt
+			}
+			Econ_social_expenditures_slider_right_click = {
+				add_to_variable = { econ_social_expenditures_slider_pct = 1 }
+				update_social_subsliders = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_social_expenditures_slider_right_shift_click = {
+				add_to_variable = { econ_social_expenditures_slider_pct = 10 }
+				update_social_subsliders = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_social_expenditures_slider_right_control_click = {
+				set_variable = { econ_social_expenditures_slider_pct = econ_social_expenditures_maximal_pct }
+				update_social_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_expenditures_slider_button_left_tt
+			}
+			Econ_social_expenditures_set_button_real_click = {
+				set_variable = { econ_social_expenditures_slider_pct = button_idx }
+				multiply_variable = { econ_social_expenditures_slider_pct = 5 }
+				divide_variable = { econ_social_expenditures_slider_pct = 3 }
+				update_social_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_expenditures_slider_button_left_tt
+			}
+
+			Econ_social_healthcare_slider_left_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_social_healthcare_slider_pct }
+				subtract_from_variable = { econ_social_healthcare_slider_pct = 1 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_healthcare_slider_button_left_tt
+			}
+			Econ_social_healthcare_slider_left_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_social_healthcare_slider_pct }
+				subtract_from_variable = { econ_social_healthcare_slider_pct = 10 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_healthcare_slider_button_left_tt
+			}
+			Econ_social_healthcare_slider_left_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_social_healthcare_slider_pct }
+				set_variable = { econ_social_healthcare_slider_pct = econ_social_healthcare_minimal_pct }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_healthcare_slider_button_left_tt
+			}
+			Econ_social_healthcare_slider_right_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_social_healthcare_slider_pct }
+				add_to_variable = { econ_social_healthcare_slider_pct = 1 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_social_healthcare_slider_right_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_social_healthcare_slider_pct }
+				add_to_variable = { econ_social_healthcare_slider_pct = 10 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_social_healthcare_slider_right_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_social_healthcare_slider_pct }
+				set_variable = { econ_social_healthcare_slider_pct = econ_social_healthcare_maximal_pct }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_healthcare_slider_button_left_tt
+			}
+			Econ_social_healthcare_set_button_real_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_social_healthcare_slider_pct }
+				set_variable = { econ_social_healthcare_slider_pct = button_idx }
+				multiply_variable = { econ_social_healthcare_slider_pct = 5 }
+				divide_variable = { econ_social_healthcare_slider_pct = 3 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_healthcare_slider_button_left_tt
+			}
+
+			Econ_social_pensions_slider_left_click = {
+				subtract_from_variable = { econ_social_pensions_slider_pct = 1 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_pensions_slider_button_left_tt
+			}
+			Econ_social_pensions_slider_left_shift_click = {
+				subtract_from_variable = { econ_social_pensions_slider_pct = 10 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_pensions_slider_button_left_tt
+			}
+			Econ_social_pensions_slider_left_control_click = {
+				set_variable = { econ_social_pensions_slider_pct = econ_social_pensions_minimal_pct }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_pensions_slider_button_left_tt
+			}
+			Econ_social_pensions_slider_right_click = {
+				add_to_variable = { econ_social_pensions_slider_pct = 1 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_social_pensions_slider_right_shift_click = {
+				add_to_variable = { econ_social_pensions_slider_pct = 10 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_social_pensions_slider_right_control_click = {
+				set_variable = { econ_social_pensions_slider_pct = econ_social_pensions_maximal_pct }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_pensions_slider_button_left_tt
+			}
+			Econ_social_pensions_set_button_real_click = {
+				set_variable = { econ_social_pensions_slider_pct = button_idx }
+				multiply_variable = { econ_social_pensions_slider_pct = 5 }
+				divide_variable = { econ_social_pensions_slider_pct = 3 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_pensions_slider_button_left_tt
+			}
+
+			Econ_social_education_slider_left_click = {
+				subtract_from_variable = { econ_social_education_slider_pct = 1 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_education_slider_button_left_tt
+			}
+			Econ_social_education_slider_left_shift_click = {
+				subtract_from_variable = { econ_social_education_slider_pct = 10 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_education_slider_button_left_tt
+			}
+			Econ_social_education_slider_left_control_click = {
+				set_variable = { econ_social_education_slider_pct = econ_social_education_minimal_pct }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_education_slider_button_left_tt
+			}
+			Econ_social_education_slider_right_click = {
+				add_to_variable = { econ_social_education_slider_pct = 1 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_social_education_slider_right_shift_click = {
+				add_to_variable = { econ_social_education_slider_pct = 10 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_social_education_slider_right_control_click = {
+				set_variable = { econ_social_education_slider_pct = econ_social_education_maximal_pct }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_education_slider_button_left_tt
+			}
+			Econ_social_education_set_button_real_click = {
+				set_variable = { econ_social_education_slider_pct = button_idx }
+				multiply_variable = { econ_social_education_slider_pct = 5 }
+				divide_variable = { econ_social_education_slider_pct = 3 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_education_slider_button_left_tt
+			}
+
+			Econ_social_unemployment_slider_left_click = {
+				subtract_from_variable = { econ_social_unemployment_slider_pct = 1 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_unemployment_slider_button_left_tt
+			}
+			Econ_social_unemployment_slider_left_shift_click = {
+				subtract_from_variable = { econ_social_unemployment_slider_pct = 10 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_unemployment_slider_button_left_tt
+			}
+			Econ_social_unemployment_slider_left_control_click = {
+				set_variable = { econ_social_unemployment_slider_pct = econ_social_unemployment_minimal_pct }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_unemployment_slider_button_left_tt
+			}
+			Econ_social_unemployment_slider_right_click = {
+				add_to_variable = { econ_social_unemployment_slider_pct = 1 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_social_unemployment_slider_right_shift_click = {
+				add_to_variable = { econ_social_unemployment_slider_pct = 10 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_social_unemployment_slider_right_control_click = {
+				set_variable = { econ_social_unemployment_slider_pct = econ_social_unemployment_maximal_pct }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_unemployment_slider_button_left_tt
+			}
+			Econ_social_unemployment_set_button_real_click = {
+				set_variable = { econ_social_unemployment_slider_pct = button_idx }
+				multiply_variable = { econ_social_unemployment_slider_pct = 5 }
+				divide_variable = { econ_social_unemployment_slider_pct = 3 }
+				update_social_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_social_unemployment_slider_button_left_tt
+			}
+
+			Econ_admin_expenditures_slider_left_click = {
+				subtract_from_variable = { econ_admin_expenditures_slider_pct = 1 }
+				update_admin_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_expenditures_slider_button_left_tt
+			}
+			Econ_admin_expenditures_slider_left_shift_click = {
+				subtract_from_variable = { econ_admin_expenditures_slider_pct = 10 }
+				update_admin_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_expenditures_slider_button_left_tt
+			}
+			Econ_admin_expenditures_slider_left_control_click = {
+				set_variable = { econ_admin_expenditures_slider_pct = econ_admin_expenditures_minimal_pct }
+				update_admin_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_expenditures_slider_button_left_tt
+			}
+			Econ_admin_expenditures_slider_right_click = {
+				add_to_variable = { econ_admin_expenditures_slider_pct = 1 }
+				update_admin_subsliders = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_admin_expenditures_slider_right_shift_click = {
+				add_to_variable = { econ_admin_expenditures_slider_pct = 10 }
+				update_admin_subsliders = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_admin_expenditures_slider_right_control_click = {
+				set_variable = { econ_admin_expenditures_slider_pct = econ_admin_expenditures_maximal_pct }
+				update_admin_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_expenditures_slider_button_left_tt
+			}
+			Econ_admin_expenditures_set_button_real_click = {
+				set_variable = { econ_admin_expenditures_slider_pct = button_idx }
+				multiply_variable = { econ_admin_expenditures_slider_pct = 5 }
+				divide_variable = { econ_admin_expenditures_slider_pct = 3 }
+				update_admin_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_expenditures_slider_button_left_tt
+			}
+
+			Econ_admin_security_slider_left_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				subtract_from_variable = { econ_admin_security_slider_pct = 1 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_security_slider_button_left_tt
+			}
+			Econ_admin_security_slider_left_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				subtract_from_variable = { econ_admin_security_slider_pct = 10 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_security_slider_button_left_tt
+			}
+			Econ_admin_security_slider_left_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				set_variable = { econ_admin_security_slider_pct = econ_admin_security_minimal_pct }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_security_slider_button_left_tt
+			}
+			Econ_admin_security_slider_right_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				add_to_variable = { econ_admin_security_slider_pct = 1 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_admin_security_slider_right_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				add_to_variable = { econ_admin_security_slider_pct = 10 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_admin_security_slider_right_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				set_variable = { econ_admin_security_slider_pct = econ_admin_security_maximal_pct }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_security_slider_button_left_tt
+			}
+			Econ_admin_security_set_button_real_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				set_variable = { econ_admin_security_slider_pct = button_idx }
+				multiply_variable = { econ_admin_security_slider_pct = 5 }
+				divide_variable = { econ_admin_security_slider_pct = 3 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_security_slider_button_left_tt
+			}
+
+			Econ_admin_regulations_slider_left_click = {
+				subtract_from_variable = { econ_admin_regulations_slider_pct = 1 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				TNO_calculate_actual_regulations_policy_effectiveness = yes
+				custom_effect_tooltip = econ_admin_regulations_slider_button_left_tt
+			}
+			Econ_admin_regulations_slider_left_shift_click = {
+				subtract_from_variable = { econ_admin_regulations_slider_pct = 10 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				TNO_calculate_actual_regulations_policy_effectiveness = yes
+				custom_effect_tooltip = econ_admin_regulations_slider_button_left_tt
+			}
+			Econ_admin_regulations_slider_left_control_click = {
+				set_variable = { econ_admin_regulations_slider_pct = econ_admin_regulations_minimal_pct }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				TNO_calculate_actual_regulations_policy_effectiveness = yes
+				custom_effect_tooltip = econ_admin_regulations_slider_button_left_tt
+			}
+			Econ_admin_regulations_slider_right_click = {
+				add_to_variable = { econ_admin_regulations_slider_pct = 1 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				TNO_calculate_actual_regulations_policy_effectiveness = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_admin_regulations_slider_right_shift_click = {
+				add_to_variable = { econ_admin_regulations_slider_pct = 10 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				TNO_calculate_actual_regulations_policy_effectiveness = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_admin_regulations_slider_right_control_click = {
+				set_variable = { econ_admin_regulations_slider_pct = econ_admin_regulations_maximal_pct }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				TNO_calculate_actual_regulations_policy_effectiveness = yes
+				custom_effect_tooltip = econ_admin_regulations_slider_button_left_tt
+			}
+			Econ_admin_regulations_set_button_real_click = {
+				set_variable = { econ_admin_regulations_slider_pct = button_idx }
+				multiply_variable = { econ_admin_regulations_slider_pct = 5 }
+				divide_variable = { econ_admin_regulations_slider_pct = 3 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				TNO_calculate_actual_regulations_policy_effectiveness = yes
+				custom_effect_tooltip = econ_admin_regulations_slider_button_left_tt
+			}
+
+			Econ_admin_bureaucracy_slider_left_click = {
+				subtract_from_variable = { econ_admin_bureaucracy_slider_pct = 1 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_bureaucracy_slider_button_left_tt
+			}
+			Econ_admin_bureaucracy_slider_left_shift_click = {
+				subtract_from_variable = { econ_admin_bureaucracy_slider_pct = 10 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_bureaucracy_slider_button_left_tt
+			}
+			Econ_admin_bureaucracy_slider_left_control_click = {
+				set_variable = { econ_admin_bureaucracy_slider_pct = econ_admin_bureaucracy_minimal_pct }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_bureaucracy_slider_button_left_tt
+			}
+			Econ_admin_bureaucracy_slider_right_click = {
+				add_to_variable = { econ_admin_bureaucracy_slider_pct = 1 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_admin_bureaucracy_slider_right_shift_click = {
+				add_to_variable = { econ_admin_bureaucracy_slider_pct = 10 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_admin_bureaucracy_slider_right_control_click = {
+				set_variable = { econ_admin_bureaucracy_slider_pct = econ_admin_bureaucracy_maximal_pct }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_bureaucracy_slider_button_left_tt
+			}
+			Econ_admin_bureaucracy_set_button_real_click = {
+				set_variable = { econ_admin_bureaucracy_slider_pct = button_idx }
+				multiply_variable = { econ_admin_bureaucracy_slider_pct = 5 }
+				divide_variable = { econ_admin_bureaucracy_slider_pct = 3 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_bureaucracy_slider_button_left_tt
+			}
+
+			Econ_research_expenditures_slider_left_click = {
+				subtract_from_variable = { econ_research_expenditures_slider_pct = 1 }
+				update_research_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_expenditures_slider_button_left_tt
+			}
+			Econ_research_expenditures_slider_left_shift_click = {
+				subtract_from_variable = { econ_research_expenditures_slider_pct = 10 }
+				update_research_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_expenditures_slider_button_left_tt
+			}
+			Econ_research_expenditures_slider_left_control_click = {
+				set_variable = { econ_research_expenditures_slider_pct = econ_research_expenditures_minimal_pct }
+				update_research_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_expenditures_slider_button_left_tt
+			}
+			Econ_research_expenditures_slider_right_click = {
+				add_to_variable = { econ_research_expenditures_slider_pct = 1 }
+				update_research_subsliders = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_research_expenditures_slider_right_shift_click = {
+				add_to_variable = { econ_research_expenditures_slider_pct = 10 }
+				update_research_subsliders = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_research_expenditures_slider_right_control_click = {
+				set_variable = { econ_research_expenditures_slider_pct = econ_research_expenditures_maximal_pct }
+				update_research_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_expenditures_slider_button_left_tt
+			}
+			Econ_research_expenditures_set_button_real_click = {
+				set_variable = { econ_research_expenditures_slider_pct = button_idx }
+				multiply_variable = { econ_research_expenditures_slider_pct = 5 }
+				divide_variable = { econ_research_expenditures_slider_pct = 3 }
+				update_research_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_expenditures_slider_button_left_tt
+			}
+
+			Econ_research_science_slider_left_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_research_science_slider_pct }
+				subtract_from_variable = { econ_research_science_slider_pct = 1 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_science_slider_button_left_tt
+			}
+			Econ_research_science_slider_left_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_research_science_slider_pct }
+				subtract_from_variable = { econ_research_science_slider_pct = 10 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_science_slider_button_left_tt
+			}
+			Econ_research_science_slider_left_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_research_science_slider_pct }
+				set_variable = { econ_research_science_slider_pct = econ_research_science_minimal_pct }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_science_slider_button_left_tt
+			}
+			Econ_research_science_slider_right_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_research_science_slider_pct }
+				add_to_variable = { econ_research_science_slider_pct = 1 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_research_science_slider_right_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_research_science_slider_pct }
+				add_to_variable = { econ_research_science_slider_pct = 10 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_research_science_slider_right_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_research_science_slider_pct }
+				set_variable = { econ_research_science_slider_pct = econ_research_science_maximal_pct }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_science_slider_button_left_tt
+			}
+			Econ_research_science_set_button_real_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_research_science_slider_pct }
+				set_variable = { econ_research_science_slider_pct = button_idx }
+				multiply_variable = { econ_research_science_slider_pct = 5 }
+				divide_variable = { econ_research_science_slider_pct = 3 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_science_slider_button_left_tt
+			}
+
+			Econ_research_facilities_slider_left_click = {
+				subtract_from_variable = { econ_research_facilities_slider_pct = 1 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_facilities_slider_button_left_tt
+			}
+			Econ_research_facilities_slider_left_shift_click = {
+				subtract_from_variable = { econ_research_facilities_slider_pct = 10 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_facilities_slider_button_left_tt
+			}
+			Econ_research_facilities_slider_left_control_click = {
+				set_variable = { econ_research_facilities_slider_pct = econ_research_facilities_minimal_pct }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_facilities_slider_button_left_tt
+			}
+			Econ_research_facilities_slider_right_click = {
+				add_to_variable = { econ_research_facilities_slider_pct = 1 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_research_facilities_slider_right_shift_click = {
+				add_to_variable = { econ_research_facilities_slider_pct = 10 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+			Econ_research_facilities_slider_right_control_click = {
+				set_variable = { econ_research_facilities_slider_pct = econ_research_facilities_maximal_pct }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_facilities_slider_button_left_tt
+			}
+			Econ_research_facilities_set_button_real_click = {
+				set_variable = { econ_research_facilities_slider_pct = button_idx }
+				multiply_variable = { econ_research_facilities_slider_pct = 5 }
+				divide_variable = { econ_research_facilities_slider_pct = 3 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_facilities_slider_button_left_tt
+			}
+
+			#SECURITY
+
+			Econ_admin_security_slider_left_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				subtract_from_variable = { econ_admin_security_slider_pct = 1 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_security_slider_button_left_tt
+			}
+			Econ_admin_security_slider_left_shift_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				subtract_from_variable = { econ_admin_security_slider_pct = 10 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_security_slider_button_left_tt
+			}
+			Econ_admin_security_slider_left_control_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				set_variable = { econ_admin_security_slider_pct = econ_admin_security_minimal_pct }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_security_slider_button_left_tt
+			}
+			Econ_admin_security_slider_right_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_admin_security_slider_pct }
+				add_to_variable = { econ_admin_security_slider_pct = 1 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+
+			#SAFETY
+
+			Econ_admin_regulations_slider_left_click = {
+				subtract_from_variable = { econ_admin_regulations_slider_pct = 1 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_regulations_slider_button_left_tt
+			}
+
+
+			#BUREAUCRACY
+
+			Econ_admin_bureaucracy_slider_left_click = {
+				subtract_from_variable = { econ_admin_bureaucracy_slider_pct = 1 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_bureaucracy_slider_button_left_tt
+			}
+			Econ_admin_bureaucracy_slider_left_shift_click = {
+				subtract_from_variable = { econ_admin_bureaucracy_slider_pct = 10 }
+				update_admin_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_admin_bureaucracy_slider_button_left_tt
+			}
+
+
+			###RESEARCH EXPENDITURES
+
+			Econ_research_expenditures_slider_left_click = {
+				subtract_from_variable = { econ_research_expenditures_slider_pct = 1 }
+				update_research_subsliders = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_expenditures_slider_button_left_tt
+			}
+
+			#SCIENCE FUNDING
+
+			Econ_research_science_slider_left_click = {
+				set_variable = { econ_army_expenditure_before_pct = econ_research_science_slider_pct }
+				subtract_from_variable = { econ_research_science_slider_pct = 1 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_science_slider_button_left_tt
+			}
+
+
+			#RESEARCH FACILITIES
+
+			Econ_research_facilities_slider_left_click = {
+				subtract_from_variable = { econ_research_facilities_slider_pct = 1 }
+				update_research_mainslider = yes
+				update_economy_tab = yes
+				custom_effect_tooltip = econ_research_facilities_slider_button_left_tt
+			}
+		}
+
+		properties = {
+			Econ_army_expenditures_slider_dot = { x = econ_army_expenditures_slider_dot_x }
+			Econ_army_maintenance_slider_dot = { x = econ_army_maintenance_slider_dot_x }
+			Econ_army_R_D_slider_dot = { x = econ_army_R_D_slider_dot_x }
+			econ_army_logistics_slider_dot = { x = econ_army_logistics_slider_dot_x }
+			econ_army_procurement_slider_dot = { x = econ_army_procurement_slider_dot_x }
+
+			Econ_naval_expenditures_slider_dot = { x = econ_naval_expenditures_slider_dot_x }
+			Econ_nuclear_expenditures_slider_dot = { x = econ_nuclear_expenditures_slider_dot_x }
+
+			Econ_social_expenditures_slider_dot = { x = econ_social_expenditures_slider_dot_x }
+			Econ_social_healthcare_slider_dot = { x = econ_social_healthcare_slider_dot_x }
+			Econ_social_pensions_slider_dot = { x = econ_social_pensions_slider_dot_x }
+			Econ_social_education_slider_dot = { x = econ_social_education_slider_dot_x }
+			Econ_social_unemployment_slider_dot = { x = econ_social_unemployment_slider_dot_x }
+
+			Econ_admin_expenditures_slider_dot = { x = econ_admin_expenditures_slider_dot_x }
+			Econ_admin_security_slider_dot = { x = econ_admin_security_slider_dot_x }
+			Econ_admin_regulations_slider_dot = { x = econ_admin_regulations_slider_dot_x }
+			Econ_admin_bureaucracy_slider_dot = { x = econ_admin_bureaucracy_slider_dot_x }
+
+			Econ_research_expenditures_slider_dot = { x = econ_research_expenditures_slider_dot_x }
+			Econ_research_science_slider_dot = { x = econ_research_science_slider_dot_x }
+			Econ_research_facilities_slider_dot = { x = econ_research_facilities_slider_dot_x }
+
+			Econ_army_expenditures_slider_limit_left = { x = econ_army_expenditures_maximal_x }
+			Econ_army_maintenance_slider_limit_left = { x = econ_army_maintenance_maximal_x }
+			Econ_army_R_D_slider_limit_left = { x = econ_army_R_D_maximal_x }
+			econ_army_logistics_slider_limit_left = { x = econ_army_logistics_maximal_x }
+			econ_army_procurement_slider_limit_left = { x = econ_army_procurement_maximal_x }
+
+			Econ_naval_expenditures_slider_limit_left = { x = econ_naval_expenditures_maximal_x }
+			Econ_nuclear_expenditures_slider_limit_left = { x = econ_nuclear_expenditures_maximal_x }
+
+			Econ_social_expenditures_slider_limit_left = { x = econ_social_expenditures_maximal_x }
+			Econ_social_healthcare_slider_limit_left = { x = econ_social_healthcare_maximal_x }
+			Econ_social_pensions_slider_limit_left = { x = econ_social_pensions_maximal_x }
+			Econ_social_education_slider_limit_left = { x = econ_social_education_maximal_x }
+			Econ_social_unemployment_slider_limit_left = { x = econ_social_unemployment_maximal_x }
+
+			Econ_admin_expenditures_slider_limit_left = { x = econ_admin_expenditures_maximal_x }
+			Econ_admin_security_slider_limit_left = { x = econ_admin_security_maximal_x }
+			Econ_admin_regulations_slider_limit_left = { x = econ_admin_regulations_maximal_x }
+			Econ_admin_bureaucracy_slider_limit_left = { x = econ_admin_bureaucracy_maximal_x }
+
+			Econ_research_expenditures_slider_limit_left = { x = econ_research_expenditures_maximal_x }
+			Econ_research_science_slider_limit_left = { x = econ_research_science_maximal_x }
+			Econ_research_facilities_slider_limit_left = { x = econ_research_facilities_maximal_x }
+
+			Econ_army_expenditures_slider_limit_right = { x = econ_army_expenditures_minimal_x }
+			Econ_army_maintenance_slider_limit_right = { x = econ_army_maintenance_minimal_x }
+			Econ_army_R_D_slider_limit_right = { x = econ_army_R_D_minimal_x }
+			econ_army_logistics_slider_limit_right = { x = econ_army_logistics_minimal_x }
+			econ_army_procurement_slider_limit_right = { x = econ_army_procurement_minimal_x }
+
+			Econ_naval_expenditures_slider_limit_right = { x = econ_naval_expenditures_minimal_x }
+			Econ_nuclear_expenditures_slider_limit_right = { x = econ_nuclear_expenditures_minimal_x }
+
+			Econ_social_expenditures_slider_limit_right = { x = econ_social_expenditures_minimal_x }
+			Econ_social_healthcare_slider_limit_right = { x = econ_social_healthcare_minimal_x }
+			Econ_social_pensions_slider_limit_right = { x = econ_social_pensions_minimal_x }
+			Econ_social_education_slider_limit_right = { x = econ_social_education_minimal_x }
+			Econ_social_unemployment_slider_limit_right = { x = econ_social_unemployment_minimal_x }
+
+			Econ_admin_expenditures_slider_limit_right = { x = econ_admin_expenditures_minimal_x }
+			Econ_admin_security_slider_limit_right = { x = econ_admin_security_minimal_x }
+			Econ_admin_regulations_slider_limit_right = { x = econ_admin_regulations_minimal_x }
+			Econ_admin_bureaucracy_slider_limit_right = { x = econ_admin_bureaucracy_minimal_x }
+
+			Econ_research_expenditures_slider_limit_right = { x = econ_research_expenditures_minimal_x }
+			Econ_research_science_slider_limit_right = { x = econ_research_science_minimal_x }
+			Econ_research_facilities_slider_limit_right = { x = econ_research_facilities_minimal_x }
+		}
+	}
+
+	# # Central Bank Policies Dropdown
+	TNO_central_bank_policies = {
+		window_name = "central_bank_policies_clip"
+		context_type = player_context
+		parent_window_token = trade_tab
+		dirty = TNO_economy_GUI_dirty
+
+		visible = {
+			#always = yes
+			has_country_flag = central_bank_policies_tab_open
+			# has_country_flag = econ_view_visible
+		}
+
+		dynamic_lists = {
+			central_bank_policy_options = {
+				array = central_bank_policies_array
+				entry_container = central_bank_policy
+				value = selected_central_bank_id
+			}
+		}
+
+		effects = {
+			central_bank_policy_btn_click = {
+				set_temp_variable = { temp_selected_central_bank_id = selected_central_bank_id }
+				set_variable = { selected_central_bank_id = temp_selected_central_bank_id }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+				clr_country_flag = central_bank_policies_tab_open
+				set_variable = { econ_tab_central_bank_display_policy_btn_frame = 1 }
+			}
+		}
+
+		properties = {
+			central_bank_policy_icon = { image = "[Get_Central_Bank_Policy_icon]" }
+		}
+	}
+
+	# # Burgundy Econ Cover
+	TNO_economy_BRG = {
+		window_name = "economy_view_BRG"
+		context_type = player_context
+		parent_window_token = trade_tab
+
+		visible = {
+			tag = BRG
+			has_country_flag = BRG_Econ_Off
+			econ_BRGView = yes
+		}
+	}
+}
+
+# # Econ Social Menu
+scripted_gui = {
+	TNO_social_view = {
+		window_name = "TNO_social_view"
+		context_type = player_context
+		parent_window_token = trade_tab
+
+		dirty = TNO_social_gui_dirty
+
+		visible = {
+			econ_socialView = yes
+		}
+
+		properties = {
+			# Buttons
+			button_last_year = { frame = social_button_frame^0 }
+			button_1961 = { frame = social_button_frame^1 }
+			button_1962 = { frame = social_button_frame^2 }
+			button_1963 = { frame = social_button_frame^3 }
+			button_1964 = { frame = social_button_frame^4 }
+			button_1965 = { frame = social_button_frame^5 }
+			button_1966 = { frame = social_button_frame^6 }
+			button_1967 = { frame = social_button_frame^7 }
+			button_1968 = { frame = social_button_frame^8 }
+			button_1969 = { frame = social_button_frame^9 }
+			button_1970 = { frame = social_button_frame^10 }
+			button_1971 = { frame = social_button_frame^11 }
+			button_1972 = { frame = social_button_frame^12 }
+
+			trade_resource_icon = { frame = social_largest_trade_resource }
+			social_largest_trade_partner_flag = { image = "[?social_largest_trade_partner.GetFlag]" }
+
+			# Line Segment Stuff
+			line_segment = {
+				frame = segment_value
+			}
+
+			vbar = {
+				y = social_tab_econ_graph_vbar_offsets^vbar_idx
+			}
+			vbar_light = {
+				y = social_tab_econ_graph_vbar_offsets^vbar_idx
+			}
+			vbar_label = {
+				y = social_tab_econ_graph_vbar_offsets^vbar_idx 
+			}
+		}
+
+		triggers = {
+			# Header
+			button_1962_click_enabled = {
+				date > 1962.12.12
+			}
+			button_1963_click_enabled = {
+				date > 1963.12.12
+			}
+			button_1964_click_enabled = {
+				date > 1964.12.12
+			}
+			button_1965_click_enabled = {
+				date > 1965.12.12
+			}
+			button_1966_click_enabled = {
+				date > 1966.12.12
+			}
+			button_1967_click_enabled = {
+				date > 1967.12.12
+			}
+			button_1968_click_enabled = {
+				date > 1968.12.12
+			}
+			button_1969_click_enabled = {
+				date > 1969.12.12
+			}
+			button_1970_click_enabled = {
+				date > 1970.12.12
+			}
+			button_1971_click_enabled = {
+				date > 1971.12.12
+			}
+			button_1972_click_enabled = {
+				date > 1972.12.12
+			}
+
+			# Nukes
+			bomb_00_visible = { check_variable = { social_nuclear_stockpile > 00000 } }
+			bomb_01_visible = { check_variable = { social_nuclear_stockpile > 01500 } }
+			bomb_02_visible = { check_variable = { social_nuclear_stockpile > 03000 } }
+			bomb_03_visible = { check_variable = { social_nuclear_stockpile > 04500 } }
+			bomb_04_visible = { check_variable = { social_nuclear_stockpile > 06000 } }
+			bomb_05_visible = { check_variable = { social_nuclear_stockpile > 07500 } }
+			bomb_10_visible = { check_variable = { social_nuclear_stockpile > 09000 } }
+			bomb_11_visible = { check_variable = { social_nuclear_stockpile > 10500 } }
+			bomb_12_visible = { check_variable = { social_nuclear_stockpile > 12000 } }
+			bomb_13_visible = { check_variable = { social_nuclear_stockpile > 13500 } }
+			bomb_14_visible = { check_variable = { social_nuclear_stockpile > 15000 } }
+			bomb_15_visible = { check_variable = { social_nuclear_stockpile > 16500 } }
+			bomb_30_visible = { check_variable = { social_nuclear_stockpile > 18000 } }
+			bomb_31_visible = { check_variable = { social_nuclear_stockpile > 19500 } }
+			bomb_32_visible = { check_variable = { social_nuclear_stockpile > 21000 } }
+			bomb_33_visible = { check_variable = { social_nuclear_stockpile > 22500 } }
+			bomb_34_visible = { check_variable = { social_nuclear_stockpile > 24000 } }
+			bomb_35_visible = { check_variable = { social_nuclear_stockpile > 25500 } }
+			nuke_dove_visible = { check_variable = { social_nuclear_stockpile = 0 } }
+
+			# Graph stuff
+			vbar_visible = {
+				check_variable = { social_tab_gdpc_graph_vbars^vbar_idx > -1 }
+			}
+			vbar_light_visible = {
+				check_variable = { social_tab_gdpc_graph_vbars^vbar_idx = -1 }
+			}
+			vbar_label_visible = {
+				check_variable = { social_tab_gdpc_graph_vbars^vbar_idx > -1 }
+			}
+
+			hbar_visible = {
+				set_temp_variable = { hmod = hbar_idx }
+				modulo_temp_variable = { hmod = 3 }
+				check_variable = { hmod = 0 }
+			}
+			hbar_light_visible = {
+				set_temp_variable = { hmod = hbar_idx }
+				modulo_temp_variable = { hmod = 3 }
+				check_variable = { hmod > 0 }
+			}
+
+			hbar_label_visible = {
+				set_temp_variable = { hmod = hbar_idx }
+				modulo_temp_variable = { hmod = 3 }
+				check_variable = { hmod = 0 }
+			}
+		}
+
+		effects = {
+			# Left Click
+			button_last_year_click = {
+				set_temp_variable = { temp_button_year = 0 }
+				left_click_social_button = yes
+			}
+			button_1961_click = {
+				set_temp_variable = { temp_button_year = 1 }
+				left_click_social_button = yes
+			}
+			button_1962_click = {
+				set_temp_variable = { temp_button_year = 2 }
+				left_click_social_button = yes
+			}
+			button_1963_click = {
+				set_temp_variable = { temp_button_year = 3 }
+				left_click_social_button = yes
+			}
+			button_1964_click = {
+				set_temp_variable = { temp_button_year = 4 }
+				left_click_social_button = yes
+			}
+			button_1965_click = {
+				set_temp_variable = { temp_button_year = 5 }
+				left_click_social_button = yes
+			}
+			button_1966_click = {
+				set_temp_variable = { temp_button_year = 6 }
+				left_click_social_button = yes
+			}
+			button_1967_click = {
+				set_temp_variable = { temp_button_year = 7 }
+				left_click_social_button = yes
+			}
+			button_1968_click = {
+				set_temp_variable = { temp_button_year = 8 }
+				left_click_social_button = yes
+			}
+			button_1969_click = {
+				set_temp_variable = { temp_button_year = 9 }
+				left_click_social_button = yes
+			}
+			button_1970_click = {
+				set_temp_variable = { temp_button_year = 10 }
+				left_click_social_button = yes
+			}
+			button_1971_click = {
+				set_temp_variable = { temp_button_year = 11 }
+				left_click_social_button = yes
+			}
+			button_1972_click = {
+				set_temp_variable = { temp_button_year = 12 }
+				left_click_social_button = yes
+			}
+			# Right Click
+			button_last_year_right_click = {
+				set_temp_variable = { temp_button_year = 0 }
+				right_click_social_button = yes
+			}
+			button_1961_right_click = {
+				set_temp_variable = { temp_button_year = 1 }
+				right_click_social_button = yes
+			}
+			button_1962_right_click = {
+				set_temp_variable = { temp_button_year = 2 }
+				right_click_social_button = yes
+			}
+			button_1963_right_click = {
+				set_temp_variable = { temp_button_year = 3 }
+				right_click_social_button = yes
+			}
+			button_1964_right_click = {
+				set_temp_variable = { temp_button_year = 4 }
+				right_click_social_button = yes
+			}
+			button_1965_right_click = {
+				set_temp_variable = { temp_button_year = 5 }
+				right_click_social_button = yes
+			}
+			button_1966_right_click = {
+				set_temp_variable = { temp_button_year = 6 }
+				right_click_social_button = yes
+			}
+			button_1967_right_click = {
+				set_temp_variable = { temp_button_year = 7 }
+				right_click_social_button = yes
+			}
+			button_1968_right_click = {
+				set_temp_variable = { temp_button_year = 8 }
+				right_click_social_button = yes
+			}
+			button_1969_right_click = {
+				set_temp_variable = { temp_button_year = 9 }
+				right_click_social_button = yes
+			}
+			button_1970_right_click = {
+				set_temp_variable = { temp_button_year = 10 }
+				right_click_social_button = yes
+			}
+			button_1971_right_click = {
+				set_temp_variable = { temp_button_year = 11 }
+				right_click_social_button = yes
+			}
+			button_1972_right_click = {
+				set_temp_variable = { temp_button_year = 12 }
+				right_click_social_button = yes
+			}
+		}
+
+		dynamic_lists = {
+
+			# Trade
+			social_trade_graph_gdpc = {
+				array = social_tab_trade_segments
+				entry_container = social_graph_segment_trade
+				value = segment_value
+				index = segment_idx
+			}
+
+			social_trade_graph_vbars = {
+				array = social_tab_trade_graph_vbars
+				entry_container = social_trade_graph_segment_vbar
+				index = vbar_idx
+			}
+
+			social_trade_graph_hbars = {
+				array = social_tab_econ_graph_months
+				entry_container = social_graph_segment_hbar
+				index = hbar_idx
+			}
+
+			# GDPC
+			social_gdp_graph_gdpc = {
+				array = social_tab_gdpc_segments
+				entry_container = social_graph_segment_gdpc
+				value = segment_value
+				index = segment_idx
+			}
+
+			social_gdp_graph_vbars = {
+				array = social_tab_gdpc_graph_vbars
+				entry_container = social_gdpc_graph_segment_vbar
+				index = vbar_idx
+			}
+
+			social_gdp_graph_hbars = {
+				array = social_tab_econ_graph_months
+				entry_container = social_graph_segment_hbar
+				index = hbar_idx
+			}
+
+			# Poverty
+			social_poverty_graph_gdpc = {
+				array = social_tab_poverty_segments
+				entry_container = social_graph_segment_poverty
+				value = segment_value
+				index = segment_idx
+			}
+
+			social_poverty_graph_vbars = {
+				array = social_tab_poverty_graph_vbars
+				entry_container = social_poverty_graph_segment_vbar
+				index = vbar_idx
+			}
+
+			social_poverty_graph_hbars = {
+				array = social_tab_econ_graph_months
+				entry_container = social_graph_segment_hbar
+				index = hbar_idx
+			}
+		}
+	}
+}
+
+# # Econ Trade Menu
+scripted_gui = {
+	# # Main
+	TNO_trade_view = {
+		window_name = "TNO_trade_view"
+		context_type = player_context
+		parent_window_token = trade_tab
+
+		# dirty = TNO_trade_gui_dirty
+
+		visible = {
+			econ_tradeView = yes
+		}
+
+		triggers = {
+			stockpile_box_missing_visible = {
+				check_variable = { TNO_stockpile^resource_type = 0 }
+			}
+			resource_icon_missing_visible = {
+				check_variable = { TNO_stockpile^resource_type = 0 }
+			}
+			selected_resource_icon_4_visible = {
+				check_variable = { box_idx > 0 }
+			}
+			selected_resource_icon_5_visible = {
+				check_variable = { box_idx > 1 }
+			}
+			selected_resource_icon_6_visible = {
+				check_variable = { box_idx > 2 }
+			}
+			sell_box_click_enabled = {
+				always = no
+				# NOT = { check_variable = { TNO_stockpile^TNO_market_selected_resource < amount } }
+			}
+			buy_box_click_enabled = {
+				always = no
+				# NOT = { check_variable = { production_units < amount } }
+				# NOT = { check_variable = { ZZZ.TNO_total_exports^TNO_market_selected_resource < amount } }
+			}
+
+			add_pus_button_visible = {
+				NOT = { check_variable = { TNO_market_selected_resource = 8 } }
+			}
+			sub_pus_button_visible = {
+				NOT = { check_variable = { TNO_market_selected_resource = 8 } }
+			}
+			autobalance_visible = {
+				NOT = { check_variable = { TNO_market_selected_resource = 8 } }
+			}
+			ai_checkbox_visible = {
+				NOT = { check_variable = { TNO_market_selected_resource = 8 } }
+			}
+			autobalance_cgs_visible = {
+				check_variable = { TNO_market_selected_resource = 8 }
+			}
+		}
+
+
+		effects = {
+			tab_bg_click = {
+				set_variable = { TNO_market_selected_resource = resource_type }
+				update_market_selected_tab = yes
+			}
+			buy_box_click = {
+				set_temp_variable = { cost = amount }
+				divide_temp_variable = { cost = 10 }
+				add_to_temp_variable = { cost = 0.49 }
+				round_temp_variable = cost
+
+				add_to_variable = { PU_imports = cost }
+				update_prod_units_trade = yes
+				add_to_variable = { TNO_stockpile^TNO_market_selected_resource = amount }
+				multiply_temp_variable = { cost = -1 }
+				add_to_array = { array = pending_trade_deals value = cost index = 0 }
+
+				country_event = {
+					id = economy.1
+					days = 30
+				}
+			}
+			sell_box_click = {
+				set_temp_variable = { cost = amount }
+				divide_temp_variable = { cost = 10 }
+				subtract_from_temp_variable = { cost = 0.5 }
+				round_temp_variable = cost
+
+				add_to_variable = { PU_exports = cost }
+				update_prod_units_trade = yes
+				subtract_from_variable = { TNO_stockpile^TNO_market_selected_resource = amount }
+				add_to_array = { array = pending_trade_deals value = cost index = 0 }
+
+				country_event = {
+					id = economy.1
+					days = 30
+				}
+			}
+			ai_checkbox_click = {
+				# Set 2 to 1 or vice-versa
+				if = {
+					limit = { check_variable = { TNO_trade_ai_on^TNO_market_selected_resource = 1 } }
+					set_variable = { TNO_trade_ai_on^TNO_market_selected_resource = 2 }
+
+					set_temp_variable = { resource_type = TNO_market_selected_resource }
+					auto_set_trade_pus = yes
+					update_market_recurring_trade = yes
+
+				}
+				else = {
+					set_variable = { TNO_trade_ai_on^TNO_market_selected_resource = 1 }
+				}
+			}
+
+			sub_pus_button_click = {
+				set_variable = { TNO_trade_ai_on^TNO_market_selected_resource = 1 }
+				add_to_variable = { TNO_recurring_trade_pus^TNO_market_selected_resource = 1 }
+				update_market_recurring_trade = yes
+			}
+			sub_pus_button_shift_click = {
+				set_variable = { TNO_trade_ai_on^TNO_market_selected_resource = 1 }
+				add_to_variable = { TNO_recurring_trade_pus^TNO_market_selected_resource = 5 }
+				update_market_recurring_trade = yes
+			}
+			sub_pus_button_control_click = {
+				set_variable = { TNO_trade_ai_on^TNO_market_selected_resource = 1 }
+				set_variable = { TNO_recurring_trade_pus^TNO_market_selected_resource = 0 }
+				update_market_recurring_trade = yes
+			}
+
+			add_pus_button_click = {
+				set_variable = { TNO_trade_ai_on^TNO_market_selected_resource = 1 }
+				subtract_from_variable = { TNO_recurring_trade_pus^TNO_market_selected_resource = 1 }
+				update_market_recurring_trade = yes
+			}
+			add_pus_button_shift_click = {
+				set_variable = { TNO_trade_ai_on^TNO_market_selected_resource = 1 }
+				subtract_from_variable = { TNO_recurring_trade_pus^TNO_market_selected_resource = 5 }
+				update_market_recurring_trade = yes
+			}
+			add_pus_button_control_click = {
+				set_variable = { TNO_trade_ai_on^TNO_market_selected_resource = 1 }
+				set_variable = { TNO_recurring_trade_pus^TNO_market_selected_resource = 0 }
+				update_market_recurring_trade = yes
+			}
+
+			trade_partners_title_header_influence_click = {
+				set_temp_variable = { trade_sort_var = 2 }
+				set_variable = { 1:trade_qs_compare = 1 }
+				create_sorted_trade_array = yes
+			}
+			trade_partners_title_header_trade_click = {
+				set_temp_variable = { trade_sort_var = 1 }
+				set_variable = { 2:trade_qs_compare = 1 }
+				create_sorted_trade_array = yes
+			}
+		}
+
+		properties = {
+			ai_checkbox = { frame = TNO_trade_ai_on^TNO_market_selected_resource }
+			resource_icon = { frame = resource_type }
+			resource_icon_missing = { frame = resource_type }
+			selected_resource_icon = { frame = TNO_market_selected_resource }
+			selected_resource_icon_2 = { frame = TNO_market_selected_resource }
+			selected_resource_icon_3 = { frame = TNO_market_selected_resource }
+			selected_resource_icon_4 = { frame = TNO_market_selected_resource }
+			selected_resource_icon_5 = { frame = TNO_market_selected_resource }
+			selected_resource_icon_6 = { frame = TNO_market_selected_resource }
+			tab_bg = { frame = TNO_market_tab_selected^resource_type }
+			econ_freedom_index_bar = { frame = economic_centralization }
+			econ_type_icon = { image = "[GetEconomyTypeGFX]" }
+
+			owner_flag = { image = "[?trade_partner.GetFlag]" }
+			owner_flag_border = { image = "[Get_owner_flag_overlay_GFX]" }
+			trade_trade_partner_box = { image = "[Get_trade_partner_box_GFX]" }
+		}
+
+		dynamic_lists = {
+			stockpile_boxes = {
+				array = trade_screen_resource_stockpiles
+				value = resource_type
+				entry_container = stockpile_entry
+			}
+			market_tabs = {
+				array = trade_screen_resources
+				value = resource_type
+				entry_container = TNO_trade_market_tab
+			}
+			trade_partners = {
+				array = TNO_trade_partners_display
+				entry_container = TNO_country_trade_entry
+				value = trade_partner
+			}
+		}
+
+		effects = {
+			trade_trade_partner_box_click = {
+				var:trade_partner = {
+					capital_scope = {
+						ROOT = {
+							goto_state = PREV
+						}
+					}
+				}
+			}
+		}
+	}
+
+	# # Trade Table
+	TNO_trade_table = {
+		window_name = "TNO_trade_table"
+		context_type = player_context
+		parent_window_name = trade_table_container
+
+		visible = {
+			always = yes
+		}
+
+		properties = {
+			resource_icon = { frame = resource_type }
+		}
+
+		dynamic_lists = {
+			table_columns = {
+				array = trade_screen_resources
+				value = resource_type
+				entry_container = TNO_trade_table_column
+			}
+		}
+	}
+}
+
+# # Construction Menu
+scripted_gui = {
+	# # Building Satisfaction
+	TNO_building_satisfaction_info = {
+		window_name = "TNO_building_satisfaction_info"
+		context_type = player_context
+		parent_window_token = construction_tab
+
+		visible = {
+			always = yes
+		}
+
+		properties = {
+			schools_prog = { frame = TNO_school_coverage_percent_gui }
+			hospitals_prog = { frame = TNO_hospital_coverage_percent_gui }
+			admins_prog = { frame = TNO_office_coverage_percent_gui }
+			bases_prog = { frame = TNO_barrack_coverage_percent_gui }
+			prisons_prog = { frame = TNO_prison_coverage_percent_gui }
+		}
+	}
+
+	# # Production Units Button
+	TNO_production_units_toggle_button_construction = {
+		window_name = "production_units_toggle_button_construction"
+		context_type = player_context
+		parent_window_token = construction_tab
+		dirty = TNO_production_gui_dirty
+
+		visible = {
+			always = yes
+		}
+
+		triggers = {
+			production_units_toggle_alert_visible = {
+				NOT = { has_country_flag = has_opened_pu_menu }
+			}
+		}
+
+		effects = {
+			production_units_toggle_const_click = {
+				if = {
+					limit = { has_country_flag = construction_production_units_open }
+					clr_country_flag = construction_production_units_open
+				}
+				else = {
+					set_country_flag = construction_production_units_open
+				}
+				set_country_flag = has_opened_pu_menu
+				update_production_unit_allocation = yes
+				add_to_variable = { TNO_production_gui_dirty = 1 }
+			}
+		}
+	}
+
+	# # Production Units Submenu
+	TNO_production_units_info_tab_parent = {
+		window_name = "production_units_info_tab_parent"
+		context_type = player_context
+		parent_window_token = construction_tab
+	}
+
+	TNO_production_units_info_tab = {
+		window_name = "production_units_info_tab"
+		context_type = player_context
+		parent_window_name = production_units_info_tab_parent_instance
+		dirty = TNO_production_gui_dirty
+
+		visible = {
+			has_country_flag = construction_production_units_open
+		}
+
+		dynamic_lists = {
+			production_squares = {
+				array = prod_units_production_display
+				change_scope = no
+				entry_container = production_units_production_square
+				index = square_idx
+			}
+		}
+
+		dynamic_lists = {
+			allocation_boxes = {
+				array = prod_units_allocation_types
+				value = good_type
+				entry_container = production_units_allocation_box
+			}
+		}
+
+		properties = {
+			box_pus = { frame = prod_units_display_amounts_frame^good_type }
+			box_pus_unfulfilled = { frame = prod_units_display_amounts_frame^good_type }
+			display_5_btn = { frame = prod_units_displaying_5^good_type }
+			display_10_btn = { frame = prod_units_displaying_10^good_type }
+			allocation_type_icon = {
+				image = "[Get_allocation_type_icon]"
+				frame = mils_mult
+			}
+			tokenizer_btn = { frame = mils_mult }
+			mini_workshop_icon = { image = "GFX_production_units_mini_workshop_[?mils_mult]" }
+		}
+
+		triggers = {
+			box_pus_visible = {
+				set_temp_variable = { thresh = square_idx }
+				multiply_temp_variable = { thresh = prod_units_display_amounts^good_type }
+
+				set_temp_variable = { amnt = PU_consumer_goods }
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_temp_variable = { amnt = PU_civilian_factories }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_temp_variable = { amnt = PU_military_factories }
+				}
+
+				check_variable = { amnt > thresh }
+			}
+			box_pus_unfulfilled_visible = {
+				set_temp_variable = { thresh = square_idx }
+				multiply_temp_variable = { thresh = prod_units_display_amounts^good_type }
+
+				set_temp_variable = { amnt = PU_consumer_goods }
+				set_temp_variable = { wanted = PU_consumer_goods_desired }
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_temp_variable = { amnt = PU_civilian_factories }
+					set_temp_variable = { wanted = PU_civilian_factories_desired }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_temp_variable = { amnt = PU_military_factories }
+					set_temp_variable = { wanted = PU_military_factories_desired }
+				}
+
+				NOT = { check_variable = { amnt > thresh } }
+				check_variable = { wanted > thresh }
+			}
+			add_pus_btn_click_enabled = {
+				NOT = { check_variable = { good_type = 2 } }
+			}
+			sub_pus_btn_click_enabled = {
+				NOT = { check_variable = { good_type = 2 } }
+			}
+		}
+
+		effects = {
+			tokenizer_btn_click = {
+				if = {
+					limit = { has_country_flag = tokenizer_flag_enabled }
+					clr_country_flag = tokenizer_flag_enabled
+					subtract_from_variable = { mils_mult = 1 }
+					update_production_unit_allocation = yes
+				}
+				else = {
+					set_country_flag = tokenizer_flag_enabled
+					add_to_variable = { mils_mult = 1 }
+					update_production_unit_allocation = yes
+				}
+			}
+			production_units_close_btn_click = {
+				clr_country_flag = construction_production_units_open
+			}
+
+			add_pus_btn_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					add_to_variable = { PU_civilian_factories_desired = 1 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					add_to_variable = { PU_military_factories_desired = 1 }
+				}
+				else = {
+					add_to_variable = { PU_consumer_goods_desired = 1 }
+				}
+				update_production_unit_allocation = yes
+			}
+			add_pus_btn_control_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					add_to_variable = { PU_civilian_factories_desired = 5 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					add_to_variable = { PU_military_factories_desired = 5 }
+				}
+				else = {
+					add_to_variable = { PU_consumer_goods_desired = 5 }
+				}
+				update_production_unit_allocation = yes
+			}
+			add_pus_btn_shift_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					add_to_variable = { PU_civilian_factories_desired = 10 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					add_to_variable = { PU_military_factories_desired = 10 }
+				}
+				else = {
+					add_to_variable = { PU_consumer_goods_desired = 10 }
+				}
+				update_production_unit_allocation = yes
+			}
+			sub_pus_btn_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					subtract_from_variable = { PU_civilian_factories_desired = 1 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					subtract_from_variable = { PU_military_factories_desired = 1 }
+				}
+				else = {
+					subtract_from_variable = { PU_consumer_goods_desired = 1 }
+				}
+				update_production_unit_allocation = yes
+			}
+			sub_pus_btn_control_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					subtract_from_variable = { PU_civilian_factories_desired = 5 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					subtract_from_variable = { PU_military_factories_desired = 5 }
+				}
+				else = {
+					subtract_from_variable = { PU_consumer_goods_desired = 5 }
+				}
+				update_production_unit_allocation = yes
+			}
+			sub_pus_btn_shift_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					subtract_from_variable = { PU_civilian_factories_desired = 10 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					subtract_from_variable = { PU_military_factories_desired = 10 }
+				}
+				else = {
+					subtract_from_variable = { PU_consumer_goods_desired = 10 }
+				}
+				update_production_unit_allocation = yes
+			}
+
+			display_5_btn_click = {
+				if = {
+					limit = { check_variable = { prod_units_display_amounts^good_type = 5 } }
+					set_variable = { prod_units_display_amounts^good_type = 1 }
+					update_prod_units_display = yes
+				}
+				else = {
+					set_variable = { prod_units_display_amounts^good_type = 5 }
+					update_prod_units_display = yes
+				}
+			}
+			display_10_btn_click = {
+				if = {
+					limit = { check_variable = { prod_units_display_amounts^good_type = 10 } }
+					set_variable = { prod_units_display_amounts^good_type = 1 }
+					update_prod_units_display = yes
+				}
+				else = {
+					set_variable = { prod_units_display_amounts^good_type = 10 }
+					update_prod_units_display = yes
+				}
+			}
+
+			production_box_click = {
+				set_variable = { desired = square_idx }
+				add_to_variable = { desired = 1 }
+				multiply_variable = { desired = prod_units_display_amounts^good_type }
+				clamp_variable = { var = desired min = 0 }
+
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_variable = { PU_civilian_factories_desired = desired }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_variable = { PU_military_factories_desired = desired }
+				}
+
+				update_production_unit_allocation = yes
+			}
+
+			production_box_right_click = {
+				set_variable = { desired = square_idx }
+				multiply_variable = { desired = prod_units_display_amounts^good_type }
+				clamp_variable = { var = desired min = 0 }
+
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_variable = { PU_civilian_factories_desired = desired }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_variable = { PU_military_factories_desired = desired }
+				}
+
+				update_production_unit_allocation = yes
+			}
+		}
+	}
+
+}
+
+# # Production Menu
+scripted_gui = {
+	# # Production Units Button
+	TNO_production_units_toggle_button_production = {
+		window_name = "production_units_toggle_button_production"
+		context_type = player_context
+		parent_window_token = production_tab
+		dirty = TNO_production_gui_dirty
+
+		visible = {
+			always = yes
+		}
+
+		triggers = {
+			production_units_toggle_alert_visible = {
+				NOT = { has_country_flag = has_opened_pu_menu }
+			}
+		}
+
+		effects = {
+			production_units_toggle_prod_click = {
+				if = {
+					limit = { has_country_flag = production_production_units_open }
+					clr_country_flag = production_production_units_open
+				}
+				else = {
+					set_country_flag = production_production_units_open
+				}
+				set_country_flag = has_opened_pu_menu
+				update_production_unit_allocation = yes
+				add_to_variable = { TNO_production_gui_dirty = 1 }
+			}
+		}
+	}
+
+	# # Production Units Submenu
+	TNO_production_units_info_tab_3_parent = {
+		window_name = "production_units_info_tab_3_parent"
+		context_type = player_context
+		parent_window_token = production_tab
+	}
+
+	TNO_production_units_info_tab_3 = {
+		window_name = "production_units_info_tab_3"
+		context_type = player_context
+		parent_window_name = production_units_info_tab_3_parent_instance
+		dirty = TNO_production_gui_dirty
+
+		visible = {
+			has_country_flag = production_production_units_open
+		}
+
+		dynamic_lists = {
+			production_squares = {
+				array = prod_units_production_display
+				change_scope = no
+				entry_container = production_units_production_square
+				index = square_idx
+			}
+		}
+
+		dynamic_lists = {
+			allocation_boxes = {
+				array = prod_units_allocation_types
+				value = good_type
+				entry_container = production_units_allocation_box
+			}
+		}
+
+		properties = {
+			box_pus = { frame = prod_units_display_amounts_frame^good_type }
+			box_pus_unfulfilled = { frame = prod_units_display_amounts_frame^good_type }
+			display_5_btn = { frame = prod_units_displaying_5^good_type }
+			display_10_btn = { frame = prod_units_displaying_10^good_type }
+			allocation_type_icon = {
+				image = "[Get_allocation_type_icon]"
+				frame = mils_mult
+			}
+			tokenizer_btn_3 = { frame = mils_mult }
+			mini_workshop_icon_3 = { image = "GFX_production_units_mini_workshop_[?mils_mult]" }
+		}
+
+		triggers = {
+			box_pus_visible = {
+				set_temp_variable = { thresh = square_idx }
+				multiply_temp_variable = { thresh = prod_units_display_amounts^good_type }
+
+				set_temp_variable = { amnt = PU_consumer_goods }
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_temp_variable = { amnt = PU_civilian_factories }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_temp_variable = { amnt = PU_military_factories }
+				}
+				check_variable = { amnt > thresh }
+			}
+			box_pus_unfulfilled_visible = {
+				set_temp_variable = { thresh = square_idx }
+				multiply_temp_variable = { thresh = prod_units_display_amounts^good_type }
+
+				set_temp_variable = { amnt = PU_consumer_goods }
+				set_temp_variable = { wanted = PU_consumer_goods_desired }
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_temp_variable = { amnt = PU_civilian_factories }
+					set_temp_variable = { wanted = PU_civilian_factories_desired }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_temp_variable = { amnt = PU_military_factories }
+					set_temp_variable = { wanted = PU_military_factories_desired }
+				}
+
+				NOT = { check_variable = { amnt > thresh } }
+				check_variable = { wanted > thresh }
+			}
+			add_pus_btn_click_enabled = {
+				NOT = { check_variable = { good_type = 2 } }
+			}
+			sub_pus_btn_click_enabled = {
+				NOT = { check_variable = { good_type = 2 } }
+			}
+		}
+
+		effects = {
+			tokenizer_btn_3_click = {
+				if = {
+					limit = { has_country_flag = tokenizer_flag_enabled }
+					clr_country_flag = tokenizer_flag_enabled
+					subtract_from_variable = { mils_mult = 1 }
+					update_production_unit_allocation = yes
+				}
+				else = {
+					set_country_flag = tokenizer_flag_enabled
+					add_to_variable = { mils_mult = 1 }
+					update_production_unit_allocation = yes
+				}
+			}
+			production_units_close_btn_click = {
+				clr_country_flag = production_production_units_open
+			}
+			add_pus_btn_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					add_to_variable = { PU_civilian_factories_desired = 1 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					add_to_variable = { PU_military_factories_desired = 1 }
+				}
+				else = {
+					add_to_variable = { PU_consumer_goods_desired = 1 }
+				}
+				update_production_unit_allocation = yes
+			}
+			add_pus_btn_control_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					add_to_variable = { PU_civilian_factories_desired = 5 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					add_to_variable = { PU_military_factories_desired = 5 }
+				}
+				else = {
+					add_to_variable = { PU_consumer_goods_desired = 5 }
+				}
+				update_production_unit_allocation = yes
+			}
+			add_pus_btn_shift_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					add_to_variable = { PU_civilian_factories_desired = 10 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					add_to_variable = { PU_military_factories_desired = 10 }
+				}
+				else = {
+					add_to_variable = { PU_consumer_goods_desired = 10 }
+				}
+				update_production_unit_allocation = yes
+			}
+			sub_pus_btn_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					subtract_from_variable = { PU_civilian_factories_desired = 1 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					subtract_from_variable = { PU_military_factories_desired = 1 }
+				}
+				else = {
+					subtract_from_variable = { PU_consumer_goods_desired = 1 }
+				}
+				update_production_unit_allocation = yes
+			}
+			sub_pus_btn_control_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					subtract_from_variable = { PU_civilian_factories_desired = 5 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					subtract_from_variable = { PU_military_factories_desired = 5 }
+				}
+				else = {
+					subtract_from_variable = { PU_consumer_goods_desired = 5 }
+				}
+				update_production_unit_allocation = yes
+			}
+			sub_pus_btn_shift_click = {
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					subtract_from_variable = { PU_civilian_factories_desired = 10 }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					subtract_from_variable = { PU_military_factories_desired = 10 }
+				}
+				else = {
+					subtract_from_variable = { PU_consumer_goods_desired = 10 }
+				}
+				update_production_unit_allocation = yes
+			}
+
+			display_5_btn_click = {
+				if = {
+					limit = { check_variable = { prod_units_display_amounts^good_type = 5 } }
+					set_variable = { prod_units_display_amounts^good_type = 1 }
+					update_prod_units_display = yes
+				}
+				else = {
+					set_variable = { prod_units_display_amounts^good_type = 5 }
+					update_prod_units_display = yes
+				}
+			}
+			display_10_btn_click = {
+				if = {
+					limit = { check_variable = { prod_units_display_amounts^good_type = 10 } }
+					set_variable = { prod_units_display_amounts^good_type = 1 }
+					update_prod_units_display = yes
+				}
+				else = {
+					set_variable = { prod_units_display_amounts^good_type = 10 }
+					update_prod_units_display = yes
+				}
+			}
+
+			production_box_click = {
+				set_variable = { desired = square_idx }
+				add_to_variable = { desired = 1 }
+				multiply_variable = { desired = prod_units_display_amounts^good_type }
+				clamp_variable = { var = desired min = 0 }
+
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_variable = { PU_civilian_factories_desired = desired }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_variable = { PU_military_factories_desired = desired }
+				}
+
+				update_production_unit_allocation = yes
+			}
+
+			production_box_right_click = {
+				set_variable = { desired = square_idx }
+				multiply_variable = { desired = prod_units_display_amounts^good_type }
+				clamp_variable = { var = desired min = 0 }
+
+				if = {
+					limit = { check_variable = { good_type = 0 } }
+					set_variable = { PU_civilian_factories_desired = desired }
+				}
+				else_if = {
+					limit = { check_variable = { good_type = 1 } }
+					set_variable = { PU_military_factories_desired = desired }
+				}
+
+				update_production_unit_allocation = yes
+			}
+
+		}
+	}
+}
+
+# # Tutorial / Help
+scripted_gui = {
+
+	TNO_economy_help = {
+		window_name = "TNO_economy_help"
+		context_type = player_context
+		parent_window_token = trade_tab
+
+		visible = {
+			has_country_flag = TNO_economy_help_open
+		}
+
+		triggers = {
+			prev_help_page_click_enabled = { check_variable = { TNO_economy_help_index > 0 } }
+			next_help_page_click_enabled = { check_variable = { TNO_economy_help_index < 3 } }
+		}
+
+		effects = {
+			help_close_button_click = {
+				clr_country_flag = TNO_economy_help_open
+			}
+			prev_help_page_click = {
+				subtract_from_variable = { TNO_economy_help_index = 1 }
+			}
+			next_help_page_click = {
+				add_to_variable = { TNO_economy_help_index = 1 }
+			}
+		}
+	}
+}
+
+scripted_gui = {
+	TNO_SG_econ_help_arrows = {
+		context_type = player_context
+		parent_window_token = trade_tab
+		window_name = "TNO_SG_econ_help_arrows"
+
+		visible = { NOT = { ROOT = { has_country_flag = TNO_econ_help_arrows_dismissed } } }
+	}
+}

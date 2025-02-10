@@ -1,0 +1,288 @@
+add_namespace = OMA
+
+country_event = { # Qaboos plans a coup
+	id = OMA.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OMA.1" }
+	title = OMA.1.t
+	desc = OMA.1.d
+	picture = GFX_report_event_generic_map
+
+	is_triggered_only = yes
+
+	option = {
+		name = OMA.1.a
+		ITA = {
+			country_event = {
+				id = OMA.2
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { # Back Qaboos
+	id = OMA.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OMA.2" }
+	title = OMA.2.t
+	desc = OMA.2.d
+	picture = GFX_report_event_generic_map
+
+	is_triggered_only = yes
+
+	option = {
+		name = OMA.2.a
+		OMA = {
+			country_event = { id = OMA.3 days = 4 }
+		}
+	}
+}
+
+country_event = { # Qaboos coups
+	id = OMA.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OMA.3" }
+	title = OMA.3.t
+	desc = OMA.3.d
+	picture = GFX_report_event_generic_map
+
+	is_triggered_only = yes
+
+	option = {
+		name = OMA.3.a
+
+		remove_ideas = OMA_the_old_sultan
+		
+		load_oob = OMA_oil_crisis
+		set_politics = {
+			ruling_party = paternalism
+		}
+		add_popularity = {
+			ideology = despotism
+			popularity = -0.2
+		}
+		add_popularity = {
+			ideology = paternalism
+			popularity = 0.2
+		}
+		hidden_effect = {
+			country_event = { id = OMA.4 days = 4 }
+			country_event = { id = OMA.5 days = 6 }
+		}
+	}
+}
+
+country_event = { # Imamate of Oman
+	id = OMA.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OMA.4" }
+	title = OMA.4.t
+	desc = OMA.4.d
+	picture = GFX_report_event_generic_map
+
+	is_triggered_only = yes
+
+	option = {
+		name = OMA.4.a
+		hidden_effect = {
+			every_country = {
+				news_event = {
+					id = WORLD.948
+					days = 1
+				}
+			}
+		}
+		remove_state_core = 1336
+		add_state_claim = 1336
+		1336 = { set_compliance = 100 }
+		OMI = {
+			add_state_core = 914
+			add_state_core = 915
+			add_state_core = 294
+			add_state_core = 913
+			add_state_claim = 1336
+			transfer_state = 914
+			load_oob = OMI_oil_crisis
+
+			add_ideas = OIL_surrender_modifier_weak
+		}
+		hidden_effect = {
+			declare_war_on = {
+				target = OMI
+				type = civil_war
+			}
+
+			914 = {
+				add_building_construction = {
+					type = naval_base
+					level = 1
+					instant_build = yes
+					province = 8002
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Dhofar Rebellion
+	id = OMA.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OMA.5" }
+	title = OMA.5.t
+	desc = OMA.5.d
+	picture = GFX_report_event_generic_map
+
+	is_triggered_only = yes
+
+	option = {
+		name = OMA.5.a
+		OMB = {
+			add_state_core = 914
+			add_state_core = 915
+			add_state_core = 294
+			add_state_core = 913
+			add_state_claim = 1336
+			transfer_state = 913
+			load_oob = OMB_oil_crisis
+
+			add_ideas = OIL_surrender_modifier_weak
+		}
+		hidden_effect = {
+			OMB = {
+				declare_war_on = {
+					target = OMI
+					type = civil_war
+				}
+				declare_war_on = {
+					target = OMA
+					type = civil_war
+				}
+			}
+
+			913 = {
+				add_building_construction = {
+					type = naval_base
+					level = 1
+					instant_build = yes
+					province = 2103
+				}
+			}
+		}
+		set_global_flag = Omman_CW
+	}
+}
+
+country_event = { #Oman Civil War End- Qaboos Victory
+	id = OMA.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OMA.6" }
+	title = OMA.6.t
+	desc = OMA.6.d
+	picture = GFX_report_event_generic_map
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = OMA.6.a
+
+		#Make Oman into an italian associated state.
+		OMA = { 
+			ITA = {
+				set_autonomy = { target = OMA autonomy_state = autonomy_italy_associate }
+			}
+
+			set_politics = { ruling_party = paternalism }
+			set_popularities = {
+				communist = 20
+				socialist = 10
+				progressivism = 0
+				liberalism = 0
+				conservatism = 0
+				paternalism = 50
+				despotism = 20
+				fascism = 0
+				ultranationalism = 0
+			}
+		}
+
+		#Then- if italy is in a faction- join that faction.
+		if = {
+			limit = { ITA = { is_in_faction_with = USA } }
+			USA = { add_to_faction = OMA }
+			OMA = { add_ideas = OFN_Independent_Member }
+		}
+		else_if = {
+			limit = { ITA = { is_in_faction_with = JAP } }
+			JAP = { add_to_faction = OMA }
+			OMA = { add_ideas = Sphere_Coequal }
+		}
+		else_if = {
+			limit = { ITA = { is_in_faction = yes } }
+			ITA = { add_to_faction = OMA }
+			OMA = {
+				if = {
+					limit = { ITA = { has_idea = ITA_Mediterranean_Bloc_Leader } }
+					add_ideas = ITA_Mediterranean_Bloc_Member
+				}
+				if = {
+					limit = { ITA = { has_idea = ITA_Imperial_Alliance_Leader } }
+					add_ideas = ITA_Imperial_Alliance_Member
+				}
+				if = {
+					limit = { ITA = { has_idea = ITA_Rome_Pact_Leader } }
+					add_ideas = ITA_Rome_Pact_Member
+				}
+			}
+		}
+
+		OMA = {
+			set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Capitalism }
+			econ_type_change = yes
+		}
+		
+		OMB = { remove_state_claim = 1336 }
+		OMI = { remove_state_claim = 1336 }
+		remove_state_claim = 1336
+		add_state_core = 1336
+		news_event = { id = WORLD.18028 days = 1 }
+	}
+}
+
+country_event = { #Oman Civil War End- Imamate Victory
+	id = OMA.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OMA.7" }
+	title = OMA.7.t
+	desc = OMA.7.d
+	picture = GFX_report_event_generic_map
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = OMA.7.a
+		OMA = { remove_state_claim = 1336 }
+		OMB = { remove_state_claim = 1336 }
+		remove_state_claim = 1336
+		add_state_core = 1336
+		news_event = { id = WORLD.18021 days = 1 }
+	}
+}
+
+country_event = { #Oman Civil War End- Dhofar Victory
+	id = OMA.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OMA.8" }
+	title = OMA.8.t
+	desc = OMA.8.d
+	picture = GFX_report_event_generic_map
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = OMA.8.a
+		
+		OMB = { remove_state_claim = 1336 }
+		OMI = { remove_state_claim = 1336 }
+		remove_state_claim = 1336
+		add_state_core = 1336
+		set_country_flag = UAR_can_join
+		set_cosmetic_tag = OMB_postwar
+		news_event = { id = WORLD.18020 days = 1 }
+	}
+}

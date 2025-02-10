@@ -1,0 +1,1872 @@
+#######################################
+##		 Puerto Plata Invasion       ##
+#######################################
+# Debug
+# Invasion Preparation
+#
+
+MEX_foreign_policy_category = {
+	## Debug ##
+	MEX_PPI_hidden = {
+		priority = 14990
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_civil_support
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			OR = {
+				has_global_flag = PPI_proxy_war_preparation
+				has_global_flag = PPI_landing_ongoing
+				ZZZ = { has_active_mission = ZZZ_PPI_DOM_CAL_Negotiations }
+			}
+			ZZZ = {
+				OR = {
+					has_active_mission = ZZZ_PPI_Invasion_Begins
+					has_active_mission = ZZZ_PPI_CAL_training
+					has_active_mission = ZZZ_PPI_Invasion_Ends
+					has_active_mission = ZZZ_PPI_DOM_CAL_Negotiations
+				}
+			}
+		}
+		available = {
+			always = no
+		}
+		ai_will_do = { base = 100 }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_hidden"
+			effect_tooltip = {
+				if = {
+					limit = { ZZZ = { has_active_mission = ZZZ_PPI_Invasion_Begins } }
+
+				}
+				else_if = {
+					limit = { ZZZ = { has_active_mission = ZZZ_PPI_CAL_training } }
+					custom_effect_tooltip = USA_PPI_CAL_training_tt
+				}
+				else_if = {
+					limit = { ZZZ = { has_active_mission = ZZZ_PPI_Invasion_Ends } }
+					custom_effect_tooltip = USA_PP_collapse_tooltip
+				}
+				else_if = {
+					limit = { ZZZ = { has_active_mission = ZZZ_PPI_DOM_CAL_Negotiations } }
+					custom_effect_tooltip = USA_PP_negotiations_tooltip
+				}
+			}
+		}
+	}
+
+	## Invasion Preparation ##
+	# Infantry Brigades #
+	MEX_PPI_show_infantry = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_visibility
+		days_re_enable = 0
+		visible = {
+			NOT = {
+				has_country_flag = MEX_show_infantry
+			}
+			TNO_fopo_puerto_plata_selected = yes
+			has_global_flag = PPI_proxy_war_preparation
+			ZZZ = { has_active_mission = ZZZ_PPI_CAL_training }
+		}
+		ai_will_do = { base = 100 }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_show_infantry"
+			set_country_flag = MEX_show_infantry
+		}
+	}
+	MEX_PPI_hide_infantry = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_visibility_closed
+		days_re_enable = 0
+		visible = {
+			has_country_flag = MEX_show_infantry
+			TNO_fopo_puerto_plata_selected = yes
+			is_ai = no
+			has_global_flag = PPI_proxy_war_preparation
+			ZZZ = { has_active_mission = ZZZ_PPI_CAL_training }
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_hide_infantry"
+			clr_country_flag = MEX_show_infantry
+		}
+	}
+
+	MEX_PPI_prepare_cuban_intervention = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_green_indent
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 5 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_infantry
+		}
+		ai_will_do = { base = 100 }
+		fire_only_once = yes
+		days_remove = 14
+		complete_effect = { hidden_effect = { add_command_power = -5 } }
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: MEX_PPI_prepare_cuban_intervention"
+
+			set_country_flag = MEX_PPI_Cuban_Intervention_Prepared
+			custom_effect_tooltip = MEX_PPI_prepare_cuban_intervention_tt
+		}
+	}
+	MEX_PPI_form_cuban_column = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_green_indent
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 12 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			ZZZ = { has_active_mission = ZZZ_PPI_CAL_training }
+			has_country_flag = MEX_show_infantry
+			has_country_flag = MEX_PPI_Cuban_Intervention_Prepared
+			NOT = { has_country_flag = MEX_PPI_Cubana_2 }
+		}
+		ai_will_do = { base = 100 }
+		days_re_enable = 5
+		days_remove = 28
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: MEX_PPI_form_column"
+			hidden_effect = { add_command_power = -12 }
+		}
+		remove_effect = {
+			set_temp_variable = { invasion_minimum_supply_temp = 20 }
+			TNO_USA_PP_minimum_supply_add = yes
+
+			add_to_variable = { USA.USA_PP_Army = 1 }
+			custom_effect_tooltip = MEX_PPI_form_column_tt
+
+			if = {
+				limit = { check_variable = { PPI_Cuban_Column_Number = 0 } }
+				set_country_flag = MEX_PPI_Cubana_1
+				set_country_flag = MEX_mexican_battalion_created
+			}
+			if = {
+				limit = { check_variable = { PPI_Cuban_Column_Number = 1 } }
+				set_country_flag = MEX_PPI_Cubana_2
+			}
+
+			add_to_variable = { PPI_Cuban_Column_Number = 1 }
+		}
+	}
+	MEX_PPI_open_offices = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_indent
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 5 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			NOT = { check_variable = { PPI_Office_Number = 3 } }
+			has_country_flag = MEX_show_infantry
+		}
+		ai_will_do = { base = 100 }
+		days_re_enable = 7
+		days_remove = 14
+		complete_effect = { hidden_effect = { add_command_power = -5 } }
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: MEX_PPI_open_offices"
+
+			add_to_variable = { PPI_Office_Number = 1 }
+			add_to_variable = { PPI_Office_Available = 1 }
+			custom_effect_tooltip = MEX_PPI_open_offices_tt
+		}
+	}
+	MEX_PPI_form_column = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_indent
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 4 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			check_variable = { PPI_Office_Number > 0 }
+			ZZZ = { has_active_mission = ZZZ_PPI_CAL_training }
+			has_country_flag = MEX_show_infantry
+			NOT = { has_country_flag = MEX_PPI_Legion_5 }
+		}
+		ai_will_do = {
+			base = 100
+			modifier = {
+				factor = 0
+				USA = { is_ai = no }
+			}
+		}
+		days_re_enable = 5
+		days_remove = 28
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: MEX_PPI_form_column"
+			hidden_effect = { add_command_power = -8 }
+		}
+		remove_effect = {
+
+			set_temp_variable = { invasion_minimum_supply_temp = 12 }
+			TNO_USA_PP_minimum_supply_add = yes
+
+			add_to_variable = { USA.USA_PP_Army = 1 }
+			custom_effect_tooltip = MEX_PPI_form_column_tt
+
+			if = {
+				limit = { check_variable = { PPI_Column_Number = 0 } }
+				set_country_flag = MEX_PPI_Legion_3
+				set_country_flag = MEX_mexican_battalion_created
+			}
+			if = {
+				limit = { check_variable = { PPI_Column_Number = 1 } }
+				set_country_flag = MEX_PPI_Legion_4
+			}
+			if = {
+				limit = { check_variable = { PPI_Column_Number = 2 } }
+				set_country_flag = MEX_PPI_Legion_5
+			}
+
+			add_to_variable = { PPI_Column_Number = 1 }
+			add_to_variable = { PPI_Office_Available = -1 }
+		}
+	}
+	MEX_PPI_training_bases = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_indent
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 5 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			NOT = { check_variable = { PPI_Base_Number = 3 } }
+			has_country_flag = MEX_show_infantry
+		}
+		ai_will_do = { base = 100 }
+		days_re_enable = 7
+		days_remove = 21
+		complete_effect = { hidden_effect = { add_command_power = -5 } }
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: MEX_PPI_training_bases"
+			custom_effect_tooltip = MEX_PPI_training_bases_tt
+
+			if = {
+				limit = { check_variable = { PPI_Base_Number = 0 } } # Yucatán
+				CAL = {
+					hidden_effect = { add_dynamic_modifier = { modifier = CAL_Specialised_Training } }
+					add_to_variable = { CAL_specialised_training_hot_acclimatisation = 0.15 }
+					add_to_variable = { CAL_specialised_training_experience_gain = 0.05 }
+					add_to_variable = { CAL_specialised_training_combat_width = -0.05 }
+					add_to_variable = { CAL_specialised_training_pocket_penalty = -0.05 }
+				}
+				custom_effect_tooltip = MEX_PPI_training_bases_yucatan_tt
+			}
+			if = {
+				limit = { check_variable = { PPI_Base_Number = 1 } } # Holguín
+				CAL = {
+					add_to_variable = { CAL_specialised_training_experience_gain = 0.05 }
+					add_to_variable = { CAL_specialised_training_breakthrough = 0.05 }
+				}
+				custom_effect_tooltip = MEX_PPI_training_bases_holguin_tt
+			}
+			if = {
+				limit = { check_variable = { PPI_Base_Number = 2 } } # Guantánamo
+				CAL = {
+					add_to_variable = { CAL_specialised_training_experience_gain = 0.05 }
+					add_to_variable = { CAL_specialised_training_combat_width = -0.05 }
+				}
+				TNO_PP_cooperation_increase_low = yes
+				custom_effect_tooltip = MEX_PPI_training_bases_guantanamo_tt
+			}
+
+			add_to_variable = { PPI_Base_Number = 1 }
+			add_to_variable = { PPI_Base_Available = 1 }
+		}
+	}
+	MEX_PPI_train_brigade = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_indent
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			has_country_flag = MEX_show_infantry
+			has_global_flag = PPI_proxy_war_preparation
+			OR = {
+				AND = {
+					has_country_flag = MEX_PPI_Legion_3
+					NOT = { has_country_flag = MEX_PPI_Legion_3_trained }
+				}
+				AND = {
+					has_country_flag = MEX_PPI_Legion_4
+					NOT = { has_country_flag = MEX_PPI_Legion_4_trained }
+				}
+				AND = {
+					has_country_flag = MEX_PPI_Legion_5
+					NOT = { has_country_flag = MEX_PPI_Legion_5_trained }
+				}
+			}
+			ZZZ = { has_active_mission = ZZZ_PPI_CAL_training }
+			check_variable = { PPI_Base_Available > 0 }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 8 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+		ai_will_do = {
+			base = 65
+			modifier = {
+				factor = 0
+				USA = { is_ai = no }
+			}
+		}
+		days_re_enable = 7
+		days_remove = 21
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_train_brigade"
+			hidden_effect = { add_command_power = -8 }
+		}
+		remove_effect = {
+			if = {
+				limit = {
+					has_country_flag = MEX_PPI_Legion_3
+					NOT = { has_country_flag = MEX_PPI_Legion_3_trained }
+				}
+				set_country_flag = MEX_PPI_Legion_3_trained
+			}
+			else_if = {
+				limit = {
+					has_country_flag = MEX_PPI_Legion_4
+					NOT = { has_country_flag = MEX_PPI_Legion_4_trained }
+				}
+				set_country_flag = MEX_PPI_Legion_4_trained
+			}
+			else = {
+				set_country_flag = MEX_PPI_Legion_5_trained
+			}
+
+			set_temp_variable = { invasion_minimum_supply_temp = 6 }
+			TNO_USA_PP_minimum_supply_decrease = yes
+
+			custom_effect_tooltip = USA_PPI_Train_Brigade_tt
+
+			add_to_variable = { PPI_Base_Available = -1 }
+		}
+	}
+	MEX_PPI_acclimatization_and_guerrilla_training = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_indent
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 5 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			check_variable = { PPI_Base_Number > 0 }
+			has_country_flag = MEX_show_infantry
+		}
+		ai_will_do = { base = 100 }
+		fire_only_once = yes
+		days_remove = 21
+		complete_effect = { hidden_effect = { add_command_power = -5 } }
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: MEX_PPI_acclimatization_and_guerrilla_training"
+
+			set_temp_variable = { invasion_minimum_supply_temp = 8 }
+			TNO_USA_PP_minimum_supply_decrease = yes
+
+			custom_effect_tooltip = MEX_PPI_acclimatization_and_guerrilla_training_tt
+			CAL = {
+				add_to_variable = { CAL_specialised_training_hot_acclimatisation = 0.10 }
+				add_to_variable = { CAL_specialised_training_experience_gain = 0.05 }
+				add_to_variable = { CAL_specialised_training_combat_width = -0.05 }
+				add_to_variable = { CAL_specialised_training_pocket_penalty = -0.05 }
+			}
+		}
+	}
+	MEX_PPI_amphibious_training = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_indent
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 5 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			check_variable = { PPI_Base_Number > 1 }
+			has_country_flag = MEX_show_infantry
+		}
+		ai_will_do = { base = 100 }
+		fire_only_once = yes
+		days_remove = 21
+		complete_effect = { hidden_effect = { add_command_power = -5 } }
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: MEX_PPI_amphibious_training"
+			custom_effect_tooltip = MEX_PPI_amphibious_training_tt
+			CAL = {
+				add_to_variable = { CAL_specialised_training_experience_gain = 0.05 }
+				add_to_variable = { CAL_specialised_training_speed = 0.05 }
+				add_to_variable = { CAL_specialised_training_org_regain = 0.05 }
+			}
+		}
+	}
+	MEX_PPI_airborne_training_1 = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_indent
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 5 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			check_variable = { PPI_Base_Number > 1 }
+			has_country_flag = MEX_show_infantry
+		}
+		ai_will_do = { base = 100 }
+		fire_only_once = yes
+		days_remove = 21
+		complete_effect = { hidden_effect = { add_command_power = -5 } }
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: MEX_PPI_airborne_training_1"
+			custom_effect_tooltip = MEX_PPI_airborne_training_1_tt
+			CAL = {
+				add_to_variable = { CAL_specialised_training_breakthrough = 0.05 }
+				add_to_variable = { CAL_specialised_training_pocket_penalty = -0.05 }
+			}
+			set_temp_variable = { invasion_minimum_supply_temp = 2 }
+			TNO_USA_PP_minimum_supply_decrease = yes
+			set_country_flag = MEX_PPI_airborne_training_1
+		}
+	}
+	MEX_PPI_airborne_training_2 = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_indent
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 5 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			check_variable = { PPI_Base_Number > 2 }
+			has_country_flag = MEX_PPI_airborne_training_1
+			has_country_flag = MEX_show_infantry
+		}
+
+		ai_will_do = {
+			base = 100
+			modifier = {
+				factor = 0
+				USA = { is_ai = no }
+			}
+		}
+
+		fire_only_once = yes
+		days_remove = 21
+		complete_effect = { hidden_effect = { add_command_power = -5 } }
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: MEX_PPI_airborne_training_2"
+			custom_effect_tooltip = MEX_PPI_airborne_training_2_tt
+			CAL = {
+				add_to_variable = { CAL_specialised_training_experience_gain = 0.05 }
+				add_to_variable = { CAL_specialised_training_breakthrough = 0.05 }
+				add_to_variable = { CAL_specialised_training_pocket_penalty = -0.05 }
+			}
+			set_temp_variable = { invasion_minimum_supply_temp = 3 }
+			TNO_USA_PP_minimum_supply_decrease = yes
+			TNO_PP_cooperation_increase_low = yes
+		}
+	}
+
+	#MEX_PPI_lease_cuba_air_wings = {
+	#	allowed = { original_tag = MEX }
+	#	icon = GFX_decision_generic_civil_support
+	#	custom_cost_trigger = {
+	#		command_power > 24.99
+	#	}
+	#	custom_cost_text = decision_cost_25_cp
+	#
+	#	visible = {
+	#		TNO_fopo_puerto_plata_selected = yes
+	#		original_tag = MEX
+	#		has_global_flag = PPI_proxy_war_preparation
+	#	}
+	#	fire_only_once = yes
+	#	#ai_will_do = { base = 100 }
+	#	complete_effect = {
+	#		log = "[GetDateText]: [Root.GetName]: MEX_PPI_lease_cuba_air_wings"
+	#		#country_event = { id = MEX_Puerto_Plata.7 }
+	#		custom_effect_tooltip = MEX_PPI_mexican_american_pp_cooperation_tt
+	#		add_to_variable = { MEX.PP_mexican_american_cooperation = 1 }
+	#		add_equipment_to_stockpile = {
+	#			type = jet_fighter_equipment_1
+	#			amount = -25
+	#		}
+	#		CAL = {
+	#			add_equipment_to_stockpile = {
+	#				type = jet_fighter_equipment_1
+	#				amount = 25
+	#			}
+	#		}
+	#		hidden_effect = { add_command_power = -25 }
+	#	}
+	#}
+	MEX_PPI_show_supply_decisions = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_visibility
+		days_re_enable = 0
+		ai_will_do = { base = 100 }
+		visible = {
+			AND = {
+				NOT = { has_country_flag = MEX_show_support_decisions }
+				TNO_fopo_puerto_plata_selected = yes
+				has_global_flag = PPI_proxy_war_preparation
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_show_supply_decisions"
+			set_country_flag = MEX_show_support_decisions
+		}
+	}
+	MEX_PPI_hide_supply_decisions = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_visibility_closed
+		days_re_enable = 0
+		visible = {
+			AND = {
+				has_country_flag = MEX_show_support_decisions
+				TNO_fopo_puerto_plata_selected = yes
+				has_global_flag = PPI_proxy_war_preparation
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_hide_supply_decisions"
+			clr_country_flag = MEX_show_support_decisions
+		}
+	}
+	# TODO add an AI organize supplies decision for Mexico
+	MEX_PPI_organize_supplies = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_supply_indent
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			has_country_flag = MEX_show_support_decisions
+			OR = {
+				has_global_flag = PPI_landing_ongoing
+				has_global_flag = PPI_proxy_war_preparation
+			}
+		}
+
+		days_remove = 7
+
+		cost = 15
+
+		remove_effect = {
+			hidden_effect = {
+				add_to_variable = { MEX.pp_supply_decision_cost_cp = 4 }
+				add_to_variable = { MEX.pp_supply_decision_cost_pp = 8 }
+				if = {
+					limit = { check_variable = { MEX.pp_supply_decision_effect > 5 } }
+					subtract_from_variable = { MEX.pp_supply_decision_effect = 1 }
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_organize_supplies"
+			hidden_effect = { add_command_power = -MEX.pp_supply_decision_cost_cp add_political_power = -MEX.pp_supply_decision_cost_pp }
+			set_temp_variable = { invasion_supply_temp = MEX.pp_supply_decision_effect }
+			TNO_USA_PP_invasion_supply_add = yes
+		}
+	}
+	MEX_PPI_mobilize_resources = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_supply_indent
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_support_decisions
+		}
+		custom_cost_trigger = {
+			check_variable = { USA.US_PP_supply > 9.99 }
+		}
+		custom_cost_text = JP_PHI_10_Supply_cost
+
+		fire_only_once = yes
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_Mobilize_Resources"
+			set_temp_variable = { invasion_supply_temp = 10 }
+			TNO_USA_PP_invasion_supply_decrease = yes
+			add_command_power = 25
+		}
+	}
+	MEX_PPI_provide_guns = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade_indent
+		days_remove = 5
+		ai_will_do = { base = 20 }
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_support_decisions
+		}
+
+		custom_cost_trigger = {
+			has_political_power > 9
+			has_equipment = { infantry_equipment > 499 }
+		}
+		custom_cost_text = decision_cost_10_pp_500_inf_eq
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_organize_supplies"
+			hidden_effect = {
+				add_political_power = -10
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = -500
+				}
+			}
+			CAL = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = 500
+				}
+			}
+		}
+	}
+	MEX_PPI_rally_oas_support = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_political_action_indent
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_support_decisions
+		}
+
+		ai_will_do = {
+			base = 100
+			modifier = {
+				factor = 0
+				USA = { is_ai = no }
+			}
+		}
+
+		fire_only_once = yes
+
+		cost = 25
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_rally_oas_support"
+			set_temp_variable = { invasion_supply_temp = 10 }
+			TNO_USA_PP_invasion_supply_add = yes
+			TNO_PP_cooperation_increase_high = yes
+		}
+	}
+	MEX_PPI_unleash_the_dgi = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_phone_call_indent
+		days_remove = 7
+		ai_will_do = { base = 10 }
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_support_decisions
+		}
+
+		days_re_enable = 10
+
+		custom_cost_trigger = {
+			command_power > 9.99
+		}
+		custom_cost_text = decision_cost_10_cp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_unleash_the_dgi"
+			DOM = {
+				add_manpower = -700
+				add_stability = -0.075
+				add_war_support = -0.075
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = -150
+				}
+			}
+			hidden_effect = { add_command_power = -10 }
+		}
+	}
+	MEX_PPI_show_operational_decisions = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_visibility
+		days_re_enable = 0
+		ai_will_do = { base = 100 }
+		visible = {
+			AND = {
+				NOT = { has_country_flag = MEX_show_operational_decisions }
+				TNO_fopo_puerto_plata_selected = yes
+				has_global_flag = PPI_proxy_war_preparation
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_show_operational_decisions"
+			set_country_flag = MEX_show_operational_decisions
+		}
+	}
+	MEX_PPI_hide_operational_decisions = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_visibility_closed
+		days_re_enable = 0
+		visible = {
+			AND = {
+				has_country_flag = MEX_show_operational_decisions
+				TNO_fopo_puerto_plata_selected = yes
+				has_global_flag = PPI_proxy_war_preparation
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_hide_operational_decisions"
+			clr_country_flag = MEX_show_operational_decisions
+		}
+	}
+	MEX_PPI_infiltrate_agents = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_investigate_indent
+		days_remove = 7
+		ai_will_do = {
+			base = 90
+			modifier = {
+				add = -85
+				USA = { is_ai = no }
+			}
+		}
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_operational_decisions
+		}
+
+		custom_cost_trigger = {
+			command_power > 9.99
+		}
+		custom_cost_text = decision_cost_10_cp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_infiltrate_agents"
+			set_temp_variable = { spy_strength_temp = 8 }
+			TNO_PP_spy_strength_increase_USA = yes
+			hidden_effect = { add_command_power = -10 }
+		}
+	}
+	MEX_PPI_organize_dissidents = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_civil_support_indent
+		days_remove = 7
+		ai_will_do = {
+			base = 70
+			modifier = {
+				add = -65
+				USA = { is_ai = no }
+			}
+		}
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_operational_decisions
+		}
+		custom_cost_trigger = {
+			command_power > 9.99
+			has_equipment = { infantry_equipment > 749 }
+		}
+		custom_cost_text = decision_cost_10_cp_750_inf_eq
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_organize_dissidents"
+			set_temp_variable = { spy_strength_temp = 7 }
+			TNO_PP_spy_strength_increase_USA = yes
+			CAL = {
+				add_manpower = 500
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = 400
+				}
+			}
+			hidden_effect = {
+				add_command_power = -10
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = -750
+				}
+			}
+		}
+	}
+	MEX_PPI_work_with_the_cia = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_investigate_indent
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_operational_decisions
+			NOT = {
+				has_country_flag = MEX_PPI_not_redirected_heat_towards_the_cia_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 50
+			modifier = {
+				factor = 0
+				USA = { is_ai = no }
+			}
+		}
+
+		fire_only_once = yes
+
+		cost = 25
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_work_with_the_cia"
+			set_temp_variable = { spy_strength_temp = 10 }
+			TNO_PP_spy_strength_increase_USA = yes
+			MEX_SB_low_raise_Ordaz = yes
+			set_country_flag = ordaz_puerto_plata_1
+			set_country_flag = new_ordaz_stuff
+			set_variable = { MEX_el_tapado_ordaz_puerto_plata_frame_var = 3 }
+			set_variable = { MEX_el_tapado_lozano_puerto_plata_frame_var = 2 }
+			TNO_PP_cooperation_increase_medium = yes
+			MEX_PRI_increase_power_dfs_med = yes
+			custom_effect_tooltip = MEX_PPI_mutually_exclusive_with_redirect_heat_towards_the_cia_tt
+			set_country_flag = MEX_PPI_not_worked_with_cia_flag
+		}
+	}
+	MEX_PPI_redirect_heat_towards_the_cia = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_investigate_indent
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_operational_decisions
+			NOT = {
+				has_country_flag = MEX_PPI_not_worked_with_cia_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 50
+			modifier = {
+				factor = 0
+				USA = { is_ai = no }
+			}
+		}
+
+		fire_only_once = yes
+
+		cost = 5
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_redirect_heat_towards_the_cia"
+			MEX_SB_low_raise_Lozano = yes
+			set_country_flag = lozano_puerto_plata_1
+			set_variable = { MEX_el_tapado_lozano_puerto_plata_frame_var = 3 }
+			set_variable = { MEX_el_tapado_ordaz_puerto_plata_frame_var = 2 }
+			set_country_flag = new_lozano_stuff
+			TNO_PP_cooperation_decrease_medium = yes
+			MEX_PRI_increase_loyalty_dfs_med = yes
+			add_command_power = 35
+			custom_effect_tooltip = MEX_PPI_mutually_exclusive_with_working_with_the_cia_tt
+			set_country_flag = MEX_PPI_not_redirected_heat_towards_the_cia_flag
+		}
+	}
+	MEX_PPI_bribe_dominican_officials = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_money_indent
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_operational_decisions
+		}
+		ai_will_do = {
+			base = 30
+			modifier = {
+				add = -25
+				USA = { is_ai = no }
+			}
+		}
+
+		custom_cost_trigger = {
+			command_power > 4.99
+		}
+
+		custom_cost_text = decision_cost_10_million_5_cp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_bribe_dominican_officials"
+			set_temp_variable = { spy_strength_temp = 6 }
+			TNO_PP_spy_strength_increase_USA = yes
+			TNO_PPI_decrease_preceasefire_tension = yes
+			DOM = {
+				add_stability = -0.02
+				add_war_support = -0.02
+			}
+			hidden_effect = {
+				set_temp_variable = { temp_econ_spending_amount = 0.01 }
+				econ_spend_money_once_effect_raw_money = yes
+				add_command_power = -5
+			}
+		}
+	}
+	MEX_PPI_the_venezuela_connection = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_political_action_indent
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_operational_decisions
+		}
+
+		ai_will_do = {
+			base = 100
+			modifier = {
+				factor = 0
+				USA = { is_ai = no }
+			}
+		}
+
+		fire_only_once = yes
+
+		cost = 20
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_the_venezuela_connection"
+			set_temp_variable = { spy_strength_temp = 10 }
+			TNO_PP_spy_strength_increase_USA = yes
+			TNO_PP_cooperation_increase_medium = yes
+			TNO_PPI_decrease_preceasefire_tension = yes
+		}
+	}
+	MEX_PPI_connect_with_dissidents = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_shake_hands_indent
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_operational_decisions
+		}
+
+		cost = 15
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_connect_with_dissidents"
+			set_temp_variable = { spy_strength_temp = 4 }
+			TNO_PP_spy_strength_increase_USA = yes
+			CAL = {
+				add_manpower = 500
+				add_stability = 0.05
+				add_war_support = 0.05
+			}
+		}
+	}
+	MEX_PPI_cruise_the_caribbean = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_aircraft_carrier_indent
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_operational_decisions
+		}
+
+		ai_will_do = {
+			base = 40
+			modifier = {
+				factor = 0
+				USA = { is_ai = no }
+			}
+		}
+
+		custom_cost_trigger = {
+			command_power > 19.99
+		}
+		custom_cost_text = decision_cost_20_cp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_cruise_the_caribbean"
+			set_temp_variable = { spy_strength_temp = 2 }
+			TNO_PP_spy_strength_increase_USA = yes
+			CAL = { add_war_support = 0.02 }
+			navy_experience = 5
+			TNO_PP_cooperation_increase_low = yes
+			TNO_PPI_increase_preceasefire_tension = yes
+			hidden_effect = { add_command_power = -20 }
+		}
+	}
+	MEX_PPI_coordinate_with_dgi = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_phone_call_indent
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_proxy_war_preparation
+			has_country_flag = MEX_show_operational_decisions
+		}
+		ai_will_do = { base = 25 }
+		days_re_enable = 10
+
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 10 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+			set_temp_variable = { t_pp_check = 10 }
+			set_temp_variable = { t_pp_check_extra = t_pp_check }
+			subtract_from_temp_variable = { t_pp_check_extra = 0.01 }
+			has_political_power > t_pp_check_extra
+			command_power > t_cp_check_extra
+		}
+
+		custom_cost_text = decision_cost_cp_pp_dynamic
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_coordinate_with_dgi"
+			set_temp_variable = { spy_strength_temp = 5 }
+			TNO_PP_spy_strength_increase_USA = yes
+			MEX_PRI_decrease_corruption_dfs_very_low = yes
+			CAL = {
+				add_stability = 0.02
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = 100
+				}
+				add_equipment_to_stockpile = {
+					type = support_equipment
+					amount = 50
+				}
+			}
+			hidden_effect = {
+				add_command_power = -10
+				add_political_power = -10
+			}
+		}
+	}
+	##Landing Decisions##
+	MEX_PPI_encourage_insurgency = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_landing_ongoing
+		}
+
+		ai_will_do = {
+			base = 100
+			modifier = {
+				factor = 0
+				USA = { is_ai = no }
+			}
+		}
+
+		custom_cost_trigger = {
+			command_power > 4.99
+			has_political_power > 14.99
+		}
+		custom_cost_text = decision_cost_5_cp_15_pp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_encourage_insurgency"
+			set_temp_variable = { insurgency_strength_temp = 4 }
+			TNO_PP_insurgency_strength_increase = yes
+			set_temp_variable = { invasion_supply_temp = 3 }
+			TNO_USA_PP_invasion_supply_add = yes
+			TNO_PP_cooperation_increase_low = yes
+			hidden_effect = {
+				add_command_power = -5
+				add_political_power = -15
+			}
+			CAL = {
+				add_manpower = 2000
+			}
+		}
+	}
+	MEX_PPI_support_insurgency = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_landing_ongoing
+		}
+
+		custom_cost_trigger = {
+			command_power > 9.99
+			#-10 operational strength
+		}
+		custom_cost_text = decision_cost_10_cp # -10 operational strength
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_support_insurgency"
+			set_temp_variable = { insurgency_strength_temp = 10 }
+			TNO_PP_insurgency_strength_increase = yes
+			TNO_PPI_increase_preceasefire_tension = yes
+			DOM = {
+				add_manpower = -300
+				add_stability = -0.06
+			}
+			hidden_effect = {
+				add_command_power = -10
+				set_temp_variable = { spy_strength_temp = 10 }
+				TNO_PP_spy_strength_decrease_USA = yes
+			}
+		}
+	}
+	MEX_PPI_strike_weapons_stores = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_bombing
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_landing_ongoing
+		}
+		ai_will_do = { base = 20 }
+
+		custom_cost_trigger = {
+			command_power > 14.99
+		}
+		custom_cost_text = decision_cost_15_cp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_support_insurgency"
+			set_temp_variable = { insurgency_strength_temp = 10 }
+			TNO_PP_insurgency_strength_increase = yes
+			DOM = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = -350
+				}
+			}
+			CAL = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = 300
+				}
+			}
+			hidden_effect = {
+				add_command_power = -15
+			}
+		}
+	}
+	MEX_PPI_smuggle_weapons = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_supply
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_landing_ongoing
+		}
+		ai_will_do = { base = 10 }
+
+		custom_cost_trigger = {
+			command_power > 4.99
+			has_equipment = { infantry_equipment > 249 }
+		}
+		custom_cost_text = decision_cost_5_cp_250_inf_eq
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_smuggle_weapons"
+			set_temp_variable = { insurgency_strength_temp = 15 }
+			TNO_PP_insurgency_strength_increase = yes
+			set_temp_variable = { invasion_supply_temp = 5 }
+			TNO_USA_PP_invasion_supply_add = yes
+			CAL = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = 225
+				}
+			}
+			hidden_effect = {
+				add_command_power = -5
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = -250
+				}
+			}
+		}
+	}
+	MEX_PPI_provide_intelligence = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_investigate
+		days_remove = 30
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_landing_ongoing
+		}
+		ai_will_do = { base = 55 }
+
+		custom_cost_trigger = {
+			command_power > 19.99
+			#-8 operational strength
+		}
+		custom_cost_text = decision_cost_20_cp # -8 operational strength
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_provide_intelligence"
+			set_temp_variable = { insurgency_strength_temp = 5 }
+			TNO_PP_insurgency_strength_increase = yes
+			CAL = {
+				add_timed_idea = { idea = CAL_PPI_provide_intelligence days = 30 }
+			}
+			hidden_effect = {
+				add_command_power = -20
+			}
+		}
+	}
+	##Ceasefire Decisions##
+	#Balaguer Version#
+	MEX_PPI_ceasefire_supply_legionnaire_mobilization = {
+		ai_will_do = { base = 100 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			NOT = { has_country_flag = MEX_Trujillo_Conspiracy_34_happened }
+			has_global_flag = PPI_ceasefire_happening
+		}
+		days_re_enable = 7
+		days_remove = 7
+
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 5 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_supply_legionnaire_mobilization"
+			hidden_effect = { add_command_power = -5 }
+		}
+		remove_effect = {
+			set_temp_variable = { ceasefire_tension_temp = 4 }
+			TNO_PPI_increase_ceasefire_tension = yes
+			set_temp_variable = { ceasefire_preparation_temp = 4 }
+			TNO_CAL_PPI_increase_ceasefire_preparation = yes
+		}
+	}
+	MEX_PPI_ceasefire_seed_intelligence_agents = {
+		ai_will_do = { base = 80 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_investigate
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			has_global_flag = PPI_ceasefire_happening
+			NOT = { has_country_flag = MEX_Trujillo_Conspiracy_34_happened }
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 5 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		complete_effect = { hidden_effect = { add_command_power = -5 }
+			set_temp_variable = { spy_strength_temp = 5 }
+			TNO_PP_spy_strength_increase_USA = yes
+		}
+	}
+	MEX_PPI_ceasefire_provide_infantry_weapons = {
+		ai_will_do = { base = 50 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_arms_trade_increase
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			NOT = { has_country_flag = MEX_Trujillo_Conspiracy_34_happened }
+			has_global_flag = PPI_ceasefire_happening
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 8 }
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+			command_power > t_cp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_dynamic
+
+		days_remove = 10
+
+		complete_effect = { hidden_effect = { add_command_power = -8 } }
+		remove_effect = {
+			send_equipment = {
+				target = CAL
+				type = infantry_equipment
+				amount = 250
+			}
+			set_temp_variable = { ceasefire_tension_temp = 5 }
+			TNO_PPI_increase_ceasefire_tension = yes
+			set_temp_variable = { ceasefire_preparation_temp = 7 }
+			TNO_CAL_PPI_increase_ceasefire_preparation = yes
+		}
+	}
+	MEX_PPI_ceasefire_increase_volunteer_support = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_political_action
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_ceasefire_happening
+			has_country_flag = organized_volunteers
+			NOT = { has_country_flag = MEX_Trujillo_Conspiracy_34_happened }
+		}
+		custom_cost_trigger = {
+			command_power > 9.99
+			has_political_power > 9.99
+		}
+		custom_cost_text = decision_cost_10_cp_10_pp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_increase_volunteer_support"
+			CAL = {
+				add_manpower = 1000
+			}
+			set_temp_variable = { ceasefire_tension_temp = 5 }
+			TNO_PPI_increase_ceasefire_tension = yes
+			set_temp_variable = { ceasefire_preparation_temp = 10 }
+			TNO_CAL_PPI_increase_ceasefire_preparation = yes
+			hidden_effect = {
+				add_command_power = -10
+				add_political_power = -10
+			}
+		}
+	}
+	MEX_PPI_ceasefire_assasinate_sim_targets = {
+		ai_will_do = { base = 60 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_assassination
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			has_global_flag = PPI_ceasefire_happening
+			NOT = { has_country_flag = MEX_Trujillo_Conspiracy_34_happened }
+		}
+		custom_cost_trigger = {
+			command_power > 19.99
+		}
+		custom_cost_text = decision_cost_20_cp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_assasinate_sim_targets"
+			set_temp_variable = { spy_strength_temp = 3 }
+			TNO_PP_spy_strength_increase_USA = yes
+			TNO_PP_cooperation_increase_low = yes
+			set_temp_variable = { ceasefire_tension_temp = 5 }
+			TNO_PPI_increase_ceasefire_tension = yes
+			DOM = {
+				add_stability = -0.03
+			}
+			MEX_PRI_increase_loyalty_dfs_very_low = yes
+			hidden_effect = {
+				add_command_power = -20
+			}
+		}
+	}
+	MEX_PPI_ceasefire_integrate_dgi_networks = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_handshake
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_ceasefire_happening
+			NOT = { has_country_flag = MEX_Trujillo_Conspiracy_34_happened }
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			command_power > 19.99
+			has_political_power > 4.99
+		}
+		custom_cost_text = decision_cost_20_cp_5_pp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_integrate_dgi_networks"
+			set_temp_variable = { spy_strength_temp = 10 }
+			TNO_PP_spy_strength_increase_USA = yes
+			set_temp_variable = { ceasefire_preparation_temp = 12 }
+			TNO_CAL_PPI_increase_ceasefire_preparation = yes
+			CAL = {
+				add_timed_idea = { idea = CAL_PPI_provide_intelligence days = 365 }
+			}
+			hidden_effect = {
+				add_command_power = -20
+				add_political_power = -5
+			}
+		}
+	}
+	MEX_PPI_ceasefire_propagandize_revolution = {
+		ai_will_do = { base = 5 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_revolt
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_ceasefire_happening
+			NOT = { has_country_flag = MEX_Trujillo_Conspiracy_34_happened }
+		}
+
+		cost = 15
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_propagandize_revolution"
+			CAL = {
+				add_manpower = 100
+				add_stability = 0.03
+				add_war_support = 0.03
+			}
+		}
+	}
+	#Pupo Roman Version#
+	MEX_PPI_ceasefire_invite_to_veracruz_forum = {
+		ai_will_do = { base = 60 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_invitation
+		days_remove = 14
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_ceasefire_happening
+			has_country_flag = MEX_Trujillo_Conspiracy_34_happened
+		}
+
+		fire_only_once = yes
+
+		cost = 20
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_invite_to_veracruz_forum"
+			set_temp_variable = { ceasefire_tension_temp = 5 }
+			TNO_PPI_decrease_ceasefire_tension = yes
+		}
+		remove_effect = {
+			MEX_PRI_increase_loyalty_intellectuals_med = yes
+			MEX_PRI_increase_power_intellectuals_med = yes
+			add_political_power = 50
+		}
+	}
+	MEX_PPI_ceasefire_mediate_with_lm = {
+		ai_will_do = { base = 75 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_political_discourse
+		days_remove = 14
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_ceasefire_happening
+			has_country_flag = MEX_Trujillo_Conspiracy_34_happened
+		}
+
+		fire_only_once = yes
+
+		cost = 25
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_mediate_with_lm"
+		}
+		remove_effect = {
+			set_temp_variable = { ceasefire_tension_temp = 10 }
+			TNO_PPI_decrease_ceasefire_tension_substantial = yes
+			MEX_increase_orthodox_med = yes
+			add_political_power = 50
+		}
+	}
+	MEX_PPI_ceasefire_hunt_sim_remnants = {
+		ai_will_do = { base = 50 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_assassination
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_ceasefire_happening
+			has_country_flag = MEX_Trujillo_Conspiracy_34_happened
+		}
+		custom_cost_trigger = {
+			command_power > 4.99
+		}
+		custom_cost_text = decision_cost_5_cp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_hunt_sim_remnants"
+			set_temp_variable = { spy_strength_temp = 4 }
+			TNO_PP_spy_strength_increase_USA = yes
+			set_temp_variable = { ceasefire_tension_temp = 5 }
+			TNO_PPI_decrease_ceasefire_tension = yes
+			hidden_effect = {
+				add_command_power = -5
+			}
+		}
+		remove_effect = {
+			random = {
+				chance = 50
+				MEX_PRI_increase_power_dfs_very_low = yes
+				MEX_PRI_increase_loyalty_dfs_very_low = yes
+			}
+		}
+	}
+	MEX_PPI_ceasefire_position_exiles = {
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_chess_king
+		days_remove = 14
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_ceasefire_happening
+			has_country_flag = MEX_Trujillo_Conspiracy_34_happened
+		}
+
+		cost = 10
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_position_exiles"
+		}
+		remove_effect = {
+			add_political_power = 5
+			if = {
+				limit = { NOT = { has_country_flag = MEX_PPI_ceasefire_position_exiles_flag } }
+				set_country_flag = MEX_PPI_ceasefire_position_exiles_flag
+				custom_effect_tooltip = MEX_PPI_ceasefire_position_exiles_tt
+			}
+			random = {
+				chance = 50
+				add_political_power = 10
+				MEX_PRI_increase_power_intellectuals_very_low = yes
+			}
+		}
+	}
+	MEX_PPI_ceasefire_pressure_legionnaire_demilitarization = {
+		ai_will_do = { base = 70 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			has_country_flag = MEX_Trujillo_Conspiracy_34_happened
+			has_global_flag = PPI_ceasefire_happening
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_cp_check = 4 }
+			set_temp_variable = { t_pp_check = 10 }
+
+			set_temp_variable = { t_cp_check_extra = t_cp_check }
+			subtract_from_temp_variable = { t_cp_check_extra = 0.01 }
+			set_temp_variable = { t_pp_check_extra = t_pp_check }
+			subtract_from_temp_variable = { t_pp_check_extra = 0.01 }
+
+			command_power > t_cp_check_extra
+			has_political_power > t_pp_check_extra
+		}
+		custom_cost_text = decision_cost_cp_pp_dynamic
+
+		days_re_enable = 14
+		days_remove = 14
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_pressure_legionnaire_demilitarization"
+			hidden_effect = { add_command_power = -4 add_political_power = -10 }
+			set_temp_variable = { ceasefire_tension_temp = 8 }
+			TNO_PPI_decrease_ceasefire_tension = yes
+			set_temp_variable = { ceasefire_preparation_temp = 8 }
+			TNO_CAL_PPI_decrease_ceasefire_preparation = yes
+		}
+	}
+	MEX_PPI_ceasefire_entrench_dgi_assets = {
+		ai_will_do = { base = 10 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_guard
+		days_remove = 14
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_ceasefire_happening
+			has_country_flag = MEX_Trujillo_Conspiracy_34_happened
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			command_power > 19.99
+		}
+		custom_cost_text = decision_cost_10_million_20_cp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_entrench_dgi_assets"
+			set_temp_variable = { ceasefire_tension_temp = 5 }
+			TNO_PPI_decrease_ceasefire_tension = yes
+			hidden_effect = {
+				set_temp_variable = { temp_econ_spending_amount = 0.01 }
+				econ_spend_money_once_effect_raw_money = yes
+				add_command_power = -20
+			}
+		}
+		remove_effect = {
+			add_command_power = 50
+			MEX_PRI_increase_power_dfs_med = yes
+			MEX_PRI_increase_loyalty_dfs_med = yes
+			set_temp_variable = { ceasefire_preparation_temp = 12 }
+			TNO_CAL_PPI_increase_ceasefire_preparation = yes
+		}
+	}
+	MEX_PPI_ceasefire_establish_commercial_ties = {
+		ai_will_do = { base = 20 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_money
+		days_remove = 21
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			original_tag = MEX
+			has_global_flag = PPI_ceasefire_happening
+			has_country_flag = MEX_Trujillo_Conspiracy_34_happened
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			has_political_power > 14.99
+		}
+		custom_cost_text = decision_cost_50_m_15_pp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_ceasefire_establish_commercial_ties"
+			hidden_effect = {
+				set_temp_variable = { temp_econ_spending_amount = 0.05 }
+				econ_spend_money_once_effect_raw_money = yes
+				add_political_power = -15
+			}
+		}
+		remove_effect = {
+			MEX_SB_low_raise_Lozano = yes
+			set_temp_variable = { ceasefire_tension_temp = 5 }
+			TNO_PPI_decrease_ceasefire_tension = yes
+			MEX_PRI_increase_power_businessmen_med = yes
+			MEX_PRI_increase_loyalty_businessmen_med = yes
+			set_temp_variable = { temp_region = 4 }
+			MEX_econ_region_base_stimulation_percent_increase_med = yes
+		}
+	}
+	MEX_PPI_solicit_corporatist_donations = {
+		ai_will_do = { base = 20 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_money
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			has_global_flag = PPI_civil_war_ongoing
+		}
+
+		cost = 10
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_solicit_corporatist_donations"
+		}
+		remove_effect = {
+			CAL = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = 100
+				}
+				add_equipment_to_stockpile = {
+					type = support_equipment
+					amount = 50
+				}
+				hidden_effect = {
+					set_temp_variable = { money_reserves_temp = 0.025 }
+					econ_money_reserves_change_raw_money = yes
+				}
+				custom_effect_tooltip = MEX_PPI_solicit_corporatist_donations_tt
+			}
+			MEX_PRI_decrease_loyalty_workers_very_low = yes
+		}
+	}
+	MEX_PPI_propagandise_revolution = {
+		ai_will_do = { base = 20 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_revolt
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			has_global_flag = PPI_civil_war_ongoing
+		}
+
+		cost = 15
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_propagandise_revolution"
+		}
+		remove_effect = {
+			CAL = {
+				add_manpower = 100
+				add_stability = 0.03
+				add_war_support = 0.03
+			}
+		}
+	}
+	MEX_PPI_smuggle_heavy_weapons = {
+		ai_will_do = { base = 20 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_arms_trade_increase
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			has_global_flag = PPI_civil_war_ongoing
+		}
+		custom_cost_trigger = {
+			command_power > 14.99
+			has_equipment = { anti_tank_equipment > 149 }
+		}
+		custom_cost_text = decision_cost_15_cp_150_at
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_smuggle_heavy_weapons"
+			hidden_effect = {
+				add_command_power = -15
+				add_equipment_to_stockpile = {
+					type = anti_tank_equipment
+					amount = -150
+				}
+			}
+		}
+		remove_effect = {
+			CAL = {
+				add_equipment_to_stockpile = {
+					type = anti_tank_equipment
+					amount = 150
+				}
+				add_war_support = 0.03
+			}
+		}
+	}
+	MEX_PPI_grant_officers_leave = {
+		ai_will_do = { base = 20 }
+		allowed = { original_tag = MEX }
+		icon = GFX_decision_generic_military_parade
+		days_remove = 7
+		visible = {
+			TNO_fopo_puerto_plata_selected = yes
+			has_global_flag = PPI_civil_war_ongoing
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			command_power > 9.99
+			has_political_power > 9.99
+		}
+		custom_cost_text = decision_cost_10_cp_10_pp
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision MEX_PPI_grant_officers_leave"
+			hidden_effect = {
+				add_command_power = -10
+				add_political_power = -10
+			}
+		}
+		remove_effect = {
+			army_experience = 10
+			custom_effect_tooltip = MEX_PPI_grant_officers_leave_tt
+			CAL = {
+				add_to_variable = { CAL_specialised_training_breakthrough = 0.05 }
+				add_to_variable = { CAL_specialised_training_attack = 0.05 }
+				add_to_variable = { CAL_specialised_training_defence = 0.05 }
+			}
+		}
+	}
+}

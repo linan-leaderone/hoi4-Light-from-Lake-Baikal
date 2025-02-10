@@ -1,0 +1,1501 @@
+# ██████╗ ██████╗ ██╗████████╗ █████╗ ██╗███╗   ██╗ #
+# ██╔══██╗██╔══██╗██║╚══██╔══╝██╔══██╗██║████╗  ██║ #
+# ██████╔╝██████╔╝██║   ██║   ███████║██║██╔██╗ ██║ #
+# ██╔══██╗██╔══██╗██║   ██║   ██╔══██║██║██║╚██╗██║ #
+# ██████╔╝██║  ██║██║   ██║   ██║  ██║██║██║ ╚████║ #
+# ╚═════╝ ╚═╝  ╚═╝╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ #
+# GUIs & Mechanics
+
+# 1. WORKSHOP GUI
+# 2. PARTY MECHANIC
+# 3. MANN MECHANIC
+# 4. MIDNIGHT MECHANIC
+
+guiTypes = { # |=[ 1. WORKSHOP GUI ]=|
+	#### Politics Screen Display ####
+	containerWindowType = {
+		name = "TNO_BRI_Workshop_AccessButton"
+		size = { width = 220 height = 128 }
+		position = { x = 0 y = 289 }
+
+		buttonType = {
+			name = "TNO_BRI_Workshop_OpenButton"
+			quadTextureSprite = "GFX_ENG_Workshop_GUI_OpenButton"
+			position = { x = 238 y = 36 }
+			pdx_tooltip = BRI_Workshop_OpenButton_tt
+			pdx_tooltip_delayed = BRI_Workshop_OpenButton_tt_delayed
+			clicksound = click_ok
+			oversound = ui_menu_over
+		}
+		
+		iconType = {
+			name = "gui_alert"
+			spriteType = "GFX_gui_alert"
+			position = { x = 189 y = -16 }
+		}
+		
+	}
+
+	#### Main Display ####
+	containerWindowType = {
+		name = "TNO_BRI_Workshop_Display"
+		size = { width = 999 height = 845 }
+		position = { x = -1000 y = 77 }
+		show_sound = open_sub_window
+		#clipping = yes
+		# no movement, means the gui returns to its original position
+		show_position = { x = 538 y = 77 }
+		show_animation_type = decelerated
+		hide_animation_type = accelerated
+		animation_time = 400
+		moveable = yes
+
+		background = {
+			name = "Background"
+			spriteType = "GFX_tiled_window_1b_no_border"
+		}
+		iconType = {
+			name = "Workshop_Borders"
+			spriteType = "GFX_ENG_Workshop_GUI_Borders"
+			position = { x = 13 y = 17 }
+		}
+
+		### Top Bar
+		## Title
+		instantTextBoxType = {
+			name = "Workshop_Title"
+			position = { x = 15 y = -6 }
+			font = "vt323_72_WT_outline"
+			text = "BRI_Workshop_Title_text"
+			maxWidth = 865
+			maxHeight = 58
+			format = center
+			fixedsize = yes
+		}
+
+		## Topbar Buttons
+		# Info Button
+		iconType = {
+			name = "Workshop_InfoButton"
+			spriteType = "GFX_ParliamentMechanic_InfoButton"
+			position = { x = -123 y = 23 }
+			orientation = UPPER_RIGHT
+			pdx_tooltip = BRI_Workshop_InfoButton_tt
+		}
+		# Close Button
+		buttonType = {
+			name = "Workshop_CloseBtn"
+			position = { x = -70 y = 22 }
+			quadTextureSprite = "GFX_Kartenhaus_CloseButton"
+			shortcut = "ESCAPE"
+			pdx_tooltip = "CLOSE"
+			clicksound = click_close
+			orientation = UPPER_RIGHT
+		}
+
+		## Category Selection
+		buttonType = {
+			name = "Workshop_CategoryRegional"
+			position = { x = 479 y = 89 }
+			quadTextureSprite = "GFX_ENG_Workshop_GUI_CategorySelection"
+			font = "aldrich_22_outline"
+			buttonText = BRI_Workshop_CategoryRegional_tt
+			pdx_tooltip = BRI_Workshop_CategoryRegional_tt_tt
+		}
+		buttonType = {
+			name = "Workshop_CategoryNational"
+			position = { x = 731 y = 89 }
+			quadTextureSprite = "GFX_ENG_Workshop_GUI_CategorySelection"
+			font = "aldrich_22_outline"
+			buttonText = BRI_Workshop_CategoryNational_tt
+		}
+
+		### Tab GUIs ###
+		## These are done in gridboxes to bypass the "can't attach visibility triggers to containers" issue
+		gridboxtype = {
+			name = "Workshop_TabDisplay"
+			position = { x = 469 y = 129 }
+			max_slots_horizontal = 1
+			max_slots_vertical = 1
+		}
+
+		### Da Map
+		containerWindowType = {
+			name = "Workshop_Map"
+			size = { width = 452 height = 750 }
+			position = { x = 14 y = 78 }
+
+			iconType = {
+				name = "Workshop_Map_Outline"
+				spriteType = "GFX_ENG_Workshop_GUI_MapOutline"
+				position = { x = 2 y = 5 }
+			}
+			
+			iconType = {
+				name = "Workshop_Northern_Ireland"
+				spriteType = "GFX_ENG_Workshop_GUI_Map_Northern_Ireland"
+				position = { x = 2 y = 326 }
+				pdx_tooltip = BRI_Workshop_Northern_Ireland_tt
+			}
+
+			# Asset gribbox
+			gridboxtype = {
+				name = "Workshop_Map_Regions"
+				position = { x = 0 y = 0 }
+			}
+			gridboxtype = {
+				name = "Workshop_Map_RegionOutlines"
+				position = { x = -2 y = -1 }
+			}
+
+			# Mapmode selection
+			buttonType = {
+				name = "Workshop_Map_Selection"
+				quadTextureSprite = "GFX_ENG_Workshop_GUI_MapmodeSelection"
+				position = { x = -48 y = 5 }
+				orientation = UPPER_RIGHT
+				pdx_tooltip = BRI_Workshop_MapmodeBtn_tt
+			}
+
+			## DEBUG
+			# Debug (reset) button
+			buttonType = {
+				name = "Workshop_Reset_Debug"
+				quadTextureSprite = "GFX_add_one"
+				position = { x = -30 y = 95 }
+				orientation = UPPER_RIGHT
+				pdx_tooltip = BRI_Workshop_Reset_Debug_tt
+			}
+			# Debug (randomize) button
+			buttonType = {
+				name = "Workshop_Randomize_Debug"
+				quadTextureSprite = "GFX_add_one"
+				position = { x = -30 y = 120 }
+				orientation = UPPER_RIGHT
+				pdx_tooltip = BRI_Workshop_Randomize_Debug_tt
+			}
+
+		}
+
+		## Info & Line Graph
+		containerWindowType = {
+			name = "Workshop_Regional_InfoGraph"
+			size = { width = 515 height = 201 }
+			position = { x = 469 y = 629 }
+
+			containerWindowType = {
+				name = "Workshop_Regional_LineGraph"
+				position = { x = 188 y = 12 }
+				gridboxtype = {
+					name = "Workshop_Regional_LineGraph_VBars"
+					position = { x = 145 y = 150 }
+					size = { width = 0 height = 300 }
+					add_horizontal = no
+					max_slots_horizontal = 1
+					slotsize = { width = 300 height = 1 }
+					
+				}	
+				gridboxtype = {
+					name = "Workshop_Regional_LineGraph_Segments"
+					position = { x = 0 y = 0 }
+					size = { width = 0 height = 300 }
+					slotsize = { width = 25 height = 300 }
+					max_slots_horizontal = 12
+					add_horizontal = yes
+				}
+				
+
+				iconType = {
+					name = "Workshop_Regional_LineGraph_VerticalBar"
+					spriteType = "GFX_BRA_Map_Graph_Vertical_Bar"
+					position = { x = 0 y = 0 }
+					alwaystransparent = yes
+				}
+				instantTextboxType = {
+					name = "Workshop_Regional_LineGraph_Label"
+					position = { x = -15 y = 7 }
+					font = "aldrich_14_outline"
+					text = "BRA_map_line_graph_x_label"
+					borderSize = { x = 0 y = 150 }
+					maxWidth = 30
+					format = center
+					pdx_tooltip = BRI_line_graph_tt_1
+				}
+			}
+
+			containerWindowType = {
+				name = "Workshop_Regional_Info"
+				position = { x = 13 y = 12 }
+
+				# Title
+				instantTextboxType = {
+					name = "Workshop_Regional_Info_Title"
+					position = { x = 0 y = 0 }
+					font = "aldrich_18_outline"
+					text = "BRI_Workshop_GUI_Regional_Info_Title"
+					pdx_tooltip = BRI_Workshop_GUI_Regional_Info_Title_tt
+					maxWidth = 110
+					maxHeight = 20
+					format = center
+					text_color_code = W
+				}
+
+				# GDP Growth Info
+				buttonType = {
+					name = "Workshop_Regional_Info_GDPGrowth"
+					spriteType = "GFX_ENG_Workshop_GUI_GraphSelection"
+					position = { x = 0 y = 45 }
+					font = "aldrich_14_outline"
+					multiline = yes
+					buttonText = BRI_Workshop_GraphButton_GDPGrowth_text
+					pdx_tooltip = BRI_Workshop_GraphBUtton_GDPGrowth_tt
+				}
+
+				# Inflation Info
+				buttonType = {
+					name = "Workshop_Regional_Info_Inflation"
+					spriteType = "GFX_ENG_Workshop_GUI_GraphSelection"
+					position = { x = 0 y = 90 }
+					font = "aldrich_14_outline"
+					multiline = yes
+					buttonText = BRI_Workshop_GraphButton_Inflation_text
+					pdx_tooltip = BRI_Workshop_GraphButton_Inflation_tt
+				}
+
+				# Unemployment Info
+				buttonType = {
+					name = "Workshop_Regional_Info_Unemployment"
+					spriteType = "GFX_ENG_Workshop_GUI_GraphSelection"
+					position = { x = 0 y = 135 }
+					font = "aldrich_14_outline"
+					multiline = yes
+					buttonText = BRI_Workshop_GraphButton_Unemployment_text
+					pdx_tooltip = BRI_Workshop_GraphButton_Unemployment_tt
+					pdx_tooltip_delayed = BRI_Workshop_GraphButton_Unemployment_tt_delayed
+				}
+			}
+			containerWindowType = {
+				name = "Workshop_graph_icon_container"
+				position = { x = 490 y = 20 }
+
+				iconType = {
+					name = "BRI_icon"
+					spriteType = "GFX_british_gdp_growth_rate_texticon"
+					position = { x = 0 y = 0 }
+				}
+				iconType = {
+					name = "BRI_target_icon"
+					spriteType = "GFX_british_economic_targets_texticon"
+					position = { x = 0 y = 0 }
+				}
+			}
+		}
+
+		## Blocked overlay (for CW)
+		iconType = {
+			name = "Workshop_BlockedOverlay"
+			spriteType = "GFX_ENG_Workshop_GUI_BlockedOverlay"
+			position = { x = 16 y = 80 }
+		}
+	}
+
+	### Regional Tab
+	containerWindowType = {
+		name = "TNO_BRI_Workshop_Regional_GUI"
+		size = { width = 515 height = 497 } 
+		position = { x = 0 y = 0 }
+
+		## Background
+		iconType = {
+			name = "Workshop_Regional_Background"
+			spriteType = "GFX_ENG_Workshop_GUI_RegionTab_Borders"
+			position = { x = 0 y = 0 }
+		}
+
+		## Image & Overlay
+		iconType = {
+			name = "Workshop_Regional_Image"
+			spriteType = "GFX_ENG_Workshop_GUI_Map_Scotland_Image"
+			position = { x = 16 y = 13 }
+		}
+		iconType = {
+			name = "Workshop_Regional_ImageOverlay"
+			spriteType = "GFX_ENG_Workshop_GUI_ImageOverlay"
+			position = { x = 10 y = 7 }
+		}
+
+		## Ownership & Corporate Progressbars
+		# Ownership Bar
+		instantTextboxType = {
+			name = "Workshop_Regional_OwnershipBar_Title"
+			position = { x = 13 y = 160 }
+			font = "aldrich_14_outline"
+			format = center
+			vertical_alignment = center
+			maxWidth = 106
+			maxHeight = 22
+			fixedsize = yes
+			text = "BRI_Workshop_OwnershipBar_text"
+		}
+		gridboxtype = {
+			name = "Workshop_Regional_OwnershipBars"
+			position = { x = 83 y = 158 }
+			size = { width = 378 height = 24 }
+			slotsize = { width = 100%% height = 0 }
+			max_slots_horizontal = 1
+		}
+
+		# Corporate Bar
+		instantTextboxType = {
+			name = "Workshop_Regional_CorpoBar_Title"
+			position = { x = 13 y = 193 }
+			font = "aldrich_14_outline"
+			format = center
+			vertical_alignment = center
+			maxWidth = 106
+			maxHeight = 22
+			fixedsize = yes
+			text = "BRI_Workshop_CorpoBar_text"
+		}
+		gridboxtype = {
+			name = "Workshop_Regional_CorpoBars"
+			position = { x = 83 y = 191 }
+			size = { width = 378 height = 24 }
+			slotsize = { width = 100%% height = 0 }
+			max_slots_horizontal = 1
+		}
+
+		### Country Entries ###
+		containerWindowType = {
+			name = "Workshop_Regional_CorpoSelection"
+			size = { width = 105 height = 265 }
+			position = { x = -1 y = 227 }
+			clipping = yes
+
+			verticalScrollbar = "left_vertical_slider"
+
+			background = {
+				name = "Background"
+				quadTextureSprite = "GFX_tiled_window_transparent"
+			}
+
+			gridboxtype = {
+				name = "Workshop_Regional_CorpoSelection_List"
+				position = { x = 31 y = 0 }
+				format = "UPPER_LEFT"
+				max_slots_horizontal = 1
+				slotsize = { width = 60 height = 54 }
+			}
+		}
+
+		# Corpo Selection Header
+		instantTextboxType = {
+			name = "Workshop_Regional_CorpoTitle"
+			position = { x = 167 y = 238 }
+			font = "aldrich_22_outline"
+			format = center
+			maxWidth = 286
+			maxHeight = 22
+			fixedsize = yes
+			text = "BRI_Workshop_CorpoSelection_text"
+		}
+
+		## Corporate Actions
+		containerWindowType = {
+			name = "Workshop_Regional_Actions"
+			size = { width = 380 height = 208 }
+			position = { x = 123 y = 278 }
+			clipping = yes
+
+			## Big Buttons
+			containerWindowType = {
+				name = "Workshop_Regional_BigActions"
+				size = { width = 380 height = 150 }
+				position = { x = 0 y = 0 }
+				clipping = yes
+
+				# Button 1
+				buttonType = {
+					name = "Workshop_Regional_Actions_1"
+					spriteType = "GFX_ENG_Workshop_GUI_ButtonBig_1"
+					position = { x = 0 y = 0 }
+				}
+				instantTextboxType = { # Text is drawn separately instead of directly in the button because buttonTypes can't have the vertical_alignment define
+					name = "Workshop_Regional_Actions_1_Text"
+					position = { x = 0 y = 0 }
+					font = "aldrich_18_outline"
+					format = center
+					maxWidth = 120
+					maxHeight = 145
+					fixedsize = yes
+					multiline = yes
+					vertical_alignment = bottom
+					text = "BRI_Workshop_Actions_1_text"
+					pdx_tooltip = "BRI_Workshop_Actions_1_tt"
+				}
+
+				# Button 2
+				buttonType = {
+					name = "Workshop_Regional_Actions_2"
+					spriteType = "GFX_ENG_Workshop_GUI_ButtonBig_2"
+					position = { x = 130 y = 0 }
+				}
+				instantTextboxType = { # Ditto
+					name = "Workshop_Regional_Actions_2_Text"
+					position = { x = 130 y = 0 }
+					font = "aldrich_18_outline"
+					format = center
+					maxWidth = 120
+					maxHeight = 145
+					fixedsize = yes
+					multiline = yes
+					vertical_alignment = bottom
+					text = "BRI_Workshop_Actions_2_text"
+					pdx_tooltip = "BRI_Workshop_Actions_2_tt"
+				}
+
+				# Button 3
+				buttonType = {
+					name = "Workshop_Regional_Actions_3"
+					spriteType = "GFX_ENG_Workshop_GUI_ButtonBig_3"
+					position = { x = 260 y = 0 }
+				}
+				instantTextboxType = { # Ditto
+					name = "Workshop_Regional_Actions_3_Text"
+					position = { x = 260 y = 0 }
+					font = "aldrich_18_outline"
+					format = center
+					maxWidth = 120
+					maxHeight = 145
+					fixedsize = yes
+					multiline = yes
+					vertical_alignment = bottom
+					text = "BRI_Workshop_Actions_3_text"
+					pdx_tooltip = "BRI_Workshop_Actions_3_tt"
+				}
+			}
+			
+			## Small Buttons
+			containerWindowType = {
+				name = "Workshop_Regional_SmallActions"
+				size = { width = 380 height = 52 }
+				position = { x = 0 y = 156 }
+				clipping = yes
+
+				# Button 4
+				buttonType = {
+					name = "Workshop_Regional_Actions_4"
+					spriteType = "GFX_ENG_Workshop_GUI_ButtonSmall"
+					position = { x = 0 y = 0 }
+					font = "aldrich_14_outline"
+					multiline = yes
+					buttonText = BRI_Workshop_Actions_4_text
+					pdx_tooltip = BRI_Workshop_Actions_4_tt
+				}
+
+				# Button 5
+				buttonType = {
+					name = "Workshop_Regional_Actions_5"
+					spriteType = "GFX_ENG_Workshop_GUI_ButtonSmall"
+					position = { x = 130 y = 0 }
+					font = "aldrich_14_outline"
+					multiline = yes
+					buttonText = BRI_Workshop_Actions_5_text
+					pdx_tooltip = BRI_Workshop_Actions_5_tt
+				}
+
+				# Button 6
+				buttonType = {
+					name = "Workshop_Regional_Actions_6"
+					spriteType = "GFX_ENG_Workshop_GUI_ButtonSmall"
+					position = { x = 260 y = 0 }
+					font = "aldrich_14_outline"
+					multiline = yes
+					buttonText = BRI_Workshop_Actions_6_text
+					pdx_tooltip = BRI_Workshop_Actions_6_tt
+				}
+			}
+		}
+	}
+
+	### National Tab
+	containerWindowType = {
+		name = "TNO_BRI_Workshop_National_GUI"
+		size = { width = 515 height = 497 } 
+		position = { x = 0 y = 0 }
+
+		# Dominant Corporation text
+		instantTextboxType = {
+			name = "Workshop_National_DominantCorpo"
+			position = { x = 11 y = 1 }
+			font = "aldrich_24_outline"
+			text = "ENG_Workshop_DominantCorpo_text"
+			maxWidth = 494
+			maxHeight = 44
+			format = center
+			vertical_alignment = center
+			fixedsize = yes
+		}
+
+		# Divider
+		iconType = {
+			name = "Workshop_National_Divider"
+			spriteType = "GFX_ENG_Workshop_GUI_DottedDivider"
+			position = { x = 0 y = 44 }
+		}
+
+		containerWindowType = { # Goals
+			name = "Workshop_Goals_Container"
+			position = { x = 10 y = 55 }
+			size = { width = 490 height = 432 }
+			verticalScrollbar = "right_vertical_slider_cabinet"
+			margin = { top = 0 left = 0 bottom = 0 right = 0 }
+
+			background = {
+				name = "Background"
+				quadTextureSprite = "GFX_tiled_window_transparent"
+			}
+
+			# Gridbox Itself
+			gridboxtype = {
+				name = "Workshop_National_Goals"
+				position = { x = 2 y = 0 }
+				size = { width = 467 height = 201 }
+				slotsize = { width = 467 height = 211 }
+				max_slots_horizontal = 1
+			}
+		}
+
+	}
+
+	extendedScrollbarType = {
+		name = "right_vertical_slider_cabinet"
+		position = { x = 5 y = 0 }
+		size = { width = 18 height = 18 }
+		startValue = 0
+		orientation = upper_right
+		origo = upper_right
+		smooth_scrolling = 0.25
+
+		background = {
+			name = "Background"
+			quadTextureSprite = "GFX_scrollbar_vertical_bg"
+		}
+
+		slider = {
+			name = "Slider"
+			quadTextureSprite = "GFX_scroll_drager"
+			position = { x = -2 y = -2 }
+		}
+
+		track = {
+			name = "Track"
+			quadTextureSprite = "GFX_scroll_track"
+			position = { x = 3 y = 0 }
+			alwaystransparent = yes
+		}
+
+		decreaseButton = {
+			name = "Decrease"
+			quadTextureSprite = "GFX_scroll_up"
+			position = { x = 1 y = 3 }
+		}
+
+		increaseButton = {
+			name = "Increase"
+			quadTextureSprite = "GFX_scroll_down"
+			position = { x = -17 y = -19 }
+		}
+	}
+
+	#### Gridboxes ####
+	## Regions
+	containerWindowType = {
+		name = "TNO_BRI_Workshop_Regions_Container"
+		position = { x = 0 y = 0 }
+
+		iconType = {
+			name = "Workshop_Map_Regions"
+			spriteType = "GFX_ENG_Workshop_GUI_Map_Scotland_0"
+			position = { x = 0 y = 0 }
+			alwaystransparent = yes
+		}
+		buttonType = {
+			name = "Workshop_Map_Regions_Button"
+			spriteType = "GFX_ENG_Workshop_GUI_Map_Scotland_Button"
+			position = { x = 0 y = 0 }
+			pdx_tooltip = BRI_Workshop_Region_tt
+			pdx_tooltip_delayed = BRI_Workshop_Region_tt_delayed
+		}
+	}
+	containerWindowType = { # Offsets the selection outline by a bit
+		name = "TNO_BRI_Workshop_Regions_OutlineOffset"
+		position = { x = 0 y = 0 }
+
+		iconType = {
+			name = "Workshop_Map_Regions_Outline"
+			spriteType = "GFX_ENG_Workshop_GUI_Map_Scotland_Outline"
+			position = { x = 0 y = 0 }
+			alwaystransparent = yes
+		}
+	}
+
+	## Corporation selection button
+	containerWindowType = {
+		name = "TNO_BRI_Workshop_Regional_CorpoSelection_Container"
+		size = { width = 60 height = 49 }
+		position = { x = 0 y = 0 }
+
+		buttonType = {
+			name = "Workshop_CorpoSelection_Button"
+			spriteType = "GFX_ENG_Workshop_GUI_CorpoSelection"
+			position = { x = 0 y = 0 }
+			pdx_tooltip = BRI_Workshop_CorpoSelection_Button_tt
+			pdx_tooltip_delayed = BRI_Workshop_CorpoSelection_Button_tt_delayed
+		}
+
+		iconType = {
+			name = "Workshop_CorpoSelection_Selected"
+			spriteType = "GFX_ENG_Workshop_GUI_CorpoSelected"
+			position = { x = 0 y = 0 }
+			alwaystransparent = yes
+		}
+	}
+
+	## Goals
+	containerWindowType = {
+		name = "TNO_BRI_Workshop_National_Goals_Container"
+		size = { width = 467 height = 201 }
+		position = { x = 0 y = 0 }
+
+		# Image
+		iconType = {
+			name = "Workshop_Goals_Image"
+			spriteType = "GFX_ENG_Workshop_GUI_Goals_Winter62"
+			position = { x = 15 y = 14 }
+		}
+
+		# Frame
+		iconType = {
+			name = "Workshop_Goals_Frame"
+			spriteType = "GFX_ENG_Workshop_GUI_Goals_Frame"
+			position = { x = 0 y = 0 }
+		}
+
+		# Title Text
+		instantTextboxType = {
+			name = "Workshop_Goals_TitleText"
+			position = { x = 17 y = 16 }
+			font = "aldrich_22_outline"
+			format = center
+			maxwidth = 357
+			maxheight = 54
+			vertical_alignment = center
+			fixedsize = yes
+			pdx_tooltip_delayed = BRI_Workshop_Goals_Description_tt
+			text = BRI_Workshop_Goals_TitleText_text
+		}
+
+		# Timer
+		containerWindowType = {
+			name = "Workshop_Goals_Timer_Container"
+			size = { width = 64 height = 64 }
+			position = { x = 388 y = 9 }
+
+			# Icon
+			iconType = {
+				name = "Workshop_Goals_Timer"
+				spriteType = "GFX_ENG_Workshop_GUI_Goals_Timer"
+				position = { x = 0 y = 0 }
+				pdx_tooltip = BRI_Workshop_Timer_tt
+				pdx_tooltip_delayed = BRI_Workshop_Timer_tt_delayed
+			}
+
+			# Text
+			instantTextboxType = {
+				name = "Workshop_Goals_Timer_Text"
+				position = { x = 0 y = 2 }
+				font = "aldrich_28_outline"
+				format = center
+				maxwidth = 64
+				maxheight = 64
+				vertical_alignment = center
+				alwaystransparent = yes
+				fixedsize = yes
+				text = BRI_Workshop_Timer_Text_tt
+			}
+		}
+
+		# Completion
+		containerWindowType = {
+			name = "Workshop_Goals_Completion_Container"
+			size = { width = 445 height = 28 }
+			position = { x = 11 y = 79 }
+
+			## Title
+			instantTextboxType = {
+				name = "Workshop_Goals_InvestmentTitle"
+				position = { x = 0 y = 1 }
+				text = BRI_Workshop_GUI_Goals_InvestmentTitle_text
+				font = "aldrich_14_outline"
+				format = center
+				maxwidth = 112
+				maxheight = 28
+				vertical_alignment = center
+				fixedsize = yes
+				pdx_tooltip = BRI_Workshop_GUI_Goals_InvestmentTitle_tt
+				pdx_tooltip_delayed = BRI_Workshop_GUI_Goals_InvestmentTitle_tt_delayed
+				text_color_code = W
+			}
+
+			## Bar
+			iconType = {
+				name = "Workshop_Goals_CompletionBar"
+				spriteType = "GFX_ENG_Workshop_GUI_Goals_CompletionBar"
+				position = { x = 114 y = 2 }
+				pdx_tooltip = BRI_Workshop_GUI_Goals_CompletionBar_tt
+				pdx_tooltip_delayed = BRI_Workshop_GUI_Goals_CompletionBar_tt_delayed
+			}
+
+			## Decrease Button
+			buttonType = {
+				name = "Workshop_Goals_CompletionButtonDecrease"
+				spriteType = "GFX_ENG_Workshop_Goals_CompletionButton"
+				frame = 1
+				position = { x = 339 y = 3 }
+				pdx_tooltip = BRI_Workshop_GUI_Goals_CompletionButtonDecrease_tt
+				pdx_tooltip_delayed = BRI_Workshop_GUI_Goals_CompletionButtonDecrease_tt_delayed
+			}
+
+			## Investment Number
+			instantTextboxType = {
+				name = "Workshop_Goals_InvestmentNumber"
+				position = { x = 361 y = 3 }
+				text = BRI_Workshop_GUI_Goals_InvestmentNumber_text
+				font = "aldrich_20_outline"
+				format = center
+				maxwidth = 59
+				maxheight = 22
+				vertical_alignment = center
+				fixedsize = yes
+				pdx_tooltip = BRI_Workshop_GUI_Goals_InvestmentNumber_tt
+				pdx_tooltip_delayed = BRI_Workshop_GUI_Goals_InvestmentNumber_tt_delayed
+			}
+
+			## Increase Button
+			buttonType = {
+				name = "Workshop_Goals_CompletionButtonIncrease"
+				spriteType = "GFX_ENG_Workshop_Goals_CompletionButton"
+				frame = 2
+				position = { x = 420 y = 3 }
+				pdx_tooltip = BRI_Workshop_GUI_Goals_CompletionButtonIncrease_tt
+				pdx_tooltip_delayed = BRI_Workshop_GUI_Goals_CompletionButtonIncrease_tt_delayed
+			}
+
+		}
+
+		## Objectives
+		containerWindowType = {
+			name = "Workshop_Goals_Objectives"
+			size = { width = 477 height = 114 }
+			position = { x = 9 y = 118 }
+
+			# Obj. num. 1
+			containerWindowType = {
+				name = "Workshop_Goals_Objectives_1"
+				size = { width = 238 height = 38 }
+				position = { x = 0 y = 0 }
+
+				iconType = {
+					name = "Workshop_Goals_Objectives_Checkbox_1"
+					spriteType = "GFX_ENG_Workshop_GUI_Goals_Checkbox"
+					position = { x = 0 y = 0 }
+				}
+				instantTextboxType = {
+					name = "Workshop_Goals_Objectives_Text_1"
+					position = { x = 29 y = 3 }
+					font = "aldrich_16_outline"
+					format = left
+					maxWidth = 196
+					maxheight = 35
+					fixedsize = yes
+					text = "[?BRI_Workshop_GoalObjective_1_String@var:goal_v.GetTokenLocalizedKey]"
+				}
+			}
+			
+			# Obj. num. 2
+			containerWindowType = {
+				name = "Workshop_Goals_Objectives_2"
+				size = { width = 238 height = 38 }
+				position = { x = 238 y = 0 }
+
+				iconType = {
+					name = "Workshop_Goals_Objectives_Checkbox_2"
+					spriteType = "GFX_ENG_Workshop_GUI_Goals_Checkbox"
+					position = { x = 0 y = 0 }
+				}
+				instantTextboxType = {
+					name = "Workshop_Goals_Objectives_Text_2"
+					position = { x = 29 y = 3 }
+					font = "aldrich_16_outline"
+					format = left
+					maxWidth = 196
+					maxheight = 35
+					fixedsize = yes
+					text = "[?BRI_Workshop_GoalObjective_2_String@var:goal_v.GetTokenLocalizedKey]"
+				}
+			}
+			
+			# Obj. num. 3
+			containerWindowType = {
+				name = "Workshop_Goals_Objectives_3"
+				size = { width = 238 height = 38 }
+				position = { x = 0 y = 38 }
+
+				iconType = {
+					name = "Workshop_Goals_Objectives_Checkbox_3"
+					spriteType = "GFX_ENG_Workshop_GUI_Goals_Checkbox"
+					position = { x = 0 y = 0 }
+				}
+				instantTextboxType = {
+					name = "Workshop_Goals_Objectives_Text_3"
+					position = { x = 29 y = 3 }
+					font = "aldrich_16_outline"
+					format = left
+					maxWidth = 196
+					maxheight = 35
+					fixedsize = yes
+					text = "[?BRI_Workshop_GoalObjective_3_String@var:goal_v.GetTokenLocalizedKey]"
+				}
+			}
+			
+			# Obj. num. 4
+			containerWindowType = {
+				name = "Workshop_Goals_Objectives_4"
+				size = { width = 238 height = 38 }
+				position = { x = 238 y = 38 }
+
+				iconType = {
+					name = "Workshop_Goals_Objectives_Checkbox_4"
+					spriteType = "GFX_ENG_Workshop_GUI_Goals_Checkbox"
+					position = { x = 0 y = 0 }
+				}
+				instantTextboxType = {
+					name = "Workshop_Goals_Objectives_Text_4"
+					position = { x = 29 y = 3 }
+					font = "aldrich_16_outline"
+					format = left
+					maxWidth = 196
+					maxheight = 35
+					fixedsize = yes
+					text = "[?BRI_Workshop_GoalObjective_4_String@var:goal_v.GetTokenLocalizedKey]"
+				}
+			}
+		}
+	}
+
+	## Entry_Containers
+	# Control Bars Container
+	containerWindowType = {
+		name = "TNO_BRI_Workshop_OwnershipBar_Container"
+		size = { width = 378 height = 24 }
+		clipping = yes
+
+		iconType = {
+			name = "Workshop_OwnershipBar"
+			position = { x = 0 y = 0 }
+			spriteType = "GFX_ENG_Workshop_GUI_Progbars_Ownership_1"
+			pdx_tooltip = BRI_Workshop_OwnershipBar_tt
+			pdx_tooltip_delayed = BRI_Workshop_OwnershipBar_tt_delayed
+		}
+	}
+
+	# Faction Power Bars Container
+	containerWindowType = {
+		name = "TNO_BRI_Workshop_CorporateBar_Container"
+		size = { width = 378 height = 24 }
+		clipping = yes
+
+		iconType = {
+			name = "Workshop_CorporateBar"
+			position = { x = 0 y = 0 }
+			spriteType = "GFX_ENG_Workshop_GUI_Progbars_Corpo_1"
+			pdx_tooltip = BRI_Workshop_CorporateBar_tt
+		}
+	}
+
+	## Line Graph
+	containerWindowType = {
+		name = "Workshop_Regional_LineGraph_Segment"
+		size = { width = 25 height = 300 }
+		position = { x = 12 y = 0 }
+		clipping = no
+		
+		
+		
+		
+		instantTextboxType = {
+			name = "LineGraph_X_Label"
+			position = { x = 13 y = 7 }
+			font = "aldrich_14_outline"
+			text = BRI_Workshop_LineGraph_X_Label_tt
+			borderSize = { x = 3 y = 150 }
+			maxWidth = 30
+			#format = center
+			pdx_tooltip = BRI_line_graph_tt
+		}
+
+		iconType = {
+			name = "LineGraph_VerticalBar"
+			spriteType = "GFX_BRA_Map_Graph_Vertical_Bar"
+			position = { x = 25 y = 0 }
+
+		}
+		iconType = {
+			name = "LineGraph_Segment_Target"
+			spriteType = "GFX_BRI_Line_Segment_Target"
+			position = { x = 0 y = 0 }
+			frame = 57
+			alwaystransparent = yes
+		}
+		iconType = {
+			name = "LineGraph_Segment"
+			spriteType = "GFX_BRI_Line_Segment"
+			position = { x = 0 y = 0 }
+			frame = 57
+			alwaystransparent = yes
+			#pdx_tooltip = BRI_line_graph_tt
+		}
+	}
+	containerWindowType = {
+		name = "Workshop_Regional_LineGraph_VBar"
+		size = { width = 300 height = 1 }
+		position = { x = 0 y = 0 }
+		clipping = no
+
+		iconType = {
+			name = "LineGraph_HorizontalBar"
+			spriteType = "GFX_BRA_Map_Graph_Horizontal_Bar"
+			position = { x = 0 y = 0 }
+			alwaystransparent = yes
+		}
+
+		containerWindowType = {
+			name = "LineGraph_Labels"
+			position = { x = 0 y = -5 }
+
+			instantTextboxType = {
+				name = "LineGraph_Y_Label"
+				position = { x = -105 y = 0 }
+				font = "aldrich_14_outline"
+				text = BRI_Workshop_LineGraph_Y_Label_tt
+				maxWidth = 100
+				format = right
+				
+			}
+		}
+	}
+}
+
+guiTypes = { # |=[ 2. PARTY MECHANIC ]=|
+	containerWindowType = {
+		name = "TNO_BRI_Party_GUI"
+		size = { width = 482 height = 560 }
+
+		## Main Image
+		containerWindowType = {
+			name = "TNO_BRI_Party_MainImage_Container"
+			position = { x = 52 y = 0 }
+
+			# Image & Frame
+			iconType = {
+				name = "TNO_BRI_Party_MainImage"
+				position = { x = 4 y = 4 }
+				quadTextureSprite = "GFX_ENG_Party_GUI_Image"
+				pdx_tooltip = BRI_Party_MainImage_tt
+			}
+			iconType = {
+				name = "TNO_BRI_Party_MainImage_Frame"
+				quadTextureSprite = "GFX_ENG_Party_GUI_ImageCover"
+				alwaystransparent = yes
+			}
+		}
+
+		## Pie Charts
+		containerWindowType = {
+			name = "TNO_BRI_Party_Piecharts"
+			position = { x = 152 y = 155 }
+
+			# Peers
+			buttonType = {
+				name = "TNO_BRI_Party_Peers"
+				position = { x = -72 y = 0 }
+				spriteType = "GFX_ENG_Party_GUI_Icon_Peers"
+				pdx_tooltip = TNO_BRI_Party_Peers_tt
+				pdx_tooltip_delayed = TNO_BRI_Party_Peers_tt_delayed
+			}
+			iconType = {
+				name = "TNO_BRI_Party_Peers_Pie"
+				position = { x = 0 y = 0 }
+				spriteType = "GFX_ENG_Party_GUI_Piechart"
+			}
+
+			# German Garrison
+			buttonType = {
+				name = "TNO_BRI_Party_Garrison"
+				position = { x = 128 y = 0 }
+				spriteType = "GFX_ENG_Party_GUI_Icon_Garrison"
+				pdx_tooltip = TNO_BRI_Party_Garrison_tt
+				pdx_tooltip_delayed = TNO_BRI_Party_Garrison_tt_delayed
+			}
+			iconType = {
+				name = "TNO_BRI_Party_Garrison_Pie"
+				position = { x = 200 y = 0 }
+				spriteType = "GFX_ENG_Party_GUI_Piechart"
+			}
+
+			# German Corporations
+			buttonType = {
+				name = "TNO_BRI_Party_Corporations"
+				position = { x = -72 y = 150 }
+				spriteType = "GFX_ENG_Party_GUI_Icon_Corporations"
+				pdx_tooltip = TNO_BRI_Party_Corporations_tt
+				pdx_tooltip_delayed = TNO_BRI_Party_Corporations_tt_delayed
+			}
+			iconType = {
+				name = "TNO_BRI_Party_Corporations_Pie"
+				position = { x = 0 y = 150 }
+				spriteType = "GFX_ENG_Party_GUI_Piechart"
+			}
+
+			# Party
+			buttonType = {
+				name = "TNO_BRI_Party_Party"
+				position = { x = 128 y = 150 }
+				spriteType = "GFX_ENG_Party_GUI_Icon_Party"
+				pdx_tooltip = TNO_BRI_Party_Party_tt
+				pdx_tooltip_delayed = TNO_BRI_Party_Party_tt_delayed
+			}
+			iconType = {
+				name = "TNO_BRI_Party_Party_Pie"
+				position = { x = 200 y = 150 }
+				spriteType = "GFX_ENG_Party_GUI_Piechart"
+			}
+		}
+
+		## Chaos Bar
+		containerWindowType = {
+			name = "TNO_BRI_Party_ChaosBar_Container"
+			position = { x = 50 y = 457 }
+
+			# Title
+			instantTextboxType = {
+				name = "TNO_BRI_Party_ChaosBar_Title"
+				position = { x = 0 y = 0 }
+				font = "aldrich_18_outline"
+				format = left
+				maxWidth = 200
+				maxHeight = 18
+				fixedsize = yes
+				text = BRI_Party_ChaosBar_Title_tt
+				pdx_tooltip = BRI_Party_ChaosBar_Desc_tt
+			}
+
+			# ProgressBar
+			iconType = {
+				name = "TNO_BRI_Party_ChaosBar"
+				position = { x = 0 y = 18 }
+				quadTextureSprite = "GFX_ENG_Party_GUI_ChaosBar"
+				pdx_tooltip = BRI_Party_ChaosBar_tt
+			}
+
+			# Thresholds
+			gridboxtype = {
+				name = "TNO_BRI_Party_ChaosBar_Threshold"
+				position = { x = 0 y = 26 }
+				format = "UPPER_LEFT"
+				add_horizontal = yes
+				max_slots_horizontal = 6
+			}
+		}
+		
+		## Status
+		instantTextboxType = {
+			name = "TNO_BRI_Party_Status"
+			position = { x = 10 y = 520 }
+			font = "aldrich_22_outline" 
+			maxWidth = 482
+			maxHeight = 22
+			format = center
+			text = BRI_Party_Status_text
+			pdx_tooltip = BRI_Party_Status_tt
+		}
+	}
+
+	### Chaos Bar Thresholds Gridbox
+	containerWindowType = {
+		name = "TNO_BRI_Party_ChaosBar_Threshold_Container"
+		position = { x = -12 y = 0 }
+
+		iconType = {
+			name = "TNO_BRI_Party_ChaosBar_ThresholdIcon_Base"
+			spriteType = "GFX_ENG_Party_GUI_ThresholdIcon_Base"
+			position = { x = 0 y = 0 }
+			orientation = CENTER
+			pdx_tooltip = BRI_ChaosThreshold_tt
+		}
+		iconType = {
+			name = "TNO_BRI_Party_ChaosBar_ThresholdIcon"
+			spriteType = "GFX_ENG_Party_GUI_ThresholdIcons"
+			position = { x = 0 y = 0 }
+			orientation = CENTER
+			alwaystransparent = yes
+		}
+	}
+}
+
+guiTypes = { # |=[ 3. MANN MECHANIC ]=|
+
+	containerWindowType = {
+		name = "BRI_Mann_DecisionGui"
+		size = { width = 482 height = 325 }
+
+		## Info
+		iconType = {
+			name = "BRI_Mann_Info"
+			spriteType = "GFX_BRA_Map_Info_Button"
+			position = { x = 390 y = -63 }
+			pdx_tooltip = "BRI_Mann_Info_tt"
+			pdx_tooltip_delayed = "BRI_Mann_Info_tt_delayed"
+		}
+
+		## Top
+		containerWindowType = {
+			name = "BRI_Mann_Top_Container"
+			position = { x = 27 y = 0 }
+			iconType = {
+				name = "BRI_Mann_Top_Image"
+				position = { x = 4 y = 4 }
+				spriteType = "GFX_BRI_Mann_Top_Image"
+				pdx_tooltip = "BRI_Mann_Top_Image_tt"
+				pdx_tooltip_delayed = "BRI_Mann_Top_Image_tt_delayed"
+			}
+			iconType = {
+				name = "BRI_Mann_Top_Background"
+				position = { x = 0 y = 0 }
+				spriteType = "GFX_BRI_Mann_Top_Background"
+				alwaystransparent = yes
+			}
+			instantTextboxType = {
+				name = "BRI_Mann_Intel_Bar_Title"
+				position = { x = 183 y = 1 }
+				maxWidth = 94
+				maxHeight = 28
+				format = center
+				vertical_alignment = center
+				fixedsize = yes
+				font = "aldrich_14_outline"
+				text = "BRI_Mann_Intel_Bar_Title"
+				pdx_tooltip = "BRI_Mann_Intel_Bar_Title_tt"
+				text_color_code = W
+			}
+			iconType = {
+				name = "BRI_Mann_Intel_Bar"
+				position = { x = 279 y = 2 }
+				quadTextureSprite = "GFX_BRI_Mann_Intel_Bar"
+				pdx_tooltip = "BRI_Mann_Intel_Bar_tt"
+				pdx_tooltip_delayed = "BRI_Mann_Intel_Bar_tt_delayed"
+			}
+			instantTextboxType = {
+				name = "BRI_Mann_Weaponry_Bar_Title"
+				position = { x = 183 y = 33 }
+				maxWidth = 94
+				maxHeight = 28
+				format = center
+				vertical_alignment = center
+				fixedsize = yes
+				font = "aldrich_14_outline"
+				text = "BRI_Mann_Weaponry_Bar_Title"
+				pdx_tooltip = "BRI_Mann_Weaponry_Bar_Title_tt"
+				text_color_code = W
+			}
+			iconType = {
+				name = "BRI_Mann_Weaponry_Bar"
+				position = { x = 279 y = 34 }
+				quadTextureSprite = "GFX_BRI_Mann_Weaponry_Bar"
+				pdx_tooltip = "BRI_Mann_Weaponry_Bar_tt"
+				pdx_tooltip_delayed = "BRI_Mann_Weaponry_Bar_tt_delayed"
+			}
+			instantTextboxType = {
+				name = "BRI_Mann_Top_Text"
+				position = { x = 183 y = 66 }
+				maxWidth = 267
+				maxHeight = 54
+				format = left
+				vertical_alignment = bottom
+				fixedsize = yes
+				font = "aldrich_14_outline"
+				text = "BRI_Mann_Top_Text"
+				multiline = yes
+			}
+		}
+
+		## Divider
+		iconType = {
+			name = "BRI_Mann_Divider"
+			position = { x = 27 y = 130 }
+			spriteType = "GFX_BRI_Mann_Divider"
+		}
+
+		## States
+		containerWindowType = {
+			name = "BRI_Mann_States_Container"
+			position = { x = 27 y = 148 }
+			instantTextBoxType = {
+				name = "BRI_Mann_States_Title"
+				position = { x = 0 y = 0 }
+				maxWidth = 450
+				maxHeight = 20
+				format = center
+				font = "aldrich_32_outline"
+				text = "BRI_Mann_States_Title"
+				pdx_tooltip = "BRI_Mann_States_Title_tt"
+				pdx_tooltip_delayed = "BRI_Mann_States_Title_tt_delayed"
+				text_color_code = d
+			}
+			gridboxtype = {
+				name = "BRI_Mann_States_List"
+				position = { x = 0 y = 46 }
+				format = "UPPER_LEFT"
+				add_horizontal = yes
+				slotsize = { width = 92 height = 121 }
+			}
+		}
+
+	}
+
+	## State List Entry
+	containerWindowType = {
+		name = "BRI_Mann_States_List_Entry"
+		position = { x = 0 y = 0 }
+		
+		iconType = {
+			name = "BRI_Mann_State_Defensiveness_Bar"
+			position = { x = 0 y = 80 }
+			spriteType = "GFX_BRI_Mann_Defensiveness_Bar"
+			pdx_tooltip = "BRI_Mann_State_Defensiveness_Bar_tt"
+			pdx_tooltip_delayed = "BRI_Mann_State_Defensiveness_Bar_tt_delayed"
+		}
+		iconType = {
+			name = "BRI_Mann_State_Image"
+			position = { x = 2 y = 2 }
+		}
+		iconType = {
+			name = "BRI_Mann_State_Frame"
+			position = { x = 0 y = 0 }
+			pdx_tooltip = "BRI_Mann_State_Frame_tt"
+		}
+		buttonType = {
+			name = "BRI_Mann_State_Button"
+			position = { x = 0 y = 97 }
+			spriteType = "GFX_BRI_Mann_State_Button"
+			buttonFont = "aldrich_14_outline"
+			text = "BRI_Mann_State_Button_Text"
+			pdx_tooltip = "BRI_Mann_State_Button_Tt"
+		}
+		iconType = {
+			name = "BRI_Mann_State_Button_Selected"
+			position = { x = 0 y = 0 }
+			spriteType = "GFX_BRI_Mann_State_Button_Selected"
+			alwaystransparent = yes
+		}
+	}
+}
+
+guiTypes = { # |=[ 4. MIDNIGHT MECHANIC ]=|
+	## Main GUI
+	containerWindowType = {
+		name = "BRI_Midnight_DecisionGUI"
+		position = { x = 0 y = 0 }
+		size = { width = 482 height = 306 }
+
+		# Image
+		iconType = {
+			name = "BRI_Midnight_Image"
+			position = { x = 47 y = 0 }
+
+			spriteType = "GFX_BRI_Midnight_Image"
+
+			pdx_tooltip = "BRI_Midnight_Image_tt"
+			pdx_tooltip_delayed = "BRI_Midnight_Image_tt_delayed"
+		}
+
+		## Military Confidence Container
+		containerWindowType = {
+			name = "BRI_Midnight_ConfidenceContainer"
+			position = { x = 205 y = 19 }
+
+			# Military Confidence Title
+			instantTextboxType = {
+				name = "BRI_Midnight_ConfidenceTitle"
+				position = { x = 0 y = 0 }
+
+				text = "BRI_Midnight_ConfidenceTitle_text"
+				font = "aldrich_18_outline"
+				format = left
+				maxWidth = 252
+				maxHeight = 17
+
+				pdx_tooltip = "BRI_Midnight_ConfidenceTitle_tt"
+			}
+
+			# Military Confidence Bar
+			iconType = {
+				name = "BRI_Midnight_ConfidenceBar"
+				position = { x = 0 y = 19 }
+
+				quadTextureSprite = "GFX_BRI_Midnight_ConfidenceBar"
+
+				pdx_tooltip = "BRI_Midnight_ConfidenceBar_tt"
+				pdx_tooltip_delayed = "BRI_Midnight_ConfidenceBar_tt_delayed"
+			}
+
+			# Military Confidence Description
+			instantTextboxType = {
+				name = "BRI_Midnight_ConfidenceDesc"
+				position = { x = 0 y = 49 }
+
+				text = "BRI_Midnight_ConfidenceDesc_text"
+				font = "aldrich_14_outline"
+				format = left
+				maxWidth = 252
+				maxHeight = 26
+
+				pdx_tooltip = "BRI_Midnight_ConfidenceDesc_tt"
+				pdx_tooltip_delayed = "BRI_Midnight_ConfidenceDesc_tt_delayed"
+			}
+
+			# Military Confidence Debug Button
+			buttonType = {
+				name = "BRI_Midnight_ConfidenceDebugButton"
+				position = { x = 228 y = -6 }
+
+				quadTextureSprite = "GFX_add_one"
+				
+				pdx_tooltip = "BRI_Midnight_ConfidenceDebugButton_tt"
+			}
+		}
+
+		## Combat Acclimation Container
+		containerWindowType = {
+			name = "BRI_Midnight_AcclimationContainer"
+			position = { x = 205 y = 110 }
+
+			# Combat Acclimation Title
+			instantTextboxType = {
+				name = "BRI_Midnight_AcclimationTitle"
+				position = { x = 0 y = 0 }
+
+				text = "BRI_Midnight_AcclimationTitle_text"
+				font = "aldrich_18_outline"
+				format = left
+				maxWidth = 252
+				maxHeight = 17
+
+				pdx_tooltip = "BRI_Midnight_AcclimationTitle_tt"
+			}
+
+			# Combat Acclimation Bar
+			iconType = {
+				name = "BRI_Midnight_AcclimationBar"
+				position = { x = 0 y = 19 }
+
+				quadTextureSprite = "GFX_BRI_Midnight_AcclimationBar"
+
+				pdx_tooltip = "BRI_Midnight_AcclimationBar_tt"
+				pdx_tooltip_delayed = "BRI_Midnight_AcclimationBar_tt_delayed"
+			}
+
+			# Combat Acclimation Description
+			instantTextboxType = {
+				name = "BRI_Midnight_AcclimationDesc"
+				position = { x = 0 y = 49 }
+
+				text = "BRI_Midnight_AcclimationDesc_text"
+				font = "aldrich_14_outline"
+				format = left
+				maxWidth = 252
+				maxHeight = 26
+
+				pdx_tooltip = "BRI_Midnight_AcclimationDesc_tt"
+				pdx_tooltip_delayed = "BRI_Midnight_AcclimationDesc_tt_delayed"
+			}
+
+			# Combat Acclimation Debug Button
+			buttonType = {
+				name = "BRI_Midnight_AcclimationDebugButton"
+				position = { x = 228 y = -6 }
+
+				quadTextureSprite = "GFX_add_one"
+				
+				pdx_tooltip = "BRI_Midnight_AcclimationDebugButton_tt"
+			}
+		}
+
+		## Structural Exhaustion Container
+		containerWindowType = {
+			name = "BRI_Midnight_ExhaustionContainer"
+			position = { x = 205 y = 201 }
+
+			# Structural Exhaustion Title
+			instantTextboxType = {
+				name = "BRI_Midnight_ExhaustionTitle"
+				position = { x = 0 y = 0 }
+
+				text = "BRI_Midnight_ExhaustionTitle_text"
+				font = "aldrich_18_outline"
+				format = left
+				maxWidth = 252
+				maxHeight = 17
+
+				pdx_tooltip = "BRI_Midnight_ExhaustionTitle_tt"
+			}
+
+			# Structural Exhaustion Bar
+			iconType = {
+				name = "BRI_Midnight_ExhaustionBar"
+				position = { x = 0 y = 19 }
+
+				quadTextureSprite = "GFX_BRI_Midnight_ExhaustionBar"
+
+				pdx_tooltip = "BRI_Midnight_ExhaustionBar_tt"
+				pdx_tooltip_delayed = "BRI_Midnight_ExhaustionBar_tt_delayed"
+			}
+
+			# Structural Exhaustion Description
+			instantTextboxType = {
+				name = "BRI_Midnight_ExhaustionDesc"
+				position = { x = 0 y = 49 }
+
+				text = "BRI_Midnight_ExhaustionDesc_text"
+				font = "aldrich_14_outline"
+				format = left
+				maxWidth = 252
+				maxHeight = 26
+
+				pdx_tooltip = "BRI_Midnight_ExhaustionDesc_tt"
+				pdx_tooltip_delayed = "BRI_Midnight_ExhaustionDesc_tt_delayed"
+			}
+
+			# Structural Exhaustion Debug Button
+			buttonType = {
+				name = "BRI_Midnight_ExhaustionDebugButton"
+				position = { x = 228 y = -6 }
+
+				quadTextureSprite = "GFX_add_one"
+				
+				pdx_tooltip = "BRI_Midnight_ExhaustionDebugButton_tt"
+			}
+		}
+	}
+}

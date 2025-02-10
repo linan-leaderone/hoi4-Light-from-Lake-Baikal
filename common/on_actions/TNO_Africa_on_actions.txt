@@ -1,0 +1,1476 @@
+on_actions = {
+	#EVENTS
+	on_startup = {
+		effect = {
+			SAF = {
+				country_event = {
+					id = SAF.18 #Boer protests
+					days = 654 #Day after Hitler dies
+				}
+				add_dynamic_modifier = { modifier = SAF_misc_stuff_hidden }
+				set_variable = { SAF_free_prod_units = 12 }
+			}
+
+			GRO = {
+				country_event = {
+					id = GRO.51 #Investigation start
+					days = 112
+				}
+				activate_mission = GRO_guns_from_germany
+			}
+
+			ZZZ = { TNO_WAC_start = yes } # West African Crisis
+			ZZZ = {
+				country_event = { id = free_france.1 days = 3234 random_hours = 120 } # de Gaulle death
+			}
+			USA = {
+				country_event = { id = free_france_reconstruction.3 days = 2343 } # West African Reconstruction
+			}
+		}
+	}
+	#STARTUP DEFINITIONS
+	on_startup = {
+		effect = {
+			SAF = {
+				add_ideas = AFRICA_SAW_defense_buff
+			}
+			COG = {
+				activate_mission = COG_guns_from_germany
+				add_ideas = AFRICA_SAW_defense_buff
+				set_variable = { cog_adminsitrative_distribution = 0.62 }
+				set_variable = { cog_native_tensions = 0.23 }
+				set_variable = { cog_bel_loyalty = 0.39 }
+				set_variable = { cog_fra_loyalty = 0.71 }
+				set_variable = { cog_eng_loyalty = 0.52 }
+				set_variable = { COG_Investor_Happiness = 0.78 }
+
+				COG_update_merc_variables = yes
+
+				add_dynamic_modifier = { modifier = COG_mercenary_army }
+
+				country_event = { id = COG_misc.13 days = 515 }
+				country_event = { id = COG_misc.14 days = 110 }
+				country_event = { id = COG_misc.15 days = 475 }
+				country_event = { id = COG_misc.24 days = 60 random_hours = 200 }
+				country_event = { id = COG_misc.25 days = 120 random_hours = 300 }
+				country_event = { id = COG_misc.26 days = 160 random_hours = 365 }
+				country_event = { id = COG_misc.27 days = 690 }
+				country_event = { id = COG_misc.28 days = 52 random_hours = 140 }
+				country_event = { id = COG_misc.29 days = 670 }
+				country_event = { id = COG_misc.30 days = 720 }
+				country_event = { id = COG_misc.31 days = 735 }
+				country_event = { id = COG_misc.32 days = 1 random_hours = 400 }
+				country_event = { id = COG_misc.33 days = 380 }
+
+				country_event = { id = OFN_COG_flavor.1 days = 1220 }
+
+				### Lobster War
+				country_event = { id = COG_Lobster_War.6 days = 14 } # Like Father Like Son
+			}
+
+			ANG = {
+				activate_mission = ANG_guns_from_germany
+				add_ideas = AFRICA_SAW_defense_buff
+				set_variable = { ANG_Muller_Sus = 5 }
+				set_variable = { ANG_Huttig_Sus = 15 }
+				set_variable = { ANG_Native_Unrest = 35 }
+				set_variable = { ANG_Native_Militancy = 25 }
+
+				set_variable = { ANG_German_Collection = 2 }
+
+				set_variable = { ANG_Liquid_Cash = 10 }
+
+				set_variable = { ANG_German_Displeasure = 18 }
+
+				set_variable = { ANG_German_Displeasure_MAX = 100 }
+
+				set_variable = { ANG_German_Displeasure_MIN = 0 }
+
+				clamp_variable = {
+					var = ANG_German_Displeasure
+					min = ANG_German_Displeasure_MIN
+					max = ANG_German_Displeasure_MAX
+				}
+
+				set_variable = { ANG_Cash_Monthly_Checker = 10 }
+
+				activate_mission = ANG_Cash_Monthly
+
+				#### Dynamic Modifier Variables
+
+				set_variable = { ANG_Air_Empire_Max_Production = 0 }
+
+				set_variable = { ANG_Air_Empire_Production_Retention = 0 }
+
+				set_variable = { ANG_Air_Empire_Fuel_Gain = 0 }
+
+				set_variable = { ANG_Air_Empire_Max_Fuel = 0 }
+
+				set_variable = { ANG_Air_Empire_Resource_Extration = 0 }
+			}
+			GRO = {
+				add_ideas = AFRICA_SAW_defense_buff
+				load_focus_tree = GRO_huttig_prewar
+			}
+			COG = {
+				give_resource_rights = { receiver = GER state = 539 resources = { oil aluminium rubber tungsten steel chromium uranium } }
+				give_resource_rights = { receiver = GER state = 1162 resources = { oil aluminium rubber tungsten steel chromium uranium } }
+				give_resource_rights = { receiver = GER state = 1164 resources = { oil aluminium rubber tungsten steel chromium uranium } }
+				give_resource_rights = { receiver = GER state = 718 resources = { oil aluminium rubber tungsten steel chromium uranium } }
+			}
+			ANG = {
+				set_variable = {
+					var = ANG_Local_cash
+					value = 2
+				}
+			}
+		}
+	}
+
+	on_daily_GRO = {
+		# REICHSSTAAT MECHANICS TICK
+		effect = {
+			if = {
+				limit = {
+					GRO = {
+						OR = {
+							has_cosmetic_tag = GRO_REICHSSTAAT
+							has_cosmetic_tag = GRO_REICHSSTAAT_2
+							has_cosmetic_tag = GRO_REICHSSTAAT_3
+						}
+						has_war = no
+						NOT = { has_global_flag = south_african_war_happening }
+					}
+				}
+
+
+				set_temp_variable = { GRO_REICHSSTAAT_stab_decay = stability }
+				add_to_temp_variable = { GRO_REICHSSTAAT_stab_decay = -0.3 } # You need over 30% Stability to have a stable nation
+
+				if = {
+					limit = {
+						NOT = { has_country_flag = GRO_REICHSSTAAT_ANC_ist_kaput }
+					}
+					set_temp_variable = { GRO_REICHSSTAAT_anc_influence_temp_calc = BOR.GRO_REICHSSTAAT_anc_influence }
+					divide_temp_variable = { GRO_REICHSSTAAT_anc_influence_temp_calc = 2 }
+
+					subtract_from_temp_variable = { GRO_REICHSSTAAT_stab_decay = GRO_REICHSSTAAT_anc_influence_temp_calc }
+				}
+
+				divide_temp_variable = { GRO_REICHSSTAAT_stab_decay = 100 }
+
+				clamp_temp_variable = {
+					var = GRO_REICHSSTAAT_stab_decay
+					min = -0.001
+					max = 0.001
+				}
+
+				log = "[GetDateText]: [Root.GetName]: Afrika's stability decrease calculated (decay = [?GRO_REICHSSTAAT_stab_decay])"
+
+				if = {
+					limit = {
+						check_variable = { GRO_REICHSSTAAT_devastation_score > 50 }
+					}
+					set_temp_variable = { GRO_REICHSSTAAT_devastation_stab_decay = GRO_REICHSSTAAT_devastation_score }
+					divide_temp_variable = { GRO_REICHSSTAAT_devastation_stab_decay = 50 }
+
+					multiply_temp_variable = { GRO_REICHSSTAAT_stab_decay = GRO_REICHSSTAAT_devastation_stab_decay }
+				}
+
+				for_each_loop = {
+					array = GRO_REICHSSTAAT_rebel_stability
+					index = i
+
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability^i = GRO_REICHSSTAAT_stab_decay }
+					clamp_variable = {
+						var = GRO_REICHSSTAAT_rebel_stability^i
+						min = 0
+						max = 1
+					}
+				}
+
+				log = "[GetDateText]: [Root.GetName]: Afrika's stability decayed (decay = [?GRO_REICHSSTAAT_stab_decay])"
+
+				add_to_variable = { GRO_REICHSSTAAT_handy_counter = 1 }
+				if = {
+					limit = {
+						check_variable = { GRO_REICHSSTAAT_handy_counter = 9 }
+					}
+
+					ROOT = { GRO_REICHSSTAAT_compute_demilitarization_and_rebellions = yes }
+
+					add_to_variable = { GRO_REICHSSTAAT_devastation_score = GRO_fiscal_crisis_devastation }
+					add_to_variable = { GRO_REICHSSTAAT_devastation_score = GRO_REICHSSTAAT_devastation_score_add }
+					if = {
+						limit = {
+							has_game_rule = {
+								rule = GRO_DEVASTATION
+								option = GRO_DEVASTATION_1
+							}
+							NOT = {
+								check_variable = {
+									var = GRO_REICHSSTAAT_devastation_score
+									value = 100
+									compare = less_than
+								}
+							}
+						}
+						set_variable = { GRO_REICHSSTAAT_devastation_score = 99 }
+					}
+					else_if = {
+						limit = {
+							has_country_flag = GRO_REICHSSTAAT_mosambik_flag
+							OR = {
+								has_game_rule = {
+									rule = GRO_DEVASTATION
+									option = GRO_DEVASTATION_2
+								}
+								has_game_rule = {
+									rule = GRO_DEVASTATION
+									option = GRO_DEVASTATION_3
+								}
+							}
+							NOT = {
+								check_variable = {
+									var = GRO_REICHSSTAAT_devastation_score
+									value = 100
+									compare = greater_than_or_equals
+								}
+							}
+						}
+						set_variable = { GRO_REICHSSTAAT_devastation_score = 100 }
+					}
+					else_if = {
+						limit = {
+							has_game_rule = {
+								rule = GRO_DEVASTATION
+								option = GRO_DEVASTATION_2
+							}
+							NOT = {
+								check_variable = {
+									var = GRO_REICHSSTAAT_devastation_score
+									value = 250
+									compare = less_than
+								}
+							}
+						}
+						set_variable = { GRO_REICHSSTAAT_devastation_score = 249 }
+					}
+					else_if = {
+						limit = {
+							has_government = fascism
+							has_game_rule = {
+								rule = GRO_DEVASTATION
+								option = GRO_DEVASTATION_3
+							}
+							NOT = {
+								check_variable = {
+									var = GRO_REICHSSTAAT_devastation_score
+									value = 250
+									compare = greater_than_or_equals
+								}
+							}
+						}
+						set_variable = { GRO_REICHSSTAAT_devastation_score = 250 }
+					}
+					GRO_REICHSSTAAT_compute_devastation_effects = yes
+					GRO_REICHSSTAAT_update_reichsstaat_color = yes
+
+					set_variable = { GRO_REICHSSTAAT_handy_counter = 0 }
+					log = "[GetDateText]: [Root.GetName]: Afrika's stability effects calculated"
+				}
+
+				set_variable = { GRO_REICHSSTAAT_rebel_stability_tot = 0 }
+				set_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 0 }
+
+				if = {
+					limit = { GRO_is_in_control_of_kameroon = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^0 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_ubangi_schari = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^1 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_kongo = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^2 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_angola = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^3 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_sambia = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^4 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_botswana = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^5 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_simbabwe = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^6 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_mosambik = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^7 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_sansibar = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^8 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_ruanda_burundi = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^9 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_uganda = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^10 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_tanganika = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^11 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_namibia = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^12 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+				if = {
+					limit = { GRO_is_in_control_of_kenia = yes }
+					add_to_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability^13 }
+					add_to_temp_variable = { GRO_REICHSSTAAT_rebel_stability_num = 1 }
+				}
+
+				divide_variable = { GRO_REICHSSTAAT_rebel_stability_tot = GRO_REICHSSTAAT_rebel_stability_num }
+
+
+				######################
+				# VON HASSEL'S CABAL #
+				######################
+
+				# Natural decay
+				#
+				# - High stability increases decay
+				# - Pro-Hüttig administrative decisions increases decay
+
+				if = {
+					limit = {
+						has_country_flag = GRO_cabal_active
+					}
+
+					set_variable = { GRO_REICHSSTAAT_cabal_decay = 0.001 } # Base value
+
+					set_temp_variable = { GRO_REICHSSTAAT_cabal_decay_stab_contrib_temp = stability }
+					add_to_temp_variable = { GRO_REICHSSTAAT_cabal_decay_stab_contrib_temp = 0.7 }
+					divide_temp_variable = { GRO_REICHSSTAAT_cabal_decay_stab_contrib_temp = 200 }
+					add_to_variable = { GRO_REICHSSTAAT_cabal_decay = GRO_REICHSSTAAT_cabal_decay_stab_contrib_temp }
+
+					if = {
+						limit = {
+							has_completed_focus = GRO_keeping_up_with_the_joneses
+						}
+						add_to_variable = { GRO_REICHSSTAAT_cabal_decay = 0.001 }
+					}
+
+					if = {
+						limit = {
+							has_completed_focus = GRO_german_management_focus
+						}
+						add_to_variable = { GRO_REICHSSTAAT_cabal_decay = 0.001 }
+					}
+
+					if = {
+						limit = {
+							has_completed_focus = GRO_a_pure_africa
+						}
+						add_to_variable = { GRO_REICHSSTAAT_cabal_decay = 0.001 }
+					}
+
+					if = {
+						limit = {
+							has_completed_focus = GRO_the_great_purge
+						}
+						add_to_variable = { GRO_REICHSSTAAT_cabal_decay = 0.001 }
+					}
+
+					subtract_from_variable = { GRO_REICHSSTAAT_cabal_decay = GRO_REICHSSTAAT_cabal_decay_GER }
+
+					clamp_variable = {
+						var = GRO_REICHSSTAAT_cabal_decay
+						min = 0.001
+					}
+
+					subtract_from_variable = { GRO_REICHSSTAAT_cabal_power = GRO_REICHSSTAAT_cabal_decay }
+
+					clamp_variable = {
+						var = GRO_REICHSSTAAT_cabal_power
+						min = 0
+						max = 1
+					}
+
+					### Political pie mechanics
+					######## -> The political chart reacts to the power of the cabal
+
+					set_temp_variable = { GRO_REICHSSTAAT_cabal_diff_temp = GRO_REICHSSTAAT_cabal_power }
+					subtract_from_temp_variable = { GRO_REICHSSTAAT_cabal_diff_temp = party_popularity@fascism }
+					divide_temp_variable = { GRO_REICHSSTAAT_cabal_diff_temp = 4 }
+
+					set_variable = { GRO_REICHSSTAAT_percent_cabal_power = GRO_REICHSSTAAT_cabal_power }
+					multiply_variable = { GRO_REICHSSTAAT_percent_cabal_power = 100 }
+
+					if = {
+						limit = {
+							check_variable = { GRO_REICHSSTAAT_cabal_diff_temp < 0.002 }
+							check_variable = { GRO_REICHSSTAAT_cabal_diff_temp > -0.002 }
+						}
+						set_political_party = {
+							ideology = fascism
+							popularity = GRO_REICHSSTAAT_percent_cabal_power
+						}
+					}
+
+					else = {
+						add_popularity = {
+							ideology = fascism
+							popularity = GRO_REICHSSTAAT_cabal_diff_temp
+						}
+					}
+				}
+			}
+		}
+	}
+
+	on_daily_ZZZ = {
+		effect = {
+			# WAC Jola Fix
+			WAC_check_offset = yes
+
+			# MANDATE MECHANICS TICK
+			if = {
+				limit = {
+					OR = {
+						USC = {
+							exists = yes
+						}
+						MZB = {
+							exists = yes
+							OR = {
+								has_cosmetic_tag = MZB_USA
+								has_cosmetic_tag = USA_CAR
+							}
+						}
+						COG = {
+							exists = yes
+							has_cosmetic_tag = COG_USA
+						}
+						ANG = {
+							exists = yes
+							has_cosmetic_tag = ANG_USA
+						}
+					}
+				}
+
+				ZZZ = {
+					add_to_variable = { USA_AFRICA_handy_counter = 1 }
+					#log = "[GetDateText]: [Root.GetName]: African mandates handy counter"
+				}
+
+				if = {
+					limit = {
+						ZZZ = { check_variable = { USA_AFRICA_handy_counter = 7 } }
+					}
+
+					#log = "[GetDateText]: [Root.GetName]: African mandates stability effects calculated"
+
+					COG = {
+						if = {
+							limit = {
+								has_completed_focus = OFN_COG_prepare_for_the_future
+								OR = {
+									has_completed_focus = OFN_COG_the_new_smiling_man
+									has_completed_focus = OFN_COG_the_american_way
+								}
+								has_completed_focus = OFN_COG_restore_order_in_congo
+							}
+							country_event = {
+								id = OFN_AFR_DECOL_COG.1
+								days = 1
+							}
+						}
+					}
+
+					USC = { #CAR
+						if = {
+							limit = {
+								NOT = { has_country_flag = OFN_CAR_collapse_is_happening }
+							}
+
+							set_variable = { OFN_MANDATE_stab_decay = OFN_MANDATE_administrative_hold }
+							add_to_variable = { OFN_MANDATE_stab_decay = -0.5 } # You need over 50% Administrative Hold to have a stable nation
+
+							divide_variable = { OFN_MANDATE_stab_decay = 50 }
+							clamp_variable = {
+								var = OFN_MANDATE_stab_decay
+								min = -0.01
+								max = 0.01
+							}
+
+							add_to_variable = { OFN_MANDATE_rebel_stability = OFN_MANDATE_stab_decay }
+							clamp_OFN_mandate_rebel_stability = yes
+
+							if = {
+								limit = {
+									check_variable = { OFN_MANDATE_rebel_stability < 0.5 }
+									is_ai = no
+									exists = yes
+								}
+								random_list = {
+									0.1 = {
+										USA_AFRICA_setup_african_crisis = yes
+									}
+									OFN_MANDATE_rebel_stability = {
+										# Nothing
+									}
+								}
+
+							}
+
+							else = {
+								if = {
+									limit = {
+										check_variable = { OFN_MANDATE_rebel_stability < 0.05 }
+										is_ai = yes
+										exists = yes
+									}
+									random_list = {
+										25 = {
+											# NOTHING HAPPENS
+										}
+										75 = {
+											USA_AFRICA_setup_african_crisis = yes
+										}
+									}
+								}
+							}
+						}
+						else_if = {
+							limit = {
+								OFN_CAR_is_in_full_control_of_africa = yes
+								has_country_flag = OFN_CAR_african_crisis_has_started
+							}
+							country_event = {
+								id = OFN_AFR_DECOL_CAR.3
+								days = 1
+							}
+						}
+					}
+
+					MZB = {
+						set_variable = { OFN_MANDATE_stab_decay = OFN_MANDATE_administrative_hold }
+						add_to_variable = { OFN_MANDATE_stab_decay = -0.5 } # You need over 50% Administrative Hold to have a stable nation
+
+						divide_variable = { OFN_MANDATE_stab_decay = 50 }
+						clamp_variable = {
+							var = OFN_MANDATE_stab_decay
+							min = -0.01
+							max = 0.01
+						}
+
+						add_to_variable = { OFN_MANDATE_rebel_stability = OFN_MANDATE_stab_decay }
+						clamp_OFN_mandate_rebel_stability = yes
+
+
+						if = {
+							limit = {
+								check_variable = { OFN_MANDATE_rebel_stability < 0.5 }
+								is_ai = no
+								exists = yes
+							}
+							random_list = {
+								0.1 = {
+									country_event = {
+										id = OFN_AFR_DECOL_MZB.7
+										days = 2
+									}
+								}
+								OFN_MANDATE_rebel_stability = {
+									# Nothing
+								}
+							}
+						}
+
+						else = {
+							if = {
+								limit = {
+									check_variable = { OFN_MANDATE_rebel_stability < 0.05 }
+									is_ai = yes
+									exists = yes
+								}
+								random_list = {
+									75 = {
+										# NOTHING HAPPENS
+									}
+									25 = {
+										country_event = {
+											id = OFN_AFR_DECOL_MZB.7
+											days = 2
+										}
+									}
+								}
+							}
+						}
+					}
+
+					COG = {
+						set_variable = { OFN_MANDATE_stab_decay = OFN_MANDATE_administrative_hold }
+						add_to_variable = { OFN_MANDATE_stab_decay = -0.5 } # You need over 50% Administrative Hold to have a stable nation
+
+						divide_variable = { OFN_MANDATE_stab_decay = 50 }
+						clamp_variable = {
+							var = OFN_MANDATE_stab_decay
+							min = -0.01
+							max = 0.01
+						}
+
+						add_to_variable = { OFN_MANDATE_rebel_stability = OFN_MANDATE_stab_decay }
+						clamp_OFN_mandate_rebel_stability = yes
+
+						if = {
+							limit = {
+								check_variable = { OFN_MANDATE_rebel_stability < 0.5 }
+								is_ai = no
+								exists = yes
+							}
+							random_list = {
+								0.1 = {
+									country_event = {
+											id = OFN_AFR_DECOL_COG.7
+											days = 2
+										}
+								}
+								OFN_MANDATE_rebel_stability = {
+									# Nothing
+								}
+							}
+						}
+
+						else = {
+							if = {
+								limit = {
+									check_variable = { OFN_MANDATE_rebel_stability < 0.05 }
+									is_ai = yes
+									exists = yes
+								}
+								random_list = {
+									75 = {
+										# NOTHING HAPPENS
+									}
+									25 = {
+										country_event = {
+											id = OFN_AFR_DECOL_COG.7
+											days = 2
+										}
+									}
+								}
+							}
+						}
+					}
+
+					ANG = {
+						set_variable = { OFN_MANDATE_stab_decay = OFN_MANDATE_administrative_hold }
+						add_to_variable = { OFN_MANDATE_stab_decay = -0.5 } # You need over 50% Administrative Hold to have a stable nation
+
+						divide_variable = { OFN_MANDATE_stab_decay = 50 }
+						clamp_variable = {
+							var = OFN_MANDATE_stab_decay
+							min = -0.01
+							max = 0.01
+						}
+
+						######### UNITA-PLUAA GOVERNMENT BALANCE CALC
+						if = {
+							limit = { has_country_flag = ANG_USA_rivalry_is_on } # enabled when rivalry mechanic kicks in
+							set_variable = { OFN_MANDATE_ANG_gov_strength = OFN_MANDATE_ANG_PLUAA_power_level }
+							subtract_from_variable = { OFN_MANDATE_ANG_gov_strength = OFN_MANDATE_ANG_UNITA_power_level }
+							if = {
+								limit = { check_variable = { OFN_MANDATE_ANG_gov_strength < 0 } }
+								multiply_variable = { OFN_MANDATE_ANG_gov_strength = -1 }
+							}
+							multiply_variable = { OFN_MANDATE_ANG_gov_strength = 0.01 }
+							if = {
+								limit = {
+									OR = {
+										has_game_rule = {
+											rule = ANG_ROOT
+											option = ANG_ROOT_MLPA
+										}
+										has_game_rule = {
+											rule = ANG_ROOT
+											option = ANG_ROOT_UNITA
+										}
+									}
+								}
+								clamp_variable = {
+									var = OFN_MANDATE_ANG_gov_strength
+									min = 0.30
+									max = 1
+								}
+							}
+							else_if = {
+								limit = {
+									has_game_rule = {
+										rule = ANG_ROOT
+										option = ANG_ROOT_FNLA
+									}
+								}
+								clamp_variable = {
+									var = OFN_MANDATE_ANG_gov_strength
+									min = 0
+									max = 0.25
+								}
+							}
+							else = {
+								clamp_variable = {
+									var = OFN_MANDATE_ANG_gov_strength
+									min = 0
+									max = 1
+								}
+							}
+
+							#set_variable = { OFN_MANDATE_ANG_gov_strength = OFN_MANDATE_ANG_PLUAA_power_level }
+							#add_to_variable = { OFN_MANDATE_ANG_gov_strength = OFN_MANDATE_ANG_UNITA_power_level }
+							#
+							#if = {
+							#	limit = {
+							#		check_variable = { OFN_MANDATE_ANG_UNITA_power_level > OFN_MANDATE_ANG_PLUAA_power_level }
+							#	}
+							#	set_temp_variable = { OFN_MANDATE_ANG_tot_gov_strength = OFN_MANDATE_ANG_gov_strength }
+							#	set_variable = { OFN_MANDATE_ANG_gov_strength = OFN_MANDATE_ANG_UNITA_power_level }
+							#	divide_variable = { OFN_MANDATE_ANG_gov_strength = OFN_MANDATE_ANG_tot_gov_strength }
+							#}
+							#
+							#else = {
+							#	set_temp_variable = { OFN_MANDATE_ANG_tot_gov_strength = OFN_MANDATE_ANG_gov_strength }
+							#	set_variable = { OFN_MANDATE_ANG_gov_strength = OFN_MANDATE_ANG_PLUAA_power_level }
+							#	divide_variable = { OFN_MANDATE_ANG_gov_strength = OFN_MANDATE_ANG_tot_gov_strength }
+							#}
+							#
+							#subtract_from_variable = { OFN_MANDATE_ANG_gov_strength = 0.5 }
+							#multiply_variable = { OFN_MANDATE_ANG_gov_strength = 0.9 }
+							#add_to_variable = { OFN_MANDATE_ANG_gov_strength = 0.1 }
+
+							######### UNITA-PLUAA RIVALRY STAB HIT
+
+							set_variable = { OFN_MANDATE_ANG_rivalry_stab_decay = OFN_MANDATE_ANG_PLUAA_power_level }
+							subtract_from_variable = { OFN_MANDATE_ANG_rivalry_stab_decay = OFN_MANDATE_ANG_UNITA_power_level }
+
+							if = {
+								limit = {
+									check_variable = { OFN_MANDATE_ANG_rivalry_stab_decay > 0 }
+								}
+								multiply_variable = { OFN_MANDATE_ANG_rivalry_stab_decay = -1 }
+							}
+							multiply_variable = { OFN_MANDATE_ANG_rivalry_stab_decay = 0.001 }
+							clamp_variable = {
+								var = OFN_MANDATE_ANG_rivalry_stab_decay
+								min = -0.15
+								max = 0
+							}
+							if = {
+								limit = {
+									OR = {
+										has_game_rule = {
+											rule = ANG_ROOT
+											option = ANG_ROOT_MLPA
+										}
+										has_game_rule = {
+											rule = ANG_ROOT
+											option = ANG_ROOT_UNITA
+										}
+										has_game_rule = {
+											rule = ANG_ROOT
+											option = ANG_ROOT_FNLA
+										}
+									}
+								}
+								clamp_variable = {
+									var = OFN_MANDATE_ANG_rivalry_stab_decay
+									min = -0.02
+									max = 0
+								}
+							}
+
+							if = {
+								limit = {
+									ANG = {
+										is_ai = yes
+									}
+								}
+								divide_variable = { OFN_MANDATE_ANG_rivalry_stab_decay = 2 }
+							}
+
+							add_to_variable = { OFN_MANDATE_stab_decay = OFN_MANDATE_ANG_rivalry_stab_decay }
+						}
+
+						#####################################
+
+						add_to_variable = { OFN_MANDATE_rebel_stability = OFN_MANDATE_stab_decay }
+						clamp_OFN_mandate_rebel_stability = yes
+
+						if = {
+							limit = {
+								check_variable = { OFN_MANDATE_rebel_stability < 0.05 }
+								is_ai = no
+								exists = yes
+								has_cosmetic_tag = ANG_USA
+							}
+							random_list = {
+								0.1 = {
+									country_event = {
+										id = OFN_AFR_DECOL_ANG.5
+										days = 2
+									}
+								}
+								OFN_MANDATE_rebel_stability = {
+									# Nothing
+								}
+							}
+						}
+
+						else = {
+							if = {
+								limit = {
+									check_variable = { OFN_MANDATE_rebel_stability < 0.05 }
+									is_ai = yes
+									exists = yes
+									has_cosmetic_tag = ANG_USA
+								}
+								random_list = {
+									80 = {
+										# NOTHING HAPPENS
+									}
+									20 = {
+										country_event = {
+											id = OFN_AFR_DECOL_ANG.5
+											days = 2
+										}
+									}
+								}
+							}
+						}
+					}
+
+					ZZZ = {
+						USA_AFRICA_compute_rebellions = yes
+						set_variable = { USA_AFRICA_handy_counter = 0 }
+					}
+				}
+			}
+		}
+	}
+
+	on_state_control_changed = {
+		effect = {
+		############################# CAPTURE EVENTS
+
+			if = { # Cape Town capture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					not = { has_global_flag = SAF_collapse_war }
+
+					SAF = {
+						has_war = yes
+					}
+					OR = {
+						AND = {
+							ROOT = { tag = BOR }
+							FROM = { tag = SAF }
+							FROM.FROM = { state = 681 }
+						}
+
+						AND = {
+							ROOT = { tag = ANG }
+							FROM = { tag = SAF }
+							FROM.FROM = { state = 681 }
+						}
+					}
+				}
+
+				USA = { country_event = { id = USA.saf.war.missions.17 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.17 days = 1 } }
+				ANG = { country_event = { id = USA.saf.war.missions.17 days = 1 } }
+				BOR = { country_event = { id = USA.saf.war.missions.17 days = 1 } }
+
+			}
+
+			if = { # East London capture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					OR = {
+						AND = {
+							ROOT = { tag = BOR }
+							FROM = { tag = SAF }
+							FROM.FROM = { state = 934 }
+						}
+
+
+						AND = {
+							ROOT = { tag = GRO }
+							FROM = { tag = SAF }
+							FROM.FROM = { state = 934 }
+						}
+					}
+				}
+				USA = { country_event = { id = USA.saf.war.missions.15 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.15 days = 1 } }
+				GRO = { country_event = { id = USA.saf.war.missions.15 days = 1 } }
+				BOR = { country_event = { id = USA.saf.war.missions.15 days = 1 } }
+			}
+
+			if = { # Salisbury Capture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					ROOT = { tag = SAF }
+					FROM = { tag = GRO }
+					FROM.FROM = { state = 1061 }
+				}
+				USA = { country_event = { id = USA.saf.war.missions.13 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.13 days = 1 } }
+				GRO = { country_event = { id = USA.saf.war.missions.13 days = 1 } }
+			}
+
+			if = { # Salisbury recapture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					GRO = {
+						is_puppet = no
+					}
+					ROOT = { tag = GRO }
+					FROM = { tag = SAF }
+					FROM.FROM = { state = 1061 }
+					has_global_flag = SAF_WAR_Salisbury_captured_Captured
+				}
+				USA = { country_event = { id = USA.saf.war.missions.14 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.14 days = 1 } }
+				GRO = { country_event = { id = USA.saf.war.missions.14 days = 1 } }
+			}
+
+			if = { # Quelimane Capture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					ROOT = { tag = SAF }
+					FROM = { tag = GRO }
+					FROM.FROM = { state = 544 }
+				}
+				USA = { country_event = { id = USA.saf.war.missions.11 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.11 days = 1 } }
+				GRO = { country_event = { id = USA.saf.war.missions.11 days = 1 } }
+			}
+
+			if = { # Quelimane recapture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					GRO = {
+						is_puppet = no
+					}
+					ROOT = { tag = GRO }
+					FROM = { tag = SAF }
+					FROM.FROM = { state = 544 }
+					has_global_flag = SAF_WAR_Quelimane_Captured
+				}
+				USA = { country_event = { id = USA.saf.war.missions.12 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.12 days = 1 } }
+				GRO = { country_event = { id = USA.saf.war.missions.12 days = 1 } }
+			}
+
+			if = { # Leopold Capture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					country_exists = COG
+					ROOT = { tag = SAF }
+					FROM = { tag = COG }
+					FROM.FROM = { state = 295 }
+				}
+				USA = { country_event = { id = USA.saf.war.missions.9 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.9 days = 1 } }
+				COG = { country_event = { id = USA.saf.war.missions.9 days = 1 } }
+			}
+
+			if = { # Leopold recapture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					ROOT = { tag = COG }
+					FROM = { tag = SAF }
+					FROM.FROM = { state = 295 }
+					has_global_flag = SAF_WAR_Leopoldville_Captured
+					COG = {
+						is_puppet = no
+					}
+					SAF = {
+						has_war = yes
+					}
+				}
+				USA = { country_event = { id = USA.saf.war.missions.10 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.10 days = 1 } }
+				COG = { country_event = { id = USA.saf.war.missions.10 days = 1 } }
+			}
+
+			if = { # Libreville Capture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					country_exists = COG
+					ROOT = { tag = SAF }
+					FROM = { tag = COG }
+					FROM.FROM = { state = 529 }
+				}
+				USA = { country_event = { id = USA.saf.war.missions.7 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.7 days = 1 } }
+				COG = { country_event = { id = USA.saf.war.missions.7 days = 1 } }
+			}
+
+			if = { # Libreville recapture event
+				limit = {
+					SAF = {
+						has_war = yes
+					}
+					COG = {
+						is_puppet = no
+					}
+					ROOT = { tag = COG }
+					FROM = { tag = SAF }
+					FROM.FROM = { state = 529 }
+					has_global_flag = SAF_WAR_Libre_Captured
+				}
+				USA = { country_event = { id = USA.saf.war.missions.8 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.8 days = 1 } }
+				COG = { country_event = { id = USA.saf.war.missions.8 days = 1 } }
+			}
+
+			if = { # Johanas capture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					country_exists = BOR
+					ROOT = { tag = SAF }
+					FROM = { tag = BOR }
+					FROM.FROM = { state = 940 }
+				}
+				USA = { country_event = { id = USA.saf.war.missions.5 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.5 days = 1 } }
+				BOR = { country_event = { id = USA.saf.war.missions.5 days = 1 } }
+			}
+
+			if = { # Johanas recapture event
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war_with = COG
+					}
+					country_exists = BOR
+					ROOT = { tag = BOR }
+					FROM = { tag = SAF }
+					FROM.FROM = { state = 940 }
+					has_global_flag = SAF_WAR_Johans_Captured
+				}
+				USA = { country_event = { id = USA.saf.war.missions.6 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.6 days = 1 } }
+				BOR = { country_event = { id = USA.saf.war.missions.6 days = 1 } }
+			}
+
+			if = { # Bloem Capture
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					country_exists = BOR
+					ROOT = { tag = SAF }
+					FROM = { tag = BOR }
+					FROM.FROM = { state = 275 }
+				}
+				USA = { country_event = { id = USA.saf.war.missions.3 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.3 days = 1 } }
+				BOR = { country_event = { id = USA.saf.war.missions.3 days = 1 } }
+			}
+
+			if = { # Bloem recapture
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					country_exists = BOR
+					ROOT = { tag = BOR }
+					FROM = { tag = SAF }
+					FROM.FROM = { state = 275 }
+					has_global_flag = SAF_WAR_Bloem_Captured
+				}
+				USA = { country_event = { id = USA.saf.war.missions.4 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.4 days = 1 } }
+				BOR = { country_event = { id = USA.saf.war.missions.4 days = 1 } }
+			}
+
+			if = { # Windhoek recapture
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					ROOT = { tag = ANG }
+					FROM = { tag = SAF }
+					FROM.FROM = { state = 778 }
+					has_global_flag = SAF_WAR_Windhoek_Captured
+				}
+				USA = { country_event = { id = USA.saf.war.missions.2 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.2 days = 1 } }
+				ANG = { country_event = { id = USA.saf.war.missions.2 days = 1 } }
+			}
+
+			if = { # Windhoek capture
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					ANG = {
+						is_puppet = no
+					}
+					ROOT = { tag = SAF }
+					FROM = { tag = ANG }
+					FROM.FROM = { state = 778 }
+				}
+				USA = { country_event = { id = USA.saf.war.missions.1 days = 1 } }
+				SAF = { country_event = { id = USA.saf.war.missions.1 days = 1 } }
+				ANG = { country_event = { id = USA.saf.war.missions.1 days = 1 } }
+			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		############################## END CAPTURE EVENTS
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						surrender_progress > 0.6
+					}
+				}
+				SAF = {
+					country_event = { id = SAFWAR.2 days = 1 }
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					COG = {
+						surrender_progress > 0.7
+					}
+				}
+				COG = {
+					country_event = { id = SAFWAR.3 days = 1 }
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					GRO = {
+						surrender_progress > 0.7
+					}
+				}
+				GRO = {
+					country_event = { id = SAFWAR.4 days = 1 }
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					ANG = {
+						surrender_progress > 0.7
+						has_government = national_socialism
+					}
+				}
+				ANG = {
+					country_event = { id = SAFWAR.5 days = 1 }
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					ROOT = { tag = SAF }
+					FROM.FROM = { state = 1054 }
+				}
+				SAF = {
+					country_event = { id = SAFWAR.30 days = 1 }
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					ROOT = { tag = SAF }
+					FROM.FROM = { state = 881 }
+				}
+				SAF = {
+					country_event = { id = SAFWAR.31 days = 1 }
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					ROOT = { tag = SAF }
+					FROM.FROM = { state = 1063 }
+				}
+				SAF = {
+					country_event = { id = SAFWAR.32 days = 1 }
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					ROOT = { tag = SAF }
+					FROM.FROM = { state = 545 }
+				}
+				SAF = {
+					country_event = { id = SAFWAR.33 days = 1 }
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					ROOT = { tag = SAF }
+					FROM.FROM = { state = 1065 }
+				}
+				SAF = {
+					country_event = { id = SAFWAR.34 days = 1 }
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					ROOT = { tag = SAF }
+					FROM.FROM = { state = 1058 }
+				}
+				SAF = {
+					country_event = { id = SAFWAR.35 days = 1 }
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					ROOT = { tag = SAF }
+					FROM.FROM = { state = 880 }
+				}
+				SAF = {
+					country_event = { id = SAFWAR.36 days = 1 }
+				}
+			}
+		}
+	}
+
+	on_state_control_changed = { # SAW | If frontlines haven't moved for 60 days (no state change), removes a flag to allow the AI to seek a ceasefire.
+		effect = {
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					SAF = {
+						has_war = yes
+					}
+					OR = {
+						FROM = { tag = SAF }
+						FROM = { tag = BOR }
+						FROM = { tag = COG }
+						FROM = { tag = ANG }
+						FROM = { tag = GRO }
+					}
+				}
+				SAF = {
+					set_country_flag = {
+					flag = SAW_frontlines_moved
+					value = 1
+					days = 60
+					}
+				}
+				USA = {
+					set_country_flag = {
+						flag = SAW_frontlines_moved
+						value = 1
+						days = 60
+					}
+				}
+				GRO = {
+					set_country_flag = {
+						flag = SAW_frontlines_moved
+						value = 1
+						days = 60
+					}
+				}
+				ANG = {
+					set_country_flag = {
+						flag = SAW_frontlines_moved
+						value = 1
+						days = 60
+					}
+				}
+				COG = {
+					set_country_flag = {
+						flag = SAW_frontlines_moved
+						value = 1
+						days = 60
+					}
+				}
+				GER = {
+					set_country_flag = {
+						flag = SAW_frontlines_moved
+						value = 1
+						days = 60
+					}
+				}
+			}
+		}
+	}
+
+	#ALGERIA
+	on_state_control_changed = {
+		effect = {
+			if = {
+				limit = {
+					ILG = {
+						controls_state = 1006
+						controls_state = 459
+						controls_state = 1007
+						controls_state = 513
+						controls_state = 1759
+						controls_state = 1154
+						controls_state = 1147
+						NOT = {
+							has_country_flag = ILG_peaceful_resolution
+						}
+					}
+				}
+				ITA = {
+					country_event = {
+						id = ILG.7
+						days = 5
+					}
+				}
+			}
+			if = {
+				limit = {
+					SLG = {
+						controls_state = 460
+						controls_state = 1161
+						controls_state = 785
+						controls_state = 1149
+						controls_state = 1148
+						controls_state = 1146
+						controls_state = 1145
+						controls_state = 1144
+						controls_state = 514
+						controls_state = 1143
+					}
+				}
+				IBR = {
+					country_event = {
+						id = SLG.21
+						days = 2
+					}
+				}
+			}
+		}
+	}
+	#BOER FACTORIES RIGGED
+	on_state_control_changed = {
+		effect = {
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					GRO = {
+						has_country_flag = GRO_Boer_factories_rigged
+					}
+					SAF = {
+						controls_state = 937
+					}
+				}
+				SAF = {
+					country_event = { id = GRO.20 days = 1 }
+
+				}
+			}
+		}
+	}
+	#####LAZER AND DOC'S RUBBERBAND. IF A NATION IS DOING WELL, THEN IT GETS DEBUFFS. IF IT IS DOING POORLY, IT GETS BUFFS. SAW_rubberband_effect is found in TNO_SAF_scripted_effects, as of 17. June 2020, Updated by Curvinghawk_5 on 4th November 2021. REEEEEEEE WHAT THE FUCK NEVER USE ON_DAILY WITHOUT A TAG - Scars
+	on_daily_SAF = {
+		effect = {
+			if = {
+				limit = {
+					has_global_flag = south_african_war_happening
+					exists = yes
+				}
+				SAW_rubberband_update_effect = yes
+			}
+		}
+	}
+	# Same as the above except for the west african war
+	on_weekly_ZZZ = {
+		effect = {
+			if = {
+				limit = {
+					has_global_flag = west_african_war_ongoing
+				}
+				TNO_WAC_Weekly_Update_Ruber_Band_Modifiers = yes
+			}
+		}
+	}
+}

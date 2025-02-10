@@ -1,0 +1,1194 @@
+#Constants
+@GRAPH_GUI_HEIGHT = 0.5
+
+startup_social_arrays = {
+	set_variable = { social_month = 1 }
+	set_variable = { social_year = 1 }
+	set_variable = { social_year_str = 0 }
+	set_variable = { social_year_end = 0 }
+
+	# We make the Monthly arrays array
+	set_temp_variable = { idx_gdpc = 16 }
+
+	set_temp_variable = { temp_pop = total_pop_m }
+
+	set_temp_variable = { temp_poverty = poverty_rate }
+	set_temp_variable = { temp_poverty_rate_monthly = poverty_monthly_change }
+	add_to_temp_variable = { temp_poverty_rate_monthly = modifier@poverty_monthly_rate }
+
+	resize_array = { array = social_array_poverty size = 13 }
+	resize_array = { array = social_array_gdpc size = 13 }
+	resize_array = { array = social_array_trade_net size = 13 }
+	resize_array = { array = social_array_trade_total size = 13 }
+
+	for_each_scope_loop = {
+		array = ZZZ.TNO_trade_nations
+	
+		resize_array = { array = social_array_trade_oil size = 13 }
+		resize_array = { array = social_array_trade_aluminium size = 13 }
+		resize_array = { array = social_array_trade_rubber size = 13 }
+		resize_array = { array = social_array_trade_tungsten size = 13 }
+		resize_array = { array = social_array_trade_steel size = 13 }
+		resize_array = { array = social_array_trade_chromium size = 13 }
+		resize_array = { array = social_array_trade_uranium size = 13 }
+		resize_array = { array = social_array_trade_consumer_goods size = 13 }
+	}
+
+	for_loop_effect = {
+		start = 12
+		end = 0
+		compare = greater_than_or_equals
+		add = -1
+		value = i
+
+		set_variable = { social_array_poverty^i = temp_poverty }
+		add_to_temp_variable = { temp_poverty = temp_poverty_rate_monthly }
+
+		divide_temp_variable = { temp_pop = 1.002 } # We can't actually calculate this properly we don't have the precision
+		add_to_variable = { social_array_gdpc^i = gdp_numbers^idx_gdpc }
+		divide_variable = { social_array_gdpc^i = total_pop_m }
+		multiply_variable = { social_array_gdpc^i = 1000 }
+
+		set_temp_variable = { temp_cg_trade = random }
+		multiply_temp_variable = { temp_cg_trade = TNO_desired_cg_trade }
+		divide_temp_variable = { temp_cg_trade = pu_to_gdp_ratio }
+		divide_temp_variable = { temp_cg_trade = 12 }
+		set_variable = { social_array_trade_net = temp_cg_trade }
+		if = {
+			limit = { check_variable = { temp_cg_trade < 0 } }
+			multiply_temp_variable = { temp_cg_trade = -1 }
+		}
+		set_variable = { social_array_trade_total^i = temp_cg_trade }
+		var:TNO_trade_partners^0 = {
+			set_variable = { social_array_trade_consumer_goods^i = temp_cg_trade }
+		}
+
+		subtract_from_temp_variable = { idx_gdpc = 1 }
+	}
+
+	# Population array
+	add_to_array = { social_array_popm = temp_pop }
+	add_to_array = { social_array_popm = total_pop_m }
+	
+	# Women Labour Participation
+	if = {
+		limit = { has_idea = tno_gender_rights_heavily_restricted }
+		add_to_array = { social_array_women = 7 }
+		add_to_array = { social_array_women = 5 }
+	} else_if = {
+		limit = { has_idea = tno_gender_rights_traditional_roles }
+		add_to_array = { social_array_women = 15 }
+		add_to_array = { social_array_women = 15 }
+	} else_if = {
+		limit = { has_idea = tno_gender_rights_women_in_the_workplace }
+		add_to_array = { social_array_women = 25 }
+		add_to_array = { social_array_women = 25 }
+	} else_if = {
+		limit = { has_idea = tno_gender_rights_gender_equality }
+		add_to_array = { social_array_women = 30 }
+		add_to_array = { social_array_women = 30 }
+	} else_if = {
+		limit = { has_idea = tno_gender_rights_promoted_equality }
+		add_to_array = { social_array_women = 35 }
+		add_to_array = { social_array_women = 35 }
+	} else = {
+		add_to_array = { social_array_women = 40 }
+		add_to_array = { social_array_women = 40 }
+	}
+
+	# Literacy
+	if = {
+		limit = { has_idea = tno_academic_base_mass_illiteracy }
+		add_to_array = { social_array_literacy = 20 }
+		add_to_array = { social_array_literacy = 20 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_basic_literacy }
+		add_to_array = { social_array_literacy = 50 }
+		add_to_array = { social_array_literacy = 50 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_primary_schooling }
+		add_to_array = { social_array_literacy = 80 }
+		add_to_array = { social_array_literacy = 80 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_secondary_schooling }
+		add_to_array = { social_array_literacy = 95 }
+		add_to_array = { social_array_literacy = 95 }
+	} else = {
+		add_to_array = { social_array_literacy = 100 }
+		add_to_array = { social_array_literacy = 100 }
+	}
+	if = {
+		limit = { has_idea = tno_education_restricted_education }
+		multiply_variable = { social_array_literacy^0 = 0.5 }
+		multiply_variable = { social_array_literacy^1 = 0.5 }
+	} else_if = {
+		limit = { has_idea = tno_education_stratified_education }
+		multiply_variable = { social_array_literacy^0 = 0.8 }
+		multiply_variable = { social_array_literacy^1 = 0.8 }
+	}
+
+	# Degree
+	if = {
+		limit = { has_idea = tno_academic_base_mass_illiteracy }
+		add_to_array = { social_array_degree = 2 }
+		add_to_array = { social_array_degree = 2 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_basic_literacy }
+		add_to_array = { social_array_degree = 15 }
+		add_to_array = { social_array_degree = 15 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_primary_schooling }
+		add_to_array = { social_array_degree = 50 }
+		add_to_array = { social_array_degree = 50 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_secondary_schooling }
+		add_to_array = { social_array_degree = 70 }
+		add_to_array = { social_array_degree = 70 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_tertiary_schooling }
+		add_to_array = { social_array_degree = 95 }
+		add_to_array = { social_array_degree = 95 }
+	} else = {
+		add_to_array = { social_array_degree = 100 }
+		add_to_array = { social_array_degree = 100 }
+	}
+	if = {
+		limit = { has_idea = tno_education_subsidised_higher_education }
+		multiply_variable = { social_array_degree^0 = 1.1 }
+		multiply_variable = { social_array_degree^1 = 1.1 }
+	} else_if = {
+		limit = { has_idea = tno_education_public_higher_education }
+		multiply_variable = { social_array_degree^0 = 1.4 }
+		multiply_variable = { social_array_degree^1 = 1.4 }
+	} else_if = {
+		limit = { has_idea = tno_education_free_education }
+		multiply_variable = { social_array_degree^0 = 2 }
+		multiply_variable = { social_array_degree^1 = 2 }
+	}
+
+	# Healthcare
+	if = {
+		limit = { has_idea = tno_healthcare_makeshift }
+		add_to_array = { social_array_healthcare = 4 }
+		add_to_array = { social_array_healthcare = 4 }
+	} else_if = {
+		limit = { has_idea = tno_healthcare_rudimentary }
+		add_to_array = { social_array_healthcare = 2 }
+		add_to_array = { social_array_healthcare = 2 }
+	} else_if = {
+		limit = { has_idea = tno_healthcare_nascent }
+		add_to_array = { social_array_healthcare = 1.33 }
+		add_to_array = { social_array_healthcare = 1.33 }
+	} else_if = {
+		limit = { has_idea = tno_healthcare_developed }
+		add_to_array = { social_array_healthcare = 1 }
+		add_to_array = { social_array_healthcare = 1 }
+	} else_if = {
+		limit = { has_idea = tno_healthcare_advanced }
+		add_to_array = { social_array_healthcare = 0.8 }
+		add_to_array = { social_array_healthcare = 0.8 }
+	} else = {
+		add_to_array = { social_array_healthcare = 0.667 }
+		add_to_array = { social_array_healthcare = 0.667 }
+	}
+	if = {
+		limit = { has_idea = tno_health_care_no_government_support } # 40% uninsured
+		multiply_variable = { social_array_healthcare^0 = 1.4 }
+		multiply_variable = { social_array_healthcare^1 = 1.4 }
+	} else_if = {
+		limit = { has_idea = tno_health_care_service_for_care } # 35% uninsured
+		multiply_variable = { social_array_healthcare^0 = 1.35 }
+		multiply_variable = { social_array_healthcare^1 = 1.35 }
+	} else_if = {
+		limit = { has_idea = tno_health_care_negotiated_coverage } # 27.5% uninsured
+		multiply_variable = { social_array_healthcare^0 = 1.275 }
+		multiply_variable = { social_array_healthcare^1 = 1.275 }
+	} else_if = {
+		limit = { has_idea = tno_health_care_support_for_emergencies } # 20% uninsured
+		multiply_variable = { social_array_healthcare^0 = 1.2 }
+		multiply_variable = { social_array_healthcare^1 = 1.2 }
+	} else_if = {
+		limit = { has_idea = tno_health_care_low_income_protections } # 10% uninsured
+		multiply_variable = { social_array_healthcare^0 = 1.1 }
+		multiply_variable = { social_array_healthcare^1 = 1.1 }
+	} else_if = {
+		limit = { has_idea = tno_health_care_universal_health_care } # 2% uninsured
+		multiply_variable = { social_array_healthcare^0 = 1.02 }
+		multiply_variable = { social_array_healthcare^1 = 1.02 }
+	}
+
+	# Agriculture
+		add_to_array = { social_array_agriculture = 0 }
+		add_to_array = { social_array_agriculture = 0 }
+	if = {
+		limit = { has_idea = tno_agriculture_subsistence }
+		add_to_variable = { social_array_agriculture^1 = random }
+	} else_if = {
+		limit = { has_idea = tno_agriculture_centralized }
+		add_to_variable = { social_array_agriculture^1 = random }
+		add_to_variable = { social_array_agriculture^1 = 0.5 }
+	} else_if = {
+		limit = { has_idea = tno_agriculture_basic_mechanized }
+		add_to_variable = { social_array_agriculture^1 = random }
+		add_to_variable = { social_array_agriculture^1 = 1 }
+	} else_if = {
+		limit = { has_idea = tno_agriculture_mass_mechanized }
+		add_to_variable = { social_array_agriculture^1 = random }
+		add_to_variable = { social_array_agriculture^1 = 3 }
+	} else = {
+		add_to_variable = { social_array_agriculture^1 = random }
+		add_to_variable = { social_array_agriculture^1 = 5 }
+	}
+
+	# Pensions
+	if = {
+		limit = { has_idea = tno_pensions_no_pensions }
+		add_to_array = { social_array_pensions = 0 }
+		add_to_array = { social_array_pensions = 0 }
+	} else_if = {
+		limit = { has_idea = tno_pensions_trinket_pensions }
+		add_to_array = { social_array_pensions = 5 }
+		add_to_array = { social_array_pensions = 5 }
+	} else_if = {
+		limit = { has_idea = tno_pensions_low_pensions }
+		add_to_array = { social_array_pensions = 10 }
+		add_to_array = { social_array_pensions = 10 }
+	} else_if = {
+		limit = { has_idea = tno_pensions_acceptable_pensions }
+		add_to_array = { social_array_pensions = 12.5 }
+		add_to_array = { social_array_pensions = 12.5 }
+	} else = {
+		add_to_array = { social_array_pensions = 15 }
+		add_to_array = { social_array_pensions = 15 }
+	}
+
+	# Military
+	add_to_array = { social_array_military = army_fielded_manpower_k }
+	add_to_variable = { social_array_military^0 = total_airforce_fielded_manpower_k }
+	add_to_variable = { social_array_military^0 = total_naval_manpower_fielded_k }
+	add_to_array = { social_array_military = social_array_military^0 }
+	multiply_variable = { social_array_military^0 = 0.80 }
+
+	# Nukes
+	add_to_array = { social_array_nukes = nuclear_stockpile }
+	add_to_array = { social_array_nukes = nuclear_stockpile }
+
+	reload_social_interface = yes
+}
+
+monthly_social_data = {
+	add_to_variable = { social_month = 1 }
+	if = {
+		limit = { check_variable = { social_month = 13 } }
+		set_variable = { social_month = 1 }
+		yearly_social_data = yes
+	}
+	set_temp_variable = { index = social_year }
+	multiply_temp_variable = { index = 12 }
+	add_to_temp_variable = { index = social_month }
+
+	# GDPc
+	add_to_array = { social_array_poverty = poverty_rate }
+	add_to_array = { social_array_gdpc = gdpc_display }
+
+	# Trade
+	add_to_array = { social_array_trade_net = total_trade_value }
+	add_to_array = { social_array_trade_total = imports_value }
+	add_to_variable = { social_array_trade_total^index = exports_value }
+	for_each_scope_loop = {
+		array = ZZZ.TNO_trade_nations
+
+		add_to_array = { social_array_trade_oil = trade_oil@PREV }
+		divide_variable = { social_array_trade_oil^index = PREV.pu_to_gdp_ratio }
+		divide_variable = { social_array_trade_oil^index = 12 }
+		add_to_array = { social_array_trade_aluminium = trade_aluminium@PREV }
+		divide_variable = { social_array_trade_aluminium^index = PREV.pu_to_gdp_ratio }
+		divide_variable = { social_array_trade_aluminium^index = 12 }
+		add_to_array = { social_array_trade_rubber = trade_rubber@PREV }
+		divide_variable = { social_array_trade_rubber^index = PREV.pu_to_gdp_ratio }
+		divide_variable = { social_array_trade_rubber^index = 12 }
+		add_to_array = { social_array_trade_tungsten = trade_tungsten@PREV }
+		divide_variable = { social_array_trade_tungsten^index = PREV.pu_to_gdp_ratio }
+		divide_variable = { social_array_trade_tungsten^index = 12 }
+		add_to_array = { social_array_trade_steel = trade_steel@PREV }
+		divide_variable = { social_array_trade_steel^index = PREV.pu_to_gdp_ratio }
+		divide_variable = { social_array_trade_steel^index = 12 }
+		add_to_array = { social_array_trade_chromium = trade_chromium@PREV }
+		divide_variable = { social_array_trade_chromium^index = PREV.pu_to_gdp_ratio }
+		divide_variable = { social_array_trade_chromium^index = 12 }
+		add_to_array = { social_array_trade_uranium = trade_uranium@PREV }
+		divide_variable = { social_array_trade_uranium^index = PREV.pu_to_gdp_ratio }
+		divide_variable = { social_array_trade_uranium^index = 12 }
+		add_to_array = { social_array_trade_consumer_goods = trade_consumer_goods@PREV }
+		divide_variable = { social_array_trade_consumer_goods^index = PREV.pu_to_gdp_ratio }
+		divide_variable = { social_array_trade_consumer_goods^index = 12 }
+	}
+
+	reload_social_interface = yes
+}
+
+yearly_social_data = {
+	# Stuff that uses previous year data
+	add_to_array = { social_array_women = social_array_women^social_year }
+	add_to_array = { social_array_literacy = social_array_literacy^social_year }
+	add_to_array = { social_array_degree = social_array_degree^social_year }
+	add_to_array = { social_array_agriculture = social_array_agriculture^social_year }
+
+	add_to_variable = { social_year = 1 }
+
+	# Socdev stuff
+	add_to_array = { social_array_popm = total_pop_m }
+
+	# Women
+	if = {
+		limit = { has_idea = tno_gender_rights_heavily_restricted }
+		add_to_variable = { social_array_women^social_year = -1 }
+		clamp_variable = { var = social_array_women^social_year min = 5 max = 80 }
+	} else_if = {
+		limit = { has_idea = tno_gender_rights_traditional_roles }
+		add_to_variable = { social_array_women^social_year = -0.5 }
+		clamp_variable = { var = social_array_women^social_year min = 5 max = 80 }
+	} else_if = {
+		limit = { has_idea = tno_gender_rights_women_in_the_workplace }
+		add_to_variable = { social_array_women^social_year = 0.5 }
+		clamp_variable = { var = social_array_women^social_year min = 5 max = 80 }
+	} else_if = {
+		limit = { has_idea = tno_gender_rights_gender_equality }
+		add_to_variable = { social_array_women^social_year = 1 }
+		clamp_variable = { var = social_array_women^social_year min = 5 max = 80 }
+	} else_if = {
+		limit = { has_idea = tno_gender_rights_promoted_equality }
+		add_to_variable = { social_array_women^social_year = 1.5 }
+		clamp_variable = { var = social_array_women^social_year min = 5 max = 80 }
+	} else = {
+		add_to_variable = { social_array_women^social_year = 2 }
+		clamp_variable = { var = social_array_women^social_year min = 5 max = 80 }
+	}
+
+	# Literacy
+	if = {
+		limit = { has_idea = tno_academic_base_mass_illiteracy }
+		set_temp_variable = { temp_social_array_literacy = 0.20 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_basic_literacy }
+		set_temp_variable = { temp_social_array_literacy = 0.70 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_primary_schooling }
+		set_temp_variable = { temp_social_array_literacy = 1 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_secondary_schooling }
+		set_temp_variable = { temp_social_array_literacy = 2 }
+	} else = {
+		set_temp_variable = { temp_social_array_literacy = 3 }
+	}
+	if = {
+		limit = { has_idea = tno_education_restricted_education }
+		multiply_temp_variable = { temp_social_array_literacy = 0.5 }
+	} else_if = {
+		limit = { has_idea = tno_education_stratified_education }
+		multiply_temp_variable = { temp_social_array_literacy = 0.8 }
+	}
+	add_to_variable = { social_array_literacy^social_year = temp_social_array_literacy }
+	if = {
+		limit = { has_idea = tno_academic_base_mass_illiteracy }
+		clamp_variable = { var = social_array_women^social_year min = 5 max = 30 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_basic_literacy }
+		clamp_variable = { var = social_array_women^social_year min = 5 max = 60 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_primary_schooling }
+		clamp_variable = { var = social_array_women^social_year min = 5 max = 90 }
+	} else = {
+		clamp_variable = { var = social_array_women^social_year min = 5 max = 100 }
+	}
+	
+	# Degree
+	set_temp_variable = { temp_social_array_degree = 1 }
+	if = {
+		limit = { has_idea = tno_education_subsidised_higher_education }
+		multiply_temp_variable = { temp_social_array_degree = 1.1 }
+	} else_if = {
+		limit = { has_idea = tno_education_public_higher_education }
+		multiply_temp_variable = { temp_social_array_degree = 1.4 }
+	} else_if = {
+		limit = { has_idea = tno_education_free_education }
+		multiply_temp_variable = { temp_social_array_degree = 2 }
+	}
+	add_to_variable = { social_array_degree^social_year = temp_social_array_degree }
+	if = {
+		limit = { has_idea = tno_academic_base_mass_illiteracy }
+		clamp_variable = { var = social_array_degree^social_year min = 0 max = 2 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_basic_literacy }
+		clamp_variable = { var = social_array_degree^social_year min = 5 max = 30 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_primary_schooling }
+		clamp_variable = { var = social_array_degree^social_year min = 20 max = 50 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_secondary_schooling }
+		clamp_variable = { var = social_array_degree^social_year min = 30 max = 80 }
+	} else_if = {
+		limit = { has_idea = tno_academic_base_tertiary_schooling }
+		clamp_variable = { var = social_array_degree^social_year min = 40 max = 95 }
+	} else = {
+		clamp_variable = { var = social_array_degree^social_year min = 50 max = 100 }
+	}
+
+	# Healthcare
+	if = {
+		limit = { has_idea = tno_healthcare_makeshift }
+		add_to_array = { social_array_healthcare = 4 }
+	} else_if = {
+		limit = { has_idea = tno_healthcare_rudimentary }
+		add_to_array = { social_array_healthcare = 2 }
+	} else_if = {
+		limit = { has_idea = tno_healthcare_nascent }
+		add_to_array = { social_array_healthcare = 1.33 }
+	} else_if = {
+		limit = { has_idea = tno_healthcare_developed }
+		add_to_array = { social_array_healthcare = 1 }
+	} else_if = {
+		limit = { has_idea = tno_healthcare_advanced }
+		add_to_array = { social_array_healthcare = 0.8 }
+	} else = {
+		add_to_array = { social_array_healthcare = 0.667 }
+	}
+	if = {
+		limit = { has_idea = tno_health_care_no_government_support } # 40% uninsured
+		multiply_variable = { social_array_healthcare^social_year = 1.4 }
+	} else_if = {
+		limit = { has_idea = tno_health_care_service_for_care } # 35% uninsured
+		multiply_variable = { social_array_healthcare^social_year = 1.35 }
+	} else_if = {
+		limit = { has_idea = tno_health_care_service_for_care } # 27.5% uninsured
+		multiply_variable = { social_array_healthcare^social_year = 1.275 }
+	} else_if = {
+		limit = { has_idea = tno_health_care_support_for_emergencies } # 20% uninsured
+		multiply_variable = { social_array_healthcare^social_year = 1.2 }
+	} else_if = {
+		limit = { has_idea = tno_health_care_low_income_protections } # 10% uninsured
+		multiply_variable = { social_array_healthcare^social_year = 1.1 }
+	} else_if = {
+		limit = { has_idea = tno_health_care_universal_health_care } # 2% uninsured
+		multiply_variable = { social_array_healthcare^social_year = 1.02 }
+	} 
+
+	# Agriculture
+	if = {
+		limit = { has_idea = tno_agriculture_subsistence }
+		add_to_variable = { social_array_agriculture^social_year = random }
+	} else_if = {
+		limit = { has_idea = tno_agriculture_centralized }
+		add_to_variable = { social_array_agriculture^social_year = random }
+		add_to_variable = { social_array_agriculture^social_year = 0.5 }
+	} else_if = {
+		limit = { has_idea = tno_agriculture_basic_mechanized }
+		add_to_variable = { social_array_agriculture^social_year = random }
+		add_to_variable = { social_array_agriculture^social_year = 1 }
+	} else_if = {
+		limit = { has_idea = tno_agriculture_mass_mechanized }
+		add_to_variable = { social_array_agriculture^social_year = random }
+		add_to_variable = { social_array_agriculture^1 = 3 }
+	} else = {
+		add_to_variable = { social_array_agriculture^social_year = random }
+		add_to_variable = { social_array_agriculture^social_year = 5 }
+	}
+
+	# Pensions
+	if = {
+		limit = { has_idea = tno_pensions_no_pensions }
+		add_to_array = { social_array_pensions = 0 }
+	} else_if = {
+		limit = { has_idea = tno_pensions_trinket_pensions }
+		add_to_array = { social_array_pensions = 5 }
+	} else_if = {
+		limit = { has_idea = tno_pensions_low_pensions }
+		add_to_array = { social_array_pensions = 10 }
+	} else_if = {
+		limit = { has_idea = tno_pensions_acceptable_pensions }
+		add_to_array = { social_array_pensions = 12.5 }
+	} else = {
+		add_to_array = { social_array_pensions = 15 }
+	}
+
+	# Military
+	add_to_array = { social_array_military = army_fielded_manpower_k }
+	add_to_variable = { social_array_military^social_year = total_airforce_fielded_manpower_k }
+	add_to_variable = { social_array_military^social_year = total_naval_manpower_fielded_k }
+
+	# Nuclear Stuff
+	add_to_array = { social_array_nukes = nuclear_stockpile }
+}
+
+reload_social_interface = {
+	# We create the year indexes
+	if = { 
+		limit = { check_variable = { social_year_str = 0 } } 
+		set_temp_variable = { start_index = social_year }
+	}
+	else = {
+		set_temp_variable = { start_index = social_year_str }
+	}
+	subtract_from_temp_variable = { start_index = 1 }
+
+	if = { 
+		limit = { check_variable = { social_year_end = 0 } } 
+		set_temp_variable = { end_index = social_year }
+	}
+	else = {
+		set_temp_variable = { end_index = social_year_end }
+	}
+	set_temp_variable = { dif_index = end_index }
+	subtract_from_temp_variable = { dif_index = start_index }
+
+	# Month indexes
+	if = { 
+		limit = { check_variable = { social_year_str = 0 } } 
+		set_temp_variable = { social_month_index = social_year }
+		multiply_temp_variable = { social_month_index = 12 }
+		add_to_temp_variable = { social_month_index = social_month }
+		subtract_from_temp_variable = { social_month_index = 13 }
+	} else = {
+		set_temp_variable = { social_month_index = start_index }
+		multiply_temp_variable = { social_month_index = 12 }
+	}
+
+	set_temp_variable = { sum_start_index = start_index }
+	set_temp_variable = { sum_end_index = end_index }
+	add_to_temp_variable = { sum_start_index = 1 }
+	add_to_temp_variable = { sum_end_index = 1 }
+
+	set_temp_variable = { start_index_month = start_index }
+	multiply_temp_variable = { start_index_month = 12 }
+	set_temp_variable = { end_index_month = end_index }
+	multiply_temp_variable = { end_index_month = 12 }
+
+	# Bottom Right Graphs
+	clear_array = social_tab_gdp_per_capita_history
+	clear_array = social_tab_poverty_history
+	clear_array = social_tab_trade_history
+	clear_array = social_tab_econ_graph_months
+	resize_temp_array = { temp_social_trade_resources = 7 }
+	for_each_scope_loop = {
+		array = ZZZ.TNO_trade_nations
+		set_variable = { social_total_trade = 0 }
+	}
+	set_temp_variable = { idx_gdpc = social_month_index }
+	for_loop_effect = {
+		start = 0
+		end = 13
+
+		add_to_array = { social_tab_gdp_per_capita_history = social_array_gdpc^idx_gdpc }
+		add_to_array = { social_tab_poverty_history = social_array_poverty^idx_gdpc }
+		add_to_array = { social_tab_trade_history = social_array_trade_total^idx_gdpc }
+		add_to_array = { social_tab_econ_graph_months = idx_gdpc }
+		for_each_scope_loop = {
+			array = ZZZ.TNO_trade_nations
+			add_to_variable = { social_total_trade = social_array_trade_oil^idx_gdpc }
+			add_to_temp_variable = { temp_social_trade_resources^0 = social_array_trade_oil^idx_gdpc }
+			add_to_variable = { social_total_trade = social_array_trade_aluminium^idx_gdpc }
+			add_to_temp_variable = { temp_social_trade_resources^1 = social_array_trade_aluminium^idx_gdpc }
+			add_to_variable = { social_total_trade = social_array_trade_rubber^idx_gdpc }
+			add_to_temp_variable = { temp_social_trade_resources^2 = social_array_trade_rubber^idx_gdpc }
+			add_to_variable = { social_total_trade = social_array_trade_tungsten^idx_gdpc }
+			add_to_temp_variable = { temp_social_trade_resources^3 = social_array_trade_tungsten^idx_gdpc }
+			add_to_variable = { social_total_trade = social_array_trade_steel^idx_gdpc }
+			add_to_temp_variable = { temp_social_trade_resources^4 = social_array_trade_steel^idx_gdpc }
+			add_to_variable = { social_total_trade = social_array_trade_chromium^idx_gdpc }
+			add_to_temp_variable = { temp_social_trade_resources^5 = social_array_trade_chromium^idx_gdpc }
+			add_to_variable = { social_total_trade = social_array_trade_uranium^idx_gdpc }
+			add_to_temp_variable = { temp_social_trade_resources^6 = social_array_trade_uranium^idx_gdpc }
+			add_to_variable = { social_total_trade = social_array_trade_consumer_goods^idx_gdpc }
+		}
+		add_to_temp_variable = { idx_gdpc = dif_index }
+	}
+	find_highest_in_array = { 
+		array = temp_social_trade_resources
+		index = temp_social_largest_trade_resource
+	}
+	set_variable = { social_largest_trade_resource = temp_social_largest_trade_resource }
+	add_to_variable = { social_largest_trade_resource = 1 }
+	get_highest_scored_country = {
+		scorer = TNO_social_total_trade_scorer
+		var = social_largest_trade_partner
+	}
+	social_tab_draw_graphs = yes
+
+	# Population
+	set_variable = { social_pop_display = social_array_popm^end_index }
+	subtract_from_variable = { social_pop_display = social_array_popm^start_index }
+
+	# Poverty
+	set_variable = { social_poverty_display = social_array_poverty^end_index_month }
+	multiply_variable = { social_poverty_display = 0.01 }
+	multiply_variable = { social_poverty_display = social_array_popm^end_index }
+	set_temp_variable = { temp_social_poverty_display = social_array_poverty^start_index_month }
+	multiply_temp_variable = { temp_social_poverty_display = 0.01 }
+	multiply_temp_variable = { temp_social_poverty_display = social_array_popm^start_index }
+	subtract_from_variable = { social_poverty_display = temp_social_poverty_display }
+
+	# Women
+	set_variable = { social_women_display = social_array_women^end_index }
+	multiply_variable = { social_women_display = 0.004 }
+	multiply_variable = { social_women_display = social_array_popm^end_index }
+	set_temp_variable = { temp_social_women_display = social_array_women^start_index }
+	multiply_temp_variable = { temp_social_women_display = 0.004 }
+	multiply_temp_variable = { temp_social_women_display = social_array_popm^start_index }
+	subtract_from_variable = { social_women_display = temp_social_women_display }
+
+	# Literacy
+	set_variable = { social_literacy_display = 0 }
+	for_loop_effect = {
+		start = sum_start_index
+		end = sum_end_index
+		value = i
+
+		set_temp_variable = { temp_social_literacy_display = social_array_literacy^i }
+		multiply_temp_variable = { temp_social_literacy_display = social_array_popm^i }
+		add_to_variable = { social_literacy_display = temp_social_literacy_display }
+	}
+	multiply_variable = { social_literacy_display = 0.01 }
+	multiply_variable = { social_literacy_display = 0.015 }
+
+	# Degree
+	set_variable = { social_degree_display = 0 }
+	for_loop_effect = {
+		start = sum_start_index
+		end = sum_end_index
+		value = i
+
+		set_temp_variable = { temp_social_degree_display = social_array_degree^i }
+		multiply_temp_variable = { temp_social_degree_display = social_array_popm^i }
+		add_to_variable = { social_degree_display = temp_social_degree_display }
+	}
+	multiply_variable = { social_degree_display = 0.01 }
+	multiply_variable = { social_degree_display = 0.006 }
+
+	# Healthcare
+	set_variable = { social_healthcare_display = 0 }
+	for_loop_effect = {
+		start = sum_start_index
+		end = sum_end_index
+		value = i
+
+		set_temp_variable = { temp_social_healthcare_display = social_array_healthcare^i }
+		multiply_temp_variable = { temp_social_healthcare_display = social_array_popm^i }
+		add_to_variable = { social_healthcare_display = temp_social_healthcare_display }
+	}
+	multiply_variable = { social_healthcare_display = 0.009 }
+
+	# Agriculture
+	set_variable = { social_agriculture_display = social_array_agriculture^end_index }
+	subtract_from_variable = { social_agriculture_display = social_array_agriculture^start_index }
+
+	# Pensions
+	set_variable = { social_pensions_display = 0 }
+	for_loop_effect = {
+		start = sum_start_index
+		end = sum_end_index
+		value = i
+
+		set_temp_variable = { temp_social_pensions_display = social_array_pensions^i }
+		multiply_temp_variable = { temp_social_pensions_display = social_array_popm^i }
+		add_to_variable = { social_pensions_display = temp_social_pensions_display }
+	}
+	multiply_variable = { social_pensions_display = 0.01 }
+	multiply_variable = { social_pensions_display = 0.071 }
+
+	# Military
+	set_variable = { social_military_display = social_array_military^end_index }
+	subtract_from_variable = { social_military_display = social_array_military^start_index }
+	divide_variable = { social_military_display = 1000 }
+
+	# NUKES
+	set_variable = { social_nuclear_stockpile = social_array_nukes^end_index }
+
+	# Direct Guit Manipulation
+	configure_social_buttons_frame = yes
+	add_to_variable = { TNO_social_gui_dirty = 1 }
+}
+
+#### Gui Stuff
+
+left_click_social_button = {
+	set_variable = { social_year_str = temp_button_year }
+	if = {
+		limit = {
+			OR = {
+				check_variable = { temp_button_year = 0 }
+				check_variable = { social_year_end = 0 }
+			}
+		}
+		set_variable = { social_year_end = temp_button_year }
+	}
+	if = {
+		limit = { check_variable = { social_year_end < social_year_str } }
+		set_variable = { social_year_str = social_year_end }
+		set_variable = { social_year_end = temp_button_year }
+	}
+	reload_social_interface = yes
+}
+
+right_click_social_button = {
+	set_variable = { social_year_end = temp_button_year }
+	if = {
+		limit = {
+			OR = {
+				check_variable = { temp_button_year = 0 }
+				check_variable = { social_year_str = 0 }
+			}
+		}
+		set_variable = { social_year_str = temp_button_year }
+	}
+	if = {
+		limit = { check_variable = { social_year_end < social_year_str } }
+		set_variable = { social_year_end = social_year_str }
+		set_variable = { social_year_str = temp_button_year }
+	}
+	reload_social_interface = yes
+}
+
+# This works with an arrat named social_button_frame where the 0 
+# indicates the 'last year' button, and the rest go from 1962 to 1972
+configure_social_buttons_frame = {
+
+	### We put the buttons to activated by default
+	clear_array = social_button_frame
+	resize_array = { array = social_button_frame value = 2 size = 13 } # last year + 12 years
+
+	### If we have selected it we mark it
+	for_each_loop = {
+		array = social_button_frame
+
+		if = {
+			limit = { 
+				OR = {
+					check_variable = { i = social_year_str }
+					check_variable = { i = social_year_end }
+				}
+			}
+
+			set_variable = { social_button_frame^i = 3 }
+		}
+	}
+
+	### Puts all of the buttons to 0 if the date hasn't arrived
+	if = {
+		limit = { date < 1963.1.1 }
+		set_variable = { social_button_frame^2 = 1 }
+	}
+	if = {
+		limit = { date < 1964.1.1 }
+		set_variable = { social_button_frame^3 = 1 }
+	}
+	if = {
+		limit = { date < 1965.1.1 }
+		set_variable = { social_button_frame^4 = 1 }
+	}
+	if = {
+		limit = { date < 1966.1.1 }
+		set_variable = { social_button_frame^5 = 1 }
+	}
+	if = {
+		limit = { date < 1967.1.1 }
+		set_variable = { social_button_frame^6 = 1 }
+	}
+	if = {
+		limit = { date < 1968.1.1 }
+		set_variable = { social_button_frame^7 = 1 }
+	}
+	if = {
+		limit = { date < 1969.1.1 }
+		set_variable = { social_button_frame^8 = 1 }
+	}
+	if = {
+		limit = { date < 1970.1.1 }
+		set_variable = { social_button_frame^9 = 1 }
+	}
+	if = {
+		limit = { date < 1971.1.1 }
+		set_variable = { social_button_frame^10 = 1 }
+	}
+	if = {
+		limit = { date < 1972.1.1 }
+		set_variable = { social_button_frame^11 = 1 }
+	}
+	if = {
+		limit = { date < 1973.1.1 }
+		set_variable = { social_button_frame^12 = 1 }
+	}
+}
+
+
+social_tab_find_graph_unit = {
+
+	# Determine rounding factor based on range
+	set_temp_variable = { unit = 10000 }
+	if = {
+		limit = {
+			check_variable = { range < 2.5 }
+		}
+		set_temp_variable = { unit = 1 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 6.25 }
+		}
+		set_temp_variable = { unit = 2.5 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 12.5 }
+		}
+		set_temp_variable = { unit = 5 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 25 }
+		}
+		set_temp_variable = { unit = 10 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 62.5 }
+		}
+		set_temp_variable = { unit = 25 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 125 }
+		}
+		set_temp_variable = { unit = 50 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 250 }
+		}
+		set_temp_variable = { unit = 100 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 625 }
+		}
+		set_temp_variable = { unit = 250 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 1250 }
+		}
+		set_temp_variable = { unit = 500 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 2500 }
+		}
+		set_temp_variable = { unit = 1000 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 6250 }
+		}
+		set_temp_variable = { unit = 2500 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 12500 }
+		}
+		set_temp_variable = { unit = 5000 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 25000 }
+		}
+		set_temp_variable = { unit = 10000 }
+	}
+}
+
+
+social_tab_draw_graphs = {
+	########################## GDPC
+	clear_array = social_tab_gdpc_segments
+	
+	# Find minimum and maximum values visible on graph
+	set_temp_variable = { min = social_tab_gdp_per_capita_history^0 }
+	set_temp_variable = { max = social_tab_gdp_per_capita_history^0 }
+	for_loop_effect = {
+		start = 0
+		end = 13
+		value = i
+
+		if = {
+			limit = { check_variable = { social_tab_gdp_per_capita_history^i > max } }
+			set_temp_variable = { max = social_tab_gdp_per_capita_history^i }
+		}
+
+		if = {
+			limit = { check_variable = { social_tab_gdp_per_capita_history^i < min } }
+			set_temp_variable = { min = social_tab_gdp_per_capita_history^i }
+		}
+	}
+
+	set_temp_variable = { range = max }
+	subtract_from_temp_variable = { range = min }
+
+	social_tab_find_graph_unit = yes
+
+	divide_temp_variable = { min = unit }
+	subtract_from_temp_variable = { min = 0.6 }
+	round_temp_variable = min
+	multiply_temp_variable = { min = unit }
+
+	set_temp_variable = { max = unit }
+	multiply_temp_variable = { max = 3 }
+	add_to_temp_variable = { max = min }
+
+	set_temp_variable = { range = max }
+	subtract_from_temp_variable = { range = min }
+
+	# Generate the y axis ticks for our graph
+	divide_temp_variable = { range = 200 }
+	set_temp_variable = { m2 = max }
+	add_to_temp_variable = { m2 = 0.25 }
+	set_temp_variable = { k = min }
+
+	clear_array = social_tab_gdpc_graph_vbars
+	clear_array = social_tab_econ_graph_vbar_offsets
+
+	set_temp_variable = { half_unit = unit }
+	divide_temp_variable = { half_unit = 2 }
+
+	for_loop_effect = {
+		start = 0
+		end = 4
+		value = i
+
+		set_temp_variable = { label = k }
+		add_to_array = { social_tab_gdpc_graph_vbars = label }
+
+		set_temp_variable = { offset = k }
+		subtract_from_temp_variable = { offset = min }
+		divide_temp_variable = { offset = range }
+		multiply_temp_variable = { offset = -1 }
+		multiply_temp_variable = { offset = @GRAPH_GUI_HEIGHT } # Magic ratio we use for the height
+		add_to_array = { social_tab_econ_graph_vbar_offsets = offset }
+
+		add_to_temp_variable = { k = unit }
+
+		if = {
+			limit = { check_variable = { i < 3 } }
+
+			subtract_from_temp_variable = { k = half_unit }
+
+			add_to_array = { social_tab_gdpc_graph_vbars = -1 }
+			set_temp_variable = { offset = k }
+			subtract_from_temp_variable = { offset = min }
+			divide_temp_variable = { offset = range }
+			multiply_temp_variable = { offset = -1 }
+			multiply_temp_variable = { offset = @GRAPH_GUI_HEIGHT } # Magic ratio we use for the height
+			add_to_array = { social_tab_econ_graph_vbar_offsets = offset }
+
+			add_to_temp_variable = { k = half_unit }
+		}
+	}
+
+	# Actually generate the graph line segments
+	for_loop_effect = {
+		start = 0
+		end = 12
+		value = i
+
+		set_temp_variable = { j = i }
+		add_to_temp_variable = { j = 1 }
+
+		set_temp_variable = { hiA = social_tab_gdp_per_capita_history^j }
+		set_temp_variable = { loA = social_tab_gdp_per_capita_history^i }
+		subtract_from_temp_variable = { hiA = min }
+		subtract_from_temp_variable = { loA = min }
+		divide_temp_variable = { hiA = range }
+		divide_temp_variable = { loA = range }
+		multiply_temp_variable = { hiA = @GRAPH_GUI_HEIGHT }
+		multiply_temp_variable = { loA = @GRAPH_GUI_HEIGHT }
+
+		round_temp_variable = hiA
+		round_temp_variable = loA
+
+		set_temp_variable = { endpoints = loA }
+		multiply_temp_variable = { endpoints = 1000 }
+		add_to_temp_variable = { endpoints = hiA }
+		add_to_array = { social_tab_gdpc_segments = endpoints }
+	}
+
+	########################## Poverty
+	clear_array = social_tab_poverty_segments
+	
+	# Find minimum and maximum values visible on graph
+	set_temp_variable = { min = social_tab_poverty_history^0 }
+	set_temp_variable = { max = social_tab_poverty_history^0 }
+	for_loop_effect = {
+		start = 0
+		end = 13
+		value = i
+
+		if = {
+			limit = { check_variable = { social_tab_poverty_history^i > max } }
+			set_temp_variable = { max = social_tab_poverty_history^i }
+		}
+
+		if = {
+			limit = { check_variable = { social_tab_poverty_history^i < min } }
+			set_temp_variable = { min = social_tab_poverty_history^i }
+		}
+	}
+
+	set_temp_variable = { range = max }
+	subtract_from_temp_variable = { range = min }
+
+	social_tab_find_graph_unit = yes
+
+	divide_temp_variable = { min = unit }
+	subtract_from_temp_variable = { min = 0.6 }
+	round_temp_variable = min
+	multiply_temp_variable = { min = unit }
+
+	set_temp_variable = { max = unit }
+	multiply_temp_variable = { max = 3 }
+	add_to_temp_variable = { max = min }
+
+	set_temp_variable = { range = max }
+	subtract_from_temp_variable = { range = min }
+
+	# Generate the y axis ticks for our graph
+	divide_temp_variable = { range = 200 }
+	set_temp_variable = { label = min }
+
+	clear_array = social_tab_poverty_graph_vbars
+
+	for_loop_effect = {
+		start = 0
+		end = 4
+		value = i
+		
+		add_to_array = { social_tab_poverty_graph_vbars = label }
+		add_to_temp_variable = { label = unit }
+
+		if = {
+			limit = { check_variable = { i < 3 } }
+
+			add_to_array = { social_tab_poverty_graph_vbars = -1 }
+		}
+	}
+
+	# Actually generate the graph line segments
+	for_loop_effect = {
+		start = 0
+		end = 12
+		value = i
+
+		set_temp_variable = { j = i }
+		add_to_temp_variable = { j = 1 }
+
+		set_temp_variable = { hiA = social_tab_poverty_history^j }
+		set_temp_variable = { loA = social_tab_poverty_history^i }
+		subtract_from_temp_variable = { hiA = min }
+		subtract_from_temp_variable = { loA = min }
+		divide_temp_variable = { hiA = range }
+		divide_temp_variable = { loA = range }
+		multiply_temp_variable = { hiA = @GRAPH_GUI_HEIGHT }
+		multiply_temp_variable = { loA = @GRAPH_GUI_HEIGHT }
+
+		round_temp_variable = hiA
+		round_temp_variable = loA
+
+		set_temp_variable = { endpoints = loA }
+		multiply_temp_variable = { endpoints = 1000 }
+		add_to_temp_variable = { endpoints = hiA }
+		add_to_array = { social_tab_poverty_segments = endpoints }
+	}
+
+	########################## Trade
+	clear_array = social_tab_trade_segments
+	
+	# Find minimum and maximum values visible on graph
+	set_temp_variable = { min = social_tab_trade_history^0 }
+	set_temp_variable = { max = social_tab_trade_history^0 }
+	for_loop_effect = {
+		start = 0
+		end = 13
+		value = i
+
+		if = {
+			limit = { check_variable = { social_tab_trade_history^i > max } }
+			set_temp_variable = { max = social_tab_trade_history^i }
+		}
+
+		if = {
+			limit = { check_variable = { social_tab_trade_history^i < min } }
+			set_temp_variable = { min = social_tab_trade_history^i }
+		}
+	}
+
+	set_temp_variable = { range = max }
+	subtract_from_temp_variable = { range = min }
+
+	social_tab_find_graph_unit = yes
+
+	divide_temp_variable = { min = unit }
+	subtract_from_temp_variable = { min = 0.6 }
+	round_temp_variable = min
+	multiply_temp_variable = { min = unit }
+
+	set_temp_variable = { max = unit }
+	multiply_temp_variable = { max = 3 }
+	add_to_temp_variable = { max = min }
+
+	set_temp_variable = { range = max }
+	subtract_from_temp_variable = { range = min }
+
+	# Generate the y axis ticks for our graph
+	divide_temp_variable = { range = 200 }
+	set_temp_variable = { label = min }
+
+	clear_array = social_tab_trade_graph_vbars
+
+	for_loop_effect = {
+		start = 0
+		end = 4
+		value = i
+		
+		add_to_array = { social_tab_trade_graph_vbars = label }
+		add_to_temp_variable = { label = unit }
+
+		if = {
+			limit = { check_variable = { i < 3 } }
+
+			add_to_array = { social_tab_trade_graph_vbars = -1 }
+		}
+	}
+
+	# Actually generate the graph line segments
+	for_loop_effect = {
+		start = 0
+		end = 12
+		value = i
+
+		set_temp_variable = { j = i }
+		add_to_temp_variable = { j = 1 }
+
+		set_temp_variable = { hiA = social_tab_trade_history^j }
+		set_temp_variable = { loA = social_tab_trade_history^i }
+		subtract_from_temp_variable = { hiA = min }
+		subtract_from_temp_variable = { loA = min }
+		divide_temp_variable = { hiA = range }
+		divide_temp_variable = { loA = range }
+		multiply_temp_variable = { hiA = @GRAPH_GUI_HEIGHT }
+		multiply_temp_variable = { loA = @GRAPH_GUI_HEIGHT }
+
+		round_temp_variable = hiA
+		round_temp_variable = loA
+
+		set_temp_variable = { endpoints = loA }
+		multiply_temp_variable = { endpoints = 1000 }
+		add_to_temp_variable = { endpoints = hiA }
+		add_to_array = { social_tab_trade_segments = endpoints }
+	}
+}

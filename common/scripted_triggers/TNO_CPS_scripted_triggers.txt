@@ -1,0 +1,85 @@
+PHI_ai_check = {
+	PHI = { is_ai = yes }
+	SPH = { is_ai = yes }
+	UPH = { is_ai = yes }
+	FGB = { is_ai = yes }
+	USA = {
+		OR = {
+			is_ai = yes
+			AND = {
+				SPH = { has_volunteers_amount_from = { tag = USA count = 0 } }
+				UPH = { has_volunteers_amount_from = { tag = USA count = 0 } }
+			}
+		}
+	}
+	JAP = {
+		OR = {
+			is_ai = yes
+			PHI = { has_volunteers_amount_from = { tag = JAP count = 0 } }
+		}
+	}
+}
+
+# For WI
+# Stage 1：Before YUN declares war on China
+WI_in_stage_1 = {
+	YUN = {
+		has_country_leader = { character = YUN_long_yun ruling_only = yes }
+		has_war = no
+		country_exists = CHI
+	}
+}
+
+# Stage 2：YUN at war with China, China is holding
+WI_in_stage_2 = {
+	YUN = {
+		has_country_leader = { character = YUN_long_yun ruling_only = yes }
+		has_war_with = CHI
+		NOT = { has_war_with = JAP }
+		NOT = { has_global_flag = YUN_NCPC_revived }
+	}
+}
+
+# Stage 3：YUN at war with China, China is not really holding
+WI_in_stage_3 = {
+	YUN = {
+		has_country_leader = { character = YUN_long_yun ruling_only = yes }
+		has_war_with = CHI
+		NOT = { has_war_with = JAP }
+		has_global_flag = YUN_NCPC_revived
+		OR = {
+			CHI = { surrender_progress < 0.35 }
+			AND = {
+				CHI = { surrender_progress < 0.25 }
+				YUN = { owns_state = 605 }
+			}
+		}
+	}
+}
+
+# Stage 4：YUN at war with China, China is not holding / China has capitulated
+WI_in_stage_4 = {
+	YUN = {
+		has_country_leader = { character = YUN_long_yun ruling_only = yes }
+		NOT = { has_war_with = JAP }
+		OR = {
+			CHI = { surrender_progress > 0.35 }
+			AND = {
+				CHI = { surrender_progress > 0.25 }
+				YUN = { owns_state = 605 }
+			}
+			AND = {
+				has_war = no
+				country_exists = NCC
+			}
+		}
+	}
+}
+
+# Stage 5：GAW begins
+WI_in_stage_5 = {
+	YUN = {
+		has_country_leader = { character = YUN_long_yun ruling_only = yes }
+		has_war_with = JAP
+	}
+}

@@ -1,0 +1,1548 @@
+iberian_wars_decisions = {
+	iberiawars_ceasefire = {
+
+		icon = GFX_decision_generic_form_nation
+		target_array = global.iberian_nations
+		available = {
+			check_variable = { ROOT.surrender_progress > 0.8 }
+		}
+
+		ai_will_do = {
+			factor = 10000
+		}
+		visible = {
+			has_global_flag = Iberian_Wars
+			is_iberian_major = yes
+			check_variable = {
+				ROOT.surrender_progress > 0.6
+			}
+			FROM = {
+				is_iberian_minor = yes
+			}
+			has_war_with = FROM
+		}
+
+		complete_effect = {
+			every_state = {
+				limit = {
+					is_owned_by = ROOT
+					OR = {
+						check_variable = {
+							THIS.controller = FROM
+						}
+						check_variable = {
+							THIS.controller = ROOT
+						}
+					}
+					OR = {
+						is_claimed_by = FROM
+						is_core_of = FROM
+					}
+				}
+				FROM = {
+					transfer_state = PREV
+					add_state_core = PREV
+				}
+			}
+			white_peace = FROM
+			IBRWarsCheckPeace = yes
+		}
+	}
+	iberiawars_prepare_war = {
+
+		icon = GFX_decision_generic_assault
+		target_array = global.iberian_nations
+		available = {
+			has_global_flag = Iberian_Anarchy_flag
+			NOT = {
+				is_puppet = yes
+			}
+			custom_trigger_tooltip = {
+				tooltip = iberiawars_bombing_campaign_WE_tt
+				check_variable = {
+					IberianWarExhaustion < 95
+				}
+			}
+		}
+
+		visible = {
+			has_global_flag = Iberian_Wars
+			FROM = {
+				NOT = { has_non_aggression_pact_with = ROOT }
+				NOT = { has_war_with = ROOT }
+				NOT = {
+					tag = GIB
+				}
+				NOT = {
+					tag = RIF
+				}
+				NOT = {
+					tag = MOR
+				}
+				any_owned_state = {
+					OR = {
+						is_claimed_by = ROOT
+						is_core_of = ROOT
+					}
+				}
+			}
+			country_exists = FROM
+			NOT = {
+				AND = {
+					OR = {
+						FROM = { tag = CTL }
+						FROM = { tag = CNT }
+						FROM = { tag = ADL }
+					}
+					ROOT = { tag = SPR }
+				}
+				AND = {
+					FROM = { tag = SPR }
+					OR = {
+						ROOT = { tag = CTL }
+						ROOT = { tag = CNT }
+						ROOT = { tag = ADL }
+					}
+				}
+			}
+		}
+		target_array = neighbors
+
+
+		cancel_trigger = {
+			OR = {
+				NOT = {
+					country_exists = FROM
+				}
+				NOT = {
+					FROM = {
+						is_neighbor_of = ROOT
+					}
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 0
+			modifier = {
+				add = 25
+				ROOT = {
+					has_far_right_ruling_party = yes
+				}
+			}
+			modifier = {
+				add = -25
+				FROM = {
+					is_puppet = yes
+				}
+			}
+			modifier = {
+				factor = 0
+				tag = GIB
+			}
+			modifier = {
+				add = 25
+				FROM = {
+					has_war = yes
+				}
+			}
+			modifier = {
+				add = 50
+				FROM = {
+					AND = {
+						has_war = yes
+						surrender_progress > 0.5
+					}
+				}
+			}
+			modifier = {
+				add = 50
+				FROM = {
+					is_iberian_minor = yes
+				}
+				ROOT = {
+					is_iberian_major = yes
+				}
+			}
+			modifier = {
+				add = 20
+				FROM = {
+					strength_ratio = {
+						tag = ROOT
+						ratio < 1
+					}
+				}
+			}
+			modifier = {
+				add = 20
+				FROM = {
+					strength_ratio = {
+						tag = ROOT
+						ratio < 2
+					}
+				}
+			}
+			modifier = {
+				add = -10
+				FROM = {
+					strength_ratio = {
+						tag = ROOT
+						ratio > 1
+					}
+				}
+			}
+			modifier = {
+				add = 2000
+				AND = {
+					tag = FSR
+					has_government = ultranationalism
+				}
+			}
+			modifier = {
+				add = -25
+				FROM = {
+					strength_ratio = {
+						tag = ROOT
+						ratio > 2
+					}
+				}
+			}
+			modifier = {
+				add = 250
+				ROOT = {
+					tag = IBR
+					all_enemy_country = {
+						original_tag = MOR
+					}
+				}
+			}
+			modifier = {
+				add = -250
+				ROOT = {
+					has_war = yes
+				}
+			}
+			modifier = {
+				add = 150
+				ROOT = {
+					any_claim = yes
+				}
+			}
+			modifier = {
+				factor = 0
+				ROOT = {
+					has_country_flag = IBR_Next_War_Prepare
+				}
+			}
+		}
+
+		cost = 10
+
+		fire_only_once = yes	#changed this as a temp fix to stop endless/repeated wars, hope it doesnt cause problems
+
+		#days_re_enable = 180
+		days_remove = 7
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_prepare_war target: [From.GetName]"
+			add_war_support = 0.30
+			set_country_flag = IBR_Next_War_Prepare
+		}
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_prepare_war target: [From.GetName]"
+			ROOT = {
+				declare_war_on = {
+					target = FROM
+					type = annex_everything
+				}
+			}
+			clr_country_flag = IBR_Next_War_Prepare
+		}
+	}
+	iberiawars_emergency_recruitment = {
+
+		icon = GFX_decision_generic_military_parade
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 10
+
+		cost = 15
+
+		ai_will_do = {
+			factor = 0
+			modifier = {
+				add = 20
+				has_manpower < 1000
+			}
+		}
+
+		days_remove = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_emergency_recruitment"
+			add_manpower = 5000
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_emergency_recruitment"
+			add_to_variable = { IberianWarExhaustion = 3 }
+
+			custom_effect_tooltip = IBRWars_recruitment_tt
+		}
+	}
+	iberiawars_war_bonds_program = {
+
+		icon = GFX_decision_category_generic_money
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_propaganda_campaign_flag
+			}
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 60
+
+		cost = 30
+
+		days_remove = 120
+
+		modifier = {
+			consumer_goods_use_modifier = -0.15
+			political_power_gain = -0.2
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_war_bonds_program"
+			set_country_flag = IBRWars_war_bonds_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_war_bonds_program"
+			clr_country_flag = IBRWars_war_bonds_flag
+		}
+	}
+	iberiawars_propaganda_campaign = {
+
+		icon = GFX_decision_generic_propaganda
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_war_bonds_flag
+			}
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 60
+
+		cost = 30
+
+		days_remove = 120
+
+		modifier = {
+			war_support_weekly = 0.02
+			political_power_gain = -0.2
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_propaganda_campaign"
+			set_country_flag = IBRWars_propaganda_campaign_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_propaganda_campaign"
+			clr_country_flag = IBRWars_propaganda_campaign_flag
+		}
+	}
+	iberiawars_frontline_resources = {
+
+		icon = GFX_decision_generic_arms_trade_increase
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_homefront_resources_flag
+			}
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 120
+
+		cost = 50
+
+		days_remove = 120
+
+		modifier = {
+			attrition = -0.2
+			army_org_factor = 0.5
+			army_morale_factor = 0.2
+			land_reinforce_rate = 0.025
+			terrain_penalty_reduction = 0.2
+			supply_consumption_factor = -0.2
+			out_of_supply_factor = -0.2
+			stability_weekly = -0.01
+			production_speed_buildings_factor = -0.25
+			industrial_capacity_factory = -0.25
+			industrial_capacity_dockyard = -0.25
+			local_resources_factor = -0.25
+			industry_repair_factor = -0.25
+			monthly_population = -0.4
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_frontline_resources"
+			set_country_flag = IBRWars_frontline_resources_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_frontline_resources"
+			clr_country_flag = IBRWars_frontline_resources_flag
+		}
+	}
+	iberiawars_home_front_resources = {
+
+		icon = GFX_decision_generic_industry
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_frontline_resources_flag
+			}
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 120
+
+		cost = 50
+
+		days_remove = 120
+
+		modifier = {
+			stability_weekly = 0.01
+			production_speed_buildings_factor = 0.2
+			industrial_capacity_factory = 0.2
+			industrial_capacity_dockyard = 0.2
+			local_resources_factor = 0.2
+			industry_repair_factor = 0.2
+			monthly_population = 0.25
+			attrition = 0.5
+			army_org_factor = -0.6
+			army_morale_factor = -0.25
+			land_reinforce_rate = -0.025
+			terrain_penalty_reduction = -0.25
+			supply_consumption_factor = 0.25
+			out_of_supply_factor = -0.25
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_home_front_resources"
+			set_country_flag = IBRWars_homefront_resources_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_home_front_resources"
+			clr_country_flag = IBRWars_homefront_resources_flag
+		}
+	}
+#	iberiawars_factory_conversion = {
+#
+#		icon = GFX_decision_generic_construction
+#		available = {
+#			is_iberian_nation = yes
+#			has_global_flag = Iberian_Wars
+#			NOT = {
+#				OR = {
+#					has_country_flag = IBRWars_build_factories_flag
+#					has_country_flag = IBRWars_repair_factories_flag
+#				}
+#			}
+#		}
+#
+#		visible = {
+#			is_iberian_nation = yes
+#			has_global_flag = Iberian_Wars
+#		}
+#
+#		fire_only_once = no
+#
+#		days_re_enable = 90
+#
+#		cost = 40
+#
+#		days_remove = 60
+#
+#		modifier = {
+#			conversion_cost_civ_to_mil_factor = -0.5
+#		}
+#
+#		complete_effect = {
+#			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_factory_conversion"
+#			set_country_flag = IBRWars_convert_factories_flag
+#		}
+#
+#		remove_effect = {
+#			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_factory_conversion"
+#			clr_country_flag = IBRWars_convert_factories_flag
+#		}
+#	}
+	iberiawars_factory_construction = {
+
+		icon = GFX_decision_generic_construction
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+#				OR = {
+					has_country_flag = IBRWars_repair_factories_flag
+#					has_country_flag = IBRWars_convert_factories_flag
+#				}
+			}
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 90
+
+		cost = 60
+
+		days_remove = 30
+
+		modifier = {
+			industrial_capacity_factory = 0.15
+			production_speed_buildings_factor = 0.15
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_factory_construction"
+			set_country_flag = IBRWars_build_factories_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_factory_construction"
+			clr_country_flag = IBRWars_build_factories_flag
+		}
+	}
+	iberiawars_factory_repair = {
+
+		icon = GFX_decision_generic_construction
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+#				OR = {
+					has_country_flag = IBRWars_build_factories_flag
+#					has_country_flag = IBRWars_convert_factories_flag
+#				}
+			}
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 90
+
+		cost = 60
+
+		days_remove = 30
+
+		modifier = {
+			industry_repair_factor = 0.4
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_factory_repair"
+			set_country_flag = IBRWars_repair_factories_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_factory_repair"
+			clr_country_flag = IBRWars_repair_factories_flag
+		}
+	}
+	iberiawars_bombing_campaign = {
+
+		icon = GFX_decision_generic_ignite_civil_war
+
+		target_array = global.iberian_nations
+		available = {
+			has_global_flag = Iberian_Anarchy_flag
+
+			custom_trigger_tooltip = {
+				tooltip = iberiawars_bombing_campaign_WE_tt
+				check_variable = {
+					IberianWarExhaustion < 95
+				}
+			}
+		}
+
+		visible = {
+			has_global_flag = Iberian_Wars
+			country_exists = FROM
+		}
+		target_array = enemies
+
+
+		target_trigger = {
+			has_global_flag = Iberian_Wars
+			FROM = {
+				has_war_with = ROOT
+			}
+		}
+
+		cancel_trigger = {
+			NOT = {
+				country_exists = FROM
+			}
+		}
+
+		cost = 10
+
+		fire_only_once = no
+
+		days_re_enable = 60
+		days_remove = 14
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_bombing_campaign target: [From.GetName]"
+		}
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_bombing_campaign target: [From.GetName]"
+			FROM = {
+				random_owned_state = {
+					damage_building = {
+						type = infrastructure
+						damage = 1
+					}
+				}
+				random_owned_state = {
+					damage_building = {
+						type = infrastructure
+						damage = 1
+					}
+				}
+
+			}
+		}
+	}
+	iberiawars_naval_shelling = {
+
+		icon = GFX_decision_generic_submarines
+
+		target_array = global.iberian_nations
+		available = {
+			has_global_flag = Iberian_Anarchy_flag
+
+			custom_trigger_tooltip = {
+				tooltip = iberiawars_bombing_campaign_WE_tt
+				check_variable = {
+					IberianWarExhaustion < 95
+				}
+			}
+		}
+
+		visible = {
+			has_global_flag = Iberian_Wars
+			country_exists = FROM
+		}
+		target_array = enemies
+
+		target_trigger = {
+			has_global_flag = Iberian_Wars
+			FROM = {
+				AND = {
+					has_war_with = ROOT
+					any_controlled_state = {
+						is_coastal = yes
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = {
+				country_exists = FROM
+			}
+		}
+
+		cost = 10
+
+		fire_only_once = no
+
+		days_re_enable = 30
+		days_remove = 5
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_naval_shelling target: [From.GetName]"
+		}
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_naval_shelling target: [From.GetName]"
+			FROM = {
+				random_owned_state = {
+					limit = {
+						is_coastal = yes
+					}
+					damage_building = {
+						type = infrastructure
+						damage = 1
+					}
+				}
+				random_owned_state = {
+					limit = {
+						is_coastal = yes
+					}
+					damage_building = {
+						type = dockyard
+						damage = 1
+					}
+				}
+			}
+		}
+	}
+	iberiawars_scorched_earth = {
+
+		icon = GFX_decision_generic_destroy_city
+
+		available = {
+			has_global_flag = Iberian_Anarchy_flag
+			custom_trigger_tooltip = {
+				tooltip = iberiawars_bombing_campaign_WE_tt
+				check_variable = {
+					IberianWarExhaustion < 95
+				}
+			}
+		}
+
+		visible = {
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_scorched_earth_flag
+			}
+			FROM = {
+				is_controlled_by = ROOT
+				any_neighbor_state = {
+					NOT = {
+						is_controlled_by = ROOT
+					}
+				}
+			}
+		}
+		state_target = yes
+
+		target_array = controlled_states
+
+		cost = 5
+
+		fire_only_once = no
+
+		days_re_enable = 14
+		days_remove = 5
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_scorched_earth target: [From.GetName]"
+		}
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_scorched_earth target: [From.GetName]"
+			FROM = {
+				damage_building = {
+					type = infrastructure
+					damage = 3
+				}
+			}
+		}
+	}
+	iberiawars_border_evacuation = {
+
+		icon = GFX_decision_generic_revolt
+
+		available = {
+			has_global_flag = Iberian_Anarchy_flag
+			custom_trigger_tooltip = {
+				tooltip = iberiawars_bombing_campaign_WE_tt
+				check_variable = {
+					IberianWarExhaustion < 95
+				}
+			}
+		}
+
+		visible = {
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_border_evacuation_flag
+			}
+			FROM = {
+				is_controlled_by = ROOT
+				any_neighbor_state = {
+					NOT = {
+						is_controlled_by = ROOT
+					}
+				}
+			}
+		}
+		state_target = yes
+
+		target_array = controlled_states
+
+		cost = 5
+
+		fire_only_once = no
+
+		days_re_enable = 14
+		days_remove = 5
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_border_evacuation target: [From.GetName]"
+		}
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_border_evacuation target: [From.GetName]"
+			FROM = {
+				add_manpower = -2000
+			}
+			random_controlled_state = {
+				add_manpower = 2000
+			}
+		}
+	}
+	iberiawars_hide_scorched = {
+
+		icon = GFX_decision_generic_decrease
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_scorched_earth_flag
+			}
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_hide_scorched"
+			set_country_flag = IBRWars_hide_scorched_earth_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_hide_scorched"
+		}
+	}
+	iberiawars_show_scorched = {
+
+		icon = GFX_decision_generic_increase
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_scorched_earth_flag
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_scorched_earth_flag
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_show_scorched"
+			clr_country_flag = IBRWars_hide_scorched_earth_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_show_scorched"
+		}
+	}
+	iberiawars_hide_evacuations = {
+
+		icon = GFX_decision_generic_decrease
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_border_evacuation_flag
+			}
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_hide_evacuations"
+			set_country_flag = IBRWars_hide_border_evacuation_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_hide_evacuations"
+		}
+	}
+	iberiawars_show_evacuations = {
+
+		icon = GFX_decision_generic_increase
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_border_evacuation_flag
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_border_evacuation_flag
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_show_evacuations"
+			clr_country_flag = IBRWars_hide_border_evacuation_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_show_evacuations"
+		}
+	}
+	iberiawars_state_purification = {
+
+		icon = GFX_decision_generic_use_force
+		available = {
+			has_global_flag = Iberian_Anarchy_flag
+			custom_trigger_tooltip = {
+				tooltip = iberiawars_bombing_campaign_WE_tt
+				check_variable = {
+					IberianWarExhaustion < 95
+				}
+			}
+		}
+
+		visible = {
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_state_purification_flag
+			}
+			OR = {
+				has_government = ultranationalism
+				has_government = national_socialism
+				has_government = fascism
+			}
+			FROM = {
+				is_controlled_by = ROOT
+				NOT = {
+					has_state_flag = IBRWars_purified_state_flag
+					has_state_flag = IBRWars_exploited_state_flag
+				}
+			}
+		}
+		state_target = yes
+
+		target_array = controlled_states
+
+		cost = 5
+
+		fire_only_once = no
+
+		days_re_enable = 1
+		days_remove = 14
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_state_purification target: [From.GetName]"
+			add_stability = -0.01
+		}
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_state_purification target: [From.GetName]"
+			FROM = {
+				add_manpower = -2500
+				set_state_flag = IBRWars_purified_state_flag
+			}
+			add_political_power = 50
+		}
+	}
+	iberiawars_state_exploitation = {
+
+		icon = GFX_decision_generic_assault
+		available = {
+			has_global_flag = Iberian_Anarchy_flag
+			custom_trigger_tooltip = {
+				tooltip = iberiawars_bombing_campaign_WE_tt
+				check_variable = {
+					IberianWarExhaustion < 95
+				}
+			}
+		}
+
+		visible = {
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_state_exploitation_flag
+			}
+			OR = {
+				has_government = ultranationalism
+				has_government = national_socialism
+				has_government = fascism
+				has_government = despotism
+			}
+			FROM = {
+				is_controlled_by = ROOT
+				NOT = {
+					has_state_flag = IBRWars_purified_state_flag
+					has_state_flag = IBRWars_exploited_state_flag
+				}
+			}
+		}
+
+		state_target = yes
+
+		target_array = controlled_states
+
+		cost = 5
+
+		fire_only_once = no
+
+		days_re_enable = 1
+		days_remove = 14
+
+		ai_will_do = {
+			factor = 0
+
+			modifier = {
+				add = 50
+				has_equipment = { infantry_equipment < 50 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_state_exploitation target: [From.GetName]"
+		}
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_state_exploitation target: [From.GetName]"
+			FROM = {
+				damage_building = {
+					type = infrastructure
+					damage = 2
+				}
+				add_manpower = -2500
+				set_state_flag = IBRWars_exploited_state_flag
+			}
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 1200
+			}
+		}
+	}
+	iberiawars_state_rally = {
+
+		icon = GFX_decision_generic_propaganda
+
+		available = {
+			has_global_flag = Iberian_Anarchy_flag
+			custom_trigger_tooltip = {
+				tooltip = iberiawars_bombing_campaign_WE_tt
+				check_variable = {
+					IberianWarExhaustion < 95
+				}
+			}
+		}
+
+		visible = {
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_state_purification_flag
+			}
+			OR = {
+				has_government = paternalism
+				has_government = conservatism
+				has_government = liberalism
+				has_government = progressivism
+				has_government = socialist
+				has_government = communist
+			}
+			FROM = {
+				is_controlled_by = ROOT
+				NOT = {
+					has_state_flag = IBRWars_rallied_state_flag
+					has_state_flag = IBRWars_collectivized_state_flag
+				}
+			}
+		}
+		state_target = yes
+
+		target_array = controlled_states
+
+		cost = 5
+
+		fire_only_once = no
+
+		days_re_enable = 1
+		days_remove = 14
+
+		ai_will_do = {
+			factor = 50
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_state_rally target: [From.GetName]"
+		}
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_state_rally target: [From.GetName]"
+			FROM = {
+				add_manpower = 250
+				set_state_flag = IBRWars_rallied_state_flag
+			}
+			add_political_power = 50
+		}
+	}
+	iberiawars_state_collectivize = {
+
+		icon = GFX_decision_generic_industry
+
+		available = {
+			has_global_flag = Iberian_Anarchy_flag
+			custom_trigger_tooltip = {
+				tooltip = iberiawars_bombing_campaign_WE_tt
+				check_variable = {
+					IberianWarExhaustion < 95
+				}
+			}
+		}
+
+		visible = {
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_state_purification_flag
+			}
+			OR = {
+				has_government = socialist
+				has_government = communist
+			}
+			FROM = {
+				is_controlled_by = ROOT
+				NOT = {
+					has_state_flag = IBRWars_rallied_state_flag
+					has_state_flag = IBRWars_collectivized_state_flag
+				}
+			}
+		}
+		state_target = yes
+
+		target_array = controlled_states
+
+		cost = 5
+
+		fire_only_once = no
+
+		days_re_enable = 1
+		days_remove = 14
+
+		ai_will_do = {
+			factor = 50
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_state_collectivize target: [From.GetName]"
+		}
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_state_collectivize target: [From.GetName]"
+			FROM = {
+				set_state_flag = IBRWars_collectivized_state_flag
+			}
+		}
+	}
+	iberiawars_hide_purification = {
+
+		icon = GFX_decision_generic_decrease
+
+		available = {
+			AND = {
+				is_iberian_nation = yes
+				has_global_flag = Iberian_Wars
+			}
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_state_purification_flag
+			}
+			OR = {
+				has_government = ultranationalism
+				has_government = national_socialism
+				has_government = fascism
+			}
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_hide_purification"
+			set_country_flag = IBRWars_hide_state_purification_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_hide_purification"
+		}
+	}
+	iberiawars_show_purification = {
+
+		icon = GFX_decision_generic_increase
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_state_purification_flag
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_state_purification_flag
+			OR = {
+				has_government = ultranationalism
+				has_government = national_socialism
+				has_government = fascism
+			}
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_show_purification"
+			clr_country_flag = IBRWars_hide_state_purification_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_show_purification"
+		}
+	}
+	iberiawars_hide_exploitation = {
+
+		icon = GFX_decision_generic_decrease
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_state_exploitation_flag
+			}
+			OR = {
+				has_government = ultranationalism
+				has_government = national_socialism
+				has_government = fascism
+				has_government = despotism
+			}
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_hide_exploitation"
+			set_country_flag = IBRWars_hide_state_exploitation_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_hide_exploitation"
+		}
+	}
+	iberiawars_show_exploitation = {
+
+		icon = GFX_decision_generic_increase
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_state_exploitation_flag
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_state_exploitation_flag
+			OR = {
+				has_government = ultranationalism
+				has_government = national_socialism
+				has_government = fascism
+				has_government = despotism
+			}
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_show_exploitation"
+			clr_country_flag = IBRWars_hide_state_exploitation_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_show_exploitation"
+		}
+	}
+	iberiawars_hide_rallies = {
+
+		icon = GFX_decision_generic_decrease
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_state_rally_flag
+			}
+			OR = {
+				has_government = paternalism
+				has_government = conservatism
+				has_government = liberalism
+				has_government = progressivism
+				has_government = socialist
+				has_government = communist
+			}
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_hide_rallies"
+			set_country_flag = IBRWars_hide_state_rally_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_hide_rallies"
+		}
+	}
+	iberiawars_show_rallies = {
+
+		icon = GFX_decision_generic_increase
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_state_rally_flag
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_state_rally_flag
+			OR = {
+				has_government = paternalism
+				has_government = conservatism
+				has_government = liberalism
+				has_government = progressivism
+				has_government = socialist
+				has_government = communist
+			}
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_show_rallies"
+			clr_country_flag = IBRWars_hide_state_rally_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_show_rallies"
+		}
+	}
+	iberiawars_hide_collectivization = {
+
+		icon = GFX_decision_generic_decrease
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			NOT = {
+				has_country_flag = IBRWars_hide_state_collectivization_flag
+			}
+			OR = {
+				has_government = socialist
+				has_government = communist
+			}
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_hide_collectivization"
+			set_country_flag = IBRWars_hide_state_collectivization_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_hide_collectivization"
+		}
+	}
+	iberiawars_show_collectivization = {
+
+		icon = GFX_decision_generic_increase
+
+		available = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_state_collectivization_flag
+		}
+
+		visible = {
+			is_iberian_nation = yes
+			has_global_flag = Iberian_Wars
+			has_country_flag = IBRWars_hide_state_collectivization_flag
+			OR = {
+				has_government = socialist
+				has_government = communist
+			}
+		}
+
+		fire_only_once = no
+
+		days_re_enable = 1
+
+		cost = 0
+
+		days_remove = 1
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision iberiawars_show_collectivization"
+			clr_country_flag = IBRWars_hide_state_collectivization_flag
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove iberiawars_show_collectivization"
+		}
+	}
+}

@@ -1,0 +1,1367 @@
+#  ██████╗ ██████╗ ██╗     ██████╗     ██╗    ██╗ █████╗ ██████╗      ██████╗ ██╗   ██╗██╗ #
+# ██╔════╝██╔═══██╗██║     ██╔══██╗    ██║    ██║██╔══██╗██╔══██╗    ██╔════╝ ██║   ██║██║ #
+# ██║     ██║   ██║██║     ██║  ██║    ██║ █╗ ██║███████║██████╔╝    ██║  ███╗██║   ██║██║ #
+# ██║     ██║   ██║██║     ██║  ██║    ██║███╗██║██╔══██║██╔══██╗    ██║   ██║██║   ██║██║ #
+# ╚██████╗╚██████╔╝███████╗██████╔╝    ╚███╔███╔╝██║  ██║██║  ██║    ╚██████╔╝╚██████╔╝██║ #
+#  ╚═════╝ ╚═════╝ ╚══════╝╚═════╝      ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝     ╚═════╝  ╚═════╝ ╚═╝ #
+# Scripted effects
+
+# Use this effect to denote a tag as a superpower, add it to the supers array and set it up for all super-related calcs
+# Specific seazone access for power projection will need to be setup separately!!!
+# Will need to defien access to each seazone separately, then add tag to the global.PowerProjection_Tags array
+# Icon definitions will also need to be done
+set_superpower = {
+	log = "[GetDateText]: [THIS.GetName]: set_superpower; Executing"
+
+	add_to_array = { global.TNO_Superpowers = THIS }
+
+	# Clearing non-super scoring vars
+	clear_variable = Score_Military
+	clear_variable = Score_Economy
+	
+	# Set up scoring modifier and effects
+	add_to_array = { score_effects_array = 0 }
+	resize_array = { score_effects_array = 6 }
+	set_variable = { power_projection_pp_effect = 0 }
+	add_dynamic_modifier = { modifier = superpower_scoring_effects_modifier	}
+	add_dynamic_modifier = { modifier = superpower_power_projection_modifier }
+
+	# Score calc + ranking definition
+	Cold_War_GUI_PowerProjection_CalculateBonuses = yes
+	Cold_War_GUI_Score_Calculation = yes
+	if = {
+		limit = { NOT = { has_global_flag = skip_super_sorting } } # Flag used to skip individually sorting each super on game startup
+		Cold_War_GUI_Sort_Superpowers = yes
+	}
+
+	set_variable = { TNO_Cold_War_GUI_Rankings_Tab_Superpower_Entries_Array_Frame = 1 }
+
+	log = "[GetDateText]: [THIS.GetName]: set_superpower; Completed execution."
+}
+
+# Use this effect once Germany gets what's coming for them
+remove_superpower = {
+	log = "[GetDateText]: [THIS.GetName]: remove_superpower; Executing"
+
+	# Clear from array and re-sort
+	remove_from_array = { global.TNO_Superpowers = THIS }
+	Cold_War_GUI_Sort_Superpowers = yes
+
+	# Remove super scoring vars
+	clear_array = Score_Military
+	clear_array = Score_Economy
+	clear_array = Score_Diplomacy
+	clear_variable = Score_Victories
+	clear_variable = TotalScore
+	if = {
+		limit = { has_country_flag = remove_seazones } # Flag used to optionally remove the seazone array if wished
+		clear_array = CW_SeaZone_Status
+		clear_variable = power_projection_pp_effect
+		remove_dynamic_modifier = { modifier = superpower_scoring_effects_modifier }
+
+		# Remove from the global arrays
+		for_each_scope_loop = {
+			array = global.PowerProjection_Tags
+			if = {
+				limit = { check_variable = { global.PowerProjection_Tags^i = THIS.id } }
+				remove_from_array = { array = global.PowerProjection_Tags   index = i }
+				remove_from_array = { array = global.PowerProjection_Tags_X index = i }
+				remove_from_array = { array = global.PowerProjection_Tags_Y index = i }
+			}
+		}
+	}
+	
+	# Remove scoring effects
+	clear_array = score_effects_array
+	remove_dynamic_modifier = { modifier = superpower_scoring_effects_modifier }
+
+	log = "[GetDateText]: [THIS.GetName]: remove_superpower; Completed execution."
+}
+
+# Used to fully recalculate scores for all supers every month
+Cold_War_GUI_Fully_Calculate_Scores = {
+	for_each_scope_loop = {
+		array = global.TNO_Superpowers
+		Cold_War_GUI_Score_Calculation = yes
+	}
+	Cold_War_GUI_Sort_Superpowers = yes
+}
+
+#############################
+## SCORE VALUE DEFINITIONS ##
+#############################
+# These values determine how many points are given for each category
+# Can be freely edited to change the score calculations
+
+### MILITARY ###
+## Army Score ##
+@score_per_battalion      = 0.15  # Num. of points given by each fielded battalion
+
+## Air Force Score ##
+@score_per_plane          = 0.05  # Num. of points given by fielded battalions (UNUSED)
+
+## Naval Score ##
+@score_per_submarine      = 0.4   # Num. of points given by each submarine
+@score_per_corvette       = 0.5   # Num. of points given by each corvette
+@score_per_frigate        = 0.75  # Num. of points given by each frigate
+@score_per_destroyer      = 1     # Num. of points given by each destroyer
+@score_per_cruiser        = 1.5   # Num. of points given by each cruiser
+@score_per_battleship     = 1.75  # Num. of points given by each battleship
+@score_per_carrier        = 2     # Num. of points given by each carrier
+
+@score_per_prof_status    = 0.08  # Num. of points given by each point in the Army Professionalism counter
+@score_per_nuke           = 0.013 # Num. of points given by each nuclear warhead in the stockpile
+
+### ECONOMY ###
+## Economic Factor Score ##
+@score_per_gdp            = 0.6   # Num. of points given by each 1B in GDP
+@score_per_gdpc			  = 1     # Num. of points given by each K in GDP/Capita
+@score_per_debt           = 0.3   # Num. of points subtracted by each 1B in debt
+@score_per_poverty        = 1.5   # Num. of points subtracted by each % of poverty rate
+@score_per_stability      = 1.5   # Num. of points given by each % in stability
+@score_per_tech           = 0.5   # Num. of points given by each tech
+
+## Resource Score ##
+@score_per_oil            = 0.05  # Num. of points given by each unit of oil produced
+@score_per_aluminium      = 0.02  # Num. of points given by each unit of aluminuim produced
+@score_per_rubber         = 0.01  # Num. of points given by each unit of rubber produced
+@score_per_tungsten       = 0.01  # Num. of points given by each unit of tungsten produced
+@score_per_steel          = 0.03  # Num. of points given by each unit of steel produced
+@score_per_chromium       = 0.02  # Num. of points given by each unit of chromium produced
+
+### DIPLOMACY ###
+@score_per_ind_member	  = 50    # Num. of points given by each independent member on the faction
+@score_per_observer       = 20    # Num. of points given by each faction observer
+@sphere_perc_modifier     = 4     # Num. of points given by each % of total world GDP on the econ sphere
+@faction_mil_modifier     = 0.5   # Modifier for the faction total military score
+@faction_eco_modifier     = 0.15  # Modifier for the faction total economic score
+@score_per_seazone        = 50    # Num. of points given by each accessible seazone
+
+calculate_army_power = {
+	set_variable = { army_power = num_battalions }
+	multiply_variable = { army_power = @score_per_battalion }
+}
+
+calculate_naval_power = {
+
+	set_variable = { SubmarineScore = num_ships_with_type@submarine }
+	multiply_variable = { SubmarineScore = @score_per_submarine }
+	set_variable = { CorvetteScore = num_ships_with_type@corvette }
+	multiply_variable = { CorvetteScore = @score_per_corvette }
+	set_variable = { FrigateScore = num_ships_with_type@frigate }
+	multiply_variable = { FrigateScore = @score_per_frigate }
+	set_variable = { DestroyerScore = num_ships_with_type@destroyer }
+	multiply_variable = { DestroyerScore = @score_per_destroyer }
+	set_variable = { CruiserScore = num_ships_with_type@cruiser }
+	add_to_variable = { CruiserScore = num_ships_with_type@light_cruiser }
+	add_to_variable = { CruiserScore = num_ships_with_type@heavy_cruiser }
+	multiply_variable = { CruiserScore = @score_per_cruiser }
+	set_variable = { BattleshipScore = num_ships_with_type@battleship }
+	multiply_variable = { BattleshipScore = @score_per_battleship }
+	set_variable = { CarrierScore = num_ships_with_type@carrier }
+	multiply_variable = { CarrierScore = @score_per_carrier }
+
+	set_variable = { naval_power = 0 }
+
+	add_to_variable = { naval_power = SubmarineScore }
+	add_to_variable = { naval_power = CorvetteScore }
+	add_to_variable = { naval_power = FrigateScore }
+	add_to_variable = { naval_power = DestroyerScore }
+	add_to_variable = { naval_power = CruiserScore }
+	add_to_variable = { naval_power = BattleshipScore }
+	add_to_variable = { naval_power = CarrierScore }
+
+}
+
+# To update the score of a cerain country, fire this command on its scope
+# Eg. GER = { Cold_War_GUI_Score_Calculation = yes } updates Germany's score
+Cold_War_GUI_Score_Calculation = {
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Score_Calculation; Executing"
+
+	hidden_effect = {
+		# Update econ values
+		# update_economy_tab = yes # If this section is uncommented it breaks the sorting algorithm bellow :funny: :funny: :funny:
+
+		### MILITARY ###
+		## Base array
+		clear_array = Score_Military
+		add_to_array = { Score_Military = 0 } # 0; Total
+		add_to_array = { Score_Military = 0 } # 1; Army Size
+		add_to_array = { Score_Military = 0 } # 2; Air Force Size (UNUSED)
+		add_to_array = { Score_Military = 0 } # 3; Navy Size
+		add_to_array = { Score_Military = 0 } # 4; Professionalism
+		add_to_array = { Score_Military = 0 } # 5; Nuclear Stockpile
+
+		## Military size
+		# Army Size score
+		calculate_army_power = yes
+		set_variable = { Score_Military^1 = army_power }
+
+		# Air Force Size score (UNUSED)
+		# set_variable = { Score_Military^2 = num_deployed_planes }
+		# multiply_variable = { Score_Military^2 = @score_per_plane }
+
+		# Naval Size score
+		calculate_naval_power = yes
+		set_variable = { Score_Military^3 = naval_power }
+
+		# Professionalism
+		set_variable = { Score_Military^4 = army_professionalism_counter }
+		multiply_variable = { Score_Military^4 = @score_per_prof_status }
+		clamp_variable = { var = Score_Military^4 min = 0 max = 240 }
+		if = {
+			limit = { has_idea = tno_army_professionalism_untrained }
+			add_to_variable = { Score_Military^4 = 20 }
+		}
+		else_if = {
+			limit = { has_idea = tno_army_professionalism_reluctant_conscripts }
+			add_to_variable = { Score_Military^4 = 40 }
+		}
+		else_if = {
+			limit = { has_idea = tno_army_professionalism_disgruntled_veterans }
+			add_to_variable = { Score_Military^4 = 60 }
+		}
+		else_if = {
+			limit = { has_idea = tno_army_professionalism_cronyism }
+			add_to_variable = { Score_Military^4 = 80 }
+		}
+		else_if = {
+			limit = { has_idea = tno_army_professionalism_political_interference }
+			add_to_variable = { Score_Military^4 = 100 }
+		}
+		else_if = {
+			limit = { has_idea = tno_army_professionalism_professional }
+			add_to_variable = { Score_Military^4 = 120 }
+		}
+		else_if = {
+			limit = { has_idea = tno_army_professionalism_spartan_discipline }
+			add_to_variable = { Score_Military^4 = 140 }
+		}
+
+		# Nuclear Stockpile
+		set_variable = { Score_Military^5 = nuclear_stockpile }
+		multiply_variable = { Score_Military^5 = @score_per_nuke }
+		multiply_variable = { Score_Military^5 = nuclear_strike_capability }
+		set_temp_variable = { CoverageBoost = nuclear_global_coverage }
+		add_to_temp_variable = { CoverageBoost = 1 }
+		multiply_variable = { Score_Military^5 = CoverageBoost }
+
+		# Rounding up all variables
+		for_each_loop = {
+			array = Score_Military
+			round_variable = Score_Military^i
+		}
+
+		### ECONOMY ###
+		# Base array
+		clear_array = Score_Economy
+		add_to_array = { Score_Economy = 0 } # 0; Total
+		add_to_array = { Score_Economy = 0 } # 1; GDP/Capita
+		add_to_array = { Score_Economy = 0 } # 2; National Debt
+		add_to_array = { Score_Economy = 0 } # 3; Poverty Rate
+		add_to_array = { Score_Economy = 0 } # 4; Stability
+		add_to_array = { Score_Economy = 0 } # 5; Technology
+		add_to_array = { Score_Economy = 0 } # 6; Social Development
+		
+		# GDP/Capita
+		set_variable = { Score_Economy^1 = GDP }
+		set_temp_variable = { country_pop = max_manpower_k }
+		divide_temp_variable = { country_pop = 100000 }
+		divide_variable = { Score_Economy^1 = country_pop }
+		multiply_variable = { Score_Economy^1 = @score_per_gdpc }
+
+		# National Debt
+		set_variable = { Score_Economy^2 = national_debt }
+		multiply_variable = { Score_Economy^2 = @score_per_debt }
+		multiply_variable = { Score_Economy^2 = -1 }
+
+		# Poverty Rate
+		set_variable = { Score_Economy^3 = poverty_rate }
+		multiply_variable = { Score_Economy^3 = @score_per_poverty }
+		multiply_variable = { Score_Economy^3 = -1 }
+
+		# Stability
+		set_variable = { Score_Economy^4 = stability }
+		multiply_variable = { Score_Economy^4 = 100 }
+		multiply_variable = { Score_Economy^4 = @score_per_stability }
+		clamp_variable = { var = Score_Economy^4 min = -100 max = 1000 }
+
+		# Tech
+		set_variable = { Score_Economy^5 = num_researched_technologies }
+		multiply_variable = { Score_Economy^5 = @score_per_tech }
+
+		# Social Development
+		set_variable = { Score_Economy^6 = modifier@socdev_points }
+
+		# Rounding up all variables
+		for_each_loop = {
+			array = Score_Economy
+			round_variable = Score_Economy^i
+		}
+
+		### DIPLOMACY ###
+		clear_array = Score_Diplomacy
+		add_to_array = { Score_Diplomacy = 0 } # 0; Total
+		add_to_array = { Score_Diplomacy = 0 } # 1; Faction Size (Display-only)
+		add_to_array = { Score_Diplomacy = 0 } # 2; Independent Members in Faction
+		add_to_array = { Score_Diplomacy = 0 } # 3; Faction Military Score
+		add_to_array = { Score_Diplomacy = 0 } # 4; Faction Economic Score
+		add_to_array = { Score_Diplomacy = 0 } # 5; Economic Bloc Power
+		add_to_array = { Score_Diplomacy = 0 } # 6; Faction Observers
+		add_to_array = { Score_Diplomacy = 0 } # 7; Power Projection
+
+		# Independent members in faction
+		set_variable = { Score_Diplomacy^2 = faction_members^num }
+		for_each_scope_loop = {
+			array = faction_members
+			if = {
+				limit = {
+					OR = {
+						is_subject = yes
+						has_idea = Sphere_Corporate_Dependency
+						has_idea = Sphere_Imp_Protectorate
+						has_idea = Sphere_Fully_Dependent
+						has_idea = Sphere_Economic_Dependent
+						has_idea = Pakt_Mitstreiter
+						has_idea = Pakt_Ordensstaat
+					}
+				}
+				subtract_from_variable = { PREV.Score_Diplomacy^2 = 1 }
+			}
+		}
+		subtract_from_variable = { Score_Diplomacy^2 = 1 } # Subtract another one to remove the faction leader
+		multiply_variable = { Score_Diplomacy^2 = @score_per_ind_member }
+
+		# Faction total scores
+		for_each_scope_loop = {
+			array = faction_members
+			if = {
+				limit = { NOT = { tag = PREV } }
+				Cold_War_GUI_Faction_Score_Calculation = yes
+				add_to_variable = { PREV.Score_Diplomacy^3 = Score_Military }  # Military
+				add_to_variable = { PREV.Score_Diplomacy^4 = Score_Economy }   # Economy
+			}
+		}
+		multiply_variable = { Score_Diplomacy^3 = @faction_mil_modifier }
+		multiply_variable = { Score_Diplomacy^4 = @faction_eco_modifier }
+
+		# Economic Bloc Power
+		set_variable = { Score_Diplomacy^5 = econ_sphere_world_percent }
+		multiply_variable = { Score_Diplomacy^5 = @sphere_perc_modifier }
+
+		# Faction Observers
+		if = {
+			limit = { tag = GER }
+			every_other_country = {
+				limit = { has_idea = Pakt_Observer }
+				add_to_variable = { PREV.Score_Diplomacy^6 = @score_per_observer }
+			}
+		}
+		else_if = {
+			limit = { tag = USA }
+			every_other_country = {
+				limit = { has_idea = OFN_Observer }
+				add_to_variable = { PREV.Score_Diplomacy^6 = @score_per_observer }
+			}
+		}
+		else_if = {
+			limit = { tag = JAP }
+			every_other_country = {
+				limit = { has_idea = Sphere_Observer }
+				add_to_variable = { PREV.Score_Diplomacy^6 = @score_per_observer }
+			}
+		}
+
+		# Power Projection
+		set_variable = { Score_Diplomacy^7 = 0 }
+		for_each_loop = {
+			array = CW_SeaZone_Status
+			add_to_variable = { Score_Diplomacy^7 = v }
+		}
+		multiply_variable = { Score_Diplomacy^7 = @score_per_seazone }
+
+		# Rounding up all variables
+		for_each_loop = {
+			array = Score_Diplomacy
+			round_variable = Score_Diplomacy^i
+		}
+
+		### TOTAL ###
+		for_each_loop = {
+			array = Score_Military
+			add_to_variable = { Score_Military^0 = v }
+		}
+		for_each_loop = {
+			array = Score_Economy
+			add_to_variable = { Score_Economy^0 = v }
+		}
+		for_each_loop = {
+			array = Score_Diplomacy
+			add_to_variable = { Score_Diplomacy^0 = v }
+		}
+
+		clear_variable = Score_Victories
+		for_each_loop = {
+			array = TNO_Cold_War_GUI_Victory_Points
+			add_to_variable = { Score_Victories = v }
+		}
+
+		clear_variable = TotalScore
+		add_to_variable = { TotalScore = Score_Military^0 }
+		add_to_variable = { TotalScore = Score_Economy^0 }
+		add_to_variable = { TotalScore = Score_Diplomacy^0 }
+		add_to_variable = { TotalScore = Score_Victories }
+		}
+
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Score_Calculation; [THIS.GetName] Military Score: [?Score_Military^0]"
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Score_Calculation; [THIS.GetName] Economic Score: [?Score_Economy^0]"
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Score_Calculation; [THIS.GetName] Diplomatic Score: [?Score_Diplomacy^0]"
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Score_Calculation; [THIS.GetName] Victories Score: [?Score_Victories]"
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Score_Calculation; [THIS.GetName] Total Score: [?TotalScore]"
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Score_Calculation; Completed execution."
+}
+
+# Simplified and more performance-friendly version of the above, to be used for non-superpowers
+Cold_War_GUI_Faction_Score_Calculation = {
+	# log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Faction_Score_Calculation; Executing"
+	### MILITARY ###
+	clear_variable = Score_Military
+
+	## Army Size score
+	set_temp_variable = { ArmyScore = num_battalions }
+	multiply_temp_variable = { ArmyScore = @score_per_battalion }
+
+	## Air Force Size score (UNUSED)
+	# set_temp_variable = { AirForceScore = num_deployed_planes }
+	# multiply_temp_variable = { AirForceScore = @score_per_plane }
+
+	## Naval Size score
+	set_temp_variable = { NavyScore = num_of_ships }
+
+	# Adding up
+	add_to_variable = { Score_Military = ArmyScore }
+	# add_to_variable = { Score_Military = AirForceScore }
+	add_to_variable = { Score_Military = NavyScore }
+
+	## Professionalism Modifier
+	if = {
+		limit = { has_idea = tno_army_professionalism_untrained }
+		multiply_variable = { Score_Military = 0.2 }
+	}
+	else_if = {
+		limit = { has_idea = tno_army_professionalism_reluctant_conscripts }
+		multiply_variable = { Score_Military = 0.4 }
+	}
+	else_if = {
+		limit = { has_idea = tno_army_professionalism_disgruntled_veterans }
+		multiply_variable = { Score_Military = 0.6 }
+	}
+	else_if = {
+		limit = { has_idea = tno_army_professionalism_cronyism }
+		multiply_variable = { Score_Military = 0.75 }
+	}
+	else_if = {
+		limit = { has_idea = tno_army_professionalism_political_interference }
+		multiply_variable = { Score_Military = 0.9 }
+	}
+	else_if = {
+		limit = { has_idea = tno_army_professionalism_professional }
+		multiply_variable = { Score_Military = 1 }
+	}
+	else_if = {
+		limit = { has_idea = tno_army_professionalism_spartan_discipline }
+		multiply_variable = { Score_Military = 1.5 }
+	}
+
+	### ECONOMY ###
+	clear_variable = Score_Economy
+
+	## GDP
+	set_temp_variable = { GDPScore = GDP }
+	divide_temp_variable = { GDPScore = 100 }
+	multiply_temp_variable = { GDPScore = @score_per_gdp }
+
+	## National Debt
+	set_temp_variable = { DebtScore = national_debt }
+	multiply_temp_variable = { DebtScore = @score_per_debt }
+
+	## Poverty Rate
+	set_temp_variable = { PovertyScore = poverty_rate }
+	multiply_temp_variable = { PovertyScore = @score_per_poverty }
+
+	## Stability
+	set_temp_variable = { StabilityScore = stability }
+	multiply_temp_variable = { StabilityScore = 100 }
+	multiply_temp_variable = { StabilityScore = @score_per_stability }
+
+	## Tech
+	set_temp_variable = { TechScore = num_researched_technologies }
+	multiply_temp_variable = { TechScore = @score_per_tech }
+
+	## Resource Production
+	set_temp_variable = { OilScore = resource_produced@oil }
+	multiply_temp_variable = { OilScore = @score_per_oil }
+	set_temp_variable = { AluminiumScore = resource_produced@aluminium }
+	multiply_temp_variable = { AluminiumScore = @score_per_aluminium }
+	set_temp_variable = { RubberScore = resource_produced@rubber }
+	multiply_temp_variable = { RubberScore = @score_per_rubber }
+	set_temp_variable = { TungstenScore = resource_produced@tungsten }
+	multiply_temp_variable = { TungstenScore = @score_per_tungsten }
+	set_temp_variable = { SteelScore = resource_produced@steel }
+	multiply_temp_variable = { SteelScore = @score_per_steel }
+	set_temp_variable = { ChromiumScore = resource_produced@chromium }
+	multiply_temp_variable = { ChromiumScore = @score_per_chromium }
+
+	## Social Development
+	set_temp_variable = { SocDevScore = modifier@socdev_points }
+	
+	## Population
+	set_temp_variable = { PopScore = max_manpower_k }
+	divide_temp_variable = { PopScore = 500 }
+
+	# Adding up
+	add_to_variable = { Score_Economy = GDPScore }
+	subtract_from_variable = { Score_Economy = DebtScore }
+	subtract_from_variable = { Score_Economy = PovertyScore }
+	add_to_variable = { Score_Economy = StabilityScore }
+	add_to_variable = { Score_Economy = TechScore }
+	add_to_variable = { Score_Economy = OilScore }
+	add_to_variable = { Score_Economy = AluminiumScore }
+	add_to_variable = { Score_Economy = RubberScore }
+	add_to_variable = { Score_Economy = TungstenScore }
+	add_to_variable = { Score_Economy = SteelScore }
+	add_to_variable = { Score_Economy = ChromiumScore }
+	add_to_variable = { Score_Economy = SocDevScore }
+	add_to_variable = { Score_Economy = PopScore }
+
+	# if = {
+	# 	limit = {
+	# 		OR = {
+	# 			is_subject = yes
+	# 			has_idea = Sphere_Imp_Protectorate
+	# 			has_idea = Sphere_Corporate_Dependency
+	# 			has_idea = Sphere_Fully_Dependent
+	# 			has_idea = Sphere_Economic_Dependent
+	# 			has_idea = Pakt_Mitstreiter
+	# 			has_idea = Pakt_Ordensstaat
+	# 		}
+	# 	}
+	# 	multiply_variable = { Score_Economy = 0.75 }
+	# }
+
+	# Rounding up all variables
+	round_variable = Score_Military
+	round_variable = Score_Economy
+
+	### TOTAL ###
+	clear_variable = TotalScore
+	add_to_variable = { TotalScore = Score_Military }
+	add_to_variable = { TotalScore = Score_Economy }
+
+	# log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Faction_Score_Calculation; [THIS.GetName] Military Score: [?Score_Military]"
+	# log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Faction_Score_Calculation; [THIS.GetName] Economic Score: [?Score_Economy]"
+	# log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Faction_Score_Calculation; [THIS.GetName] Total Score: [?TotalScore]"
+	# log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Faction_Score_Calculation; Completed execution."
+}
+
+# Sorts the superpowers array, setting up the new ranking positions based on their total score
+Cold_War_GUI_Sort_Superpowers = {
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Sort_Superpowers; Executing"
+	
+	ZZZ = {
+		get_sorted_scored_countries = {
+			scorer = superpower_rank_scorer
+			array = global.TNO_Superpowers
+		}
+
+		for_each_scope_loop = {
+			array = global.TNO_Superpowers
+			add_to_variable = { global.supers_index = 1 }
+			set_variable = { super_ranking = global.supers_index }
+			log = "[GetDateText]: [PREV.PREV.GetName]: Cold_War_GUI_Sort_Superpowers; Place [?global.supers_index]: [THIS.GetName]"
+			Cold_War_GUI_Calculate_Score_Effects = yes
+		}
+		clear_variable = global.supers_index
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Sort_Superpowers; Completed execution."
+}
+
+Cold_War_GUI_Calculate_Score_Effects = {
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Calculate_Score_Effects; Executing"
+
+	# Set base values
+	# These are also the max values, should the nation be 1st in score
+	set_variable = { score_effects_array^0 = 30   } # 0 - Max Command Power
+	set_variable = { score_effects_array^1 = 0.3  } # 1 - Daily PP Gain
+	set_variable = { score_effects_array^2 = 0.06 } # 2 - War Support
+	set_variable = { score_effects_array^3 = 0.12 } # 3 - Research Speed
+	set_variable = { score_effects_array^4 = 0.12 } # 4 - Consumer Goods Production
+	set_variable = { score_effects_array^5 = 30   } # 5 - Debt to GDP Ceilling
+
+	# Divide by randking num
+	for_each_loop = {
+		array = score_effects_array
+		divide_variable = { score_effects_array^i = super_ranking }
+	}
+
+	force_update_dynamic_modifier = yes
+	
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_Calculate_Score_Effects; Completed execution."
+}
+
+# Calculates the influence percentages and sets up the display array for the Int. Alignment/Influence system
+# TNO_IntAlign_setup_array = {
+# 	clear_array = TNO_IntAlignment_Perc
+# 	add_to_array = { TNO_IntAlignment_Perc = 0 }
+# 	resize_array = { TNO_IntAlignment_Perc = TNO_IntAlignment_Infl^num }
+
+# 	for_each_loop = {
+# 		array = TNO_IntAlignment_Infl
+# 		add_to_temp_variable = { sum = v }
+# 	}
+# 	multiply_temp_variable = { sum = 0.01 }
+
+# 	clear_array = TNO_IntAlignment_CumPerc
+# 	clear_array = TNO_IntAlignment_TooltipOffset
+# 	set_temp_variable = { pct_left = 100 }
+# 	set_temp_variable = { pct_fill = 0 }
+
+# 	# Compute both the pct of influence left and already filled, to let us fill each progress bar to the right amount
+# 	# And compute where its tooltip should lie
+# 	for_each_loop = {
+# 		array = TNO_IntAlignment_Perc
+
+# 		set_variable = { TNO_IntAlignment_Perc^i = TNO_IntAlignment_Infl^i }
+# 		divide_variable = { TNO_IntAlignment_Perc^i = sum }
+
+# 		# Used to render progbar
+# 		add_to_array = { TNO_IntAlignment_CumPerc = pct_left }
+
+# 		# Used to determine tooltip hitbox position
+# 		add_to_array = { TNO_IntAlignment_TooltipOffset = pct_fill }
+# 		divide_variable = { TNO_IntAlignment_TooltipOffset^i = 100 }
+# 		multiply_variable = { TNO_IntAlignment_TooltipOffset^i = 230 }
+
+# 		subtract_from_temp_variable = { pct_left = TNO_IntAlignment_Perc^i }
+# 		add_to_temp_variable = { pct_fill = TNO_IntAlignment_Perc^i }
+# 	}
+# }
+
+## Adds a specific victory to the target superpower's victory list
+# Arguments: Victory_ID
+# Optional Arguments: Victory_Outcome, Victory_Points
+Cold_War_GUI_AddVictory = {
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_AddVictory; Executing"
+
+	if = {
+		limit = { is_superpower = no }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_AddVictory; Handed non-superpower tag. Breaking."
+	}
+	else_if = {
+		limit = { NOT = { has_variable = Victory_ID } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_AddVictory; Handed unset ID. Breaking."
+	}
+	else = {
+		# Checking to ensure that our array is the right size
+		set_temp_variable = { x = Victory_ID }
+		add_to_temp_variable = { x = 1 }
+		if = {
+			limit = { check_variable = { TNO_Cold_War_GUI_Victory_Entry^num < x } }
+			resize_array = { TNO_Cold_War_GUI_Victory_Entry = x }
+			resize_array = { TNO_Cold_War_GUI_Victory_Outcome = x }
+			resize_array = { TNO_Cold_War_GUI_Victory_Points = x }
+		}
+
+		# Conflicts in this array are stored in a way so that their specific index corresponds to their actual victory ID
+		# E.g. the The Aleutians Crisis' victory ID is 1, so it is stored in the array index 1
+		# The German Civil War's victory ID is 14, so it is stored in the array index 14
+		# And so on
+		# This is done so that we can know for sure where a specific conflict is stored if we want to manipulate it later
+		set_variable = { TNO_Cold_War_GUI_Victory_Entry^Victory_ID = 1 }
+		set_variable = { TNO_Cold_War_GUI_Victory_Outcome^Victory_ID = Victory_Outcome }
+		set_variable = { TNO_Cold_War_GUI_Victory_Points^Victory_ID = Victory_Points }
+
+		Cold_War_GUI_CalculateDisplayArrays = yes
+		Cold_War_GUI_Score_Calculation = yes
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_AddVictory; Completed execution."
+}
+
+## Edits a specific victory on the target superpower's victory list
+# Arguments: Victory_ID, Victory_Outcome, Victory_Points
+Cold_War_GUI_ManipulateVictory = {
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_ManipulateVictory; Executing"
+
+	if = {
+		limit = { is_superpower = no }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_AddVictory; Handed non-superpower tag. Breaking."
+	}
+	else_if = {
+		limit = { NOT = { has_variable = Victory_ID } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_AddVictory; Handed unset ID. Breaking."
+	}
+	else_if = {
+		limit = { NOT = { has_variable = Victory_Outcome } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_AddVictory; Handed unset Outcome. Breaking."
+	}
+	else_if = {
+		limit = { NOT = { has_variable = Victory_Points } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_AddVictory; Handed unset Points. Breaking."
+	}
+	else_if = {
+		limit = { check_variable = { TNO_Cold_War_GUI_Victory_Entry^Victory_ID = 0 } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_AddVictory; Handed ID does not exist in the target scope."
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_AddVictory; Executing Cold_War_GUI_AddVictory instead"
+		Cold_War_GUI_AddVictory = yes
+	}
+	else = {
+		set_variable = { TNO_Cold_War_GUI_Victory_Outcome^Victory_ID = Victory_Outcome }
+		set_variable = { TNO_Cold_War_GUI_Victory_Points^Victory_ID = Victory_Points }
+
+		Cold_War_GUI_CalculateDisplayArrays = yes
+		Cold_War_GUI_Score_Calculation = yes
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_ManipulateVictory; Completed execution."
+}
+
+## This command creates a new, display-only array used to populate the gridbox in the GUI, which are based on the ones defined beforehand
+Cold_War_GUI_CalculateDisplayArrays = {
+	clear_array = TNO_Cold_War_GUI_Victory_Entry_Display
+	clear_array = TNO_Cold_War_GUI_Victory_Outcome_Display
+	clear_array = TNO_Cold_War_GUI_Victory_Points_Display
+
+	for_each_loop = {
+		array = TNO_Cold_War_GUI_Victory_Entry
+		if = {
+			limit = { check_variable = { v = 1 } }
+			add_to_array = { TNO_Cold_War_GUI_Victory_Entry_Display = i }
+			add_to_array = { TNO_Cold_War_GUI_Victory_Outcome_Display = TNO_Cold_War_GUI_Victory_Outcome^i }
+			add_to_array = { TNO_Cold_War_GUI_Victory_Points_Display = TNO_Cold_War_GUI_Victory_Points^i }
+		}
+	}
+}
+
+## Sets up superpower access to a single seazone
+# Arguments: SeaZone_ID
+# Accepted IDs:
+#   0; East Pacific
+#   1; West Pacific
+#   2; South Atlantic
+#   3; North Atlantic
+#   4; North Sea
+#   5; Mediterranean
+#   6; Indian Ocean
+Cold_War_GUI_PowerProjection_AddSeaZone = {
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_AddSeaZone; Executing"
+
+	if = {
+		limit = { NOT = { is_in_array = { global.PowerProjection_Tags = THIS.id } } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_AddSeaZone; Handed invalid tag. Breaking."
+	}
+	else_if = {
+		limit = { NOT = { has_variable = SeaZone_ID } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_AddSeaZone; Handed unset ID. Breaking."
+	}
+	else_if = {
+		limit = { OR = { check_variable = { SeaZone_ID < 0 } check_variable = { SeaZone_ID > 6 } } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_AddSeaZone; Handed invalid ID. Breaking."
+	}
+	else_if = {
+		limit = { check_variable = { CW_SeaZone_Status^SeaZone_ID = 1 } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_AddSeaZone; Target is already set. Breaking."
+	}
+	else = {
+		log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_AddSeaZone; Adding [THIS.GetAdjective] Power Projection to [Cold_War_GUI_GetSeaZone_Name]."
+		custom_effect_tooltip = Cold_War_GUI_PowerProjection_AddSeaZone_tt
+		set_variable = { CW_SeaZone_Status^SeaZone_ID = 1 }
+		Cold_War_GUI_PowerProjection_CalculateBonuses = yes
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_AddSeaZone; Completed execution."
+}
+
+## Removes superpower access to a single seazone
+# Arguments: SeaZone_ID
+# Accepted IDs:
+#   0; East Pacific
+#   1; West Pacific
+#   2; South Atlantic
+#   3; North Atlantic
+#   4; North Sea
+#   5; Mediterranean
+#   6; Indian Ocean
+Cold_War_GUI_PowerProjection_RemoveSeaZone = {
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_RemoveSeaZone; Executing"
+
+	if = {
+		limit = { NOT = { is_in_array = { global.PowerProjection_Tags = THIS.id } } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_RemoveSeaZone; Handed invalid tag. Breaking."
+	}
+	else_if = {
+		limit = { NOT = { has_variable = SeaZone_ID } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_RemoveSeaZone; Handed unset ID. Breaking."
+	}
+	else_if = {
+		limit = { OR = { check_variable = { SeaZone_ID < 0 } check_variable = { SeaZone_ID > 6 } } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_RemoveSeaZone; Handed invalid ID. Breaking."
+	}
+	else_if = {
+		limit = { check_variable = { CW_SeaZone_Status^SeaZone_ID = 0 } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_RemoveSeaZone; Target is already set. Breaking."
+	}
+	else = {
+		log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_RemoveSeaZone; Removing [THIS.GetAdjective] Power Projection to [Cold_War_GUI_GetSeaZone_Name]."
+		custom_effect_tooltip = Cold_War_GUI_PowerProjection_RemoveSeaZone_tt
+		set_variable = { CW_SeaZone_Status^SeaZone_ID = 0 }
+		Cold_War_GUI_PowerProjection_CalculateBonuses = yes
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: Cold_War_GUI_PowerProjection_RemoveSeaZone; Completed execution."
+}
+
+## Used to calculate bonuses from seazone power projection
+Cold_War_GUI_PowerProjection_CalculateBonuses = {
+	set_variable = { power_projection_pp_effect = 0 }
+	for_each_loop = {
+		array = CW_SeaZone_Status
+		add_to_variable = { power_projection_pp_effect = v }
+	}
+	multiply_variable = { power_projection_pp_effect = 0.025 }
+}
+
+#All the things you need to change TNO's World Tension, hopefully
+TNO_clamping_tension_vars = {
+	clamp_variable = { var = global.TNO_World_Tension min = 0 max = 100 }
+	if = {
+		limit = {
+			OR = {
+				has_global_flag = TNO_world_tension_heydrich
+				has_global_flag = TNO_world_tension_WW3
+			}
+		}
+		set_variable = { global.TNO_World_Tension = 100 }
+	}
+
+	if = {
+		limit = {
+			check_variable = { global.TNO_World_Tension = 100 }
+		}
+		set_variable = { TNO_Cold_War_GUI_Nuke_Small_Icon_Frame = 2 }
+	}
+	else = {
+		set_variable = { TNO_Cold_War_GUI_Nuke_Small_Icon_Frame = 1 }
+	}
+}
+
+TNO_tension_animation_check = {
+	while_loop_effect = {
+		limit = {
+			check_variable = { old_threat > 20 }
+		}
+		subtract_from_temp_variable = { old_threat = 20 }
+		add_to_temp_variable = { old_threat_20s = 1 }
+	}
+	while_loop_effect = {
+		limit = {
+			check_variable = { new_threat > 20 }
+		}
+		subtract_from_temp_variable = { new_threat = 20 }
+		add_to_temp_variable = { new_threat_20s = 1 }
+	}
+	
+	if = {
+		limit = {
+			check_variable = { var = old_threat_20s value = new_threat_20s compare = not_equals }
+		}
+		add_to_array = { global.TNO_WT_static_controller = 1 }
+	}
+}
+
+TNO_tension_setup = { #The Setup for the Tension Tab. Different Arrays show the different Incidents and Involved Superpowers
+	## Past Incidents must be added chronologically, with the latest one at the top and the previous ones following
+	# The Aleutian Crisis
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List = 5 }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1 = JAP }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2 = USA } 
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_WT = 20 }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Date = 60986.720 }
+
+	# End of the Akagi Accords
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List = 4 }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1 = JAP }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2 = USA }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_WT = 10 }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Date = 60923.76 }
+
+	# End of the Tripartite Pact
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List = 3 }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1 = GER }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2 = JAP }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_WT = 40 }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Date = 60876.624 }
+
+	# Akagi Accords
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List = 2 }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1 = JAP }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2 = USA }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_WT = 50 }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Date = 60844.056 }
+
+	# Westminster Treaty
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List = 1 }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1 = USA }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2 = GER }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_WT = 50 }
+	add_to_array = { global.TNO_Cold_War_GUI_Tension_Incidents_Date = 60841.248 }
+
+	## Setup initial tensions
+	add_to_array = { global.TNO_superpower_tension = 50 } # German-American
+	add_to_array = { global.TNO_superpower_tension = 40 } # German-Japanese
+	add_to_array = { global.TNO_superpower_tension = 80 } # Japanese-American
+	set_variable = { global.TNO_superpower_tension_areas = 3 }
+	TNO_tension_calc = yes
+}
+
+TNO_tension_calc = {
+	set_variable = { TNO_average_threat = 0 }
+	for_each_loop = {
+		array = global.TNO_superpower_tension
+		add_to_variable = { TNO_average_threat = global.TNO_superpower_tension^i }
+		if = {
+			limit = { check_variable = { i < 3 } }
+			clamp_variable = {
+				var = global.TNO_superpower_tension^i
+				min = 0
+				max = 100
+			}
+		}
+	}
+	TNO_calc_alerts_and_ww3 = yes
+	divide_variable = { TNO_average_threat = global.TNO_superpower_tension_areas }
+	round_variable = TNO_average_threat
+	set_variable = { global.TNO_World_Tension = TNO_average_threat }
+	
+	set_temp_variable = { old_threat = global.threat }
+	multiply_temp_variable = { old_threat = 100 }
+	
+	set_variable = { threat_negative = global.threat }
+	multiply_variable = { threat_negative = -100 }
+	add_threat = var:threat_negative
+	add_threat = var:TNO_average_threat
+	
+	set_temp_variable = { new_threat = global.threat }
+	multiply_temp_variable = { new_threat = 100 }
+	
+	TNO_clamping_tension_vars = yes
+	TNO_calc_tension_dynmod_effects = yes
+	TNO_tension_animation_check = yes
+}
+
+TNO_change_tension = { ##Modify World Tension Script
+	if = {
+		limit = { has_variable = tension_ID }
+		add_to_array = { array = global.TNO_Cold_War_GUI_Tension_Incidents_WT value = tension_WT index = 0 } #How much world tension there has to be modified
+		add_to_array = { array = global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_1 value = tension_superpower_1 index = 0 } #Side 1
+		add_to_array = { array = global.TNO_Cold_War_GUI_Tension_Incidents_Involved_Superpower_2 value = tension_superpower_2 index = 0 } #Side 2
+		add_to_array = { array = global.TNO_Cold_War_GUI_Tension_Tab_Incidents_List value = tension_ID index = 0 } #What the Conflict's ID is. Refer to Cold_War_scripted_localisation
+		add_to_array = { array = global.TNO_Cold_War_GUI_Tension_Incidents_Date value = global.date index = 0 } # The date when this effect is executed
+	}
+
+	if = {
+		limit = {
+			OR = {
+				AND = {
+					check_variable = { tension_superpower_1 = USA }
+					check_variable = { tension_superpower_2 = GER }
+				}
+				AND = {
+					check_variable = { tension_superpower_2 = USA }
+					check_variable = { tension_superpower_1 = GER }
+				}
+			} 
+		}
+		add_to_variable = { global.TNO_superpower_tension^0 = tension_WT }
+		set_temp_variable = { index = 0 }
+	}
+	else_if = {
+		limit = {
+			OR = {
+				AND = {
+					check_variable = { tension_superpower_1 = GER }
+					check_variable = { tension_superpower_2 = JAP }
+				}
+				AND = {
+					check_variable = { tension_superpower_2 = GER }
+					check_variable = { tension_superpower_1 = JAP }
+				}
+			}
+		}
+		add_to_variable = { global.TNO_superpower_tension^1 = tension_WT }
+		set_temp_variable = { index = 1 }
+	}
+	else_if = {
+		limit = {
+			OR = {
+				AND = {
+					check_variable = { tension_superpower_1 = USA }
+					check_variable = { tension_superpower_2 = JAP }
+				}
+				AND = {
+					check_variable = { tension_superpower_2 = USA }
+					check_variable = { tension_superpower_1 = JAP }
+				}
+			}
+		}
+		add_to_variable = { global.TNO_superpower_tension^2 = tension_WT }
+		set_temp_variable = { index = 2 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { tension_superpower_1 = ALL }
+			check_variable = { tension_superpower_2 = ALL }
+		}
+		add_to_variable = { global.TNO_superpower_tension^0 = tension_WT }
+		add_to_variable = { global.TNO_superpower_tension^1 = tension_WT }
+		add_to_variable = { global.TNO_superpower_tension^2 = tension_WT }
+	}
+	set_temp_variable = { total_temp = global.TNO_superpower_tension^index }
+	add_to_temp_variable = { total_temp = tension_WT }
+	set_temp_variable = { tension_WT_display = tension_WT }
+	if = {
+		limit = {
+			check_variable = { tension_WT_display < 0 }
+			multiply_temp_variable = { tension_WT_display = -1 }
+		}
+	}
+	custom_effect_tooltip = TNO_change_tension_tt
+	hidden_effect = {
+		TNO_tension_calc = yes
+	}
+}
+
+d_add_tension = {
+	set_temp_variable = { tension_WT = args^0?0 }
+	set_temp_variable = { tension_superpower_1 = ALL }
+	set_temp_variable = { tension_superpower_2 = ALL }
+	set_temp_variable = { tension_id = args^1?0 }
+	TNO_change_tension = yes
+}
+
+TNO_tension_decay = {
+	set_temp_variable = { tension_WT = -2.5 }
+	set_temp_variable = { tension_ID = 0 }
+	set_temp_variable = { tension_superpower_1 = ALL }
+	set_temp_variable = { tension_superpower_2 = ALL }
+	TNO_change_tension = yes
+}
+
+Start_Tension_Alert = {
+	set_temp_variable = { alert_id = token:Alert_HighTension }
+	add_TNO_alert_unless_exists = yes
+	log = "tried to spawn tension alert with alert id [?alert_id]"
+}	
+End_Tension_Alert = {
+	set_temp_variable = { alert_id = token:Alert_HighTension }
+	remove_TNO_alert = yes
+}
+
+TNO_calc_tension_dynmod_effects = { #Calculates the effects tension have on the nations.
+	GER = {
+		set_temp_variable = { GER_JAP_tension_temp = global.TNO_superpower_tension^1 }
+		divide_temp_variable = { GER_JAP_tension_temp = 100 }
+		set_variable = { GER_JAP_war_support_Tension_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_war_support_Tension_var = 0.15 }
+		set_variable = { GER_JAP_stability_Tension_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_stability_Tension_var = -0.15 }
+		set_variable = { GER_JAP_factory_output_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_factory_output_var = 0.2 }
+		set_variable = { GER_JAP_dockyard_output_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_dockyard_output_var = 0.2 }
+		set_variable = { GER_JAP_division_training_time_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_division_training_time_var = -0.125 }
+		set_variable = { GER_JAP_nuclear_production_factor_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_nuclear_production_factor_var = 0.15 } #15% at 100%
+		set_variable = { GER_JAP_misc_costs_of_gdp = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_misc_costs_of_gdp = 0.015 } #1.5% of GDP at 100%. 0% at 0%
+
+		set_temp_variable = { USA_GER_tension_temp = global.TNO_superpower_tension^0 }
+		divide_temp_variable = { USA_GER_tension_temp = 100 }
+		set_variable = { USA_GER_war_support_Tension_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_war_support_Tension_var = 0.15 }
+		set_variable = { USA_GER_stability_Tension_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_stability_Tension_var = -0.15 }
+		set_variable = { USA_GER_factory_output_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_factory_output_var = 0.2 }
+		set_variable = { USA_GER_dockyard_output_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_dockyard_output_var = 0.2 }
+		set_variable = { USA_GER_division_training_time_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_division_training_time_var = -0.125 }
+		set_variable = { USA_GER_nuclear_production_factor_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_nuclear_production_factor_var = 0.15 } #15% at 100%
+		set_variable = { USA_GER_misc_costs_of_gdp = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_misc_costs_of_gdp = 0.015 } #1.5% of GDP at 100%. 0% at 0%
+		if = {
+			limit = { has_country_flag = TNO_has_started_up }
+			update_economy_tab = yes
+		}
+	}
+
+	USA = {
+		set_temp_variable = { USA_GER_tension_temp = global.TNO_superpower_tension^0 }
+		divide_temp_variable = { USA_GER_tension_temp = 100 }
+		set_variable = { USA_GER_war_support_Tension_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_war_support_Tension_var = 0.15 }
+		set_variable = { USA_GER_stability_Tension_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_stability_Tension_var = -0.15 }
+		set_variable = { USA_GER_factory_output_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_factory_output_var = 0.2 }
+		set_variable = { USA_GER_dockyard_output_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_dockyard_output_var = 0.2 }
+		set_variable = { USA_GER_division_training_time_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_division_training_time_var = -0.125 }
+		set_variable = { USA_GER_nuclear_production_factor_var = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_nuclear_production_factor_var = 0.15 } #15% at 100%
+		set_variable = { USA_GER_misc_costs_of_gdp = USA_GER_tension_temp }
+		multiply_variable = { USA_GER_misc_costs_of_gdp = 0.015 } #1.5% of GDP at 100%. 0% at 0%
+
+		set_temp_variable = { JAP_USA_tension_temp = global.TNO_superpower_tension^2 }
+		divide_temp_variable = { JAP_USA_tension_temp = 100 }
+		set_variable = { JAP_USA_war_support_Tension_var = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_war_support_Tension_var = 0.15 } #15% at 100%
+		set_variable = { JAP_USA_stability_Tension_var = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_stability_Tension_var = -0.15 } #-15% at 100%
+		set_variable = { JAP_USA_factory_output_var = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_factory_output_var = 0.2 } #20% at 100%
+		set_variable = { JAP_USA_dockyard_output_var = JAP_USA_tension_temp } 
+		multiply_variable = { JAP_USA_dockyard_output_var = 0.2 } #20% at 100%
+		set_variable = { JAP_USA_division_training_time_var = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_division_training_time_var = -0.125 } #-12.5% at 100%
+		set_variable = { JAP_USA_nuclear_production_factor_var = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_nuclear_production_factor_var = 0.15 } #15% at 100%
+		set_variable = { JAP_USA_misc_costs_of_gdp = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_misc_costs_of_gdp = 0.015 } #1.5% of GDP at 100%. 0% at 0%
+		if = {
+			limit = { has_country_flag = TNO_has_started_up }
+			update_economy_tab = yes
+		}
+	}
+
+	JAP = {
+		set_temp_variable = { GER_JAP_tension_temp = global.TNO_superpower_tension^1 }
+		divide_temp_variable = { GER_JAP_tension_temp = 100 }
+		set_variable = { GER_JAP_war_support_Tension_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_war_support_Tension_var = 0.15 }
+		set_variable = { GER_JAP_stability_Tension_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_stability_Tension_var = -0.15 }
+		set_variable = { GER_JAP_factory_output_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_factory_output_var = 0.2 }
+		set_variable = { GER_JAP_dockyard_output_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_dockyard_output_var = 0.2 }
+		set_variable = { GER_JAP_division_training_time_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_division_training_time_var = -0.125 }
+		set_variable = { GER_JAP_nuclear_production_factor_var = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_nuclear_production_factor_var = 0.15 } #15% at 100%
+		set_variable = { GER_JAP_misc_costs_of_gdp = GER_JAP_tension_temp }
+		multiply_variable = { GER_JAP_misc_costs_of_gdp = 0.015 } #1.5% of GDP at 100%. 0% at 0%
+
+		set_temp_variable = { JAP_USA_tension_temp = global.TNO_superpower_tension^2 }
+		divide_temp_variable = { JAP_USA_tension_temp = 100 }
+		set_variable = { JAP_USA_war_support_Tension_var = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_war_support_Tension_var = 0.15 } #15% at 100%
+		set_variable = { JAP_USA_stability_Tension_var = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_stability_Tension_var = -0.15 } #-15% at 100%
+		set_variable = { JAP_USA_factory_output_var = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_factory_output_var = 0.2 } #20% at 100%
+		set_variable = { JAP_USA_dockyard_output_var = JAP_USA_tension_temp } 
+		multiply_variable = { JAP_USA_dockyard_output_var = 0.2 } #20% at 100%
+		set_variable = { JAP_USA_division_training_time_var = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_division_training_time_var = -0.125 } #-12.5% at 100%
+		set_variable = { JAP_USA_nuclear_production_factor_var = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_nuclear_production_factor_var = 0.15 } #15% at 100%
+		set_variable = { JAP_USA_misc_costs_of_gdp = JAP_USA_tension_temp }
+		multiply_variable = { JAP_USA_misc_costs_of_gdp = 0.015 } #1.5% of GDP at 100%. 0% at 0%
+		if = {
+			limit = { has_country_flag = TNO_has_started_up }
+			update_economy_tab = yes
+		}
+	}
+}
+
+TNO_calc_alerts_and_ww3 = {
+	if = {
+		limit = { 
+			check_variable = { global.TNO_superpower_tension^0 = 100 }
+		}
+		if = {
+			limit = {
+				OR = {
+					has_global_flag = TENSION_DISABLED_GAME_RULE
+					AND = {
+						GER = {
+							is_ai = yes
+						}
+						USA = {
+							is_ai = yes
+						}
+						BRG = {
+							is_ai = yes
+						}
+						NOT = { has_global_flag = TENSION_ENABLED_GAME_RULE }
+					}
+				}
+			}
+			set_variable = { global.TNO_superpower_tension^0 = 99 }
+		}
+		else = {
+			USA = {
+				country_event = {
+					id = tension_diplo_crisis.1
+				}
+			}
+		}
+	}
+
+	else_if = {
+		limit = { 
+			check_variable = { global.TNO_superpower_tension^0 > 90 }
+			check_variable = { global.TNO_superpower_tension^0 < 100 }
+		}
+		USA = {
+			Start_Tension_Alert = yes
+		}
+		GER = {
+			Start_Tension_Alert = yes	
+		}
+	}
+
+	else_if = {
+		limit = { 
+			check_variable = { global.TNO_superpower_tension^0 < 90.01 }
+		}
+		USA = {
+			End_Tension_Alert = yes
+		}
+		GER = {
+			End_Tension_Alert = yes	
+		}
+	}
+
+	else_if = {
+		limit = { 
+			check_variable = { global.TNO_superpower_tension^1 = 100 }
+		}
+		if = {
+			limit = {
+				OR = {
+					has_global_flag = TENSION_DISABLED_GAME_RULE
+					AND = {
+						GER = {
+							is_ai = yes
+						}
+						JAP = {
+							is_ai = yes
+						}
+						BRG = {
+							is_ai = yes
+						}
+						NOT = { has_global_flag = TENSION_ENABLED_GAME_RULE }
+					}
+				}
+			}
+			set_variable = { global.TNO_superpower_tension^1 = 99 }
+		}
+		else = {
+			JAP = {
+				country_event = {
+					id = tension_diplo_crisis.11
+				}
+			}
+		}
+	}
+
+	else_if = {
+		limit = { 
+			check_variable = { global.TNO_superpower_tension^1 > 90 }
+			check_variable = { global.TNO_superpower_tension^1 < 100 }
+		}
+		JAP = {
+			Start_Tension_Alert = yes
+		}
+		GER = {
+			Start_Tension_Alert = yes	
+		}
+	}
+
+	else_if = {
+		limit = { 
+			check_variable = { global.TNO_superpower_tension^1 < 90.01 }
+		}
+		JAP = {
+			End_Tension_Alert = yes
+		}
+		GER = {
+			End_Tension_Alert = yes	
+		}
+	}
+
+
+	else_if = {
+		limit = { 
+			check_variable = { global.TNO_superpower_tension^2 = 100 }
+		}
+		if = {
+			limit = {
+				OR = {
+					has_global_flag = TENSION_DISABLED_GAME_RULE
+					AND = {
+						JAP = {
+							is_ai = yes
+						}
+						USA = {
+							is_ai = yes
+						}
+						BRG = {
+							is_ai = yes
+						}
+						NOT = { has_global_flag = TENSION_ENABLED_GAME_RULE }
+					}
+				}
+			}
+			set_variable = { global.TNO_superpower_tension^2 = 99 }
+		}
+		else = {
+			USA = {
+				country_event = {
+					id = tension_diplo_crisis.21
+				}
+			}
+		}
+	}
+	else_if = {
+		limit = { 
+			check_variable = { global.TNO_superpower_tension^2 > 90 }
+			check_variable = { global.TNO_superpower_tension^2 < 100 }
+		}
+		JAP = {
+			Start_Tension_Alert = yes
+		}
+		USA = {
+			Start_Tension_Alert = yes	
+		}
+	}
+
+	else_if = {
+		limit = { 
+			check_variable = { global.TNO_superpower_tension^2 < 90.01 }
+		}
+		JAP = {
+			End_Tension_Alert = yes
+		}
+		USA = {
+			End_Tension_Alert = yes	
+		}
+	}
+}

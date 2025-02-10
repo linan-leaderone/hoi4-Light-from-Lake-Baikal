@@ -1,0 +1,484 @@
+
+OMO_2022_turn_pony_culture = {
+	set_variable = { nationality = 375 }
+	custom_effect_tooltip = OMO_pony_convert_culture
+	if = {
+		limit = {
+			NOT = {
+				is_core_of = ROOT
+			}
+		}
+		add_core_of = ROOT
+	}
+}
+
+OMO_2022_change_crystal_stockpile = {
+	add_to_variable = { OMO_pony_crystals = temp_crystals }
+	if = {
+		limit = {
+			check_variable = { temp_crystals < 0 }
+		}
+		multiply_temp_variable = { temp_crystals = -1 }
+		custom_effect_tooltip = OMO_decrease_crystal_stockpile
+	}
+	else = { custom_effect_tooltip = OMO_increase_crystal_stockpile }
+	clamp_variable = { var = OMO_pony_crystals min = 0 max = OMO_pony_crystals_cap }
+	add_to_variable = { OMO_pony_crystals_dirty = 0.001 }
+}
+
+OMO_2022_change_crystal_monthly_gain = {
+	add_to_variable = { OMO_pony_crystals_monthly = temp_cry_gain }
+	if = {
+		limit = {
+			check_variable = { temp_cry_gain < 0 }
+		}
+		multiply_temp_variable = { temp_cry_gain = -1 }
+		custom_effect_tooltip = OMO_decrease_crystal_monthly_gain
+	}
+	else = { custom_effect_tooltip = OMO_increase_crystal_monthly_gain }
+}
+
+OMO_2022_change_crystal_cap = {
+	add_to_variable = { OMO_pony_crystals_cap_base = temp_cry_cap }
+	if = {
+		limit = {
+			check_variable = { temp_cry_cap < 0 }
+		}
+		multiply_temp_variable = { temp_cry_cap = -1 }
+		custom_effect_tooltip = OMO_decrease_crystal_cap
+	}
+	else = { custom_effect_tooltip = OMO_increase_crystal_cap }
+	
+	set_variable = { OMO_pony_crystals_cap = OMO_pony_crystals_cap_base }
+	add_to_variable = { OMO_pony_crystals_cap = modifier@OMO_crystals_maximum_capacity_modifier }
+	clamp_variable = { var = OMO_pony_crystals_cap min = 0 max = 1000 }
+	clamp_variable = { var = OMO_pony_crystals min = 0 max = OMO_pony_crystals_cap }
+	OMO_2022_calculate_cap_indicator_x = yes
+}
+
+OMO_2022_change_crystal_stockpile_decision = {
+	multiply_temp_variable = { temp_crystals = OMO_crystal_multiplier }
+	subtract_from_temp_variable = { temp_crystals = 0.5 }
+	round_temp_variable = temp_crystals
+	OMO_2022_change_crystal_stockpile = yes
+	hidden_effect = {
+		scoped_sound_effect = pony_magic_sound
+	}
+}
+
+OMO_2022_change_crystal_multiplier = {
+	add_to_variable = { OMO_crystal_multiplier = temp_crystal_multi }
+	
+	set_temp_variable = { mult_display = OMO_crystal_multiplier }
+	add_to_temp_variable = { mult_display = temp_crystal_multi }
+	
+	if = {
+		limit = {
+			check_variable = { temp_crystal_multi > 0 }
+		}
+		custom_effect_tooltip = OMO_increase_crystal_multi
+	}
+	else = { custom_effect_tooltip = OMO_decrease_crystal_multi }
+}
+
+OMO_2022_calculate_cap_indicator_x = {
+	set_variable = { cap_indicator_x = OMO_pony_crystals_cap }
+	multiply_variable = { cap_indicator_x = 0.45 }
+	add_to_variable = { cap_indicator_x = 1 }
+	set_variable = { cap_text_x = cap_indicator_x }
+	subtract_from_variable = { cap_text_x = 29 }
+	add_to_variable = { OMO_pony_crystals_dirty = 0.001 }
+}
+
+OMO_2022_crystal_buffs_manipulate = {
+	custom_effect_tooltip = OMO_2022_crystal_buffs_change_main_tt
+	add_to_variable = { OMO_crystal_buffs_array^0 = temp_crystal_buffs_0 }	# Research Speed
+	add_to_variable = { OMO_crystal_buffs_array^1 = temp_crystal_buffs_1 }	# Construction Speed
+	add_to_variable = { OMO_crystal_buffs_array^2 = temp_crystal_buffs_2 }	# Factory Output
+	add_to_variable = { OMO_crystal_buffs_array^3 = temp_crystal_buffs_3 }	# Monthly Population
+	add_to_variable = { OMO_crystal_buffs_array^4 = temp_crystal_buffs_4 }	# Needed Consumer Goods
+	force_update_dynamic_modifier = yes
+	
+	clear_variable = temp_crystal_buffs_0
+	clear_variable = temp_crystal_buffs_1
+	clear_variable = temp_crystal_buffs_2
+	clear_variable = temp_crystal_buffs_3
+	clear_variable = temp_crystal_buffs_4
+}
+
+OMO_2022_warplan_decisions_init_cooldown = {
+	clr_country_flag = OMO_2022_far_eastern_war_doing_decision
+	set_country_flag = {
+		flag = OMO_2022_far_eastern_war_war_plan_cooldown
+		days = 70
+		value = 1
+	}
+}
+
+## Crisis ##
+OMO_2022_crisis_calculate_influences = {
+	set_variable = { OMO_2022_crisis_pony_influence = 100 }
+	subtract_from_variable = { OMO_2022_crisis_pony_influence = OMO_2022_crisis_human_influence }
+	if = { 
+		limit = {
+			has_game_rule = {
+				rule = OMO_2022_ROUTE
+				option = OMO_2022_ROUTE_BUCKHARIN
+			}
+		}
+		set_variable = { OMO_2022_crisis_pony_influence = 50 }
+		set_variable = { OMO_2022_crisis_human_influence = 50 }
+	}
+	if = {
+		limit = {
+			OR = {
+				check_variable = { OMO_2022_crisis_pony_influence > 75 }
+				check_variable = { OMO_2022_crisis_human_influence > 75 }
+			}
+			NOT = {
+				has_country_flag = OMO_2022_crisis_too_radical
+			}
+		}
+		set_country_flag = OMO_2022_crisis_too_radical
+		activate_mission = OMO_2022_impending_regime_collapse
+	}
+	else_if = {
+		limit = {
+			NOT = {
+				check_variable = { OMO_2022_crisis_pony_influence > 75 }
+				check_variable = { OMO_2022_crisis_human_influence > 75 }
+			}
+			has_country_flag = OMO_2022_crisis_too_radical
+		}
+		clr_country_flag = OMO_2022_crisis_too_radical
+		remove_mission = OMO_2022_impending_regime_collapse
+	}
+}
+
+OMO_2022_crisis_manipulate_influence = {
+	# NEGATIVE temp_influence means you're increasing PONY influence
+	# POSITIVE temp_influence means you're increasing HUMAN influence
+	
+	add_to_variable = { OMO_2022_crisis_human_influence = temp_influence }
+	if = {
+		limit = {
+			check_variable = { temp_influence < 0 }
+		}
+		multiply_temp_variable = { temp_influence = -1 }
+		custom_effect_tooltip = OMO_crisis_increase_pony_influence
+	}
+	else = {
+		custom_effect_tooltip = OMO_crisis_increase_human_influence
+	}
+	clear_variable = temp_influence
+	
+	clamp_variable = { var = OMO_2022_crisis_human_influence min = 0 max = 100 }
+	OMO_2022_crisis_calculate_influences = yes
+}
+
+d_OMO_2022_crisis_manipulate_influence = {
+	set_temp_variable = { temp_influence = args^0 }
+	OMO_2022_crisis_manipulate_influence = yes
+}
+
+OMO_2022_crisis_increase_human_breakdown = {
+	if = {
+		limit = {
+			has_idea = OMO_2022_crisis_human_unstable_2
+		}
+		swap_ideas = {
+			remove_idea = OMO_2022_crisis_human_unstable_2
+			add_idea = OMO_2022_crisis_human_unstable_3
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = OMO_2022_crisis_human_unstable_1
+		}
+		swap_ideas = {
+			remove_idea = OMO_2022_crisis_human_unstable_1
+			add_idea = OMO_2022_crisis_human_unstable_2
+		}
+	}
+	else = {
+		add_ideas = OMO_2022_crisis_human_unstable_1
+	}
+}
+
+OMO_2022_crisis_decrease_human_breakdown = {
+	if = {
+		limit = {
+			has_idea = OMO_2022_crisis_human_unstable_3
+		}
+		swap_ideas = {
+			remove_idea = OMO_2022_crisis_human_unstable_3
+			add_idea = OMO_2022_crisis_human_unstable_2
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = OMO_2022_crisis_human_unstable_2
+		}
+		swap_ideas = {
+			remove_idea = OMO_2022_crisis_human_unstable_2
+			add_idea = OMO_2022_crisis_human_unstable_1
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = OMO_2022_crisis_human_unstable_1
+		}
+		remove_ideas = OMO_2022_crisis_human_unstable_1
+	}
+}
+
+OMO_2022_crisis_increase_pony_breakdown = {
+	if = {
+		limit = {
+			has_idea = OMO_2022_crisis_pony_unstable_2
+		}
+		swap_ideas = {
+			remove_idea = OMO_2022_crisis_pony_unstable_2
+			add_idea = OMO_2022_crisis_pony_unstable_3
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = OMO_2022_crisis_pony_unstable_1
+		}
+		swap_ideas = {
+			remove_idea = OMO_2022_crisis_pony_unstable_1
+			add_idea = OMO_2022_crisis_pony_unstable_2
+		}
+	}
+	else = {
+		add_ideas = OMO_2022_crisis_pony_unstable_1
+	}
+}
+
+OMO_2022_crisis_decrease_pony_breakdown = {
+	if = {
+		limit = {
+			has_idea = OMO_2022_crisis_pony_unstable_3
+		}
+		swap_ideas = {
+			remove_idea = OMO_2022_crisis_pony_unstable_3
+			add_idea = OMO_2022_crisis_pony_unstable_2
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = OMO_2022_crisis_pony_unstable_2
+		}
+		swap_ideas = {
+			remove_idea = OMO_2022_crisis_pony_unstable_2
+			add_idea = OMO_2022_crisis_pony_unstable_1
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = OMO_2022_crisis_pony_unstable_1
+		}
+		remove_ideas = OMO_2022_crisis_pony_unstable_1
+	}
+}
+
+## Sibplan 2: Electric Boogaloo ##
+OMO_2022_sibplan_boogaloo_manipulate = {
+	custom_effect_tooltip = OMO_2022_crystal_sibplan_change_main_tt
+	add_to_variable = { OMO_sibplan_boogaloo_array^0 = temp_cry_sibplan_0 } # Maximum Efficiency
+	add_to_variable = { OMO_sibplan_boogaloo_array^1 = temp_cry_sibplan_1 } # Factory Output
+	add_to_variable = { OMO_sibplan_boogaloo_array^2 = temp_cry_sibplan_2 } # Resource Efficiency
+	add_to_variable = { OMO_sibplan_boogaloo_array^3 = temp_cry_sibplan_3 } # Misc Income
+	force_update_dynamic_modifier = yes
+	
+	clear_variable = temp_cry_sibplan_0
+	clear_variable = temp_cry_sibplan_1
+	clear_variable = temp_cry_sibplan_2
+	clear_variable = temp_cry_sibplan_3
+	
+	clamp_variable = { var = OMO_2022_sibplan_boogaloo_progress min = 0 max = 100 }
+	if = {
+		limit = {
+			check_variable = { OMO_2022_sibplan_boogaloo_progress = 100 }
+		}
+		clr_country_flag = OMO_2022_crystals_regional_sibplan
+	}
+}
+
+OMO_2022_sibplan_boogaloo_progress_add = {
+	add_to_variable = { OMO_2022_sibplan_boogaloo_progress = temp_progress }
+	custom_effect_tooltip = OMO_2022_crystal_sibplan_progress_add_tt
+	
+	set_temp_variable = { temp_progress_check = OMO_2022_sibplan_boogaloo_progress }
+	add_to_temp_variable = { temp_progress_check = temp_progress }
+	clamp_temp_variable = { var = temp_progress_check min = 0 max = 100 }
+	if = {
+		limit = {
+			check_variable = { temp_progress_check = 100 }
+		}
+		custom_effect_tooltip = OMO_2022_crystal_sibplan_progress_finished_tt
+		clr_country_flag = OMO_2022_crystals_regional_sibplan
+	}
+}
+
+OMO_2022_amplify_censibplan = {
+	custom_effect_tooltip = OMO_2022_amplify_censibplan_tt
+	multiply_variable = { RUS_siberian_plan_consumer_goods = 1.2 }
+	multiply_variable = { RUS_siberian_plan_construction_speed = 1.2 }
+	multiply_variable = { RUS_siberian_plan_max_efficiency = 1.2 }
+	multiply_variable = { RUS_siberian_plan_ic = 1.2 }
+	multiply_variable = { RUS_siberian_plan_resources = 1.2 }
+	multiply_variable = { RUS_siberian_plan_efficiency_gain = 1.2 }
+}
+
+## 3D Stuff ##
+OMO_2022_move_portal = {
+	set_entity_position = { 
+		id = 0401445
+		x = 5284
+		y = 1933
+		z = 0
+	}
+}
+OMO_2022_hide_portal = {
+	set_entity_position = { 
+		id = 0401445
+		x = 5284
+		y = 1933
+		z = -10
+	}
+}
+OMO_2022_idle_portal = {
+	set_entity_animation = { 
+		id = 0401445
+		animation = "idle"
+	}
+}
+OMO_2022_magic_portal = {
+	set_entity_animation = { 
+		id = 0401445
+		animation = "magic"
+	}
+}
+
+OMO_2022_nuke = {
+	goto_province = 5264
+	create_entity = { 
+		entity = TNO_AprilFools_nuke_entity
+		id = 0401446
+		province = 5264
+		min_zoom = -1
+	}
+	set_entity_animation = {
+		id = 0401446
+		animation = "attack"
+	}
+}
+
+## Project Ferus ##
+OMO_2022_Ferus_add_entry_effect = {
+	meta_effect = {
+		text = {
+			add_to_array = { OMO_2022_Ferus_[CHAR]_Entries = temp_id }
+		}
+		CHAR = "[?temp_char]"
+	}
+	for_each_loop = {
+		array = OMO_2022_Ferus_Entries_Array
+		if = {
+			limit = {
+				check_variable = { v = temp_char }
+			}
+			set_temp_variable = { i_check = i }
+			set_temp_variable = { break = 1 }
+		}
+	}
+	add_to_temp_variable = { i_check = 1 }
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { OMO_2022_Ferus_Entries_Array^i_check > 100 }
+				check_variable = { OMO_2022_Ferus_Entries_Array^i_check = 0 }
+			}
+		}
+		for_each_loop = {
+			array = OMO_2022_Ferus_Entries_Array
+			if = {
+				limit = {
+					check_variable = { v = temp_char }
+				}
+				set_temp_variable = { current_char_i = i }
+			}
+			if = {
+				limit = {
+					NOT = {
+						check_variable = { v = temp_char }
+					}
+					has_variable = current_char_i
+				}
+				if = {
+					limit = {
+						check_variable = { v > 100 }
+						check_variable = { i > current_char_i }
+					}
+					set_temp_variable = { break = 1 }
+				}
+				if = { # Why do I even have to do this, pdx woe
+					limit = {
+						NOT = { check_variable = { break > 0 } }
+					}
+					set_temp_variable = { target = i }
+					add_to_temp_variable = { target = 1 }
+				}
+			}
+		}
+		add_to_array = {
+			array = OMO_2022_Ferus_Entries_Array
+			value = temp_id
+			index = target
+		}
+	}
+	set_temp_variable = { va = temp_char }
+	custom_effect_tooltip = OMO_2022_ferus_add_new_entry_tt
+	clear_variable = va
+}
+
+OMO_2022_Ferus_debug_spawn_all = {
+	country_event = OMO_project_ferus.33
+	country_event = OMO_project_ferus.7
+	country_event = OMO_project_ferus.8
+	country_event = OMO_project_ferus.1
+	country_event = OMO_project_ferus.16
+	country_event = OMO_project_ferus.17
+	country_event = OMO_project_ferus.2
+	country_event = OMO_project_ferus.20
+	country_event = OMO_project_ferus.27
+	country_event = OMO_project_ferus.3
+	country_event = OMO_project_ferus.22
+	country_event = OMO_project_ferus.23
+	country_event = OMO_project_ferus.29
+	country_event = OMO_project_ferus.24
+	country_event = OMO_project_ferus.19
+	country_event = OMO_project_ferus.30
+	country_event = OMO_project_ferus.28
+	country_event = OMO_project_ferus.4
+	country_event = OMO_project_ferus.9
+	country_event = OMO_project_ferus.5
+	country_event = OMO_project_ferus.10
+	country_event = OMO_project_ferus.36
+	country_event = OMO_project_ferus.37
+	country_event = OMO_project_ferus.38
+	country_event = OMO_project_ferus.41
+	country_event = OMO_project_ferus.11
+	country_event = OMO_project_ferus.21
+	country_event = OMO_project_ferus.39
+	country_event = OMO_project_ferus.34
+	country_event = OMO_project_ferus.40
+	country_event = OMO_project_ferus.31
+	country_event = OMO_project_ferus.32
+	country_event = OMO_project_ferus.13
+	country_event = OMO_project_ferus.25
+	country_event = OMO_project_ferus.14
+	country_event = OMO_project_ferus.15
+}

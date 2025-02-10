@@ -1,0 +1,3093 @@
+FIN_initialise_national_popularities = { #Temporary system to be used until full parliament mechanic is created.
+	clear_array = FIN_party_pops
+	add_to_array = { FIN_party_pops = 12 } #SDTP
+	add_to_array = { FIN_party_pops = 2 } #PKP
+	add_to_array = { FIN_party_pops = 37 } #SDP
+	add_to_array = { FIN_party_pops = 5 } #SKP
+	add_to_array = { FIN_party_pops = 31 } #ML
+	add_to_array = { FIN_party_pops = 7 } #RKP
+	add_to_array = { FIN_party_pops = 1 } #AA - Note - not technically used because AA is just hardcoded to always have one seat.
+	add_to_array = { FIN_party_pops = 4 } #SMP
+	add_to_array = { FIN_party_pops = 19 } #Kok.
+	add_to_array = { FIN_party_pops = 6 } #IKL
+
+	clear_array = FIN_parliament_seats
+	add_to_array = { FIN_parliament_seats = 0 } #SDTP
+	add_to_array = { FIN_parliament_seats = 0 } #PKP
+	add_to_array = { FIN_parliament_seats = 74 } #SDP
+	add_to_array = { FIN_parliament_seats = 7 } #SKP
+	add_to_array = { FIN_parliament_seats = 53 } #ML
+	add_to_array = { FIN_parliament_seats = 13 } #RKP
+	add_to_array = { FIN_parliament_seats = 1 } #AA
+	add_to_array = { FIN_parliament_seats = 3 } #SMP
+	add_to_array = { FIN_parliament_seats = 38 } #Kok.
+	add_to_array = { FIN_parliament_seats = 11 } #IKL
+
+	clear_array = FIN_party_legality
+	add_to_array = { FIN_party_legality = 0 } #SDTP
+	add_to_array = { FIN_party_legality = 0 } #PKP
+	add_to_array = { FIN_party_legality = 1 } #SDP
+	add_to_array = { FIN_party_legality = 1 } #SKP
+	add_to_array = { FIN_party_legality = 1 } #ML
+	add_to_array = { FIN_party_legality = 1 } #RKP
+	add_to_array = { FIN_party_legality = 0 } #AA - One flat seat is just going to be modelled as the AA being illegal.
+	add_to_array = { FIN_party_legality = 1 } #SMP
+	add_to_array = { FIN_party_legality = 1 } #Kok.
+	add_to_array = { FIN_party_legality = 1 } #IKL
+
+	clear_array = FIN_coalition
+	add_to_array = { FIN_coalition = 0 } #SDTP
+	add_to_array = { FIN_coalition = 0 } #PKP
+	add_to_array = { FIN_coalition = 0 } #SDP
+	add_to_array = { FIN_coalition = 1 } #SKP
+	add_to_array = { FIN_coalition = 1 } #ML
+	add_to_array = { FIN_coalition = 0 } #RKP
+	add_to_array = { FIN_coalition = 0 } #AA
+	add_to_array = { FIN_coalition = 0 } #SMP
+	add_to_array = { FIN_coalition = 1 } #Kok.
+	add_to_array = { FIN_coalition = 1 } #IKL
+
+	set_variable = { FIN_temp_parliament_coalition_seats = 109 }
+}
+
+FIN_legalise_all_parties = {
+	set_variable = { FIN_party_legality^0 = 1 }
+	set_variable = { FIN_party_legality^1 = 1 }
+}
+
+FIN_assemble_parliament_backend = {
+	set_temp_variable = { total = 0 }
+	for_each_loop = {
+		array = FIN_party_pops
+		if = {
+			limit = {
+				check_variable = { FIN_party_legality^i = 1 }
+			}
+			add_to_temp_variable = { total = FIN_party_pops^i }
+		}
+	}
+	set_temp_variable = { percent_modifier = 100 }
+	divide_temp_variable = { percent_modifier = total }
+	add_to_array = { FIN_party_percentages = 0 }
+	add_to_array = { FIN_parliament_seats = 0 }
+	set_variable = { validator = 0 }
+	for_each_loop = {
+		array = FIN_party_pops
+		if = {
+			limit = {
+				check_variable = { FIN_party_legality^i = 1 }
+			}
+			set_variable = { FIN_party_percentages^i = FIN_party_pops^i }
+			multiply_variable = { FIN_party_percentages^i = percent_modifier }
+			divide_variable = { FIN_party_percentages^i = 100 }
+			set_variable = { FIN_parliament_seats^i = 199 }
+			multiply_variable = { FIN_parliament_seats^i = FIN_party_percentages^i }
+			round_variable = FIN_parliament_seats^i
+			add_to_variable = { validator = FIN_parliament_seats^i }
+		}
+	}
+	set_variable = { FIN_parliament_seats^6 = 1 } #Aland seat.
+	add_to_variable = { validator = 1 }
+
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { validator = 200 }
+			}
+		}
+		set_temp_variable = { valinv = 200 }
+		subtract_from_temp_variable = { valinv = validator }
+		add_to_variable = { FIN_parliament_seats^5 = valinv }
+	}
+
+	FIN_assemble_parliament_display_array = yes
+
+	log = "SDTP Seats: [?FIN_parliament_seats^0]"
+	log = "PKP Seats: [?FIN_parliament_seats^1]"
+	log = "SDP Seats: [?FIN_parliament_seats^2]"
+	log = "SKP Seats: [?FIN_parliament_seats^3]"
+	log = "ML Seats: [?FIN_parliament_seats^4]"
+	log = "RKP Seats: [?FIN_parliament_seats^5]"
+	log = "AA Seats: [?FIN_parliament_seats^6]"
+	log = "SMP Seats: [?FIN_parliament_seats^7]"
+	log = "Kok. Seats: [?FIN_parliament_seats^8]"
+	log = "IKL Seats: [?FIN_parliament_seats^9]"
+}
+
+FIN_parliament_coalition_calculations = {
+	clear_array = FIN_coalition_scoring
+	clear_array = coalition_seat_percents
+	clear_array = coalition_seat_percents_sort
+	set_variable = { FIN_temp_parliament_coalition_seats = 0 }
+	set_variable = { FIN_coalition_stability = 0 }
+	set_variable = { FIN_ideal_stability = 0 }
+	set_variable = { FIN_leading_party = 0 }
+	for_each_loop = {
+		array = FIN_coalition
+		set_variable = { FIN_coalition^i = 0 }
+	}
+
+	# Leading party is determined by its seat count times how submissive and coalitionable it is.
+	set_variable = { current_pid = 0 }
+	for_each_loop = {
+		array = FIN_parliament_seats
+		value = val
+		index = idx
+		break = brk
+		set_variable = { party_coalition_score = 0 }
+		meta_effect = {
+			text = {
+				for_each_loop = {
+					array = FIN_party_[FIN_party_id]_relations
+					value = val2
+					index = idx2
+					break = brk2
+
+					set_variable = { party_coalition_seat_bonus = FIN_party_[FIN_party_id]_relations^idx2 }
+					set_temp_variable = { subtractor = party_coalition_seat_bonus }
+					add_to_temp_variable = { subtractor = 1 }
+					divide_variable = { party_coalition_seat_bonus = subtractor }
+					multiply_variable = { party_coalition_seat_bonus = FIN_parliament_seats^idx2 }
+					add_to_variable = { party_coalition_score = party_coalition_seat_bonus }
+				}
+			}
+			FIN_party_id = "[?current_pid]"
+		}
+		log = "[?current_pid]"
+		log = "[?party_coalition_score]"
+		add_to_variable = { current_pid = 1 }
+		if = {
+			limit = {
+				NOT = {
+					check_variable = { FIN_parliament_seats^idx = 0 }
+				}
+			}
+			set_variable = { coalition_score_seats = FIN_parliament_seats^idx }
+		}
+		else = {
+			set_variable = { coalition_score_seats = 0 }
+		}
+		log = "[?coalition_score_seats]"
+		set_variable = { coalition_score_final = coalition_score_seats }
+		multiply_variable = { coalition_score_final = party_coalition_score }
+		multiply_variable = { coalition_score_seats = 50 }
+		add_to_variable = { coalition_score_final = coalition_score_seats }
+		add_to_array = { FIN_coalition_seat_bonuses = coalition_score_seats }
+		add_to_array = { FIN_coalition_scoring = coalition_score_final }
+		log = "[?coalition_score_final]"
+
+		log = "---NEXT PARTY---"
+	}
+	clear_variable = current_pid
+
+	find_highest_in_array = {
+		array = FIN_coalition_scoring
+		value = leading_party_val
+		index = leading_party_idx
+	}
+	set_variable = { FIN_leading_party = leading_party_idx }
+	set_variable = { FIN_coalition^FIN_leading_party = 1 }
+	add_to_variable = { FIN_temp_parliament_coalition_seats = FIN_parliament_seats^FIN_leading_party }
+	set_variable = { FIN_num_parties_in_coalition = 1 }
+	set_variable = { FIN_coalition_scoring^leading_party_idx = 0 }
+
+	set_variable = { current_pid = 0 }
+
+	for_each_loop = {
+		array = FIN_coalition_scoring
+		set_temp_variable = { adjustor = FIN_coalition_seat_bonuses^i }
+		multiply_variable = { adjustor = 50 }
+		subtract_from_variable = { FIN_coalition_scoring^i = adjustor }
+		meta_effect = {
+			text = {
+				for_each_loop = {
+					array = FIN_party_[FIN_party_id]_relations
+					value = valrel
+					index = idxrel
+					break = brkrel
+
+					set_temp_variable = { finmult = FIN_party_[FIN_party_id]_relations^leading_party_idx }
+				}
+			}
+			FIN_party_id = "[?current_pid]"
+		}
+		multiply_variable = { FIN_coalition_scoring^i = finmult }
+		log = "Multiplied party [?current_pid]'s value by [?finmult] to [?FIN_coalition_scoring^i]."
+		add_to_variable = { current_pid = 1 }
+	}
+
+	clear_variable = current_pid
+
+	### Checking parties.
+	for_each_loop = {
+		array = FIN_parliament_seats
+		value = val3
+		index = idx3
+		break = brk3
+
+		find_highest_in_array = {
+			array = FIN_coalition_scoring
+			value = leading_party_val
+			index = leading_party_idx
+		}
+
+		set_variable = { current_pid = leading_party_idx }
+		set_temp_variable = { FIN_add_to_coalition = 0 }
+
+		log = "------ Examining party [?current_pid] - score [?leading_party_val] ------"
+		for_each_loop = {
+			array = FIN_coalition
+			value = val4
+			index = idx4
+			break = brk4
+
+			if = {
+				limit = {
+					check_variable = { FIN_coalition^idx4 = 1 }
+				}
+				meta_effect = {
+					text = {
+						set_temp_variable = { diag = FIN_party_[FIN_party_id]_relations^idx4 }
+						if = {
+							limit = {
+								NOT = {
+									check_variable = { diag = 0 }
+								}
+							}
+							add_to_temp_variable = { FIN_add_to_coalition = 1 }
+							add_to_variable = { FIN_coalition_stability = diag }
+							add_to_variable = { FIN_ideal_stability = 2 }
+						}
+					}
+					FIN_party_id = "[?current_pid]"
+				}
+				log = "Party [?idx4] IS in the coalition."
+				log = "Checked party [?idx4]'s relations to party [?current_pid]"
+				log = "Value equals [?diag]"
+				log = "Variable set to [?FIN_add_to_coalition] in response."
+			}
+			else = {
+				log = "Party [?idx4] is not in the coalition!"
+			}
+		}
+		random_list = { #Note - this is really lazy code, and I'll fix it later with a function of coalition power.
+			50 = {
+				if = {
+					limit = {
+						check_variable = { FIN_temp_parliament_coalition_seats > 100 }
+					}
+					add_to_temp_variable = { brk3 = 1 }
+					log = "Ended script!"
+				}
+			}
+			50 = {
+				if = {
+					limit = {
+						check_variable = { FIN_temp_parliament_coalition_seats > 120 }
+					}
+					add_to_temp_variable = { brk3 = 1 }
+					log = "Ended script!"
+				}
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_add_to_coalition = FIN_num_parties_in_coalition }
+			}
+			add_to_variable = { FIN_temp_parliament_coalition_seats = FIN_parliament_seats^current_pid }
+			set_variable = { FIN_coalition^current_pid = 1 }
+			add_to_variable = { FIN_num_parties_in_coalition = 1 }
+			log = "Added party [?current_pid] to coalition."
+			log = "Currently [?FIN_num_parties_in_coalition] parties in coalition, controlling [?FIN_temp_parliament_coalition_seats] seats."
+		}
+		else = {
+			log = "Check FAILED ([?FIN_add_to_coalition]/[?FIN_num_parties_in_coalition])"
+		}
+		set_variable = { FIN_coalition_scoring^leading_party_idx = 0 }
+		log = "Removed party [?leading_party_idx] from contention."
+	}
+
+	log = "Coalition Stability - [?FIN_coalition_stability] out of [?FIN_ideal_stability]."
+	divide_variable = { FIN_coalition_stability = FIN_ideal_stability }
+	log = "Coalition Stability - [?FIN_coalition_stability]"
+
+	# Check this I guess.
+	if = {
+		limit = {
+			AND = {
+				check_variable = { FIN_coalition^5 = 1 }
+				check_variable = { FIN_coalition^6 = 0 }
+			}
+		}
+		set_variable = { FIN_coalition^6 = 1 }
+		add_to_variable = { FIN_temp_parliament_coalition_seats = 1 }
+	}
+	clear_variable = current_pid
+
+	for_each_loop = {
+		array = FIN_parliament_seats
+		if = {
+			limit = {
+				check_variable = { FIN_coalition^i = 1 }
+			}
+			add_to_array = { coalition_seat_percents = FIN_parliament_seats^i }
+			add_to_array = { coalition_seat_percents_sort = FIN_parliament_seats^i }
+			divide_variable = { coalition_seat_percents^i = FIN_temp_parliament_coalition_seats }
+			divide_variable = { coalition_seat_percents_sort^i = FIN_temp_parliament_coalition_seats }
+			multiply_variable = { coalition_seat_percents^i = 100 }
+			multiply_variable = { coalition_seat_percents_sort^i = 100 }
+		}
+		else = {
+			add_to_array = { coalition_seat_percents = 0 }
+			add_to_array = { coalition_seat_percents_sort = 0 }
+		}
+	}
+
+	FIN_assign_ministers = yes
+}
+
+FIN_assign_ministers = { #NOTE - if I feel like it, I'll simulate a Bahnzaf power index through some means. For now this is going to use proportional weighting within the coalition, plus some hardcoded rules.
+	for_each_loop = {
+		array = FIN_parliament_seats
+		find_highest_in_array = {
+			array = coalition_seat_percents_sort
+			value = percent_highest_val
+			index = percent_highest_idx
+		}
+		set_variable = { coalition_parties_sorted^i = percent_highest_idx }
+		set_variable = { coalition_seat_percents_sort^percent_highest_idx = 0 }
+		log = "Set position [?i] to [?percent_highest_idx]"
+	}
+	#Easiest part. Prime Minister is the leading party's candidate.
+	log = "ALLOCATING PRIME MINISTER"
+	if = {
+		limit = {
+			NOT = {
+				has_government = fascism
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_coalition_stability > 0.9 }
+			}
+			set_variable = { FIN_prime_minister_party = FIN_leading_party }
+			log = "Coalition Instability [?FIN_coalition_stability] - [?FIN_leading_party] remains leading party."
+			FIN_allocate_prime_minister = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { FIN_coalition_stability > 0.8 }
+			}
+			random_list = {
+				75 = {
+					set_variable = { FIN_prime_minister_party = FIN_leading_party }
+					log = "Coalition Instability [?FIN_coalition_stability] - [?FIN_leading_party] remains leading party."
+					FIN_allocate_prime_minister = yes
+				}
+				25 = {
+					set_variable = { FIN_leading_party = coalition_parties_sorted^1 }
+					set_variable = { FIN_prime_minister_party = coalition_parties_sorted^1 }
+					log = "Coalition Instability [?FIN_coalition_stability] - [?FIN_leading_party] chosen as leading party."
+					FIN_allocate_prime_minister = yes
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = { FIN_coalition_stability > 0.7 }
+			}
+			random_list = {
+				50 = {
+					set_variable = { FIN_prime_minister_party = FIN_leading_party }
+					log = "Coalition Instability [?FIN_coalition_stability] - party [?FIN_leading_party] remains leading party."
+					FIN_allocate_prime_minister = yes
+				}
+				35 = {
+					set_variable = { FIN_leading_party = coalition_parties_sorted^1 }
+					set_variable = { FIN_prime_minister_party = coalition_parties_sorted^1 }
+					log = "Coalition Instability [?FIN_coalition_stability] - party [?FIN_leading_party] chosen as leading party in response."
+					FIN_allocate_prime_minister = yes
+				}
+				15 = {
+					set_variable = { FIN_leading_party = coalition_parties_sorted^2 }
+					set_variable = { FIN_prime_minister_party = coalition_parties_sorted^2 }
+					log = "Coalition Instability [?FIN_coalition_stability] - party [?FIN_leading_party] chosen as leading party in response."
+					FIN_allocate_prime_minister = yes
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = { FIN_coalition_stability > 0.6 }
+			}
+			random_list = {
+				33 = {
+					set_variable = { FIN_prime_minister_party = FIN_leading_party }
+					log = "Coalition Instability [?FIN_coalition_stability] - party [?FIN_leading_party] remains leading party."
+					FIN_allocate_prime_minister = yes
+				}
+				33 = {
+					set_variable = { FIN_leading_party = coalition_parties_sorted^1 }
+					set_variable = { FIN_prime_minister_party = coalition_parties_sorted^1 }
+					log = "Coalition Instability [?FIN_coalition_stability] - party [?FIN_leading_party] chosen as leading party in response."
+					FIN_allocate_prime_minister = yes
+				}
+				33 = {
+					set_variable = { FIN_leading_party = coalition_parties_sorted^2 }
+					set_variable = { FIN_prime_minister_party = coalition_parties_sorted^2 }
+					log = "Coalition Instability [?FIN_coalition_stability] - party [?FIN_leading_party] chosen as leading party in response."
+					FIN_allocate_prime_minister = yes
+				}
+			}
+		}
+
+		else_if = {
+			limit = {
+				check_variable = { FIN_coalition_stability < 0.601 }
+			}
+			random_list = {
+				20 = {
+					set_variable = { FIN_prime_minister_party = FIN_leading_party }
+					log = "Coalition Instability [?FIN_coalition_stability] - party [?FIN_leading_party] remains leading party."
+					FIN_allocate_prime_minister = yes
+				}
+				40 = {
+					set_variable = { FIN_leading_party = coalition_parties_sorted^1 }
+					set_variable = { FIN_prime_minister_party = coalition_parties_sorted^1 }
+					log = "Coalition Instability [?FIN_coalition_stability] - party [?FIN_leading_party] chosen as leading party in response."
+					FIN_allocate_prime_minister = yes
+
+				}
+				40 = {
+					set_variable = { FIN_leading_party = coalition_parties_sorted^2 }
+					set_variable = { FIN_prime_minister_party = coalition_parties_sorted^2 }
+					log = "Coalition Instability [?FIN_coalition_stability] - party [?FIN_leading_party] chosen as leading party in response."
+					FIN_allocate_prime_minister = yes
+				}
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			has_government = fascism
+		}
+		set_variable = { FIN_leading_party = 9 }
+		set_variable = { FIN_prime_minister_party = 9 }
+		FIN_allocate_prime_minister = yes
+	}
+
+	#Foreign minister is either the second largest party's candidate, or the leading party's candidate if the leading party makes up more than 55% of the coalition.
+	log = "ALLOCATING FOREIGN MINISTER"
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { coalition_seat_percents^FIN_leading_party > 55 }
+			}
+		}
+		set_variable = { FIN_foreign_minister_party = coalition_parties_sorted^1 }
+		log = "Second largest party ([?FIN_foreign_minister_party])."
+		set_variable = { coalition_seat_percents^idx_highest = archive }
+	}
+	else = {
+		set_variable = { FIN_foreign_minister_party = coalition_parties_sorted^0 }
+	}
+	log = "AI selected party [?FIN_foreign_minister_party] foreign minister."
+	FIN_allocate_foreign_minister = yes
+
+	#Economy and Security ministers are decided by random AI chance
+	log = "ALLOCATING ECONOMY MINISTER"
+	FIN = {
+		country_event = FIN_SKELETON.101
+	}
+	if = {
+		limit = {
+			AND = {
+				check_variable = { FIN_economy_minister_party = 0 }
+				check_variable = { FIN_coalition^0 = 0 }
+			}
+		}
+		random_list = {
+			70 = {
+				set_variable = { FIN_security_minister_party = coalition_parties_sorted^0 }
+			}
+			30 = {
+				set_variable = { FIN_security_minister_party = coalition_parties_sorted^1 }
+			}
+		}
+	}
+	log = "AI selected party [?FIN_economy_minister_party] economy minister."
+	FIN_allocate_economy_minister = yes
+
+	log = "ALLOCATING SECURITY MINISTER"
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { coalition_seat_percents^FIN_leading_party > 55 }
+			}
+		}
+		random_list = {
+			85 = {
+				set_variable = { FIN_security_minister_party = coalition_parties_sorted^0 }
+			}
+			15 = {
+				set_variable = { FIN_security_minister_party = coalition_parties_sorted^1 }
+			}
+		}
+	}
+	else = {
+		random_list = {
+			60 = {
+				set_variable = { FIN_security_minister_party = coalition_parties_sorted^0 }
+			}
+			40 = {
+				set_variable = { FIN_security_minister_party = coalition_parties_sorted^1 }
+			}
+		}
+	}
+	log = "AI selected party [?FIN_security_minister_party] security minister."
+	FIN_allocate_security_minister = yes
+}
+
+FIN_allocate_prime_minister = {
+	# The only reason this isn't better is because no OOP.
+	remove_ideas_with_trait = head_of_government
+	if = {
+		limit = { #Before July 7th, 1966
+			date < 1966.07.07
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1963_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 2 }
+					}
+					has_game_rule = {
+						rule = FIN_1963_ELECTIONS
+						option = FIN_1963_ELECTIONS_SDP
+					}
+				}
+			}
+			log = "Elected Erkki Lindfors (SDP) as Finnish PM."
+			add_ideas = FIN_Erkki_Lindfors_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.3
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1963_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 4 }
+					}
+					has_game_rule = {
+						rule = FIN_1963_ELECTIONS
+						option = FIN_1963_ELECTIONS_ML
+					}
+				}
+			}
+			log = "Elected Johannes Virolainen (ML) as Finnish PM."
+			add_ideas = FIN_Johannes_Virolainen_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.1
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1963_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 5 }
+					}
+					has_game_rule = {
+						rule = FIN_1963_ELECTIONS
+						option = FIN_1963_ELECTIONS_RKP
+					}
+				}
+			}
+			log = "Elected Johan Otto Söderhjelm (RKP) as Finnish PM."
+			add_ideas = FIN_Johan_Otto_Soderhjelm_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.5
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = FIN_1963_ELECTIONS
+					option = DEFAULT
+				}
+				check_variable = { FIN_prime_minister_party = 6 }
+			}
+			log = "Elected Johan Otto Söderhjelm (RKP) as Finnish PM."
+			add_ideas = FIN_Johan_Otto_Soderhjelm_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.5
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1963_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 7 }
+					}
+					has_game_rule = {
+						rule = FIN_1963_ELECTIONS
+						option = FIN_1963_ELECTIONS_SMP
+					}
+				}
+			}
+			log = "Elected Veikko VENNAMO! (SMP) as Finnish PM."
+			add_ideas = FIN_Veikko_Vennamo_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.4
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1963_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 8 }
+					}
+					has_game_rule = {
+						rule = FIN_1963_ELECTIONS
+						option = FIN_1963_ELECTIONS_KOK
+					}
+				}
+			}
+			log = "Elected Niilo Kosola (Kok.) as Finnish PM."
+			add_ideas = FIN_Niilo_Kosola_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.2
+					days = 1
+				}
+			}
+		}
+	}
+	else_if = {
+		limit = { #Before July 5th, 1969
+			date < 1969.07.05
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 2 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = FIN_1966_ELECTIONS_SDP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Mauno Koivisto (SDP) as Finnish PM."
+			add_ideas = FIN_Mauno_Koivisto_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.17
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 3 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = FIN_1966_ELECTIONS_SKP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Ensio Kytömaa (SKP) as Finnish PM."
+			add_ideas = FIN_Ensio_Kytomaa_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.19
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 4 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = FIN_1966_ELECTIONS_ML
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Veikko Pihlajamäki (ML) as Finnish PM."
+			add_ideas = FIN_Veikko_Pihlajamaki_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.16
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 5 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = FIN_1966_ELECTIONS_RKP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Jan-Magnus Jansson (RKP) as Finnish PM."
+			add_ideas = FIN_Jan_Magnus_Jansson_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.20
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = FIN_1966_ELECTIONS
+					option = DEFAULT
+				}
+				check_variable = { FIN_prime_minister_party = 6 }
+			}
+			log = "Elected Jan-Magnus Jansson (RKP) as Finnish PM."
+			add_ideas = FIN_Jan_Magnus_Jansson_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.20
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 7 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = FIN_1966_ELECTIONS_SMP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Veikko VENNAMO! (SMP) as Finnish PM."
+			add_ideas = FIN_Veikko_Vennamo_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.21
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 8 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1966_ELECTIONS
+							option = FIN_1966_ELECTIONS_KOK
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Tuure Junnila (Kok.) as Finnish PM."
+			add_ideas = FIN_Tuure_Junnila_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.15
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_prime_minister_party = 9 }
+			}
+			log = "Elected Paavo Susitaival (IKL) as Finnish PM."
+			add_ideas = FIN_Paavo_Susitaival_hog
+			if = {
+				limit = {
+					has_country_leader = {
+						character = FIN_Lauri_Torni
+						ruling_only = yes
+					}
+				}
+				remove_ideas = FIN_Second_Crisis_Of_Democracy
+				every_country = {
+					limit = { is_ai = no }
+					news_event = {
+						id = FIN_WORLD.18
+						days = 1
+					}
+				}
+			}
+			else = {
+				# fascists come to power without civil war
+			}
+		}
+	}
+	else_if = {
+		limit = { #Before July 7th, 1972
+			date < 1972.07.07
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1969_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 0 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1969_ELECTIONS
+							option = FIN_1969_ELECTIONS_SDTP
+						}
+						check_variable = { FIN_party_legality^0 = 1 }
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Aarne Saarinen (SDTP) as Finnish PM."
+			add_ideas = FIN_Aarne_Saarinen_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.31
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1969_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1969_ELECTIONS
+									option = FIN_1969_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 2 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1969_ELECTIONS
+							option = FIN_1969_ELECTIONS_SDP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Mauno Koivisto (SDP) as Finnish PM."
+			add_ideas = FIN_Mauno_Koivisto_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.30
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1969_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1969_ELECTIONS
+									option = FIN_1969_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 3 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1969_ELECTIONS
+							option = FIN_1969_ELECTIONS_SKP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Teuvo Aura (SKP) as Finnish PM."
+			add_ideas = FIN_Teuvo_Aura_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.33
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1969_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1969_ELECTIONS
+									option = FIN_1969_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 4 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1969_ELECTIONS
+							option = FIN_1969_ELECTIONS_ML
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Veikko Pihlajamäki (ML) as Finnish PM."
+			add_ideas = FIN_Veikko_Pihlajamaki_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.29
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1969_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1969_ELECTIONS
+									option = FIN_1969_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 5 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1969_ELECTIONS
+							option = FIN_1969_ELECTIONS_RKP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Jan-Magnus Jansson (RKP) as Finnish PM."
+			add_ideas = FIN_Jan_Magnus_Jansson_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.34
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					has_game_rule = {
+						rule = FIN_1969_ELECTIONS
+						option = DEFAULT
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1969_ELECTIONS
+							option = FIN_1969_ELECTIONS_SDTP
+						}
+						NOT = {
+							check_variable = { FIN_party_legality^0 = 1 }
+						}
+					}
+				}
+				check_variable = { FIN_prime_minister_party = 6 }
+			}
+			log = "Elected Jan-Magnus Jansson (RKP) as Finnish PM."
+			add_ideas = FIN_Jan_Magnus_Jansson_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.34
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1969_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1969_ELECTIONS
+									option = FIN_1969_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 7 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1969_ELECTIONS
+							option = FIN_1969_ELECTIONS_SMP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Veikko VENNAMO! (SMP) as Finnish PM."
+			add_ideas = FIN_Veikko_Vennamo_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.35
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1969_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1969_ELECTIONS
+									option = FIN_1969_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 8 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1969_ELECTIONS
+							option = FIN_1969_ELECTIONS_KOK
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Kullervo Rainio (Kok.) as Finnish PM."
+			add_ideas = FIN_Kullervo_Rainio_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.28
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_prime_minister_party = 9 }
+			}
+			log = "Elected Paavo Susitaival (IKL) as Finnish PM."
+			add_ideas = FIN_Paavo_Susitaival_hog
+			if = {
+				limit = {
+					has_country_leader = {
+						character = FIN_Elias_Simojoki
+						ruling_only = yes
+					}
+				}
+				remove_ideas = FIN_Second_Crisis_Of_Democracy
+				every_country = {
+					limit = { is_ai = no }
+					news_event = {
+						id = FIN_WORLD.32
+						days = 1
+					}
+				}
+			}
+			else = {
+				# fascists come to power without civil war
+			}
+		}
+	}
+	else_if = {
+		limit = { #Before July 7th, 1975
+			date < 1975.07.07
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FIN_1972_ELECTIONS
+							option = DEFAULT
+						}
+						check_variable = { FIN_prime_minister_party = 0 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1972_ELECTIONS
+							option = FIN_1972_ELECTIONS_SDTP
+						}
+						check_variable = { FIN_party_legality^0 = 1 }
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Aarne Saarinen (SDTP) as Finnish PM."
+			add_ideas = FIN_Aarne_Saarinen_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.39
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1972_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1972_ELECTIONS
+									option = FIN_1972_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 2 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1972_ELECTIONS
+							option = FIN_1972_ELECTIONS_SDP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Pirkko Työläjärvi (SDP) as Finnish PM."
+			add_ideas = FIN_Pirkko_Tyolajarvi_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.38
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1972_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1972_ELECTIONS
+									option = FIN_1972_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 3 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1972_ELECTIONS
+							option = FIN_1972_ELECTIONS_SKP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Olavi Borg (SKP) as Finnish PM."
+			add_ideas = FIN_Olavi_Borg_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.41
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1972_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1972_ELECTIONS
+									option = FIN_1972_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 4 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1972_ELECTIONS
+							option = FIN_1972_ELECTIONS_ML
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Taisto Tähkämaa (ML) as Finnish PM."
+			add_ideas = FIN_Taisto_Tahkamaa_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.37
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1972_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1972_ELECTIONS
+									option = FIN_1972_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 5 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1972_ELECTIONS
+							option = FIN_1972_ELECTIONS_RKP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Carl Olof Tallgren (RKP) as Finnish PM."
+			add_ideas = FIN_Carl_Olaf_Talgren_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.42
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					has_game_rule = {
+						rule = FIN_1972_ELECTIONS
+						option = DEFAULT
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1972_ELECTIONS
+							option = FIN_1972_ELECTIONS_SDTP
+						}
+						NOT = {
+							check_variable = { FIN_party_legality^0 = 1 }
+						}
+					}
+				}
+				check_variable = { FIN_prime_minister_party = 6 }
+			}
+			log = "Elected Carl Olof Tallgren (RKP) as Finnish PM."
+			add_ideas = FIN_Carl_Olaf_Talgren_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.42
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1972_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1972_ELECTIONS
+									option = FIN_1972_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 7 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1972_ELECTIONS
+							option = FIN_1972_ELECTIONS_SMP
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Veikko VENNAMO! (SMP) as Finnish PM."
+			add_ideas = FIN_Veikko_Vennamo_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.43
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							has_game_rule = {
+								rule = FIN_1972_ELECTIONS
+								option = DEFAULT
+							}
+							AND = {
+								has_game_rule = {
+									rule = FIN_1972_ELECTIONS
+									option = FIN_1972_ELECTIONS_SDTP
+								}
+								NOT = {
+									check_variable = { FIN_party_legality^0 = 1 }
+								}
+							}
+						}
+						check_variable = { FIN_prime_minister_party = 8 }
+					}
+					AND = {
+						has_game_rule = {
+							rule = FIN_1972_ELECTIONS
+							option = FIN_1972_ELECTIONS_KOK
+						}
+						NOT = {
+							has_government = fascism
+						}
+					}
+				}
+			}
+			log = "Elected Eero Lattula (Kok.) as Finnish PM."
+			add_ideas = FIN_Eero_Lattula_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.36
+					days = 1
+				}
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_prime_minister_party = 9 }
+			}
+			log = "Elected Teo Snellman (IKL) as Finnish PM."
+			add_ideas = FIN_Teo_Snellman_hog
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FIN_WORLD.40
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+FIN_allocate_foreign_minister = {
+	#remove_ideas_with_trait = foreign_minister - uncomment when ministers added
+	if = {
+		limit = { #Before July 7th, 1966
+			date < 1966.07.07
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 2 }
+			}
+			log = "Elected Väinö Leskinen (SDP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 3 }
+			}
+			log = "Elected Veli Merikoski (SKP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 4 }
+			}
+			log = "Elected Vieno Johannes Sukselainen (ML) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 5 }
+			}
+			log = "Elected Inger Ehrström (RKP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 7 }
+			}
+			log = "Elected Keijo Kalevi Huotari (SMP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 8 }
+			}
+			log = "Elected Asko Ivalo (Kok.) as Finnish Foreign Minister."
+		}
+	}
+	else_if = {
+		limit = { #Before July 5th, 1969
+			date < 1969.07.05
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 2 }
+			}
+			log = "Elected Jussi Linnamo (SDP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 3 }
+			}
+			log = "Elected Arne Berner (SKP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 4 }
+			}
+			log = "Elected Ahti Karjalainen (ML) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 5 }
+			}
+			log = "Elected Gunnar Häggblom (RKP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 7 }
+			}
+			log = "Elected Heikki Kainulainen (SMP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 8 }
+			}
+			log = "Elected Toivo Antero Wiherheimo (Kok.) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 9 }
+			}
+			log = "Elected Reidar Hedman (IKL) as Finnish Foreign Minister."
+		}
+	}
+	else_if = {
+		limit = { #Before July 7th, 1972
+			date < 1972.07.07
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 0 }
+			}
+			log = "Elected Paavo Aitio (SDTP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 2 }
+			}
+			log = "Elected Rafael Paasio (SDP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 3 }
+			}
+			log = "Elected Irma Karvikko (SKP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 4 }
+			}
+			log = "Elected Ahti Karjalainen (ML) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 5 }
+			}
+			log = "Elected Carl Göran Aminoff (RKP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 7 }
+			}
+			log = "Elected Matti Asunmaa (SMP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 8 }
+			}
+			log = "Elected Göran Stenius (Kok.) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 9 }
+			}
+			log = "Elected Rauno Gustaf Kallia (IKL) as Finnish Foreign Minister."
+		}
+	}
+	else_if = {
+		limit = { #Before July 7th, 1975
+			date < 1975.07.07
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 0 }
+			}
+			log = "Elected Mirjam Vire-Tuominen (SDTP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 2 }
+			}
+			log = "Elected Martti Ahtisaari (SDP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 3 }
+			}
+			log = "Elected Helvi Sipilä (SKP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 4 }
+			}
+			log = "Elected Heikki Hannikainen (ML) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 5 }
+			}
+			log = "Elected Carl Göran Aminoff (RKP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 7 }
+			}
+			log = "Elected Reijo Enävaara (SMP) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 8 }
+			}
+			log = "Elected Raimo Ilaskivi (Kok.) as Finnish Foreign Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_foreign_minister_party = 9 }
+			}
+			log = "Elected Torsten G. Aminoff (IKL) as Finnish Foreign Minister."
+		}
+	}
+}
+
+FIN_allocate_economy_minister = {
+	#remove_ideas_with_trait = economy_minister - uncomment when ministers added
+	if = {
+		limit = { #Before July 7th, 1966
+			date < 1966.07.07
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 2 }
+			}
+			log = "Elected Mauno Koivisto (SDP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 3 }
+			}
+			log = "Elected Esa Kaitila (SKP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 4 }
+			}
+			log = "Elected Martti Miettunen (ML) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 5 }
+			}
+			log = "Elected Björn Westerlund (RKP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 7 }
+			}
+			log = "Elected Lauri Linna (SMP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 8 }
+			}
+			log = "Elected Päiviö Hetemäki (Kok.) as Finnish Economy Minister."
+		}
+	}
+	else_if = {
+		limit = { #Before July 5th, 1969
+			date < 1969.07.05
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 2 }
+			}
+			log = "Elected Eino Raunio (SDP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 3 }
+			}
+			log = "Elected Esko Rekola (SKP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 4 }
+			}
+			log = "Elected Wiljam Sarjala (ML) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 5 }
+			}
+			log = "Elected Carl Olof Tallgren (RKP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 7 }
+			}
+			log = "Elected Mikko Vainio (SMP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 8 }
+			}
+			log = "Elected Osmo P. Karttunen (Kok.) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 9 }
+			}
+			log = "Elected Pekka Juhana Kuusi (IKL) as Finnish Economy Minister."
+		}
+	}
+	else_if = {
+		limit = { #Before July 7th, 1972
+			date < 1972.07.07
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 0 }
+			}
+			log = "Elected Aarre Simonen (SDTP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 2 }
+			}
+			log = "Elected Valto Käkelä (SDP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 3 }
+			}
+			log = "Elected Keijo Liinamaa (SKP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 4 }
+			}
+			log = "Elected Mauno Jussila (ML) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 5 }
+			}
+			log = "Elected Grels Teir (RKP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 7 }
+			}
+			log = "Elected Vieno Eklund (SMP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 8 }
+			}
+			log = "Elected Osmo P. Karttunen (Kok.) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 9 }
+			}
+			log = "Elected Väinö Auer (IKL) as Finnish Economy Minister."
+		}
+	}
+	else_if = {
+		limit = { #Before July 7th, 1975
+			date < 1975.07.07
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 0 }
+			}
+			log = "Elected Olavi Saarinen (SDTP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 2 }
+			}
+			log = "Elected Paul Paavela (SDP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 3 }
+			}
+			log = "Elected Pekka Tarjanne (SKP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 4 }
+			}
+			log = "Elected Pauli Lehtosalo (ML) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 5 }
+			}
+			log = "Elected Ola Rosendahl (RKP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 7 }
+			}
+			log = "Elected Urpo Leppänen (SMP) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 8 }
+			}
+			log = "Elected Ilkka Suominen (Kok.) as Finnish Economy Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_economy_minister_party = 9 }
+			}
+			log = "Elected Reino Ala-Kulju (IKL) as Finnish Economy Minister."
+		}
+	}
+}
+
+FIN_allocate_security_minister = {
+	#remove_ideas_with_trait = security_minister - uncomment when ministers added
+	if = {
+		limit = { #Before July 7th, 1966
+			date < 1966.07.07
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 2 }
+			}
+			log = "Elected Kalle Lehmus (SDP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 3 }
+			}
+			log = "Elected Pekka Malinen (SKP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 4 }
+			}
+			log = "Elected Arvo Pentti (ML) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 5 }
+			}
+			log = "Elected Adolf Ehrnrooth (RKP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 7 }
+			}
+			log = "Elected Olavi Honka (SMP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 8 }
+			}
+			log = "Elected Toivo Antero Wiherheimo (Kok.) as Finnish Security Minister."
+		}
+	}
+	else_if = {
+		limit = { #Before July 5th, 1969
+			date < 1969.07.05
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 2 }
+			}
+			log = "Elected Kalle Lehmus (SDP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 3 }
+			}
+			log = "Elected Sakari Lappi-Seppälä (SKP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 4 }
+			}
+			log = "Elected Sulo Suorttanen (ML) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 5 }
+			}
+			log = "Elected Sven Högström (RKP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 7 }
+			}
+			log = "Elected Arvo Sainio (SMP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 8 }
+			}
+			log = "Elected Armas-Eino Martola (Kok.) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 9 }
+			}
+			log = "Elected Yrjö K. Suominen (IKL) as Finnish Security Minister."
+		}
+	}
+	else_if = {
+		limit = { #Before July 7th, 1972
+			date < 1972.07.07
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 0 }
+			}
+			log = "Elected Emil Skog (SDTP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 2 }
+			}
+			log = "Elected Veikko Puskala (SDP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 3 }
+			}
+			log = "Elected Veikko Hyytiäinen (SKP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 4 }
+			}
+			log = "Elected Pauli Lehtosalo (ML) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 5 }
+			}
+			log = "Elected Ingvar S. Melin (RKP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 7 }
+			}
+			log = "Elected Gunnar Joutsensaari (SMP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 8 }
+			}
+			log = "Elected Mikko Asunta (Kok.) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 9 }
+			}
+			log = "Elected Jukka Tyrkkö (IKL) as Finnish Security Minister."
+		}
+	}
+	else_if = {
+		limit = { #Before July 7th, 1975
+			date < 1975.07.07
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 0 }
+			}
+			log = "Elected Aarre Simonen (SDTP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 2 }
+			}
+			log = "Elected Veikko Puskala (SDP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 3 }
+			}
+			log = "Elected Teuvo Aura (SKP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 4 }
+			}
+			log = "Elected Juhani Saukkonen (ML) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 5 }
+			}
+			log = "Elected Kristian Gestrin (RKP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 7 }
+			}
+			log = "Elected Rainer Lemström (SMP) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 8 }
+			}
+			log = "Elected Pentti Multanen (Kok.) as Finnish Security Minister."
+		}
+		if = {
+			limit = {
+				check_variable = { FIN_security_minister_party = 9 }
+			}
+			log = "Elected Mauno Kannari (IKL) as Finnish Security Minister."
+		}
+	}
+}
+
+FIN_initialise_party_relations_matrix = {
+	clear_array = FIN_party_0_relations
+	add_to_array = { FIN_party_0_relations = 0 } #SDTP-SDTP
+	add_to_array = { FIN_party_0_relations = 2 } #SDTP-PKP
+	add_to_array = { FIN_party_0_relations = 1 } #SDTP-SDP
+	add_to_array = { FIN_party_0_relations = 0 } #SDTP-SKP
+	add_to_array = { FIN_party_0_relations = 0 } #SDTP-ML
+	add_to_array = { FIN_party_0_relations = 1 } #SDTP-RKP
+	add_to_array = { FIN_party_0_relations = 1 } #SDTP-AA
+	add_to_array = { FIN_party_0_relations = 1 } #SDTP-SMP
+	add_to_array = { FIN_party_0_relations = 0 } #SDTP-Kok.
+	add_to_array = { FIN_party_0_relations = 0 } #SDTP-IKL
+
+	clear_array = FIN_party_1_relations
+	add_to_array = { FIN_party_1_relations = 2 } #PKP-SDTP
+	add_to_array = { FIN_party_1_relations = 0 } #PKP-PKP
+	add_to_array = { FIN_party_1_relations = 2 } #PKP-SDP
+	add_to_array = { FIN_party_1_relations = 0 } #PKP-SKP
+	add_to_array = { FIN_party_1_relations = 0 } #PKP-ML
+	add_to_array = { FIN_party_1_relations = 1 } #PKP-RKP
+	add_to_array = { FIN_party_1_relations = 1 } #PKP-AA
+	add_to_array = { FIN_party_1_relations = 2 } #PKP-SMP
+	add_to_array = { FIN_party_1_relations = 0 } #PKP-Kok.
+	add_to_array = { FIN_party_1_relations = 0 } #PKP-IKL
+
+	clear_array = FIN_party_2_relations
+	add_to_array = { FIN_party_2_relations = 1 } #SDP-SDTP
+	add_to_array = { FIN_party_2_relations = 2 } #SDP-PKP
+	add_to_array = { FIN_party_2_relations = 0 } #SDP-SDP
+	add_to_array = { FIN_party_2_relations = 1 } #SDP-SKP
+	add_to_array = { FIN_party_2_relations = 1 } #SDP-ML
+	add_to_array = { FIN_party_2_relations = 1 } #SDP-RKP
+	add_to_array = { FIN_party_2_relations = 1 } #SDP-AA
+	add_to_array = { FIN_party_2_relations = 1 } #SDP-SMP
+	add_to_array = { FIN_party_2_relations = 0 } #SDP-Kok.
+	add_to_array = { FIN_party_2_relations = 0 } #SDP-IKL
+
+	clear_array = FIN_party_3_relations
+	add_to_array = { FIN_party_3_relations = 0 } #SKP-SDTP
+	add_to_array = { FIN_party_3_relations = 0 } #SKP-PKP
+	add_to_array = { FIN_party_3_relations = 1 } #SKP-SDP
+	add_to_array = { FIN_party_3_relations = 0 } #SKP-SKP
+	add_to_array = { FIN_party_3_relations = 2 } #SKP-ML
+	add_to_array = { FIN_party_3_relations = 2 } #SKP-RKP
+	add_to_array = { FIN_party_3_relations = 2 } #SKP-AA
+	add_to_array = { FIN_party_3_relations = 1 } #SKP-SMP
+	add_to_array = { FIN_party_3_relations = 2 } #SKP-Kok.
+	add_to_array = { FIN_party_3_relations = 1 } #SKP-IKL
+
+	clear_array = FIN_party_4_relations
+	add_to_array = { FIN_party_4_relations = 0 } #ML-SDTP
+	add_to_array = { FIN_party_4_relations = 0 } #ML-PKP
+	add_to_array = { FIN_party_4_relations = 1 } #ML-SDP
+	add_to_array = { FIN_party_4_relations = 2 } #ML-SKP
+	add_to_array = { FIN_party_4_relations = 0 } #ML-ML
+	add_to_array = { FIN_party_4_relations = 2 } #ML-RKP
+	add_to_array = { FIN_party_4_relations = 2 } #ML-AA
+	add_to_array = { FIN_party_4_relations = 0 } #ML-SMP
+	add_to_array = { FIN_party_4_relations = 2 } #ML-Kok.
+	add_to_array = { FIN_party_4_relations = 1 } #ML-IKL
+
+	clear_array = FIN_party_5_relations
+	add_to_array = { FIN_party_5_relations = 1 } #RKP-SDTP
+	add_to_array = { FIN_party_5_relations = 1 } #RKP-PKP
+	add_to_array = { FIN_party_5_relations = 1 } #RKP-SDP
+	add_to_array = { FIN_party_5_relations = 2 } #RKP-SKP
+	add_to_array = { FIN_party_5_relations = 2 } #RKP-ML
+	add_to_array = { FIN_party_5_relations = 0 } #RKP-RKP
+	add_to_array = { FIN_party_5_relations = 2 } #RKP-AA
+	add_to_array = { FIN_party_5_relations = 2 } #RKP-SMP
+	add_to_array = { FIN_party_5_relations = 2 } #RKP-Kok.
+	add_to_array = { FIN_party_5_relations = 1 } #RKP-IKL
+
+	clear_array = FIN_party_6_relations
+	add_to_array = { FIN_party_6_relations = 1 } #AA-SDTP
+	add_to_array = { FIN_party_6_relations = 1 } #AA-PKP
+	add_to_array = { FIN_party_6_relations = 1 } #AA-SDP
+	add_to_array = { FIN_party_6_relations = 2 } #AA-SKP
+	add_to_array = { FIN_party_6_relations = 2 } #AA-ML
+	add_to_array = { FIN_party_6_relations = 2 } #AA-RKP
+	add_to_array = { FIN_party_6_relations = 0 } #AA-AA
+	add_to_array = { FIN_party_6_relations = 2 } #AA-SMP
+	add_to_array = { FIN_party_6_relations = 2 } #AA-Kok.
+	add_to_array = { FIN_party_6_relations = 1 } #AA-IKL
+
+	clear_array = FIN_party_7_relations
+	add_to_array = { FIN_party_7_relations = 1 } #SMP-SDTP
+	add_to_array = { FIN_party_7_relations = 2 } #SMP-PKP
+	add_to_array = { FIN_party_7_relations = 1 } #SMP-SDP
+	add_to_array = { FIN_party_7_relations = 1 } #SMP-SKP
+	add_to_array = { FIN_party_7_relations = 0 } #SMP-ML
+	add_to_array = { FIN_party_7_relations = 2 } #SMP-RKP
+	add_to_array = { FIN_party_7_relations = 2 } #SMP-AA
+	add_to_array = { FIN_party_7_relations = 0 } #SMP-SMP
+	add_to_array = { FIN_party_7_relations = 1 } #SMP-Kok.
+	add_to_array = { FIN_party_7_relations = 0 } #SMP-IKL
+
+	clear_array = FIN_party_8_relations
+	add_to_array = { FIN_party_8_relations = 0 } #Kok.-SDTP
+	add_to_array = { FIN_party_8_relations = 0 } #Kok.-PKP
+	add_to_array = { FIN_party_8_relations = 0 } #Kok.-SDP
+	add_to_array = { FIN_party_8_relations = 2 } #Kok.-SKP
+	add_to_array = { FIN_party_8_relations = 2 } #Kok.-ML
+	add_to_array = { FIN_party_8_relations = 2 } #Kok.-RKP
+	add_to_array = { FIN_party_8_relations = 2 } #Kok.-AA
+	add_to_array = { FIN_party_8_relations = 1 } #Kok.-SMP
+	add_to_array = { FIN_party_8_relations = 0 } #Kok.-Kok.
+	add_to_array = { FIN_party_8_relations = 1 } #Kok.-IKL
+
+	clear_array = FIN_party_9_relations
+	add_to_array = { FIN_party_9_relations = 0 } #IKL-SDTP
+	add_to_array = { FIN_party_9_relations = 0 } #IKL-PKP
+	add_to_array = { FIN_party_9_relations = 0 } #IKL-SDP
+	add_to_array = { FIN_party_9_relations = 1 } #IKL-SKP
+	add_to_array = { FIN_party_9_relations = 1 } #IKL-ML
+	add_to_array = { FIN_party_9_relations = 1 } #IKL-RKP
+	add_to_array = { FIN_party_9_relations = 1 } #IKL-AA
+	add_to_array = { FIN_party_9_relations = 0 } #IKL-SMP
+	add_to_array = { FIN_party_9_relations = 1 } #IKL-Kok.
+	add_to_array = { FIN_party_9_relations = 0 } #IKL-IKL
+
+}
+
+FIN_initialise_state_popularities = { #This has to be done manually, unfortunately.
+
+}
+
+FIN_assemble_parliament_display_array = { #Note - this can absolutely be looped, and I'll do that later.
+	clear_array = FIN_parliament_display_array
+	set_variable = { FIN_arr_MP_counter = FIN_parliament_seats^0 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 2
+		size = FIN_arr_MP_counter
+	}
+	add_to_variable = { FIN_arr_MP_counter = FIN_parliament_seats^1 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 3
+		size = FIN_arr_MP_counter
+	}
+	add_to_variable = { FIN_arr_MP_counter = FIN_parliament_seats^2 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 4
+		size = FIN_arr_MP_counter
+	}
+	add_to_variable = { FIN_arr_MP_counter = FIN_parliament_seats^3 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 5
+		size = FIN_arr_MP_counter
+	}
+	add_to_variable = { FIN_arr_MP_counter = FIN_parliament_seats^4 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 6
+		size = FIN_arr_MP_counter
+	}
+	add_to_variable = { FIN_arr_MP_counter = FIN_parliament_seats^5 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 7
+		size = FIN_arr_MP_counter
+	}
+	add_to_variable = { FIN_arr_MP_counter = FIN_parliament_seats^6 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 8
+		size = FIN_arr_MP_counter
+	}
+	add_to_variable = { FIN_arr_MP_counter = FIN_parliament_seats^7 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 9
+		size = FIN_arr_MP_counter
+	}
+	add_to_variable = { FIN_arr_MP_counter = FIN_parliament_seats^8 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 10
+		size = FIN_arr_MP_counter
+	}
+	add_to_variable = { FIN_arr_MP_counter = FIN_parliament_seats^9 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 11
+		size = FIN_arr_MP_counter
+	}
+	add_to_variable = { FIN_arr_MP_counter = FIN_parliament_seats^10 }
+	resize_array = {
+		array = FIN_parliament_display_array
+		value = 12
+		size = FIN_arr_MP_counter
+	}
+
+	clear_array = FIN_parliament_coalition_display_array
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^0 = 1 }
+		}
+		set_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^0 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		set_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^0 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^1 = 1 }
+		}
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^1 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^1 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^2 = 1 }
+		}
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^2 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^2 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^3 = 1 }
+		}
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^3 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^3 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^4 = 1 }
+		}
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^4 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^4 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^5 = 1 }
+		}
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^5 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^5 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^6 = 1 }
+		}
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^6 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^6 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^7 = 1 }
+		}
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^7 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^7 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^8 = 1 }
+		}
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^8 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^8 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^9 = 1 }
+		}
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^9 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^9 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { FIN_coalition^10 = 1 }
+		}
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^10 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 2
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+	else = {
+		add_to_variable = { FIN_arr_coalition_MP_counter = FIN_parliament_seats^10 }
+		resize_array = {
+			array = FIN_parliament_coalition_display_array
+			value = 1
+			size = FIN_arr_coalition_MP_counter
+		}
+	}
+}
+
+FIN_calculate_civil_war = {
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { FIN_party_legality^0 = 1 }
+			}
+		}
+		set_variable = { FIN_civil_war_certainty = 10 }
+		if = {
+			limit = {
+				WSR = {
+					OR = {
+						has_government = socialist
+						has_government = communist
+					}
+				}
+			}
+			add_to_variable = { FIN_civil_war_certainty = 20 }
+		}
+		if = {
+			limit = {
+				FIN = {
+					has_idea = FIN_Niilo_Kosola_hog
+				}
+			}
+			add_to_variable = { FIN_civil_war_certainty = 20 }
+		}
+		if = {
+			limit = {
+				FIN = {
+					has_idea = FIN_Johannes_Virolainen_hog
+				}
+			}
+			add_to_variable = { FIN_civil_war_certainty = 15 }
+		}
+		set_variable = { FIN_civil_war_certainty_inv = 100 }
+		subtract_from_variable = { FIN_civil_war_certainty_inv = FIN_civil_war_certainty }
+		random_list = {
+			FIN_civil_war_certainty = {
+				modifier = {
+					factor = 0
+					has_game_rule = {
+						rule = FIN_CIVIL_WAR_TYPE
+						option = FIN_CIVIL_WAR_TYPE_NORMAL
+					}
+				}
+				country_event = {
+					id = red_finland.1
+					days = 50
+					random_hours = 250
+				}
+			}
+			FIN_civil_war_certainty_inv = {
+				modifier = {
+					factor = 0
+					has_game_rule = {
+						rule = FIN_CIVIL_WAR_TYPE
+						option = FIN_CIVIL_WAR_TYPE_RED
+					}
+				}
+				add_stability = -0.01
+			}
+		}
+	}
+}
+
+FIN_monthly_popularities_tick = {
+
+}
+
+FIN_initialise_parliament_diagram = {
+	add_to_array = { FIN_parliament_x = 0 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 16 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 31 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 47 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 63 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 79 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 94 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 110 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 2 }
+	add_to_array = { FIN_parliament_y = 185 }
+	add_to_array = { FIN_parliament_x = 18 }
+	add_to_array = { FIN_parliament_y = 185 }
+	add_to_array = { FIN_parliament_x = 34 }
+	add_to_array = { FIN_parliament_y = 186 }
+	add_to_array = { FIN_parliament_x = 50 }
+	add_to_array = { FIN_parliament_y = 185 }
+	add_to_array = { FIN_parliament_x = 65 }
+	add_to_array = { FIN_parliament_y = 186 }
+	add_to_array = { FIN_parliament_x = 82 }
+	add_to_array = { FIN_parliament_y = 185 }
+	add_to_array = { FIN_parliament_x = 5 }
+	add_to_array = { FIN_parliament_y = 166 }
+	add_to_array = { FIN_parliament_x = 98 }
+	add_to_array = { FIN_parliament_y = 186 }
+	add_to_array = { FIN_parliament_x = 22 }
+	add_to_array = { FIN_parliament_y = 166 }
+	add_to_array = { FIN_parliament_x = 38 }
+	add_to_array = { FIN_parliament_y = 167 }
+	add_to_array = { FIN_parliament_x = 114 }
+	add_to_array = { FIN_parliament_y = 185 }
+	add_to_array = { FIN_parliament_x = 54 }
+	add_to_array = { FIN_parliament_y = 166 }
+	add_to_array = { FIN_parliament_x = 11 }
+	add_to_array = { FIN_parliament_y = 148 }
+	add_to_array = { FIN_parliament_x = 70 }
+	add_to_array = { FIN_parliament_y = 167 }
+	add_to_array = { FIN_parliament_x = 28 }
+	add_to_array = { FIN_parliament_y = 147 }
+	add_to_array = { FIN_parliament_x = 87 }
+	add_to_array = { FIN_parliament_y = 166 }
+	add_to_array = { FIN_parliament_x = 44 }
+	add_to_array = { FIN_parliament_y = 148 }
+	add_to_array = { FIN_parliament_x = 104 }
+	add_to_array = { FIN_parliament_y = 168 }
+	add_to_array = { FIN_parliament_x = 18 }
+	add_to_array = { FIN_parliament_y = 130 }
+	add_to_array = { FIN_parliament_x = 61 }
+	add_to_array = { FIN_parliament_y = 148 }
+	add_to_array = { FIN_parliament_x = 35 }
+	add_to_array = { FIN_parliament_y = 129 }
+	add_to_array = { FIN_parliament_x = 78 }
+	add_to_array = { FIN_parliament_y = 149 }
+	add_to_array = { FIN_parliament_x = 52 }
+	add_to_array = { FIN_parliament_y = 131 }
+	add_to_array = { FIN_parliament_x = 121 }
+	add_to_array = { FIN_parliament_y = 167 }
+	add_to_array = { FIN_parliament_x = 26 }
+	add_to_array = { FIN_parliament_y = 112 }
+	add_to_array = { FIN_parliament_x = 96 }
+	add_to_array = { FIN_parliament_y = 149 }
+	add_to_array = { FIN_parliament_x = 70 }
+	add_to_array = { FIN_parliament_y = 130 }
+	add_to_array = { FIN_parliament_x = 45 }
+	add_to_array = { FIN_parliament_y = 112 }
+	add_to_array = { FIN_parliament_x = 113 }
+	add_to_array = { FIN_parliament_y = 151 }
+	add_to_array = { FIN_parliament_x = 88 }
+	add_to_array = { FIN_parliament_y = 133 }
+	add_to_array = { FIN_parliament_x = 62 }
+	add_to_array = { FIN_parliament_y = 114 }
+	add_to_array = { FIN_parliament_x = 37 }
+	add_to_array = { FIN_parliament_y = 96 }
+	add_to_array = { FIN_parliament_x = 56 }
+	add_to_array = { FIN_parliament_y = 96 }
+	add_to_array = { FIN_parliament_x = 82 }
+	add_to_array = { FIN_parliament_y = 114 }
+	add_to_array = { FIN_parliament_x = 107 }
+	add_to_array = { FIN_parliament_y = 132 }
+	add_to_array = { FIN_parliament_x = 132 }
+	add_to_array = { FIN_parliament_y = 151 }
+	add_to_array = { FIN_parliament_x = 48 }
+	add_to_array = { FIN_parliament_y = 80 }
+	add_to_array = { FIN_parliament_x = 74 }
+	add_to_array = { FIN_parliament_y = 99 }
+	add_to_array = { FIN_parliament_x = 99 }
+	add_to_array = { FIN_parliament_y = 117 }
+	add_to_array = { FIN_parliament_x = 125 }
+	add_to_array = { FIN_parliament_y = 136 }
+	add_to_array = { FIN_parliament_x = 69 }
+	add_to_array = { FIN_parliament_y = 81 }
+	add_to_array = { FIN_parliament_x = 95 }
+	add_to_array = { FIN_parliament_y = 99 }
+	add_to_array = { FIN_parliament_x = 62 }
+	add_to_array = { FIN_parliament_y = 66 }
+	add_to_array = { FIN_parliament_x = 87 }
+	add_to_array = { FIN_parliament_y = 85 }
+	add_to_array = { FIN_parliament_x = 120 }
+	add_to_array = { FIN_parliament_y = 118 }
+	add_to_array = { FIN_parliament_x = 113 }
+	add_to_array = { FIN_parliament_y = 104 }
+	add_to_array = { FIN_parliament_x = 83 }
+	add_to_array = { FIN_parliament_y = 67 }
+	add_to_array = { FIN_parliament_x = 76 }
+	add_to_array = { FIN_parliament_y = 53 }
+	add_to_array = { FIN_parliament_x = 146 }
+	add_to_array = { FIN_parliament_y = 137 }
+	add_to_array = { FIN_parliament_x = 110 }
+	add_to_array = { FIN_parliament_y = 86 }
+	add_to_array = { FIN_parliament_x = 139 }
+	add_to_array = { FIN_parliament_y = 123 }
+	add_to_array = { FIN_parliament_x = 102 }
+	add_to_array = { FIN_parliament_y = 72 }
+	add_to_array = { FIN_parliament_x = 99 }
+	add_to_array = { FIN_parliament_y = 55 }
+	add_to_array = { FIN_parliament_x = 91 }
+	add_to_array = { FIN_parliament_y = 41 }
+	add_to_array = { FIN_parliament_x = 136 }
+	add_to_array = { FIN_parliament_y = 106 }
+	add_to_array = { FIN_parliament_x = 128 }
+	add_to_array = { FIN_parliament_y = 92 }
+	add_to_array = { FIN_parliament_x = 126 }
+	add_to_array = { FIN_parliament_y = 75 }
+	add_to_array = { FIN_parliament_x = 118 }
+	add_to_array = { FIN_parliament_y = 61 }
+	add_to_array = { FIN_parliament_x = 108 }
+	add_to_array = { FIN_parliament_y = 31 }
+	add_to_array = { FIN_parliament_x = 116 }
+	add_to_array = { FIN_parliament_y = 44 }
+	add_to_array = { FIN_parliament_x = 155 }
+	add_to_array = { FIN_parliament_y = 112 }
+	add_to_array = { FIN_parliament_x = 163 }
+	add_to_array = { FIN_parliament_y = 126 }
+	add_to_array = { FIN_parliament_x = 145 }
+	add_to_array = { FIN_parliament_y = 82 }
+	add_to_array = { FIN_parliament_x = 153 }
+	add_to_array = { FIN_parliament_y = 96 }
+	add_to_array = { FIN_parliament_x = 135 }
+	add_to_array = { FIN_parliament_y = 52 }
+	add_to_array = { FIN_parliament_x = 143 }
+	add_to_array = { FIN_parliament_y = 66 }
+	add_to_array = { FIN_parliament_x = 125 }
+	add_to_array = { FIN_parliament_y = 22 }
+	add_to_array = { FIN_parliament_x = 133 }
+	add_to_array = { FIN_parliament_y = 36 }
+	add_to_array = { FIN_parliament_x = 173 }
+	add_to_array = { FIN_parliament_y = 105 }
+	add_to_array = { FIN_parliament_x = 163 }
+	add_to_array = { FIN_parliament_y = 75 }
+	add_to_array = { FIN_parliament_x = 153 }
+	add_to_array = { FIN_parliament_y = 45 }
+	add_to_array = { FIN_parliament_x = 143 }
+	add_to_array = { FIN_parliament_y = 15 }
+	add_to_array = { FIN_parliament_x = 152 }
+	add_to_array = { FIN_parliament_y = 29 }
+	add_to_array = { FIN_parliament_x = 162 }
+	add_to_array = { FIN_parliament_y = 59 }
+	add_to_array = { FIN_parliament_x = 171 }
+	add_to_array = { FIN_parliament_y = 89 }
+	add_to_array = { FIN_parliament_x = 181 }
+	add_to_array = { FIN_parliament_y = 118 }
+	add_to_array = { FIN_parliament_x = 162 }
+	add_to_array = { FIN_parliament_y = 10 }
+	add_to_array = { FIN_parliament_x = 172 }
+	add_to_array = { FIN_parliament_y = 40 }
+	add_to_array = { FIN_parliament_x = 171 }
+	add_to_array = { FIN_parliament_y = 24 }
+	add_to_array = { FIN_parliament_x = 181 }
+	add_to_array = { FIN_parliament_y = 70 }
+	add_to_array = { FIN_parliament_x = 181 }
+	add_to_array = { FIN_parliament_y = 54 }
+	add_to_array = { FIN_parliament_x = 191 }
+	add_to_array = { FIN_parliament_y = 100 }
+	add_to_array = { FIN_parliament_x = 191 }
+	add_to_array = { FIN_parliament_y = 84 }
+	add_to_array = { FIN_parliament_x = 181 }
+	add_to_array = { FIN_parliament_y = 6 }
+	add_to_array = { FIN_parliament_x = 191 }
+	add_to_array = { FIN_parliament_y = 37 }
+	add_to_array = { FIN_parliament_x = 191 }
+	add_to_array = { FIN_parliament_y = 21 }
+	add_to_array = { FIN_parliament_x = 200 }
+	add_to_array = { FIN_parliament_y = 115 }
+	add_to_array = { FIN_parliament_x = 201 }
+	add_to_array = { FIN_parliament_y = 67 }
+	add_to_array = { FIN_parliament_x = 200 }
+	add_to_array = { FIN_parliament_y = 52 }
+	add_to_array = { FIN_parliament_x = 201 }
+	add_to_array = { FIN_parliament_y = 5 }
+	add_to_array = { FIN_parliament_x = 210 }
+	add_to_array = { FIN_parliament_y = 98 }
+	add_to_array = { FIN_parliament_x = 210 }
+	add_to_array = { FIN_parliament_y = 83 }
+	add_to_array = { FIN_parliament_x = 210 }
+	add_to_array = { FIN_parliament_y = 36 }
+	add_to_array = { FIN_parliament_x = 210 }
+	add_to_array = { FIN_parliament_y = 20 }
+	add_to_array = { FIN_parliament_x = 220 }
+	add_to_array = { FIN_parliament_y = 5 }
+	add_to_array = { FIN_parliament_x = 220 }
+	add_to_array = { FIN_parliament_y = 52 }
+	add_to_array = { FIN_parliament_x = 220 }
+	add_to_array = { FIN_parliament_y = 67 }
+	add_to_array = { FIN_parliament_x = 220 }
+	add_to_array = { FIN_parliament_y = 115 }
+	add_to_array = { FIN_parliament_x = 230 }
+	add_to_array = { FIN_parliament_y = 21 }
+	add_to_array = { FIN_parliament_x = 230 }
+	add_to_array = { FIN_parliament_y = 37 }
+	add_to_array = { FIN_parliament_x = 239 }
+	add_to_array = { FIN_parliament_y = 6 }
+	add_to_array = { FIN_parliament_x = 230 }
+	add_to_array = { FIN_parliament_y = 84 }
+	add_to_array = { FIN_parliament_x = 229 }
+	add_to_array = { FIN_parliament_y = 100 }
+	add_to_array = { FIN_parliament_x = 240 }
+	add_to_array = { FIN_parliament_y = 54 }
+	add_to_array = { FIN_parliament_x = 239 }
+	add_to_array = { FIN_parliament_y = 70 }
+	add_to_array = { FIN_parliament_x = 249 }
+	add_to_array = { FIN_parliament_y = 24 }
+	add_to_array = { FIN_parliament_x = 249 }
+	add_to_array = { FIN_parliament_y = 40 }
+	add_to_array = { FIN_parliament_x = 258 }
+	add_to_array = { FIN_parliament_y = 10 }
+	add_to_array = { FIN_parliament_x = 239 }
+	add_to_array = { FIN_parliament_y = 118 }
+	add_to_array = { FIN_parliament_x = 249 }
+	add_to_array = { FIN_parliament_y = 89 }
+	add_to_array = { FIN_parliament_x = 259 }
+	add_to_array = { FIN_parliament_y = 59 }
+	add_to_array = { FIN_parliament_x = 269 }
+	add_to_array = { FIN_parliament_y = 29 }
+	add_to_array = { FIN_parliament_x = 277 }
+	add_to_array = { FIN_parliament_y = 15 }
+	add_to_array = { FIN_parliament_x = 267 }
+	add_to_array = { FIN_parliament_y = 45 }
+	add_to_array = { FIN_parliament_x = 258 }
+	add_to_array = { FIN_parliament_y = 75 }
+	add_to_array = { FIN_parliament_x = 248 }
+	add_to_array = { FIN_parliament_y = 105 }
+	add_to_array = { FIN_parliament_x = 287 }
+	add_to_array = { FIN_parliament_y = 36 }
+	add_to_array = { FIN_parliament_x = 295 }
+	add_to_array = { FIN_parliament_y = 22 }
+	add_to_array = { FIN_parliament_x = 277 }
+	add_to_array = { FIN_parliament_y = 66 }
+	add_to_array = { FIN_parliament_x = 285 }
+	add_to_array = { FIN_parliament_y = 52 }
+	add_to_array = { FIN_parliament_x = 268 }
+	add_to_array = { FIN_parliament_y = 96 }
+	add_to_array = { FIN_parliament_x = 276 }
+	add_to_array = { FIN_parliament_y = 82 }
+	add_to_array = { FIN_parliament_x = 258 }
+	add_to_array = { FIN_parliament_y = 126 }
+	add_to_array = { FIN_parliament_x = 266 }
+	add_to_array = { FIN_parliament_y = 112 }
+	add_to_array = { FIN_parliament_x = 305 }
+	add_to_array = { FIN_parliament_y = 44 }
+	add_to_array = { FIN_parliament_x = 313 }
+	add_to_array = { FIN_parliament_y = 31 }
+	add_to_array = { FIN_parliament_x = 303 }
+	add_to_array = { FIN_parliament_y = 61 }
+	add_to_array = { FIN_parliament_x = 295 }
+	add_to_array = { FIN_parliament_y = 75 }
+	add_to_array = { FIN_parliament_x = 292 }
+	add_to_array = { FIN_parliament_y = 92 }
+	add_to_array = { FIN_parliament_x = 285 }
+	add_to_array = { FIN_parliament_y = 106 }
+	add_to_array = { FIN_parliament_x = 329 }
+	add_to_array = { FIN_parliament_y = 41 }
+	add_to_array = { FIN_parliament_x = 322 }
+	add_to_array = { FIN_parliament_y = 55 }
+	add_to_array = { FIN_parliament_x = 319 }
+	add_to_array = { FIN_parliament_y = 72 }
+	add_to_array = { FIN_parliament_x = 282 }
+	add_to_array = { FIN_parliament_y = 123 }
+	add_to_array = { FIN_parliament_x = 311 }
+	add_to_array = { FIN_parliament_y = 86 }
+	add_to_array = { FIN_parliament_x = 274 }
+	add_to_array = { FIN_parliament_y = 137 }
+	add_to_array = { FIN_parliament_x = 345 }
+	add_to_array = { FIN_parliament_y = 53 }
+	add_to_array = { FIN_parliament_x = 337 }
+	add_to_array = { FIN_parliament_y = 67 }
+	add_to_array = { FIN_parliament_x = 308 }
+	add_to_array = { FIN_parliament_y = 104 }
+	add_to_array = { FIN_parliament_x = 300 }
+	add_to_array = { FIN_parliament_y = 118 }
+	add_to_array = { FIN_parliament_x = 333 }
+	add_to_array = { FIN_parliament_y = 85 }
+	add_to_array = { FIN_parliament_x = 359 }
+	add_to_array = { FIN_parliament_y = 66 }
+	add_to_array = { FIN_parliament_x = 326 }
+	add_to_array = { FIN_parliament_y = 99 }
+	add_to_array = { FIN_parliament_x = 351 }
+	add_to_array = { FIN_parliament_y = 81 }
+	add_to_array = { FIN_parliament_x = 296 }
+	add_to_array = { FIN_parliament_y = 136 }
+	add_to_array = { FIN_parliament_x = 321 }
+	add_to_array = { FIN_parliament_y = 117 }
+	add_to_array = { FIN_parliament_x = 347 }
+	add_to_array = { FIN_parliament_y = 99 }
+	add_to_array = { FIN_parliament_x = 372 }
+	add_to_array = { FIN_parliament_y = 80 }
+	add_to_array = { FIN_parliament_x = 288 }
+	add_to_array = { FIN_parliament_y = 151 }
+	add_to_array = { FIN_parliament_x = 313 }
+	add_to_array = { FIN_parliament_y = 132 }
+	add_to_array = { FIN_parliament_x = 339 }
+	add_to_array = { FIN_parliament_y = 114 }
+	add_to_array = { FIN_parliament_x = 364 }
+	add_to_array = { FIN_parliament_y = 96 }
+	add_to_array = { FIN_parliament_x = 384 }
+	add_to_array = { FIN_parliament_y = 96 }
+	add_to_array = { FIN_parliament_x = 358 }
+	add_to_array = { FIN_parliament_y = 114 }
+	add_to_array = { FIN_parliament_x = 333 }
+	add_to_array = { FIN_parliament_y = 133 }
+	add_to_array = { FIN_parliament_x = 308 }
+	add_to_array = { FIN_parliament_y = 151 }
+	add_to_array = { FIN_parliament_x = 376 }
+	add_to_array = { FIN_parliament_y = 112 }
+	add_to_array = { FIN_parliament_x = 350 }
+	add_to_array = { FIN_parliament_y = 130 }
+	add_to_array = { FIN_parliament_x = 325 }
+	add_to_array = { FIN_parliament_y = 149 }
+	add_to_array = { FIN_parliament_x = 394 }
+	add_to_array = { FIN_parliament_y = 112 }
+	add_to_array = { FIN_parliament_x = 299 }
+	add_to_array = { FIN_parliament_y = 167 }
+	add_to_array = { FIN_parliament_x = 368 }
+	add_to_array = { FIN_parliament_y = 131 }
+	add_to_array = { FIN_parliament_x = 343 }
+	add_to_array = { FIN_parliament_y = 149 }
+	add_to_array = { FIN_parliament_x = 385 }
+	add_to_array = { FIN_parliament_y = 129 }
+	add_to_array = { FIN_parliament_x = 359 }
+	add_to_array = { FIN_parliament_y = 148 }
+	add_to_array = { FIN_parliament_x = 403 }
+	add_to_array = { FIN_parliament_y = 130 }
+	add_to_array = { FIN_parliament_x = 317 }
+	add_to_array = { FIN_parliament_y = 168 }
+	add_to_array = { FIN_parliament_x = 377 }
+	add_to_array = { FIN_parliament_y = 148 }
+	add_to_array = { FIN_parliament_x = 333 }
+	add_to_array = { FIN_parliament_y = 166 }
+	add_to_array = { FIN_parliament_x = 393 }
+	add_to_array = { FIN_parliament_y = 147 }
+	add_to_array = { FIN_parliament_x = 350 }
+	add_to_array = { FIN_parliament_y = 167 }
+	add_to_array = { FIN_parliament_x = 410 }
+	add_to_array = { FIN_parliament_y = 148 }
+	add_to_array = { FIN_parliament_x = 366 }
+	add_to_array = { FIN_parliament_y = 166 }
+	add_to_array = { FIN_parliament_x = 307 }
+	add_to_array = { FIN_parliament_y = 185 }
+	add_to_array = { FIN_parliament_x = 383 }
+	add_to_array = { FIN_parliament_y = 167 }
+	add_to_array = { FIN_parliament_x = 399 }
+	add_to_array = { FIN_parliament_y = 166 }
+	add_to_array = { FIN_parliament_x = 323 }
+	add_to_array = { FIN_parliament_y = 186 }
+	add_to_array = { FIN_parliament_x = 415 }
+	add_to_array = { FIN_parliament_y = 166 }
+	add_to_array = { FIN_parliament_x = 339 }
+	add_to_array = { FIN_parliament_y = 185 }
+	add_to_array = { FIN_parliament_x = 355 }
+	add_to_array = { FIN_parliament_y = 186 }
+	add_to_array = { FIN_parliament_x = 371 }
+	add_to_array = { FIN_parliament_y = 185 }
+	add_to_array = { FIN_parliament_x = 387 }
+	add_to_array = { FIN_parliament_y = 186 }
+	add_to_array = { FIN_parliament_x = 403 }
+	add_to_array = { FIN_parliament_y = 185 }
+	add_to_array = { FIN_parliament_x = 419 }
+	add_to_array = { FIN_parliament_y = 185 }
+	add_to_array = { FIN_parliament_x = 310 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 326 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 342 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 358 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 373 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 389 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 405 }
+	add_to_array = { FIN_parliament_y = 205 }
+	add_to_array = { FIN_parliament_x = 421 }
+	add_to_array = { FIN_parliament_y = 205 }
+}

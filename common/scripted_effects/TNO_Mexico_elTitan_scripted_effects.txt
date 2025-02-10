@@ -1,0 +1,329 @@
+#  88888888b dP    d888888P oo   dP
+#  88        88       88         88
+# a88aaaa    88       88    dP d8888P .d8888b. 88d888b.
+#  88        88       88    88   88   88'  `88 88'  `88
+#  88        88       88    88   88   88.  .88 88    88
+#  88888888P dP       dP    dP   dP   `88888P8 dP    dP
+#  El Titan Mechanic
+# ---------------------------------------------------------------------------------------
+# - Works off of a single authoritarianism variable, which then influences a bunch of shit dependent upon the amnt of authoritarianism
+# - Such that;
+#	- 0-33% Auth:
+#		- PRI GUI: Peasant, Workers & Intellectual loyalty ++
+#		- Dirty War: Guerilla Growth --
+#		- Mex. Miracle: Stimulation base ++
+#		- Doctors Strike: Radicalism --
+#		- Greatly benefits del Rosal
+#	- 33-66% Auth:
+#		- PRI GUI: Industrialist loyalty ++
+#		- Dirty War: Guerilla Growth - & Unit Effectiveness +
+#		- Mex. Miracle: Rural>Urban Migration ++
+#		- Doctors Strike: Radicalism -
+#		- Benefits del Rosal marginally
+#	- 66-100% Auth:
+#		- PRI GUI: DFS, Bureaucrat loyalty ++
+#		- Dirty War: Guerilla Growth ++, Unit Recruitment & Unit Effectiveness ++
+#		- Mex. Miracle: Stimulationd decay ++, Rural>Urban Migration ++ & Urban QoL --
+#			- Amnt of debt you can take before it 'burts' grows
+#		- Doctors Strike: Radicalism ++
+#		- Tlatelolco Massacre and Echeveria succession (add in the future)
+# ---------------------------------------------------------------------------------------
+# - This mechanic achieves these effects by NOT using DynMods; They're expensive and we don't *need* them.
+# - Instead, it emulates this effect in on_actions.
+#
+# Constants
+#@ONETHIRD = 0.3334
+#@TWOTHIRD = 0.6667
+# - These are the maximum possible absolute values of what will be applied.
+#   - E.x; at 0% auth. Peasant Loyalty monthly change = @PRI_Change
+#	- This is a way to make balancing a bit quicker to tweak (and the code prettier to look at)
+#@PRI_Loyalty_add = 0.25
+#@DW_GuerillaGrowth_sub1	= -0 #TODO
+#@DW_GuerillaGrowth_sub2	= -0 #TODO
+#@DW_GuerillaGrowth_add		= 0 #TODO
+#@DW_UnitEffectiveness_add	= 0 #TODO
+#@DW_UnitRecruitment_add		= 0 #TODO
+#@ECON_StimulationBase_add	= 0.1
+#@ECON_StimulationBase_sub	= -0.1
+#@ECON_StimulationDecay_add	= 0.1
+#@ECON_UrbanMigration_add	= 0.2
+#@ECON_UrbanQoL_sub			= -0.1
+#@DS_Radicalism_sub1	= -0.2
+#@DS_Radicalism_sub2	= -0.1
+#@DS_Radicalism_add	= 0.2
+# For demonstration purposes:
+#@CONSTANT = 0
+#
+#Mexico_elTitan_init = {
+#	log = "[GetDate]: [GetTag]: Mexico_elTitan_init; Executing."
+#
+#	set_variable = { Mexico_elTitan_authoritarianism = 0 }
+#
+#	# TODO setup tooltip vars to hold data to be displayed.
+#
+#	log = "[GetDate]: [GetTag]: Mexico_elTitan_init; Executed."
+#}
+#
+# The exact inverse of elTitan_apply
+#Mexico_elTitan_unapply = {
+#	set_country_flag = Mexico_elTitan_unapply
+#	Mexico_elTitan_apply = yes
+#	clr_country_flag = Mexico_elTitan_unapply
+#}
+#
+#Mexico_elTitan_apply = {
+#	set_temp_variable = { accomplishment = Mexico_elTitan_authoritarianism }
+#
+#	# All modifier applications in this effect work like so;
+#	#	set_temp_variable = { val = @<CONSTANT> }						# @<CONSTANT> stores the actual value
+#	#	if = { limit = { ... } multiply_temp_variable = { val = -1 } }	# Makes this effect *reversible* (see 'Mexico_elTitan_unapply')
+#	#	multiply_temp_variable = { val = accomplishment }				# May be 'inverse_accomplishment' where appropriate
+#	#	add_to_variable = { modifier@<MODIFIER>}						# <MODIFIER> is what we're changing, here
+#	#	...																# We may need to change multiple modifiers per block
+#	# And Done!
+#
+#	# If you need to change the value a modifier is affected by,
+#	# - Check the entry you need to effect, see what CONSTANT is applying to it
+#	# - Go above to where CONSTANTS are, and change that value.
+#
+#	# If you need to change/add/remove the modifiers that are changed,
+#	# - Add an entry to CONSTANTS for the value to change by
+#	# - Copy this above format and add this to the appropriate block (ordered by authority brackets, 0-33; 33-66; 66-100)
+#	# - *Make sure* the modifier changed is the right one, you'll need to create one if there isn't one yet.
+#
+#	# If you need to change/add/remove the *constant* (NOT the value) a modifier is set by,
+#	# - Change/Add/Remove an entry in CONSTANTS
+#	# - Go find the modifier block you want to change, and swap the current constant for the one you want it to be.
+#	# - If removing an constant, be sure you change modifier blocks that depend upon it.
+#
+#	if = { # Low Auth
+#		limit = { check_variable = { accomplishment < @ONETHIRD } }
+#
+#		# Generate accomplishment (closer to 0 => closer to 100%)
+#		divide_temp_variable = { accomplishment = @ONETHIRD }
+#		subtract_from_temp_variable = { accomplishment = 1 }
+#		multiply_temp_variable = { accomplishment = -1 }
+#
+#		# PRI GUI: Peasant, Workers & Intellectual loyalty ++
+#		set_temp_variable = { val = @PRI_Loyalty_increase }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = accomplishment }
+#		add_to_variable = { modifier@MEX_PRI_workers_loyalty_modifier = val }
+#		add_to_variable = { modifier@MEX_PRI_peasants_loyalty_modifier = val }
+#		add_to_variable = { modifier@MEX_PRI_intellectuals_loyalty_modifier = val }
+#
+#		# Dirty War: Guerilla Growth --
+#		# - TODO
+#
+#		# Mex. Miracle: Stimulation base ++
+#		set_temp_variable = { val = @ECON_StimulationBase_add }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = accomplishment }
+#		add_to_variable = { modifier@MEX_econ_global_stimulation_monthly_modifier = val }
+#
+#		# Doctors Strike: Radicalism --
+#		set_temp_variable = { val = @DS_Radicalism_sub1 }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = accomplishment }
+#		add_to_variable = { modifier@MEX_ds_doctor_intern_radicalism_monthly = val }
+#	}
+#	else_if = { # Mid Auth
+#		limit = { check_variable = { accomplishment < @TWOTHIRD } }
+#
+#		# Generate accomplishment (closer to 66 => closer to 100%)
+#		# - and inverse_accomplishment (closer to 33 => closer to 100%)
+#		divide_temp_variable = { accomplishment = @TWOTHIRD }
+#		set_temp_variable = { inverse_accomplishment = accomplishment }
+#		subtract_from_temp_variable = { inverse_accomplishment = 1 }
+#		multiply_temp_variable = { inverse_accomplishment = -1 }
+#
+#		# PRI GUI: Industrialist loyalty ++
+#		set_temp_variable = { val = @PRI_Loyalty_increase }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = accomplishment }
+#		add_to_variable = { modifier@MEX_PRI_businessmen_loyalty_modifier = val }
+#
+#		# Dirty War: Guerilla Growth -
+#		# Dirty War: Unit Effectiveness +
+#		# - TODO
+#
+#		# Mex. Miracle: Rural>Urban Migration ++
+#		set_temp_variable = { val = @ECON_UrbanMigration_add }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = accomplishment }
+#		add_to_variable = { modifier@MEX_econ_global_base_migration_monthly_modifier = val }
+#
+#		# Doctors Strike: Radicalism -
+#		set_temp_variable = { val = @DS_Radicalism_sub1 }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = inverse_accomplishment }
+#		add_to_variable = { modifier@MEX_ds_doctor_intern_radicalism_monthly = val }
+#	}
+#	else_if = { # High Auth
+#		limit = { check_variable = { accomplishment < @TWOTHIRD } }
+#
+#		# Generate accomplishment (closer to 66 => closer to 100%)
+#		divide_temp_variable = { accomplishment = @TWOTHIRD }
+#
+#		# PRI GUI: DFS, Bureaucrat loyalty ++
+#		set_temp_variable = { val = @PRI_Loyalty_increase }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = accomplishment }
+#		add_to_variable = { modifier@MEX_PRI_dfs_loyalty_modifier = val }
+#		add_to_variable = { modifier@MEX_PRI_officials_loyalty_modifier = val }
+#
+#		# Dirty War: Guerilla Growth ++
+#		# Dirty War: Unit Recruitment
+#		# Dirty War: Unit Effectiveness ++
+#		# - TODO
+#
+#		# Mex. Miracle: Stimulation decay ++
+#		set_temp_variable = { val = @ECON_StimulationDecay_add }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = accomplishment }
+#		add_to_variable = { modifier@MEX_econ_global_stimulation_decay_monthly_modifier = val }
+#
+#		# Mex. Miracle: Rural>Urban Migration ++
+#		set_temp_variable = { val = @ECON_UrbanMigration_add }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = accomplishment }
+#		add_to_variable = { modifier@MEX_econ_global_base_migration_monthly_modifier = val }
+#
+#		# Mex. Miracle: Urban QoL --
+#		set_temp_variable = { val = @ECON_UrbanQoL_sub }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = accomplishment }
+#		add_to_variable = { modifier@MEX_econ_global_urban_quality_of_life_monthly_modifier = val }
+#
+#		# Mex. Miracle: TODO: Amnt of debt you can take before it 'bursts' grows (TODO; talk to Shukla)
+#
+#		# Doctors Strike: Radicalism ++
+#		set_temp_variable = { val = @DS_Radicalism_add }
+#		if = { limit = { has_country_flag = Mexico_elTitan_unapply } multiply_temp_variable = { val = -1 } }
+#		multiply_temp_variable = { val = inverse_accomplishment }
+#		add_to_variable = { modifier@MEX_ds_doctor_intern_radicalism_monthly = val }
+#
+#		# Tlatelolco Massacre and Echeveria succession (add in the future)
+#	}
+#}
+#
+# Expects: t_val
+Mexico_elTitan_authoritarianism_change = {
+	#log = "[GetDate]: [GetTag]: Mexico_elTitan_authoritarianism_change, t_val: [?t_val]; Executing."
+
+	#Mexico_elTitan_unapply = yes
+	add_to_variable = { Mexico_elTitan_authoritarianism = t_val }
+	custom_effect_tooltip = Mexico_elTitan_authoritarianism_change_tt
+	clamp_variable = { var = Mexico_elTitan_authoritarianism min = 0 max = 100 }
+	#Mexico_elTitan_apply = yes
+	Mexico_elTitan_tendaz_frame = yes
+	el_titan_effect_applier = yes
+
+	#log = "[GetDate]: [GetTag]: Mexico_elTitan_authoritarianism_change; authoritarianism: [?Mexico_elTitan_authoritarianism]."
+	#log = "[GetDate]: [GetTag]: Mexico_elTitan_authoritarianism_change; Executed."
+}
+
+el_titan_effect_applier = {
+	if = {
+		limit = {
+			AND = {
+				check_variable = { Mexico_elTitan_authoritarianism < 34 }
+				NOT = { has_country_flag = el_titan_one_third }
+			}
+		}
+		hidden_effect = {
+			MEX_PRI_increase_loyalty_workers_low = yes
+			MEX_PRI_increase_loyalty_peasants_low = yes
+			MEX_PRI_increase_loyalty_intellectuals_low = yes
+			MEX_econ_global_base_stimulation_percent_increase_med = yes
+			if = { limit = { has_country_flag = el_titan_two_third }
+				MEX_PRI_decrease_loyalty_businessmen_low = yes
+				MEX_econ_global_population_base_migration_percent_decrease_med = yes
+			}
+			set_country_flag = el_titan_one_third
+			clr_country_flag = el_titan_two_third
+			clr_country_flag = el_titan_three_third
+		}
+	}
+	else_if = {
+		limit = {
+			AND = {
+				check_variable = { Mexico_elTitan_authoritarianism > 66 }
+				NOT = { has_country_flag = el_titan_three_third }
+			}
+		}
+		hidden_effect = {
+			set_country_flag = el_titan_three_third
+			clr_country_flag = el_titan_one_third
+			clr_country_flag = el_titan_two_third
+			MEX_PRI_increase_loyalty_dfs_low = yes
+			MEX_PRI_increase_loyalty_officials_low = yes
+			MEX_econ_global_stimulation_decay_increase_med = yes
+			MEX_econ_global_population_base_migration_percent_increase_med = yes
+			MEX_econ_global_urban_quality_of_life_percent_decrease_med = yes
+		}
+	}
+	else_if = {
+		limit = {
+			AND = {
+				check_variable = { Mexico_elTitan_authoritarianism > 33 }
+				NOT = { has_country_flag = el_titan_two_third }
+			}
+		}
+		hidden_effect = {
+			MEX_PRI_increase_loyalty_businessmen_low = yes
+			MEX_econ_global_population_base_migration_percent_increase_med = yes
+			if = { limit = { has_country_flag = el_titan_one_third }
+				MEX_PRI_decrease_loyalty_workers_low = yes
+				MEX_PRI_decrease_loyalty_peasants_low = yes
+				MEX_PRI_decrease_loyalty_intellectuals_low = yes
+				MEX_econ_global_base_stimulation_percent_decrease_med = yes
+			}
+			else_if = { limit = { has_country_flag = el_titan_three_third }
+				MEX_PRI_decrease_loyalty_dfs_low = yes
+				MEX_PRI_decrease_loyalty_officials_low = yes
+				MEX_econ_global_stimulation_decay_decrease_med = yes
+				MEX_econ_global_urban_quality_of_life_percent_increase_med = yes
+			}
+			set_country_flag = el_titan_two_third
+			clr_country_flag = el_titan_one_third
+			clr_country_flag = el_titan_three_third
+		}
+	}
+}
+
+Mexico_elTitan_tendaz_frame = {
+	if = { limit = { check_variable = { Mexico_elTitan_authoritarianism > 89 } }
+		set_variable = { tendaz_frame_var = 11 }
+	}
+	else_if = { limit = { check_variable = { Mexico_elTitan_authoritarianism > 79 } }
+		set_variable = { tendaz_frame_var = 10 }
+	}
+	else_if = { limit = { check_variable = { Mexico_elTitan_authoritarianism > 69 } }
+		set_variable = { tendaz_frame_var = 9 }
+	}
+	else_if = { limit = { check_variable = { Mexico_elTitan_authoritarianism > 59 } }
+		set_variable = { tendaz_frame_var = 8 }
+	}
+	else_if = { limit = { check_variable = { Mexico_elTitan_authoritarianism > 49 } }
+		set_variable = { tendaz_frame_var = 7 }
+	}
+	else_if = { limit = { check_variable = { Mexico_elTitan_authoritarianism > 39 } }
+		set_variable = { tendaz_frame_var = 6 }
+	}
+	else_if = { limit = { check_variable = { Mexico_elTitan_authoritarianism > 29 } }
+		set_variable = { tendaz_frame_var = 5 }
+	}
+	else_if = { limit = { check_variable = { Mexico_elTitan_authoritarianism > 19 } }
+		set_variable = { tendaz_frame_var = 4 }
+	}
+	else_if = { limit = { check_variable = { Mexico_elTitan_authoritarianism > 9 } }
+		set_variable = { tendaz_frame_var = 3 }
+	}
+	else_if = { limit = { check_variable = { Mexico_elTitan_authoritarianism > 0 } }
+		set_variable = { tendaz_frame_var = 2 }
+	}
+	else_if = { limit = { check_variable = { Mexico_elTitan_authoritarianism = 0 } }
+		set_variable = { tendaz_frame_var = 1 }
+	}
+}

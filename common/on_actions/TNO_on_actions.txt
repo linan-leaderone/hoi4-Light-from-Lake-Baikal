@@ -1,0 +1,182 @@
+on_actions = {
+	######################################################
+	### on_startup goes to TNO_on_startup_actions.txt ###
+	######################################################
+
+	on_declare_war = { #I am genuinely terrified of this code, and resent the fact that mechanically I need to do this shit at all. I hope it actually works. - Pacifica, Came here to fix what wasn't working - Wendell, Hello Pacifica and Wendell, this is Marethyu from almost 4 years in the future. I optimized some of the code so I hopefully it helps :D
+		effect = {
+			if = {
+				limit = {
+					ROOT = { has_border_war = yes }
+				}
+				ROOT = {
+					TNO_cancel_border_war_scope = yes
+				}
+			}
+			if = {
+				limit = {
+					FROM = { has_border_war = yes }
+				}
+				FROM = {
+					TNO_cancel_border_war_scope = yes
+				}
+			}
+		}
+	}
+
+	on_war_relation_added = {
+		effect = {
+			log = "on_war_relation_added trade"
+			ROOT = { 
+				reload_trade_influence_on_war = yes 
+				every_enemy_country = {
+					every_enemy_country = {
+						limit = { is_ai = yes }
+						update_ai_slider_logic = yes
+					}
+				}
+				every_enemy_country = {
+					limit = { is_ai = yes }
+					update_ai_slider_logic = yes
+				}
+			}
+		}
+	}
+
+	on_peace = {
+		effect = {
+			# Trade
+			recalculate_trade_influence = yes
+
+			#War Taxes auto disable stuff
+			if = {
+				limit = {
+					has_country_flag = war_taxes_enabled
+					has_war = no
+				}
+				clr_country_flag = war_taxes_enabled
+				set_variable = { wt_status_frame = 1 }
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+				war_taxes_check = yes
+			}
+		}
+	}
+
+	on_monthly_ZZZ = {
+		effect = {
+			# Update embargoes between the superpowers
+			update_superpower_embargoes = yes
+		}
+	}
+
+	on_state_control_changed = {
+		effect = {
+			if = { # hurts state value based on occupier
+				limit = {
+					NOT = {
+						has_global_flag = NUCLEAR_WAR
+						FROM.FROM = { has_state_flag = TNO_recently_occupied }
+					}
+					ROOT = {
+						has_war_with = FROM
+					}
+				}
+				FROM.FROM = {
+					log = "[FROM.GetName]: [?state_value] was state value before applying effects of changing on war"
+					set_temp_variable = { state_value_kept = ROOT:modifier@state_GDP_kept_on_occupation_modifier }
+					clamp_temp_variable = {
+						var = state_value_kept
+						max = 1 
+					}
+					multiply_variable = { state_value = state_value_kept }
+					log = "[FROM.GetName]: [?state_value] was state value after applying effects of changing on war"
+					set_state_flag = { flag = TNO_recently_occupied value = 1 days = 14 }
+				}
+			}
+
+			# else_if = { # this bit hurts state_value a bit due to exchange that's not explicitly peaceful DISABLED FOR NOW
+
+			# 	limit = {
+			# 		NOT = {
+			# 			has_global_flag = NUCLEAR_WAR
+			# 		}
+			# 		NOT = {
+			# 			OR = {
+			# 				ROOT = {
+			# 					has_variable = peaceful_land_transfer
+			# 				}
+			# 				FROM = {
+			# 					has_variable = peaceful_land_transfer
+			# 				}
+			# 			}
+			# 		}
+			# 	}
+			# 	log = "[?state_value] was state value before applying effects of changing on non-peaceful transfer"
+			# 	FROM.FROM = {
+			# 		multiply_variable = { state_value = 0.95 }
+			# 	}
+			# 	log = "[?state_value] was state value after applying effects of changing on non-peaceful transfer"
+			# }
+			if = { # To prevent Old England Error spam at start (can be removed if no state changes on game start)
+				limit = { ROOT = { has_country_flag = TNO_has_started_up } }
+				ROOT = {
+					recalculate_GDP_and_PUs_on_demand = yes
+				}
+			}
+			if = {
+				limit = { FROM = { has_country_flag = TNO_has_started_up } }
+				FROM = {
+					recalculate_GDP_and_PUs_on_demand = yes
+				}
+			}
+
+			if = { #To make the AI reopen power supplies in states whose power supplies have been shut off by a player
+				limit = { FROM.FROM = { NOT = { check_variable = { TNO_lights = 1 } } } }
+				FROM.FROM = { set_variable = { TNO_lights = 1 } }
+				FROM.FROM = { set_state_flag = { flag = TNO_lit_up } }
+				FROM = { calculate_building_variables = yes }
+				ROOT = { calculate_building_variables = yes }
+			}
+
+			if = { #If the state returns to the player, idk why the values don't refresh on the building tab
+				limit = { FROM.FROM = { has_state_flag = TNO_lit_up } }
+				FROM = { calculate_building_variables = yes }
+				ROOT = { calculate_building_variables = yes }
+				FROM.FROM = { clr_state_flag = TNO_lit_up }
+			}
+		}	
+	}
+
+	# Anarchy tag daily pulse
+
+	# Anarchy tag weekly pulse
+	on_weekly_ZZZ = {
+		effect = {
+			first_every_week_script = yes
+			force_update_map_mode = {
+				mapmode = tno_culture_map_mode
+			}
+		}
+	}
+
+	# Anarchy tag monthly pulse
+	on_monthly_ZZZ = {
+		effect = {
+			first_every_month_script = yes
+			add_to_variable = { pulse_month = 1 }
+			if = {
+				limit = { check_variable = { pulse_month = 12 } }
+				set_variable = { pulse_month = 0 }
+				BRA_run_year_on_action = yes
+			}
+			Cold_War_GUI_Fully_Calculate_Scores = yes # Recalc scores
+		}
+	}
+
+	# Monthly Espionage Budget Pulse
+	on_monthly_GER = { effect = { Espionage_Budget_Update = yes } }
+	on_monthly_USA = { effect = { Espionage_Budget_Update = yes } }
+
+	# Monthly pulse for everyone - NO LAMOUNIER BAD
+
+}

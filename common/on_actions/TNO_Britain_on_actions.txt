@@ -1,0 +1,123 @@
+on_actions = {
+	on_daily_ENG = {
+		effect = {
+			if = {
+				limit = {
+					has_global_flag = TFL_ECW_ongoing
+					1566 = { is_owned_by = ENG }
+				}
+				ENG_demil_mann = yes
+			}
+			if = { # Workshop GUI
+				limit = { has_country_flag = BRI_WorkshopMechanic_Active }
+				for_each_loop = {
+					array = BRI_Workshop_Regions
+					subtract_from_variable = { BRI_Workshop_Action1_Cooldown@var:v = 1 }
+					subtract_from_variable = { BRI_Workshop_Action2_Cooldown@var:v = 1 }
+					subtract_from_variable = { BRI_Workshop_Action3_Cooldown@var:v = 1 }
+					subtract_from_variable = { BRI_Workshop_Action4_Cooldown@var:v = 1 }
+					subtract_from_variable = { BRI_Workshop_Action5_Cooldown@var:v = 1 }
+					clamp_variable = { var = BRI_Workshop_Action1_Cooldown@var:v min = 0 }
+					clamp_variable = { var = BRI_Workshop_Action2_Cooldown@var:v min = 0 }
+					clamp_variable = { var = BRI_Workshop_Action3_Cooldown@var:v min = 0 }
+					clamp_variable = { var = BRI_Workshop_Action4_Cooldown@var:v min = 0 }
+					clamp_variable = { var = BRI_Workshop_Action5_Cooldown@var:v min = 0 }
+
+					if = { # i hate this (reset action 5 pp cost)
+						limit = { 
+							check_variable = { BRI_Workshop_Action5_Check@var:v = 1 }
+							check_variable = { BRI_Workshop_Action5_Cooldown@var:v = 0 }
+						}
+						add_to_variable = { BRI_Workshop_Action5_Check@var:v = -1 }
+						add_to_variable = { BRI_Workshop_Action5_PP_Cost = -0.15 }
+					}
+				}
+				for_each_loop = {
+					array = BRI_Workshop_Goals
+					if = {
+						limit = {
+							check_variable = { BRI_Workshop_GoalDuration@var:v > 0 }
+							check_variable = { BRI_Workshop_GoalCompletion@var:v < 100 }
+						}
+						subtract_from_variable = { BRI_Workshop_GoalDuration@var:v = 1 }
+						add_to_variable = { BRI_Workshop_Dirty = 1 }
+					}
+					else = {
+						BRI_Workshop_ConcludeProject = yes
+					}
+				}
+			}
+		}
+	}
+
+	on_monthly_ENG = {
+		effect = {
+			if = {
+				limit = { has_country_flag = BRI_WorkshopMechanic_Active }
+				# Monthly Unemployment change
+				BRI_Workshop_GraphMonthlyUpdate = yes
+				set_temp_variable = { Unemployment = modifier@monthly_unemployment_rate }
+				BRI_Workshop_AddUnemployment = yes
+
+				# Monthly Influence effects
+				for_each_loop = {
+					array = BRI_Workshop_Regions
+					if = {
+						limit = { NOT = { check_variable = { BRI_Workshop_InflMonthly_Val@var:v = 0 } } }
+						set_temp_variable = { Region_v = v }
+						set_temp_variable = { CorpoID = BRI_Workshop_InflMonthly_ID@var:v }
+						set_temp_variable = { Influence = BRI_Workshop_InflMonthly_Val@var:v }
+						BRI_Workshop_AddInfluence = yes
+					}
+				}
+				if = { # Wallop ideas that decreases monthly corp influence
+					limit = { 
+						OR = {
+							has_idea = ENG_The_Imperial_State_dummy
+							has_idea = ENG_Oak_And_Ash_dummy
+						} 
+					} 
+					for_each_loop = {
+						array = BRI_Workshop_Regions
+						if = {
+							limit = { NOT = { check_variable = { BRI_Wallop_Ideas_Corp_var = 0 } } }
+							set_temp_variable = { Region_v = v }
+							set_temp_variable = { GroupID = 2 }
+							set_temp_variable = { Ownership = BRI_Wallop_Ideas_Corp_var } # default = -0.5 for britfasc, -0.25 for soccred
+							BRI_Workshop_AddOwnership = yes
+						}
+					}
+				}
+			}
+
+			# Yearly counter
+			add_to_variable = { month_counter = 1 }
+			if = {
+				limit = { check_variable = { month_counter = 12 } }
+				set_variable = { month_counter = 0 }
+
+				# on_yearly effects
+				set_variable = { BRI_Workshop_Action2_Uses = 5 }
+			}
+
+			# Goals
+			for_each_loop = {
+				array = BRI_Workshop_Goals
+				add_to_variable = { BRI_Workshop_GoalCompletion@var:v = BRI_Workshop_GoalCompletionGain@var:v }
+				clamp_variable = { var = BRI_Workshop_GoalCompletion@var:v max = 100 }
+				if = {
+					limit = {
+						check_variable = { v = token:ENG_Workshop_GUI_Goals_ThamesAirport }
+						NOT = { has_country_flag = BRI_Workshop_ThamesAirport_SoldContracts }
+					}
+					if = {
+						limit = { check_variable = { BRI_Workshop_GoalCompletion@var:ENG_Workshop_GUI_Goals_ThamesAirport > 20 } }
+						country_event = britain_projects.8
+						set_country_flag = BRI_Workshop_ThamesAirport_SoldContracts
+					}
+				}
+				BRI_Workshop_CheckObjectives = yes
+			}
+		}
+	}
+}

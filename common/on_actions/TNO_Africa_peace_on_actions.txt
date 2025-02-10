@@ -1,0 +1,981 @@
+on_actions = {
+	### OVEJA'S OWN PERSONAL VIETNAM
+	## Abandon all hope ye who enter here
+
+	on_peaceconference_ended = {
+		effect = {
+			if = { # West African War
+				limit = {
+					is_in_array = { global.WAC_contender = ROOT.id }
+					has_global_flag = west_african_war_ongoing
+				}
+
+				log = "[GetDateText]: FROM: [From.GetName] ROOT: [Root.GetName] WAC on_peaceconference_ended"
+
+				if = { # SCENARIO 1 / WAA vs. PALF
+					limit = { has_global_flag = WAC_scenario_1 }
+					if = { # WAA victory
+						limit = { is_in_array = { global.WAC_WAA_faction = ROOT.id } }
+						ZZZ = {
+							WAC_1_WAA_VICTORY = yes
+						}
+					}
+					else_if = { # PALF victory
+						limit = { is_in_array = { global.WAC_PALF_faction = ROOT.id } }
+						ZZZ = {
+							WAC_1_PALF_VICTORY = yes
+						}
+					}
+				}
+
+				else_if = { # SCENARIO 2 / WAA vs. FMA vs. PALF
+					limit = { has_global_flag = WAC_scenario_2 }
+
+
+					if = { # WAA fell
+						limit = {
+							NOT = { has_global_flag = WAC_scen2_WAA_fell }
+							all_of_scopes = {
+								array = global.WAC_WAA_faction
+								exists = no
+							}
+						}
+						set_global_flag = WAC_scen2_WAA_fell
+					}
+					if = { # FMA fell
+						limit = {
+							NOT = { has_global_flag = WAC_scen2_FMA_fell }
+							all_of_scopes = {
+								array = global.WAC_FMA_faction
+								exists = no
+							}
+						}
+						set_global_flag = WAC_scen2_FMA_fell
+						TNO_WAC_clear_decision_categories_scenario2usa = yes
+					}
+					if = { # PALF fell
+						limit = {
+							NOT = { has_global_flag = WAC_scen2_PALF_fell }
+							all_of_scopes = {
+								array = global.WAC_PALF_faction
+								exists = no
+							}
+						}
+						ROOT = {
+							annex_country = {
+								target = SWB
+								transfer_troops = no
+							}
+						}
+						ZZZ = {
+							WAC_2_PALF_BEATEN = yes
+						}
+					}
+
+					if = { # WAA victory royale
+						limit = {
+							is_in_array = { global.WAC_WAA_faction = ROOT.id }
+							has_global_flag = WAC_scen2_FMA_fell
+							has_global_flag = WAC_scen2_PALF_fell
+						}
+						ZZZ = {
+							WAC_2_WAA_VICTORY = yes
+						}
+					}
+					else_if = { # FMA victory royale
+						limit = {
+							is_in_array = { global.WAC_FMA_faction = ROOT.id }
+							has_global_flag = WAC_scen2_WAA_fell
+							has_global_flag = WAC_scen2_PALF_fell
+						}
+						ZZZ = {
+							WAC_2_FFR_VICTORY = yes
+						}
+					}
+					else_if = { # PALF victory royale
+						limit = {
+							is_in_array = { global.WAC_PALF_faction = ROOT.id }
+							has_global_flag = WAC_scen2_WAA_fell
+							has_global_flag = WAC_scen2_FMA_fell
+						}
+						ZZZ = {
+							WAC_2_PALF_VICTORY = yes
+						}
+					}
+				}
+
+				else_if = { # SCENARIO 3 / FMA vs. PALF
+					limit = { has_global_flag = WAC_scenario_3 }
+					if = { # FMA victory
+						limit = { is_in_array = { global.WAC_FMA_faction = ROOT.id } }
+						ZZZ = {
+							WAC_3_FMA_VICTORY = yes
+						}
+					}
+					else_if = { # PALF victory
+						limit = { is_in_array = { global.WAC_PALF_faction = ROOT.id } }
+						ZZZ = {
+							WAC_3_PALF_VICTORY = yes
+						}
+					}
+				}
+			}
+
+			else_if = { # Mano Campaign - PALF Victory
+				limit = {
+					is_in_array = { global.mano_campaign_contender = ROOT.id }
+					has_global_flag = mano_campaign_ongoing
+					NOT = { has_global_flag = mano_campaign_MRP_victory }
+				}
+
+				log = "[GetDateText]: FROM: [From.GetName] ROOT: [Root.GetName] Mano on_peaceconference_ended"
+
+				if = { # PALF wins
+					limit = {
+						FROM = {
+							OR = {
+								tag = LIB
+								tag = MDI
+							}
+						}
+					}
+					ZZZ = {
+						MANO_PALF_VICTORY = yes
+					}
+				}
+			}
+
+			else_if = { # South African War - OFN Victory
+				limit = {
+					is_in_array = { global.SAW_participant = ROOT.id }
+					has_global_flag = south_african_war_happening
+					NOT = { has_global_flag = SAF_OFN_Victory }
+				}
+
+				if = { # OFN wins
+					limit = {
+						ROOT = {
+							tag = SAF
+						}
+						FROM = {
+							OR = {
+								original_tag = GRO
+								is_in_faction_with = GRO
+							}
+						}
+					}
+
+					log = "[GetDateText]: FROM: [From.GetName] ROOT: [Root.GetName] SAW on_peaceconference_ended"
+
+					SAF = {
+						country_event = { id = SAFWAR.13 }
+					}
+				}
+			}
+		}
+	}
+
+	on_capitulation = {
+		effect = {
+			## Cameroon Collapse ##
+			if = { # Cameroon Collapse
+				limit = {
+					has_global_flag = global_cameroon_has_collapsed
+					FROM = { is_in_array = { global.cameroon_collapse = THIS } }
+					ROOT = { is_in_array = { global.cameroon_collapse = THIS } }
+				}
+
+				log = "[GetDateText]: FROM: [From.GetName] ROOT: [Root.GetName] WAC - Cameroon Collapse on_capitulation"
+
+				set_global_flag = skip_default_capitulation
+
+				# Saraland
+				if = {
+					limit = {
+						FROM = {
+							OR = {
+								original_tag = KNM
+								original_tag = CHF
+								original_tag = CHD
+							}
+						}
+						ROOT = {
+							OR = {
+								original_tag = KNM
+								original_tag = CHF
+								original_tag = CHD
+							}
+						}
+					}
+					FROM = {
+						white_peace = ROOT
+						annex_country = {
+							target = ROOT
+							transfer_troops = no
+						}
+						every_state = {
+							limit = {
+								is_core_of = ROOT
+							}
+							add_core_of = FROM
+							remove_core_of = ROOT
+						}
+					}
+					if = {
+						limit = {
+							FROM = { original_tag = CHF }
+							NOT = { country_exists = CHD country_exists = KNM }
+						}
+						CHF = { set_cosmetic_tag = CHF_unified }
+					}
+				}
+
+				# Nigeria
+				else_if = {
+					limit = {
+						FROM = {
+							OR = {
+								original_tag = NNG
+								original_tag = NGA
+								original_tag = YOR
+								original_tag = HAU
+								original_tag = BFR
+							}
+						}
+						ROOT = {
+							OR = {
+								original_tag = NNG
+								original_tag = NGA
+								original_tag = YOR
+								original_tag = HAU
+								original_tag = BFR
+							}
+						}
+					}
+
+					FROM = { white_peace = ROOT }
+
+					if = { # YOR vs NNG vs NGA vs HAU
+						limit = {
+							FROM = {
+								OR = {
+									original_tag = NNG
+									original_tag = NGA
+									original_tag = YOR
+									original_tag = HAU
+								}
+							}
+							ROOT = {
+								OR = {
+									original_tag = NNG
+									original_tag = NGA
+									original_tag = YOR
+									original_tag = HAU
+								}
+							}
+							NOT = {
+								FROM = { original_tag = BFR }
+								ROOT = { original_tag = BFR }
+							}
+						}
+						FROM = {
+							annex_country = {
+								target = ROOT
+								transfer_troops = no
+							}
+						}
+						if = {
+							limit = {
+								NOT = {
+									country_exists = NGA
+									country_exists = YOR
+									country_exists = HAU
+								}
+								FROM = { original_tag = NNG }
+							}
+							NNG = {
+								every_owned_state = {
+									add_core_of = NNG
+								}
+								set_cosmetic_tag = NNG_unified
+							}
+						}
+						else_if = {
+							limit = {
+								NOT = {
+									country_exists = YOR
+									country_exists = NNG
+									country_exists = HAU
+								}
+								FROM = { original_tag = YOR }
+							}
+							NGA = {
+								every_owned_state = {
+									add_core_of = NGA
+								}
+							}
+						}
+						else_if = {
+							limit = {
+								NOT = {
+									country_exists = NGA
+									country_exists = NNG
+									country_exists = HAU
+								}
+								FROM = { original_tag = YOR }
+							}
+							YOR = {
+								every_owned_state = {
+									add_core_of = YOR
+								}
+								set_cosmetic_tag = YOR_unified
+							}
+						}
+						else_if = {
+							limit = {
+								NOT = {
+									country_exists = NNG
+									country_exists = YOR
+									country_exists = HAU
+								}
+								FROM = { original_tag = NGA }
+							}
+							NGA = {
+								if = {
+									limit = {
+										has_government = paternalism
+									}
+									country_event = { id = A_SPRING.22 days = 100 }
+									set_country_flag = NGA_convenient_WAF_check
+								}
+							}
+						}
+					}
+
+					else_if = { # Biafra
+						limit = {
+							FROM = {
+								OR = {
+									original_tag = NNG
+									original_tag = NGA
+									original_tag = YOR
+									original_tag = HAU
+									original_tag = BFR
+								}
+							}
+							ROOT = {
+								OR = {
+									original_tag = NNG
+									original_tag = NGA
+									original_tag = YOR
+									original_tag = HAU
+									original_tag = BFR
+								}
+							}
+						}
+						if = { # Free Biafra
+							limit = { FROM = { original_tag = BFR } }
+							ROOT = { white_peace = BFR }
+						}
+						else = { # dead biafra rip
+							FROM = {
+								annex_country = {
+									target = ROOT
+									transfer_troops = no
+								}
+							}
+						}
+					}
+				}
+
+				# Cameroon
+
+				else_if = { # Breakaway Factions + Collapse Victory
+					limit = {
+						FROM = { original_tag = CAO }
+						ROOT = {
+							OR = {
+								original_tag = BFR
+								original_tag = CHD
+								original_tag = CHF
+								original_tag = KNM
+								original_tag = YOR
+								original_tag = NNG
+								original_tag = NGA
+								original_tag = HAU
+							}
+						}
+					}
+					CAO = {
+						white_peace = ROOT
+						annex_country = {
+							target = ROOT
+							transfer_troops = no
+						}
+					}
+					if = {
+						limit = {
+							NOT = {
+								country_exists = BFR
+								country_exists = CHD
+								country_exists = CHF
+								country_exists = KNM
+								country_exists = YOR
+								country_exists = NNG
+								country_exists = NGA
+								country_exists = HAU
+							}
+						}
+						CAO = { country_event = CAO.101 }
+					}
+				}
+
+				else_if = { # Cameroon Dies
+					limit = { ROOT = { original_tag = CAO } }
+					every_country = {
+						limit = { has_war_with = CAO }
+						white_peace = CAO
+					}
+					CAO = {
+						country_event = CAO.102
+					}
+				}
+			}
+
+			else_if = { # Mano Campaign - Mano Victory
+				limit = {
+					is_in_array = { global.mano_campaign_contender = FROM.id }
+					is_in_array = { global.mano_campaign_contender = ROOT.id }
+					has_global_flag = mano_campaign_ongoing
+				}
+
+				if = { # Mano Pact wins
+					limit = {
+						FROM = {
+							OR = {
+								tag = LIB
+								tag = MDI
+							}
+						}
+					}
+					ZZZ = { MANO_MRP_VICTORY = yes }
+				}
+			}
+
+			## Orungu Campaign
+			else_if = {
+				limit = {
+					FROM = {
+						OR = {
+							original_tag = CAO
+							is_in_faction_with = CAO
+						}
+					}
+					ROOT = { original_tag = GAB }
+				}
+				log = "[GetDateText]: FROM: [From.GetName] ROOT: [Root.GetName] Orungu Campaign on_capitulation"
+				set_global_flag = skip_default_capitulation
+				ROOT = {
+					every_country = {
+						limit = { has_war_with = ROOT }
+						white_peace = ROOT
+					}
+				}
+				CPR = {
+					set_autonomy = {
+						target = GAB
+						autonomy_state = autonomy_client_state
+					}
+				}
+				GAB = {
+					set_politics = { ruling_party = socialist }
+					set_popularities = {
+						socialist = 75
+						communist = 15
+						paternalism = 10
+					}
+					set_cosmetic_tag = GAB_CPR_puppet
+					remove_all_ministers = yes
+					fill_empty_minister_nochecks = yes
+					econ_join_sphere_CAO = yes
+					set_country_flag = PALF_MEMBER
+					add_ideas = WEST_AFRICA_idea_economic_reconstruction
+					set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Planned }
+					econ_type_change = yes
+					add_ideas = PALF_Satellite_peace
+					CAO = {
+						add_to_faction = GAB
+					}
+				}
+			}
+		}
+	}
+
+	on_capitulation_immediate = {
+		effect = {
+			if = { # West Africa - Pre-WAC
+				limit = {
+					FROM = { is_west_african_nation = yes }
+					ROOT = { is_west_african_nation = yes }
+					NOT = { has_global_flag = west_african_war_ongoing }
+					NOT = { has_global_flag = WAC_over }
+					NOT = {
+						AND = {
+							FROM = { is_in_array = { global.cameroon_collapse = THIS } }
+							ROOT = { is_in_array = { global.cameroon_collapse = THIS } }
+						}
+					}
+				}
+				log = "[GetDateText]: FROM: [From.GetName] ROOT: [Root.GetName] WAC - Pre-WAC on_capitulation_immediate"
+
+				set_global_flag = skip_default_capitulation
+
+				if = { # Sokoto
+					limit = {
+						ROOT = {
+							OR = {
+								original_tag = HAU
+								original_tag = SWB
+							}
+						}
+						FROM = {
+							OR = {
+								tag = HAU
+								tag = SWB
+								is_in_faction_with = SWB
+							}
+						}
+					}
+
+					every_country = {
+						limit = { has_war_with = ROOT }
+						white_peace = ROOT
+					}
+
+					if = {
+						limit = {
+							FROM = {
+								OR = {
+									tag = SWB
+									is_in_faction_with = SWB
+								}
+							}
+						}
+						SWB = {
+							annex_country = {
+								target = HAU
+								transfer_troops = no
+							}
+						}
+					}
+					else = {
+						HAU = {
+							annex_country = {
+								target = SWB
+								transfer_troops = no
+							}
+						}
+					}
+					if = {
+						limit = {
+							FROM = {
+								OR = {
+									tag = SWB
+									is_in_faction_with = SWB
+								}
+							}
+						}
+						SWB = {
+							set_cosmetic_tag = SWB_unified
+						}
+					}
+				}
+
+				else_if = { # Zarmaland
+					limit = {
+						ROOT = { original_tag = ZAR }
+					}
+
+					every_country = {
+						limit = { has_war_with = ZAR }
+						white_peace = ZAR
+					}
+
+					SWB = {
+						add_state_core = 1226
+						transfer_state = 1226
+					}
+				}
+
+				else_if = { # Yorubaland
+					limit = {
+						FROM = {
+							OR = {
+								original_tag = CAO
+								is_in_faction_with = CAO
+							}
+						}
+						ROOT = { original_tag = YOR }
+					}
+
+					CAO = { remove_ideas = CAO_idea_tense_borders }
+
+					if = {
+						limit = { has_global_flag = west_african_war_ongoing }
+						# leave empty
+					}
+					else = {
+						CAO = {
+							white_peace = YOR
+							annex_country = {
+								target = YOR
+								transfer_troops = no
+							}
+						}
+					}
+				}
+
+				else_if = { # Mossiland
+					limit = {
+						ROOT = { tag = BKF }
+						FROM = { tag = FFR }
+					}
+
+					FROM = {
+						white_peace = ROOT
+						annex_country = {
+							target = ROOT
+							transfer_troops = no
+						}
+					}
+				}
+			}
+
+			## Post-WAC ##
+			else_if = {
+				limit = {
+					FROM = { is_west_african_nation = yes }
+					ROOT = { is_west_african_nation = yes }
+					has_global_flag = WAC_over
+					NOT = {
+						AND = {
+							FROM = { is_in_array = { global.cameroon_collapse = THIS } }
+							ROOT = { is_in_array = { global.cameroon_collapse = THIS } }
+						}
+					}
+					NOT = {
+						AND = {
+							FROM = { is_in_array = { global.mano_campaign_contender = THIS } }
+							ROOT = { is_in_array = { global.mano_campaign_contender = THIS } }
+						}
+					}
+				}
+
+				log = "[GetDateText]: FROM: [From.GetName] ROOT: [Root.GetName] WAC - Post-WAC on_capitulation_immediate"
+
+				if = { # Kayes
+					limit = {
+						FROM = { original_tag = KAY }
+						has_global_flag = WAC_scenario_1 #Should only ever trigger after WAA victory in Scenario 1
+					}
+					set_global_flag = skip_default_capitulation
+					# leave empty in purpose so KAY doesn't fuck up the peace deals, they're supposed to die
+				}
+
+				else_if = { # Kayes
+					limit = {
+						ROOT = { original_tag = KAY }
+						has_global_flag = WAC_scenario_1 #Should only ever trigger after WAA victory in Scenario 1
+					}
+					set_global_flag = skip_default_capitulation
+					ROOT = {
+						every_country = {
+							limit = { has_war_with = ROOT }
+							white_peace = ROOT
+						}
+					}
+					KAY = {
+						remove_state_core = 836
+						remove_state_core = 1227
+						remove_state_core = 1231
+						remove_state_core = 1225
+						remove_state_core = 837
+						remove_state_core = 1230
+						remove_state_core = 1540
+						remove_state_core = 1604
+					}
+					MLI = {
+						annex_country = {
+							target = KAY
+							transfer_troops = no
+						}
+					}
+				}
+
+				else_if = { # Futa
+					limit = {
+						FROM = { original_tag = FTF }
+					}
+					set_global_flag = skip_default_capitulation
+					# leave empty in purpose so FTF doesn't fuck up the peace deals, they're supposed to die
+				}
+
+				else_if = { # Futa
+					limit = {
+						ROOT = { original_tag = FTF }
+					}
+					set_global_flag = skip_default_capitulation
+					ROOT = {
+						every_country = {
+							limit = { has_war_with = ROOT }
+							white_peace = ROOT
+						}
+					}
+					if = {
+						limit = { country_exists = MLI }
+						MLI = {
+							add_state_core = 1216
+							transfer_state = 1216
+						}
+					}
+					else = {
+						KAY = {
+							add_state_core = 1216
+							transfer_state = 1216
+						}
+					}
+				}
+
+				else_if = { # Zarmaland
+					limit = {
+						FROM = { original_tag = ZAR }
+					}
+					set_global_flag = skip_default_capitulation
+
+					# leave empty in purpose so ZAR doesn't fuck up the peace deals, they're supposed to die
+					if = { # leaving this comment here in case i ever need to return to it
+						limit = {
+							ROOT = { original_tag = HAU }
+							has_global_flag = global_cameroon_has_collapsed
+						}
+						HAU = { white_peace = ZAR }
+						NGR = {
+							add_state_core = 1226
+							add_state_core = 832
+							add_state_core = 1542
+							add_state_core = 835
+							add_state_core = 1221
+							add_state_core = 1220
+							transfer_state = 1226
+							transfer_state = 832
+							transfer_state = 1542
+							transfer_state = 835
+							transfer_state = 1221
+							transfer_state = 1220
+							TNO_startup_nation = yes
+
+							set_politics = { ruling_party = despotism }
+
+							set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+							econ_subtype_change = yes
+						}
+					}
+				}
+
+				else_if = { # Zarmaland
+					limit = {
+						ROOT = { original_tag = ZAR }
+					}
+					set_global_flag = skip_default_capitulation
+					ROOT = {
+						every_country = {
+							limit = { has_war_with = ROOT }
+							white_peace = ROOT
+						}
+					}
+					if = {
+						limit = { has_global_flag = WAC_SCENARIO_3_FMA_VICTORY }
+						NGR = {
+							add_state_core = 1226
+							add_state_core = 831
+							add_state_core = 1218
+							add_state_core = 1219
+							transfer_state = 1226
+							transfer_state = 831
+							transfer_state = 1218
+							transfer_state = 1219
+							TNO_startup_nation = yes
+
+							FFR = {
+								puppet = NGR
+								add_to_faction = NGR
+								country_event = { # invasion of sokoto
+									id = west_african_crisis.110
+									days = 30
+								}
+							}
+							set_cosmetic_tag = NGR_FFRPuppet
+							set_politics = { ruling_party = despotism }
+							set_popularities = {
+								socialist = 20
+								progressivism = 0
+								liberalism = 0
+								liberal_conservatism = 0
+								conservatism = 20
+								paternalism = 20
+								despotism = 40
+							}
+
+							set_country_flag = FMA_MEMBER
+							hidden_effect = {
+								remove_faction_status = yes
+								add_ideas = FMA_Puppet
+							}
+							if = {
+								limit = { FFR = { has_idea = WEST_AFRICA_idea_economic_reconstruction } }
+								swap_ideas = {
+									remove_idea = WEST_AFRICA_idea_obliterated_infrastructures
+									add_idea = WEST_AFRICA_idea_economic_reconstruction
+								}
+							}
+							set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+							econ_subtype_change = yes
+						}
+					}
+					else_if = {
+						limit = { has_global_flag = WAC_SCENARIO_3_PALF_VICTORY }
+
+						SWB = {
+							add_state_core = 1226
+							add_state_core = 831
+							add_state_core = 1218
+							add_state_core = 1219
+							transfer_state = 1226
+							transfer_state = 831
+							transfer_state = 1218
+							transfer_state = 1219
+							TNO_startup_nation = yes
+
+							CAO = {
+								puppet = SWB
+								add_to_faction = SWB
+								country_event = { # invasion of sokoto
+									id = west_african_crisis.110
+									days = 30
+								}
+							}
+
+							set_politics = {
+								ruling_party = socialist
+								last_election = "1966.6.23"
+								election_frequency = 48
+								elections_allowed = no
+							}
+							set_popularities = {
+								communist = 10
+								socialist = 35
+								progressivism = 5
+								liberalism = 0
+								liberal_conservatism = 0
+								paternalism = 10
+								despotism = 30
+								ultranationalism = 0
+								fascism = 10
+							}
+							set_country_flag = PALF_MEMBER
+							hidden_effect = {
+								remove_faction_status = yes
+								add_ideas = PALF_Satellite_peace
+							}
+							if = {
+								limit = { CAO = { has_idea = WEST_AFRICA_idea_economic_reconstruction } }
+								swap_ideas = {
+									remove_idea = WEST_AFRICA_idea_obliterated_infrastructures
+									add_idea = WEST_AFRICA_idea_economic_reconstruction
+								}
+							}
+							set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Planned }
+							econ_type_change = yes
+
+							set_cosmetic_tag = SWB_unified
+							econ_join_sphere_CAO = yes
+						}
+					}
+				}
+
+				else_if = { # Sokoto
+					limit = {
+						FROM = { original_tag = HAU }
+					}
+					set_global_flag = skip_default_capitulation
+					HAU = {
+						every_country = {
+							limit = { has_war_with = HAU }
+							white_peace = HAU
+						}
+						transfer_state = 832
+						transfer_state = 1542
+						transfer_state = 831
+						transfer_state = 1218
+						transfer_state = 1219
+						if = {
+							limit = { NOT = { country_exists = ZAR } }
+							transfer_state = 1226
+						}
+					}
+				}
+
+				else_if = { # Sokoto
+					limit = {
+						ROOT = { original_tag = HAU }
+					}
+					set_global_flag = skip_default_capitulation
+					ROOT = {
+						every_country = {
+							limit = { has_war_with = ROOT }
+							white_peace = ROOT
+						}
+					}
+
+					if = { # FMA Victory
+						limit = { has_global_flag = WAC_SCENARIO_3_FMA_VICTORY }
+						NGR = {
+							add_state_core = 835
+							add_state_core = 1221
+							add_state_core = 1220
+							add_state_core = 832
+							add_state_core = 1542
+							transfer_state = 835
+							transfer_state = 1221
+							transfer_state = 1220
+							transfer_state = 832
+							transfer_state = 1542
+						}
+					}
+
+					else_if = { # PALF Victory
+						limit = { has_global_flag = WAC_SCENARIO_3_PALF_VICTORY }
+						SWB = {
+							add_state_core = 835
+							add_state_core = 1221
+							add_state_core = 1220
+							add_state_core = 832
+							add_state_core = 1542
+							transfer_state = 835
+							transfer_state = 1221
+							transfer_state = 1220
+							transfer_state = 832
+							transfer_state = 1542
+						}
+					}
+				}
+			}
+		}
+	}
+	#don't mind me just logging wars
+	on_declare_war = {
+		effect = {
+			log="[GetDateText]: [Root.GetName] declared war on [From.GetName]"
+		}
+	}
+}

@@ -1,0 +1,872 @@
+
+shared_focus = {
+	id = BRA_the_intervention
+	icon = GFX_focus_BRA_the_intervention
+	cost = 0
+	x = 6
+	y = 0
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_the_intervention"
+		country_event = {
+			id = brazil.132
+		}
+		set_party_name = {#Change despotism party name from the gridlock
+			ideology = despotism
+			long_name = BRA_despotism_party_long
+			name = BRA_despotism_party
+		}
+		add_ideas = {
+			tno_political_parties_controlled_opposition
+			tno_press_rights_censored_press
+			tno_public_meetings_regulated
+			tno_vote_franchise_registered_voting
+			tno_trade_unions_state_controlled
+		}
+		effect_tooltip = {
+			TNO_worsen_trade_unions_policy_effectiveness_high = yes
+			TNO_worsen_press_rights_policy_effectiveness_high = yes
+			TNO_worsen_political_parties_policy_effectiveness_high = yes
+			TNO_worsen_public_meetings_policy_effectiveness_high = yes
+		}
+		hidden_effect = {
+			country_event = { id = brazil.340 days = 10 } # Arago sieges Rio
+			country_event = { id = brazil.313 days = 15 } # Goulart Flees
+			country_event = { id = brazil.310 days = 45 } # Vargas Watch
+			subtract_from_variable = { tno_trade_unions_effectiveness = 50 }
+			subtract_from_variable = { tno_press_rights_effectiveness = 40 }
+			subtract_from_variable = { tno_political_parties_effectiveness = 40 }
+			subtract_from_variable = { tno_public_meetings_effectiveness = 40 }
+			TNO_update_political_policy_effectiveness = yes
+			every_country = {
+				news_event = {
+					id = LATAM_news.5
+				}
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_lighting_ofensive
+	icon = GFX_focus_BRA_lightning_offensive
+	cost = 4
+	#prerequisite = { focus = BRA_the_intervention }
+	x = 0
+	y = 1
+	relative_position_id = BRA_the_intervention
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_lighting_ofensive"
+		custom_effect_tooltip = BRA_military_decrease_power_const_high
+		every_unit_leader = {
+			limit = { has_id = 4015 }
+			retire = yes
+		}
+		every_unit_leader = {
+			limit = { has_id = 4016 }
+			retire = yes
+		}
+		hidden_effect = {
+			subtract_from_variable = { BRA_military_const_power = 30 }
+			add_to_variable = { BRA_military_sorbonne_power = 15 }
+			add_to_variable = { BRA_military_hardliners_power = 15 }
+			BRA_military_update = yes
+		}
+		hidden_effect = {
+			country_event = { id = brazil.312 days = 14 } # Lott captured
+			country_event = { id = brazil.357 days = 7 } # Goias Reoccupied
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_pass_first_institutional_act
+	icon = GFX_focus_generic_suspend_constitution
+	cost = 1
+	prerequisite = { focus = BRA_humbertos_inauguration }
+	x = 0
+	y = 2
+	relative_position_id = BRA_the_intervention
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_pass_first_institutional_act"
+		add_popularity = {
+			ideology = despotism
+			popularity = 0.04
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = -0.02
+		}
+		add_popularity = {
+			ideology = liberalism
+			popularity = -0.02
+		}
+		country_event ={
+			id = brazil.133
+		}
+		add_ideas = {
+			tno_vote_franchise_no_voting
+		}
+		TNO_improve_political_parties_policy_effectiveness_monthly_low = yes
+		TNO_improve_public_meetings_policy_effectiveness_monthly_low = yes
+		BRA_military_increase_power_hardliners_low = yes
+		effect_tooltip = {
+			BRA_military_decrease_power_const_high = yes
+		}
+		hidden_effect = {
+			set_variable = { BRA_military_const_power = 5 }
+			add_to_variable = { BRA_military_sorbonne_power = 5 }
+			add_to_variable = { BRA_military_hardliners_power = 5 }
+			BRA_military_update = yes
+			country_event = { id = brazil.309 days = 6 } # Adhemar Bribe
+			country_event = { id = brazil.343 days = 16 } # Governors back the Military
+			country_event = { id = brazil.314 days = 28 } # Lacerda Bends the knee
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_arrest_dissidents
+	icon = GFX_focus_ITA_OLD_begin_the_crackdown
+	cost = 4
+	#prerequisite = { focus = BRA_pass_first_institutional_act }
+	x = -2
+	y = 1
+	relative_position_id = BRA_pass_first_institutional_act
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_arrest_dissidents"
+		custom_effect_tooltip = BRA_military_nation_chaos_action
+		add_popularity = {
+			ideology = progressivism
+			popularity = -0.03
+		}
+		TNO_worsen_public_meetings_policy_effectiveness_monthly_med = yes
+		hidden_effect = {
+			BRA_check_nation_chaos = yes
+			subtract_from_variable = { BRA_military_const_power = 4 }
+			add_to_variable = { BRA_military_sorbonne_power = 2 }
+			add_to_variable = { BRA_military_hardliners_power = 2 }
+			BRA_military_update = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_win_over_media
+	icon = GFX_focus_generic_kickstart_the_media
+	cost = 4
+	#prerequisite = { focus = BRA_pass_first_institutional_act }
+	x = 2
+	y = 1
+	relative_position_id = BRA_pass_first_institutional_act
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_win_over_media"
+		custom_effect_tooltip = BRA_military_nation_chaos_action_2
+		set_temp_variable = { temp_econ_spending_amount = 0.075 }
+		econ_spend_money_once_effect_raw_money = yes
+		TNO_improve_press_rights_policy_effectiveness_monthly_low = yes
+		TNO_improve_security_policy_effectiveness_low = yes
+		add_popularity = {
+			ideology = despotism
+			popularity = 0.02
+		}
+		add_popularity = {
+			ideology = conservatism
+			popularity = -0.02
+		}
+		hidden_effect = {
+			subtract_from_variable = { BRA_military_const_power = 4 }
+			add_to_variable = { BRA_military_sorbonne_power = 2 }
+			add_to_variable = { BRA_military_hardliners_power = 2 }
+			BRA_military_update = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_break_up_strikes
+	icon = GFX_focus_generic_purge_opposition
+	cost = 4
+	prerequisite = { focus = BRA_arrest_dissidents }
+	x = -1
+	y = 1
+	relative_position_id = BRA_arrest_dissidents
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_break_up_strikes"
+		country_event = {
+			id = brazil.134
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_crush_students
+	icon = GFX_focus_generic_cage_the_students
+	cost = 4
+	prerequisite = { focus = BRA_arrest_dissidents }
+	x = 1
+	y = 1
+	relative_position_id = BRA_arrest_dissidents
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_crush_students"
+		BRA_military_increase_power_hardliners_low = yes
+		TNO_worsen_education_policy_effectiveness_high = yes
+		TNO_worsen_academic_base_med = yes
+		add_manpower = -5000
+		BRA_check_nation_chaos = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_totally_not_a_coup
+	icon = GFX_focus_generic_peoples_coup
+	cost = 4
+	prerequisite = { focus = BRA_win_over_media }
+	x = -1
+	y = 1
+	relative_position_id = BRA_win_over_media
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_totally_not_a_coup"
+		country_event = {
+			id = brazil.137
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_storm_them_instead
+	icon = GFX_focus_generic_pacific_blitz_2
+	cost = 4
+	prerequisite = { focus = BRA_win_over_media }
+	x = 1
+	y = 1
+	relative_position_id = BRA_win_over_media
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_storm_them_instead"
+		country_event = {
+			id = brazil.135
+		}
+		BRA_check_nation_chaos = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_hunt_down_communist
+	icon = GFX_focus_generic_execute_communists
+	cost = 4
+	prerequisite = { focus = BRA_crush_students }
+	prerequisite = { focus = BRA_break_up_strikes }
+	x = -1
+	y = 1
+	relative_position_id = BRA_crush_students
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_hunt_down_communist"
+		add_popularity = {
+			ideology = communist
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = socialist
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = -0.01
+		}
+		tno_trade_unions_worsen = yes
+		add_manpower = -500
+		hidden_effect = {
+			subtract_from_variable = { BRA_military_const_power = 4 }
+			add_to_variable = { BRA_military_sorbonne_power = 2 }
+			add_to_variable = { BRA_military_hardliners_power = 2 }
+			BRA_military_update = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_move_into_country
+	icon = GFX_focus_COG_through_the_jungle
+	cost = 4
+	prerequisite = { focus = BRA_crush_students }
+	prerequisite = { focus = BRA_totally_not_a_coup }
+	x = 1
+	y = 1
+	relative_position_id = BRA_crush_students
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_move_into_country"
+		country_event = {
+			id = brazil.136
+		}
+		BRA_check_nation_chaos = yes
+		hidden_effect = {
+			country_event = { id = brazil.311 days = 15 } # To Kill an eagle
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_censorship_laws
+	icon = GFX_focus_generic_change_law_voting
+	cost = 4
+	prerequisite = { focus = BRA_storm_them_instead }
+	prerequisite = { focus = BRA_totally_not_a_coup }
+	x = -1
+	y = 1
+	relative_position_id = BRA_storm_them_instead
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_censorship_laws"
+		swap_ideas = {
+			remove_idea = tno_press_rights_free_press
+			add_idea = tno_press_rights_censored_press
+		}
+		TNO_improve_press_rights_policy_effectiveness_monthly_low = yes
+		hidden_effect = {
+			subtract_from_variable = { BRA_military_const_power = 4 }
+			add_to_variable = { BRA_military_sorbonne_power = 2 }
+			add_to_variable = { BRA_military_hardliners_power = 2 }
+			BRA_military_update = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_win_over_companies
+	icon = GFX_focus_generic_corporate_wealth_red
+	cost = 4
+	prerequisite = { focus = BRA_hunt_down_communist }
+	prerequisite = { focus = BRA_move_into_country }
+	x = 1
+	y = 1
+	relative_position_id = BRA_hunt_down_communist
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_win_over_companies"
+		BRA_check_nation_chaos = yes
+		set_temp_variable = { business_tax_temp = -0.1 }
+		set_temp_variable = { temp_econ_GDP_boost_percentage = 0.03 }
+		econ_GDP_boost_once_percentage = yes
+		econ_business_tax_rate_change = yes
+		set_temp_variable = { gdp_growth_temp = 0.02 }
+		econ_gdp_growth_change = yes
+		hidden_effect = {
+			subtract_from_variable = { BRA_military_const_power = 8 }
+			add_to_variable = { BRA_military_sorbonne_power = 4 }
+			add_to_variable = { BRA_military_hardliners_power = 4 }
+			BRA_military_update = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_talk_with_cia
+	icon = GFX_focus_USA_contact_the_cia
+	cost = 4
+	prerequisite = { focus = BRA_censorship_laws }
+	prerequisite = { focus = BRA_move_into_country }
+	x = -1
+	y = 1
+	relative_position_id = BRA_censorship_laws
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_talk_with_cia"
+		country_event = {
+			id = brazil.138
+		}
+		hidden_effect = {
+			subtract_from_variable = { BRA_military_const_power = 8 }
+			add_to_variable = { BRA_military_sorbonne_power = 4 }
+			add_to_variable = { BRA_military_hardliners_power = 4 }
+			BRA_military_update = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_the_storm_subsides
+	icon = GFX_focus_BRA_the_storm_subsides
+	cost = 4
+	prerequisite = { focus = BRA_win_over_companies }
+	prerequisite = { focus = BRA_talk_with_cia }
+	x = 1
+	y = 1
+	relative_position_id = BRA_win_over_companies
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_the_storm_subsides"
+		BRA_check_nation_chaos = yes
+		TNO_improve_admin_efficiency_low = yes
+		TNO_improve_army_professionalism_high = yes
+		hidden_effect = {
+			subtract_from_variable = { BRA_military_const_power = 8 }
+			add_to_variable = { BRA_military_sorbonne_power = 4 }
+			add_to_variable = { BRA_military_hardliners_power = 4 }
+			BRA_military_update = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_schedule_new_elections
+	icon = GFX_focus_generic_election
+	cost = 4
+	prerequisite = { focus = BRA_the_storm_subsides }
+	mutually_exclusive = { focus = BRA_pass_second_institutional_act }
+	available = {
+		custom_trigger_tooltip = {
+			tooltip = BRA_sorbonne_high_tt
+			BRA_sorbonne_high = yes
+		}
+	}
+	x = -1
+	y = 1
+	relative_position_id = BRA_the_storm_subsides
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_schedule_new_elections"
+		set_country_flag = BRA_sorbonne_military_wins
+		country_event = {
+			id = BRA_military_elections.1
+			days = 7
+		}
+		hidden_effect = {
+			set_country_flag = BRA_military_power_struggle_over
+			clr_country_flag = BRA_military_category_allowed
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_pass_second_institutional_act
+	icon = GFX_focus_BRA_pass_the_second_institutional_act
+	cost = 4
+	prerequisite = { focus = BRA_the_storm_subsides }
+	mutually_exclusive = { focus = BRA_schedule_new_elections }
+	available = {
+		custom_trigger_tooltip = {
+			tooltip = BRA_hardliner_high_tt
+			BRA_hardliner_high = yes
+		}
+	}
+	x = 7
+	y = 8
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_pass_second_institutional_act"
+		set_country_flag = BRA_hardline_military_wins
+		tno_public_meetings_worsen = yes
+		TNO_improve_political_parties_policy_effectiveness_monthly_high = yes
+		country_event = {
+			id = brazil.141
+		}
+		set_party_name = {
+			ideology = fascism
+			long_name = BRA_arena_name_long
+			name = BRA_arena_name
+		}
+		set_party_name = {
+			ideology = despotism
+			long_name = BRA_arena_name_long
+			name = BRA_arena_name
+		}
+		set_party_name = {
+			ideology = paternalism
+			long_name = BRA_arena_name_long
+			name = BRA_arena_name
+		}
+		set_party_name = {
+			ideology = conservatism
+			long_name = BRA_mdb_name_long
+			name = BRA_mdb_name
+		}
+		set_party_name = {
+			ideology = liberalism
+			long_name = BRA_mdb_name_long
+			name = BRA_mdb_name
+		}
+		set_party_name = {
+			ideology = progressivism
+			long_name = BRA_mdb_name_long
+			name = BRA_mdb_name
+		}
+		set_party_name = {
+			ideology = socialist
+			long_name = BRA_socialist_party_pcdob_long
+			name = BRA_socialist_party_pcdob
+		}
+		hidden_effect = {
+			clr_country_flag = BRA_military_category_allowed
+			set_country_flag = BRA_military_power_struggle_over
+			country_event = { id = brazil.315 days = 2 } # Lacerda scared
+			country_event = { id = brazil.271 days = 5 }
+			promote_character = BRA_Costa_e_Silva
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_humbertos_inauguration
+	icon = GFX_focus_BRA_humbertos_inauguration
+	cost = 1
+	prerequisite = { focus = BRA_the_intervention }
+	x = 0
+	y = 1
+	relative_position_id = BRA_the_intervention
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_humbertos_inauguration"
+		promote_character = BRA_Humberto_Castelo_Branco
+		add_stability = 0.05
+		BRA_military_increase_loyalty_high = yes
+		country_event = { id = brazil.445 }
+		hidden_effect = {
+			country_event = { id = brazil.312 days = 2 } # Lott captured
+			country_event = { id = brazil.357 days = 7 } # Goias Reoccupied
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_meet_with_delfim_netto
+	icon = GFX_focus_BRA_meet_with_delfim_netto
+	cost = 3
+	prerequisite = { focus = BRA_pass_first_institutional_act }
+	x = -5
+	y = 1
+	relative_position_id = BRA_pass_first_institutional_act
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_meet_with_delfim_netto"
+		set_temp_variable = { inflation_temp = -2 }
+		econ_inflation_change = yes
+		set_temp_variable = { gdp_growth_temp = -1 }
+		econ_gdp_growth_change = yes
+		country_event = { id = brazil.446 }
+	}
+}
+
+shared_focus = {
+	id = BRA_attract_investment
+	icon = GFX_focus_generic_let_the_money_flow
+	cost = 2
+	prerequisite = { focus = BRA_meet_with_delfim_netto }
+	x = -1
+	y = 1
+	relative_position_id = BRA_meet_with_delfim_netto
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_attract_investment"
+		set_temp_variable = { business_tax_temp = -0.05 }
+		econ_business_tax_rate_change = yes
+		501 = {
+			set_temp_variable = { temp_state_value_addition = 0.5 }
+			econ_state_value_change_addition_specified_state = yes
+		}
+		499 = {
+			set_temp_variable = { temp_state_value_addition = 0.5 }
+			econ_state_value_change_addition_specified_state = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_ban_strikes
+	icon = GFX_focus_BRA_end_coffee_strikes
+	cost = 2
+	prerequisite = { focus = BRA_attract_investment }
+	x = -1
+	y = 2
+	relative_position_id = BRA_meet_with_delfim_netto
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_ban_strikes"
+		country_event = { id = brazil.139 }
+		effect_tooltip = {
+			TNO_improve_trade_unions_policy_effectiveness_high = yes
+		}
+		hidden_effect = {
+			add_to_variable = { tno_trade_unions_effectiveness = 30 }
+			TNO_update_political_policy_effectiveness = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_freeze_wages
+	icon = GFX_focus_generic_mind_the_economy
+	cost = 2
+	prerequisite = { focus = BRA_meet_with_delfim_netto }
+	x = 1
+	y = 1
+	relative_position_id = BRA_meet_with_delfim_netto
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_freeze_wages"
+		tno_minimum_wage_worsen = yes
+		effect_tooltip = {
+			TNO_worsen_minimum_wage_policy_effectiveness_high = yes
+		}
+		set_temp_variable = { inflation_temp = -3 }
+		econ_inflation_change = yes
+		hidden_effect = {
+			subtract_from_variable = { tno_minimum_wage_effectiveness = 20 }
+			TNO_update_economic_policy_effectiveness = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_build_up_infrastructure
+	icon = GFX_focus_generic_new_broad_gauge_railways
+	cost = 2
+	prerequisite = { focus = BRA_freeze_wages }
+	x = 1
+	y = 2
+	relative_position_id = BRA_meet_with_delfim_netto
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_build_up_infrastructure"
+		504 = {
+			add_building_construction = {
+				type = infrastructure
+				level = 2
+				instant_build = yes
+			}
+		}
+		498 = {
+			add_building_construction = {
+				type = infrastructure
+				level = 2
+				instant_build = yes
+			}
+		}
+		BRA_develop_increase_industry_central_west_med = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_dealing_with_dissent
+	icon = GFX_focus_generic_riot_police_2
+	cost = 3
+	prerequisite = { focus = BRA_pass_first_institutional_act }
+	x = 5
+	y = 1
+	relative_position_id = BRA_pass_first_institutional_act
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_dealing_with_dissent"
+		country_event = { id = brazil.447 }
+		BRA_military_increase_power_hardliners_low = yes
+		TNO_improve_security_policy_effectiveness_med = yes
+	}
+}
+
+shared_focus = {
+	id = BRA_ban_the_far_left
+	icon = GFX_focus_generic_execute_communists
+	cost = 2
+	prerequisite = { focus = BRA_dealing_with_dissent }
+	x = -1
+	y = 1
+	relative_position_id = BRA_dealing_with_dissent
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_ban_the_far_left"
+		TNO_improve_political_parties_policy_effectiveness_med = yes
+		add_popularity = {
+			ideology = communist
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = -0.01
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_extinguish_the_student_union
+	icon = GFX_focus_BRA_extinguish_the_student_union
+	cost = 2
+	prerequisite = { focus = BRA_ban_the_far_left }
+	x = -1
+	y = 2
+	relative_position_id = BRA_dealing_with_dissent
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_extinguish_the_student_union"
+		add_stability = 0.03
+		#country_event = { id = brazil.361 days = 1 }
+		effect_tooltip = {
+			TNO_improve_public_meetings_policy_effectiveness_high = yes
+		}
+		hidden_effect = {
+			add_to_variable = { tno_public_meetings_effectiveness = 30 }
+			TNO_update_political_policy_effectiveness = yes
+			add_popularity = {#Should be moved to the event's effects
+				ideology = communist
+				popularity = 0.01
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_close_opposition_radio_stations
+	icon = GFX_focus_generic_change_law_speech
+	cost = 2
+	prerequisite = { focus = BRA_dealing_with_dissent }
+	x = 1
+	y = 1
+	relative_position_id = BRA_dealing_with_dissent
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_close_opposition_radio_stations"
+		country_event = { id = brazil.135 }
+		TNO_improve_press_rights_policy_effectiveness_med = yes
+		TNO_improve_press_rights_policy_effectiveness_monthly_low = yes
+		swap_ideas = {
+			remove_idea = BRA_idea_nationwide_chaos_max
+			add_idea = BRA_idea_nationwide_chaos_high
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_integrate_the_integralists
+	icon = GFX_focus_generic_fascist_handshake
+	cost = 2
+	prerequisite = { focus = BRA_close_opposition_radio_stations }
+	x = 1
+	y = 2
+	relative_position_id = BRA_dealing_with_dissent
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_integrate_the_integralists"
+		country_event = { id = brazil.360 days = 1 }
+		add_popularity = {
+			ideology = fascism
+			popularity = 0.01
+		}
+		TNO_improve_political_parties_policy_effectiveness_med = yes
+		hidden_effect = {
+			country_event = { id = brazil.311 days = 15 } # To Kill an eagle
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_establish_a_formalized_high_command
+	icon = GFX_focus_generic_army_officers
+	cost = 2
+	prerequisite = { focus = BRA_pass_first_institutional_act }
+	x = 0
+	y = 1
+	relative_position_id = BRA_pass_first_institutional_act
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_establish_a_formalized_high_command"
+		country_event = { id = brazil.140 }
+		TNO_improve_army_professionalism_low = yes
+		add_ideas = BRA_idea_formalised_high_command
+		BRA_military_increase_loyalty_med = yes
+		BRA_military_increase_nepotism_low = yes
+		custom_effect_tooltip = BRA_military_decrease_power_const_high
+		every_unit_leader = {
+			limit = { has_id = 4015 }
+			retire = yes
+		}
+		every_unit_leader = {
+			limit = { has_id = 4016 }
+			retire = yes
+		}
+		every_unit_leader = {
+			limit = { has_id = 4300 }
+			retire = yes
+		}
+		hidden_effect = {
+			subtract_from_variable = { BRA_military_const_power = 30 }
+			add_to_variable = { BRA_military_sorbonne_power = 15 }
+			add_to_variable = { BRA_military_hardliners_power = 15 }
+			BRA_military_update = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_reform_the_officer_corps
+	icon = GFX_focus_RUS_budget_debate
+	cost = 2
+	prerequisite = { focus = BRA_establish_a_formalized_high_command }
+	mutually_exclusive = { focus = BRA_leave_as_it_is }
+	x = -2
+	y = 2
+	relative_position_id = BRA_pass_first_institutional_act
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_reform_the_officer_corps"
+		BRA_military_decrease_loyalty_low = yes
+		add_political_power = -30
+		swap_ideas = {
+			remove_idea = BRA_idea_formalised_high_command
+			add_idea = BRA_idea_formalised_high_command_2
+		}
+		hidden_effect = {
+			BRA_military_increase_power_hardliners_low = yes
+			BRA_military_decrease_power_sorbonne_low = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_leave_as_it_is
+	icon = GFX_focus_generic_new_model_army
+	cost = 2
+	prerequisite = { focus = BRA_establish_a_formalized_high_command }
+	mutually_exclusive = { focus = BRA_reform_the_officer_corps }
+	x = 2
+	y = 2
+	relative_position_id = BRA_pass_first_institutional_act
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_leave_as_it_is"
+		BRA_military_increase_loyalty_low = yes
+		add_political_power = 20
+		hidden_effect = {
+			BRA_military_increase_power_sorbonne_low = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_form_the_sni
+	icon = GFX_focus_BRA_form_the_sni
+	cost = 2
+	prerequisite = {
+		focus = BRA_reform_the_officer_corps
+		focus = BRA_leave_as_it_is
+	}
+	x = 0
+	y = 3
+	relative_position_id = BRA_pass_first_institutional_act
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_form_the_sni"
+		if = {
+			limit = { has_dlc = "La Resistance" }
+			create_intelligence_agency = yes
+		}
+		BRA_military_increase_loyalty_low = yes
+		effect_tooltip = {
+			TNO_improve_security_policy_effectiveness_high = yes
+		}
+		country_event = { id = brazil.244 }
+		hidden_effect = {
+			add_to_variable = { tno_security_effectiveness = 20 }
+			TNO_update_social_policy_effectiveness = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = BRA_prepare_the_elections
+	icon = GFX_focus_BRA_prepare_the_elections
+	cost = 2
+	prerequisite = { focus = BRA_ban_strikes }
+	prerequisite = { focus = BRA_build_up_infrastructure }
+	prerequisite = { focus = BRA_form_the_sni }
+	prerequisite = { focus = BRA_extinguish_the_student_union }
+	prerequisite = { focus = BRA_integrate_the_integralists }
+	x = 0
+	y = 4
+	relative_position_id = BRA_pass_first_institutional_act
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRA_prepare_the_elections"
+		country_event = { id = brazil.362 days = 1 }
+		add_stability = 0.05
+		remove_ideas = BRA_idea_nationwide_chaos_high
+		hidden_effect = {
+			set_country_flag = BRA_military_power_struggle_over
+			clr_country_flag = BRA_military_category_allowed
+		}
+	}
+}

@@ -1,0 +1,107 @@
+
+#  ________   ______   _______   ______   ______   __    __   ______    ______   ________        __       __   ______    ______            _____   ______   __       __  ________   ______         _______    ______   __    __  _______  
+#  /        | /      \ /       \ /      | /      \ /  \  /  | /      \  /      \ /        |      /  |  _  /  | /      \  /      \          /     | /      \ /  \     /  |/        | /      \       /       \  /      \ /  \  /  |/       \ 
+#  $$$$$$$$/ /$$$$$$  |$$$$$$$  |$$$$$$/ /$$$$$$  |$$  \ $$ |/$$$$$$  |/$$$$$$  |$$$$$$$$/       $$ | / \ $$ |/$$$$$$  |/$$$$$$  |         $$$$$ |/$$$$$$  |$$  \   /$$ |$$$$$$$$/ /$$$$$$  |      $$$$$$$  |/$$$$$$  |$$  \ $$ |$$$$$$$  |
+#  $$ |__    $$ \__$$/ $$ |__$$ |  $$ |  $$ |  $$ |$$$  \$$ |$$ |__$$ |$$ | _$$/ $$ |__          $$ |/$  \$$ |$$ |  $$ |$$ |  $$ |            $$ |$$ |__$$ |$$$  \ /$$$ |$$ |__    $$ \__$$/       $$ |__$$ |$$ |  $$ |$$$  \$$ |$$ |  $$ |
+#  $$    |   $$      \ $$    $$/   $$ |  $$ |  $$ |$$$$  $$ |$$    $$ |$$ |/    |$$    |         $$ /$$$  $$ |$$ |  $$ |$$ |  $$ |       __   $$ |$$    $$ |$$$$  /$$$$ |$$    |   $$      \       $$    $$< $$ |  $$ |$$$$  $$ |$$ |  $$ |
+#  $$$$$/     $$$$$$  |$$$$$$$/    $$ |  $$ |  $$ |$$ $$ $$ |$$$$$$$$ |$$ |$$$$ |$$$$$/          $$ $$/$$ $$ |$$ |  $$ |$$ |  $$ |      /  |  $$ |$$$$$$$$ |$$ $$ $$/$$ |$$$$$/     $$$$$$  |      $$$$$$$  |$$ |  $$ |$$ $$ $$ |$$ |  $$ |
+#  $$ |_____ /  \__$$ |$$ |       _$$ |_ $$ \__$$ |$$ |$$$$ |$$ |  $$ |$$ \__$$ |$$ |_____       $$$$/  $$$$ |$$ \__$$ |$$ \__$$ |      $$ \__$$ |$$ |  $$ |$$ |$$$/ $$ |$$ |_____ /  \__$$ |      $$ |__$$ |$$ \__$$ |$$ |$$$$ |$$ |__$$ |
+#  $$       |$$    $$/ $$ |      / $$   |$$    $$/ $$ | $$$ |$$ |  $$ |$$    $$/ $$       |      $$$/    $$$ |$$    $$/ $$    $$/       $$    $$/ $$ |  $$ |$$ | $/  $$ |$$       |$$    $$/       $$    $$/ $$    $$/ $$ | $$$ |$$    $$/ 
+#  $$$$$$$$/  $$$$$$/  $$/       $$$$$$/  $$$$$$/  $$/   $$/ $$/   $$/  $$$$$$/  $$$$$$$$/       $$/      $$/  $$$$$$/   $$$$$$/         $$$$$$/  $$/   $$/ $$/      $$/ $$$$$$$$/  $$$$$$/        $$$$$$$/   $$$$$$/  $$/   $$/ $$$$$$$/  
+# Events
+# By Reich & OFN teams
+
+############################
+# Generic Espionage Events #
+############################
+add_namespace = TNO_Espionage
+
+country_event = { # Bi-weekly pulse
+	id = TNO_Espionage.0
+	title = "Espionage Bi-Weekly Pulse"
+	desc = "You shouldn't be seeing this"
+
+	hidden = yes
+	is_triggered_only = yes
+	trigger = { has_country_flag = TNO_Espionage_Mech_Active }
+
+	immediate = {
+		Espionage_Training_Update = yes
+		Espionage_Success_Update = yes
+		country_event = { id = TNO_Espionage.0 days = 14 }
+	}
+
+	option = { name = ":)" }
+}
+
+country_event = { # Research Pulse
+	id = TNO_Espionage.1
+	title = "Espionage Research Pulse"
+	desc = "You shouldn't be seeing this"
+
+	hidden = yes
+	is_triggered_only = yes
+	trigger = {
+		has_country_flag = TNO_Espionage_Mech_Active
+		check_variable = { TNO_Espionage_CurrentResearch > -1 }
+	}
+
+	immediate = { Espionage_Research_Update = yes }
+
+	option = { name = ":)" }
+}
+
+country_event = { # Started recruitment
+	id = TNO_Espionage.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event TNO_Espionage.2" }
+	title = TNO_Espionage.2.t
+	desc = TNO_Espionage.2.desc
+	picture = GFX_report_event_GER_abwehr_intelligence
+
+	is_triggered_only = yes
+
+	option = { #
+		name = TNO_Espionage.2.a
+	}
+}
+
+country_event = { # Recruitment finished
+	id = TNO_Espionage.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event TNO_Espionage.3" }
+	title = TNO_Espionage.3.t
+	desc = TNO_Espionage.3.desc
+	picture = GFX_report_event_KOM_SC_agent_in_chair
+
+	is_triggered_only = yes
+	immediate = { clr_country_flag = TNO_Espionage_IsRecruiting }
+
+	option = { #
+		name = TNO_Espionage.3.a
+		custom_effect_tooltip = TNO_Espionage_AddAgent_tt
+		add_to_variable = { TNO_Espionage_Agents = 1 }
+		add_to_variable = { TNO_Espionage_AgentsTotal = 1 }
+		set_temp_variable = { ExpertiseChange = 25 } Espionage_AddExpertise = yes
+		set_variable = { TNO_Espionage_Training = 0 }
+	}
+}
+
+country_event = { # Recruitment Pulse
+	id = TNO_Espionage.4
+	title = "Espionage Recruitment Pulse"
+	desc = "You shouldn't be seeing this"
+
+	hidden = yes
+	is_triggered_only = yes
+	trigger = { has_country_flag = TNO_Espionage_IsRecruiting }
+
+	immediate = {
+		if = {
+			limit = { has_country_flag = TNO_Espionage_IsRecruiting }
+			add_to_variable = { TNO_Espionage_Training = 10 }
+			clamp_variable = { var = TNO_Espionage_Training max = 100 }
+			country_event = { id = TNO_Espionage.4 days = 10 }
+		}
+	}
+
+	option = { name = ":)" }
+}

@@ -1,0 +1,3631 @@
+BRI_Party_of_Contrasts_category = {
+
+	ENG_weekly_influence_tick = {
+		icon = GFX_decision_GNG_clock_indent
+		priority = 110
+		activation = {
+			has_country_flag = TNO_BRI_Party_GUI_Active
+		}
+		visible = {
+			has_country_flag = TNO_BRI_Party_GUI_Active
+		}
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+		cancel_if_not_visible = yes
+		cancel_trigger = { hidden_trigger = { NOT = { has_country_flag = TNO_BRI_Party_GUI_Active } } }
+		days_mission_timeout = 7
+
+		timeout_effect = {
+			BRI_Party_OnWeekly = yes # only affects chaos
+			BRI_Party_Influence_tick = yes
+			hidden_effect = {
+				if = {
+					limit = { has_country_flag = TNO_BRI_Party_GUI_Active }
+					activate_mission = ENG_weekly_influence_tick
+				}
+			}
+		}
+	}
+
+	ENG_POC_CurrentSelection = {
+		icon = GFX_decision_generic_shake_hands
+		priority = 150
+		available = { hidden_trigger = { always = no } }
+		ai_will_do = { base = 0 }
+	}
+
+	ENG_POC_Remove_Chaos_5 = {
+		icon = GFX_decision_generic_shake_hands
+		priority = 105
+		available = {
+			check_variable = { BRI_Chaos > 5 }
+		}
+		visible = {
+			check_variable = { BRI_Chaos > 5 }
+		}
+		ai_will_do = {
+			base = 10
+		}
+		cost = 15
+		days_remove = 14
+		days_re_enable = 30
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_POC_Remove_Chaos_5"
+		}
+		remove_effect = {
+			set_temp_variable = { ChaosChange = -5 }
+			BRI_Party_Modify_Chaos = yes
+		}
+	}
+
+	ENG_POC_Remove_Chaos_10 = {
+		icon = GFX_decision_generic_shake_hands
+		priority = 106
+		available = {
+			check_variable = { BRI_Chaos > 10 }
+		}
+		visible = {
+			check_variable = { BRI_Chaos > 10 }
+		}
+		ai_will_do = {
+			base = 10
+		}
+		cost = 25
+		days_remove = 21
+		days_re_enable = 30
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_POC_Remove_Chaos_10"
+		}
+		remove_effect = {
+			set_temp_variable = { ChaosChange = -10 }
+			BRI_Party_Modify_Chaos = yes
+		}
+	}
+
+	ENG_POC_Remove_Chaos_15 = {
+		icon = GFX_decision_generic_shake_hands
+		priority = 107
+		available = {
+			check_variable = { BRI_Chaos > 15 }
+		}
+		visible = {
+			check_variable = { BRI_Chaos > 15 }
+		}
+		ai_will_do = {
+			base = 10
+		}
+		cost = 35
+		days_remove = 30
+		days_re_enable = 45
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_POC_Remove_Chaos_15"
+		}
+		remove_effect = {
+			set_temp_variable = { ChaosChange = -15 }
+			BRI_Party_Modify_Chaos = yes
+		}
+	}
+
+	# Section 0 - (S)peers
+
+	ENG_Ideo_Peers_Large_Boost = {
+		icon = GFX_decision_generic_evening_curfews
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 0 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 50 }
+			check_variable = { political_power > 49.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_decrease_voting_eff
+		days_remove = 20
+		days_re_enable = 60
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Ideo_Peers_Large_Boost"
+			add_political_power = -50
+			TNO_worsen_vote_franchise_policy_effectiveness_low = yes
+			set_temp_variable = { CandidateChange = 0 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Peers_IncreaseIdeologues_Large = yes
+			BRI_Party_Modify_Chaos_Large = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Prag_Peers_Large_Boost = {
+		icon = GFX_decision_generic_factory_inspection
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 0 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 50 }
+			set_temp_variable = { t_m_check = 300 }
+			check_variable = { political_power > 49.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 20
+		days_re_enable = 60
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Prag_Peers_Large_Boost"
+			add_political_power = -50
+			set_temp_variable = { temp_econ_spending_amount = 0.3 }
+			econ_spend_money_once_effect_raw_money = yes
+			set_temp_variable = { CandidateChange = 1 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Peers_IncreasePragmatists_Large = yes
+			BRI_Party_Modify_Chaos_Large = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Ideo_Peers_Med_Boost = {
+		icon = GFX_decision_GER_nsdap_reactionary
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 0 }
+				is_ai = yes
+			}
+			NOT = {
+				has_country_flag = BRI_Wallop_Active_flag
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 30 }
+			set_temp_variable = { M = 0.03 }
+			check_variable = { political_power > 29.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_nazi_pop
+		days_remove = 10
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Ideo_Peers_Med_Boost"
+			add_political_power = -30
+			add_popularity = {
+				ideology = national_socialism
+				popularity = 0.03
+			}
+			set_temp_variable = { CandidateChange = 0 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Peers_IncreaseIdeologues_Med = yes
+			BRI_Party_Modify_Chaos_Med = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Ideo_Peers_Med_Boost_OldGuard = {
+		icon = GFX_decision_generic_chess_king
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 0 }
+				is_ai = yes
+			}
+			has_country_flag = BRI_Wallop_Active_flag
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 30 }
+			set_temp_variable = { M = -0.025 }
+			check_variable = { political_power > 29.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_stab_bri
+		days_remove = 10
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Ideo_Peers_Med_Boost"
+			add_political_power = -30
+			add_stability = -0.025
+			set_temp_variable = { CandidateChange = 0 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Peers_IncreaseIdeologues_Med = yes
+			BRI_Party_Modify_Chaos_Med = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Prag_Peers_Med_Boost = {
+		icon = GFX_decision_generic_point_reversed
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 0 }
+				is_ai = yes
+			}
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = { N = 30 }
+			set_temp_variable = { M = 0.03 }
+			check_variable = { political_power > 29.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_desp_pop
+		days_remove = 10
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Prag_Peers_Med_Boost"
+			add_political_power = -30
+			add_popularity = {
+				ideology = despotism
+				popularity = 0.03
+			}
+			set_temp_variable = { CandidateChange = 1 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Peers_IncreasePragmatists_Med = yes
+			BRI_Party_Modify_Chaos_Med = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Ideo_Peers_Small_Boost = {
+		icon = GFX_decision_generic_farm
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 0 }
+				is_ai = yes
+			}
+		}
+
+		cost = 15
+		days_remove = 5
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Ideo_Peers_Small_Boost"
+			set_temp_variable = { CandidateChange = 0 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			set_country_flag = BFC_met
+			BRI_Party_Peers_IncreaseIdeologues = yes
+			BRI_Party_Modify_Chaos = yes
+			TNO_improve_security_policy_effectiveness_low = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Prag_Peers_Small_Boost = {
+		icon = GFX_decision_generic_money
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 0 }
+				is_ai = yes
+			}
+		}
+
+		cost = 15
+		days_remove = 5
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Prag_Peers_Small_Boost"
+			set_temp_variable = { CandidateChange = 1 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Peers_IncreasePragmatists = yes
+			BRI_Party_Modify_Chaos = yes
+			TNO_improve_income_taxation_policy_effectiveness_low = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	# Section 1 - German Garrison
+
+	ENG_Ideo_Garrison_Large_Boost = {
+		icon = GFX_decision_ENG_britain
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 1 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 50 }
+			set_temp_variable = { M = 10000 }
+			check_variable = { political_power > 49.99 }
+			check_variable = { manpower > 9999 }
+		}
+		custom_cost_text = decision_cost_N_pp_men
+		days_remove = 20
+		days_re_enable = 60
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Ideo_Garrison_Large_Boost"
+			set_temp_variable = { CandidateChange = 0 }
+			add_political_power = -50
+			add_manpower = -10000
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Garrison_IncreaseIdeologues_Large = yes
+			BRI_Party_Modify_Chaos_Large = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Prag_Garrison_Large_Boost = {
+		icon = GFX_decision_generic_luxury_trade_increase
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 1 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 50 }
+			check_variable = { political_power > 49.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_decrease_milprof
+		days_remove = 20
+		days_re_enable = 60
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Prag_Garrison_Large_Boost"
+			set_temp_variable = { CandidateChange = 1 }
+			add_political_power = -50
+			TNO_worsen_army_professionalism_med = yes
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Garrison_IncreasePragmatists_Large = yes
+			BRI_Party_Modify_Chaos_Large = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Support_The_BFC = {
+		icon = GFX_decision_generic_pakt_business
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 1 }
+				is_ai = yes
+			}
+			NOT = {
+				has_country_flag = BRI_Wallop_Active_flag
+			}
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 30 }
+			set_temp_variable = { t_inf_eq_check = 750 }
+			check_variable = { political_power > 29.99 }
+			check_variable = { num_equipment@infantry_equipment > 749 }
+		}
+		custom_cost_text = decision_cost_pp_inf_eq_dynamic
+		days_remove = 10
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Support_The_BFC"
+			add_political_power = -30
+			add_equipment_to_stockpile = { type = infantry_equipment amount = -750 producer = ENG }
+			set_temp_variable = { CandidateChange = 0 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Garrison_IncreaseIdeologues_Med = yes
+			BRI_Party_Modify_Chaos_Med = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Support_The_British_Army = {
+		icon = GFX_decision_generic_military_parade
+		visible = {
+			has_country_flag = BRI_Wallop_Active_flag
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 1 }
+				is_ai = yes
+			}
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 30 }
+			set_temp_variable = { t_inf_eq_check = 750 }
+			check_variable = { political_power > 29.99 }
+			check_variable = { num_equipment@infantry_equipment > 749 }
+		}
+		custom_cost_text = decision_cost_pp_inf_eq_dynamic
+		days_remove = 10
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Support_The_BFC"
+			add_political_power = -30
+			add_equipment_to_stockpile = { type = infantry_equipment amount = -750 producer = ENG }
+			set_temp_variable = { CandidateChange = 0 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Garrison_IncreaseIdeologues_Med = yes
+			BRI_Party_Modify_Chaos_Med = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Prag_Garrison_Med_Boost = {
+		icon = GFX_decision_generic_building_army_base
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 1 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 30 }
+			set_temp_variable = { M = 30 }
+			check_variable = { command_power > 29.99 }
+			check_variable = { political_power > 29.99 }
+		}
+		custom_cost_text = decision_cost_30_cp_30_pp_rev
+		days_remove = 10
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Prag_Garrison_Med_Boost"
+			add_political_power = -30
+			add_command_power = -30
+			set_temp_variable = { CandidateChange = 1 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Garrison_IncreasePragmatists_Med = yes
+			BRI_Party_Modify_Chaos_Med = yes
+			TNO_improve_training_policy_effectiveness_low = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Meet_With_The_BFC = {
+		icon = GFX_decision_generic_guard
+		visible = {
+			NOT = {
+				has_country_flag = BRI_Wallop_Active_flag
+			}
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 1 }
+				is_ai = yes
+			}
+		}
+
+		cost = 15
+		days_remove = 5
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Meet_With_The_BFC"
+			set_temp_variable = { CandidateChange = 0 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Garrison_IncreaseIdeologues = yes
+			BRI_Party_Modify_Chaos = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Meet_With_The_Garrison_Command = {
+		icon = GFX_decision_generic_pakt_guns
+		visible = {
+			has_country_flag = BRI_Wallop_Active_flag
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 1 }
+				is_ai = yes
+			}
+		}
+
+		cost = 15
+		days_remove = 5
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Meet_With_The_Garrison_Command"
+			set_temp_variable = { CandidateChange = 0 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Garrison_IncreaseIdeologues = yes
+			BRI_Party_Modify_Chaos = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Dine_With_The_Plenipotentiary = {
+		icon = GFX_decision_generic_invitation
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 1 }
+				is_ai = yes
+			}
+		}
+
+		cost = 15
+		days_remove = 5
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Dine_With_The_Plenipotentiary"
+			set_temp_variable = { CandidateChange = 1 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Garrison_IncreasePragmatists = yes
+			BRI_Party_Modify_Chaos = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	# Section 2 - German Corpos
+	#rip bozo
+
+	ENG_Ideo_Corporations_Large_Boost = {
+		icon = GFX_decision_generic_break_treaty
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 2 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 50 }
+			set_temp_variable = { M = -0.1 }
+			check_variable = { political_power > 49.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_M_gdp_growth
+		days_remove = 20
+		days_re_enable = 60
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Ideo_Corporations_Large_Boost"
+			set_temp_variable = { CandidateChange = 0 }
+			BRI_Party_Choice_Update = yes
+			add_political_power = -50
+			set_temp_variable = { gdp_growth_temp = -0.1 }
+			econ_gdp_growth_change = yes
+		}
+		remove_effect = {
+			BRI_Party_Corporations_IncreaseIdeologues_Large = yes
+			BRI_Party_Modify_Chaos_Large = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Prag_Corporations_Large_Boost = {
+		icon = GFX_decision_terrain_urban
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 2 }
+				is_ai = yes
+			}
+		}
+
+		#cost = 50
+		custom_cost_trigger = {
+			set_temp_variable = { N = 50 }
+			check_variable = { political_power > 49.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_small_poverty
+		days_remove = 20
+		days_re_enable = 60
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Prag_Corporations_Large_Boost"
+			set_temp_variable = { CandidateChange = 1 }
+			BRI_Party_Choice_Update = yes
+			add_political_power = -50
+			TNO_worsen_poverty_low = yes
+		}
+		remove_effect = {
+			BRI_Party_Corporations_IncreasePragmatists_Large = yes
+			BRI_Party_Modify_Chaos_Large = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_cut_back_contracts = {
+		icon = GFX_decision_generic_document_cancel
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 2 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 30 }
+			set_temp_variable = { t_m_check = 150 }
+			check_variable = { political_power > 29.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 10
+		days_re_enable = 30
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_cut_back_contracts"
+			set_temp_variable = { CandidateChange = 0 }
+			add_political_power = -30
+			set_temp_variable = { temp_econ_spending_amount = 0.15 }
+			econ_spend_money_once_effect_raw_money = yes
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Corporations_IncreaseIdeologues_Med = yes
+			BRI_Party_Modify_Chaos_Med = yes
+		}
+	}
+
+	ENG_open_pipeline = {
+		icon = GFX_decision_generic_oil_pipeline
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 2 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 30 }
+			set_temp_variable = { M = 3 }
+			check_variable = { political_power > 29.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_M_corp_influence
+		days_remove = 10
+		days_re_enable = 30
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_open_pipeline"
+			set_temp_variable = { CandidateChange = 1 }
+			add_political_power = -30
+			set_temp_variable = { Region_v = var:BRI_Workshop_SelectedRegion }
+			set_temp_variable = { GroupID = 2 }
+			set_temp_variable = { Ownership = 3 }
+			BRI_Workshop_AddOwnership = yes
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Corporations_IncreasePragmatists_Med = yes
+			BRI_Party_Modify_Chaos_Med = yes
+		}
+	}
+
+	ENG_Push_back = {
+		icon = GFX_decision_generic_seizure
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 2 }
+				is_ai = yes
+			}
+		}
+
+		cost = 15
+		days_remove = 5
+		days_re_enable = 30
+		fixed_random_seed = no
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Push_back"
+			set_temp_variable = { CandidateChange = 0 }
+			random_list = {
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Scotland }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northwest }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northeast }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Yorkshire }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Wales }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_WestMidlands }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_EastMidlands }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Anglia }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southwest }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southeast }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_London }
+					set_temp_variable = { GroupID = 1 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+			}
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Corporations_IncreaseIdeologues = yes
+			BRI_Party_Modify_Chaos = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Meet_With_the_Megacorps = {
+		icon = GFX_decision_generic_gear_blue
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 2 }
+				is_ai = yes
+			}
+		}
+
+		cost = 15
+		days_remove = 5
+		days_re_enable = 30
+		fixed_random_seed = no
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Meet_With_the_Megacorps"
+			set_temp_variable = { CandidateChange = 1 }
+			random_list = {
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Scotland }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northwest }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northeast }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Yorkshire }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Wales }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_WestMidlands }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_EastMidlands }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Anglia }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southwest }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southeast }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+				1 = {
+					set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_London }
+					set_temp_variable = { GroupID = 2 }
+					set_temp_variable = { Ownership = 2 }
+					BRI_Workshop_AddOwnership = yes 
+				}
+			}
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Corporations_IncreasePragmatists = yes
+			BRI_Party_Modify_Chaos = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	# Section 3 - The Party
+
+	ENG_Ideo_Party_Large_Boost = {
+		icon = GFX_decision_category_generic_fascism
+		visible = {
+			NOT = {
+				has_country_flag = BRI_Wallop_Active_flag
+			}
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 3 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 50 }
+			check_variable = { political_power > 49.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_decrease_admin
+		days_remove = 20
+		days_re_enable = 60
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Ideo_Party_Large_Boost"
+			set_temp_variable = { CandidateChange = 0 }
+			add_political_power = -50
+			TNO_worsen_admin_efficiency_med = yes
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Party_IncreaseIdeologues_Large = yes
+			BRI_Party_Modify_Chaos_Large = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Ideo_Party_Large_Boost_OldGuard = {
+		icon = GFX_decision_generic_political_discourse
+		visible = {
+			has_country_flag = BRI_Wallop_Active_flag
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 3 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 50 }
+			check_variable = { political_power > 49.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_decrease_admin
+		days_remove = 20
+		days_re_enable = 60
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Ideo_Party_Large_Boost"
+			set_temp_variable = { CandidateChange = 0 }
+			add_political_power = -50
+			TNO_worsen_admin_efficiency_med = yes
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Party_IncreaseIdeologues_Large = yes
+			BRI_Party_Modify_Chaos_Large = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Prag_Party_Large_Boost = {
+		icon = GFX_decision_generic_independence
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 3 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 50 }
+			check_variable = { political_power > 49.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_decrease_party_eff
+		days_remove = 20
+		days_re_enable = 60
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Prag_Party_Large_Boost"
+			add_political_power = -50
+			TNO_worsen_political_parties_policy_effectiveness_low = yes
+			#TNO_calculate_actual_political_parties_policy_effectiveness = yes
+			set_temp_variable = { CandidateChange = 1 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Party_IncreasePragmatists_Large = yes
+			BRI_Party_Modify_Chaos_Large = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_indoctrinate = {
+		icon = GFX_decision_generic_propaganda
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 3 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 30 }
+			set_temp_variable = { M = -0.025 }
+			check_variable = { political_power > 29.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_stab_bri
+		days_remove = 10
+		days_re_enable = 30
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_indoctrinate"
+			set_temp_variable = { CandidateChange = 0 }
+			add_political_power = -30
+			add_stability = -0.025
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Modify_Chaos_Med = yes
+			set_country_flag = party_indoctrinated
+		}
+	}
+
+	ENG_educate = {
+		icon = GFX_decision_generic_political_action
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 3 }
+				is_ai = yes
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { N = 30 }
+			set_temp_variable = { M = -0.025 }
+			check_variable = { political_power > 29.99 }
+		}
+		custom_cost_text = decision_cost_N_pp_war_support
+		days_remove = 10
+		days_re_enable = 30
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_educate"
+			set_temp_variable = { CandidateChange = 1 }
+			add_political_power = -30
+			add_war_support = -0.025
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Party_IncreasePragmatists_Med = yes
+			BRI_Party_Modify_Chaos_Med = yes
+		}
+	}
+
+	ENG_Hold_A_Speech = {
+		icon = GFX_decision_generic_podium
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 3 }
+				is_ai = yes
+			}
+		}
+
+		cost = 15
+		days_remove = 5
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Hold_A_Speech"
+			set_temp_variable = { CandidateChange = 0 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Party_IncreaseIdeologues = yes
+			BRI_Party_Modify_Chaos = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+
+	ENG_Meet_With_Research_Department = {
+		icon = GFX_decision_generic_research
+		visible = {
+			OR = {
+				check_variable = { BRI_Party_CategorySelection = 3 }
+				is_ai = yes
+			}
+		}
+
+		cost = 15
+		days_remove = 5
+		days_re_enable = 30
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision ENG_Meet_With_Research_Department"
+			set_temp_variable = { CandidateChange = 1 }
+			BRI_Party_Choice_Update = yes
+		}
+		remove_effect = {
+			BRI_Party_Party_IncreasePragmatists = yes
+			BRI_Party_Modify_Chaos = yes
+		}
+		ai_will_do = { base = 10 }
+	}
+}
+
+BRI_Mann_Shall_Stand_category = {
+
+	BRI_Mann_SetUpArtillery = {
+		icon = GFX_decision_generic_towed_artillery
+		ai_will_do = {
+			base = 10
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { amount_weaponry = 9.99 }
+			check_variable = { BRI_Mann_Weaponry > amount_weaponry }
+		}
+		custom_cost_text = decision_cost_mann_10_weaponry
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Mann_SetUpArtillery"
+
+			set_temp_variable = { TargetState = BRI_Mann_StateSelected }
+			set_temp_variable = { D_Change = 5 }
+			BRI_Mann_Modify_Defenseviness = yes
+
+			hidden_effect = {
+				set_temp_variable = { WeaponryChange = -10 }
+				BRI_Mann_Modify_Weaponry = yes
+			}
+		}
+
+		days_remove = 10
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Mann_SetUpArtillery"
+
+			set_temp_variable = { IntelChange = 2.5 }
+			BRI_Mann_Modify_Intel_FEN = yes
+		}
+
+		days_re_enable = 5
+	}
+
+	BRI_Mann_LayMines = {
+		icon = GFX_decision_generic_landmines
+		ai_will_do = {
+			base = 10
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { amount_weaponry = 14.99 }
+			check_variable = { BRI_Mann_Weaponry > amount_weaponry }
+		}
+		custom_cost_text = decision_cost_mann_15_weaponry
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Mann_LayMines"
+
+			set_temp_variable = { TargetState = BRI_Mann_StateSelected }
+			set_temp_variable = { D_Change = 5 }
+			BRI_Mann_Modify_Defenseviness = yes
+
+			hidden_effect = {
+				set_temp_variable = { WeaponryChange = -15 }
+				BRI_Mann_Modify_Weaponry = yes
+			}
+		}
+
+		days_remove = 5
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Mann_LayMines"
+
+			set_temp_variable = { IntelChange = 2.5 }
+			BRI_Mann_Modify_Intel_FEN = yes
+		}
+
+		days_re_enable = 5
+	}
+
+	BRI_Mann_EstablishBunkers = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { amount_weaponry = 19.99 }
+			check_variable = { BRI_Mann_Weaponry > amount_weaponry }
+		}
+		custom_cost_text = decision_cost_mann_20_weaponry
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Mann_EstablishBunkers"
+
+			set_temp_variable = { TargetState = BRI_Mann_StateSelected }
+			set_temp_variable = { D_Change = 7.5 }
+			BRI_Mann_Modify_Defenseviness = yes
+			set_temp_variable = { DLoss_Change = -1.5 }
+			BRI_Mann_Modify_DefensevinessLoss = yes
+
+			hidden_effect = {
+				set_temp_variable = { WeaponryChange = -20 }
+				BRI_Mann_Modify_Weaponry = yes
+			}
+		}
+
+		days_remove = 10
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Mann_EstablishBunkers"
+
+			set_temp_variable = { IntelChange = 2.5 }
+			BRI_Mann_Modify_Intel_FEN = yes
+		}
+
+		days_re_enable = 5
+	}
+
+	BRI_Mann_DistributePolice = {
+		icon = GFX_decision_ENG_cop
+		ai_will_do = {
+			base = 10
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { amount_weaponry = 9.99 }
+			check_variable = { BRI_Mann_Weaponry > amount_weaponry }
+
+			set_temp_variable = { amount_intel = 14.99 }
+			check_variable = { BRI_Mann_Intel > amount_intel }
+		}
+		custom_cost_text = decision_cost_mann_intel_weaponry
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Mann_DistributePolice"
+
+			set_temp_variable = { TargetState = BRI_Mann_StateSelected }
+			set_temp_variable = { D_Change = 15 }
+			BRI_Mann_Modify_Defenseviness = yes
+			set_temp_variable = { DLoss_Change = 10 }
+			BRI_Mann_Modify_DefensevinessLoss = yes
+
+			hidden_effect = {
+				set_temp_variable = { WeaponryChange = -10 }
+				BRI_Mann_Modify_Weaponry = yes
+
+				set_temp_variable = { IntelChange = -15 }
+				BRI_Mann_Modify_Intel_ENG = yes
+			}
+		}
+
+		days_remove = 10
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Mann_DistributePolice"
+
+			set_temp_variable = { IntelChange = 5 }
+			BRI_Mann_Modify_Intel_FEN = yes
+		}
+
+		days_re_enable = 5
+	}
+
+	BRI_Mann_DirectPanzers = {
+		icon = GFX_decision_generic_tank
+		ai_will_do = {
+			base = 10
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { amount_weaponry = 24.99 }
+			check_variable = { BRI_Mann_Weaponry > amount_weaponry }
+		}
+		custom_cost_text = decision_cost_mann_25_weaponry
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Mann_DistributePolice"
+
+			set_temp_variable = { TargetState = BRI_Mann_StateSelected }
+			set_temp_variable = { D_Change = 20 }
+			BRI_Mann_Modify_Defenseviness = yes
+
+			hidden_effect = {
+				set_temp_variable = { WeaponryChange = -25 }
+				BRI_Mann_Modify_Weaponry = yes
+			}
+		}
+
+		days_remove = 10
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Mann_DistributePolice"
+
+			set_temp_variable = { IntelChange = 5 }
+			BRI_Mann_Modify_Intel_FEN = yes
+			set_temp_variable = { IntelBiWeeklyChange = 1.5 }
+			BRI_Mann_Modify_Intel_FEN_BiWeekly = yes
+			set_temp_variable = { WeaponrBiWeeklyChange = -2.5 }
+			BRI_Mann_Modify_Weaponry_BiWeekly = yes
+		}
+
+		days_re_enable = 5
+	}
+
+	BRI_Mann_WeaponryShow = {
+		icon = GFX_decision_generic_visibility
+		ai_will_do = {
+			base = 4000
+		}
+		visible = {
+			NOT = {
+				has_country_flag = BRI_Mann_WeaponryShown
+			}
+		}
+
+		complete_effect = {
+			set_country_flag = BRI_Mann_WeaponryShown
+		}
+	}
+
+	BRI_Mann_WeaponryHide = {
+		icon = GFX_decision_generic_visibility_closed
+
+		visible = {
+			has_country_flag = BRI_Mann_WeaponryShown
+		}
+
+		complete_effect = {
+			clr_country_flag = BRI_Mann_WeaponryShown
+		}
+	}
+
+	BRI_Mann_AssignFrontlineUnits = {
+		icon = GFX_decision_generic_building_army_base
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Mann_WeaponryShown
+		}
+
+		custom_cost_trigger = {
+			command_power > 24.99
+		}
+		custom_cost_text = decision_cost_25_cp
+
+		complete_effect = {
+			set_temp_variable = { WeaponryChange = 10 }
+			BRI_Mann_Modify_Weaponry = yes
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = -200
+			}
+			add_equipment_to_stockpile = {
+				type = support_equipment
+				amount = -100
+			}
+
+			hidden_effect = {
+				add_command_power = -25
+			}
+		}
+
+		days_remove = 10
+		remove_effect = {
+			add_fuel = -100
+		}
+
+		days_re_enable = 5
+	}
+
+	BRI_Mann_DedicateGermanCompanies = {
+		icon = GFX_decision_GER_nsdap_logo
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Mann_WeaponryShown
+		}
+
+		custom_cost_trigger = {
+			command_power > 14.99
+			has_political_power > 24.99
+		}
+		custom_cost_text = decision_cost_15_cp_25_pp
+
+		complete_effect = {
+			set_temp_variable = { WeaponryChange = 20 }
+			BRI_Mann_Modify_Weaponry = yes
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = -100
+			}
+			add_equipment_to_stockpile = {
+				type = support_equipment
+				amount = -50
+			}
+
+			hidden_effect = {
+				add_command_power = -15
+				add_political_power = -25
+			}
+		}
+
+		days_remove = 10
+		remove_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.05 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+
+		days_re_enable = 5
+	}
+
+	BRI_Mann_DeliverCovertCrates = {
+		icon = GFX_decision_generic_supply
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Mann_WeaponryShown
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = { amount_intel = 14.99 }
+			check_variable = { BRI_Mann_Intel > amount_intel }
+		}
+		custom_cost_text = decision_cost_mann_intel
+
+		complete_effect = {
+			set_temp_variable = { WeaponryChange = 15 }
+			BRI_Mann_Modify_Weaponry = yes
+			set_temp_variable = { IntelChange = -15 }
+			BRI_Mann_Modify_Intel_FEN = yes
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = -400
+			}
+		}
+
+		days_remove = 20
+		remove_effect = {
+			set_temp_variable = { IntelBiWeeklyChange = 1 }
+			BRI_Mann_Modify_Intel_FEN_BiWeekly = yes
+		}
+
+		days_re_enable = 10
+	}
+
+	BRI_Mann_IntelShow = {
+		icon = GFX_decision_generic_visibility
+		ai_will_do = {
+			base = 4000
+		}
+		visible = {
+			NOT = {
+				has_country_flag = BRI_Mann_IntelShown
+			}
+		}
+
+		complete_effect = {
+			set_country_flag = BRI_Mann_IntelShown
+		}
+	}
+
+	BRI_Mann_IntelHide = {
+		icon = GFX_decision_generic_visibility_closed
+
+		visible = {
+			has_country_flag = BRI_Mann_IntelShown
+		}
+
+		complete_effect = {
+			clr_country_flag = BRI_Mann_IntelShown
+		}
+	}
+
+	BRI_Mann_PlantFakeEvidence = {
+		icon = GFX_decision_generic_document_building_no
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Mann_IntelShown
+		}
+
+		custom_cost_trigger = {
+			command_power > 9.99
+		}
+		custom_cost_text = decision_cost_10_cp
+
+		complete_effect = {
+			set_temp_variable = { IntelChange = 5 }
+			BRI_Mann_Modify_Intel_ENG = yes
+
+			hidden_effect = {
+				add_command_power = -10
+			}
+		}
+
+		days_remove = 10
+		remove_effect = {
+			set_temp_variable = { IntelChange = -2.5 }
+			BRI_Mann_Modify_Intel_FEN = yes
+		}
+
+		days_re_enable = 5
+	}
+
+	BRI_Mann_PlaceFakeDefences = {
+		icon = GFX_decision_generic_lockdown
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Mann_IntelShown
+		}
+
+		cost = 25
+
+		complete_effect = {
+			set_temp_variable = { IntelChange = 7.5 }
+			BRI_Mann_Modify_Intel_ENG = yes
+		}
+
+		days_remove = 20
+		remove_effect = {
+			set_temp_variable = { IntelChange = -7.5 }
+			BRI_Mann_Modify_Intel_FEN = yes
+		}
+
+		days_re_enable = 10
+	}
+
+	BRI_Mann_InfiltrateHMMLR = {
+		icon = GFX_decision_generic_wiretaps
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Mann_IntelShown
+		}
+
+		custom_cost_trigger = {
+			command_power > 29.99
+			has_political_power > 29.99
+		}
+		custom_cost_text = decision_cost_30_cp_30_pp
+
+		complete_effect = {
+			set_temp_variable = { IntelBiWeeklyChange = 2.5 }
+			BRI_Mann_Modify_Intel_ENG_BiWeekly = yes
+
+			set_temp_variable = { IntelBiWeeklyChange = -1.5 }
+			BRI_Mann_Modify_Intel_FEN_BiWeekly = yes
+
+			hidden_effect = {
+				add_command_power = -30
+				add_political_power = -30
+			}
+		}
+
+		days_remove = 15
+		remove_effect = {
+			set_temp_variable = { WeaponryChange = 5 }
+			BRI_Mann_Modify_Weaponry = yes
+		}
+	}
+
+	BRI_Mann_BiWeeklyTick = {
+		icon = GFX_decision_generic_timer
+
+		activation = { always = no }
+		available = { hidden_trigger = { always = no } }
+
+		days_mission_timeout = 14
+		days_re_enable = 0
+
+		timeout_effect = {
+			hidden_effect = { activate_mission = BRI_Mann_BiWeeklyTick }
+
+			# ENG Intel
+			set_temp_variable = { IntelChange = BRI_Mann_Intel_BiWeekly }
+			BRI_Mann_Modify_Intel_ENG = yes
+
+			# FEN Intel
+			set_temp_variable = { IntelFENBiWeeklyChange = FEN.BRI_Mann_Intel_BiWeekly }
+			add_to_temp_variable = { IntelFENBiWeeklyChange = BRI_Mann_Weaponry_DynModModifiers^2 }
+			BRI_Mann_Modify_Intel_FEN = yes
+
+			# Weaponry
+			set_temp_variable = { WeaponryChange = BRI_Mann_Weaponry_BiWeekly }
+			BRI_Mann_Modify_Weaponry = yes
+
+			custom_effect_tooltip = BRI_Mann_BiWeeklyTick_tt
+			for_each_loop = {
+				array = BRI_Mann_State
+				if = {
+					limit = {
+						NOT = { check_variable = { BRI_Mann_StateStatus@var:v = token:BRI_Mann_StateOccupied } }
+					}
+					add_to_variable = { BRI_Mann_StateDefensiveness@var:v = -1.5 }
+					clamp_variable = { var = BRI_Mann_StateDefensiveness@var:v min = 0 }
+				}
+			}
+			add_to_variable = { BRI_Mann_Dirty = 1 }
+		}
+	}
+
+	BRI_Mann_Invasion_Start = {
+		icon = GFX_decision_generic_border_war
+
+		activation = { always = no }
+		available = { hidden_trigger = { always = no } }
+
+		days_mission_timeout = 14
+		days_re_enable = 0
+
+		timeout_effect = {
+			BRI_Mann_Invasion_Start = yes
+			hidden_effect = { activate_mission = BRI_Mann_Invasion_End }
+		}
+	}
+
+	BRI_Mann_Invasion_End = {
+		icon = GFX_decision_generic_border_war
+
+		activation = { always = no }
+		available = { hidden_trigger = { always = no } }
+
+		days_mission_timeout = 7
+		days_re_enable = 0
+
+		timeout_effect = {
+			BRI_Mann_Invasion_End = yes
+		}
+	}
+
+}
+
+BRI_The_Chimes_of_Midnight_category = {
+
+	BRI_Midnight_GenericShow = {
+		icon = GFX_decision_generic_visibility
+		ai_will_do = {
+			base = 4000
+		}
+		visible = {
+			NOT = {
+				has_country_flag = BRI_Midnight_GenericShown
+			}
+		}
+
+		complete_effect = {
+			set_country_flag = BRI_Midnight_GenericShown
+		}
+	}
+
+	BRI_Midnight_GenericHide = {
+		icon = GFX_decision_generic_visibility_closed
+
+		visible = {
+			has_country_flag = BRI_Midnight_GenericShown
+		}
+
+		complete_effect = {
+			clr_country_flag = BRI_Midnight_GenericShown
+		}
+	}
+
+	BRI_Midnight_LocateAndOverwhelm = {
+		icon = GFX_decision_generic_bombing
+
+		visible = {
+			has_country_flag = BRI_Midnight_GenericShown
+		}
+		ai_will_do = {
+			base = 10
+			modifier = {
+				check_variable = { BRI_Midnight_Confidence < 40.99 }
+				factor = 0
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { mil_confidence = 9.99 }
+			check_variable = { BRI_Midnight_Confidence > mil_confidence }
+		}
+		custom_cost_text = decision_cost_chimes_10_combat
+		days_remove = 20
+
+		modifier = {
+			land_night_attack = 0.15
+			breakthrough_factor = 0.3
+			decryption_factor = 0.5
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Midnight_LocateAndOverwhelm"
+
+			hidden_effect = {
+				set_temp_variable = { Confidence = -10 }
+				BRI_Midnight_ConfidenceAdd = yes
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Midnight_SeizePetrol"
+
+			random_controlled_state = {
+				damage_building = {
+					type = infrastructure
+					damage = 0.2
+				}
+			}
+		}
+	}
+
+	BRI_Midnight_PinDownAndOutmaneuver = {
+		icon = GFX_decision_generic_assault
+
+		visible = {
+			has_country_flag = BRI_Midnight_GenericShown
+		}
+		ai_will_do = {
+			base = 10
+			modifier = {
+				check_variable = { BRI_Midnight_Confidence < 40.99 }
+				factor = 0
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { mil_confidence = 9.99 }
+			check_variable = { BRI_Midnight_Confidence > mil_confidence }
+		}
+		custom_cost_text = decision_cost_chimes_10_combat
+		days_remove = 15
+
+		modifier = {
+			supply_consumption_factor = 0.3
+			army_speed_factor = 0.4
+			combat_width_factor = 0.5
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Midnight_LocateAndOverwhelm"
+
+			hidden_effect = {
+				set_temp_variable = { Confidence = -10 }
+				BRI_Midnight_ConfidenceAdd = yes
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Midnight_SeizePetrol"
+
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+
+	BRI_Midnight_SaveTheTrapped = {
+		icon = GFX_decision_generic_clock_red
+
+		visible = {
+			has_country_flag = BRI_Midnight_GenericShown
+		}
+		ai_will_do = {
+			base = 10
+			modifier = {
+				check_variable = { BRI_Midnight_Confidence < 40.99 }
+				factor = 0
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { mil_confidence = 9.99 }
+			check_variable = { BRI_Midnight_Confidence > mil_confidence }
+		}
+		custom_cost_text = decision_cost_chimes_10_combat
+		days_remove = 25
+
+		modifier = {
+			no_supply_grace = 48
+			pocket_penalty = -0.5
+			dont_lose_dig_in_on_attack = 0.5
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Midnight_SaveTheTrapped"
+
+			hidden_effect = {
+				set_temp_variable = { Confidence = -10 }
+				BRI_Midnight_ConfidenceAdd = yes
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Midnight_SaveTheTrapped"
+			add_political_power = 20
+		}
+	}
+
+	BRI_Midnight_SeizePetrol = {
+		icon = GFX_decision_generic_oil_pipeline
+
+		visible = {
+			has_country_flag = BRI_Midnight_GenericShown
+		}
+		ai_will_do = {
+			base = 10
+			modifier = {
+				check_variable = { BRI_Midnight_Confidence < 40.99 }
+				factor = 0
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { mil_confidence = 7.49 }
+			check_variable = { BRI_Midnight_Confidence > mil_confidence }
+		}
+		custom_cost_text = decision_cost_chimes_7.5_combat
+		days_remove = 10
+		days_re_enable = 10
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Midnight_SeizePetrol"
+
+			hidden_effect = {
+				set_temp_variable = { Confidence = -7.5 }
+				BRI_Midnight_ConfidenceAdd = yes
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Midnight_SeizePetrol"
+
+			set_temp_variable = { Exhaustion = -10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			add_fuel = 10000
+		}
+	}
+
+	BRI_Midnight_RepairRoads = {
+		icon = GFX_decision_generic_workers
+
+		visible = {
+			has_country_flag = BRI_Midnight_GenericShown
+		}
+		ai_will_do = {
+			base = 10
+			modifier = {
+				check_variable = { BRI_Midnight_Confidence < 40.99 }
+				factor = 0
+			}
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { mil_confidence = 4.99 }
+			check_variable = { BRI_Midnight_Confidence > mil_confidence }
+		}
+		custom_cost_text = decision_cost_chimes_5_combat
+		days_remove = 30
+		days_re_enable = 10
+
+		modifier = {
+			production_speed_buildings_factor = 0.3
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Midnight_RepairRoads"
+
+			hidden_effect = {
+				set_temp_variable = { Confidence = -15 }
+				BRI_Midnight_ConfidenceAdd = yes
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Midnight_RepairRoads"
+
+			set_temp_variable = { temp_econ_spending_amount = 0.03 }
+			econ_spend_money_once_effect_raw_money = yes
+			set_temp_variable = { ExhaustionGain = -1 }
+			BRI_Midnight_ExhaustionGainAdd = yes
+		}
+	}
+
+	BRI_Midnight_RelocateWeaponry = {
+		icon = GFX_decision_generic_arms_crate
+
+		visible = {
+			has_country_flag = BRI_Midnight_GenericShown
+		}
+		ai_will_do = {
+			factor = 20
+		}
+		cost = 30
+		days_remove = 25
+		days_re_enable = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Midnight_RelocateWeaponry"
+			set_temp_variable = { AcclimationGain = -2 }
+			BRI_Midnight_AcclimationGainAdd = yes
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Midnight_RelocateWeaponry"
+			if = {
+				limit = { tag = FEN }
+				ENG = {
+					send_equipment = {
+						type = infantry_equipment
+						amount = 500
+						target = FEN
+					}
+					send_equipment = {
+						type = support_equipment
+						amount = 100
+						target = FEN
+					}
+					send_equipment = {
+						type = anti_tank_equipment
+						amount = 100
+						target = FEN
+					}
+				}
+			}
+			else = {
+				FEN = {
+					send_equipment = {
+						type = infantry_equipment
+						amount = 500
+						target = ENG
+					}
+					send_equipment = {
+						type = support_equipment
+						amount = 100
+						target = ENG
+					}
+					send_equipment = {
+						type = anti_tank_equipment
+						amount = 100
+						target = ENG
+					}
+				}
+			}
+		}
+	}
+
+	BRI_Midnight_InfiltrateAllLayers = {
+		icon = GFX_decision_generic_assassination
+
+		visible = {
+			has_country_flag = BRI_Midnight_GenericShown
+		}
+
+		custom_cost_text = decision_cost_15_cp
+		custom_cost_trigger = {
+			command_power > 14.99
+		}
+		ai_will_do = {
+			factor = 20
+		}
+		days_remove = 14
+		days_re_enable = 45
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Complete BRI_Midnight_InfiltrateAllLayers"
+			if = {
+				limit = {
+					tag = FEN
+				}
+				ENG = {
+					add_timed_idea = {
+						idea = ENG_Collabs_Sabotaged
+						days = 30
+					}
+				}
+			}
+			else = {
+				FEN = {
+					add_timed_idea = {
+						idea = ENG_HMMLR_Sabotaged
+						days = 30
+					}
+				}
+			}
+			hidden_effect = {
+				add_command_power = -15
+			}
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Midnight_InfiltrateAllLayers"
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+
+	BRI_Midnight_Fortifications_Show = {
+		icon = GFX_decision_generic_visibility
+		ai_will_do = {
+			base = 4000
+		}
+		visible = {
+			NOT = {
+				has_country_flag = BRI_Midnight_Fortifications_Shown
+			}
+		}
+
+		complete_effect = {
+			set_country_flag = BRI_Midnight_Fortifications_Shown
+		}
+	}
+
+	BRI_Midnight_Fortifications_Hide = {
+		icon = GFX_decision_generic_visibility_closed
+
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+		}
+
+		complete_effect = {
+			clr_country_flag = BRI_Midnight_Fortifications_Shown
+		}
+	}
+
+	BRI_Chimes_fortify_essex = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+			tag = ENG
+		}
+		available = {
+			controls_state = 2014
+			controls_state = 2012
+			NOT = { has_country_flag = BRI_Currently_Building_Forts }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 20 }
+			set_temp_variable = { t_m_check = 750 }
+			check_variable = { political_power > 19.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 24
+		fire_only_once = yes
+
+		on_map_mode = map_and_decisions_view
+		highlight_states = {
+			highlight_state_targets = {
+				state = 2014
+				state = 2012
+			}
+		}
+
+		complete_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.75 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_political_power = -20
+			set_country_flag = BRI_Currently_Building_Forts
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Chimes_fortify_essex"
+			2014 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16333
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 11374
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16366
+				}
+			}
+			2012 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 11253
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 296
+				}
+			}
+			set_temp_variable = { Confidence = 5 }
+			BRI_Midnight_ConfidenceAdd = yes
+			clr_country_flag = BRI_Currently_Building_Forts
+		}
+	}
+
+	BRI_Chimes_fortify_Hull_Leeds = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+			tag = ENG
+		}
+		available = {
+			controls_state = 130
+			controls_state = 2007
+			NOT = { has_country_flag = BRI_Currently_Building_Forts }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 20 }
+			set_temp_variable = { t_m_check = 750 }
+			check_variable = { political_power > 19.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 24
+		fire_only_once = yes
+
+		on_map_mode = map_and_decisions_view
+		highlight_states = {
+			highlight_state_targets = {
+				state = 130
+				state = 2007
+			}
+		}
+
+		complete_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.75 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_political_power = -20
+			set_country_flag = BRI_Currently_Building_Forts
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Chimes_fortify_Hull_Leeds"
+			130 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 9379
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16344
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16343
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 9315
+				}
+			}
+			2007 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 11297
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16368
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 9269
+				}
+			}
+			set_temp_variable = { Confidence = 5 }
+			BRI_Midnight_ConfidenceAdd = yes
+			clr_country_flag = BRI_Currently_Building_Forts
+		}
+	}
+
+	BRI_Chimes_fortify_Edinburgh = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+			tag = ENG
+		}
+		available = {
+			controls_state = 121
+			NOT = { has_country_flag = BRI_Currently_Building_Forts }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 20 }
+			set_temp_variable = { t_m_check = 750 }
+			check_variable = { political_power > 19.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 24
+		fire_only_once = yes
+
+		on_map_mode = map_and_decisions_view
+		highlight_states = {
+			highlight_state_targets = {
+				state = 121
+			}
+		}
+
+		complete_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.75 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_political_power = -20
+			set_country_flag = BRI_Currently_Building_Forts
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Chimes_fortify_Edinburgh"
+			121 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16352
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16374
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 9392
+				}
+			}
+			set_temp_variable = { Confidence = 5 }
+			BRI_Midnight_ConfidenceAdd = yes
+			clr_country_flag = BRI_Currently_Building_Forts
+		}
+	}
+
+	BRI_Chimes_fortify_Portsmouth_Oxford = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+			tag = ENG
+		}
+		available = {
+			controls_state = 126
+			controls_state = 777
+			NOT = { has_country_flag = BRI_Currently_Building_Forts }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 20 }
+			set_temp_variable = { t_m_check = 750 }
+			check_variable = { political_power > 19.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 24
+		fire_only_once = yes
+
+		on_map_mode = map_and_decisions_view
+		highlight_states = {
+			highlight_state_targets = {
+				state = 126
+				state = 777
+			}
+		}
+
+		complete_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.75 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_political_power = -20
+			set_country_flag = BRI_Currently_Building_Forts
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Chimes_fortify_Portsmouth_Oxford"
+			126 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 6221
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 9239
+				}
+			}
+			777 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 9458
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16326
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 6489
+				}
+			}
+			set_temp_variable = { Confidence = 5 }
+			BRI_Midnight_ConfidenceAdd = yes
+			clr_country_flag = BRI_Currently_Building_Forts
+		}
+	}
+
+	BRI_Chimes_fortify_Bristol_Coventry = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+			tag = ENG
+		}
+		available = {
+			controls_state = 338
+			controls_state = 2010
+			NOT = { has_country_flag = BRI_Currently_Building_Forts }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 20 }
+			set_temp_variable = { t_m_check = 750 }
+			check_variable = { political_power > 19.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 24
+		fire_only_once = yes
+
+		on_map_mode = map_and_decisions_view
+		highlight_states = {
+			highlight_state_targets = {
+				state = 338
+				state = 2010
+			}
+		}
+
+		complete_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.75 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_political_power = -20
+			set_country_flag = BRI_Currently_Building_Forts
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Chimes_fortify_Bristol_Coventry"
+			338 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 3369
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16325
+				}
+			}
+			2010 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16359
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 6270
+				}
+			}
+			set_temp_variable = { Confidence = 5 }
+			BRI_Midnight_ConfidenceAdd = yes
+			clr_country_flag = BRI_Currently_Building_Forts
+		}
+	}
+
+	BRI_Chimes_fortify_Dorset = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+			tag = FEN
+		}
+		available = {
+			controls_state = 1296
+			NOT = { has_country_flag = BRI_Currently_Building_Forts }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 20 }
+			set_temp_variable = { t_m_check = 750 }
+			check_variable = { political_power > 19.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 24
+		fire_only_once = yes
+
+		on_map_mode = map_and_decisions_view
+		highlight_states = {
+			highlight_state_targets = {
+				state = 1296
+			}
+		}
+
+		complete_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.75 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_political_power = -20
+			set_country_flag = BRI_Currently_Building_Forts
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Chimes_fortify_Dorset"
+			1296 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 9484
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16324
+				}
+			}
+			set_temp_variable = { Confidence = 5 }
+			BRI_Midnight_ConfidenceAdd = yes
+			clr_country_flag = BRI_Currently_Building_Forts
+		}
+	}
+	BRI_Chimes_fortify_Welsh_Border = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+			tag = FEN
+		}
+		available = {
+			controls_state = 122
+			controls_state = 885
+			controls_province = 6378
+			controls_province = 7239
+			NOT = { has_country_flag = BRI_Currently_Building_Forts }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 25 }
+			set_temp_variable = { t_m_check = 750 }
+			check_variable = { political_power > 24.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 24
+		fire_only_once = yes
+
+		on_map_mode = map_and_decisions_view
+		highlight_states = {
+			highlight_state_targets = {
+				state = 122
+				state = 885
+			}
+			highlight_provinces = { 6378 7239 }
+		}
+
+		complete_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.75 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_political_power = -25
+			set_country_flag = BRI_Currently_Building_Forts
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Chimes_fortify_Welsh_Border"
+			122 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16337
+				}
+			}
+			885 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 3241
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 6301
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 3301
+				}
+			}
+			338 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					instant_build = yes
+					province = 6378
+				}
+			}
+			2010 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					instant_build = yes
+					province = 7239
+				}
+			}
+			set_temp_variable = { Confidence = 5 }
+			BRI_Midnight_ConfidenceAdd = yes
+			clr_country_flag = BRI_Currently_Building_Forts
+		}
+	}
+
+	BRI_Chimes_fortify_Manchester_Lancashire = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+			tag = FEN
+		}
+		available = {
+			controls_state = 2001
+			controls_state = 132
+			NOT = { has_country_flag = BRI_Currently_Building_Forts }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 20 }
+			set_temp_variable = { t_m_check = 750 }
+			check_variable = { political_power > 19.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 24
+		fire_only_once = yes
+
+		on_map_mode = map_and_decisions_view
+		highlight_states = {
+			highlight_state_targets = {
+				state = 2001
+				state = 132
+			}
+		}
+
+		complete_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.75 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_political_power = -20
+			set_country_flag = BRI_Currently_Building_Forts
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Chimes_fortify_Manchester_Lancashire"
+			2001 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 6318
+				}
+			}
+			132 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16342
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 6335
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 6384
+				}
+			}
+			set_temp_variable = { Confidence = 5 }
+			BRI_Midnight_ConfidenceAdd = yes
+			clr_country_flag = BRI_Currently_Building_Forts
+		}
+	}
+	BRI_Chimes_fortify_Liverpool_Cheshire = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+			tag = FEN
+		}
+		available = {
+			controls_state = 2000
+			controls_state = 2004
+			NOT = { has_country_flag = BRI_Currently_Building_Forts }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 20 }
+			set_temp_variable = { t_m_check = 750 }
+			check_variable = { political_power > 19.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 24
+		fire_only_once = yes
+
+		on_map_mode = map_and_decisions_view
+		highlight_states = {
+			highlight_state_targets = {
+				state = 2000
+				state = 2004
+			}
+		}
+
+		complete_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.75 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_political_power = -20
+			set_country_flag = BRI_Currently_Building_Forts
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Chimes_fortify_Liverpool_Cheshire"
+			2000 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16340
+				}
+			}
+			2004 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16341
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 3205
+				}
+			}
+			set_temp_variable = { Confidence = 5 }
+			BRI_Midnight_ConfidenceAdd = yes
+			clr_country_flag = BRI_Currently_Building_Forts
+		}
+	}
+	BRI_Chimes_fortify_Glasgow = {
+		icon = GFX_decision_generic_destroy_fort
+		ai_will_do = {
+			base = 10
+		}
+		visible = {
+			has_country_flag = BRI_Midnight_Fortifications_Shown
+			tag = FEN
+		}
+		available = {
+			controls_state = 133
+			controls_state = 1320
+			controls_province = 6395
+			NOT = { has_country_flag = BRI_Currently_Building_Forts }
+		}
+		custom_cost_trigger = {
+			set_temp_variable = { t_pp_check = 20 }
+			set_temp_variable = { t_m_check = 750 }
+			check_variable = { political_power > 19.99 }
+		}
+		custom_cost_text = decision_cost_pp_m_dynamic
+		days_remove = 24
+		fire_only_once = yes
+
+		on_map_mode = map_and_decisions_view
+		highlight_states = {
+			highlight_provinces = {
+				6395 3273 16376 9383 6300
+			}
+		}
+
+		complete_effect = {
+			set_temp_variable = { temp_econ_spending_amount = 0.75 }
+			econ_spend_money_once_effect_raw_money = yes
+			add_political_power = -20
+			set_country_flag = BRI_Currently_Building_Forts
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision Remove BRI_Chimes_fortify_Glasgow"
+			133 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 3273
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 16376
+				}
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 9383
+				}
+			}
+			1320 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 6300
+				}
+			}
+			1321 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 6395
+				}
+			}
+			set_temp_variable = { Confidence = 5 }
+			BRI_Midnight_ConfidenceAdd = yes
+			clr_country_flag = BRI_Currently_Building_Forts
+		}
+	}
+
+	BRI_Midnight_MissionBiWeeklyTick = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = { hidden_trigger = { always = no } }
+
+		days_mission_timeout = 14
+		days_re_enable = 0
+
+		timeout_effect = {
+			if = {
+				limit = { has_country_flag = BRI_Midnight_Active }
+				activate_mission = BRI_Midnight_MissionBiWeeklyTick
+			}
+			BRI_Midnight_MissionBiWeeklyTick_Effect = yes
+		}
+	}
+
+	BRI_Midnight_Mission_Hold_Norwich = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				FEN = {
+					controls_state = 125
+				}
+			}
+			else = {
+				NOT = {
+					FEN = {
+						controls_state = 125
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 21
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = 10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -20 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = -10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_norwich
+		}
+	}
+	BRI_Midnight_Mission_Retake_Norwich = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				ENG = {
+					controls_state = 125
+				}
+			}
+			else = {
+				NOT = {
+					ENG = {
+						controls_state = 125
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 30
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = -5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 15 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -5 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_norwich
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = 5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 5 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+
+	BRI_Midnight_Mission_Hold_Birmingham = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				FEN = {
+					controls_state = 2002
+				}
+			}
+			else = {
+				NOT = {
+					FEN = {
+						controls_state = 2002
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 21
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = 10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -20 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = -10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+	BRI_Midnight_Mission_Retake_Birmingham = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				ENG = {
+					controls_state = 2002
+				}
+			}
+			else = {
+				NOT = {
+					ENG = {
+						controls_state = 2002
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 30
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = -5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 15 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = 5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+
+	BRI_Midnight_Mission_Hold_Cardiff = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				FEN = {
+					controls_state = 122
+				}
+			}
+			else = {
+				NOT = {
+					FEN = {
+						controls_state = 122
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 21
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = 10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -20 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = -10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_cardiff
+		}
+	}
+	BRI_Midnight_Mission_Retake_Cardiff = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				ENG = {
+					controls_state = 122
+				}
+			}
+			else = {
+				NOT = {
+					ENG = {
+						controls_state = 122
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 30
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = -5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 15 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_cardiff
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = 5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+
+	BRI_Midnight_Mission_Hold_Liverpool = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				FEN = {
+					controls_state = 2000
+				}
+			}
+			else = {
+				NOT = {
+					FEN = {
+						controls_state = 2000
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 21
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = 10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -20 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = -10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_liverpool
+		}
+	}
+	BRI_Midnight_Mission_Retake_Liverpool = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				ENG = {
+					controls_state = 2000
+				}
+			}
+			else = {
+				NOT = {
+					ENG = {
+						controls_state = 2000
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 30
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = -5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 15 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_liverpool
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = 5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+
+	BRI_Midnight_Mission_Hold_York = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				FEN = {
+					controls_state = 2006
+				}
+			}
+			else = {
+				NOT = {
+					FEN = {
+						controls_state = 2006
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 21
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = 10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -20 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = -10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_york
+		}
+	}
+	BRI_Midnight_Mission_Retake_York = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				ENG = {
+					controls_state = 2006
+				}
+			}
+			else = {
+				NOT = {
+					ENG = {
+						controls_state = 2006
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 30
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = -5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 15 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_york
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = 5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+
+	BRI_Midnight_Mission_Hold_Leeds = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				FEN = {
+					controls_state = 130
+				}
+			}
+			else = {
+				NOT = {
+					FEN = {
+						controls_state = 130
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 21
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = 5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 5 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = -10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_leeds
+		}
+	}
+	BRI_Midnight_Mission_Retake_Leeds = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				ENG = {
+					controls_state = 130
+				}
+			}
+			else = {
+				NOT = {
+					ENG = {
+						controls_state = 130
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 30
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = -5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 15 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_leeds
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = 5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+
+	BRI_Midnight_Mission_Hold_Glasgow = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				FEN = {
+					controls_state = 133
+				}
+			}
+			else = {
+				NOT = {
+					FEN = {
+						controls_state = 133
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 21
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = 10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -20 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = -10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_glasgow
+		}
+	}
+	BRI_Midnight_Mission_Retake_Glasgow = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				ENG = {
+					controls_state = 133
+				}
+			}
+			else = {
+				NOT = {
+					ENG = {
+						controls_state = 133
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 30
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = -5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 15 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_glasgow
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = 5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+
+	BRI_Midnight_Mission_Hold_Edinburgh = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				FEN = {
+					controls_state = 121
+				}
+			}
+			else = {
+				NOT = {
+					FEN = {
+						controls_state = 121
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 300
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = 10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -20 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = -20 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 30 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_edinburgh
+		}
+	}
+	BRI_Midnight_Mission_Retake_Edinburgh = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				ENG = {
+					controls_state = 121
+				}
+			}
+			else = {
+				NOT = {
+					ENG = {
+						controls_state = 121
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 30
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = -5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 15 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+			set_country_flag = BRI_SGU_held_edinburgh
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = 5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+
+	BRI_Midnight_Mission_Hold_London = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				FEN = {
+					controls_state = 1300
+				}
+			}
+			else = {
+				NOT = {
+					FEN = {
+						controls_state = 1300
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 150
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = 30 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -50 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 30 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = -10 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 10 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+	BRI_Midnight_Mission_Retake_London = {
+		icon = GFX_decision_generic_propaganda
+
+		activation = { always = no }
+		available = {
+			if = {
+				limit = { tag = ENG }
+				ENG = {
+					controls_state = 1300
+				}
+			}
+			else = {
+				NOT = {
+					ENG = {
+						controls_state = 1300
+					}
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = TFL_ECW_ongoing }
+		}
+
+		days_mission_timeout = 30
+		days_re_enable = 0
+
+		complete_effect = {
+			set_temp_variable = { Exhaustion = -5 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = 15 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = -10 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+
+		timeout_effect = {
+			set_temp_variable = { Exhaustion = 15 }
+			BRI_Midnight_ExhaustionAdd = yes
+			set_temp_variable = { Confidence = -30 }
+			BRI_Midnight_ConfidenceAdd = yes
+			set_temp_variable = { Acclimation = 20 }
+			BRI_Midnight_AcclimationAdd = yes
+		}
+	}
+}

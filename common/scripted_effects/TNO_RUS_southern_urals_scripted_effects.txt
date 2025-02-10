@@ -1,0 +1,2192 @@
+#LIFE IS PAIN I HATE
+
+owb_throw_victor = {
+	#Lysenko
+	if = {
+		limit = { ROOT = { original_tag = MGN NOT = { has_global_flag = MGN_NKVD_coup } } }
+		#Dirlewanger
+		if = { limit = { FROM = { original_tag = DRL } }
+			DRL = { country_event = { id = DRL.2000 } }
+		}
+		#Orenburg
+		if = { limit = { FROM = { original_tag = ORE } }
+			ORE = { country_event = { id = ORE.601 } }
+		}
+		#Ural League
+		if = { limit = { FROM = { original_tag = URL } }
+			URL = { country_event = { id = URL.200 } }
+		}
+	}
+
+	#NKVD
+	if = {
+		limit = { ROOT = { original_tag = MGN has_global_flag = MGN_NKVD_coup } }
+		#Dirlewanger
+		if = { limit = { FROM = { original_tag = DRL } }
+			DRL = { country_event = { id = DRL.2003 } }
+		}
+		#Orenburg
+		if = { limit = { FROM = { original_tag = ORE } }
+			ORE = { country_event = { id = ORE.602 } }
+		}
+		#Ural League
+		if = { limit = { FROM = { original_tag = URL } }
+			URL = { country_event = { id = URL.201 } }
+		}
+	}
+
+	#Dirlewanger
+	if = {
+		limit = { ROOT = { original_tag = DRL } }
+
+		if = { limit = { FROM = { original_tag = MGN } }
+
+			if = { limit = { has_global_flag = MGN_NKVD_coup } MGN = { country_event = { id = MGN_NKVD.2000 } } }
+
+			else = { MGN = { country_event = { id = MGN.300 } } }
+		}
+
+		if = { limit = { FROM = { original_tag = ORE } }
+			ORE = { country_event = { id = ORE.600 } }
+		}
+
+		if = { limit = { FROM = { original_tag = URL } }
+			URL = { country_event = { id = URL.202 } }
+		}
+	}
+
+	#Orenburg
+	if = {
+		limit = { ROOT = { original_tag = ORE } }
+		#Magnitogorsk
+		if = { limit = { FROM = { original_tag = MGN } }
+			#NKVD
+			if = { limit = { has_global_flag = MGN_NKVD_coup } MGN = { country_event = { id = MGN_NKVD.2002 } } }
+			#Lysenko
+			else = { MGN = { country_event = { id = MGN.302 } } }
+		}
+		#Dirlewanger
+		if = { limit = { FROM = { original_tag = DRL } }
+			DRL = { country_event = { id = DRL.2002 } }
+		}
+	}
+
+	#Ural League
+	if = {
+		limit = { ROOT = { original_tag = URL } }
+		#Magnitogorsk
+		if = { limit = { FROM = { original_tag = MGN } }
+			#NKVD
+			if = { limit = { has_global_flag = MGN_NKVD_coup } MGN = { country_event = { id = MGN_NKVD.2001 } } }
+			#Lysenko
+			else = { MGN = { country_event = { id = MGN.301 } } }
+		}
+		#Dirlewanger
+		if = { limit = { FROM = { original_tag = DRL } }
+			DRL = { country_event = { id = DRL.2001 } }
+		}
+	}
+}
+
+### RACE TO THE URALS CODE
+### MISERERE NOBIS
+### MADE BY PACIFICA
+
+### Mostly old effects now. Kept incase it is needed for the Race for kazakhstan
+
+RUS_calculate_southern_urals_influence_calculators = {
+	RUS_calculate_southern_urals_influence_generic_daily = yes
+	if = {
+		limit = {
+			ORE = {
+				exists = yes
+			}
+		}
+		if = {
+			limit = {
+				ORE = {
+					has_country_flag = ORE_ANARCHY
+					has_government = socialist
+				}
+			}
+			#Note - There is no kartenhaus for anarchy regions - this code exists just for placeholder purposes.
+		}
+		else_if = {
+			limit = {
+				ORE = {
+					NOT = {
+						has_country_flag = ORE_ANARCHY
+					}
+					has_government = socialist
+				}
+			}
+			RUS_calculate_southern_urals_influence_orenburg_council_daily = yes
+		}
+		else_if = {
+			limit = {
+				ORE = {
+					has_government = communist
+				}
+			}
+			RUS_calculate_southern_urals_influence_orenburg_malenkov_daily = yes
+		}
+		else_if = {
+			limit = {
+				ORE = {
+					has_government = paternalism
+				}
+			}
+			RUS_calculate_southern_urals_influence_orenburg_burba_daily = yes
+		}
+	}
+	if = {
+		limit = {
+			URL = {
+				exists = yes
+			}
+		}
+		RUS_calculate_southern_urals_influence_ural_league_daily = yes
+	}
+	if = {
+		limit = {
+			DRL = {
+				exists = yes
+			}
+		}
+		if = {
+			limit = {
+				DRL = {
+					has_government = national_socialism
+				}
+			}
+			#Note - There is no kartenhaus for anarchy regions - this code exists just for placeholder purposes.
+		}
+		else_if = {
+			limit = {
+				DRL = {
+					has_government = socialist
+				}
+			}
+			#Note - There is no kartenhaus for anarchy regions - this code exists just for placeholder purposes.
+		}
+	}
+	if = {
+		limit = {
+			MGN = {
+				exists = yes
+			}
+		}
+		if = {
+			limit = {
+				MGN = {
+					has_government = despotism
+				}
+			}
+			RUS_calculate_southern_urals_influence_magnitogorsk_lysenko_daily = yes
+		}
+		else_if = {
+			limit = {
+				MGN = {
+					has_government = communist
+				}
+			}
+			RUS_calculate_southern_urals_influence_magnitogorsk_nkvd_daily = yes
+		}
+	}
+}
+
+RUS_calculate_southern_urals_influence_generic_daily = {
+	### Military Component Calculator ###
+	set_variable = { RUS_Influence_Daily_Ticker_Military = 0 }
+	if = {
+		limit = { has_army_manpower = { size < 200000 } }
+		if = {
+			limit = { has_army_manpower = { size < 10000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.04 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 20000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.08 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 30000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.12 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 40000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.16 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 50000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.2 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 60000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.24 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 70000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.28 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 80000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.32 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 90000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.36 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 100000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.4 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 110000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.44 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 120000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.48 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 130000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.52 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 140000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.56 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 150000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.6 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 160000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.64 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 170000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.68 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 180000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.72 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 190000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.76 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 200000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.8 }
+		}
+	}
+	else_if = {
+		limit = { has_army_manpower = { size > 200000 } }
+		#Medium sized armies, between 500k and 1M men
+		if = {
+			limit = { has_army_manpower = { size < 210000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.84 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 220000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.88 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 230000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.92 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 240000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 0.96 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 250000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 260000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.04 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 270000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.08 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 280000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.12 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 290000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.16 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 300000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.2 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 310000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.24 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 320000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.28 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 330000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.32 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 340000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.36 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 350000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.4 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 360000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.44 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 370000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.48 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 380000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.52 }
+		}
+		else_if = {
+			limit = { has_army_manpower = { size < 390000 } }
+			set_variable = { RUS_Influence_Daily_Ticker_Military = 1.56 }
+		}
+	}
+	else = {
+		#400k and above
+		set_variable = { RUS_Influence_Daily_Ticker_Military = 1.6 }
+	}
+
+	### Industry Component Calculator ###
+	set_variable = { RUS_Influence_Daily_Ticker_Industry = num_of_factories }
+	divide_variable = { RUS_Influence_Daily_Ticker_Industry = 50 }
+	set_variable = { RUS_Influence_Daily_Ticker_Generic = 0 }
+
+	add_to_variable = { RUS_Influence_Daily_Ticker_Generic = RUS_Influence_Daily_Ticker_Industry }
+	add_to_variable = { RUS_Influence_Daily_Ticker_Generic = RUS_Influence_Daily_Ticker_Military }
+}
+
+RUS_calculate_southern_urals_influence_orenburg_council_daily = {
+	set_variable = { RUS_ORE_Influence_Daily_Ticker = 0 }
+	set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+	### Ideology Component Calculator ###
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = liberal_conservatism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					has_government = fascism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+					has_government = despotism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -5 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			if = {
+				limit = {
+					has_government = communist
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					has_government = socialist
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -5 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+
+	### Combination Calculator For Final Influence Value ###
+	add_to_variable = { RUS_ORE_Influence_Daily_Ticker = RUS_ORE_Influence_Daily_Ticker_Ideology }
+	add_to_variable = { RUS_ORE_Influence_Daily_Ticker = RUS_Influence_Daily_Ticker_Generic }
+	divide_variable = { RUS_ORE_Influence_Daily_Ticker = 2.5 }
+	clamp_variable = { var = RUS_ORE_Influence_Daily_Ticker min = 0.01 }
+	RUS_calculate_southern_urals_influence_orenburg_modifiers = yes
+}
+
+RUS_calculate_southern_urals_influence_orenburg_malenkov_daily = {
+	set_variable = { RUS_ORE_Influence_Daily_Ticker = 0 }
+	set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+	### Ideology Component Calculator ###
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = liberal_conservatism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					has_government = fascism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+					has_government = despotism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -5 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			if = {
+				limit = {
+					has_government = communist
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					has_government = socialist
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -5 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+
+	### Combination Calculator For Final Influence Value ###
+	add_to_variable = { RUS_ORE_Influence_Daily_Ticker = RUS_ORE_Influence_Daily_Ticker_Ideology }
+	add_to_variable = { RUS_ORE_Influence_Daily_Ticker = RUS_Influence_Daily_Ticker_Generic }
+	divide_variable = { RUS_ORE_Influence_Daily_Ticker = 2.5 }
+	clamp_variable = { var = RUS_ORE_Influence_Daily_Ticker min = 0.01 }
+	RUS_calculate_southern_urals_influence_orenburg_modifiers = yes
+}
+
+RUS_calculate_southern_urals_influence_orenburg_burba_daily = {
+	set_variable = { RUS_ORE_Influence_Daily_Ticker = 0 }
+	set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+	### Ideology Component Calculator ###
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = liberal_conservatism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+				if = {
+					limit = {
+						KOM = {
+							has_government = national_socialism
+						}
+					}
+					KOM = {
+						set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -5 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					has_government = fascism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+					has_government = despotism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -5 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			if = {
+				limit = {
+					has_government = communist
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					has_government = socialist
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_ORE_Influence_Daily_Ticker_Ideology = -5 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+
+	### Combination Calculator For Final Influence Value ###
+	add_to_variable = { RUS_ORE_Influence_Daily_Ticker = RUS_ORE_Influence_Daily_Ticker_Ideology }
+	add_to_variable = { RUS_ORE_Influence_Daily_Ticker = RUS_Influence_Daily_Ticker_Generic }
+	divide_variable = { RUS_ORE_Influence_Daily_Ticker = 2.5 }
+	clamp_variable = { var = RUS_ORE_Influence_Daily_Ticker min = 0.01 }
+	RUS_calculate_southern_urals_influence_orenburg_modifiers = yes
+}
+
+RUS_calculate_southern_urals_influence_ural_league_daily = {
+	set_variable = { RUS_URL_Influence_Daily_Ticker = 0 }
+	set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = -1 }
+	### Ideology Component Calculator ###
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = liberal_conservatism
+					}
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 0 }
+				if = {
+					limit = {
+						KOM = {
+							has_government = national_socialism
+						}
+					}
+					KOM = {
+						set_country_flag = RUS_CANNOT_NEGOTIATE_URL
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = -1 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_URL
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					has_government = fascism
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+					has_government = despotism
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = -5 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_URL
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			if = {
+				limit = {
+					has_government = communist
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					has_government = socialist
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_URL_Influence_Daily_Ticker_Ideology = -5 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_URL
+			}
+		}
+	}
+
+	### Combination Calculator For Final Influence Value ###
+	add_to_variable = { RUS_URL_Influence_Daily_Ticker = RUS_URL_Influence_Daily_Ticker_Ideology }
+	add_to_variable = { RUS_URL_Influence_Daily_Ticker = RUS_Influence_Daily_Ticker_Generic }
+	divide_variable = { RUS_URL_Influence_Daily_Ticker = 2.5 }
+	clamp_variable = { var = RUS_URL_Influence_Daily_Ticker min = 0.01 }
+	RUS_calculate_southern_urals_influence_ural_league_modifiers = yes
+}
+
+RUS_calculate_southern_urals_influence_magnitogorsk_lysenko_daily = {
+	set_variable = { RUS_MGN_Influence_Daily_Ticker = 0 }
+	set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+	### Ideology Component Calculator ###
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = liberal_conservatism
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					has_government = fascism
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+					has_government = despotism
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -5 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			if = {
+				limit = {
+					has_government = communist
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					has_government = socialist
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -5 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+			}
+		}
+	}
+
+	### Combination Calculator For Final Influence Value ###
+	add_to_variable = { RUS_MGN_Influence_Daily_Ticker = RUS_MGN_Influence_Daily_Ticker_Ideology }
+	add_to_variable = { RUS_MGN_Influence_Daily_Ticker = RUS_Influence_Daily_Ticker_Generic }
+	divide_variable = { RUS_MGN_Influence_Daily_Ticker = 2.5 }
+	clamp_variable = { var = RUS_MGN_Influence_Daily_Ticker min = 0.01 }
+	RUS_calculate_southern_urals_influence_magnitogorsk_modifiers = yes
+}
+
+RUS_calculate_southern_urals_influence_magnitogorsk_nkvd_daily = {
+	set_variable = { RUS_MGN_Influence_Daily_Ticker = 0 }
+	set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+	### Ideology Component Calculator ###
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = conservatism
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					has_government = fascism
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+					has_government = despotism
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -5 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			if = {
+				limit = {
+					has_government = communist
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					has_government = socialist
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_MGN_Influence_Daily_Ticker_Ideology = -5 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+			}
+		}
+	}
+
+	### Combination Calculator For Final Influence Value ###
+	add_to_variable = { RUS_MGN_Influence_Daily_Ticker = RUS_MGN_Influence_Daily_Ticker_Ideology }
+	add_to_variable = { RUS_MGN_Influence_Daily_Ticker = RUS_Influence_Daily_Ticker_Generic }
+	divide_variable = { RUS_MGN_Influence_Daily_Ticker = 2 }
+	clamp_variable = { var = RUS_MGN_Influence_Daily_Ticker min = 0.01 }
+	RUS_calculate_southern_urals_influence_magnitogorsk_modifiers = yes
+}
+
+RUS_calculate_southern_urals_influence_orenburg_modifiers = {
+	set_variable = { RUS_ORE_Modifier_Value = 1 }
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_ORE_INFLUENCE_0
+		}
+		multiply_variable = { RUS_ORE_Modifier_Value = 0 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_ORE_INFLUENCE_1
+		}
+		multiply_variable = { RUS_ORE_Modifier_Value = 0.5 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_ORE_INFLUENCE_2
+		}
+		multiply_variable = { RUS_ORE_Modifier_Value = 0.75 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_ORE_INFLUENCE_3
+		}
+		multiply_variable = { RUS_ORE_Modifier_Value = 1 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_ORE_DISCREDITED
+		}
+		multiply_variable = { RUS_ORE_Modifier_Value = 0.66 }
+	}
+	if = {
+		limit = {
+			ORE = {
+				exists = yes
+			}
+		}
+		if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_2
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_2
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 0.86 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_1
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_2
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 0.93 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_2
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_1
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 0.93 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_1
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_3
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 0.79 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_3
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_1
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 0.79 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_2
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_3
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 0.72 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_3
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_2
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 0.72 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_3
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_3
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 0.66 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_0
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_0
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 1.16 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_0
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_1
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 1.08 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_1
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_0
+			}
+			multiply_variable = { RUS_ORE_Modifier_Value = 1.08 }
+		}
+	}
+	set_variable = { RUS_ORE_Influence_Daily_Ticker_End = RUS_ORE_Influence_Daily_Ticker }
+	multiply_variable = { RUS_ORE_Influence_Daily_Ticker_End = RUS_ORE_Modifier_Value }
+}
+
+RUS_calculate_southern_urals_influence_ural_league_modifiers = {
+	set_variable = { RUS_URL_Modifier_Value = 1 }
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_URL_INFLUENCE_0
+		}
+		multiply_variable = { RUS_URL_Modifier_Value = 0 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_URL_INFLUENCE_1
+		}
+		multiply_variable = { RUS_URL_Modifier_Value = 0.5 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_URL_INFLUENCE_2
+		}
+		multiply_variable = { RUS_URL_Modifier_Value = 0.75 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_URL_INFLUENCE_3
+		}
+		multiply_variable = { RUS_URL_Modifier_Value = 1 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_URL_DISCREDITED
+		}
+		multiply_variable = { RUS_URL_Modifier_Value = 0.66 }
+	}
+	if = {
+		limit = {
+			URL = {
+				exists = yes
+			}
+		}
+		if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_2
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_2
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 0.86 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_1
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_2
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 0.93 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_2
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_1
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 0.93 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_1
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_3
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 0.79 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_3
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_1
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 0.79 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_2
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_3
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 0.72 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_3
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_2
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 0.72 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_3
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_3
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 0.66 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_0
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_0
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 1.16 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_0
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_1
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 1.08 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_MGN_INFLUENCE_1
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_0
+			}
+			multiply_variable = { RUS_URL_Modifier_Value = 1.08 }
+		}
+	}
+	set_variable = { RUS_URL_Influence_Daily_Ticker_End = RUS_URL_Influence_Daily_Ticker }
+	multiply_variable = { RUS_URL_Influence_Daily_Ticker_End = RUS_URL_Modifier_Value }
+}
+
+RUS_calculate_southern_urals_influence_magnitogorsk_modifiers = {
+	set_variable = { RUS_MGN_Modifier_Value = 1 }
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_MGN_INFLUENCE_0
+		}
+		multiply_variable = { RUS_MGN_Modifier_Value = 0 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_MGN_INFLUENCE_1
+		}
+		multiply_variable = { RUS_MGN_Modifier_Value = 0.5 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_MGN_INFLUENCE_2
+		}
+		multiply_variable = { RUS_MGN_Modifier_Value = 0.75 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_MGN_INFLUENCE_3
+		}
+		multiply_variable = { RUS_MGN_Modifier_Value = 1 }
+	}
+	if = {
+		limit = {
+			has_country_flag = URALS_CRISIS_MGN_DISCREDITED
+		}
+		multiply_variable = { RUS_MGN_Modifier_Value = 0.66 }
+	}
+	if = {
+		limit = {
+			MGN = {
+				exists = yes
+			}
+		}
+		if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_2
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_2
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 0.86 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_1
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_2
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 0.93 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_2
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_1
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 0.93 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_1
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_3
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 0.79 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_3
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_1
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 0.79 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_2
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_3
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 0.72 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_3
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_2
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 0.72 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_3
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_3
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 0.66 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_0
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_0
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 1.16 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_0
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_1
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 1.08 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = URALS_CRISIS_URL_INFLUENCE_1
+				has_country_flag = URALS_CRISIS_ORE_INFLUENCE_0
+			}
+			multiply_variable = { RUS_MGN_Modifier_Value = 1.08 }
+		}
+	}
+	set_variable = { RUS_MGN_Influence_Daily_Ticker_End = RUS_MGN_Influence_Daily_Ticker }
+	multiply_variable = { RUS_MGN_Influence_Daily_Ticker_End = RUS_MGN_Modifier_Value }
+}
+
+RUS_WSR_increase_relations = {
+	if = {
+		limit = { #Opposed
+			has_country_flag = WSR_INFLUENCE_LEVEL_1
+		}
+		clr_country_flag = WSR_INFLUENCE_LEVEL_1
+		set_country_flag = WSR_INFLUENCE_LEVEL_2
+		custom_effect_tooltip = RUS_increase_relations_1_tt
+	}
+	else_if = {
+		limit = { #Neutral
+			has_country_flag = WSR_INFLUENCE_LEVEL_2
+		}
+		clr_country_flag = WSR_INFLUENCE_LEVEL_2
+		set_country_flag = WSR_INFLUENCE_LEVEL_3
+		custom_effect_tooltip = RUS_increase_relations_2_tt
+	}
+	else_if = {
+		limit = { #Cordial
+			has_country_flag = WSR_INFLUENCE_LEVEL_3
+		}
+		clr_country_flag = WSR_INFLUENCE_LEVEL_3
+		set_country_flag = WSR_INFLUENCE_LEVEL_4
+		custom_effect_tooltip = RUS_increase_relations_3_tt
+	}
+	else_if = {
+		limit = { #Friendly
+			has_country_flag = WSR_INFLUENCE_LEVEL_4
+		}
+		clr_country_flag = WSR_INFLUENCE_LEVEL_4
+		set_country_flag = WSR_INFLUENCE_LEVEL_5
+		custom_effect_tooltip = RUS_increase_relations_4_tt
+	}
+}
+
+RUS_WSB_increase_relations = {
+	if = {
+		limit = { #Opposed
+			has_country_flag = WSB_INFLUENCE_LEVEL_1
+		}
+		clr_country_flag = WSB_INFLUENCE_LEVEL_1
+		set_country_flag = WSB_INFLUENCE_LEVEL_2
+		custom_effect_tooltip = RUS_increase_relations_1_tt
+	}
+	else_if = {
+		limit = { #Neutral
+			has_country_flag = WSB_INFLUENCE_LEVEL_2
+		}
+		clr_country_flag = WSB_INFLUENCE_LEVEL_2
+		set_country_flag = WSB_INFLUENCE_LEVEL_3
+		custom_effect_tooltip = RUS_increase_relations_2_tt
+	}
+	else_if = {
+		limit = { #Cordial
+			has_country_flag = WSB_INFLUENCE_LEVEL_3
+		}
+		clr_country_flag = WSB_INFLUENCE_LEVEL_3
+		set_country_flag = WSB_INFLUENCE_LEVEL_4
+		custom_effect_tooltip = RUS_increase_relations_3_tt
+	}
+	else_if = {
+		limit = { #Friendly
+			has_country_flag = WSB_INFLUENCE_LEVEL_4
+		}
+		clr_country_flag = WSB_INFLUENCE_LEVEL_4
+		set_country_flag = WSB_INFLUENCE_LEVEL_5
+		custom_effect_tooltip = RUS_increase_relations_4_tt
+	}
+}
+
+RUS_WSR_decrease_relations = {
+	if = {
+		limit = { #Friendly
+			has_country_flag = WSR_INFLUENCE_LEVEL_5
+		}
+		clr_country_flag = WSR_INFLUENCE_LEVEL_5
+		set_country_flag = WSR_INFLUENCE_LEVEL_4
+		custom_effect_tooltip = RUS_decrease_relations_4_tt
+	}
+	else_if = {
+		limit = { #Cordial
+			has_country_flag = WSR_INFLUENCE_LEVEL_4
+		}
+		clr_country_flag = WSR_INFLUENCE_LEVEL_4
+		set_country_flag = WSR_INFLUENCE_LEVEL_3
+		custom_effect_tooltip = RUS_decrease_relations_3_tt
+	}
+	else_if = {
+		limit = { #Neutral
+			has_country_flag = WSR_INFLUENCE_LEVEL_3
+		}
+		clr_country_flag = WSR_INFLUENCE_LEVEL_3
+		set_country_flag = WSR_INFLUENCE_LEVEL_2
+		custom_effect_tooltip = RUS_decrease_relations_2_tt
+	}
+	else_if = {
+		limit = { #Opposed
+			has_country_flag = WSR_INFLUENCE_LEVEL_2
+		}
+		clr_country_flag = WSR_INFLUENCE_LEVEL_2
+		set_country_flag = WSR_INFLUENCE_LEVEL_1
+		custom_effect_tooltip = RUS_decrease_relations_1_tt
+	}
+}
+
+RUS_WSB_decrease_relations = {
+	if = {
+		limit = { #Friendly
+			has_country_flag = WSB_INFLUENCE_LEVEL_5
+		}
+		clr_country_flag = WSB_INFLUENCE_LEVEL_5
+		set_country_flag = WSB_INFLUENCE_LEVEL_4
+		custom_effect_tooltip = RUS_decrease_relations_4_tt
+	}
+	else_if = {
+		limit = { #Cordial
+			has_country_flag = WSB_INFLUENCE_LEVEL_4
+		}
+		clr_country_flag = WSB_INFLUENCE_LEVEL_4
+		set_country_flag = WSB_INFLUENCE_LEVEL_3
+		custom_effect_tooltip = RUS_decrease_relations_3_tt
+	}
+	else_if = {
+		limit = { #Neutral
+			has_country_flag = WSB_INFLUENCE_LEVEL_3
+		}
+		clr_country_flag = WSB_INFLUENCE_LEVEL_3
+		set_country_flag = WSB_INFLUENCE_LEVEL_2
+		custom_effect_tooltip = RUS_decrease_relations_2_tt
+	}
+	else_if = {
+		limit = { #Opposed
+			has_country_flag = WSB_INFLUENCE_LEVEL_2
+		}
+		clr_country_flag = WSB_INFLUENCE_LEVEL_2
+		set_country_flag = WSB_INFLUENCE_LEVEL_1
+		custom_effect_tooltip = RUS_decrease_relations_1_tt
+	}
+}

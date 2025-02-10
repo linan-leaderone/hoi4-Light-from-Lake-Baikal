@@ -1,0 +1,2779 @@
+GRO_REICHSSTAAT_set_start_stability = {
+	set_variable = { GRO_REICHSSTAAT_stability_kameroon = 0.75 }			# GAB
+	set_variable = { GRO_REICHSSTAAT_stability_ubangi_schari = 0.7 }		# AZD, CAF
+	set_variable = { GRO_REICHSSTAAT_stability_kongo = 0.75 }			# CFS
+	set_variable = { GRO_REICHSSTAAT_stability_angola = 0.6 }			# ANG
+	set_variable = { GRO_REICHSSTAAT_stability_sambia = 0.6 }			# ZAM, BRS
+	set_variable = { GRO_REICHSSTAAT_stability_botswana = 0.6 }			# BTS
+	set_variable = { GRO_REICHSSTAAT_stability_simbabwe = 0.5 }			# ZIM
+	set_variable = { GRO_REICHSSTAAT_stability_mosambik = 0.75 }			# GAZ, RMB
+	set_variable = { GRO_REICHSSTAAT_stability_sansibar = 0.6 }			# ZZB
+	set_variable = { GRO_REICHSSTAAT_stability_ruanda_burundi = 0.75 }	# RWD, BRD
+	set_variable = { GRO_REICHSSTAAT_stability_uganda = 0.55 }			# UGD
+	set_variable = { GRO_REICHSSTAAT_stability_tanganika = 0.6 }			# TNZ
+	set_variable = { GRO_REICHSSTAAT_stability_namibia = 0.6 }			# NMB
+	set_variable = { GRO_REICHSSTAAT_stability_kenia = 0.6 }				# LUO
+
+	resize_array = {
+		array = GRO_REICHSSTAAT_rebel_stability
+		value = 0
+		size = 14
+	}
+
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^0 = GRO_REICHSSTAAT_stability_kameroon }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^1 = GRO_REICHSSTAAT_stability_ubangi_schari }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^2 = GRO_REICHSSTAAT_stability_kongo }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^3 = GRO_REICHSSTAAT_stability_angola }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^4 = GRO_REICHSSTAAT_stability_sambia }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^5 = GRO_REICHSSTAAT_stability_botswana }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^6 = GRO_REICHSSTAAT_stability_simbabwe }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^7 = GRO_REICHSSTAAT_stability_mosambik }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^8 = GRO_REICHSSTAAT_stability_sansibar }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^9 = GRO_REICHSSTAAT_stability_ruanda_burundi }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^10 = GRO_REICHSSTAAT_stability_uganda }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^11 = GRO_REICHSSTAAT_stability_tanganika }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^12 = GRO_REICHSSTAAT_stability_namibia }
+	set_variable = { GRO_REICHSSTAAT_rebel_stability^13 = GRO_REICHSSTAAT_stability_kenia }
+
+	set_variable = { GRO_REICHSSTAAT_devastation_score = 0 }
+	set_variable = { GRO_REICHSSTAAT_devastation_score_add = 1 }
+}
+
+GRO_REICHSSTAAT_compute_demilitarization_and_rebellions = {
+	hidden_effect = {
+		#if = {
+			#limit = {
+				#check_variable = { GRO_REICHSSTAAT_devastation_score > 700 }
+				#is_ai = yes
+			#}
+
+			#country_event = {
+				##id = GRO_REICHSSTAAT_GHOST.803
+			#}
+		#}
+
+		### KAMEROON
+		if = {
+			limit = {
+				check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^0 < 0.3 }
+				GRO_is_in_control_of_kameroon = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_kameroon_flag }
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.2
+				days = 7
+			}
+		}
+
+		### UBANGI-SCHARI
+		if = {
+			limit = {
+				GRO_is_in_control_of_ubangi_schari = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_ubangi_schari_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^1 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_kameroon_flag
+							GRO_is_in_control_of_kameroon = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_kongo_flag
+							GRO_is_in_control_of_kongo = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_ubangi_schari_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.3
+				days = 7
+			}
+		}
+
+		### KONGO
+		if = {
+			limit = {
+				check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^2 < 0.3 }
+				GRO_is_in_control_of_kongo = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_kongo_flag }
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.4
+				days = 7
+			}
+		}
+
+		### ANGOLA
+		if = {
+			limit = {
+				check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^3 < 0.3 }
+				GRO_is_in_control_of_angola = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_angola_flag }
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.5
+				days = 7
+			}
+		}
+
+		### SAMBIA
+		if = {
+			limit = {
+				GRO_is_in_control_of_sambia = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_sambia_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^4 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_angola_flag
+							GRO_is_in_control_of_angola = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_botswana_flag
+							GRO_is_in_control_of_botswana = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_kongo_flag
+							GRO_is_in_control_of_kongo = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_mosambik_flag
+							GRO_is_in_control_of_mosambik = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_simbabwe_flag
+							GRO_is_in_control_of_simbabwe = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_sambia_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.6
+				days = 7
+			}
+		}
+
+		### BOTSWANA
+		if = {
+			limit = {
+				GRO_is_in_control_of_botswana = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_botswana_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^5 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_angola_flag
+							GRO_is_in_control_of_angola = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_namibia_flag
+							GRO_is_in_control_of_namibia = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_sambia_flag
+							GRO_is_in_control_of_sambia = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_simbabwe_flag
+							GRO_is_in_control_of_simbabwe = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_botswana_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.7
+				days = 7
+			}
+		}
+
+		### SIMBABWE
+		if = {
+			limit = {
+				GRO_is_in_control_of_simbabwe = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_simbabwe_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^6 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_botswana_flag
+							GRO_is_in_control_of_botswana = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_mosambik_flag
+							GRO_is_in_control_of_mosambik = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_sambia_flag
+							GRO_is_in_control_of_sambia = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_simbabwe_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.8
+				days = 7
+			}
+		}
+
+		### MOSAMBIK
+		if = {
+			limit = {
+				GRO_is_in_control_of_mosambik = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_mosambik_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^7 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_sambia_flag
+							GRO_is_in_control_of_sambia = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_sansibar_flag
+							GRO_is_in_control_of_sansibar = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_simbabwe_flag
+							GRO_is_in_control_of_simbabwe = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_tanganika_flag
+							GRO_is_in_control_of_tanganika = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_mosambik_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.9
+				days = 7
+			}
+		}
+
+		### SANSIBAR
+		if = {
+			limit = {
+				GRO_is_in_control_of_sansibar = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_sansibar_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^8 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_mosambik_flag
+							GRO_is_in_control_of_mosambik = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_tanganika_flag
+							GRO_is_in_control_of_tanganika = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_sansibar_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.10
+				days = 7
+			}
+		}
+
+		### RUANDA-URUNDI
+		if = {
+			limit = {
+				GRO_is_in_control_of_ruanda_burundi = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_ruanda_burundi_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^9 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_kongo_flag
+							GRO_is_in_control_of_kongo = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_tanganika_flag
+							GRO_is_in_control_of_tanganika = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_uganda_flag
+							GRO_is_in_control_of_uganda = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_ruanda_burundi_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.11
+				days = 7
+			}
+		}
+
+		### UGANDA
+		if = {
+			limit = {
+				GRO_is_in_control_of_uganda = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_uganda_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^10 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_kenia_flag
+							GRO_is_in_control_of_kenia = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_kongo_flag
+							GRO_is_in_control_of_kongo = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_ruanda_burundi_flag
+							GRO_is_in_control_of_ruanda_burundi = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_uganda_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.12
+				days = 7
+			}
+		}
+
+		### TANGANIKA
+		if = {
+			limit = {
+				GRO_is_in_control_of_tanganika = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_tanganika_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^11 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_kenia_flag
+							GRO_is_in_control_of_kenia = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_mosambik_flag
+							GRO_is_in_control_of_mosambik = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_ruanda_burundi_flag
+							GRO_is_in_control_of_ruanda_burundi = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_sansibar_flag
+							GRO_is_in_control_of_sansibar = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_tanganika_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.13
+				days = 7
+			}
+		}
+
+		### NAMIBIA
+		if = {
+			limit = {
+				GRO_is_in_control_of_namibia = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_namibia_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^12 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_angola_flag
+							GRO_is_in_control_of_angola = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_botswana_flag
+							GRO_is_in_control_of_botswana = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_namibia_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.26
+				days = 7
+			}
+		}
+
+		### KENIA
+		if = {
+			limit = {
+				GRO_is_in_control_of_kenia = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_kenia_flag }
+				OR = {
+					check_variable = { ROOT.GRO_REICHSSTAAT_rebel_stability^13 < 0.3 }
+					AND = {
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_tanganika_flag
+							GRO_is_in_control_of_tanganika = no
+						}
+						OR = {
+							has_country_flag = GRO_REICHSSTAAT_uganda_flag
+							GRO_is_in_control_of_uganda = no
+						}
+
+						NOT = { has_country_flag = GRO_REICHSSTAAT_kenia_flag }
+					}
+				}
+			}
+
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.28
+				days = 7
+			}
+		}
+
+		##################################################################################################
+		### BOERS
+
+		if = {
+			limit = {
+				country_exists = BOR
+				BOR = {
+					check_variable = { BOR_hapiness_dummy_var < 0.1 }
+					NOT = { has_country_flag = BOR_second_civil_war_in_motion }
+				}
+			}
+
+			GRO = {
+				country_event = {
+					id = GRO_REICHSSTAAT_BOERS.100
+					days = 7
+				}
+				set_country_flag = BOR_second_civil_war_in_motion
+			}
+		}
+
+		##################################################################################################
+
+		if = {
+			limit = {
+				country_exists = BTS
+				country_exists = NAM
+				country_exists = BOR
+				NOT = { has_country_flag = GRO_REICHSSTAAT_has_lost_contact_with_sudafrika }
+				NOT = { country_exists = SAF }
+			}
+
+			GRO = {
+				set_country_flag = GRO_REICHSSTAAT_has_lost_contact_with_sudafrika
+				country_event = {
+					id = GRO_REICHSSTAAT.44
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+GRO_REICHSSTAAT_setup_event_triggers = {
+	hidden_effect = {
+		GRO = {
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.100
+				days = 85
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.200
+				days = 100
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.300
+				days = 25
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.400
+				days = 50
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.500
+				days = 20
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.600
+				days = 300
+			}
+			if = {
+				limit = { GRO = { is_ai = yes } }
+				country_event = {
+					id = GRO_REICHSSTAAT_GHOST.700
+					days = 15
+				}
+			}
+			else = {
+				country_event = {
+					id = GRO_REICHSSTAAT_GHOST.700
+					days = 170
+				}
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.800
+				days = 420
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.900
+				days = 260
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.1000
+				days = 70
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.1100
+				days = 35
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.1200
+				days = 200
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.1300
+				days = 150
+			}
+			country_event = {
+				id = GRO_REICHSSTAAT_GHOST.1400
+				days = 120
+			}
+		}
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_kameroon = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_kameroon_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_kameroon_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_kameroon
+		activate_decision = GRO_REICHSSTAAT_stabilize_kameroon
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_kameroon = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_kameroon_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_kameroon_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_ubangi_schari = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_ubangi_schari_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_ubangi_schari_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_ubangi_schari
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_ubangi_schari = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_ubangi_schari_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_ubangi_schari_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_kongo = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_kongo_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_kongo_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_kongo
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_kongo = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_kongo_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_kongo_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_angola = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_angola_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_angola_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_angola
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_angola = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_angola_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_angola_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_sambia = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_sambia_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_sambia_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_sambia
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_sambia = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_sambia_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_sambia_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_botswana = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_botswana_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_botswana_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_botswana
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_botswana = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_botswana_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_botswana_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_simbabwe = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_simbabwe_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_simbabwe_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_simbabwe
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_simbabwe = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_simbabwe_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_simbabwe_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_mosambik = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_mosambik_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_mosambik_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_mosambik
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_mosambik = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_mosambik_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_mosambik_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_sansibar = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_sansibar_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_sansibar_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_sansibar
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_sansibar = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_sansibar_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_sansibar_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_ruanda_burundi = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_ruanda_burundi_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_ruanda_burundi_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_ruanda_burundi
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_ruanda_burundi = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_ruanda_burundi_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_ruanda_burundi_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_uganda = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_uganda_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_uganda_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_uganda
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_uganda = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_uganda_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_uganda_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_tanganika = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_tanganika_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_tanganika_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_tanganika
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_tanganika = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_tanganika_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_tanganika_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_namibia = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_namibia_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_namibia_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_namibia
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_namibia = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_namibia_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_namibia_flag
+	}
+}
+
+GRO_REICHSSTAAT_demilitarize_kenia = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_kenia_state = yes
+			}
+			subtract_from_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = yes
+		}
+
+		set_country_flag = GRO_REICHSSTAAT_kenia_flag
+		activate_mission = GRO_REICHSSTAAT_act_in_kenia
+	}
+}
+
+GRO_REICHSSTAAT_remilitarize_kenia = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_kenia_state = yes
+			}
+			add_to_variable = { GRO.EAT_PU = EAT_loc_PU }
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_kenia_flag
+	}
+}
+
+GRO_REICHSSTAAT_revolt_kameroon = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_kameroon_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_kameroon_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_kameroon
+
+		GAB = {
+			add_ideas = {
+				GAB_Paul_Marie_Yembit_hog
+				GAB_Jacques_Opangault_for
+				GAB_Apollinaire_Bazinga_eco
+				GAB_Ba_Oumar_sec
+			}
+		}
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_GAB = yes }
+			GAB = {
+
+			}
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_GAB = yes }
+			GAB = {
+				set_politics = {
+					ruling_party = despotism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 5
+					ultranationalism = 10
+					socialist = 5
+					progressivism = 10
+					liberalism = 15
+					conservatism = 20
+					paternalism = 10
+					despotism = 25
+					fascism = 0
+					national_socialism = 0
+
+				}
+				add_country_leader_role = {
+					character = GAB_Nazaire_Boulingui
+					promote_leader = yes
+					country_leader = {
+						ideology = despotism_military_junta_subtype
+						expire = "1999.1.23"
+						id = -1
+					}
+				}
+			}
+		}
+
+		else = {
+			GRO = { Release_GAB_3 = yes }
+			GAB = {
+				set_politics = {
+					ruling_party = ultranationalism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 5
+					ultranationalism = 30
+					socialist = 5
+					progressivism = 10
+					liberalism = 15
+					conservatism = 20
+					paternalism = 10
+					despotism = 5
+					fascism = 0
+					national_socialism = 0
+				}
+				set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Corporatism }
+				econ_type_change = yes
+				add_country_leader_role = {
+					character = GAB_Francisco_Macias_Nguema
+					promote_leader = yes
+					country_leader = {
+						ideology = ultranationalism_esoteric_despotism_subtype
+						expire = "1999.1.23"
+						id = -1
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^1 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^2 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_ubangi_schari = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_ubangi_schari_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_ubangi_schari_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_ubangi_schari
+
+		CAF = {
+			add_ideas = {
+				CAF_David_Dacko_hog
+				CAF_Barthelemy_Boganda_for
+				CAF_Ange_Felix_Patasse_eco
+				CAF_Andre_Kolingba_sec
+			}
+		}
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_CAF = yes }
+			CAF = {
+
+			}
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_CAF = yes }
+			CAF = {
+				set_politics = {
+					ruling_party = despotism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					ultranationalism = 0
+					socialist = 20
+					progressivism = 0
+					liberalism = 0
+					conservatism = 0
+					paternalism = 0
+					despotism = 80
+					fascism = 0
+					national_socialism = 0
+
+				}
+				add_country_leader_role = {
+					character = CAF_Andre_Kolingba
+					country_leader = {
+						expire = "1999.1.23"
+						ideology = despotism_military_junta_subtype
+						id = -1
+					}
+					promote_leader = yes
+				}
+			}
+		}
+
+		else = {
+			GRO = { Release_CAF_3 = yes }
+			CAF = {
+				set_politics = {
+					ruling_party = despotism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					ultranationalism = 0
+					socialist = 20
+					progressivism = 0
+					liberalism = 0
+					conservatism = 0
+					paternalism = 0
+					despotism = 80
+					fascism = 0
+					national_socialism = 0
+
+				}
+				add_country_leader_role = {
+					character = CAF_Andre_Kolingba
+					country_leader = {
+						expire = "1999.1.23"
+						ideology = despotism_military_junta_subtype
+						id = -1
+					}
+					promote_leader = yes
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^0 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^2 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_kongo = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_kongo_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_kongo_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_kongo
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_CFS_1 = yes }
+		}
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_CFS_1 = yes }
+			CFS = {
+				set_politics = {
+					ruling_party = despotism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					ultranationalism = 0
+					socialist = 0
+					progressivism = 0
+					liberalism = 10
+					conservatism = 10
+					paternalism = 5
+					despotism = 75
+					fascism = 0
+					national_socialism = 0
+				}
+			}
+		}
+		else = {
+			GRO = { Release_CFS_3 = yes }
+			CFS = {
+				CFS_Victor_Lundula = {
+					set_nationality = COG
+				}
+				add_ideas = CFS_Generic_Vacant_sec
+			}
+			COG = {
+				load_focus_tree = ZZZ_blank_focus #to clear away Müller's foci
+				set_cosmetic_tag = COG_FED_REP
+				set_politics = {
+					ruling_party = despotism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					ultranationalism = 0
+					socialist = 0
+					progressivism = 0
+					liberalism = 10
+					conservatism = 10
+					paternalism = 5
+					despotism = 75
+					fascism = 0
+					national_socialism = 0
+				}
+
+				promote_character = CFS_Victor_Lundula
+
+				remove_ideas = {
+					COG_Heart_Of_Afrika_0
+					COG_Heart_Of_Afrika_1
+					COG_Heart_Of_Afrika_2
+					COG_Heart_Of_Afrika_3
+					COG_Heart_Of_Afrika_4
+					COG_Heart_Of_Afrika_5
+					COG_Heart_Of_Afrika_6
+					COG_Heart_Of_Afrika_7
+					COG_Heart_Of_Afrika_8
+					COG_Heart_Of_Afrika_9
+					COG_Hands_Off_Administration
+					COG_Soldiers_Of_Fortune
+					COG_The_Fatherland_Arrives
+					COG_Conscripted_Natives
+					COG_Conscripted_Mercenaries
+					COG_Conscripted_Mercenaries_2
+					COG_Up_to_Date_Maps
+					COG_Cameroon_Defense_Plan
+					COG_the_strive_for_panzers
+					COG_the_strive_for_panzers_2
+					COG_the_strive_for_panzers_3
+					COG_an_adapted_force
+					COG_Mullers_Army_0
+					COG_Mullers_Army_1
+					COG_Mullers_Army_2
+					COG_Zentralafrikaner_Military_Complex_0
+					COG_Zentralafrikaner_Military_Complex_1
+					COG_Air_Training_Programs
+					COG_die_walkuren
+					COG_Aerian_Logistics
+					COG_SAF_Tactical_Bombing_Campaigns
+					COG_Airfield_Developments_0
+					COG_Airfield_Developments_1
+					COG_bonus_vacation_kollner
+					COG_bonus_vacation_speer_jr
+					COG_bonus_vacation_kaselowsky
+					COG_bonus_vacation_manstein
+					COG_bonus_vacation_nordhoff
+					COG_bonus_vacation_von_heydekampf
+					COG_bonus_vacation_abs
+					COG_bonus_vacation_flick
+					COG_bonus_vacation_geilenberg
+					COG_bonus_vacation_von_siemens
+					COG_Raised_Steel_Quotas
+					COG_Raised_Rubber_Quotas
+					GER_SGR_drugs_SAW
+					Pakt_Autonomous_Reichskommissariat
+					COG_lobster_war
+					ANG_Mutual_Assistence_Pact_COG
+				}
+				remove_dynamic_modifier = {
+					modifier = COG_mercenary_army
+				}
+				remove_dynamic_modifier = {
+					modifier = COG_the_call_of_the_wild
+				}
+
+				set_variable = { national_debt = 0 }
+				set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Capitalism }
+				econ_type_change = yes
+				econ_leave_sphere = yes
+				load_focus_tree = ZZZ_blank_focus
+			}
+
+			KSI = {
+				set_politics = {
+					ruling_party = paternalism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 30
+					ultranationalism = 0
+					socialist = 30
+					progressivism = 0
+					liberalism = 0
+					conservatism = 0
+					paternalism = 40
+					despotism = 0
+					fascism = 0
+					national_socialism = 0
+				}
+				promote_character = KSI_Moise_Tshombe
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^0 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^2 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_angola = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_angola_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_angola_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_angola
+
+		ANG = {
+			retire_country_leader = yes
+			set_capital = { state = 1035 }
+			drop_cosmetic_tag = yes
+
+			set_politics = {
+				ruling_party = despotism
+				last_election = "1933.3.5"
+				election_frequency = 48
+				elections_allowed = no
+			}
+
+			set_popularities = {
+				communist = 0
+				ultranationalism = 0
+				socialist = 0
+				progressivism = 0
+				liberalism = 0
+				conservatism = 0
+				paternalism = 0
+				despotism = 80
+				fascism = 20
+				national_socialism = 0
+
+			}
+			ANG_Jonas_Savimbi = {
+				promote_character = { ideology = despotism_personalistic_dictatorship_subtype }
+			}
+			add_ideas = {
+				ANG_Jeremias_Chitunda_hog
+				ANG_Demosthenes_Amos_Chilingutila_sec
+				ANG_Jorge_Sangumba_for
+				ANG_Jose_Eduardo_dos_Santos_eco
+			}
+
+			remove_ideas = {
+				ANG_Afrikaner_Airstrip
+				ANG_Incoherent_Bookkeeping
+				ANG_Incoherent_Bookkeeping_2
+				ANG_Incoherent_Bookkeeping_3
+				ANG_Incoherent_Bookkeeping_4
+				ANG_Away_In_The_Clouds
+				ANG_The_Fatherland_Arrives
+				ANG_Disrupted_Comms
+				ANG_Slipping_The_Plans
+				ANG_Constant_Partisans
+				ANG_Broken_Fuel_Lines
+				ANG_Token_Troops
+				ANG_Muller_Airlift
+				ANG_No_One_In_No_One_Out
+				ANG_USA_Infiltrated_RK_Armies
+				ANG_SKL_Air_Exercises
+				ANG_SKL_RD_Expanded
+				ANG_Secure_The_Homefront
+				ANG_In_The_Nuts
+				ANG_In_The_Nuts_2
+				ANG_In_The_Nuts_3
+				ANG_In_The_Nuts_4
+				ANG_Reprisal_Attacks
+				ANG_SS_Anti_Terror
+				ANG_SS_Anti_Terror_2
+				ANG_Using_Our_People
+				ANG_Using_Our_People_Paid_Well
+				ANG_Using_Our_People_Paid_Well_2
+				ANG_Using_Our_People_Paid_Enough
+				ANG_Using_Our_People_Paid_Enough_2
+				ANG_Roll_Them_Off_The_Line
+				GRO_Financed_Shit
+				ANG_Mutual_Assistence_Pact_1
+				ANG_Mutual_Assistence_Pact
+				ANG_Road_Of_Life
+				ANG_Natives_In_The_Air_2
+				ANG_Natives_In_The_Air_1
+				ANG_RANDR
+				ANG_RANDR_2
+				ANG_Joint_Offensive_Shit
+				ANG_Lords_Of_The_Air
+				ANG_Lords_Of_The_Air_2
+				ANG_PlanesInOurHand_1
+				ANG_PlanesInOurHand_2
+				ANG_PlanesInOurHand_3
+				ANG_bomber_production
+				ANG_fighter_production
+				ANG_transport_production
+				ANG_Bomber_Plans
+				ANG_Bomber_Plans_And_Fighter_Plans
+				ANG_Fighter_Plans
+				ANG_Air_Assault_And_Fighter
+				ANG_Trifecta
+				ANG_Air_Assault
+				ANG_Air_Assault_And_Bomber
+				ANG_Safetey_is_paramount_idea
+				ANG_pit_stop_model_idea
+				ANG_pit_stop_modeland_saftey_idea
+				ANG_build_quickly_idea
+				ANG_German_Sus_idea_1
+				ANG_German_Sus_idea_2
+				ANG_German_Sus_idea_3
+				ANG_German_Sus_idea_4
+				ANG_German_Sus_idea_5
+				ANG_Huttig_sus_idea_1
+				ANG_Huttig_sus_idea_2
+				ANG_Huttig_sus_idea_3
+				ANG_Huttig_sus_idea_4
+				ANG_Muller_sus_idea_1
+				ANG_Muller_sus_idea_2
+				ANG_Muller_sus_idea_3
+				ANG_Muller_sus_idea_4
+				ANG_Native_Militancy_1
+				ANG_Native_Militancy_2
+				ANG_Native_Militancy_3
+				ANG_Native_Militancy_4
+				ANG_Native_Militancy_5
+				ANG_Sudwest_Training_Shit
+				ANG_Sudwest_Training_med
+				ANG_Sudwest_Training_high
+				ANG_constitution
+				ANG_Guerrillas_Rescued
+				ANG_few_prisoners_freed
+				ANG_med_prisoners_freed
+				ANG_high_prisoners_freed
+				ANG_German_Resistance
+				ANG_Improved_Internal_Structure
+				ANG_City_Terror_Attack
+				ANG_Terror_Troop_Angst
+				ANG_American_Advisors
+				GER_SGR_drugs_SAW
+				Pakt_Autonomous_Reichskommissariat
+
+				ANG_Air_Empire_Dynmod_Dummy
+			}
+
+			set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Planned }
+			econ_type_change = yes
+			econ_leave_sphere = yes
+			load_focus_tree = ZZZ_blank_focus
+		}
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_ANG = yes }
+			ANG = {
+				set_party_name = {
+					ideology = despotism
+					long_name = ANG_CIVIL_WAR_UNITA_long
+					name = ANG_CIVIL_WAR_UNITA
+				}
+			}
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_ANG = yes }
+			ANG = {
+				set_party_name = {
+					ideology = despotism
+					long_name = ANG_CIVIL_WAR_UNITA_long
+					name = ANG_CIVIL_WAR_UNITA
+				}
+			}
+		}
+
+		else = {
+			GRO = { Release_ANG_3 = yes }
+			ANG = {
+				set_cosmetic_tag = ANG_CIVIL_WAR
+				set_party_name = {
+					ideology = despotism
+					long_name = ANG_CIVIL_WAR_UNITA_long
+					name = ANG_CIVIL_WAR_UNITA
+				}
+			}
+			BRS = {
+				set_politics = {
+					ruling_party = socialist
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 20
+					socialist = 55
+					progressivism = 0
+					liberalism = 0
+					liberal_conservatism = 0
+					conservatism = 0
+					paternalism = 0
+					despotism = 25
+					ultranationalism = 0
+					fascism = 0
+					national_socialism = 0
+				}
+			}
+		}
+
+		# ANG = {
+		# 	declare_war_on = {
+		# 		target = GRO
+		# 		type = annex_everything
+		# 	}
+		# }
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^2 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^4 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^12 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_sambia = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_sambia_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_sambia_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_sambia
+		ZAM = {
+			remove_all_ministers = yes
+		}
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_ZAM = yes }
+			ZAM = {
+				add_ideas = {
+					ZAM_Reuben_Kamanga_hog
+					ZAM_Elijah_Mudenda_for
+					ZAM_Alexander_Grey_Zulu_eco
+					ZAM_Casimir_Michael_Grigg_sec
+				}
+			}
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_ZAM_2 = yes }
+			ZAM = {
+				set_politics = {
+					ruling_party = despotism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 10
+					socialist = 40
+					progressivism = 0
+					liberalism = 5
+					liberal_conservatism = 0
+					conservatism = 5
+					paternalism = 5
+					despotism = 35
+					ultranationalism = 0
+					fascism = 0
+					national_socialism = 0
+				}
+				add_ideas = {
+					ZAM_Reuben_Kamanga_hog
+					ZAM_Elijah_Mudenda_for
+					ZAM_Alexander_Grey_Zulu_eco
+					ZAM_Casimir_Michael_Grigg_sec
+				}
+			}
+		}
+
+		else = {
+			GRO = { Release_ZAM_3 = yes }
+			ZAM = {
+				ZAM_Casimir_Michael_Grigg = {
+					set_nationality = ZBO
+				}
+				set_politics = {
+					ruling_party = despotism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 5
+					socialist = 10
+					progressivism = 0
+					liberalism = 0
+					liberal_conservatism = 0
+					conservatism = 5
+					paternalism = 5
+					despotism = 75
+					ultranationalism = 0
+					fascism = 0
+					national_socialism = 0
+				}
+				add_ideas = {
+					ZAM_Reuben_Kamanga_hog
+					ZAM_Elijah_Mudenda_for
+					ZAM_Alexander_Grey_Zulu_eco
+					ZAM_Reuben_Kamanga_sec
+				}
+			}
+
+			ZBO = {
+				promote_character = ZAM_Casimir_Michael_Grigg
+				set_politics = {
+					ruling_party = paternalism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 20
+					socialist = 50
+					progressivism = 0
+					liberalism = 0
+					liberal_conservatism = 0
+					conservatism = 0
+					paternalism = 30
+					despotism = 0
+					ultranationalism = 0
+					fascism = 0
+					national_socialism = 0
+				}
+			}
+
+			BRS = {
+				set_politics = {
+					ruling_party = socialist
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 20
+					socialist = 55
+					progressivism = 0
+					liberalism = 0
+					liberal_conservatism = 0
+					conservatism = 0
+					paternalism = 0
+					despotism = 25
+					ultranationalism = 0
+					fascism = 0
+					national_socialism = 0
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^2 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^3 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^5 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^6 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^7 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_botswana = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_botswana_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_botswana_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_botswana
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_BTS = yes }
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_BTS = yes }
+			BTS = {
+				set_politics = {
+					ruling_party = despotism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					socialist = 5
+					progressivism = 10
+					liberalism = 20
+					liberal_conservatism = 0
+					conservatism = 20
+					paternalism = 15
+					despotism = 30
+					ultranationalism = 0
+					fascism = 0
+					national_socialism = 0
+				}
+			}
+		}
+
+		else = {
+			GRO = { Release_BTS_3 = yes }
+			BTS = {
+				set_politics = {
+					ruling_party = despotism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					socialist = 5
+					progressivism = 10
+					liberalism = 15
+					liberal_conservatism = 0
+					conservatism = 15
+					paternalism = 15
+					despotism = 40
+					ultranationalism = 0
+					fascism = 0
+					national_socialism = 0
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^3 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^4 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^6 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^12 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_simbabwe = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_simbabwe_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_simbabwe_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_simbabwe
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			random_list = {
+				95 = {
+					modifier = {
+						factor = 0
+						has_game_rule = {
+							rule = ZIM_GRORELEASE
+							option = ZIM_GRORELEASE_1
+						}
+					}
+					GRO = { Release_ZIM = yes }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_game_rule = {
+							rule = ZIM_GRORELEASE
+							option = ZIM_GRORELEASE_2
+						}
+					}
+					GRO = { Release_ZIM_2 = yes }
+				}
+			}
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_ZIM = yes }
+		}
+
+		else = {
+			GRO = { Release_ZIM_3 = yes }
+			ZIM = {
+				ZIM_Leopold_Takawira = {
+					set_nationality = ZMO
+				}
+				fill_empty_minister = yes
+			}
+			ZMO = {
+				promote_character = ZIM_Leopold_Takawira
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^4 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^5 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^7 = 0.1 }
+		}
+
+		set_province_name = { #Harare
+			id = 13730
+			name = VICTORY_POINTS_13730_nat
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_mosambik = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_mosambik_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_mosambik_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_mosambik
+
+		GAZ = {
+			add_ideas = {
+				GAZ_Joaquim_Chissano_hog
+				GAZ_Alberto_Massavanhane_for
+				GAZ_Marcelino_dos_Santos_eco
+				GAZ_Samora_Machel_sec
+			}
+		}
+
+		RMB = {
+			add_ideas = {
+				RMB_Hastings_Kamuzu_Banda_hog
+				RMB_Orton_Chirwa_for
+				RMB_Aleke_Banda_eco
+				RMB_Katoba_Musopole_sec
+			}
+		}
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_GAZ = yes }
+			ZZZ = {
+				country_event = { id = GAZ.1 days = 1460 }
+			}
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_GAZ = yes }
+			ZZZ = {
+				country_event = { id = GAZ.1 days = 1460 }
+			}
+			RMB = {
+				set_politics = {
+					ruling_party = fascism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					socialist = 0
+					progressivism = 0
+					liberalism = 0
+					liberal_conservatism = 0
+					conservatism = 25
+					paternalism = 30
+					despotism = 15
+					ultranationalism = 0
+					fascism = 30
+					national_socialism = 0
+				}
+				promote_character = RMB_Flax_Katoba_Musopole
+			}
+		}
+
+		else = {
+			GRO = { Release_GAZ_3 = yes }
+			RMB = {
+				set_politics = {
+					ruling_party = fascism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					socialist = 0
+					progressivism = 0
+					liberalism = 0
+					liberal_conservatism = 0
+					conservatism = 25
+					paternalism = 30
+					despotism = 15
+					ultranationalism = 0
+					fascism = 30
+					national_socialism = 0
+				}
+				promote_character = RMB_Flax_Katoba_Musopole
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^4 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^6 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^8 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^11 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_sansibar = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_sansibar_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_sansibar_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_sansibar
+
+		ZZB = {
+			add_ideas = {
+				ZZB_Muhammad_Shamte_Hamadi_hog
+				ZZB_Ali_Muhsin_Al_Barwani_for
+				ZZB_Kighoma_Malima_eco
+				ZZB_Kanali_Ali_Mahfoudh_sec
+			}
+		}
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_ZZB_1 = yes }
+			ZZB = {
+
+			}
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_ZZB_1 = yes }
+			ZZB = {
+
+			}
+		}
+
+		else = {
+			GRO = { Release_ZZB_3 = yes }
+			ZZB = {
+
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^7 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^11 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_ruanda_burundi = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_ruanda_burundi_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_ruanda_burundi_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_ruanda_burundi
+
+		BRD = {
+			add_ideas = {
+				BRD_Michel_Micombero_hog
+				BRD_Alexis_Nimubona_for
+				BRD_Thomas_Ndabemeye_eco
+				BRD_Jean_Baptiste_Bagaza_sec
+			}
+		}
+
+		RWA = {
+			add_ideas = {
+				RWA_Dominique_Mbonyumutwa_hog
+				RWA_Sylvestre_Nsanzimana_for
+				RWA_Gregoire_Kayibanda_eco
+				RWA_Juvenal_Habyarimana_sec
+			}
+		}
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_BRD = yes }
+			BRD = {
+
+			}
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_BRD = yes }
+			BRD = {
+
+			}
+			RWA = {
+				set_politics = {
+					ruling_party = fascism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+
+				set_popularities = {
+					communist = 0
+					ultranationalism = 0
+					socialist = 0
+					progressivism = 0
+					liberalism = 0
+					conservatism = 25
+					paternalism = 30
+					despotism = 15
+					fascism = 0
+					national_socialism = 0
+				}
+				promote_character = RWA_Gregoire_Kayibanda
+			}
+		}
+
+		else = {
+			GRO = { Release_BRD = yes }
+			BRD = {
+				set_politics = {
+					ruling_party = fascism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					ultranationalism = 0
+					socialist = 5
+					progressivism = 5
+					liberalism = 10
+					conservatism = 15
+					paternalism = 15
+					despotism = 20
+					fascism = 30
+					national_socialism = 0
+
+				}
+				add_country_leader_role = {
+					character = BRD_Jean_Baptiste_Bagaza
+					country_leader = {
+						ideology = fascism_revolutionary_nationalism_subtype
+						expire = "1999.1.23.1"
+						id = -1
+					}
+					promote_leader = yes
+				}
+			}
+
+			RWA = {
+				set_politics = {
+					ruling_party = ultranationalism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					ultranationalism = 45
+					socialist = 0
+					progressivism = 0
+					liberalism = 0
+					conservatism = 0
+					paternalism = 0
+					despotism = 15
+					fascism = 40
+					national_socialism = 0
+				}
+				promote_character = RWA_Theoneste_Bagosora
+			}
+		}
+
+		set_province_name = { #Kigali
+			id = 13383
+			name = VICTORY_POINTS_13383_nat
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^2 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^10 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^11 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_uganda = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_uganda_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_uganda_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_uganda
+
+		UGD = {
+			add_ideas = {
+				UGD_Isaac_Maliyamungu_hog
+				UGD_Idi_Amin_Dada_for
+				UGD_Juma_Butabika_eco
+				UGD_Mustafa_Adrisi_sec
+			}
+		}
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_UGD = yes }
+			UGD = {
+
+			}
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_UGD_2 = yes }
+			UGD = {
+
+			}
+			TOO = {
+				set_politics = {
+					ruling_party = despotism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+			}
+		}
+
+		else = {
+			GRO = { Release_UGD_2 = yes }
+			UGD = {
+				UGD_Tito_Okello = {
+					set_nationality = TOO
+				}
+				set_politics = {
+					ruling_party = fascism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					socialist = 0
+					progressivism = 0
+					liberalism = 0
+					liberal_conservatism = 0
+					conservatism = 0
+					paternalism = 0
+					despotism = 40
+					ultranationalism = 0
+					fascism = 60
+					national_socialism = 0
+				}
+			}
+			TOO = {
+				promote_character = UGD_Tito_Okello
+				set_politics = {
+					ruling_party = paternalism
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 0
+					socialist = 0
+					progressivism = 0
+					liberalism = 0
+					liberal_conservatism = 0
+					conservatism = 0
+					paternalism = 60
+					despotism = 40
+					ultranationalism = 0
+					fascism = 0
+					national_socialism = 0
+				}
+			}
+		}
+
+		UGD = { # If Mutesa II was desposed prior to revolt or Stage III Devastation
+			if = {
+				limit = { has_government = fascism }
+				remove_ideas = UGD_Idi_Amin_Dada_for
+				add_ideas = UGD_Juma_Oris_for
+			}
+		}
+
+		set_province_name = { #Kampala
+			id = 12989
+			name = VICTORY_POINTS_12989_nat
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^2 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^9 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^13 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_tanganika = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_tanganika_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_tanganika_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_tanganika
+
+		TNZ = {
+			add_ideas = {
+				TNZ_Rashidi_Kawawa_hog
+				TNZ_Paul_Bomani_for
+				TNZ_John_Malecela_eco
+				TNZ_Rashidi_Kawawa_sec
+			}
+		}
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_TNZ_1 = yes }
+			TNZ = {
+
+			}
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_TNZ_1 = yes }
+			TNZ = {
+				set_politics = {
+					ruling_party = socialist
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 35
+					ultranationalism = 0
+					socialist = 25
+					progressivism = 0
+					liberalism = 0
+					conservatism = 10
+					paternalism = 15
+					despotism = 15
+					fascism = 0
+					national_socialism = 0
+				}
+				promote_character = TNZ_Edward_Sokoine
+			}
+		}
+
+		else = {
+			GRO = { Release_TNZ_3 = yes }
+			ZZB = {
+				ZZB_John_Okello = {
+					set_nationality = FMF
+				}
+			}
+			FMF = {
+				promote_character = ZZB_John_Okello
+			}
+			TNZ = {
+				set_politics = {
+					ruling_party = socialist
+					last_election = "1933.3.5"
+					election_frequency = 48
+					elections_allowed = no
+				}
+				set_popularities = {
+					communist = 35
+					ultranationalism = 0
+					socialist = 25
+					progressivism = 0
+					liberalism = 0
+					conservatism = 10
+					paternalism = 15
+					despotism = 15
+					fascism = 0
+					national_socialism = 0
+				}
+				promote_character = TNZ_Edward_Sokoine
+				TNZ_David_Musuguri = { set_nationality = TND }
+			}
+			TND = {
+				promote_character = TNZ_David_Musuguri
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^7 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^8 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^9 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^13 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_namibia = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_namibia_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_namibia_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_namibia
+
+		if = {
+			limit = {
+				GRO_has_stage_1_devastation = yes
+			}
+			GRO = { Release_NAM = yes }
+		}
+
+		else_if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+			}
+			GRO = { Release_NAM = yes }
+		}
+
+		else = {
+			GRO = { Release_NAM_3 = yes }
+			NAM = {
+				NAM_Andimba_Toivo_ya_Toivo = {
+					set_nationality = OVB
+				}
+				add_ideas = NAM_Generic_Vacant_hog
+			}
+			OVB = {
+				promote_character = NAM_Andimba_Toivo_ya_Toivo
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^3 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^5 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_revolt_kenia = {
+	hidden_effect = {
+		every_owned_state = {
+			limit = {
+				GRO_is_kenia_state = yes
+			}
+			set_demilitarized_zone = no
+		}
+
+		clr_country_flag = GRO_REICHSSTAAT_kenia_flag
+		remove_mission = GRO_REICHSSTAAT_act_in_kenia
+
+		GRO = { Release_LUO = yes }
+
+		LUO = {
+			add_ideas = {
+				LUO_Argwings_Kodhek_hog
+				LUO_Elijah_Masinde_for
+				LUO_William_Odongo_Omamo_eco
+				LUO_Hezekiah_Ochuka_sec
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_completed_focus = GRO_close_the_border }
+			}
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^10 = 0.1 }
+			subtract_from_variable = { GRO_REICHSSTAAT_rebel_stability^11 = 0.1 }
+		}
+	}
+}
+
+GRO_REICHSSTAAT_compute_devastation_effects = {
+	set_variable = { GRO_REICHSSTAAT_devastation_resistance_damage = GRO_REICHSSTAAT_devastation_score }
+	divide_variable = { GRO_REICHSSTAAT_devastation_resistance_damage = 250 }
+	subtract_from_variable = { GRO_REICHSSTAAT_devastation_resistance_damage = 1 }
+	multiply_variable = { GRO_REICHSSTAAT_devastation_resistance_damage = -1 }
+	multiply_variable = { GRO_REICHSSTAAT_devastation_resistance_damage = 0.5 }
+
+	if = {
+		limit = {
+			check_variable = { GRO_REICHSSTAAT_devastation_score < 500 }
+		}
+		set_variable = { GRO_REICHSSTAAT_devastation_pop = GRO_REICHSSTAAT_devastation_score }
+		subtract_from_variable = { GRO_REICHSSTAAT_devastation_pop = 100 }
+		divide_variable = { GRO_REICHSSTAAT_devastation_pop = 400 }
+		multiply_variable = { GRO_REICHSSTAAT_devastation_pop = -0.75 }
+	}
+
+	else = {
+		set_variable = { GRO_REICHSSTAAT_devastation_pop = -0.75 }
+	}
+
+	if = {
+		limit = {
+			check_variable = {
+				var = GRO_REICHSSTAAT_devastation_score
+				value = 100
+				compare = less_than
+			}
+			NOT = {
+				has_dynamic_modifier = {
+					modifier = GRO_REICHSSTAAT_devastation_stage_1
+				}
+			}
+		}
+		GRO = {
+			add_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_1 }
+			if = {
+				limit = {
+					has_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_2 }
+				}
+				remove_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_2 }
+			}
+			if = {
+				limit = {
+					has_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_3 }
+				}
+				remove_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_3 }
+			}
+		}
+	}
+
+	else_if = {
+		limit = {
+			check_variable = {
+				var = GRO_REICHSSTAAT_devastation_score
+				value = 250
+				compare = less_than
+			}
+			check_variable = {
+				var = GRO_REICHSSTAAT_devastation_score
+				value = 100
+				compare = greater_than_or_equals
+			}
+			NOT = {
+				has_dynamic_modifier = {
+					modifier = GRO_REICHSSTAAT_devastation_stage_2
+				}
+			}
+		}
+		GRO = {
+			add_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_2 }
+			if = {
+				limit = {
+					has_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_1 }
+				}
+				remove_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_1 }
+			}
+			if = {
+				limit = {
+					has_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_3 }
+				}
+				remove_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_3 }
+			}
+		}
+	}
+
+	else_if = {
+		limit = {
+			check_variable = {
+				var = GRO_REICHSSTAAT_devastation_score
+				value = 250
+				compare = greater_than_or_equals
+			}
+			NOT = {
+				has_dynamic_modifier = {
+					modifier = GRO_REICHSSTAAT_devastation_stage_3
+				}
+			}
+		}
+		GRO = {
+			add_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_3 }
+			if = {
+				limit = {
+					has_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_1 }
+				}
+				remove_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_1 }
+			}
+			if = {
+				limit = {
+					has_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_2 }
+				}
+				remove_dynamic_modifier = { modifier = GRO_REICHSSTAAT_devastation_stage_2 }
+			}
+		}
+	}
+}
+
+#Determines initial cabal strength
+GRO_REICHSSTAAT_calculate_cabal_power = {
+	GRO = {
+		if = {
+			limit = { has_global_flag = german_civil_war_speervic }
+			set_variable = { GRO_REICHSSTAAT_cabal_power = GER.SGR_SAW_involvement }
+		}
+		else_if = {
+			limit = { has_global_flag = german_civil_war_bormannvic }
+			set_variable = { GRO_REICHSSTAAT_cabal_power = GER.GER_Bormann_SAW_involvement }
+		}
+		if = {
+			limit = {
+				GER = {
+					has_country_flag = GER_add_5_cabal
+				}
+			}
+			add_to_variable = {
+				GRO_REICHSSTAAT_cabal_power = 5
+			}
+		}
+		if = {
+			limit = {
+				GER = {
+					has_country_flag = GER_add_10_cabal
+				}
+			}
+			add_to_variable = {
+				GRO_REICHSSTAAT_cabal_power = 10
+			}
+		}
+		if = {
+			limit = {
+				GER = {
+					has_country_flag = GER_halve_cabal_strength
+				}
+			}
+			divide_variable = { GRO_REICHSSTAAT_cabal_power = 2 }
+		}
+		log = "[GetDateText]: [?GRO_REICHSSTAAT_cabal_power]"
+		divide_variable = { GRO_REICHSSTAAT_cabal_power = 100 }
+		log = "[GetDateText]: [?GRO_REICHSSTAAT_cabal_power]"
+		if = {
+			limit = { check_variable = { GRO_REICHSSTAAT_cabal_power > 0 } }
+			set_country_flag = GRO_cabal_active
+		}
+	}
+}
+
+GRO_REICHSSTAAT_update_reichsstaat_color = {
+	if = {
+		limit = {
+			GRO_has_stage_1_devastation = yes
+			NOT = { has_country_flag = GRO_REICHSSTAAT_stage_1_devastation }
+		}
+		set_country_flag = GRO_REICHSSTAAT_stage_1_devastation
+		clr_country_flag = GRO_REICHSSTAAT_stage_2_devastation
+		clr_country_flag = GRO_REICHSSTAAT_stage_3_devastation
+
+		set_cosmetic_tag = GRO_REICHSSTAAT
+	}
+
+	else = {
+		if = {
+			limit = {
+				GRO_has_stage_2_devastation = yes
+				NOT = { has_country_flag = GRO_REICHSSTAAT_stage_2_devastation }
+			}
+			clr_country_flag = GRO_REICHSSTAAT_stage_1_devastation
+			set_country_flag = GRO_REICHSSTAAT_stage_2_devastation
+			clr_country_flag = GRO_REICHSSTAAT_stage_3_devastation
+
+			set_cosmetic_tag = GRO_REICHSSTAAT_2
+
+			GRO_Hans_Huttig = {
+				set_portraits = {
+					#army = { large = "gfx/leaders/GRO/Portrait_GRO_Hans_Huttig_Reichsstaat.dds" }
+					civilian = { large = "gfx/leaders/GRO/Portrait_GRO_Hans_Huttig_Reichsstaat.dds" }
+				}
+			}
+		}
+
+		else = {
+			if = {
+				limit = {
+					GRO_has_stage_3_devastation = yes
+					NOT = { has_country_flag = GRO_REICHSSTAAT_stage_3_devastation }
+				}
+				clr_country_flag = GRO_REICHSSTAAT_stage_1_devastation
+				clr_country_flag = GRO_REICHSSTAAT_stage_2_devastation
+				set_country_flag = GRO_REICHSSTAAT_stage_3_devastation
+
+				set_cosmetic_tag = GRO_REICHSSTAAT_3
+
+				GRO_Hans_Huttig = {
+					set_portraits = {
+						#army = { large = "gfx/leaders/GRO/Portrait_GRO_Hans_Huttig_Reichsstaat_BurgSys.dds" }
+						civilian = { large = "gfx/leaders/GRO/Portrait_GRO_Hans_Huttig_Reichsstaat_BurgSys.dds" }
+					}
+				}
+			}
+		}
+	}
+}
+
+SSAFCW_core_saf = {
+	add_state_core = 681
+	add_state_core = 719
+	add_state_core = 933
+	add_state_core = 934
+	add_state_core = 935
+	add_state_core = 936
+	add_state_core = 942
+	add_state_core = 1312
+	add_state_core = 275
+	add_state_core = 939
+	add_state_core = 940
+	add_state_core = 938
+	add_state_core = 937
+}

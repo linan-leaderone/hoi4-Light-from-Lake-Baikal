@@ -1,0 +1,68 @@
+scripted_gui = {
+	GNG_Negotiations_Proposals_GUI = {
+		context_type = player_context
+		window_name = GNG_Negotiations_Proposals_GUI
+		visible = { has_country_flag = GNG_Negotiations_Proposals_Visible }
+		dynamic_lists = {
+			proposals_grid = {
+				array = GNG_Proposals_Array
+				value = prop
+				entry_container = GNG_Negotiations_Proposals_Entry
+			}
+		}
+		effects = {
+			entry_click = {
+				set_variable = { GNG_Proposals_Current_Selected_Proposal = prop }
+			}
+			confirm_click = {
+				set_variable = { GNG_Proposal_Value = GNG_Proposals_Current_Selected_Proposal }
+				multiply_variable = { GNG_Proposal_Value = 10 }
+				clr_country_flag = GNG_Negotiations_Proposals_Visible
+				country_event = guangdong_RiotsNegotiations.2
+			}
+		}
+		triggers = {
+			entry_background_visible = {
+				if = {
+					limit = {
+						check_variable = {
+							var = GNG_Proposals_Current_Selected_Proposal
+							value = prop
+							compare = less_than
+						}
+					}
+					set_temp_variable = { entry_background_frame = 1 }
+				}
+				else = { set_temp_variable = { entry_background_frame = 2 } }
+			}
+			entry_visible = {
+				if = {
+					limit = {
+						OR = {
+							check_variable = { prop = 4 }
+							check_variable = { prop = 6 }
+							check_variable = { prop = 7 }
+							check_variable = { prop = 8 }
+							check_variable = { prop = 9 }
+							check_variable = { prop = 10 }
+						}
+					}
+					set_temp_variable = { entry_frame = GNG_riot_group_negotiating }
+				}
+				else = { set_temp_variable = { entry_frame = 1 } }
+			}
+			confirm_click_enabled = {
+				NOT = { check_variable = { GNG_Proposals_Current_Selected_Proposal = 0 } }
+			}
+		}
+		properties = {
+			entry_background = {
+				frame = entry_background_frame
+			}
+			entry = {
+				image = "GFX_GNG_Proposals_item_[?prop]"
+				frame = entry_frame
+			}
+		}
+	}
+}

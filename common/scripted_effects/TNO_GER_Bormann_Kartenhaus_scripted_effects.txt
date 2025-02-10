@@ -1,0 +1,1994 @@
+########################################################################
+##  ██████╗  ██████╗ ██████╗ ███╗   ███╗ █████╗ ███╗   ██╗███╗   ██╗  ##
+##  ██╔══██╗██╔═══██╗██╔══██╗████╗ ████║██╔══██╗████╗  ██║████╗  ██║  ##
+##  ██████╔╝██║   ██║██████╔╝██╔████╔██║███████║██╔██╗ ██║██╔██╗ ██║  ##
+##  ██╔══██╗██║   ██║██╔══██╗██║╚██╔╝██║██╔══██║██║╚██╗██║██║╚██╗██║  ##
+##  ██████╔╝╚██████╔╝██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║██║ ╚████║  ##
+##  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝  ##
+########################################################################
+
+#	INDEX
+#	Use ctrl+f on the below titles to navigate to any section or effect.
+#
+#	OVERALL EFFECTS
+#		BOR_Influence_Initialize
+#			Initializes the Influence System
+#			Args: n/a
+#
+#		BOR_Influence_Update
+#			Performs a fully update of the Influence System
+#			Args: n/a
+#
+#	BORMANN ADD POWER GENERIC EFFECTS
+#		BOR_SIG_AP_Clear
+#			Cleaning Command; used by BOR_SIG_AddPower to clear variables once unneeded
+#			Args: n/a
+#
+#		BOR_SIG_AP_RemoveFromFactionPower
+#			Helper Command; Used in BOR_SIG_AddPower to remove SIG Power contribution(s) to Faction Power(s)
+#			Args: BOR_SIG_AP_i
+#
+#		BOR_SIG_AP_AddToFactionPower
+#			Helper Command; Used in BOR_SIG_AddPower to add SIG Power contribution(s) to Faction Power(s)
+#			Args: BOR_SIG_AP_i
+#
+#		BOR_SIG_AddPower
+#		   Basic Command; Adds power to SIG Power- SIG index and value to be added must be provided
+#		   Args: BOR_SIG_AP_i & BOR_SIG_AP_v
+#
+#	BORMANN ADD LOYALTY GENERIC EFFECTS
+#		BOR_SIG_AL_Clear
+#			Cleaning Command; used by BOR_SIG_AddLoyalty to clear variables once unneeded
+#
+#		BOR_SIG_AL_RemoveFromFactionPower
+#			Helper Command; Used in BOR_SIG_AddLoyalty to remove SIG Power contribution(s) to Faction Power(s)
+#			Args: BOR_SIG_AL_i
+#
+#		BOR_SIG_AL_AddToFactionPower
+#			Helper Command; Used in BOR_SIG_AddLoyalty to add SIG Power contribution(s) to Faction Power(s)
+#			Args: BOR_SIG_AL_i
+#
+#		BOR_SIG_AddLoyalty
+#		   Basic Command; Adds loyalty to any SIG- SIG index, value and faction index must be provided (0 for Ref, 1 for State, 2 for Mil)
+#		   Args: BOR_SIG_AL_i, BOR_SIG_AL_v, BOR_SIG_AL_fi
+#
+#	SPECIFIC EFFECTS SECTION
+#		ADD POWER
+#			SIG <SIG_index>
+#				BOR_SIG_AP_<SIG_index>_<value>
+#					Specific Command; Adds <value> to the power of the SIG at <SIG_index>.
+#					Args: n/a
+#			Ex: SIG_AP_0_5 adds 5 to SIG #0's power
+#
+#		SUB POWER
+#			SIG <SIG_index>
+#				BOR_SIG_SP_<SIG_index>_<value>
+#					Specific Command; Subtracts <value> from the power of the SIG at <SIG_index>.
+#					Args: n/a
+#			Ex: SIG_SP_0_5 subtracts 5 from SIG #0's power
+#
+#		ADD LOYALTY
+#			SIG <SIG_index>
+#				BOR_SIG_AL_<SIG_index>_<value>_<faction_index>
+#					Specific Command; Adds <value> to the loyalty towards <faction_index> of the SIG at <SIG_index>. Then balances.
+#					Args: n/a
+#			Ex: SIG_AL_0_5_0 adds 5 to SIG #0's loyalty to Reformists, then balances.
+#
+#		SUB LOYALTY
+#			SIG <SIG_index>
+#				BOR_SIG_SL_<SIG_index>_<value>_<faction_index>
+#					Specific Command; Subtracts <value> from the loyalty towards <faction_index> of the SIG at <SIG_index>. Then balances.
+#					Args: n/a
+#			Ex: SIG_SL_0_5_0 subtracts 5 from SIG #0's loyalty to Reformists, then balances.
+#
+#		ADD SUPPORT
+#			Faction <faction_index>
+#				BOR_SIG_AS_<faction_index>_<value>
+#					Specific Command; Adds <value> to <faction_index> support, then clamps the variable.
+#			Ex: SIG_AS_0_5 adds 5 to Reformist support, then clamps the variable.
+#
+#		SUB SUPPORT
+#			Faction <faction_index>
+#				BOR_SIG_SS_<faction_index>_<value>
+#					Specific Command; Subtracts <value> from <faction_index> support, then clamps the variable.
+#			Ex: SIG_SS_0_5 subtracts 5 from Reformist support, then clamps the variable.
+#
+#	INTERACTION SECTION
+#		ADD LOYALTY INTERACTION
+#			SIG <SIG_index>
+#				BOR_SIG_AL_<SIG_index>_<value>_<faction_index>
+#					Specific Command; Adds <value> to the loyalty towards <faction_index> of the SIG at <SIG_index>. Then balances.
+#					Args: n/a
+#			Ex: SIG_AL_0_5_0 adds 5 to SIG #0's loyalty to Reformists, then balances.
+#
+#		SUB LOYALTY INTERACTION
+#			SIG <SIG_index>
+#				BOR_SIG_SL_<SIG_index>_<value>_<faction_index>
+#					Specific Command; Subtracts <value> from the loyalty towards <faction_index> of the SIG at <SIG_index>. Then balances.
+#					Args: n/a
+#			Ex: SIG_SL_0_5_0 subtracts 5 from SIG #0's loyalty to Reformists, then balances.
+#
+#		ADD SUPPORT INTERACTION
+#			Faction <faction_index>
+#				BOR_SIG_AS_<faction_index>_<value>
+#					Specific Command; Adds <value> to <faction_index> support, then clamps the variable.
+#			Ex: SIG_AS_0_5 adds 5 to Reformist support, then clamps the variable.
+#
+#		SUB SUPPORT INTERACTION
+#			Faction <faction_index>
+#				BOR_SIG_SS_<faction_index>_<value>
+#					Specific Command; Subtracts <value> from <faction_index> support, then clamps the variable.
+#			Ex: SIG_SS_0_5 subtracts 5 from Reformist support, then clamps the variable.
+#
+
+###############
+# GUI EFFECTS #
+###############
+GER_Bormann_Kartenhaus_Info_ClearBtnFlags = {
+	clr_country_flag = GER_Bormann_Kartenhaus_GUI_InfoScrawl_Overview
+	clr_country_flag = GER_Bormann_Kartenhaus_GUI_InfoScrawl_ControlAndFactions
+	clr_country_flag = GER_Bormann_Kartenhaus_GUI_InfoScrawl_SIG
+	clr_country_flag = GER_Bormann_Kartenhaus_GUI_InfoScrawl_Interactions
+}
+
+BOR_Kartenhaus_Open = {
+	# For the Control Bar
+	set_variable = { BOR_AlliedControlPerc_Disp = BOR_AlliedControlPerc }
+	round_variable = BOR_AlliedControlPerc_Disp
+
+	# For the Faction Power Bar
+	set_variable = { BOR_ReformistPowerPerc_Disp = BOR_ReformistPowerPerc }
+	round_variable = BOR_ReformistPowerPerc_Disp
+	set_variable = { BOR_MilitaristPowerPerc_Disp = BOR_MilitaristPowerPerc }
+	round_variable = BOR_MilitaristPowerPerc_Disp
+
+	set_variable = { BOR_Kartenhaus_SIG_Target = 0 }
+	BOR_Kartenhaus_OnCardSelect = yes
+}
+
+BOR_Kartenhaus_Close = {
+	clear_variable = BOR_AlliedControlPerc_Disp
+	clear_variable = BOR_MilitaristPowerPerc_Disp
+	clear_variable = BOR_ReformistPowerPerc_Disp
+}
+
+BOR_Kartenhaus_OnCardSelect = {
+	set_variable = { BOR_Kartenhaus_LoyaltyBar_Ref_Disp = BOR_SIGLoyalty_Ref^BOR_Kartenhaus_SIG_Target }
+	round_variable = BOR_Kartenhaus_LoyaltyBar_Ref_Disp
+	set_variable = { BOR_Kartenhaus_LoyaltyBar_Mil_Disp = BOR_SIGLoyalty_Mil^BOR_Kartenhaus_SIG_Target }
+	round_variable = BOR_Kartenhaus_LoyaltyBar_Mil_Disp
+}
+
+###################
+# OVERALL EFFECTS #
+###################
+
+# On_Monthly
+BOR_Kartenhaus_On_Monthly = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_On_Monthly; Executing."
+
+	add_to_variable = { BOR_Kartenhaus_InteractionsCount = 3 }
+
+	set_temp_variable = { alert_id = token:Alert_KartenhausAction }
+	add_TNO_alert_unless_exists = yes
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_On_Monthly; Execution completed."
+}
+
+#For Post-CW
+BOR_Influence_Initialize = {
+	set_country_flag = BOR_Kartenhaus_Active
+	set_country_flag = country_has_gui
+	set_country_flag = gui_alert_visible
+	set_country_flag = gui_alert_visible_2
+
+	###Interaction Count
+	set_variable = { BOR_Kartenhaus_InteractionsCount = 3 }
+
+	###Control
+	set_variable = { BOR_AlliedControl = 0 }
+	set_variable = { BOR_TotalControl = 0 }
+	set_variable = { BOR_AlliedControlPerc = 0 }
+
+	###Factions
+	##Reformists
+	set_variable = { BOR_ReformistPower = 0 }
+	set_variable = { BOR_ReformistSupport = 40 }
+
+	##Conservatives/State
+	set_variable = { BOR_StatePower = 0 }
+	set_variable = { BOR_StateSupport = 90 }
+
+	##Militarists
+	set_variable = { BOR_MilitaristPower = 0 }
+	set_variable = { BOR_MilitaristSupport = 40 }
+
+	###Special Interest Groups
+	##Array Definition
+	add_to_array = { BOR_SIGPower = 0 }
+	resize_array = { BOR_SIGPower = 12 }
+
+	#0 = Dismantled, 1 = Immutable, 2 = Other
+	add_to_array = { BOR_SIGType = 0 }
+	resize_array = { BOR_SIGType = 12 }
+
+	add_to_array = { BOR_SIGLoyalty_Ref = 0 }
+	resize_array = { BOR_SIGLoyalty_Ref = 12 }
+
+	add_to_array = { BOR_SIGLoyalty_State = 0 }
+	resize_array = { BOR_SIGLoyalty_State = 12 }
+
+	add_to_array = { BOR_SIGLoyalty_Mil = 0 }
+	resize_array = { BOR_SIGLoyalty_Mil = 12 }
+
+	##Social
+	#Note: "Used for Index Access" refers to variable meant to make indexing easier and safer to do
+	#i.e. BOR_SIGPower^Party_Bureaucracy guarantees, no matter code changes, that
+	#Party Bureaucracy
+	set_variable = { Party_Bureaucracy			= 0 }		#Used for Index Access, ex. BOR_SIGPower^Party_Bureaucracy = BOR_SIGPower^0
+	set_variable = { BOR_SIGPower^0				= 253 }
+	set_variable = { BOR_SIGType^0				= 1 }
+	set_variable = { BOR_SIGLoyalty_Ref^0 		= 22 }
+	set_variable = { BOR_SIGLoyalty_State^0		= 47 }
+	set_variable = { BOR_SIGLoyalty_Mil^0 		= 31 }
+
+	#People
+	set_variable = { People						= 1 }		#Used for Index Access, ex. BOR_SIGPower^People = BOR_SIGPower^1
+	set_variable = { BOR_SIGPower^1				= 194 }
+	set_variable = { BOR_SIGType^1				= 1 }
+	set_variable = { BOR_SIGLoyalty_Ref^1 		= 37 }
+	set_variable = { BOR_SIGLoyalty_State^1 	= 33 }
+	set_variable = { BOR_SIGLoyalty_Mil^1 		= 30 }
+
+	#Intelligentsia
+	set_variable = { Intelligentsia				= 2 }		#Used for Index Access, ex. BOR_SIGPower^Intelligentsia = BOR_SIGPower^2
+	set_variable = { BOR_SIGPower^2				= 120 }
+	set_variable = { BOR_SIGType^2				= 2 }
+	set_variable = { BOR_SIGLoyalty_Ref^2 		= 52 }
+	set_variable = { BOR_SIGLoyalty_State^2 	= 29 }
+	set_variable = { BOR_SIGLoyalty_Mil^2 		= 19 }
+
+	#Church
+	set_variable = { Church						= 3 }		#Used for Index Access, ex. BOR_SIGPower^Church = BOR_SIGPower^3
+	set_variable = { BOR_SIGPower^3				= 156 }
+	set_variable = { BOR_SIGType^3				= 2 }
+	set_variable = { BOR_SIGLoyalty_Ref^3 		= 34 }
+	set_variable = { BOR_SIGLoyalty_State^3 	= 43 }
+	set_variable = { BOR_SIGLoyalty_Mil^3 		= 23 }
+
+	##Military
+	#Heer
+	set_variable = { Heer						= 4 }		#Used for Index Access, ex. BOR_SIGPower^Heer = BOR_SIGPower^4
+	set_variable = { BOR_SIGPower^4				= 239 }
+	set_variable = { BOR_SIGType^4				= 2 }
+	set_variable = { BOR_SIGLoyalty_Ref^4 		= 26 }
+	set_variable = { BOR_SIGLoyalty_State^4 	= 34 }
+	set_variable = { BOR_SIGLoyalty_Mil^4 		= 40 }
+
+	#Kriegsmarine
+	set_variable = { Kriegsmarine				= 5 }		#Used for Index Access, ex. BOR_SIGPower^Kriegsmarine = BOR_SIGPower^5
+	set_variable = { BOR_SIGPower^5				= 67 }		#Will jump to 160ish after Crimea joins up
+	set_variable = { BOR_SIGType^5				= 2 }
+	set_variable = { BOR_SIGLoyalty_Ref^5 		= 34 }
+	set_variable = { BOR_SIGLoyalty_State^5 	= 45 }
+	set_variable = { BOR_SIGLoyalty_Mil^5 		= 21 }
+
+	#Ordnungspolizei
+	set_variable = { Orpo						= 6 }		#Used for Index Access, ex. BOR_SIGPower^Orpo = BOR_SIGPower^6
+	set_variable = { BOR_SIGPower^6				= 98 }
+	set_variable = { BOR_SIGType^6				= 2 }
+	set_variable = { BOR_SIGLoyalty_Ref^6 		= 31 }
+	set_variable = { BOR_SIGLoyalty_State^6 	= 43 }
+	set_variable = { BOR_SIGLoyalty_Mil^6 		= 26 }
+
+	##Economic
+	#Zentraldeutsche Industry/Reichswerke
+	set_variable = { ZIndustry					= 7 }		#Used for Index Access, ex. BOR_SIGPower^ZIndustry = BOR_SIGPower^7
+	set_variable = { BOR_SIGPower^7				= 146 }
+	set_variable = { BOR_SIGType^7				= 2 }
+	set_variable = { BOR_SIGLoyalty_Ref^7 		= 28 }
+	set_variable = { BOR_SIGLoyalty_State^7 	= 33 }
+	set_variable = { BOR_SIGLoyalty_Mil^7 		= 39 }
+
+	#Rhine Industry/IG Farben
+	set_variable = { RIndustry					= 8 }		#Used for Index Access, ex. BOR_SIGPower^RIndustry = BOR_SIGPower^8
+	set_variable = { BOR_SIGPower^8				= 163 }
+	set_variable = { BOR_SIGType^8				= 2 }
+	set_variable = { BOR_SIGLoyalty_Ref^8 		= 22 }
+	set_variable = { BOR_SIGLoyalty_State^8 	= 42 }
+	set_variable = { BOR_SIGLoyalty_Mil^8 		= 36 }
+
+	#South German Industry/Siemens
+	set_variable = { SIndustry					= 9 }		#Used for Index Access, ex. BOR_SIGPower^SIndustry = BOR_SIGPower^9
+	set_variable = { BOR_SIGPower^9				= 122 }
+	set_variable = { BOR_SIGType^9				= 2 }
+	set_variable = { BOR_SIGLoyalty_Ref^9 		= 39 }
+	set_variable = { BOR_SIGLoyalty_State^9 	= 31 }
+	set_variable = { BOR_SIGLoyalty_Mil^9 		= 25 }
+
+	#Slave Plantations
+	set_variable = { Plantations				= 10 }		#Used for Index Access, ex. BOR_SIGPower^Plantations = BOR_SIGPower^10
+	set_variable = { BOR_SIGPower^10			= 112 }
+	set_variable = { BOR_SIGType^10				= 2 }
+	set_variable = { BOR_SIGLoyalty_Ref^10 		= 16 }
+	set_variable = { BOR_SIGLoyalty_State^10 	= 30 }
+	set_variable = { BOR_SIGLoyalty_Mil^10 		= 54 }
+
+	#Banks
+	set_variable = { Banks						= 11 }		#Used for Index Access, ex. BOR_SIGPower^Banks = BOR_SIGPower^11
+	set_variable = { BOR_SIGPower^11			= 176 }
+	set_variable = { BOR_SIGType^11				= 2 }
+	set_variable = { BOR_SIGLoyalty_Ref^11 		= 34 }
+	set_variable = { BOR_SIGLoyalty_State^11 	= 30 }
+	set_variable = { BOR_SIGLoyalty_Mil^11 		= 36 }
+
+	###Update
+	BOR_Influence_Update = yes
+
+	# add_ideas = GER_BOR_political_rodeo_idea
+	add_dynamic_modifier = { modifier = GER_BOR_political_rodeo_dynamic_modifier }
+
+	###Setup AI
+	country_event = { id = bormann_kartenhaus.0 days = 14 }
+
+	set_temp_variable = { alert_id = token:Alert_KartenhausAction }
+	add_TNO_alert_unless_exists = yes
+}
+
+#Fully Updates the Influence system
+BOR_Influence_Update = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Influence_Update; Executing"
+
+	##Backup Faction variables, just in case
+	log = "[GetDateText]: [Root.GetName]: BOR_Influence_Update; faction variables before:"
+
+	#Reformists
+	log = "[GetDateText]: [Root.GetName]: BOR_Influence_Update; BOR_ReformistPower = [?BOR_ReformistPower]"
+	set_variable = { BOR_ReformistPower_Temp = BOR_ReformistPower }
+
+	#Conservatives/State
+	log = "[GetDateText]: [Root.GetName]: BOR_Influence_Update; BOR_StatePower = [?BOR_StatePower]"
+	set_variable = { BOR_StatePower_Temp = BOR_StatePower }
+
+	#Militarists
+	log = "[GetDateText]: [Root.GetName]: BOR_Influence_Update; BOR_MilitaristPower = [?BOR_MilitaristPower]"
+	set_variable = { BOR_MilitaristPower_Temp = BOR_MilitaristPower }
+
+	##Clear Faction Power variables, so they can be recalculated
+	set_variable = { BOR_ReformistPower = 0 }
+	set_variable = { BOR_StatePower = 0 }
+	set_variable = { BOR_MilitaristPower = 0 }
+
+
+	####SIG Updates
+	for_each_loop = {
+		array = BOR_SIGPower
+	
+		#Zero SIG Powers that should be 0
+		if = {
+			limit = {
+				NOT = { check_variable = { BOR_SIGPower^i = 0 } } #If it already is 0 it doesn't need to be set to 0
+				check_variable = { BOR_SIGPower^i < 0.1 } #I don't care about hundreths of a unit of Power
+			}
+			set_variable = { BOR_SIGPower^i = 0 }
+		}
+
+		#Update Type; if a SIG is powerless, it's dismantled.
+		if = {
+			limit = {
+				check_variable = { var = BOR_SIGPower^i value = 0 compare = less_than_or_equals }
+				check_variable = { BOR_SIGType^i > 0 }
+			}
+			set_variable = { BOR_SIGType^i = 0 }
+			set_variable = { BOR_SIGPower^i = 0 }
+		}
+
+		#Dismantled
+		if = { limit = { check_variable = { BOR_SIGType^i = 0 } } } #Do Nothing
+
+		#Immutable
+		else_if = {
+			limit = { check_variable = { BOR_SIGType^i = 1 } }
+		
+			#Calulating contribution to Faction Power
+			# ROUND(Power * Loyalty(%)) = Contribution_To_Faction_Power
+		
+			#Reformist
+			set_temp_variable = { x = BOR_SIGPower^i }
+			multiply_temp_variable = { x = BOR_SIGLoyalty_Ref^i }
+			divide_temp_variable = { x = 100 }
+			round_temp_variable = x
+
+			add_to_variable = { BOR_ReformistPower = x }
+
+			#State
+			set_temp_variable = { x = BOR_SIGPower^i }
+			multiply_temp_variable = { x = BOR_SIGLoyalty_State^i }
+			divide_temp_variable = { x = 100 }
+			round_temp_variable = x
+
+			add_to_variable = { BOR_StatePower = x }
+
+			#Militarist
+			set_temp_variable = { x = BOR_SIGPower^i }
+			multiply_temp_variable = { x = BOR_SIGLoyalty_Mil^i }
+			divide_temp_variable = { x = 100 }
+			round_temp_variable = x
+
+			add_to_variable = { BOR_MilitaristPower = x }
+
+		}
+
+		#Other
+		else = {
+			#Below looks complex, but it's just this: https://1.bp.blogspot.com/--QLRolwaY90/U8PoaQKR-nI/AAAAAAAABsE/WL-rR5LcFt8/s1600/flow+chart+of+largest+of+three+numbers+in+Java.JPG
+			#It finds the largest value of a set of 3 (A,B, & C)
+			#A = Ref.
+			#B = State
+			#C = Mil.
+		
+			#A>B = True
+			if = {
+				limit = {
+					check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_State^i }
+				}
+
+				#A>C = True, then A is the largest value (add SIG Power to Reformist Faction Power)
+				if = {
+					limit = {
+						check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_Mil^i }
+					}
+				
+					add_to_variable = { BOR_ReformistPower = BOR_SIGPower^i }
+				}
+
+				#A>C = False, then C is the largest value (add SIG Power to Militarist Faction Power)
+				else = {
+					add_to_variable = { BOR_MilitaristPower = BOR_SIGPower^i }
+				}
+			}
+
+			#A>B = False
+			else = {
+				#B>C = True, then B is the largest value (add SIG Power to State Faction Power)
+				if = {
+					limit = {
+						check_variable = {
+							var = BOR_SIGLoyalty_State^i
+							value = BOR_SIGLoyalty_Mil^i
+							compare = greater_than_or_equals
+						}
+					}
+				
+					add_to_variable = { BOR_StatePower = BOR_SIGPower^i }
+				}
+
+				#B>C = False, then C is the largest value (add SIG Power to Militarist Faction Power)
+				else = {
+					add_to_variable = { BOR_MilitaristPower = BOR_SIGPower^i }
+				}
+			}
+		}
+	}
+
+	###Control Updates
+	BOR_Control_Update = yes
+
+	###Dynamic Modifer Updates
+	BOR_DynMod_Update = yes
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Influence_Update; Completed execution."
+}
+
+#Updates the GUI display bars after an action is taken
+BOR_Control_Update = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Control_Update; Executing"
+
+	###Control Updates
+	##Clear Values
+	set_variable = { BOR_AlliedControl = 0 }
+	set_variable = { BOR_TotalControl = 0 }
+
+	##Set Allied Control
+	if = {
+		limit = { check_variable = { BOR_ReformistSupport > 50 } }
+		add_to_variable = { BOR_AlliedControl = BOR_ReformistPower }
+	}
+
+	add_to_variable = { BOR_AlliedControl = BOR_StatePower }
+
+	if = {
+		limit = { check_variable = { BOR_MilitaristSupport > 50 } }
+		add_to_variable = { BOR_AlliedControl = BOR_MilitaristPower }
+	}
+
+	##Set Total Control
+	add_to_variable = { BOR_TotalControl = BOR_ReformistPower }
+	add_to_variable = { BOR_TotalControl = BOR_StatePower }
+	add_to_variable = { BOR_TotalControl = BOR_MilitaristPower }
+
+	##Set Allied Control Perc
+	set_variable = { BOR_AlliedControlPerc = BOR_AlliedControl }
+	divide_variable = { BOR_AlliedControlPerc = BOR_TotalControl }
+	multiply_variable = { BOR_AlliedControlPerc = 100 }
+
+	##Set Faction Power Perc
+	set_variable = { BOR_ConservativePowerPerc = BOR_StatePower }
+	divide_variable = { BOR_ConservativePowerPerc = BOR_TotalControl }
+	multiply_variable = { BOR_ConservativePowerPerc = 100 }
+
+	set_variable = { BOR_MilitaristPowerPerc = BOR_MilitaristPower }
+	divide_variable = { BOR_MilitaristPowerPerc = BOR_TotalControl }
+	multiply_variable = { BOR_MilitaristPowerPerc = 100 }
+
+	set_variable = { BOR_ReformistPowerPerc = 100 }
+	subtract_from_variable = { BOR_ReformistPowerPerc = BOR_ConservativePowerPerc }
+	subtract_from_variable = { BOR_ReformistPowerPerc = BOR_MilitaristPowerPerc }
+
+	###Clean up
+	clear_variable = BOR_ReformistPower_Temp
+	clear_variable = BOR_StatePower_Temp
+	clear_variable = BOR_MilitaristPower_Temp
+
+	###Display update
+	# For the Control Bar
+	set_variable = { BOR_AlliedControlPerc_Disp = BOR_AlliedControlPerc }
+	round_variable = BOR_AlliedControlPerc_Disp
+
+	# For the Faction Power Bar
+	set_variable = { BOR_ReformistPowerPerc_Disp = BOR_ReformistPowerPerc }
+	round_variable = BOR_ReformistPowerPerc_Disp
+	set_variable = { BOR_MilitaristPowerPerc_Disp = BOR_MilitaristPowerPerc }
+	round_variable = BOR_MilitaristPowerPerc_Disp
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Control_Update; Completed execution."
+}
+
+# Disables the entire mechanic, clears all variables/arrays and hides the GUI
+BOR_Influence_Disable = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Influence_Disable; Executing"
+
+	clr_country_flag = BOR_Kartenhaus_Active
+	clear_array = BOR_SIGPower
+	clear_array = BOR_SIGType
+	clear_array = BOR_SIGLoyalty_Ref
+	clear_array = BOR_SIGLoyalty_State
+	clear_array = BOR_SIGLoyalty_Mil
+	clear_variable = BOR_Kartenhaus_InteractionsCount
+	clear_variable = BOR_AlliedControl
+	clear_variable = BOR_TotalControl
+	clear_variable = BOR_AlliedControlPerc
+	clear_variable = BOR_ReformistPower
+	clear_variable = BOR_ReformistSupport
+	clear_variable = BOR_StatePower
+	clear_variable = BOR_StateSupport
+	clear_variable = BOR_MilitaristPower
+	clear_variable = BOR_MilitaristSupport
+	clear_variable = Party_Bureaucracy
+	clear_variable = People
+	clear_variable = Intelligentsia
+	clear_variable = Church
+	clear_variable = Heer
+	clear_variable = Kriegsmarine
+	clear_variable = Orpo
+	clear_variable = ZIndustry
+	clear_variable = RIndustry
+	clear_variable = SIndustry
+	clear_variable = Plantations
+	clear_variable = Banks
+
+	clear_array = BOR_SIGDynMod_Values
+	hidden_effect = { remove_dynamic_modifier = { modifier = GER_BOR_political_rodeo_dynamic_modifier } }
+	swap_ideas = {
+		remove_idea = GER_BOR_political_rodeo_idea
+		add_idea = GER_BOR_political_opulence_idea
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Influence_Disable; Completed execution."
+}
+
+# Updates the values for the Kartenhaus dynamic modifier
+BOR_DynMod_Update = {
+	log = "[GetDateText]: [Root.GetName]: BOR_DynMod_Update; Executing"
+
+	clear_array = BOR_SIGDynMod_Values
+
+	for_each_loop = {
+		array = BOR_SIGPower
+		if = {
+			limit = { NOT = { check_variable = { BOR_SIGType^i = 0 } } } # Skip all complicated checks/math in case the SIG is Dismantled
+			add_to_array = { BOR_SIGDynMod_Values = v }
+
+			if = { # Opposition SIG (Reformists)
+				limit = {
+					check_variable = { BOR_ReformistSupport < 50 }
+					check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_State^i }
+					check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_Mil^i }
+				}
+				multiply_variable = { BOR_SIGDynMod_Values^i = BOR_SIGLoyalty_Ref^i }
+				multiply_variable = { BOR_SIGDynMod_Values^i = -1 }
+			}
+			else_if = { # Opposition SIG (Militarists)
+				limit = {
+					check_variable = { BOR_MilitaristSupport < 50 }
+					check_variable = { BOR_SIGLoyalty_Mil^i > BOR_SIGLoyalty_Ref^i }
+					check_variable = { BOR_SIGLoyalty_Mil^i > BOR_SIGLoyalty_State^i }
+				}
+				multiply_variable = { BOR_SIGDynMod_Values^i = BOR_SIGLoyalty_Mil^i }
+				multiply_variable = { BOR_SIGDynMod_Values^i = -1 }
+			}
+			else = { # Allied/Supportive/Immutable SIG
+				multiply_variable = { BOR_SIGDynMod_Values^i = BOR_SIGLoyalty_State^i }
+			}
+
+			divide_variable = { BOR_SIGDynMod_Values^i = 100000 }
+		}
+		else = { add_to_array = { BOR_SIGDynMod_Values = 0 } } # Still need to add a value for Dismantled SIGs, otherwise the whole thing breaks
+	}
+
+	# Set up Control Stability modifier separately
+	add_to_array = { BOR_SIGDynMod_Values = BOR_AlliedControlPerc }
+	divide_variable = { BOR_SIGDynMod_Values^12 = 500 }
+
+	# Divide the Bureaucracy and Banks modifiers in for balance
+	divide_variable = { BOR_SIGDynMod_Values^0  = 2 }
+	divide_variable = { BOR_SIGDynMod_Values^11 = 4 }
+
+	force_update_dynamic_modifier = yes
+
+	log = "[GetDateText]: [Root.GetName]: BOR_DynMod_Update; Completed execution."
+}
+
+#################
+
+# Adds one entry to the SIG GUI log list, needs to be fired before the cycling effect can be done
+BOR_SIG_expand_log_list = {
+	if = {
+		limit = { check_variable = { BOR_SIGLogs_num < 50 } } # Edit this variable to increase the maximum number of logs
+		add_to_variable = { BOR_SIGLogs_num = 1 }
+		resize_array = { BOR_SIGLogs = BOR_SIGLogs_num }
+		resize_array = { BOR_SIG_Log_Actor = BOR_SIGLogs_num }
+		resize_array = { BOR_SIG_Log_AffectedSIG = BOR_SIGLogs_num }
+		resize_array = { BOR_SIG_Log_InteractionType = BOR_SIGLogs_num }
+		resize_array = { BOR_SIG_Log_InteractionTarget = BOR_SIGLogs_num }
+		resize_array = { BOR_SIG_Log_BeforeValue = BOR_SIGLogs_num }
+		resize_array = { BOR_SIG_Log_AfterValue = BOR_SIGLogs_num }
+		resize_array = { BOR_SIG_Log_ValueChange = BOR_SIGLogs_num }
+	}
+}
+
+#####################################
+# BORMANN ADD POWER GENERIC EFFECTS #
+#####################################
+
+##Cleaning Command; Used in BOR_SIG_AddPower to clear variables once unneeded
+#Args: n/a
+BOR_SIG_AP_Clear = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_Clear; Executing."
+	if = { limit = { has_variable = BOR_SIG_AP_i } clear_variable = BOR_SIG_AP_i }
+	if = { limit = { has_variable = BOR_SIG_AP_v } clear_variable = BOR_SIG_AP_v }
+	if = { limit = { has_country_flag = BOR_SIG_non_specific_effect } clr_country_flag = BOR_SIG_non_specific_effect }
+	if = { limit = { has_country_flag = BOR_SIG_specific_effect } clr_country_flag = BOR_SIG_specific_effect }
+}
+
+##Helper/Updater Command; Used in BOR_SIG_AddPower to remove SIG Power contribution(s) to Faction Power(s)
+#Args: BOR_SIG_AP_i
+BOR_SIG_AP_RemoveFromFactionPower = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; Executing."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; Given SIG#[?BOR_SIG_AP_i] ([?BOR_SIGPower^BOR_SIG_AP_i] | [?BOR_SIGLoyalty_Ref^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_AP_i]%)."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; Cur: Ref [?BOR_ReformistPower] ([?BOR_ReformistSupport]%), State [?BOR_StatePower] ([?BOR_StateSupport]%), Mil [?BOR_MilitaristPower] ([?BOR_MilitaristSupport]%)"
+
+	#Makes code easier to deal with
+	set_temp_variable = { i = BOR_SIG_AP_i }
+	set_temp_variable = { was = -1 }
+
+	#This Scripted Effect expects not to be given indexes pointing to SIG w/ type 0 (Dismantled).
+
+	#If given index points to SIG of type 1 (Immutable)
+	if = {
+		limit = { check_variable = { BOR_SIGType^i = 1 } }
+	
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; SIG #[?BOR_SIG_AP_i] is Immutable."
+
+		#Calulating contribution to Faction Power and then removing
+		# ROUND(Power * Loyalty(%)) = Contribution_To_Faction_Power
+	
+		#Reformist
+		set_temp_variable = { was = BOR_ReformistPower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_Ref^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		subtract_from_variable = { BOR_ReformistPower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; Ref Pow: [?was] -> [?BOR_ReformistPower] (-[?x])"
+
+		#State
+		set_temp_variable = { was = BOR_StatePower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_State^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		subtract_from_variable = { BOR_StatePower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; State Pow: [?was] -> [?BOR_StatePower] (-[?x])"
+
+		#Militarist
+		set_temp_variable = { was = BOR_MilitaristPower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_Mil^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		subtract_from_variable = { BOR_MilitaristPower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] (-[?x])"
+
+	}
+
+	#If given index points to SIG of other type (2+; Opposition, Allied or Supportive)
+	else = {
+		#Below finds largest Faction of Loyalty of the 3, then removes SIG Power from that Faction's Power
+		#See BOR_Influence_Update's alike section for more info
+		if = {
+			limit = { check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_State^i } }
+
+			if = {
+				limit = { check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_Mil^i } }
+
+				set_temp_variable = { was = BOR_ReformistPower }
+				subtract_from_variable = { BOR_ReformistPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; Ref Pow: [?was] -> [?BOR_ReformistPower] (-[?BOR_SIGPower^i])"
+			}
+
+			else = {
+				set_temp_variable = { was = BOR_MilitaristPower }
+				subtract_from_variable = { BOR_MilitaristPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] (-[?BOR_SIGPower^i])"
+			}
+		}
+
+		else = {
+			if = {
+				limit = { check_variable = { BOR_SIGLoyalty_State^i > BOR_SIGLoyalty_Mil^i } }
+				set_temp_variable = { was = BOR_StatePower }
+				subtract_from_variable = { BOR_StatePower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; State Pow: [?was] -> [?BOR_StatePower] (-[?BOR_SIGPower^i])"
+			}
+
+			else = {
+				set_temp_variable = { was = BOR_MilitaristPower }
+				subtract_from_variable = { BOR_MilitaristPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] (-[?BOR_SIGPower^i])"
+			}
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; Now: Ref [?BOR_ReformistPower] ([?BOR_ReformistSupport]%), State [?BOR_StatePower] ([?BOR_StateSupport]%), Mil [?BOR_MilitaristPower] ([?BOR_MilitaristSupport]%)"
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_RemoveFromFactionPower; Completed execution."
+}
+
+##Helper/Updater Command; Used in BOR_SIG_AddPower to add SIG Power contribution(s) to Faction Power(s)
+#Args: BOR_SIG_AP_i
+BOR_SIG_AP_AddToFactionPower = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; Executing."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; Given SIG#[?BOR_SIG_AP_i] ([?BOR_SIGPower^BOR_SIG_AP_i] | [?BOR_SIGLoyalty_Ref^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_AP_i]%)."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; Cur: Ref [?BOR_ReformistPower] ([?BOR_ReformistSupport]%), State [?BOR_StatePower] ([?BOR_StateSupport]%), Mil [?BOR_MilitaristPower] ([?BOR_MilitaristSupport]%)"
+
+	#Makes code easier to deal with
+	set_temp_variable = { i = BOR_SIG_AP_i }
+	set_temp_variable = { was = -1 }
+
+	#This Scripted Effect expects not to be given indexes pointing to SIG w/ type 0 (Dismantled).
+
+	#If given index points to SIG of type 1 (Immutable)
+	if = {
+		limit = { check_variable = { BOR_SIGType^i = 1 } }
+	
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; SIG #[?BOR_SIG_AP_i] is Immutable."
+
+		#Calulating contribution to Faction Power and then removing
+		# ROUND(Power * Loyalty(%)) = Contribution_To_Faction_Power
+	
+		#Reformist
+		set_temp_variable = { was = BOR_ReformistPower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_Ref^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		add_to_variable = { BOR_ReformistPower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; Ref Pow: [?was] -> [?BOR_ReformistPower] ([?x])"
+
+		#State
+		set_temp_variable = { was = BOR_StatePower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_State^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		add_to_variable = { BOR_StatePower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; State Pow: [?was] -> [?BOR_StatePower] ([?x])"
+
+		#Militarist
+		set_temp_variable = { was = BOR_MilitaristPower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_Mil^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		add_to_variable = { BOR_MilitaristPower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] ([?x])"
+
+	}
+
+	#If given index points to SIG of other type (2+; Opposition, Allied or Supportive)
+	else = {
+		#Below finds largest Faction of Loyalty of the 3, then removes SIG Power from that Faction's Power
+		#See BOR_Influence_Update's alike section for more info
+		if = {
+			limit = { check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_State^i } }
+
+			if = {
+				limit = { check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_Mil^i } }
+
+				set_temp_variable = { was = BOR_ReformistPower }
+				add_to_variable = { BOR_ReformistPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; Ref Pow: [?was] -> [?BOR_ReformistPower] ([?BOR_SIGPower^i])"
+			}
+
+			else = {
+				set_temp_variable = { was = BOR_MilitaristPower }
+				add_to_variable = { BOR_MilitaristPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] ([?BOR_SIGPower^i])"
+			}
+		}
+
+		else = {
+			if = {
+				limit = { check_variable = { BOR_SIGLoyalty_State^i > BOR_SIGLoyalty_Mil^i } }
+				set_temp_variable = { was = BOR_StatePower }
+				add_to_variable = { BOR_StatePower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; State Pow: [?was] -> [?BOR_StatePower] ([?BOR_SIGPower^i])"
+			}
+
+			else = {
+				set_temp_variable = { was = BOR_MilitaristPower }
+				add_to_variable = { BOR_MilitaristPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] ([?BOR_SIGPower^i])"
+			}
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; Now: Ref [?BOR_ReformistPower] ([?BOR_ReformistSupport]%), State [?BOR_StatePower] ([?BOR_StateSupport]%), Mil [?BOR_MilitaristPower] ([?BOR_MilitaristSupport]%)"
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AP_AddToFactionPower; Completed execution."
+}
+
+##Basic Command; Adds power to SIG Power- SIG index and value to be added must be provided
+#Args: BOR_SIG_AP_i & BOR_SIG_AP_v
+BOR_SIG_AddPower = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddPower; Executing."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddPower; Given BOR_SIG_AP_i: [?BOR_SIG_AP_i] BOR_SIG_AP_v: [?BOR_SIG_AP_v]"
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddPower; Cur: SIG#[?BOR_SIG_AP_i] ([?BOR_SIGPower^BOR_SIG_AP_i] | [?BOR_SIGLoyalty_Ref^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_AP_i]%)."
+	set_temp_variable = { BOR_SIG_AP_tempdisp = BOR_SIGPower^BOR_SIG_AP_i }
+	add_to_temp_variable = { BOR_SIG_AP_tempdisp = BOR_SIG_AP_v }
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddPower; Exp: SIG#[?BOR_SIG_AP_i] ([?BOR_SIG_AP_tempdisp] | [?BOR_SIGLoyalty_Ref^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_AP_i]%)."
+
+	##Err Checks
+	#Handed unset Index
+	if = {
+		limit = { NOT = { has_variable = BOR_SIG_AP_i } }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_SIG_AddPower; Handed unset index. Breaking."
+		BOR_SIG_AP_Clear = yes
+		#break = yes #Only in loops
+	}
+	#Handed unset Value
+	else_if = {
+		limit = { NOT = { has_variable = BOR_SIG_AP_v } }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_SIG_AddPower; Handed unset value. Breaking."
+		BOR_SIG_AP_Clear = yes
+		#break = yes #Only in loops
+	}
+	#Handed negative Index
+	else_if = {
+		limit = { check_variable = { BOR_SIG_AP_i < 0 } }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_SIG_AddPower; Handed negative index (#[?BOR_SIG_AP_i]), which cannot exist. Breaking."
+		BOR_SIG_AP_Clear = yes
+		#break = yes #Only in loops
+	}
+	#Handed Index which points to a dismantled SIG
+	else_if = {
+		limit = { check_variable = { BOR_SIGType^BOR_SIG_AP_i = 0 } }
+		log = "[WARNING]: [GetDateText]: [Root.GetName]: BOR_SIG_AddPower; Handed SIG (#[?BOR_SIG_AP_i]), which is dismantled (Type#: [?BOR_SIGType^BOR_SIG_AP_i]). Breaking."
+		BOR_SIG_AP_Clear = yes
+		#break = yes #Only in loops
+	}
+
+	else = {
+		##Pre-Effect Logging
+		set_temp_variable = { Log_Power_BeforeValue = BOR_SIGPower^BOR_SIG_AP_i } # Saving the pre-effect value for logging
+
+		##Effects
+		#Remove current SIG Power from Faction Power
+		BOR_SIG_AP_RemoveFromFactionPower = yes
+
+		#Change SIG Power by BOR_SIG_AP_v
+		add_to_variable = { BOR_SIGPower^BOR_SIG_AP_i = BOR_SIG_AP_v }
+		clamp_variable = { var = BOR_SIGPower^BOR_SIG_AP_i min = 0 max = 999 }
+
+		#Re-add current SIG Power to Faction Power
+		BOR_SIG_AP_AddToFactionPower = yes
+
+		##Post-Effect Logging
+		BOR_SIG_expand_log_list = yes
+		
+		# Logging the before value
+		add_to_array = { array = BOR_SIG_Log_BeforeValue value = Log_Power_BeforeValue index = 0 }
+
+		# Logging the after value
+		add_to_array = { array = BOR_SIG_Log_AfterValue value = BOR_SIGPower^BOR_SIG_AP_i index = 0 }
+
+		# Logging the change in value
+		set_temp_variable = { Log_Power_ValueChange = BOR_SIG_Log_AfterValue^0 }
+		subtract_from_temp_variable = { Log_Power_ValueChange = BOR_SIG_Log_BeforeValue^0 }
+		add_to_array = { array = BOR_SIG_Log_ValueChange value = Log_Power_ValueChange index = 0 }
+
+		# Setting the type of interaction
+		if = { # Add Power
+			limit = { check_variable = { BOR_SIG_Log_ValueChange^0 > 0 } }
+			add_to_array = { array = BOR_SIG_Log_InteractionType value = 0 index = 0 }
+		}
+		else_if = { # Sub Power
+			limit = { check_variable = { BOR_SIG_Log_ValueChange^0 < 0 } }
+			add_to_array = { array = BOR_SIG_Log_InteractionType value = 1 index = 0 }
+		}
+
+		# Setting the actor
+		# if = { # Conservatives
+		# 	limit = {
+		# 		has_country_flag = BOR_SIG_non_specific_effect
+		# 		NOT = { has_country_flag = BOR_SIG_specific_effect }
+		# 	}
+		# 	add_to_array = { array = BOR_SIG_Log_Actor value = 1 index = 0 }
+		# }
+		if = { # Specific effect (Event)
+			limit = {
+				NOT = { has_country_flag = BOR_SIG_non_specific_effect }
+				has_country_flag = BOR_SIG_specific_effect
+			}
+			add_to_array = { array = BOR_SIG_Log_Actor value = 3 index = 0 }
+		}
+		else = { # Conservatives
+			add_to_array = { array = BOR_SIG_Log_Actor value = 1 index = 0 }
+		}
+
+		# Setting the targeted SIG
+		add_to_array = { array = BOR_SIG_Log_AffectedSIG value = BOR_SIG_AP_i index = 0 }
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddPower; Now: SIG#[?BOR_SIG_AP_i] ([?BOR_SIGPower^BOR_SIG_AP_i] | [?BOR_SIGLoyalty_Ref^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_AP_i]%)."
+	
+	##Cleanup
+	BOR_SIG_AP_Clear = yes
+
+	###Control Updates
+	BOR_Control_Update = yes
+
+	###Dynamic Modifer Updates
+	BOR_DynMod_Update = yes
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddPower; Completed execution."
+}
+
+#######################################
+# BORMANN ADD LOYALTY GENERIC EFFECTS #
+#######################################
+
+##Cleaning Command; Used in BOR_SIG_AddLoyalty to clear variables once unneeded
+#Args: n/a
+BOR_SIG_AL_Clear = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_Clear; Executing."
+	if = { limit = { has_variable = BOR_SIG_AL_i } clear_variable = BOR_SIG_AL_i }
+	if = { limit = { has_variable = BOR_SIG_AL_v } clear_variable = BOR_SIG_AL_v }
+	if = { limit = { has_variable = BOR_SIG_AL_fi } clear_variable = BOR_SIG_AL_fi }
+	#if = { limit = { has_variable = BOR_SIG_AL_mode } clear_variable = BOR_SIG_AL_mode }
+	clr_country_flag = BOR_SIG_AL_NotNeedUpdate
+}
+
+##Helper/Updater Command; Used in BOR_SIG_AddLoyalty to remove SIG Power contribution(s) to Faction Power(s)
+#Args: BOR_SIG_AL_i
+BOR_SIG_AL_RemoveFromFactionPower = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; Executing."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; Given SIG#[?BOR_SIG_AL_i] ([?BOR_SIGPower^BOR_SIG_AL_i] | [?BOR_SIGLoyalty_Ref^BOR_SIG_AL_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_AL_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_AL_i]%)."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; Cur: Ref [?BOR_ReformistPower] ([?BOR_ReformistSupport]%), State [?BOR_StatePower] ([?BOR_StateSupport]%), Mil [?BOR_MilitaristPower] ([?BOR_MilitaristSupport]%)"
+
+	#Makes code easier to deal with
+	set_temp_variable = { i = BOR_SIG_AL_i }
+
+	#This Scripted Effect expects not to be given indexes pointing to SIG w/ type 0 (Dismantled).
+
+	#If given index points to SIG of type 1 (Immutable)
+	if = {
+		limit = { check_variable = { BOR_SIGType^i = 1 } }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; SIG #[?BOR_SIG_AL_i] is Immutable."
+
+		#Calulating contribution to Faction Power and then removing
+		# ROUND(Power * Loyalty(%)) = Contribution_To_Faction_Power
+	
+		#Reformist
+		set_temp_variable = { was = BOR_ReformistPower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_Ref^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		subtract_from_variable = { BOR_ReformistPower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; Ref Pow: [?was] -> [?BOR_ReformistPower] (-[?x])"
+
+		#State
+		set_temp_variable = { was = BOR_StatePower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_State^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		subtract_from_variable = { BOR_StatePower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; State Pow: [?was] -> [?BOR_StatePower] (-[?x])"
+
+		#Militarist
+		set_temp_variable = { was = BOR_MilitaristPower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_Mil^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		subtract_from_variable = { BOR_MilitaristPower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] (-[?x])"
+
+	}
+
+	#If given index points to SIG of other type (2+; Opposition, Allied or Supportive)
+	else = {
+		#Below finds largest Faction of Loyalty of the 3, then removes SIG Power from that Faction's Power
+		#See BOR_Influence_Update's alike section for more info
+		if = {
+			limit = { check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_State^i } }
+
+			if = {
+				limit = { check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_Mil^i } }
+
+				set_temp_variable = { was = BOR_ReformistPower }
+				subtract_from_variable = { BOR_ReformistPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; Ref Pow: [?was] -> [?BOR_ReformistPower] (-[?BOR_SIGPower^i])"
+			}
+
+			else = {
+				set_temp_variable = { was = BOR_MilitaristPower }
+				subtract_from_variable = { BOR_MilitaristPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] (-[?BOR_SIGPower^i])"
+			}
+		}
+
+		else = {
+			if = {
+				limit = { check_variable = { BOR_SIGLoyalty_State^i > BOR_SIGLoyalty_Mil^i } }
+				set_temp_variable = { was = BOR_StatePower }
+				subtract_from_variable = { BOR_StatePower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; State Pow: [?was] -> [?BOR_StatePower] (-[?BOR_SIGPower^i])"
+			}
+
+			else = {
+				set_temp_variable = { was = BOR_MilitaristPower }
+				subtract_from_variable = { BOR_MilitaristPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] (-[?BOR_SIGPower^i])"
+			}
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; Now: Ref [?BOR_ReformistPower] ([?BOR_ReformistSupport]%), State [?BOR_StatePower] ([?BOR_StateSupport]%), Mil [?BOR_MilitaristPower] ([?BOR_MilitaristSupport]%)"
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_RemoveFromFactionPower; Completed execution."
+}
+
+##Helper/Updater Command; Used in BOR_SIG_AddLoyalty to add SIG Power contribution(s) to Faction Power(s)
+#Args: BOR_SIG_AL_i
+BOR_SIG_AL_AddToFactionPower = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; Executing."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; Given SIG#[?BOR_SIG_AL_i] ([?BOR_SIGPower^BOR_SIG_AL_i] | [?BOR_SIGLoyalty_Ref^BOR_SIG_AL_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_AL_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_AL_i]%)."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; Cur: Ref [?BOR_ReformistPower] ([?BOR_ReformistSupport]%), State [?BOR_StatePower] ([?BOR_StateSupport]%), Mil [?BOR_MilitaristPower] ([?BOR_MilitaristSupport]%)"
+
+	#Makes code easier to deal with
+	set_temp_variable = { i = BOR_SIG_AL_i }
+
+	#This Scripted Effect expects not to be given indexes pointing to SIG w/ type 0 (Dismantled).
+
+	#If given index points to SIG of type 1 (Immutable)
+	if = {
+		limit = { check_variable = { BOR_SIGType^i = 1 } }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; SIG #[?BOR_SIG_AL_i] is Immutable."
+
+		#Calulating contribution to Faction Power and then removing
+		# ROUND(Power * Loyalty(%)) = Contribution_To_Faction_Power
+	
+		#Reformist
+		set_temp_variable = { was = BOR_ReformistPower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_Ref^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		add_to_variable = { BOR_ReformistPower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; Ref Pow: [?was] -> [?BOR_ReformistPower] ([?x])"
+
+		#State
+		set_temp_variable = { was = BOR_StatePower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_State^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		add_to_variable = { BOR_StatePower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; State Pow: [?was] -> [?BOR_StatePower] ([?x])"
+
+		#Militarist
+		set_temp_variable = { was = BOR_MilitaristPower }
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_Mil^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		add_to_variable = { BOR_MilitaristPower = x }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] ([?x])"
+
+	}
+
+	#If given index points to SIG of other type (2+; Opposition, Allied or Supportive)
+	else = {
+		#Below finds largest Faction of Loyalty of the 3, then removes SIG Power from that Faction's Power
+		#See BOR_Influence_Update's alike section for more info
+		if = {
+			limit = { check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_State^i } }
+
+			if = {
+				limit = { check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_Mil^i } }
+
+				set_temp_variable = { was = BOR_ReformistPower }
+				add_to_variable = { BOR_ReformistPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; Ref Pow: [?was] -> [?BOR_ReformistPower] ([?BOR_SIGPower^i])"
+			}
+
+			else = {
+				set_temp_variable = { was = BOR_MilitaristPower }
+				add_to_variable = { BOR_MilitaristPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] ([?BOR_SIGPower^i])"
+			}
+		}
+
+		else = {
+			if = {
+				limit = { check_variable = { BOR_SIGLoyalty_State^i > BOR_SIGLoyalty_Mil^i } }
+				set_temp_variable = { was = BOR_StatePower }
+				add_to_variable = { BOR_StatePower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; State Pow: [?was] -> [?BOR_StatePower] ([?BOR_SIGPower^i])"
+			}
+
+			else = {
+				set_temp_variable = { was = BOR_MilitaristPower }
+				add_to_variable = { BOR_MilitaristPower = BOR_SIGPower^i }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; Mil Pow: [?was] -> [?BOR_MilitaristPower] ([?BOR_SIGPower^i])"
+			}
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; Now: Ref [?BOR_ReformistPower] ([?BOR_ReformistSupport]%), State [?BOR_StatePower] ([?BOR_StateSupport]%), Mil [?BOR_MilitaristPower] ([?BOR_MilitaristSupport]%)"
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AL_AddToFactionPower; Completed execution."
+}
+
+##Basic Command; Adds loyalty to any SIG- SIG index, value and faction index must be provided
+#(0 for Ref, 1 for State, 2 for Mil)
+#--
+#If SIG Type = 1, then:
+#	Remove from Faction Power
+#	Create new loyalty values
+#	Re-add to Faction Power
+#--
+#If SIG Type > 1, then:
+#	Determine largest
+#	If fi != largest, remove from faction power
+#	Create new loyalty values
+#	If fi != largest, re-add to faction power
+#--
+#Args: BOR_SIG_AL_i, BOR_SIG_AL_v, BOR_SIG_AL_fi
+BOR_SIG_AddLoyalty = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Executing."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Given BOR_SIG_AP_i: [?BOR_SIG_AL_i] BOR_SIG_AP_v: [?BOR_SIG_AL_v] BOR_SIG_AL_fi: [?BOR_SIG_AL_fi]"
+
+	##Err Checks
+	#Handed unset Index
+	if = {
+		limit = { NOT = { has_variable = BOR_SIG_AL_i } }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Handed unset index. Breaking."
+	}
+	#Handed unset Value
+	else_if = {
+		limit = { NOT = { has_variable = BOR_SIG_AL_v } }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Handed unset value. Breaking."
+	}
+	#Handed unset Faction Index
+	else_if = {
+		limit = { NOT = { has_variable = BOR_SIG_AL_fi } }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Handed unset faction index. Breaking."
+	}
+	#Handed negative Index
+	else_if = {
+		limit = { check_variable = { BOR_SIG_AL_i < 0 } }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Handed negative index (#[?BOR_SIG_AL_i]), which cannot exist. Breaking."
+	}
+	#Handed unexpected Faction Index
+	else_if = {
+		limit = { OR = { check_variable = { BOR_SIG_AL_fi < 0 } check_variable = { BOR_SIG_AL_fi > 2 } } }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Handed unexpected faction index ([?BOR_SIG_AL_fi]). Breaking."
+	}
+	#Handed Index which points to a dismantled SIG
+	else_if = {
+		limit = { check_variable = { BOR_SIGType^BOR_SIG_AL_i = 0 } }
+		log = "[WARNING]: [GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Handed SIG (#[?BOR_SIG_AL_i]), which is dismantled (Type#: [?BOR_SIGType^BOR_SIG_AL_i]). Breaking."
+	}
+
+	##Effect
+	else = {
+		##Pre-Effect Logging
+		if = {
+			limit = { check_variable = { BOR_SIG_AL_fi = 0 } }
+			set_temp_variable = { Log_Loyalty_BeforeValue = BOR_SIGLoyalty_Ref^BOR_SIG_AL_i } # Saving the pre-effect value for logging
+		}
+		else_if = {
+			limit = { check_variable = { BOR_SIG_AL_fi = 1 } }
+			set_temp_variable = { Log_Loyalty_BeforeValue = BOR_SIGLoyalty_State^BOR_SIG_AL_i } # Saving the pre-effect value for logging
+		}
+		else = {
+			set_temp_variable = { Log_Loyalty_BeforeValue = BOR_SIGLoyalty_Mil^BOR_SIG_AL_i } # Saving the pre-effect value for logging
+		}
+
+		#Calculate Temp Var showing loyalty change; used in code
+		set_temp_variable = { BOR_SIG_AL_tempv = BOR_SIG_AL_v }
+		if = {
+			limit = { check_variable = { BOR_SIG_AL_fi = 0 } }
+			add_to_temp_variable = { BOR_SIG_AL_tempv = BOR_SIGLoyalty_Ref^BOR_SIG_AL_i }
+		}
+		else_if = {
+			limit = { check_variable = { BOR_SIG_AL_fi = 1 } }
+			add_to_temp_variable = { BOR_SIG_AL_tempv = BOR_SIGLoyalty_State^BOR_SIG_AL_i }
+		}
+		else = {
+			add_to_temp_variable = { BOR_SIG_AL_tempv = BOR_SIGLoyalty_Mil^BOR_SIG_AL_i }
+		}
+
+		#Determine Largest; if SIG is of Type > 1
+		if = {
+			limit = { check_variable = { BOR_SIGType^BOR_SIG_AL_i > 1 } }
+
+			#For if v is positive
+			if = {
+				limit = {
+					check_variable = { BOR_SIG_AL_v > 0 }
+					OR = {
+						AND = {
+							check_variable = { BOR_SIG_AL_fi = 0 } #Reformists
+							check_variable = { BOR_SIGLoyalty_Ref^BOR_SIG_AL_i > BOR_SIGLoyalty_State^BOR_SIG_AL_i }
+							check_variable = { BOR_SIGLoyalty_Ref^BOR_SIG_AL_i > BOR_SIGLoyalty_Mil^BOR_SIG_AL_i }
+						}
+						AND = {
+							check_variable = { BOR_SIG_AL_fi = 1 } #Conservatives/State
+							check_variable = { BOR_SIGLoyalty_State^BOR_SIG_AL_i > BOR_SIGLoyalty_Ref^BOR_SIG_AL_i }
+							check_variable = { BOR_SIGLoyalty_State^BOR_SIG_AL_i > BOR_SIGLoyalty_Mil^BOR_SIG_AL_i }
+						}
+						AND = {
+							check_variable = { BOR_SIG_AL_fi = 2 } #Militarists
+							check_variable = { BOR_SIGLoyalty_Mil^BOR_SIG_AL_i > BOR_SIGLoyalty_Ref^BOR_SIG_AL_i }
+							check_variable = { BOR_SIGLoyalty_Mil^BOR_SIG_AL_i > BOR_SIGLoyalty_State^BOR_SIG_AL_i }
+						}
+					}
+				}
+				set_country_flag = BOR_SIG_AL_NotNeedUpdate
+			}
+
+			#For if v is negative
+			else_if = {
+				limit = {
+					check_variable = { BOR_SIG_AL_v < 0 }
+					OR = {
+						AND = {
+							check_variable = { BOR_SIG_AL_fi = 0 }
+							check_variable = { BOR_SIG_AL_tempv > BOR_SIGLoyalty_State^BOR_SIG_AL_i }
+							check_variable = { BOR_SIG_AL_tempv > BOR_SIGLoyalty_Mil^BOR_SIG_AL_i }
+						}
+						AND = {
+							check_variable = { BOR_SIG_AL_fi = 1 }
+							check_variable = { BOR_SIG_AL_tempv > BOR_SIGLoyalty_Ref^BOR_SIG_AL_i }
+							check_variable = { BOR_SIG_AL_tempv > BOR_SIGLoyalty_Mil^BOR_SIG_AL_i }
+						}
+						AND = {
+							check_variable = { BOR_SIG_AL_fi = 2 }
+							check_variable = { BOR_SIG_AL_tempv > BOR_SIGLoyalty_Ref^BOR_SIG_AL_i }
+							check_variable = { BOR_SIG_AL_tempv > BOR_SIGLoyalty_State^BOR_SIG_AL_i }
+						}
+					}
+				}
+				set_country_flag = BOR_SIG_AL_NotNeedUpdate
+			}
+		}
+
+		#Remove SIG Power Contribution to Faction Power; if necessary
+		if = {
+			limit = {
+				OR = {
+					check_variable = { BOR_SIGType^BOR_SIG_AL_i = 1 }
+					NOT = { has_country_flag = BOR_SIG_AL_NotNeedUpdate }
+				}
+			}
+			#set_temp_variable = { BOR_SIG_AL_tempi }
+			BOR_SIG_AL_RemoveFromFactionPower = yes
+		}
+
+		#Add to Loyalties
+		if = {
+			limit = { check_variable = { BOR_SIG_AL_fi = 0 } }
+			set_variable = { BOR_SIGLoyalty_Ref^BOR_SIG_AL_i = BOR_SIG_AL_tempv }
+		}
+		else_if = {
+			limit = { check_variable = { BOR_SIG_AL_fi = 1 } }
+			set_variable = { BOR_SIGLoyalty_State^BOR_SIG_AL_i = BOR_SIG_AL_tempv }
+		}
+		else = {
+			set_variable = { BOR_SIGLoyalty_Mil^BOR_SIG_AL_i = BOR_SIG_AL_tempv }
+		}
+
+		#Balance
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Balancing. Cur: ([?BOR_SIGLoyalty_Ref^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_AP_i]%)."
+
+		set_temp_variable = { BOR_SIG_AL_LoyaltyBalanceFactor = BOR_SIGLoyalty_Ref^BOR_SIG_AL_i }
+		add_to_temp_variable = { BOR_SIG_AL_LoyaltyBalanceFactor = BOR_SIGLoyalty_State^BOR_SIG_AL_i }
+		add_to_temp_variable = { BOR_SIG_AL_LoyaltyBalanceFactor = BOR_SIGLoyalty_Mil^BOR_SIG_AL_i }
+		
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Balance Factor: [?BOR_SIG_AL_LoyaltyBalanceFactor]."
+
+		subtract_from_temp_variable = { BOR_SIG_AL_LoyaltyBalanceFactor = 100 }
+		divide_temp_variable = { BOR_SIG_AL_LoyaltyBalanceFactor = 3 }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Balance Correction: [?BOR_SIG_AL_LoyaltyBalanceFactor]."
+
+		subtract_from_variable = { BOR_SIGLoyalty_Ref^BOR_SIG_AL_i = BOR_SIG_AL_LoyaltyBalanceFactor }
+		subtract_from_variable = { BOR_SIGLoyalty_State^BOR_SIG_AL_i = BOR_SIG_AL_LoyaltyBalanceFactor }
+		subtract_from_variable = { BOR_SIGLoyalty_Mil^BOR_SIG_AL_i = BOR_SIG_AL_LoyaltyBalanceFactor }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Balanced. Now: ([?BOR_SIGLoyalty_Ref^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_AP_i]%)."
+
+		## Resolving >100 and <0 loyalty situations
+		# Still a pain but holy fuck is this not better than before, jesus
+
+		# Put everything in a temp array we'll clear manually later
+		add_to_array = { loyalties = BOR_SIGLoyalty_Ref^BOR_SIG_AL_i }
+		add_to_array = { loyalties = BOR_SIGLoyalty_State^BOR_SIG_AL_i }
+		add_to_array = { loyalties = BOR_SIGLoyalty_Mil^BOR_SIG_AL_i }
+
+		# Start off by finding the highest and lowest elements in the array
+		# Note to self and to future explorers: FIND IN ARRAY COMMANDS CAN'T RECEIVE UPPERCASE CHARACTERS!!! Thank you Paradox, I love you very much
+		find_highest_in_array = { array = loyalties index = high_i value = high_v }
+		find_lowest_in_array  = { array = loyalties index = low_i  value = low_v }
+
+		# Next we find the middle element. To do this, we clear the highest element, run the command, then restore the original value
+		set_variable = { loyalties^high_i = 0 }
+		find_highest_in_array = { array = loyalties index = mid_i  value = mid_v }
+		set_variable = { loyalties^high_i = high_v }
+
+		# Now that we have everything, check if the highest value is above 100 or if the lowest is below 0
+		if = { # >100 - simple case of setting the highest value to 100 and clearing the rest
+			limit = { check_variable = { high_v > 100 } }
+			set_variable = { loyalties^high_i = 100 }
+			set_variable = { loyalties^mid_i = 0 }
+			set_variable = { loyalties^low_i = 0 }
+		}
+		else_if = { # <0 - more complicated, we'll need to check the command target to see where we need to put the negative value (so the total sum remains 100)
+			limit = { check_variable = { low_v < 0 } }
+			if = { # If the highest element is the target, add value to middle
+				limit = { check_variable = { BOR_SIG_AL_fi = high_i } }
+				add_to_variable = { loyalties^mid_i = low_v }
+			}
+			else = { # Otherwise, add value to highest
+				add_to_variable = { loyalties^high_i = low_v }
+			}
+
+			# Now clamp everything
+			clamp_variable = { var = loyalties^0 min = 0 max = 100 }
+			clamp_variable = { var = loyalties^1 min = 0 max = 100 }
+			clamp_variable = { var = loyalties^2 min = 0 max = 100 }
+		}
+
+		# Now we replace the values in the variables and clear the array
+		set_variable = { BOR_SIGLoyalty_Ref^BOR_SIG_AL_i = loyalties^0 }
+		set_variable = { BOR_SIGLoyalty_State^BOR_SIG_AL_i = loyalties^1 }
+		set_variable = { BOR_SIGLoyalty_Mil^BOR_SIG_AL_i = loyalties^2 }
+		clear_array = loyalties
+
+		#Re-add SIG Power Contribution to Faction Power
+		if = {
+			limit = {
+				OR = {
+					check_variable = { BOR_SIGType^BOR_SIG_AL_i = 1 }
+					NOT = { has_country_flag = BOR_SIG_AL_NotNeedUpdate }
+				}
+			}
+			BOR_SIG_AL_AddToFactionPower = yes
+		}
+
+		##Post-Effect Logging
+		BOR_SIG_expand_log_list = yes
+
+		# Logging the before value
+		add_to_array = { array = BOR_SIG_Log_BeforeValue value = Log_Loyalty_BeforeValue index = 0 }
+
+		# logging the after value
+		if = { # Reformist change
+			limit = { check_variable = { BOR_SIG_AL_fi = 0 } }
+			add_to_array = { array = BOR_SIG_Log_AfterValue value = BOR_SIGLoyalty_Ref^BOR_SIG_AL_i index = 0 }
+		}
+		else_if = { # Conservative change
+			limit = { check_variable = { BOR_SIG_AL_fi = 1 } }
+			add_to_array = { array = BOR_SIG_Log_AfterValue value = BOR_SIGLoyalty_State^BOR_SIG_AL_i index = 0 }
+		}
+		else_if = { # Militarist change
+			limit = { check_variable = { BOR_SIG_AL_fi = 2 } }
+			add_to_array = { array = BOR_SIG_Log_AfterValue value = BOR_SIGLoyalty_Mil^BOR_SIG_AL_i index = 0 }
+		}
+
+		# Logging the change in value
+		set_temp_variable = { Log_Loyalty_ValueChange = BOR_SIG_Log_AfterValue^0 }
+		subtract_from_temp_variable = { Log_Loyalty_ValueChange = BOR_SIG_Log_BeforeValue^0 }
+		add_to_array = { array = BOR_SIG_Log_ValueChange value = Log_Loyalty_ValueChange index = 0 }
+
+		# Setting the type of interaction
+		if = { # Add Loyalty
+			limit = { check_variable = { BOR_SIG_Log_ValueChange^0 > 0 } }
+			add_to_array = { array = BOR_SIG_Log_InteractionType value = 2 index = 0 }
+		}
+		else_if = { # Sub Loyalty
+			limit = { check_variable = { BOR_SIG_Log_ValueChange^0 < 0 } }
+			add_to_array = { array = BOR_SIG_Log_InteractionType value = 3 index = 0 }
+		}
+
+		# Setting the actor
+		# if = { # Conservatives
+		# 	limit = {
+		# 		has_country_flag = BOR_SIG_non_specific_effect
+		# 		NOT = { has_country_flag = BOR_SIG_specific_effect }
+		# 	}
+		# 	set_variable = { array = BOR_SIG_Log_Actor value = 1 index = 0 }
+		# }
+		if = { # Specific effect (Event)
+			limit = {
+				NOT = { has_country_flag = BOR_SIG_non_specific_effect }
+				has_country_flag = BOR_SIG_specific_effect
+			}
+			add_to_array = { array = BOR_SIG_Log_Actor value = 3 index = 0 }
+		}
+		else = { # Conservatives
+			add_to_array = { array = BOR_SIG_Log_Actor value = 1 index = 0 }
+		}
+
+		# Setting the targeted faction
+		add_to_array = { array = BOR_SIG_Log_InteractionTarget value = BOR_SIG_AL_fi index = 0 }
+
+		# Setting the targeted SIG
+		add_to_array = { array = BOR_SIG_Log_AffectedSIG value = BOR_SIG_AL_i index = 0 }
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Now: SIG#[?BOR_SIG_AP_i] ([?BOR_SIGPower^BOR_SIG_AP_i] | [?BOR_SIGLoyalty_Ref^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_AP_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_AP_i]%)."
+
+	##Cleanup
+	BOR_SIG_AL_Clear = yes
+
+	###Control Updates
+	BOR_Control_Update = yes
+
+	###Dynamic Modifer Updates
+	BOR_DynMod_Update = yes
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AddLoyalty; Completed execution."
+}
+
+##DBG Command; user must provide index
+#Args: BOR_SIG_DC_i
+BOR_SIG_DumpContribution = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; Executing."
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; Given SIG #[?BOR_SIG_DC_i]: (P | R%, S%, M%), ([?BOR_SIGPower^BOR_SIG_DC_i] | [?BOR_SIGLoyalty_Ref^BOR_SIG_DC_i]%, [?BOR_SIGLoyalty_State^BOR_SIG_DC_i]%, [?BOR_SIGLoyalty_Mil^BOR_SIG_DC_i]%)."
+
+	if = {
+		limit = { check_variable = { BOR_SIGType^BOR_SIG_DC_i = 0 } }
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; SIG #[?BOR_SIG_DC_i] is Dismantled."
+	}
+	else_if = {
+		limit = { check_variable = { BOR_SIGType^BOR_SIG_DC_i = 1 } }
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; SIG #[?BOR_SIG_DC_i] is Immutable."
+
+		#Calulating contribution to Faction Power and then adding
+		# ROUND(Power * Loyalty(%)) = Contribution_To_Faction_Power
+	
+		#Reformist
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_Ref^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; SIG #[?BOR_SIG_DC_i] contributes [?x] to the Reformist Faction."
+
+		#State
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_State^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; SIG #[?BOR_SIG_DC_i] contributes [?x] to the State Faction."
+
+		#Militarist
+		set_temp_variable = { x = BOR_SIGPower^i }
+		multiply_temp_variable = { x = BOR_SIGLoyalty_Mil^i }
+		divide_temp_variable = { x = 100 }
+		round_temp_variable = x
+
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; SIG #[?BOR_SIG_DC_i] contributes [?x] to the Militarist Faction."
+
+		#Cleanup
+	}
+	else = {
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; SIG #[?BOR_SIG_DC_i] is of other type (not Dismantled or Immutable)."
+		#Below finds largest Faction of Loyalty of the 3
+		if = {
+			limit = { check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_State^i } }
+
+			if = {
+				limit = { check_variable = { BOR_SIGLoyalty_Ref^i > BOR_SIGLoyalty_Mil^i } }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; SIG #[?BOR_SIG_DC_i] contributes [?BOR_SIGPower^BOR_SIG_DC_i] to the Reformist Faction."
+			}
+
+			else = {
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; SIG #[?BOR_SIG_DC_i] contributes [?BOR_SIGPower^BOR_SIG_DC_i] to the Militarist Faction."
+			}
+		}
+
+		else = {
+			if = {
+				limit = { check_variable = { BOR_SIGLoyalty_State^i > BOR_SIGLoyalty_Mil^i } }
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; SIG #[?BOR_SIG_DC_i] contributes [?BOR_SIGPower^BOR_SIG_DC_i] to the State Faction."
+			}
+
+			else = {
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; SIG #[?BOR_SIG_DC_i] contributes [?BOR_SIGPower^BOR_SIG_DC_i] to the Militarist Faction."
+			}
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_DumpContribution; Completed execution."
+}
+
+#################################
+# BORMANN DISMANTLEMENT EFFECTS #
+#################################
+
+#### Event Chain Effects ####
+
+
+
+#### Event Chain Effects ####
+
+### Kartenhaus Commands;
+
+##Cleaning Command; Used in BOR_Kartenhaus_SIGApplyDismantlement to clear variables once unneeded
+#Args: n/a
+BOR_Kartenhaus_SIGApplyDismantlement_Cleanup = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement_Cleanup; Executing,"
+
+	clear_variable = BOR_SIG_DF_LoyaltyPerc
+	clear_variable = BOR_SIG_DF_PowerReduction
+	clear_variable = BOR_SIG_DF_LoyaltyToFaction
+	clear_variable = BOR_SIG_DF_LoyaltyToState
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement_Cleanup; Completed execution."
+}
+
+##Helper Command; Applies Dismantlement to an SIG
+# - Reduce BOR_SIG_DF_i's Power by 40% times it's BOR_SIG_DF_i's loyalty to BOR_SIG_DF_fi
+# - Then, divide BOR_SIG_DF_fi's loyalty between the remaining faction (if one exists) and the Conservatives at a rate of 60% to 40%.
+# - This may only target the Reformist and Militarist Factions
+#Args: BOR_SIG_DF_i, BOR_SIG_DF_fi
+BOR_Kartenhaus_SIGApplyDismantlement = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; Executing."
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; Given: (BOR_SIG_DF_i = [?BOR_SIG_DF_i], BOR_SIG_DF_fi = [?BOR_SIG_DF_fi])"
+
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { BOR_SIG_DF_fi = 0 }
+				check_variable = { BOR_SIG_DF_fi = 2 }
+			}
+		}
+		log = "[NOTE]: [GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; BOR_SIG_DF_fi must be either 0 or 2, it is [?BOR_SIG_DF_fi]."
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; Handed invalid faction index. Breaking."
+	}
+
+	else = {
+		if = {
+			limit = { check_variable = { BOR_SIG_DF_fi = 0 } }
+
+			log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; Identified FI as Reformists."
+			set_variable = { BOR_SIG_DF_LoyaltyPerc = BOR_SIGLoyalty_Ref^BOR_SIG_DF_i }
+		}
+		else = {
+
+			log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; Identified FI as Militarists."
+			set_variable = { BOR_SIG_DF_LoyaltyPerc = BOR_SIGLoyalty_Mil^BOR_SIG_DF_i }
+		}
+		
+		### REDUCE BOR_SIG_DF_i's POWER
+		# Power - (Power * (Loyalty% * 0.4))
+		# Unless there is no remaining faction, then,
+		# Power - (Power * (Loyalty% * 0.8))
+		set_variable = { BOR_SIG_DF_PowerReduction = BOR_SIG_DF_LoyaltyPerc }
+		multiply_variable = { BOR_SIG_DF_PowerReduction = 0.01 } # BOR_SIG_DF_LoyaltyPerc / 100
+		
+		if = {
+			limit = { has_country_flag = BOR_Dismantlement_II_active }
+			
+			log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; No Remaining Faction, BOR_SIG_DF_PowerReduction * 0.8."
+			multiply_variable = { BOR_SIG_DF_PowerReduction = 0.8 }
+		}
+		else = {
+			log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; BOR_SIG_DF_PowerReduction * 0.4"
+			multiply_variable = { BOR_SIG_DF_PowerReduction = 0.4 }
+		}
+		multiply_variable = { BOR_SIG_DF_PowerReduction = BOR_SIGPower^BOR_SIG_DF_i }
+
+		log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; BOR_SIG_DF_PowerReduction = [?BOR_SIG_DF_PowerReduction]"
+
+		subtract_from_variable = { BOR_SIGPower^BOR_SIG_DF_i = BOR_SIG_DF_PowerReduction }
+
+		### DIVIDE BOR_SIG_DF_i's LOYALTY TO BOR_SIG_DF_fi
+		# 60% to remaining faction (if it exists)
+		# 40% to the state (if it exists)
+		# If remaining faction does not exist, then just give all loyalty to the state
+		set_variable = { BOR_SIG_DF_LoyaltyToFaction = BOR_SIG_DF_LoyaltyPerc }
+		set_variable = { BOR_SIG_DF_LoyaltyToState = BOR_SIG_DF_LoyaltyPerc }
+
+		# Multiplier
+		if = {
+			limit = { has_country_flag = BOR_Dismantlement_II_active }
+			
+			multiply_variable = { BOR_SIG_DF_LoyaltyToFaction = 0 }
+			multiply_variable = { BOR_SIG_DF_LoyaltyToState = 1 }
+		}
+		else = {
+			multiply_variable = { BOR_SIG_DF_LoyaltyToFaction = 0.6 }
+			multiply_variable = { BOR_SIG_DF_LoyaltyToState = 0.4 }
+		}
+
+		log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; BOR_SIG_DF_LoyaltyToFaction = [?BOR_SIG_DF_LoyaltyToFaction]."
+		log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; BOR_SIG_DF_LoyaltyToState = [?BOR_SIG_DF_LoyaltyToState]."
+
+		# Add & Remove
+		if = {
+			limit = { check_variable = { BOR_SIG_DF_fi = 0 } }
+			
+			add_to_variable = { BOR_SIGLoyalty_Mil^BOR_SIG_DF_i = BOR_SIG_DF_LoyaltyToFaction }
+			set_variable = { BOR_SIGLoyalty_Ref^BOR_SIG_DF_i = 0 }
+		}
+		else = {
+			add_to_variable = { BOR_SIGLoyalty_Ref^BOR_SIG_DF_i = BOR_SIG_DF_LoyaltyToFaction }
+			set_variable = { BOR_SIGLoyalty_Mil^BOR_SIG_DF_i = 0 }
+		}
+
+		add_to_variable = { BOR_SIGLoyalty_State^BOR_SIG_DF_i = BOR_SIG_DF_LoyaltyToState }
+
+		## Resolving <100% total loyalty situations
+		if = {
+			limit = { NOT = { has_country_flag = BOR_Dismantlement_II_active } }
+			set_temp_variable = { MissingLoyaltyVal = BOR_SIGLoyalty_Ref^BOR_SIG_DF_i }
+			add_to_temp_variable = { MissingLoyaltyVal = BOR_SIGLoyalty_State^BOR_SIG_DF_i }
+			add_to_temp_variable = { MissingLoyaltyVal = BOR_SIGLoyalty_Mil^BOR_SIG_DF_i }
+	
+			subtract_from_temp_variable = { MissingLoyaltyVal = 100 }
+			multiply_temp_variable = { MissingLoyaltyVal = -1 }
+
+			add_to_variable = { BOR_SIGLoyalty_State^BOR_SIG_DF_i = MissingLoyaltyVal }
+
+			round_variable = BOR_SIGLoyalty_Ref^BOR_SIG_DF_i
+			round_variable = BOR_SIGLoyalty_State^BOR_SIG_DF_i
+			round_variable = BOR_SIGLoyalty_Mil^BOR_SIG_DF_i
+		}
+
+		### Cleanup
+		BOR_Kartenhaus_SIGApplyDismantlement_Cleanup = yes
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SIGApplyDismantlement; Completed execution."
+}
+
+BOR_Kartenhaus_DismantleFaction_Cleanup = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_DismantleFaction_Cleanup; Executing,"
+
+	# Clearing loyalty selection buttons
+	if = {
+		limit = { check_variable = { BOR_SIG_DF_fi = 0 } }
+		clr_country_flag = BOR_Kartenhaus_Card_RefSelection
+	}
+	else_if = {
+		clr_country_flag = BOR_Kartenhaus_Card_MilSelection
+	}
+
+	clear_variable = BOR_SIG_DF_fi
+	clear_variable = BOR_SIG_DF_i
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_DismantleFaction_Cleanup; Completed execution."
+}
+
+##Base Command; Dismantles a Faction
+#Args: BOR_SIG_DF_fi
+BOR_Kartenhaus_DismantleFaction = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_Dismantle; Executing."
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_Dismantle; Given: (BOR_SIG_DF_fi = [?BOR_SIG_DF_fi])."
+
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { BOR_SIG_DF_fi = 0 }
+				check_variable = { BOR_SIG_DF_fi = 2 }
+			}
+		}
+		log = "[NOTE]: [GetDateText]: [Root.GetName]: BOR_Kartenhaus_DismantleFaction; BOR_SIG_DF_fi must be either 0 or 2, it is [?BOR_SIG_DF_fi]."
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_Kartenhaus_DismantleFaction; Handed invalid faction index. Breaking."
+	}
+
+	else = {
+		## Core
+		for_each_loop = {
+			array = BOR_SIGPower
+			index = i
+
+			set_variable = { BOR_SIG_DF_i = i }
+			BOR_Kartenhaus_SIGApplyDismantlement = yes
+		}
+
+		## Update
+		BOR_Influence_Update = yes
+
+		## Cleanup
+		BOR_Kartenhaus_DismantleFaction_Cleanup = yes
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_Dismantle; Completed execution."
+}
+
+##Face Command; Makes calling BOR_Kartenhaus_DismantleFaction simpler
+#Args: n/a
+BOR_Kartenhaus_Dismantle_Reformists = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_Dismantle_Reformists; Executing,"
+
+	set_country_flag = BOR_reformists_dismantled
+	
+	## Clear Variables
+	set_variable = { BOR_ReformistSupport = 0 }
+	set_variable = { BOR_ReformistPower = 0 }
+
+	## Run DismantleFaction
+	set_variable = { BOR_SIG_DF_fi = 0 }
+	BOR_Kartenhaus_DismantleFaction = yes
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_Dismantle_Reformists; Completed execution."
+}
+
+##Face Command; Makes calling BOR_Kartenhaus_DismantleFaction simpler
+#Args: n/a
+BOR_Kartenhaus_Dismantle_Militarists = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_Dismantle_Militarists; Executing,"
+
+	set_country_flag = BOR_militarists_dismantled
+	
+	## Clear Variables
+	set_variable = { BOR_MilitaristSupport = 0 }
+	set_variable = { BOR_MilitaristPower = 0 }
+
+	## Run DismantleFaction
+	set_variable = { BOR_SIG_DF_fi = 2 }
+	BOR_Kartenhaus_DismantleFaction = yes
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_Dismantle_Militarists; Completed execution."
+}
+
+
+##Base Command; Dismantles a SIG
+# - Reduce BOR_SIG_DF_i's Power to 0
+# - Set all loyalties of BOR_SIG_DF_i to 0
+# - Mark it off as Dismantled
+#Args: BOR_SIG_DF_i
+BOR_Kartenhaus_DismantleSIG = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_DismantleSIG; Executing,"
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_DismantleSIG; Given: (BOR_SIG_DF_i = [?BOR_SIG_DF_i])"
+
+	if = {
+		limit = { check_variable = { BOR_SIGType^BOR_SIG_DF_i = 0 } }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_Kartenhaus_DismantleSIG; Handed an already dismantled SIG. Breaking."
+	}
+	else_if = {
+		limit = { check_variable = { BOR_SIGType^BOR_SIG_DF_i = 1 } }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_Kartenhaus_DismantleSIG; Handed an Immutable SIG. Breaking."
+	}
+	else = {
+		# Clear the SIG's Power
+		set_variable = { BOR_SIGPower^BOR_SIG_DF_i			= 0 }
+
+		# Clear the SIG's Loyalties
+		set_variable = { BOR_SIGLoyalty_Ref^BOR_SIG_DF_i 	= 0 }
+		set_variable = { BOR_SIGLoyalty_State^BOR_SIG_DF_i 	= 0 }
+		set_variable = { BOR_SIGLoyalty_Mil^BOR_SIG_DF_i 	= 0 }
+
+		# Mark it as Dismantled
+		set_variable = { BOR_SIGType^BOR_SIG_DF_i			= 0 }
+		log = "(ERROR): [GetDateText]: [Root.GetName]: BOR_Kartenhaus_DismantleSIG; SIG [?BOR_SIG_DF_i] dismantled."
+	}
+
+	### Cleanup
+	clear_variable = BOR_SIG_DF_i
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_DismantleSIG; Completed execution."
+}
+
+#######################
+# INTERACTION EFFECTS #
+#######################
+#TODO: ADD COMMENTS CLARIFYING
+BOR_Kartenhaus_AddLoyaltyInteraction = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_AddLoyaltyInteraction; Executing."
+
+	# If the player doesn't have enough interactions
+	if = {
+		limit = { NOT = { check_variable = { BOR_Kartenhaus_InteractionsCount > 0 } } }
+		log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_AddLoyaltyInteraction; Not enough interactions!"
+	}
+	
+	# If the player has enough interactions : )
+	else = {
+		## Set up
+		subtract_from_variable = { BOR_Kartenhaus_InteractionsCount = 1 }
+
+		# Logs
+		set_country_flag = BOR_SIG_non_specific_effect
+		add_to_array = { BOR_SIG_Log_Actor = 0 }
+
+		## Effect
+		set_variable = { BOR_SIG_AL_i = BOR_Kartenhaus_SIG_Target }
+		set_variable = { BOR_SIG_AL_v = 3 }
+
+		# Determine Targeted FactionIndex
+		if = {
+			limit = { has_country_flag = BOR_Kartenhaus_Card_RefSelection }
+			set_variable = { BOR_SIG_AL_fi = 0 }
+		}
+		else_if = {
+			limit = { has_country_flag = BOR_Kartenhaus_Card_ConSelection }
+			set_variable = { BOR_SIG_AL_fi = 1 }
+		}
+		else_if = {
+			limit = { has_country_flag = BOR_Kartenhaus_Card_MilSelection }
+			set_variable = { BOR_SIG_AL_fi = 2 }
+		}
+		
+		BOR_SIG_AddLoyalty = yes
+	}
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_AddLoyaltyInteraction; Completed execution."
+}
+
+BOR_Kartenhaus_SubLoyaltyInteraction = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SubLoyaltyInteraction; Executing."
+
+	# If the player doesn't have enough interactions
+	if = {
+		limit = { NOT = { check_variable = { BOR_Kartenhaus_InteractionsCount > 0 } } }
+		log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SubLoyaltyInteraction; Not enough interactions!"
+	}
+
+	# If the player has enough interactions : )
+	else = {
+		## Set up
+		subtract_from_variable = { BOR_Kartenhaus_InteractionsCount = 1 }
+
+		# Logs
+		set_country_flag = BOR_SIG_non_specific_effect
+		add_to_array = { BOR_SIG_Log_Actor = 0 }
+
+		## Effect
+		set_variable = { BOR_SIG_AL_i = BOR_Kartenhaus_SIG_Target }
+		set_variable = { BOR_SIG_AL_v = -3 }
+
+		# Determine Targeted FactionIndex
+		if = {
+			limit = { has_country_flag = BOR_Kartenhaus_Card_RefSelection }
+			set_variable = { BOR_SIG_AL_fi = 0 }
+		}
+		else_if = {
+			limit = { has_country_flag = BOR_Kartenhaus_Card_ConSelection }
+			set_variable = { BOR_SIG_AL_fi = 1 }
+		}
+		else_if = {
+			limit = { has_country_flag = BOR_Kartenhaus_Card_MilSelection }
+			set_variable = { BOR_SIG_AL_fi = 2 }
+		}
+		
+		BOR_SIG_AddLoyalty = yes
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SubLoyaltyInteraction; Completed execution."
+}
+
+BOR_Kartenhaus_AddPowerInteraction = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_AddPowerInteraction; Executing."
+
+	# If the player doesn't have enough interactions
+	if = {
+		limit = { NOT = { check_variable = { BOR_Kartenhaus_InteractionsCount > 0 } } }
+		log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_AddPowerInteraction; Not enough interactions!"
+	}
+
+	# If the player has enough interactions : )
+	else = {
+		## Set up
+		subtract_from_variable = { BOR_Kartenhaus_InteractionsCount = 1 }
+
+		# Logs
+		set_country_flag = BOR_SIG_non_specific_effect
+		add_to_array = { BOR_SIG_Log_Actor = 0 }
+
+		## Effect
+		set_variable = { BOR_SIG_AP_i = BOR_Kartenhaus_SIG_Target }
+		set_variable = { BOR_SIG_AP_v = 5 }
+		BOR_SIG_AddPower = yes
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_AddPowerInteraction; Completed execution."
+}
+
+BOR_Kartenhaus_SubPowerInteraction = {
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SubPowerInteraction; Executing."
+
+	# If the player doesn't have enough interactions
+	if = {
+		limit = { NOT = { check_variable = { BOR_Kartenhaus_InteractionsCount > 0 } } }
+		log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_AddPowerInteraction; Not enough interactions!"
+	}
+
+	# If the player has enough interactions : )
+	else = {
+		## Set up
+		subtract_from_variable = { BOR_Kartenhaus_InteractionsCount = 1 }
+
+		# Logs
+		set_country_flag = BOR_SIG_non_specific_effect
+		add_to_array = { BOR_SIG_Log_Actor = 0 }
+
+		## Effect
+		set_variable = { BOR_SIG_AP_i = BOR_Kartenhaus_SIG_Target }
+		set_variable = { BOR_SIG_AP_v = -5 }
+		BOR_SIG_AddPower = yes
+	}
+	log = "[GetDateText]: [Root.GetName]: BOR_Kartenhaus_SubPowerInteraction; Completed execution."
+}

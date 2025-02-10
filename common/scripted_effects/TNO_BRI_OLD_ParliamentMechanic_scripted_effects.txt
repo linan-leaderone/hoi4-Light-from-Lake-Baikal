@@ -1,0 +1,856 @@
+# |===============================================================================================================================| #
+#  ____   ____  ____   _      ____   ____  ___ ___    ___  ____   ______      ___ ___    ___    __  __ __   ____  ____   ____   __  #
+# |    \ /    ||    \ | |    |    | /    ||   |   |  /  _]|    \ |      |    |   |   |  /  _]  /  ]|  |  | /    ||    \ |    | /  ] #
+# |  o  )  o  ||  D  )| |     |  | |  o  || _   _ | /  [_ |  _  ||      |    | _   _ | /  [_  /  / |  |  ||  o  ||  _  | |  | /  /  #
+# |   _/|     ||    / | |___  |  | |     ||  \_/  ||    _]|  |  ||_|  |_|    |  \_/  ||    _]/  /  |  _  ||     ||  |  | |  |/  /   #
+# |  |  |  _  ||    \ |     | |  | |  _  ||   |   ||   [_ |  |  |  |  |      |   |   ||   [_/   \_ |  |  ||  _  ||  |  | |  /   \_  #
+# |  |  |  |  ||  .  \|     | |  | |  |  ||   |   ||     ||  |  |  |  |      |   |   ||     \     ||  |  ||  |  ||  |  | |  \     | #
+# |__|  |__|__||__|\_||_____||____||__|__||___|___||_____||__|__|  |__|      |___|___||_____|\____||__|__||__|__||__|__||____\____| #
+#                                                                                                                                   #
+# |=====================================================| Scripted Effects |======================================================| #
+
+# ***HUGE*** Brains List:
+# Calph, 
+
+###### INDEX ###################################
+#
+#	#### Code Purposes
+#	|### ParliamentMechanic Initializers
+#	| ## 'ParliamentMechanic_Initialize_Gamestart'
+#
+#	#### Display Purposes
+#	|### ParliamentMechanic GUIHelper Base
+#	| ## 'ParliamentMechanic_GUIHelper_initialize'
+#	| ## 'ParliamentMechanic_GUIHelper_cleanup'
+#	|
+#	|### ParliamentMechanic GUIHelper PartiesDisp
+#	| ## 'ParliamentMechanic_GUIHelper_PartiesDisp_generate'
+#	| ## 'ParliamentMechanic_GUIHelper_PartiesDisp_cleanup'
+#	|
+#	|### ParliamentMechanic GUIHelper PartiesDisp
+#	| ## 'ParliamentMechanic_GUIHelper_ParliamentDisp_generate'
+#	| ## 'ParliamentMechanic_GUIHelper_ParliamentDisp_cleanup'
+#
+################################### INDEX ######
+
+
+#### CODE PURPOSES ####
+	### DEBUG ###
+ParliamentMechanic_DBG_LogPartyInfo = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_DBG_LogPartyInfo; Executing"
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_DBG_LogPartyInfo; (ID| Status, Seats, Support%)"
+
+	for_each_loop = {
+		array = ParliamentMechanic_Party_Identity
+		index = i
+
+		log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_DBG_LogPartyInfo; ([?ParliamentMechanic_Party_Identity^i] | [?ParliamentMechanic_Party_GovStatus^i], [?ParliamentMechanic_Party_SeatNum^i], [?ParliamentMechanic_Party_Support^i|1%])"
+	}
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_DBG_LogPartyInfo; Completed execution."
+}
+	### DEBUG ###
+
+	### ParliamentMechanic Initializers ###
+		## ParliamentMechanic Initializer Example
+		#  - An example to help express ParliamentMechanic's code org
+ParliamentMechanic_Initialize_Gamestart = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Initialize_Gamestart; Executing"
+
+	set_country_flag = ParliamentMechanic_Initialized #Here for now
+
+			# ElectionMech State Popularity Initializer (for the opening of the game)
+	TNO_Britain_ElectionSeason_Initialize_GameStart = yes
+
+			## Ideas Init
+			#  - See `$/common/ideas/TNO_ParliamentMechanic_ideas.txt
+	add_ideas = {
+		TNO_ParliamentMechanic_Speaker_Alec_Douglas_Home
+		TNO_ParliamentMechanic_Monarch_Edward_VIII
+		TNO_ParliamentMechanic_OppLeader_Harold_Macmillan
+	}
+
+			# Douglas-Home's Military effect
+	add_to_variable = { ENG_MIL_LOY = 5 }
+
+			## GovStab
+	set_variable = { ParliamentMechanic_GovStab = 0 }
+
+			## Party Init
+			# - Identity, Seat #, Support %, Gov. Status
+
+			# <d> - <Example Party>, <Example Party Faction>
+			# add_to_array = { ParliamentMechanic_Party_Identity = <d> }	# ID; used to determine Color of it's seats, etc.
+			# add_to_array = { ParliamentMechanic_Party_SeatNum	= <d>  }	# # of MPs in Parliament
+			# add_to_array = { ParliamentMechanic_Party_Support	= <d>  }	# 0-100%
+			# add_to_array = { ParliamentMechanic_Party_GovStatus= <d> }	# 0 for Inactive, 1 for Leading, 2 for Governing, 3 for Opposition & 4 for Sit-out
+
+			#NOTE: Party_Identity STARTS AT 1 (so 1 = Blank, 2 = Blue, etc)
+
+			# 1 - NULL
+			#	- USED FOR CODE CONVENIENCE
+			#	- THE FOLLOWING VALUES SHOULD NEVER CHANGE:
+			#   - NOTE, DESPITE THE ID THIS IS INDEX 0
+	add_to_array = { ParliamentMechanic_Party_Identity	= 1		}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 2 - Independents
+	add_to_array = { ParliamentMechanic_Party_Identity	= 2		}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 3		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 88	}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0.43	}
+
+			# 3 - The Royal Party - Moderates
+	add_to_array = { ParliamentMechanic_Party_Identity	= 3		}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 1		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 188	}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0.86	}
+
+			# 4 - The Royal Party - Reformists
+	add_to_array = { ParliamentMechanic_Party_Identity	= 4		}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 3		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 136	}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0.53	}
+
+			# 5 - The Royal Party - Hardliners
+	add_to_array = { ParliamentMechanic_Party_Identity	= 5		}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 2		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 89	}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0.74	}
+
+			# 6 - United England - Macmillanists
+	add_to_array = { ParliamentMechanic_Party_Identity	= 6		}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 7 - United England - Liberals
+	add_to_array = { ParliamentMechanic_Party_Identity	= 7		}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 8 - The Royal Party
+	add_to_array = { ParliamentMechanic_Party_Identity	= 8		}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 9 - The National Front
+	add_to_array = { ParliamentMechanic_Party_Identity	= 9		}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 10 - The Liberal Party
+	add_to_array = { ParliamentMechanic_Party_Identity	= 10	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 11 - National Democratic League - New Whigs
+	add_to_array = { ParliamentMechanic_Party_Identity	= 11	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 12 - National Democratic League - Democrats
+	add_to_array = { ParliamentMechanic_Party_Identity	= 12	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 13 - National Democratic League - Patriots
+	add_to_array = { ParliamentMechanic_Party_Identity	= 13	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 14 - Socialist Labour Party - Progress
+	add_to_array = { ParliamentMechanic_Party_Identity	= 14	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 15 - Socialist Labour Party - Pollitites
+	add_to_array = { ParliamentMechanic_Party_Identity	= 15	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 16 - Movement in Support of the Army
+	add_to_array = { ParliamentMechanic_Party_Identity	= 16	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 17 - Independent Labour Party
+	add_to_array = { ParliamentMechanic_Party_Identity	= 17	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 18 - Scottish National Party
+	add_to_array = { ParliamentMechanic_Party_Identity	= 18	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 19 - The Unionist Party
+	add_to_array = { ParliamentMechanic_Party_Identity	= 19	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 20 - Plaid Cymru
+	add_to_array = { ParliamentMechanic_Party_Identity	= 20	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 21 - Cymru Goch
+	add_to_array = { ParliamentMechanic_Party_Identity	= 21	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 22 - British National Convention
+	add_to_array = { ParliamentMechanic_Party_Identity	= 22	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# 23 - Popular Convention
+	add_to_array = { ParliamentMechanic_Party_Identity	= 23	}
+	add_to_array = { ParliamentMechanic_Party_GovStatus	= 0		}
+	add_to_array = { ParliamentMechanic_Party_SeatNum	= 0		}
+	add_to_array = { ParliamentMechanic_Party_Support	= 0		}
+
+			# Calculate Thing
+	set_variable = { ParliamentMechanic_Overall_SeatNum = 500 }
+
+			# Calculate GovStab
+	ParliamentMechanic_GovStab_Calculate = yes
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Initialize_Gamestart; Completed execution"
+}
+
+		## ParliamentMechanic Initializer DBG Clear
+ParliamentMechanic_Initialize_DBG_Clear = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Initialize_DBG_Clear; Executing"
+
+	clear_array = ParliamentMechanic_Party_Identity
+	clear_array = ParliamentMechanic_Party_GovStatus
+	clear_array = ParliamentMechanic_Party_SeatNum
+	clear_array = ParliamentMechanic_Party_Support
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Initialize_DBG_Clear; Executing"
+}
+	### ParliamentMechanic Initializers ###
+
+	### GovStab ###
+ParliamentMechanic_GovStab_Calculate = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GovStab_Calculate; Executing"
+
+	set_variable = { SupportiveSeats = 0 }
+	for_each_loop = {
+		array = ParliamentMechanic_Party_SeatNum
+		value = seats
+		index = i
+
+		set_temp_variable = { new_supportiveSeats = seats }
+		multiply_temp_variable = { new_supportiveSeats = ParliamentMechanic_Party_Support^i }
+		add_to_variable = { SupportiveSeats = new_supportiveSeats }
+	}
+
+	set_variable = { ParliamentMechanic_GovStab = SupportiveSeats }
+	divide_variable = { ParliamentMechanic_GovStab = ParliamentMechanic_Overall_SeatNum }
+
+	ParliamentMechanic_GovStab_Modify = yes
+
+	clear_variable = SupportiveSeats
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GovStab_Calculate; Completed execution."
+}
+
+ParliamentMechanic_GovStab_Modify = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GovStab_Modify; Executing"
+
+			# Put some various boosts here, things like
+			# GovStab boosts/maluses from leaders, etc.
+
+	if = {
+		limit = { has_completed_focus = FEN_NDL_pol_1_there_is_work_to_be_done }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.02 }
+		clamp_variable = {
+			var = ParliamentMechanic_GovStab
+			min = 0
+			max = 1
+		}
+	}
+	if = {
+		limit = { has_completed_focus = FEN_NDL_pol_1_the_cracks_in_our_system }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.02 }
+		clamp_variable = {
+			var = ParliamentMechanic_GovStab
+			min = 0
+			max = 1
+		}
+	}
+	if = {
+		limit = { has_completed_focus = FEN_NDL_pol_1_find_the_splinters }
+		add_to_variable = { ParliamentMechanic_GovStab = 0.02 }
+		clamp_variable = {
+			var = ParliamentMechanic_GovStab
+			min = 0
+			max = 1
+		}
+	}
+
+	if = {
+		limit = { has_completed_focus = FEN_NDL_pol_2_a_common_enemy }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.03 }
+		clamp_variable = {
+			var = ParliamentMechanic_GovStab
+			min = 0
+			max = 1
+		}
+	}
+	if = {
+		limit = { NOT = { check_variable = { Act_stab = 0 } } }
+		set_temp_variable = { Act_stab_true = Act_stab }
+		multiply_temp_variable = { Act_stab_true = -.03 }
+		add_to_variable = { ParliamentMechanic_GovStab = Act_stab_true }
+		clamp_variable = {
+			var = ParliamentMechanic_GovStab
+			min = 0
+			max = 1
+		}
+	}
+
+			## Speaker Effects
+			# Military Government
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Military_Government }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Alec Douglas-Home
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Alec_Douglas_Home }
+		add_to_variable = { ParliamentMechanic_GovStab = 0.1 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Harold Macmillian
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Harold_Macmillan }
+		add_to_variable = { ParliamentMechanic_GovStab = 0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Arthur Chesterton
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Arthur_Chesterton }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.1 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Margaret Thatcher
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Margaret_Thatcher }
+		add_to_variable = { ParliamentMechanic_GovStab = 0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Rab Butler
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Rab_Butler }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.2 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Reginal Maudling
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Reginald_Maudling }
+		add_to_variable = { ParliamentMechanic_GovStab = 0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# George Jellicoe
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_George_Jellicoe }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Harold Wilson
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Harold_Wilson }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.08 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# David Stirling
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_David_Stirling }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			## Monarch Effects
+			# Edward VIII
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Monarch_Edward_VIII }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.1 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Elizabeth II
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Monarch_Elizabeth_II }
+		add_to_variable = { ParliamentMechanic_GovStab = 0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Henry IX
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Monarch_Henry_IX }
+		add_to_variable = { ParliamentMechanic_GovStab = 0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Henry IX (Incapacitated)
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Monarch_Henry_IX_Incapacitated }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			## Opposition Leaders Effects
+			# Harold Macmillian
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_OppLeader_Harold_Macmillan }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Margaret Thatcher
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_OppLeader_Margaret_Thatcher }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Arthur Chesterton
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_OppLeader_Arthur_Chesterton }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Reginal Maudling
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_OppLeader_Reginald_Maudling }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# George Jellicoe
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_OppLeader_George_Jellicoe }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+			# Harold Wilson
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_OppLeader_Harold_Wilson }
+		add_to_variable = { ParliamentMechanic_GovStab = -0.05 }
+		clamp_variable = { var = ParliamentMechanic_GovStab min = 0 max = 1 }
+	}
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GovStab_Modify; Completed execution."
+}
+	### GovStab ###
+
+	### Talking Heads Removers ###
+		## Talking Heads Remover
+		#  - Cleans up all Talking Heads ideas
+ParliamentMechanic_Clean_TalkingHeads = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Clean_TalkingHeads; Executing"
+
+	ParliamentMechanic_Clean_Speaker = yes
+	ParliamentMechanic_Clean_Monarch = yes
+	ParliamentMechanic_Clean_OppositionLeader = yes
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Clean_TalkingHeads; Completed execution"
+}
+
+		## Speaker Remover
+		#  - Cleans up all Speaker ideas
+ParliamentMechanic_Clean_Speaker = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Clean_Speaker; Executing"
+
+			## Clear Military effects
+			# Military Government
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Military_Government }
+		add_to_variable = { ENG_MIL_LOY = -5 }
+		add_to_variable = { ENG_MIL_EFF = -5 }
+	}
+			# Alec Douglas-Home
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Alec_Douglas_Home }
+		add_to_variable = { ENG_MIL_LOY = -5 }
+	}
+			# Arthur Chesterton
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Arthur_Chesterton }
+		add_to_variable = { ENG_MIL_LOY = 5 }
+		add_to_variable = { ENG_MIL_EFF = 5 }
+	}
+			# Margaret Thatcher
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Margaret_Thatcher }
+		add_to_variable = { ENG_MIL_LOY = -5 }
+	}
+			# Rab Butler
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_Rab_Butler }
+		add_to_variable = { ENG_MIL_LOY = 5 }
+	}
+			# David Stirling
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_Speaker_David_Stirling }
+		add_to_variable = { ENG_MIL_LOY = -5 }
+		add_to_variable = { ENG_MIL_EFF = -5 }
+	}
+
+	hidden_effect = {
+		remove_ideas = {
+			TNO_ParliamentMechanic_Speaker_Military_Government
+			TNO_ParliamentMechanic_Speaker_No_Opposition
+			TNO_ParliamentMechanic_Speaker_Alec_Douglas_Home
+			TNO_ParliamentMechanic_Speaker_Harold_Macmillan
+			TNO_ParliamentMechanic_Speaker_Arthur_Chesterton
+			TNO_ParliamentMechanic_Speaker_Margaret_Thatcher
+			TNO_ParliamentMechanic_Speaker_Rab_Butler
+			TNO_ParliamentMechanic_Speaker_Reginald_Maudling
+			TNO_ParliamentMechanic_Speaker_George_Jellicoe
+			TNO_ParliamentMechanic_Speaker_Harold_Wilson
+			TNO_ParliamentMechanic_Speaker_David_Stirling
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Clean_Speaker; Completed execution"
+}
+
+		## Monarch Remover
+		#  - Cleans up all Monarch ideas
+ParliamentMechanic_Clean_Monarch = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Clean_Monarch; Executing"
+
+	hidden_effect = {
+		remove_ideas = {
+			TNO_ParliamentMechanic_Monarch_NoMonarch
+			TNO_ParliamentMechanic_Monarch_Edward_VIII
+			TNO_ParliamentMechanic_Monarch_Elizabeth_II
+			TNO_ParliamentMechanic_Monarch_Henry_IX
+			TNO_ParliamentMechanic_Monarch_Henry_IX_Incapacitated
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Clean_Monarch; Completed execution"
+}
+
+		## Opposition Leader Remover
+		#  - Cleans up all Opposition Leader ideas
+ParliamentMechanic_Clean_OppositionLeader = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Clean_OppositionLeader; Executing"
+
+			## Clear Military effects
+			# Arthur Chesterton
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_OppLeader_Arthur_Chesterton }
+		add_to_variable = { ENG_MIL_LOY = -5 }
+	}
+			# George Jellicoe
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_OppLeader_George_Jellicoe }
+		add_to_variable = { ENG_MIL_LOY = 5 }
+		add_to_variable = { ENG_MIL_EFF = 5 }
+	}
+			# Harold Wilson
+	if = {
+		limit = { has_idea = TNO_ParliamentMechanic_OppLeader_Harold_Wilson }
+		add_to_variable = { ENG_MIL_LOY = -5 }
+	}
+
+	hidden_effect = {
+		remove_ideas = {
+			TNO_ParliamentMechanic_OppLeader_Harold_Macmillan
+			TNO_ParliamentMechanic_OppLeader_Margaret_Thatcher
+			TNO_ParliamentMechanic_OppLeader_Arthur_Chesterton
+			TNO_ParliamentMechanic_OppLeader_Reginald_Maudling
+			TNO_ParliamentMechanic_OppLeader_George_Jellicoe
+			TNO_ParliamentMechanic_OppLeader_Harold_Wilson
+			TNO_ParliamentMechanic_OppLeader_No_Opposition
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_Clean_OppositionLeader; Completed execution"
+}
+	### Talking Heads Removers ###
+
+	### SeatNum Calculation ###
+	### SeatNum Calculation ###
+#### CODE PURPOSES ####
+
+#### DISPLAY PURPOSES ####
+	### ParliamentMechanic GUIHelper Base ###
+		## ParliamentMechanic GUIHelper Initialize
+		#  - Constructs objects needed for the GUI's display
+ParliamentMechanic_GUIHelper_initialize = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_initialize; Executing"
+
+			### Parties Display GUI Gen
+	ParliamentMechanic_GUIHelper_PartiesDisp_generate = yes
+
+			### Parliament Display GUI Gen
+	if = {
+		limit = { NOT = { has_country_flag = ParliamentMechanic_Show_BillsDisplay } } #If Bills aren't being show, show Parliament
+		ParliamentMechanic_GUIHelper_ParliamentDisp_generate = yes
+	}
+
+			### Closing
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_initialize; Completed execution"
+}
+
+		## ParliamentMechanic GUIHelper Cleanup
+		#  - Helper for 'ParliamentMechanic_GUIHelper_initialize'
+		#  - Cleans up all the code generated in 'ParliamentMechanic_GUIHelper_initialize'
+ParliamentMechanic_GUIHelper_cleanup = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_cleanup; Executing"
+
+	ParliamentMechanic_GUIHelper_ParliamentDisp_cleanup = yes
+	ParliamentMechanic_GUIHelper_PartiesDisp_cleanup = yes
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_cleanup; Completed execution"
+}
+	### ParliamentMechanic GUIHelper Base ###
+
+	### ParliamentMechanic GUIHelper PartiesDisp ###
+		## ParliamentMechanic GUIHelper PartiesDisp Generate
+		#  - Helper for 'ParliamentMechanic_GUIHelper_initialize'
+		#  - Generates array(s) used for Parties Display
+		#
+		#  - TODO:
+		#    - Strictly divide Parties Display into 3 parts? (Gov, Opp & SitOut)
+		#      - May make display clearer, if coupled w/ gui changes
+		#    - Order entries by loyalty % (after gov status)?
+		#
+		#  - CREATES:
+		#    - 'TNO_ParliamentMechanic_GUIHelper_PartiesDisp_Array'
+		#      - Size  = # of active parties
+		#      - Value = Party Index
+ParliamentMechanic_GUIHelper_PartiesDisp_generate = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_PartiesDisp_generate; Executing"
+
+			### Generate PartiesDisp_Array
+			#   - We're going to loop through the parties 4 times,
+			#     - First, to find the Leader party
+			#     - Second, to find the in-Government parties
+			#     - Third, to find the Opposition parties
+			#     - Finally, to find the Sit-Out parties
+			#     - We do this such that the PartiesDisp_Array array is organized by gov status
+			#     - Yes, this is indeed a dumb way to achieve this. :/
+			#       - The alternative is annoyingly complicated code 🗿 
+
+			## Leader Loop
+	for_each_loop = {
+		array = ParliamentMechanic_Party_GovStatus
+		value = status
+		index = i
+
+		if = {
+			limit = { check_variable = { status = 1 } } # Leading
+			add_to_array = { TNO_ParliamentMechanic_GUIHelper_PartiesDisp_Array = i }
+		}
+	}
+
+			## Government Loop
+	for_each_loop = {
+		array = ParliamentMechanic_Party_GovStatus
+		value = status
+		index = i
+
+		if = {
+			limit = { check_variable = { status = 2 } } # Government
+			add_to_array = { TNO_ParliamentMechanic_GUIHelper_PartiesDisp_Array = i }
+		}
+	}
+
+			## Opposition Loop
+	for_each_loop = {
+		array = ParliamentMechanic_Party_GovStatus
+		value = status
+		index = i
+
+		if = {
+			limit = { check_variable = { status = 3 } } # Opposition
+			add_to_array = { TNO_ParliamentMechanic_GUIHelper_PartiesDisp_Array = i }
+		}
+	}
+
+			## Sit-Out Loop
+	for_each_loop = {
+		array = ParliamentMechanic_Party_GovStatus
+		value = status
+		index = i
+
+		if = {
+			limit = { check_variable = { status = 4 } } # Sit-Out
+			add_to_array = { TNO_ParliamentMechanic_GUIHelper_PartiesDisp_Array = i }
+		}
+	}
+
+			# Done
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_PartiesDisp_generate; Completed execution"
+}
+
+		## ParliamentMechanic GUIHelper PartiesDisp
+		#  - Helper for 'ParliamentMechanic_GUIHelper_PartiesDisp_generate'
+		#  - Clears arrays generated in 'ParliamentMechanic_GUIHelper_PartiesDisp_generate'
+ParliamentMechanic_GUIHelper_PartiesDisp_cleanup = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_PartiesDisp_cleanup; Executing"
+
+	clear_array = TNO_ParliamentMechanic_GUIHelper_PartiesDisp_Array
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_PartiesDisp_cleanup; Completed execution"
+}
+	### ParliamentMechanic GUIHelper PartiesDisp ###
+
+	### ParliamentMechanic GUIHelper ParliamentDisp ###
+		## ParliamentMechanic GUIHelper ParliamentDisp Generate
+		#  - *Generally* a helper for 'ParliamentMechanic_GUIHelper_initialize'
+		#    - Can be used independently
+		#  - Generates array(s) used for the Parliament Display
+		#
+		#  - TODO:
+		#    - Allow column balancing (Display Centering)
+		#    - Allow leading party to be displayed first for ParliamentDisp_Gov
+		#    - Have parties be displayed in declining order of support (related to above)?
+		#    - Optimize 'Loop' section
+		#
+		#  - CREATES:
+		#    - 'TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Gov'
+		#    - 'TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Opp'
+		#    - 'TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Sit'
+ParliamentMechanic_GUIHelper_ParliamentDisp_generate = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_ParliamentDisp_generate; Executing"
+
+			## Init
+	resize_array = { TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Gov = 300 }
+	resize_array = { TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Opp = 300 }
+	resize_array = { TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Sit = 300 }
+	set_variable = { gov_i = 0 }
+	set_variable = { opp_i = 0 }
+	set_variable = { sit_i = 299 } # ParliamentDisp_Sit displays right -> left
+			# Bug-checking log:
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_initialize; ParliamentDisp; (gov_i, [?gov_i]), (opp_i, [?opp_i]), (sit_i, [?sit_i])"
+
+			## Loop
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_initialize; ParliamentDisp; Loop Beginning,"
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_initialize; ParliamentDisp; Loop; (index, status, sn, id)"
+	for_each_loop = {
+		array = ParliamentMechanic_Party_GovStatus
+		value = status
+		index = i
+
+		log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_initialize; ParliamentDisp; Loop; (gov_i, [?gov_i]), (opp_i, [?opp_i]), (sit_i, [?sit_i])"
+
+		if = {
+			limit = { always = yes } # For later
+
+			set_temp_variable = { sn = ParliamentMechanic_Party_SeatNum^i }
+
+			log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_initialize; ParliamentDisp; Loop; ([?i],[?status],[?sn],[?ParliamentMechanic_Party_Identity^i])"
+
+			if = {
+				limit = {
+					OR = {
+						check_variable = { status = 1 } # Leading
+						check_variable = { status = 2 } # Governing
+					}
+				}
+
+						# Add SeatNum # of Identity values to ParliamentDisp_Gov
+				while_loop_effect = {
+					limit = { check_variable = { sn > 0 } }
+
+					set_variable = { TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Gov^gov_i = ParliamentMechanic_Party_Identity^i }
+
+					add_to_variable = { gov_i = 1 }
+					subtract_from_temp_variable = { sn = 1 }
+				}
+			}
+			else_if = {
+				limit = { check_variable = { status = 3 } } # Opposition
+
+						# Add SeatNum # of Identity values to ParliamentDisp_Gov
+				while_loop_effect = {
+					limit = { check_variable = { sn > 0 } }
+
+					set_variable = { TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Opp^opp_i = ParliamentMechanic_Party_Identity^i }
+
+					add_to_variable = { opp_i = 1 }
+					subtract_from_temp_variable = { sn = 1 }
+				}
+			}
+			else_if = {
+				limit = { check_variable = { status = 4 } } # Sit Out
+
+						# Add SeatNum # of Identity values to ParliamentDisp_Gov
+				while_loop_effect = {
+					limit = { check_variable = { sn > 0 } }
+
+					set_variable = { TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Sit^sit_i = ParliamentMechanic_Party_Identity^i }
+
+					subtract_from_variable = { sit_i = 1 }
+					subtract_from_temp_variable = { sn = 1 }
+				}
+			}
+
+			log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_initialize; ParliamentDisp; Loop; (gov_i, [?gov_i]), (opp_i, [?opp_i]), (sit_i, [?sit_i])"
+		}
+	}
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_initialize; ParliamentDisp; Loop Ended."
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_initialize; ParliamentDisp; (gov_i, [?gov_i]), (opp_i, [?opp_i]), (sit_i, [?sit_i])"
+
+			## Clear
+	clear_variable = gov_i
+	clear_variable = opp_i
+	clear_variable = sit_i
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_ParliamentDisp_generate; Completed execution"
+}
+
+		## ParliamentMechanic GUIHelper ParliamentDisp Cleanup
+		#  - Helper for 'ParliamentMechanic_GUIHelper_ParliamentDisp_generate'
+		#  - Clears arrays generated in 'ParliamentMechanic_GUIHelper_ParliamentDisp_generate'
+ParliamentMechanic_GUIHelper_ParliamentDisp_cleanup = {
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_ParliamentDisp_generate; Executing"
+
+	clear_array = TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Gov
+	clear_array = TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Opp
+	clear_array = TNO_ParliamentMechanic_GUIHelper_ParliamentDisp_Sit
+
+	log = "[GetDateText]: [Root.GetName]: ParliamentMechanic_GUIHelper_ParliamentDisp_generate; Completed execution"
+}
+	### ParliamentMechanic GUIHelper ParliamentDisp ###
+#### DISPLAY PURPOSES ####

@@ -1,0 +1,804 @@
+focus_tree = {
+	id = ofn_angola
+	country = {
+		factor = 0
+	}
+	default = no
+	focus = {
+		id = OFN_ANG_the_dust_settles_in_the_south_west
+		icon = GFX_focus_ANG_USA_the_dust_settles
+		cost = 5
+		x = 8
+		y = 0
+
+		available = {
+			#hidden_trigger = {
+			#	OR = {
+			#		ANG = { has_country_flag = OFN_MANDATE_country_is_chosen }
+			#		COG = { has_country_flag = OFN_MANDATE_country_is_chosen }
+			#		MZB = { has_country_flag = OFN_MANDATE_country_is_chosen }
+			#	}
+			#}
+		}
+
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_the_dust_settles_in_the_south_west"
+			add_political_power = 70
+			add_stability = 0.0025
+			add_popularity = {
+				ideology = paternalism
+				popularity = 0.0025
+			}
+		}
+	}
+	focus = {
+		id = OFN_ANG_the_sudwestafrikaner_secret
+		icon = GFX_focus_ANG_spy_haven
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_the_dust_settles_in_the_south_west
+		}
+		x = 2
+		y = 1
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_the_sudwestafrikaner_secret"
+			country_event = {
+				id = OFN_ANG_FOCUS.11
+				days = 1
+			}
+		}
+	}
+	focus = {
+		id = OFN_ANG_contacting_unita
+		icon = GFX_focus_ANG_USA_contacting_unita
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_the_sudwestafrikaner_secret
+		}
+		x = 0
+		y = 2
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_contacting_unita"
+			country_event = {
+				id = OFN_ANG_FOCUS.5
+				days = 1
+			}
+			add_political_power = 20
+		}
+	}
+	focus = {
+		id = OFN_ANG_study_the_plans
+		icon = GFX_focus_ANG_laying_the_groundwork
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_the_sudwestafrikaner_secret
+		}
+		x = 2
+		y = 2
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_study_the_plans"
+			add_to_variable = { OFN_MANDATE_administrative_hold = 0.02 }
+			USA = { country_event = { id = OFN_ANG.5 } }
+			clamp_variable = {
+				var = OFN_MANDATE_administrative_hold
+				max = 1
+				min = 0
+			}
+			custom_effect_tooltip = OFN_AFRICA_MANDATE_small_admin_increase_tt
+			add_political_power = 10
+			TNO_improve_admin_efficiency_med = yes
+		}
+	}
+	focus = {
+		id = OFN_ANG_contacting_the_pluaa
+		icon = GFX_focus_ANG_USA_contacting_the_pluaa
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_the_sudwestafrikaner_secret
+		}
+		x = 4
+		y = 2
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_contacting_the_pluaa"
+			country_event = {
+				id = OFN_ANG_FOCUS.6
+				days = 1
+			}
+			add_political_power = 20
+		}
+	}
+	focus = {
+		id = OFN_ANG_picking_up_where_he_left_it
+		icon = GFX_focus_ANG_in_their_pocket
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_study_the_plans
+		}
+		prerequisite = {
+			focus = OFN_ANG_contacting_unita
+		}
+		prerequisite = {
+			focus = OFN_ANG_contacting_the_pluaa
+		}
+		x = 2
+		y = 3
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_picking_up_where_he_left_it"
+			custom_effect_tooltip = OFN_ANG_able_act_pluaa_unita_tt
+			TNO_improve_industrial_equipment_low = yes
+			add_political_power = 30
+			if = {
+				limit = {
+					NOT = {
+						AND = {
+							has_country_flag = TNO_USA_ANG_Went_with_Savimbi
+							has_country_flag = TNO_USA_ANG_Went_with_Agostinho
+							has_completed_focus = OFN_ANG_contacting_the_pluaa
+							has_completed_focus = OFN_ANG_contacting_unita
+						}
+					}
+				}
+				custom_effect_tooltip = TNO_ANG_by_our_beat
+				set_country_flag = TNO_USA_ANG_Alone
+			}
+		}
+	}
+	focus = {
+		id = OFN_ANG_training_the_natives
+		icon = GFX_focus_generic_train_militias
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_picking_up_where_he_left_it
+		}
+		x = 1
+		y = 4
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_training_the_natives"
+			add_ideas = ANG_USA_The_Free_Angolan_Regiments
+			custom_effect_tooltip = OFN_ANG_act_pluaa_unita_training_tt
+			TNO_improve_army_professionalism_low = yes
+			TNO_improve_training_policy_effectiveness_low = yes
+			army_experience = 20
+			add_to_variable = { OFN_MANDATE_rebel_stability = 0.05 }
+			clamp_OFN_mandate_rebel_stability = yes
+			custom_effect_tooltip = OFN_AFRICA_MANDATE_small_stability_decrease_tt
+		}
+	}
+	focus = {
+		id = OFN_ANG_meet_with_savimbi
+		icon = GFX_focus_ANG_USA_meet_with_savimbi
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_training_the_natives
+		}
+		x = 0
+		y = 5
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_meet_with_savimbi"
+			country_event = {
+				id = OFN_ANG_FOCUS.9
+				days = 1
+			}
+			add_political_power = 20
+		}
+	}
+	focus = {
+		id = OFN_ANG_arming_the_warlords
+		icon = GFX_focus_generic_arms_shipments
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_picking_up_where_he_left_it
+		}
+		x = 3
+		y = 4
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_arming_the_warlords"
+			custom_effect_tooltip = OFN_ANG_act_pluaa_unita_weapons_tt
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 500
+			}
+			TNO_ANG_Warlord_Balance_Check = yes
+		}
+	}
+	focus = {
+		id = OFN_ANG_establishing_a_native_army
+		icon = GFX_focus_USC_the_central_african_defense_forces
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_training_the_natives
+		}
+		prerequisite = {
+			focus = OFN_ANG_arming_the_warlords
+		}
+		x = 2
+		y = 5
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_establishing_a_native_army"
+			#TNO_improve_racial_integration_policy_effectiveness_med = yes
+			TNO_improve_conscription_policy_effectiveness_med = yes
+			swap_ideas = {
+				remove_idea = ANG_USA_The_Free_Angolan_Regiments
+				add_idea = ANG_USA_The_Free_Angolan_Regiments_2
+			}
+			country_event = {
+				id = OFN_ANG_FOCUS.8
+				days = 1
+			}
+			custom_effect_tooltip =  OFN_ANG_able_act_pluaa_unita_command_tt
+		}
+	}
+	focus = {
+		id = OFN_ANG_discuss_with_neto
+		icon = GFX_focus_ANG_USA_discuss_with_neto
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_arming_the_warlords
+		}
+		x = 4
+		y = 5
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_discuss_with_neto"
+			country_event = {
+				id = OFN_ANG_FOCUS.10
+				days = 1
+			}
+			add_political_power = 20
+		}
+	}
+	focus = {
+		id = OFN_ANG_consolidate_an_army
+		icon = GFX_focus_generic_army_officers
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_meet_with_savimbi
+		}
+		prerequisite = {
+			focus = OFN_ANG_establishing_a_native_army
+		}
+		prerequisite = {
+			focus = OFN_ANG_discuss_with_neto
+		}
+		x = 2
+		y = 6
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_consolidate_an_army"
+			swap_ideas = {
+				remove_idea = ANG_USA_The_Free_Angolan_Regiments_2
+				add_idea = ANG_USA_The_Free_Angolan_Army
+			}
+			add_command_power = 20
+			TNO_improve_army_professionalism_med = yes
+			TNO_improve_training_policy_effectiveness_med = yes
+		}
+	}
+	focus = {
+		id = OFN_ANG_heal_the_scars
+		icon = GFX_focus_ANG_USA_heal_the_scars
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_the_dust_settles_in_the_south_west
+		}
+		x = 8
+		y = 1
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_heal_the_scars"
+			swap_ideas = {
+				remove_idea = ANG_USA_Fumes_of_the_Battlefields
+				add_idea = ANG_USA_Fumes_of_the_Battlefields_2
+			}
+			USA = { country_event = { id = OFN_ANG.5 } }
+			set_temp_variable = { temp_econ_spending_amount = 0.05 }
+			econ_spend_money_once_effect_raw_money = yes
+			tno_improve_agriculture = yes
+			tno_improve_healthcare = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.03 }
+			econ_GDP_boost_once_percentage = yes
+			add_stability = 0.05
+		}
+	}
+	focus = {
+		id = OFN_ANG_clean_the_battlefields
+		icon = GFX_focus_ANG_USA_clean_the_battlefields
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_heal_the_scars
+		}
+		x = 7
+		y = 2
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_clean_the_battlefields"
+			swap_ideas = {
+				remove_idea = ANG_USA_Fumes_of_the_Battlefields_2
+				add_idea = ANG_USA_Memories_of_the_Battlefields
+			}
+			TNO_improve_regulations_policy_effectiveness_med = yes
+			TNO_improve_health_care_policy_effectiveness_low = yes
+			TNO_improve_healthcare_med = yes
+			set_temp_variable = { temp_econ_spending_amount = 0.075 }
+			econ_spend_money_once_effect_raw_money = yes
+		}
+	}
+	focus = {
+		id = OFN_ANG_rebuilding_industrial_infrastructure
+		icon = GFX_focus_generic_modern_construction_equipment_red
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_clean_the_battlefields
+		}
+		x = 6
+		y = 3
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_rebuilding_industrial_infrastructure"
+			set_temp_variable = { temp_econ_spending_amount = 0.225 }
+			TNO_improve_industrial_equipment_low = yes
+			econ_spend_money_once_effect_raw_money = yes
+			add_to_variable = { OFN_MANDATE_rebel_stability = 0.05 }
+			clamp_OFN_mandate_rebel_stability = yes
+			custom_effect_tooltip = OFN_AFRICA_MANDATE_medium_stability_increase_tt
+			1035 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 2
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				add_building_construction = {
+					type = hospitals
+					level = 2
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				add_building_construction = {
+					type = offices
+					level = 2
+					instant_build = yes
+				}
+			}
+		}
+	}
+	focus = {
+		id = OFN_ANG_communication_across_the_south_west
+		icon = GFX_focus_USA_the_yankee_connection
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_rebuilding_industrial_infrastructure
+		}
+		x = 6
+		y = 4
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_communication_across_the_south_west"
+			add_to_variable = { OFN_MANDATE_administrative_hold = 0.05 }
+			TNO_improve_admin_efficiency_low = yes
+			TNO_improve_political_parties_policy_effectiveness_low = yes
+			TNO_improve_public_meetings_policy_effectiveness_low = yes
+			clamp_variable = {
+				var = OFN_MANDATE_administrative_hold
+				max = 1
+				min = 0
+			}
+			custom_effect_tooltip = OFN_AFRICA_MANDATE_medium_admin_increase_tt
+		}
+	}
+	focus = {
+		id = OFN_ANG_nujomas_government
+		icon = GFX_focus_ANG_USA_nujomas_government
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_discuss_with_neto
+		}
+		prerequisite = {
+			focus = OFN_ANG_communication_across_the_south_west
+		}
+		x = 5
+		y = 6
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_nujomas_government"
+			country_event = {
+				id = OFN_ANG_FOCUS.12
+				days = 1
+			}
+		}
+	}
+	focus = {
+		id = OFN_ANG_rebuild_the_infrastructures
+		icon = GFX_focus_generic_infrastructure_debate
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_heal_the_scars
+		}
+		x = 9
+		y = 2
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_rebuild_the_infrastructures"
+			1034 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			1035 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			1038 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = { temp_econ_spending_amount = 0.015 }
+			econ_spend_money_once_effect_raw_money = yes
+			TNO_improve_industrial_equipment_low = yes
+			TNO_ANG_Warlord_Balance_Check = yes
+		}
+	}
+	focus = {
+		id = OFN_ANG_the_south_west_african_reconstruction_program
+		icon = GFX_focus_generic_industry_tanks_green
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_rebuild_the_infrastructures
+		}
+		prerequisite = {
+			focus = OFN_ANG_clean_the_battlefields
+		}
+		x = 8
+		y = 3
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_the_south_west_african_reconstruction_program"
+			swap_ideas = {
+				remove_idea = ANG_USA_Memories_of_the_Battlefields
+				add_idea = ANG_USA_Fading_Memories_of_the_Battlefields_2
+			}
+			add_ideas = ANG_USA_The_South_West_Reconstruction_Program
+			tno_regulations_improve = yes
+			tno_pollution_improve = yes
+			TNO_improve_max_workhours_policy_effectiveness_low = yes
+			TNO_improve_health_care_policy_effectiveness_low = yes
+			TNO_ANG_Warlord_Balance_Check = yes
+			country_event = {
+				id = OFN_ANG_FOCUS.4
+				days = 1
+			}
+		}
+	}
+	focus = {
+		id = OFN_ANG_reconnect_the_cities
+		icon = GFX_focus_generic_open_road
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_rebuild_the_infrastructures
+		}
+		x = 10
+		y = 3
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_reconnect_the_cities"
+			add_to_variable = { OFN_MANDATE_administrative_hold = 0.05 }
+			clamp_variable = {
+				var = OFN_MANDATE_administrative_hold
+				max = 1
+				min = 0
+			}
+			custom_effect_tooltip = OFN_AFRICA_MANDATE_medium_admin_increase_tt
+			1036 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			1037 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			1039 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			1166 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+	}
+	focus = {
+		id = OFN_ANG_restart_the_factories
+		icon = GFX_focus_generic_improving_factory_efficiency
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_the_south_west_african_reconstruction_program
+		}
+		prerequisite = {
+			focus = OFN_ANG_reconnect_the_cities
+		}
+		x = 9
+		y = 4
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_restart_the_factories"
+			set_temp_variable = { gdp_growth_temp = 0.09 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { pus_temp = 2 }
+			econ_pus_change = yes
+		}
+	}
+	focus = {
+		id = OFN_ANG_hire_the_natives
+		icon = GFX_focus_USC_american_foreign_legions
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_communication_across_the_south_west
+		}
+		prerequisite = {
+			focus = OFN_ANG_restart_the_factories
+		}
+		x = 7
+		y = 5
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_hire_the_natives"
+			admin_funding_maximal_increase_low = yes
+			admin_funding_minimal_increase_low = yes
+			TNO_improve_industrial_expertise_low = yes
+			TNO_improve_regulations_policy_effectiveness_med = yes
+			TNO_improve_minimum_wage_policy_effectiveness_med = yes
+			TNO_improve_poverty_high = yes
+			TNO_ANG_Warlord_Balance_Check = yes
+		}
+	}
+	focus = {
+		id = OFN_ANG_create_an_industrial_foundation
+		icon = GFX_focus_generic_industrial_data_consolidation
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_restart_the_factories
+		}
+		x = 9
+		y = 5
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_create_an_industrial_foundation"
+			set_temp_variable = { temp_econ_spending_amount = 0.25 }
+			econ_spend_money_once_effect_raw_money = yes
+			1035 = {
+				add_building_construction = {
+					type = dockyard
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = thermoelectric_plant
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = offices
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = schools
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+	}
+	focus = {
+		id = OFN_ANG_stabilize_the_industry
+		icon = GFX_focus_generic_the_planned_economy
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_hire_the_natives
+		}
+		prerequisite = {
+			focus = OFN_ANG_create_an_industrial_foundation
+		}
+		x = 8
+		y = 6
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_stabilize_the_industry"
+			swap_ideas = {
+				remove_idea = ANG_USA_Fading_Memories_of_the_Battlefields_2
+				add_idea = ANG_USA_Distant_Memories_of_the_Battlefields
+			}
+			TNO_ANG_Warlord_Balance_Check = yes
+			set_temp_variable = { gdp_growth_temp = 0.10 }
+			econ_gdp_growth_change = yes
+			set_temp_variable = { pus_temp = 1 }
+			econ_pus_change = yes
+			set_temp_variable = { temp_econ_spending_amount = 0.1 }
+			econ_spend_money_once_effect_raw_money = yes
+			tno_improve_academic_base = yes
+			random_owned_controlled_state = {
+				add_building_construction = {
+					type = thermoelectric_plant
+					level = 1
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				add_building_construction = {
+					type = schools
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+	}
+	focus = {
+		id = OFN_ANG_the_luanda_office
+		icon = GFX_focus_COG_USA_the_leopoldville_committee
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_rebuild_the_infrastructures
+		}
+		x = 13
+		y = 3
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_the_luanda_office"
+			add_to_variable = { OFN_MANDATE_administrative_hold = 0.02 }
+			clamp_variable = {
+				var = OFN_MANDATE_administrative_hold
+				max = 1
+				min = 0
+			}
+			custom_effect_tooltip = OFN_AFRICA_MANDATE_small_admin_increase_tt
+			country_event = {
+				id = OFN_ANG_FOCUS.1
+				days = 1
+			}
+			TNO_improve_admin_efficiency_med = yes
+		}
+	}
+	focus = {
+		id = OFN_ANG_administrative_rework
+		icon = GFX_focus_generic_change_law_enforcement
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_the_luanda_office
+		}
+		x = 12
+		y = 4
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_administrative_rework"
+			add_to_variable = { OFN_MANDATE_administrative_hold = 0.05 }
+			clamp_variable = {
+				var = OFN_MANDATE_administrative_hold
+				max = 1
+				min = 0
+			}
+			custom_effect_tooltip = OFN_AFRICA_MANDATE_medium_admin_increase_tt
+			TNO_improve_political_parties_policy_effectiveness_med = yes
+			TNO_improve_vote_franchise_policy_effectiveness_low = yes
+			TNO_improve_academic_base_med = yes
+			TNO_improve_admin_efficiency_low = yes
+			add_stability = 0.1
+		}
+	}
+	focus = {
+		id = OFN_ANG_dierks_proposal
+		icon = GFX_focus_ANG_USA_listen_to_the_dierks_proposal
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_administrative_rework
+		}
+		x = 12
+		y = 5
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_dierks_proposal"
+			add_to_variable = { OFN_MANDATE_administrative_hold = 0.02 }
+			clamp_variable = {
+				var = OFN_MANDATE_administrative_hold
+				max = 1
+				min = 0
+			}
+			custom_effect_tooltip = OFN_AFRICA_MANDATE_small_admin_increase_tt
+			country_event = {
+				id = OFN_ANG_FOCUS.2
+				days = 1
+			}
+		}
+	}
+	focus = {
+		id = OFN_ANG_fix_schencks_mistakes
+		icon = GFX_focus_ANG_history_will_remember_us
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_the_luanda_office
+		}
+		x = 14
+		y = 4
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_fix_schencks_mistakes"
+			add_to_variable = { OFN_MANDATE_administrative_hold = 0.05 }
+			clamp_variable = {
+				var = OFN_MANDATE_administrative_hold
+				max = 1
+				min = 0
+			}
+			custom_effect_tooltip = OFN_AFRICA_MANDATE_medium_admin_increase_tt
+			TNO_ANG_Warlord_Balance_Check = yes
+			tno_press_rights_improve = yes
+			tno_vote_franchise_improve = yes
+		}
+	}
+	focus = {
+		id = OFN_ANG_balance_the_south_west
+		icon = GFX_focus_generic_change_law_trade
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_fix_schencks_mistakes
+		}
+		x = 14
+		y = 5
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_balance_the_south_west"
+			set_temp_variable = { gdp_growth_temp = 0.15 }
+			econ_gdp_growth_change = yes
+			TNO_improve_regulations_policy_effectiveness_low = yes
+		}
+	}
+	focus = {
+		id = OFN_ANG_setting_up_the_transitional_governance
+		icon = GFX_focus_generic_change_law_immigration
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_dierks_proposal
+		}
+		prerequisite = {
+			focus = OFN_ANG_balance_the_south_west
+		}
+		x = 13
+		y = 6
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_setting_up_the_transitional_governance"
+			country_event = {
+				id = OFN_ANG_FOCUS.3
+				days = 1
+			}
+			add_stability = 0.1
+		}
+	}
+	focus = {
+		id = OFN_ANG_the_leap_of_faith
+		icon = GFX_focus_ANG_USA_the_leap_of_faith
+		cost = 5
+		prerequisite = {
+			focus = OFN_ANG_stabilize_the_industry
+		}
+		prerequisite = {
+			focus = OFN_ANG_consolidate_an_army
+		}
+		prerequisite = {
+			focus = OFN_ANG_setting_up_the_transitional_governance
+		}
+		x = 8
+		y = 7
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus OFN_ANG_the_leap_of_faith"
+			custom_effect_tooltip = OFN_ANGOLA_MANDATE_DECON_tt
+			custom_effect_tooltip = OFN_ANGOLA_MANDATE_DECON_PROCESS_tt
+			hidden_effect = {
+				country_event = {
+					id = OFN_ANG_FOCUS.7
+					days = 1
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,6290 @@
+#############
+### INDEX ###
+#############
+## TRUJILLO'S BLITZ ##
+## HAITIAN CIVIL WAR ##
+
+## PUERTO PLATA ##
+# PREPARATION/LANDING
+# CEASEFIRE/CIVIL WAR
+# OUTCOMES
+
+######################
+## TRUJILLO'S BLITZ ##
+######################
+TNO_HIS_blitz_clear_proxy = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HIS_blitz_clear_proxy; Executing."
+	clr_global_flag = HIS_trujillo_blitz_ongoing
+	set_global_flag = HIS_trujillo_blitz_finished
+
+	USA = {
+		set_temp_variable = { target = HAI }
+		TNO_clear_and_recall_volunteers = yes
+	}
+
+	HAI = { country_event = { id = HIS_HAI.24 days = 14 } }
+
+	hidden_effect = {
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = TRUJILLO_BLITZ_OUTCOME
+					option = TRUJILLO_BLITZ_OUTCOME_DOM
+				}
+			}
+			DOM = {
+				remove_war_buff = yes
+			}
+		}
+		else_if = {
+			limit = {
+				DOM = {
+					has_idea = Custom_TNO_CHI_war_debuff
+					has_idea = Custom_TNO_JAP_war_debuff
+				}
+			}
+			DOM = {
+				remove_ideas = {
+					Custom_TNO_CHI_war_debuff
+					Custom_TNO_JAP_war_debuff
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAI_CRUSH
+				}
+				HAI = {
+					has_idea = Custom_TNO_war_buff
+				}
+			}
+			HAI = {
+				remove_war_buff = yes
+			}
+		}
+		else_if = {
+			limit = {
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAC_CRUSH
+				}
+				HAC = {
+					has_idea = Custom_TNO_war_buff
+				}
+			}
+			HAC = {
+				remove_war_buff = yes
+			}
+		}
+	}
+}
+
+TNO_HIS_blitz_setup_HAI = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HIS_blitz_setup_HAI; Executing."
+	set_global_flag = HIS_trujillo_blitz_setup
+	for_each_scope_loop = {
+		array = USA.HAI_map_array
+		if = {
+			limit = { has_state_flag = HCW_demilitarized }
+			set_demilitarized_zone = no
+		}
+		else_if = {
+			limit = { has_state_flag = HCW_transferred }
+			set_demilitarized_zone = no
+			create_unit = {
+				division = "name = \"Milis Revolisyonè\" division_template = \"Milis Revolisyonè\" start_experience_factor = 0.1"
+				owner = HAC
+			}
+		}
+	}
+}
+
+TNO_HIS_blitz_start = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HIS_blitz_start; Executing."
+	clr_global_flag = HIS_trujillo_blitz_preparing
+	clr_global_flag = HIS_trujillo_blitz_setup
+	set_global_flag = HIS_trujillo_blitz_ongoing
+
+	USA = {
+		hidden_effect = {
+			set_temp_variable = { Victory_ID = 35 }
+			set_temp_variable = { Victory_Outcome = 0 }
+			set_temp_variable = { Victory_Points = 0 }
+			Cold_War_GUI_AddVictory = yes
+		}
+	}
+
+	DOM = {
+		declare_war_on = {
+			type = annex_everything
+			target = HAI
+		}
+		declare_war_on = {
+			type = annex_everything
+			target = HAC
+		}
+	}
+
+	hidden_effect = {
+		ZZZ = {
+			remove_mission = ZZZ_USA_Haiti_Updates
+			activate_mission = ZZZ_USA_HAI_Blitz_Combat_Stagnates
+		}
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = TRUJILLO_BLITZ_OUTCOME
+					option = TRUJILLO_BLITZ_OUTCOME_DOM
+				}
+			}
+			DOM = {
+				apply_war_buff_with_5_divisions = yes
+			}
+			if = {
+				limit = {
+					HAI = {
+						has_idea = Custom_TNO_war_buff
+					}
+				}
+				HAI = {
+					remove_war_buff = yes
+				}
+			}
+			else_if = {
+				limit = {
+					HAC = {
+						has_idea = Custom_TNO_war_buff
+					}
+				}
+				HAC = {
+					remove_war_buff = yes
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_game_rule = {
+					rule = TRUJILLO_BLITZ_OUTCOME
+					option = TRUJILLO_BLITZ_OUTCOME_HAI
+				}
+			}
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = HAITIAN_CIVIL_WAR_OUTCOME
+						option = HAITIAN_CIVIL_WAR_OUTCOME_HAI_CRUSH
+					}
+					country_exists = HAC
+				}
+				HAI = {
+					apply_war_buff_with_5_divisions = yes
+				}
+			}
+			else_if = {
+				limit = {
+					has_game_rule = {
+						rule = HAITIAN_CIVIL_WAR_OUTCOME
+						option = HAITIAN_CIVIL_WAR_OUTCOME_HAC_CRUSH
+					}
+					country_exists = HAC
+				}
+				HAC = {
+					apply_war_buff_with_5_divisions = yes
+				}
+			}
+			else = {
+				DOM = {
+					add_ideas = {
+						Custom_TNO_CHI_war_debuff
+						Custom_TNO_JAP_war_debuff
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_game_rule = {
+						rule = TRUJILLO_BLITZ_OUTCOME
+						option = TRUJILLO_BLITZ_OUTCOME_CASEFIRE_DOM
+					}
+					has_game_rule = {
+						rule = TRUJILLO_BLITZ_OUTCOME
+						option = TRUJILLO_BLITZ_OUTCOME_CASEFIRE_HAI
+					}
+				}
+			}
+			HAI = {
+				add_ideas = {
+					Custom_TNO_HIS_front_line_stopper
+				}
+			}
+			every_country = {
+				limit = {
+					has_war_with = HAI
+				}
+				add_ideas = {
+					Custom_TNO_HIS_front_line_stopper
+				}
+			}
+			if = {
+				limit = {
+					HAI = {
+						has_idea = Custom_TNO_war_buff
+					}
+				}
+				HAI = {
+					remove_war_buff = yes
+				}
+			}
+			else_if = {
+				limit = {
+					HAC = {
+						has_idea = Custom_TNO_war_buff
+					}
+				}
+				HAC = {
+					remove_war_buff = yes
+				}
+			}
+		}
+	}
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.11
+			days = 1
+		}
+	}
+}
+
+TNO_HIS_blitz_victory_haiti = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HIS_blitz_victory_haiti; Executing." # Haiti Victory in Blitz
+	set_global_flag = HIS_trujillo_blitz_haiti_won
+	ZZZ = { remove_mission = ZZZ_USA_HAI_Blitz_Combat_Stagnates }
+
+	USA = {
+		hidden_effect = {
+			set_temp_variable = { Victory_ID = 35 }
+			set_temp_variable = { Victory_Outcome = 5 }
+			set_temp_variable = { Victory_Points = 100 }
+			Cold_War_GUI_ManipulateVictory = yes
+
+			set_temp_variable = { Victory_ID = 34 }
+			set_temp_variable = { Victory_Outcome = 4 }
+			set_temp_variable = { Victory_Points = 125 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+	}
+
+	HAI = {
+		transfer_state = 1706
+		add_to_array = { global.OFN_members = HAI }
+		add_ideas = OFN_Dependent_Member
+		remove_ideas = HIS_Hispaniola_War
+	}
+	USA = {
+		set_variable = { HCW_Hinche_frame = 3 }
+		set_variable = { HAI_blitz_tension = 0 }
+		TNO_HCW_calc_values = yes
+	}
+
+	DOM = {
+		white_peace = HAI
+		kill_country_leader = yes
+		remove_all_ministers = yes
+		fill_empty_minister_nochecks = yes
+
+		remove_ideas = {
+			DOM_Dios_Trujillo
+			DOM_Blanqueamiento
+			DOM_The_Defense_State
+			DOM_Black_Spot_of_the_Caribbean
+			HIS_Hispaniola_War
+		}
+		add_ideas = {
+			DOM_Pan_American_Force
+			DOM_The_Living_Ghost
+		}
+
+		USA = {
+			add_to_faction = DOM
+			add_to_faction = HAI
+			puppet = DOM
+			set_autonomy = {
+				target = DOM
+				autonomy_state = autonomy_military_government
+			}
+		}
+
+		add_ideas = OFN_Interim_Authority
+		add_to_array = { global.OFN_members = DOM }
+
+		set_popularities = {
+			fascism = 20
+			ultranationalism = 15
+			despotism = 32
+			paternalism = 19
+			liberalism = 12
+			socialist = 2
+		}
+		set_politics = { ruling_party = despotism }
+		promote_character = DOM_OFN_OAS_peacekeeping
+		set_party_name = {
+			ideology = despotism
+			name = DOM_trujillo_victory_OFN
+			long_name = DOM_trujillo_victory_OFN_long
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			name = DOM_ultranationalism_party_puertoplata
+			long_name = DOM_ultranationalism_party_puertoplata_long
+		}
+		set_party_name = {
+			ideology = fascism
+			name = DOM_fascism_party_puertoplata
+			long_name = DOM_fascism_party_puertoplata_long
+		}
+		set_cosmetic_tag = DOM_OFN_OAS
+		econ_join_sphere_USA = yes
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+		econ_subtype_change = yes
+
+		1706 = {
+			remove_claim_by = DOM
+			set_state_name = STATE_1706_CAL
+		}
+		319 = { set_state_name = STATE_319_CAL }
+
+		remove_opinion_modifier = { target = CLC modifier = CLC_fascist_comrades }
+		remove_opinion_modifier = { target = STC modifier = CLC_fascist_comrades }
+		remove_opinion_modifier = { target = PAR modifier = CLC_fascist_comrades }
+		CLC = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+		STC = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+		PAR = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+
+		remove_opinion_modifier = { target = IBR modifier = COL_iberia_love }
+		IBR = { remove_opinion_modifier = { target = DOM modifier = USA_we_support_them } }
+
+		remove_opinion_modifier = { target = USA modifier = USA_DOM_hostile_diplomacy }
+		USA = { remove_opinion_modifier = { target = DOM modifier = USA_DOM_hostile_diplomacy } }
+
+		remove_opinion_modifier = { target = CUB modifier = DOM_caribbean_tension }
+		remove_opinion_modifier = { target = WIN modifier = DOM_caribbean_tension }
+		remove_opinion_modifier = { target = MEX modifier = DOM_caribbean_tension }
+		remove_opinion_modifier = { target = VEN modifier = DOM_caribbean_tension }
+		CUB = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+		WIN = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+		MEX = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+		VEN = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+
+		country_event = {
+			id = HIS_DOM_ceasefire_skeleton.7
+			days = 380
+		}
+	}
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.18
+			days = 1
+		}
+	}
+}
+
+TNO_HIS_blitz_ceasefire_trujillo = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HIS_blitz_ceasefire_trujillo; Executing." # pro-Trujillo Ceasefire
+	set_global_flag = HIS_trujillo_blitz_ceasefire_trujillo
+	HAI = {
+		add_to_array = { global.OFN_members = HAI }
+		add_ideas = OFN_Dependent_Member
+	}
+	USA = {
+		set_variable = { HAI_blitz_tension = 0 }
+		TNO_HCW_calc_values = yes
+		TNO_HIS_blitz_clear_proxy = yes
+
+		hidden_effect = {
+			set_temp_variable = { Victory_ID = 35 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -50 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+	}
+
+	DOM = {
+		white_peace = HAI
+		set_portraits = {
+			character = DOM_Rafael_Trujillo
+			civilian = { large = "gfx/leaders/DOM/Portrait_Dominican_Republic_Rafael_Trujillo_70s.dds" }
+		}
+		if = {
+			limit = { date > 1966.05.30 }
+			country_event = { # Trujillo Assassinated
+				id = HIS_general.2
+				days = 131
+				random_days = 169
+			}
+		}
+	}
+
+	if = {
+		limit = { date > 1966.5.30 }
+		DOM = {
+			country_event = {
+				id = HIS_general.2
+				days = 101
+			}
+		}
+	}
+
+	every_state = {
+		limit = { is_core_of = HAI NOT = { state = 1706 } }
+		HAI = { transfer_state = PREV }
+	}
+
+	hidden_effect = {
+		ZZZ = {
+			remove_mission = ZZZ_USA_HAI_Blitz_Combat_Stagnates
+			activate_mission = ZZZ_USA_Haiti_Updates
+		}
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = TRUJILLO_BLITZ_OUTCOME
+					option = TRUJILLO_BLITZ_OUTCOME_CASEFIRE_DOM
+				}
+			}
+			every_country = {
+				limit = {
+					has_idea = Custom_TNO_HIS_front_line_stopper
+				}
+				remove_ideas = Custom_TNO_HIS_front_line_stopper
+			}
+		}
+		if = {
+			limit = {
+				has_global_flag = TNO_HIS_HAI_uprising_ongoing
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAI
+				}
+			}
+			HAI = {
+				apply_war_buff_with_5_divisions = yes
+			}
+		}
+		else_if = {
+			limit = {
+				has_global_flag = TNO_HIS_HAI_uprising_ongoing
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAC
+				}
+			}
+			HAC = {
+				apply_war_buff_with_5_divisions = yes
+			}
+		}
+	}
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.24
+			days = 1
+		}
+	}
+}
+
+TNO_HIS_blitz_ceasefire_haiti = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HIS_blitz_ceasefire_haiti; Executing." # pro-Haiti Ceasefire
+	set_global_flag = HIS_trujillo_blitz_ceasefire_haiti
+	USA = {
+		set_variable = { HAI_blitz_tension = 0 }
+		TNO_HCW_calc_values = yes
+		TNO_HIS_blitz_clear_proxy = yes
+
+		hidden_effect = {
+			set_temp_variable = { Victory_ID = 35 }
+			set_temp_variable = { Victory_Outcome = 4 }
+			set_temp_variable = { Victory_Points = 50 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+	}
+
+	DOM = {
+		white_peace = HAI
+		set_portraits = {
+			character = DOM_Rafael_Trujillo
+			civilian = { large = "gfx/leaders/DOM/Portrait_Dominican_Republic_Rafael_Trujillo_70s.dds" }
+		}
+	}
+	HAI = { transfer_state = 1706 }
+	USA = { set_variable = { HCW_Hinche_frame = 3 } }
+
+	if = {
+		limit = {
+			DOM = { any_owned_state = { is_in_array = { USA.HAI_map_array = THIS } } }
+		}
+		DOM = {
+			every_owned_state = {
+				limit = { is_in_array = { USA.HAI_map_array = THIS } }
+				HAI = { transfer_state = PREV }
+			}
+		}
+	}
+
+	if = {
+		limit = { date > 1966.5.30 }
+		DOM = {
+			country_event = {
+				id = HIS_general.2
+				days = 69
+			}
+		}
+	}
+
+	hidden_effect = {
+		ZZZ = {
+			remove_mission = ZZZ_USA_HAI_Blitz_Combat_Stagnates
+			activate_mission = ZZZ_USA_Haiti_Updates
+		}
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = TRUJILLO_BLITZ_OUTCOME
+					option = TRUJILLO_BLITZ_OUTCOME_CASEFIRE_HAI
+				}
+			}
+			every_country = {
+				limit = {
+					has_idea = Custom_TNO_HIS_front_line_stopper
+				}
+				remove_ideas = Custom_TNO_HIS_front_line_stopper
+			}
+		}
+		if = {
+			limit = {
+				has_global_flag = TNO_HIS_HAI_uprising_ongoing
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAI
+				}
+			}
+			HAI = {
+				apply_war_buff_with_5_divisions = yes
+			}
+		}
+		else_if = {
+			limit = {
+				has_global_flag = TNO_HIS_HAI_uprising_ongoing
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAC
+				}
+			}
+			HAC = {
+				apply_war_buff_with_5_divisions = yes
+			}
+		}
+	}
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.25
+			days = 1
+		}
+	}
+}
+
+TNO_HIS_blitz_victory_trujillo = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HIS_blitz_victory_trujillo; Executing." # Total Trujillo Victory
+	set_global_flag = HIS_trujillo_blitz_trujillo_won
+	ZZZ = { remove_mission = ZZZ_USA_HAI_Blitz_Combat_Stagnates }
+	USA = {
+		set_variable = { HAI_blitz_tension = 0 }
+		TNO_fopo_remove_haitian_civil_war_tab = yes
+
+		hidden_effect = {
+			set_temp_variable = { Victory_ID = 35 }
+			set_temp_variable = { Victory_Outcome = 1 }
+			set_temp_variable = { Victory_Points = -150 }
+			Cold_War_GUI_ManipulateVictory = yes
+
+			set_temp_variable = { Victory_ID = 34 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -100 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+	}
+
+	DOM = {
+		remove_ideas = {
+			DOM_Blanqueamiento
+			DOM_The_Defense_State
+			DOM_Black_Spot_of_the_Caribbean
+			HIS_Hispaniola_War
+		}
+		add_ideas = {
+			DOM_La_Patria_Nueva
+			DOM_The_Defense_State_2
+			DOM_Black_Spot_of_the_Caribbean_2
+		}
+		white_peace = HAI
+		white_peace = HAC
+		if = {
+			limit = { HAI = { has_country_flag = HIS_HAI_united_front_active } }
+			HAI = { remove_ideas = HUF_Faction dismantle_faction = yes }
+			HAC = { remove_ideas = HUF_Faction }
+		}
+		set_cosmetic_tag = DOM_Santo_Domingo
+		annex_country = {
+			target = HAI
+			transfer_troops = no
+		}
+		annex_country = {
+			target = HAC
+			transfer_troops = no
+		}
+		set_portraits = {
+			character = DOM_Rafael_Trujillo
+			civilian = { large = "gfx/leaders/DOM/Portrait_Dominican_Republic_Rafael_Trujillo_70s.dds" }
+		}
+	}
+
+	318 = { set_state_name = STATE_318_DOM }
+	set_province_name = {
+		id = 4641
+		name = VICTORY_POINTS_4641_DOM
+	}
+	1880 = { set_state_name = STATE_1880_DOM }
+	set_province_name = {
+		id = 15636
+		name = VICTORY_POINTS_15636_DOM
+	}
+	1881 = { set_state_name = STATE_1881_DOM }
+	set_province_name = {
+		id = 15642
+		name = VICTORY_POINTS_15642_DOM
+	}
+	1882 = { set_state_name = STATE_1882_DOM }
+	1728 = { set_state_name = STATE_1728_DOM }
+	set_province_name = {
+		id = 1594
+		name = VICTORY_POINTS_1594_DOM
+	}
+
+
+	if = {
+		limit = { date > 1968.5.30 }
+		DOM = {
+			country_event = {
+				id = HIS_general.1
+				days = 112
+			}
+		}
+	}
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.23
+			days = 1
+		}
+	}
+}
+
+#######################
+## HAITIAN CIVIL WAR ##
+#######################
+TNO_HAI_civil_war_clear_proxy = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HAI_civil_war_clear_proxy; Executing."
+	clr_global_flag = HIS_HAI_civil_war_ongoing
+	clr_global_flag = TNO_HIS_HAI_uprising_ongoing
+	set_global_flag = HIS_HAI_civil_war_finished
+	HAI = {
+		remove_ideas = {
+			HAI_Protracted_Guerrilla_Campaign
+			HAI_Advisory_Staff_4
+			HAI_Advisory_Staff_3
+			HAI_Advisory_Staff_2
+			HAI_Advisory_Staff_1
+			HAI_Advisory_Staff_0
+		}
+	}
+	USA = {
+		TNO_fopo_remove_haitian_civil_war_tab = yes
+		set_temp_variable = { target = HAI }
+		TNO_clear_num_volunteers = yes
+		# remove_mission = USA_HCW_ppln_tick
+		# remove_mission = USA_HCW_ppln_tick_bonus_1
+		# remove_mission = USA_HCW_ppln_tick_bonus_2
+		# remove_mission = USA_HCW_PPLN_Uprising
+		# remove_mission = USA_HCW_demanding_disengagement
+		# remove_mission = USA_HCW_disengagement_target
+		# remove_mission = USA_HCW_weariness_increases_tick
+		# remove_mission = USA_HCW_cantave_coup
+		# remove_mission = USA_HCW_lavaud_coup
+		# remove_mission = USA_HCW_tensions_increase
+		# remove_mission = USA_HCW_red_dr_assistance
+		# remove_mission = USA_HCW_anti_americanism
+	}
+	hidden_effect = {
+		ZZZ = {
+			remove_mission = ZZZ_USA_Haiti_Updates
+		}
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAI
+				}
+			}
+			HAI = {
+				remove_war_buff = yes
+			}
+		}
+		else_if = {
+			limit = {
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAC
+				}
+			}
+			HAC = {
+				remove_war_buff = yes
+			}
+		}
+	}
+}
+
+TNO_HAI_civil_war_start = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HAI_civil_war_start; Executing."
+	USA = {
+		if = {
+			limit = { is_ai = yes }
+			add_command_power = 30
+			add_political_power = 30
+		}
+		country_event = { id = HIS_HAI_ugly.1 days = 2 }
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = hispaniola_news.21 days = 2 }
+		}
+	}
+}
+
+TNO_HCW_Calculate_Frame = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_Calculate_Frame; Executing."
+	for_each_loop = {
+		array = USA.HAI_map_array
+		var:v = {
+			if = {
+				limit = {
+					check_variable = { HCW_Government_Control > HCW_Communist_Control }
+				}
+				set_variable = { controlling_faction = 1 }
+
+				set_variable = { gui_display_frame = controlling_faction }
+				multiply_variable = { gui_display_frame = 1000 }
+
+				set_temp_variable = { gui_display_frame_add = HCW_Government_Control }
+				subtract_from_temp_variable = { gui_display_frame_add = HCW_Communist_Control }
+				divide_temp_variable = { gui_display_frame_add = HCW_Government_Control }
+				multiply_temp_variable = { gui_display_frame_add = 100 }
+
+				add_to_variable = { gui_display_frame = gui_display_frame_add }
+			}
+			else = {
+				set_variable = { controlling_faction = 2 }
+
+				set_variable = { gui_display_frame = controlling_faction }
+				multiply_variable = { gui_display_frame = 1000 }
+
+				set_temp_variable = { gui_display_frame_add = HCW_Communist_Control }
+				subtract_from_temp_variable = { gui_display_frame_add = HCW_Government_Control }
+				divide_temp_variable = { gui_display_frame_add = HCW_Communist_Control }
+				multiply_temp_variable = { gui_display_frame_add = 100 }
+
+				add_to_variable = { gui_display_frame = gui_display_frame_add }
+			}
+
+			if = {
+				limit = {
+					USA = {
+						has_country_flag = HCW_signal_lost
+					}
+				}
+				set_variable = { gui_display_frame = 4000 }
+			}
+		}
+	}
+}
+
+TNO_HCW_Draw_Pie_Chart = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_Draw_Pie_Chart; Executing."
+
+	set_temp_variable = { divided = HAI_selected_state:HCW_Communist_Control }
+	add_to_temp_variable = { divided = HAI_selected_state:HCW_Government_Control }
+	set_temp_variable = { one_hundo = 100 }
+	subtract_from_temp_variable = { one_hundo = divided }
+	clamp_temp_variable = {
+		var = one_hundo
+		min = 0
+		max = 100
+	}
+	set_variable = { HAI_selected_state:HCW_Divided_Control = one_hundo }
+
+	set_variable = { haiti_divided_pie_frame = HAI_selected_state:HCW_Communist_Control }
+	round_variable = haiti_divided_pie_frame
+	multiply_variable = { haiti_divided_pie_frame = 1000 }
+	add_to_variable = { haiti_divided_pie_frame = HAI_selected_state:HCW_Communist_Control }
+	add_to_variable = { haiti_divided_pie_frame = HAI_selected_state:HCW_Divided_Control }
+
+	set_variable = { haiti_government_pie_frame = HAI_selected_state:HCW_Communist_Control }
+	add_to_variable = { haiti_government_pie_frame = HAI_selected_state:HCW_Divided_Control }
+	round_variable = haiti_government_pie_frame
+	multiply_variable = { haiti_government_pie_frame = 1000 }
+	add_to_variable = { haiti_government_pie_frame = 100 }
+}
+
+TNO_HCW_check_haiti_status = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_check_haiti_status; Executing."
+	if = {
+		limit = {
+			NOT = {
+				has_global_flag = HIS_trujillo_blitz_ongoing
+				has_global_flag = TNO_HIS_HAI_uprising_ongoing
+			}
+		}
+		if = { # Dejoie Assassination
+			limit = {
+				check_variable = { USA.HAI_legitimacy < 35 }
+				OR = {
+					check_variable = { USA.HAI_communist_average > 19 }
+					has_game_rule = {
+						rule = HAI_1964_ELECTIONS
+						option = HAI_1964_ELECTIONS_LESCOT
+					}
+				}
+				has_global_flag = PPI_finished
+				NOT = { has_global_flag = PPI_Trujillo_Victory }
+				HAI = {
+					has_country_flag = HIS_HAI_1964_elections
+					has_country_leader = { character = HAI_Pierre_Joseph_Louis_Dejoie ruling_only = yes }
+				}
+			}
+			HAI = {
+				set_country_flag = HIS_HAI_dejoie_assassinated
+				kill_country_leader = yes
+				add_popularity = {
+					ideology = paternalism
+					popularity = -0.05
+				}
+				add_country_leader_role = {
+					character = HAI_Elie_Lescot
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_HAI_LESCOT_DESC"
+						expire = "1999.1.1"
+						ideology = paternalism_oligarchy_subtype
+						traits = { }
+						id = -1
+					}
+				}
+				every_country = {
+					limit = { is_ai = no }
+					news_event = {
+						id = hispaniola_news.49
+						hours = 10
+					}
+				}
+			}
+		}
+		if = { # Trujillo Scenario
+			limit = { has_global_flag = PPI_Trujillo_Victory }
+			if = {
+				limit = { check_variable = { USA.HAI_blitz_tension > 89 } }
+				TNO_HIS_blitz_setup_HAI = yes
+			}
+		}
+		else_if = { # Socialist DR Scenario
+			limit = {
+				DOM = {
+					OR = {
+						has_government = socialist
+						has_government = communist
+					}
+				}
+			}
+			if = { # Cantave Coup
+				limit = {
+					OR = {
+						AND = {
+							check_variable = { USA.HAI_communist_average > 34 }
+							HAI = {
+								has_country_flag = HIS_HAI_dejoie_assassinated
+								NOT = { has_country_flag = HIS_HAI_cantave_coup }
+							}
+							has_game_rule = { rule = HAI_COUP option = DEFAULT }
+						}
+						has_game_rule = { rule = HAI_COUP option = HAI_COUP_CANTAVE }
+					}
+				}
+				USA = {
+					custom_effect_tooltip = USA_HCW_incoming_coup_tt
+					set_country_flag = HIS_HAI_cantave_coup
+					hidden_effect = { HAI = { country_event = { id = HIS_HAI.3 } } }
+				}
+			}
+		}
+		if = { # Violence peaking
+			limit = { has_global_flag = PPI_Trujillo_Victory }
+			if = {
+				limit = {
+					has_global_flag = HIS_trujillo_blitz_finished
+					check_variable = { USA.HAI_radicalism > 79 }
+					check_variable = { global.HCW_locked_states > 0 }
+				}
+				USA = {
+					custom_effect_tooltip = USA_HCW_PPLN_Uprising_tt
+					hidden_effect = { HAI = { country_event = { id = HIS_HAI.13 days = 1 random_days = 4 } } }
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = { USA.HAI_radicalism > 79 }
+				check_variable = { global.HCW_locked_states > 0 }
+			}
+			USA = {
+				custom_effect_tooltip = USA_HCW_PPLN_Uprising_tt
+				hidden_effect = { HAI = { country_event = { id = HIS_HAI.13 days = 1 random_days = 4 } } }
+			}
+		}
+		if = {
+			limit = { check_variable = { USA.HAI_weariness > 54 } }
+			USA = { USA_HCW_disengagement_demanded = yes }
+		}
+	}
+}
+
+USA_HCW_disengagement_demanded = {
+	log = "[GetDateText]: [Root.GetTag]: USA_HCW_disengagement_demanded; Executing."
+	add_stability = -0.01
+			add_war_support = -0.025
+			# TNO_HCW_increase_weariness_medium = yes # causes a recursive call, put it in the events
+
+			set_temp_variable = { protest_weeks = 1 }
+			custom_effect_tooltip = USA_all_voters_header_tt
+
+			if = { # NPP
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = paternalism
+					}
+				}
+
+				set_temp_variable = { USA_week_change_rural_dem = protest_weeks }
+				set_temp_variable = { USA_week_change_rural_rep = protest_weeks }
+
+				add_to_variable = { Demographic_Shift_black_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_hispanic_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_minority_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_nativists_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_urban_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_rural_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_union_dem_Weeks = protest_weeks }
+
+				add_to_variable = { Demographic_Shift_black_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_hispanic_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_minority_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_nativists_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_urban_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_rural_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_union_rep_Weeks = protest_weeks }
+
+				custom_effect_tooltip = USA_rural_dem_shift
+				custom_effect_tooltip = USA_rural_rep_shift
+			}
+
+			if = { # RDC
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+					}
+				}
+
+				set_temp_variable = { USA_week_change_rural_pro = protest_weeks }
+				set_temp_variable = { USA_week_change_rural_nat = protest_weeks }
+
+				add_to_variable = { Demographic_Shift_black_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_hispanic_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_minority_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_nativists_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_urban_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_rural_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_union_pro_Weeks = protest_weeks }
+
+				add_to_variable = { Demographic_Shift_black_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_hispanic_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_minority_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_nativists_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_urban_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_rural_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_union_nat_Weeks = protest_weeks }
+
+				custom_effect_tooltip = USA_rural_pro_shift
+				custom_effect_tooltip = USA_rural_nat_shift
+			}
+
+			set_temp_variable = { USA_week_change_black_foreign_policy_con = protest_weeks }
+			add_to_variable = { Policy_Shift_black_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_hispanic_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_minority_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_nativists_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_urban_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_rural_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_union_foreign_policy_con_Weeks = protest_weeks }
+			custom_effect_tooltip = USA_black_foreign_policy_con
+
+}
+
+TNO_HCW_thresholds = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_thresholds; Executing."
+	# fired within the state scope
+	for_each_scope_loop = {
+		array = USA.HAI_map_array
+		if = {
+			limit = { has_state_flag = HCW_locked }
+			clamp_variable = { var = HCW_Communist_Control min = 75 max = 100 }
+		}
+
+		if = {
+			limit = {
+				NOT = {
+					has_global_flag = HIS_trujillo_blitz_ongoing
+					has_global_flag = HIS_trujillo_blitz_setup
+					has_global_flag = TNO_HIS_HAI_uprising_ongoing
+				}
+			}
+			if = {
+				limit = {
+					NOT = { has_state_flag = HCW_demilitarized }
+					check_variable = { HCW_Communist_Control > 29.99 }
+				}
+				set_demilitarized_zone = yes
+				set_state_flag = HCW_demilitarized
+			}
+			else_if = {
+				limit = {
+					NOT = { has_state_flag = HCW_transferred }
+					check_variable = { HCW_Communist_Control > 49.99 }
+				}
+				add_core_of = HAC
+				transfer_state_to = HAC
+				set_state_flag = HCW_transferred
+			}
+			else_if = {
+				limit = {
+					NOT = { has_state_flag = HCW_locked }
+					check_variable = { HCW_Communist_Control > 84.99 }
+				}
+				set_demilitarized_zone = no
+				create_unit = {
+					division = "name = \"Milis Revolisyonè\" division_template = \"Milis Revolisyonè\" start_experience_factor = 0.1"
+					owner = HAC
+				}
+				set_state_flag = HCW_locked
+				add_to_variable = { global.HCW_locked_states = 1 }
+				TNO_HAI_crush_check = yes
+			}
+			else_if = {
+				limit = {
+					has_state_flag = HCW_transferred
+					NOT = { has_state_flag = HCW_locked }
+					check_variable = { HCW_Communist_Control < 50.99 }
+				}
+				remove_core_of = HAC
+				transfer_state_to = HAI
+				clr_state_flag = HCW_transferred
+			}
+			else_if = {
+				limit = {
+					has_state_flag = HCW_demilitarized
+					check_variable = { HCW_Communist_Control < 30.99 }
+				}
+				set_demilitarized_zone = no
+				clr_state_flag = HCW_demilitarized
+			}
+		}
+	}
+}
+
+TNO_check_tensions = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_check_tensions; Executing."
+	clamp_variable = { var = USA.HAI_blitz_tension min = 0 max = 100 }
+	TNO_HCW_check_haiti_status = yes
+	USA = {
+		if = {
+			limit = {
+				check_variable = { USA.HAI_blitz_tension = 100 }
+				NOT = { has_country_flag = USA_HINCHE_AFFAIR_SCARY }
+			}
+			country_event = { # Hinche Incident
+				id = HIS_PP_flavor.9
+				days = 2
+				random_days = 5
+			}
+			set_country_flag = USA_HINCHE_AFFAIR_SCARY
+		}
+		else_if = {
+			limit = {
+				check_variable = { USA.HAI_blitz_tension > 74.99 }
+				NOT = {
+					TNO_HCW_Phase_Disengagement = yes
+					has_country_flag = USA_blitz_pulse_started
+				}
+			}
+			set_country_flag = USA_blitz_pulse_started
+			country_event = { id = HIS_HAI.19 days = 14 }
+			country_event = { # CIA report on preparations
+				id = HIS_HAI.20
+				days = 1
+			}
+		}
+	}
+}
+
+TNO_HCW_check_phase = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_check_phase; Executing."
+	if = {
+		limit = {
+			NOT = { has_global_flag = HIS_trujillo_blitz_ongoing }
+		}
+		if = {
+			limit = {
+				has_country_flag = TNO_HCW_base_phase
+				check_variable = { HAI_involvement > 32 }
+			}
+			TNO_HCW_apply_phase = yes
+			hidden_effect = {
+				country_event = {
+					id = HIS_HAI_decision.21
+					days = 150
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = TNO_HCW_buildup_phase
+				check_variable = { HAI_involvement > 65 }
+			}
+			TNO_HCW_apply_phase = yes
+		}
+	}
+	if = {
+		limit = {
+			OR = {
+				has_country_flag = TNO_HCW_base_phase
+				has_country_flag = TNO_HCW_disengagement_phase
+			}
+		}
+		clamp_variable = { var = HAI_involvement min = 0 max = 100 }
+	}
+	else_if = {
+		limit = { has_country_flag = TNO_HCW_buildup_phase }
+		clamp_variable = { var = HAI_involvement min = 33 max = 100 }
+	}
+	else_if = {
+		limit = { has_country_flag = TNO_HCW_interventionism_phase }
+		clamp_variable = { var = HAI_involvement min = 66 max = 100 }
+	}
+}
+
+TNO_HCW_apply_phase = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_apply_phase; Executing."
+	if = {
+		limit = { NOT = { has_global_flag = HIS_trujillo_blitz_ongoing } }
+		if = {
+			limit = { has_country_flag = TNO_HCW_base_phase }
+			clr_country_flag = TNO_HCW_base_phase
+			set_country_flag = TNO_HCW_buildup_phase
+			custom_effect_tooltip = TNO_HCW_buildup_phase_tt
+			country_event = { id = HIS_HAI_ugly.3 hours = 16 }
+			country_event = { id = HIS_HAI_ugly.4 days = 60 }
+			country_event = { id = HIS_HAI_ugly.5 days = 120 }
+			# activate_mission = USA_HCW_anti_americanism
+		}
+		else_if = {
+			limit = { has_country_flag = TNO_HCW_buildup_phase }
+			clr_country_flag = TNO_HCW_buildup_phase
+			set_country_flag = TNO_HCW_interventionism_phase
+			custom_effect_tooltip = TNO_HCW_interventionism_phase_tt
+			country_event = { id = HIS_HAI_ugly.6 hours = 7 }
+			country_event = { id = HIS_HAI_ugly.7 days = 60 }
+			country_event = { id = HIS_HAI_ugly.8 days = 120 }
+			country_event = { id = HIS_HAI_ugly.9 days = 180 }
+			country_event = { id = HIS_HAI_ugly.10 days = 240 }
+		}
+	}
+}
+
+TNO_HCW_withdrawal = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_withdrawal; Executing."
+	hidden_effect = {
+		for_each_scope_loop = {
+			array = USA.HAI_map_array
+			if = {
+				limit = {
+					NOT = {
+						TNO_HCW_is_transferred = yes
+						TNO_HCW_is_locked = yes
+					}
+				}
+				set_demilitarized_zone = yes
+			}
+		}
+		HAC = {
+			transfer_state = 1880
+		}
+		for_each_scope_loop = {
+			array = USA.HAI_map_array
+			if = {
+				limit = { has_state_flag = HCW_demilitarized }
+				set_demilitarized_zone = no
+				create_unit = {
+					division = "name = \"Geriya Revolisyonè\" division_template = \"Geriya Revolisyonè\" start_experience_factor = 0.04"
+					owner = HAC
+				}
+			}
+			else_if = {
+				limit = { has_state_flag = HCW_transferred }
+				set_demilitarized_zone = no
+				create_unit = {
+					division = "name = \"Milis Revolisyonè\" division_template = \"Milis Revolisyonè\" start_experience_factor = 0.1"
+					owner = HAC
+				}
+			}
+		}
+	}
+	TNO_fopo_remove_haitian_civil_war_tab = yes
+	hidden_effect = {
+		clr_country_flag = TNO_HCW_disengagement_phase
+		clr_country_flag = USA_HCW_did_troop_surge_active
+		set_global_flag = TNO_HCW_USA_withdrew
+
+		HAI = { country_event = { id = HIS_HAI.26 days = 21 random_days = 7 } }
+		country_event = { id = HIS_HAI_ugly.13 hours = 4 }
+
+		#news_event = {
+		#	id = hispaniola_news.66
+		#	hours = 10
+		#}
+	}
+}
+
+TNO_HCW_coalition_gov = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_withdrawal; Executing."
+	TNO_fopo_remove_haitian_civil_war_tab = yes
+	hidden_effect = {
+		1880 = {
+			transfer_state_to = HAI
+			set_demilitarized_zone = no
+		}
+		1728 = {
+			transfer_state_to = HAI
+			set_demilitarized_zone = no
+		}
+		1881 = {
+			transfer_state_to = HAI
+			set_demilitarized_zone = no
+		}
+		1882 = {
+			transfer_state_to = HAI
+			set_demilitarized_zone = no
+		}
+
+		if = {
+			limit = { DOM = { has_idea = DOM_Autonomous_Hinche } }
+			HAI = { remove_ideas = HIS_Hispaniola_War }
+			DOM = {
+				remove_ideas = {
+					HIS_Hispaniola_War
+					DOM_Autonomous_Hinche
+				}
+			}
+		}
+		clr_country_flag = TNO_HCW_disengagement_phase
+		clr_country_flag = USA_HCW_did_troop_surge_active
+		set_global_flag = TNO_HCW_USA_withdrew
+
+		HAI = {
+			set_country_flag = HAI_Socialist_Republic_Skeleton
+			country_event = {
+				id = HIS_HAI_skel_taps.3
+				days = 20
+			}
+			if = {
+				limit = { has_idea = HAI_Occupation }
+				swap_ideas = {
+					remove_idea = HAI_Occupation
+					add_idea = HAI_Renewed_Haitian_Sovereignty
+				}
+			}
+			if = {
+				limit = {
+					AND = {
+						NOT = { is_in_faction_with = USA }
+						NOT = { HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } } }
+					}
+				}
+				USA = { add_to_faction = HAI }
+				add_ideas = OFN_Dependent_Member
+				add_to_array = { global.OFN_members = HAI }
+			}
+		}
+
+		country_event = { id = HIS_HAI_ugly.13 hours = 4 }
+		country_event = { id = HIS_HAI_ugly.16 days = 2 }
+		HAI = { country_event = { id = HIS_HAI.25 days = 6 } }
+	}
+}
+
+TNO_HCW_start_disengagement = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_start_disengagement; Executing."
+	clr_country_flag = TNO_HCW_base_phase
+	clr_country_flag = TNO_HCW_buildup_phase
+	clr_country_flag = TNO_HCW_interventionism_phase
+	set_country_flag = TNO_HCW_disengagement_phase
+	custom_effect_tooltip = TNO_HCW_disengagement_phase_tt
+	effect_tooltip = { TNO_HCW_decrease_HAI_professionalism = yes }
+	hidden_effect = {
+		country_event = { id = HIS_HAI_ugly.10 hours = 16 }
+		country_event = { id = HIS_HAI_ugly.11 days = 60 random_days = 60 }
+		subtract_from_variable = { HAI.HCW_HAI_professionalism = 1 }
+		set_variable = { USA_HCW_disengagement_target_needed = HAI_involvement }
+		subtract_from_variable = { USA_HCW_disengagement_target_needed = 10 }
+		set_variable = { USA_HCW_disengagement_target_needed_check = USA_HCW_disengagement_target_needed }
+		subtract_from_variable = { USA_HCW_disengagement_target_needed_check = 0.01 }
+		# activate_mission = USA_HCW_disengagement_target
+		# remove_mission = USA_HCW_anti_americanism
+	}
+}
+
+TNO_HCW_snowball_bonus = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_snowball_bonus; Executing."
+	# fired within the state scope
+	if = {
+		limit = { check_variable = { HCW_Communist_Control > 24.99 } }
+		set_variable = { HCW_bonus = 1 }
+	}
+	else_if = {
+		limit = { check_variable = { HCW_Communist_Control > 49.99 } }
+		set_variable = { HCW_bonus = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { HCW_Communist_Control > 74.99 } }
+		set_variable = { HCW_bonus = 3 }
+	}
+	else_if = {
+		limit = { check_variable = { HCW_Communist_Control = 100 } }
+		set_variable = { HCW_bonus = 4 }
+	}
+}
+
+TNO_HCW_apply_snowball_bonus = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_apply_snowball_bonus; Executing."
+	if = {
+		limit = {
+			NOT = {
+				has_global_flag = HIS_trujillo_blitz_ongoing
+				has_global_flag = TNO_HIS_HAI_uprising_ongoing
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { HCW_total_snowball > 4 }
+				check_variable = { HAI_radicalism < 32 }
+				NOT = { has_country_flag = HCW_applied_snowball_1 }
+			}
+			random_scope_in_array = {
+				array = USA.HAI_map_array
+				limit = { NOT = { state = ROOT.HAI_selected_random_state_tick_comm } }
+				set_variable = { ROOT.HAI_selected_random_state_tick_comm_bonus_1 = THIS }
+			}
+			# activate_mission = USA_HCW_ppln_tick_bonus_1
+			set_country_flag = HCW_applied_snowball_1
+		}
+		else_if = {
+			limit = {
+				check_variable = { HCW_total_snowball > 9 }
+				check_variable = { HAI_radicalism < 54 }
+				NOT = { has_country_flag = HCW_applied_snowball_2 }
+			}
+			random_scope_in_array = {
+				array = USA.HAI_map_array
+				limit = {
+					NOT = {
+						state = ROOT.HAI_selected_random_state_tick_comm
+						state = ROOT.HAI_selected_random_state_tick_comm_bonus_1
+					}
+				}
+				set_variable = { ROOT.HAI_selected_random_state_tick_comm_bonus_2 = THIS }
+			}
+			# activate_mission = USA_HCW_ppln_tick_bonus_2
+			set_country_flag = HCW_applied_snowball_2
+		}
+		else_if = {
+			limit = {
+				check_variable = { HCW_total_snowball < 10 }
+				has_country_flag = HCW_applied_snowball_2
+			}
+			random_scope_in_array = {
+				array = USA.HAI_map_array
+				limit = { state = ROOT.HAI_selected_random_state_tick_comm_bonus_2 }
+				clear_variable = ROOT.HAI_selected_random_state_tick_comm_bonus_2
+			}
+			# remove_mission = USA_HCW_ppln_tick_bonus_2
+			clr_country_flag = HCW_applied_snowball_2
+		}
+		else_if = {
+			limit = {
+				check_variable = { HCW_total_snowball < 5 }
+				has_country_flag = HCW_applied_snowball_1
+			}
+			random_scope_in_array = {
+				array = USA.HAI_map_array
+				limit = { state = ROOT.HAI_selected_random_state_tick_comm_bonus_1 }
+				clear_variable = ROOT.HAI_selected_random_state_tick_comm_bonus_1
+			}
+			# remove_mission = USA_HCW_ppln_tick_bonus_1
+			clr_country_flag = HCW_applied_snowball_1
+		}
+	}
+}
+
+TNO_HCW_signal_lost = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_signal_lost; Executing."
+	set_country_flag = HCW_signal_lost
+	set_variable = { HCW_Hinche_frame = 4 }
+	TNO_HCW_Calculate_Frame = yes
+}
+
+TNO_HCW_increase_DR_assistance = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_DR_assistance; Executing."
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { assistance_change = 1 } }
+			1 = { set_temp_variable = { assistance_change = 2 } }
+			1 = { set_temp_variable = { assistance_change = 3 } }
+		}
+		add_to_variable = { USA_HCW_dominican_assistance = assistance_change }
+	}
+	custom_effect_tooltip = TNO_HCW_increase_DR_assistance_tt
+}
+TNO_HCW_decrease_DR_assistance = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_DR_assistance; Executing."
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { assistance_change = 1 } }
+			1 = { set_temp_variable = { assistance_change = 2 } }
+			1 = { set_temp_variable = { assistance_change = 3 } }
+		}
+		subtract_from_variable = { USA_HCW_dominican_assistance = assistance_change }
+	}
+	custom_effect_tooltip = TNO_HCW_decrease_DR_assistance_tt
+}
+
+TNO_HCW_calc_values = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_calc_values; Executing."
+	if = {
+		limit = { has_global_flag = HIS_HAI_civil_war_ongoing }
+		set_temp_variable = { haiti_involvement_temp = HAI_involvement }
+		divide_temp_variable = { haiti_involvement_temp = 6.25 }
+
+		set_temp_variable = { haiti_government_average_temp = 0 }
+		set_temp_variable = { haiti_communist_average_temp = 0 }
+		set_temp_variable = { haiti_snowball_bonus_temp = 0 }
+
+		# Clamp
+		for_each_scope_loop = {
+			array = USA.HAI_map_array
+			clamp_variable = { var = HCW_Government_Control min = 0 max = 100 }
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = HAITIAN_CIVIL_WAR_OUTCOME
+						option = HAITIAN_CIVIL_WAR_OUTCOME_HAI_CRUSH
+					}
+				}
+				clamp_variable = { var = HCW_Communist_Control min = 0 max = 9 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_game_rule = {
+							rule = HAITIAN_CIVIL_WAR_OUTCOME
+							option = HAITIAN_CIVIL_WAR_OUTCOME_HAI
+						}
+						has_game_rule = {
+							rule = HAITIAN_CIVIL_WAR_OUTCOME
+							option = HAITIAN_CIVIL_WAR_OUTCOME_HAC
+						}
+					}
+					check_variable = { global.HCW_locked_states > 1 }
+				}
+				clamp_variable = { var = HCW_Communist_Control min = 0 max = 50 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_game_rule = {
+							rule = HAITIAN_CIVIL_WAR_OUTCOME
+							option = HAITIAN_CIVIL_WAR_OUTCOME_HAC_CRUSH
+						}
+						AND = {
+							OR = {
+								has_game_rule = {
+									rule = HAITIAN_CIVIL_WAR_OUTCOME
+									option = HAITIAN_CIVIL_WAR_OUTCOME_HAI
+								}
+								has_game_rule = {
+									rule = HAITIAN_CIVIL_WAR_OUTCOME
+									option = HAITIAN_CIVIL_WAR_OUTCOME_HAC
+								}
+							}
+							check_variable = { global.HCW_locked_states < 2 }
+						}
+					}
+				}
+				clamp_variable = { var = HCW_Communist_Control min = 85 max = 100 }
+			}
+			else = {
+				clamp_variable = { var = HCW_Communist_Control min = 0 max = 100 }
+			}
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = HAITIAN_CIVIL_WAR_OUTCOME
+						option = HAITIAN_CIVIL_WAR_OUTCOME_HAI_CRUSH
+					}
+				}
+				set_variable = { HCW_Divided_Control = 0 }
+			}
+			else = {
+				clamp_variable = { var = HCW_Divided_Control min = 0 max = 100 }
+			}
+
+			# Average
+			add_to_temp_variable = { USA.haiti_government_average_temp = HCW_Government_Control }
+			add_to_temp_variable = { USA.haiti_communist_average_temp = HCW_Communist_Control }
+
+			# Snowball Bonus
+			TNO_HCW_snowball_bonus = yes
+			add_to_temp_variable = { USA.haiti_snowball_bonus_temp = HCW_bonus }
+
+			TNO_HCW_thresholds = yes
+		}
+
+		set_variable = { HCW_snowball_bonus = haiti_snowball_bonus_temp }
+		set_variable = { HCW_total_snowball = haiti_snowball_bonus_temp }
+		multiply_variable = { HCW_snowball_bonus = 4 }
+		divide_variable = { HCW_snowball_bonus = 16 }
+
+		divide_temp_variable = { HAI.haiti_government_average_temp = 4 }
+		set_temp_variable = { haiti_government_average_temp_2 = haiti_government_average_temp }
+		set_variable = { HAI_communist_average = haiti_communist_average_temp }
+		set_variable = { HAI_government_average = haiti_government_average_temp }
+		divide_temp_variable = { haiti_communist_average_temp = 5 }
+		divide_temp_variable = { haiti_government_average_temp_2 = 5 }
+
+		set_variable = { USA.HAI_legitimacy = haiti_government_average_temp }
+		subtract_from_variable = { USA.HAI_legitimacy = haiti_communist_average_temp }
+		subtract_from_variable = { USA.HAI_legitimacy = haiti_involvement_temp }
+		add_to_variable = { USA.HAI_legitimacy = haiti_government_average_temp_2 }
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = HAI_1964_ELECTIONS
+					option = HAI_1964_ELECTIONS_DEJOIE
+				}
+			}
+			clamp_variable = { var = USA.HAI_legitimacy min = 35 max = 100 }
+		}
+		else_if = {
+			limit = {
+				has_game_rule = {
+					rule = HAI_1964_ELECTIONS
+					option = HAI_1964_ELECTIONS_LESCOT
+				}
+			}
+			clamp_variable = { var = USA.HAI_legitimacy min = 0 max = 34 }
+		}
+		else = {
+			clamp_variable = { var = USA.HAI_legitimacy min = 0 max = 100 }
+		}
+		TNO_HCW_Draw_Pie_Chart = yes
+		TNO_HCW_Calculate_Frame = yes
+		TNO_HCW_apply_snowball_bonus = yes
+		TNO_HCW_check_haiti_status = yes
+	}
+}
+
+TNO_HCW_increase_control_govt_calc = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_control_govt_calc; Executing."
+	# fired within the state scope
+	# random values increments within a range for gameplay purposes
+	if = {
+		limit = {
+			HAI = { has_country_flag = USA_HCW_providing_air_support }
+			OR = {
+				HAI = { has_idea = HAI_Advisory_Staff_4 }
+				check_variable = { HAI.HCW_HAI_professionalism > 7 }
+			}
+		}
+		random_list = {
+			2 = { add_to_temp_variable = { control_increase = 5.5 } }
+			1 = { add_to_temp_variable = { control_increase = 6 } }
+		}
+	}
+	else_if = {
+		limit = {
+			NOT = { HAI = { has_country_flag = USA_HCW_providing_air_support } }
+			OR = {
+				HAI = { has_idea = HAI_Advisory_Staff_4 }
+				check_variable = { HAI.HCW_HAI_professionalism > 7 }
+			}
+		}
+		random_list = {
+			2 = { add_to_temp_variable = { control_increase = 4 } }
+			1 = { add_to_temp_variable = { control_increase = 4.5 } }
+		}
+	}
+	else_if = {
+		limit = {
+			OR = {
+				HAI = { has_idea = HAI_Advisory_Staff_2 }
+				HAI = { has_idea = HAI_Advisory_Staff_3 }
+				check_variable = { HAI.HCW_HAI_professionalism > 5 }
+				AND = {
+					HAI = { has_country_flag = USA_HCW_providing_air_support }
+					check_variable = { HAI.HCW_HAI_professionalism < 8 }
+				}
+			}
+		}
+		random_list = {
+			2 = { add_to_temp_variable = { control_increase = 3 } }
+			1 = { add_to_temp_variable = { control_increase = 3.5 } }
+		}
+	}
+	else_if = {
+		limit = {
+			OR = {
+				HAI = { has_idea = HAI_Advisory_Staff_1 }
+				check_variable = { HAI.HCW_HAI_professionalism > 3 }
+			}
+		}
+		random_list = {
+			2 = { add_to_temp_variable = { control_increase = 2 } }
+			1 = { add_to_temp_variable = { control_increase = 2.5 } }
+		}
+	}
+	else_if = {
+		limit = {
+			OR = {
+				HAI = { has_idea = HAI_Advisory_Staff_0 }
+				check_variable = { HAI.HCW_HAI_professionalism > 1 }
+			}
+		}
+		random_list = {
+			2 = { add_to_temp_variable = { control_increase = 1 } }
+			1 = { add_to_temp_variable = { control_increase = 1.5 } }
+		}
+	}
+	if = {
+		limit = { USA = { has_country_flag = USA_HCW_did_troop_surge } }
+		random_list = {
+			2 = { add_to_temp_variable = { control_increase = 7.5 } }
+			2 = { add_to_temp_variable = { control_increase = 10 } }
+			1 = { add_to_temp_variable = { control_increase = 12.5 } }
+			1 = { add_to_temp_variable = { control_increase = 15 } }
+		}
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = HAITIAN_CIVIL_WAR_OUTCOME
+				option = HAITIAN_CIVIL_WAR_OUTCOME_HAI_CRUSH
+			}
+			check_variable = { control_increase > HCW_Communist_Control }
+		}
+		set_temp_variable = { control_increase = HCW_Communist_Control }
+	}
+	if = {
+		limit = { check_variable = { HCW_Divided_Control > 0 } }
+		if = {
+			limit = { check_variable = { HCW_Divided_Control < control_increase } }
+			set_temp_variable = { control_difference = control_increase }
+			subtract_from_temp_variable = { control_difference = HCW_Divided_Control }
+			set_variable = { HCW_Divided_Control = 0 }
+			subtract_from_variable = { HCW_Communist_Control = control_difference }
+		}
+		else = {
+			subtract_from_variable = { HCW_Divided_Control = control_increase }
+		}
+		add_to_variable = { HCW_Government_Control = control_increase }
+	}
+	else_if = {
+		limit = { check_variable = { control_increase > HCW_Communist_Control } }
+		subtract_from_temp_variable = { control_increase = HCW_Communist_Control }
+		set_variable = { HCW_Communist_Control = 0 }
+	}
+	else = {
+		subtract_from_variable = { HCW_Communist_Control = control_increase }
+		add_to_variable = { HCW_Government_Control = control_increase }
+		if = {
+			limit = {
+				NOT = {
+					HAI = { has_country_flag = HIS_HAI_united_front_active }
+					has_global_flag = TNO_HIS_HAI_uprising_ongoing
+					has_global_flag = HIS_trujillo_blitz_ongoing
+				}
+				check_variable = { HCW_Communist_Control < 10 }
+			}
+		}
+	}
+	USA = { TNO_HCW_calc_values = yes }
+}
+
+TNO_HCW_increase_control_comm_calc = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_control_comm_calc; Executing."
+	# fired within the state scope
+	# random values increments within a range for gameplay purposes
+
+	if = {
+		limit = { check_variable = { USA.HAI_radicalism > 9 } }
+		add_to_temp_variable = { control_increase = 0.5 }
+	}
+	else_if = {
+		limit = { check_variable = { USA.HAI_radicalism > 19 } }
+		add_to_temp_variable = { control_increase = 1 }
+	}
+	else_if = {
+		limit = { check_variable = { USA.HAI_radicalism > 29 } }
+		add_to_temp_variable = { control_increase = 1.5 }
+	}
+	else_if = {
+		limit = { check_variable = { USA.HAI_radicalism > 39 } }
+		add_to_temp_variable = { control_increase = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { USA.HAI_radicalism > 49 } }
+		add_to_temp_variable = { control_increase = 2.5 }
+	}
+	else_if = {
+		limit = { check_variable = { USA.HAI_radicalism > 59 } }
+		add_to_temp_variable = { control_increase = 3 }
+	}
+	else_if = {
+		limit = { check_variable = { USA.HAI_radicalism > 69 } }
+		add_to_temp_variable = { control_increase = 3.5 }
+	}
+	else_if = {
+		limit = { check_variable = { USA.HAI_radicalism > 79 } }
+		add_to_temp_variable = { control_increase = 4 }
+	}
+	else_if = {
+		limit = { check_variable = { USA.HAI_radicalism > 84 } }
+		add_to_temp_variable = { control_increase = 4.5 }
+	}
+	else_if = {
+		limit = { check_variable = { USA.HAI_radicalism > 89 } }
+		add_to_temp_variable = { control_increase = 5 }
+	}
+
+	if = {
+		limit = {
+			NOT = { check_variable = { control_winner = 1 } }
+			check_variable = { USA.HCW_snowball_bonus > 0 }
+		}
+		add_to_temp_variable = { control_increase = USA.HCW_snowball_bonus }
+	}
+	if = {
+		limit = {
+			check_variable = { USA.USA_HCW_dominican_assistance > 0 }
+			DOM = {
+				OR = {
+					has_government = socialist
+					has_government = communist
+				}
+			}
+		}
+		set_temp_variable = { assistance_bonus = USA.USA_HCW_dominican_assistance }
+		divide_temp_variable = { assistance_bonus = 20 } # tweaking between either 20 or 25
+		add_to_temp_variable = { control_increase = assistance_bonus }
+	}
+
+	if = {
+		limit = {
+			OR = {
+				has_state_flag = HCW_ongoing_naval_action
+				has_state_flag = HCW_ongoing_air_action
+				HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } }
+			}
+		}
+		set_temp_variable = { control_increase_2 = control_increase }
+		if = {
+			limit = {
+				HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } }
+				has_state_flag = HCW_ongoing_naval_action
+				has_state_flag = HCW_ongoing_air_action
+			}
+			divide_temp_variable = { control_increase_2 = 2 }
+		}
+		else_if = {
+			limit = {
+				HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } }
+				OR = {
+					has_state_flag = HCW_ongoing_naval_action
+					has_state_flag = HCW_ongoing_air_action
+				}
+			}
+			divide_temp_variable = { control_increase_2 = 2.5 }
+		}
+		else_if = {
+			limit = {
+				has_state_flag = HCW_ongoing_naval_action
+				has_state_flag = HCW_ongoing_air_action
+			}
+			divide_temp_variable = { control_increase_2 = 3 }
+		}
+		else_if = {
+			limit = { HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } } }
+			divide_temp_variable = { control_increase_2 = 4 }
+		}
+		else_if = {
+			limit = { has_state_flag = HCW_ongoing_naval_action }
+			divide_temp_variable = { control_increase_2 = 4 }
+		}
+		else_if = {
+			limit = { has_state_flag = HCW_ongoing_air_action }
+			divide_temp_variable = { control_increase_2 = 3 }
+		}
+		#round_temp_variable = control_increase_2
+		subtract_from_temp_variable = { control_increase = control_increase_2 }
+	}
+
+	if = {
+		limit = { check_variable = { HCW_Divided_Control > 0 } }
+		if = {
+			limit = { check_variable = { HCW_Divided_Control < control_increase } }
+			set_temp_variable = { control_difference = control_increase }
+			subtract_from_temp_variable = { control_difference = HCW_Divided_Control }
+			set_variable = { HCW_Divided_Control = 0 }
+			subtract_from_variable = { HCW_Government_Control = control_difference }
+		}
+		else = {
+			subtract_from_variable = { HCW_Divided_Control = control_increase }
+		}
+		add_to_variable = { HCW_Communist_Control = control_increase }
+	}
+	else_if = {
+		limit = { check_variable = { control_increase > HCW_Government_Control } }
+		subtract_from_temp_variable = { control_increase = HCW_Government_Control }
+		set_variable = { HCW_Government_Control = 0 }
+	}
+	else = {
+		subtract_from_variable = { HCW_Government_Control = control_increase }
+		add_to_variable = { HCW_Communist_Control = control_increase }
+		if = {
+			limit = {
+				has_state_flag = HCW_locked
+				NOT = {
+					has_state_flag = HCW_red_guard
+					has_global_flag = TNO_HIS_HAI_uprising_ongoing
+					has_global_flag = HIS_trujillo_blitz_ongoing
+				}
+				check_variable = { HCW_Communist_Control > 79.99 }
+			}
+		}
+	}
+	USA = { TNO_HCW_calc_values = yes }
+}
+
+TNO_HCW_increase_control_small = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_control_small; Executing."
+	# set temp variable "control_winner = 1" indicating it's the government, otherwise leave empty for communists
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { control_increase = 2 } }
+			1 = { set_temp_variable = { control_increase = 3 } }
+			1 = { set_temp_variable = { control_increase = 4 } }
+		}
+	}
+	if = {
+		limit = { check_variable = { control_winner = 1 } }
+		custom_effect_tooltip = TNO_HCW_increase_control_small_govt_tt
+		hidden_effect = {
+			if = {
+				limit = { check_variable = { USA.HAI_legitimacy < 40 } }
+				set_temp_variable = { control_increase = 2 }
+			}
+			TNO_HCW_increase_control_govt_calc = yes
+		}
+	}
+	else = {
+		if = {
+			limit = { NOT = { has_state_flag = HCW_communists_crushed } }
+			custom_effect_tooltip = TNO_HCW_increase_control_small_comm_tt
+			hidden_effect = { TNO_HCW_increase_control_comm_calc = yes }
+		}
+	}
+}
+TNO_HCW_increase_control_medium = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_control_medium; Executing."
+	# set temp variable "control_winner = 1" indicating it's the government, otherwise leave empty for communists
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { control_increase = 5 } }
+			1 = { set_temp_variable = { control_increase = 6 } }
+			1 = { set_temp_variable = { control_increase = 7 } }
+			1 = { set_temp_variable = { control_increase = 8 } }
+		}
+	}
+	if = {
+		limit = { check_variable = { control_winner = 1 } }
+		custom_effect_tooltip = TNO_HCW_increase_control_medium_govt_tt
+		hidden_effect = {
+			if = {
+				limit = { check_variable = { USA.HAI_legitimacy < 40 } }
+				set_temp_variable = { control_increase = 4 }
+			}
+			TNO_HCW_increase_control_govt_calc = yes
+		}
+	}
+	else = {
+		if = {
+			limit = { NOT = { has_state_flag = HCW_communists_crushed } }
+			custom_effect_tooltip = TNO_HCW_increase_control_medium_comm_tt
+			hidden_effect = { TNO_HCW_increase_control_comm_calc = yes }
+		}
+	}
+}
+TNO_HCW_increase_control_large = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_control_large; Executing."
+	# set temp variable "control_winner = 1" indicating it's the government, otherwise leave empty for communists
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { control_increase = 9 } }
+			1 = { set_temp_variable = { control_increase = 10 } }
+			1 = { set_temp_variable = { control_increase = 11 } }
+			1 = { set_temp_variable = { control_increase = 12 } }
+		}
+	}
+	if = {
+		limit = { check_variable = { control_winner = 1 } }
+		custom_effect_tooltip = TNO_HCW_increase_control_large_govt_tt
+		hidden_effect = {
+			if = {
+				limit = { check_variable = { USA.HAI_legitimacy < 40 } }
+				set_temp_variable = { control_increase = 6 }
+			}
+			TNO_HCW_increase_control_govt_calc = yes
+		}
+	}
+	else = {
+		if = {
+			limit = { NOT = { has_state_flag = HCW_communists_crushed } }
+			custom_effect_tooltip = TNO_HCW_increase_control_large_comm_tt
+			hidden_effect = { TNO_HCW_increase_control_comm_calc = yes }
+		}
+	}
+}
+
+TNO_HCW_increase_tensions_small = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_tensions_small; Executing."
+	if = {
+		limit = { has_global_flag = HIS_trujillo_blitz_preparing }
+		custom_effect_tooltip = TNO_HCW_increase_tensions_small_tt
+		hidden_effect = {
+			random_list = {
+				1 = { set_temp_variable = { tensions_increase = 1 } }
+				1 = { set_temp_variable = { tensions_increase = 2 } }
+				1 = { set_temp_variable = { tensions_increase = 3 } }
+			}
+			add_to_variable = { USA.HAI_blitz_tension = tensions_increase }
+			TNO_check_tensions = yes
+		}
+	}
+}
+TNO_HCW_increase_tensions_medium = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_tensions_medium; Executing."
+	if = {
+		limit = { has_global_flag = HIS_trujillo_blitz_preparing }
+		custom_effect_tooltip = TNO_HCW_increase_tensions_medium_tt
+		hidden_effect = {
+			random_list = {
+				1 = { set_temp_variable = { tensions_increase = 4 } }
+				1 = { set_temp_variable = { tensions_increase = 5 } }
+				1 = { set_temp_variable = { tensions_increase = 6 } }
+			}
+			add_to_variable = { USA.HAI_blitz_tension = tensions_increase }
+			TNO_check_tensions = yes
+		}
+	}
+}
+TNO_HCW_increase_tensions_large = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_tensions_large; Executing."
+	if = {
+		limit = { has_global_flag = HIS_trujillo_blitz_preparing }
+		custom_effect_tooltip = TNO_HCW_increase_tensions_large_tt
+		hidden_effect = {
+			random_list = {
+				1 = { set_temp_variable = { tensions_increase = 7 } }
+				1 = { set_temp_variable = { tensions_increase = 8 } }
+				1 = { set_temp_variable = { tensions_increase = 9 } }
+				1 = { set_temp_variable = { tensions_increase = 10 } }
+			}
+			add_to_variable = { USA.HAI_blitz_tension = tensions_increase }
+			TNO_check_tensions = yes
+		}
+	}
+}
+
+TNO_HCW_decrease_tensions_small = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_tensions_small; Executing."
+	if = {
+		limit = { has_global_flag = HIS_trujillo_blitz_preparing }
+		custom_effect_tooltip = TNO_HCW_decrease_tensions_small_tt
+		hidden_effect = {
+			random_list = {
+				1 = { set_temp_variable = { tensions_decrease = 1 } }
+				1 = { set_temp_variable = { tensions_decrease = 2 } }
+				1 = { set_temp_variable = { tensions_decrease = 3 } }
+			}
+			subtract_from_variable = { USA.HAI_blitz_tension = tensions_decrease }
+			TNO_check_tensions = yes
+		}
+	}
+}
+TNO_HCW_decrease_tensions_medium = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_tensions_medium; Executing."
+	if = {
+		limit = { has_global_flag = HIS_trujillo_blitz_preparing }
+		custom_effect_tooltip = TNO_HCW_decrease_tensions_medium_tt
+		hidden_effect = {
+			random_list = {
+				1 = { set_temp_variable = { tensions_decrease = 4 } }
+				1 = { set_temp_variable = { tensions_decrease = 5 } }
+				1 = { set_temp_variable = { tensions_decrease = 6 } }
+			}
+			subtract_from_variable = { USA.HAI_blitz_tension = tensions_decrease }
+			TNO_check_tensions = yes
+		}
+	}
+}
+TNO_HCW_decrease_tensions_large = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_tensions_large; Executing."
+	if = {
+		limit = { has_global_flag = HIS_trujillo_blitz_preparing }
+		custom_effect_tooltip = TNO_HCW_decrease_tensions_large_tt
+		hidden_effect = {
+			random_list = {
+				1 = { set_temp_variable = { tensions_decrease = 7 } }
+				1 = { set_temp_variable = { tensions_decrease = 8 } }
+				1 = { set_temp_variable = { tensions_decrease = 9 } }
+				1 = { set_temp_variable = { tensions_decrease = 10 } }
+			}
+			subtract_from_variable = { USA.HAI_blitz_tension = tensions_decrease }
+			TNO_check_tensions = yes
+		}
+	}
+}
+
+TNO_HCW_increase_involvement_small = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_involvement_small; Executing."
+	custom_effect_tooltip = TNO_HCW_increase_involvement_small_tt
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { involvement_increase = 1 } }
+			1 = { set_temp_variable = { involvement_increase = 2 } }
+			1 = { set_temp_variable = { involvement_increase = 3 } }
+		}
+		add_to_variable = { HAI_involvement = involvement_increase }
+		TNO_HCW_check_phase = yes
+		TNO_HCW_calc_values = yes
+	}
+}
+TNO_HCW_increase_involvement_medium = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_involvement_medium; Executing."
+	custom_effect_tooltip = TNO_HCW_increase_involvement_medium_tt
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { involvement_increase = 4 } }
+			1 = { set_temp_variable = { involvement_increase = 5 } }
+			1 = { set_temp_variable = { involvement_increase = 6 } }
+		}
+		add_to_variable = { HAI_involvement = involvement_increase }
+		TNO_HCW_check_phase = yes
+		TNO_HCW_calc_values = yes
+	}
+}
+TNO_HCW_increase_involvement_large = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_involvement_large; Executing."
+	custom_effect_tooltip = TNO_HCW_increase_involvement_large_tt
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { involvement_increase = 7 } }
+			1 = { set_temp_variable = { involvement_increase = 8 } }
+			1 = { set_temp_variable = { involvement_increase = 9 } }
+		}
+		add_to_variable = { HAI_involvement = involvement_increase }
+		TNO_HCW_check_phase = yes
+		TNO_HCW_calc_values = yes
+	}
+}
+
+TNO_HCW_decrease_involvement_small = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_involvement_small; Executing."
+	if = {
+		limit = {
+			OR = {
+				AND = {
+					check_variable = { HAI_involvement = 33 }
+					has_country_flag = TNO_HCW_buildup_phase
+				}
+				AND = {
+					check_variable = { HAI_involvement = 66 }
+					has_country_flag = TNO_HCW_interventionism_phase
+				}
+			}
+		}
+		custom_effect_tooltip = TNO_HCW_no_decrease_involvement_tt
+	}
+	else = { custom_effect_tooltip = TNO_HCW_decrease_involvement_small_tt }
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { involvement_decrease = 1 } }
+			1 = { set_temp_variable = { involvement_decrease = 2 } }
+			1 = { set_temp_variable = { involvement_decrease = 3 } }
+		}
+		subtract_from_variable = { HAI_involvement = involvement_decrease }
+		TNO_HCW_check_phase = yes
+		TNO_HCW_calc_values = yes
+	}
+}
+TNO_HCW_decrease_involvement_medium = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_involvement_medium; Executing."
+	if = {
+		limit = {
+			OR = {
+				AND = {
+					check_variable = { HAI_involvement = 33 }
+					has_country_flag = TNO_HCW_buildup_phase
+				}
+				AND = {
+					check_variable = { HAI_involvement = 66 }
+					has_country_flag = TNO_HCW_interventionism_phase
+				}
+			}
+		}
+		custom_effect_tooltip = TNO_HCW_no_decrease_involvement_tt
+	}
+	else = { custom_effect_tooltip = TNO_HCW_decrease_involvement_medium_tt }
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { involvement_decrease = 4 } }
+			1 = { set_temp_variable = { involvement_decrease = 5 } }
+			1 = { set_temp_variable = { involvement_decrease = 6 } }
+		}
+		subtract_from_variable = { HAI_involvement = involvement_decrease }
+		TNO_HCW_check_phase = yes
+		TNO_HCW_calc_values = yes
+	}
+}
+TNO_HCW_decrease_involvement_large = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_involvement_large; Executing."
+	if = {
+		limit = {
+			OR = {
+				AND = {
+					check_variable = { HAI_involvement = 33 }
+					has_country_flag = TNO_HCW_buildup_phase
+				}
+				AND = {
+					check_variable = { HAI_involvement = 66 }
+					has_country_flag = TNO_HCW_interventionism_phase
+				}
+			}
+		}
+		custom_effect_tooltip = TNO_HCW_no_decrease_involvement_tt
+	}
+	else = { custom_effect_tooltip = TNO_HCW_decrease_involvement_large_tt }
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { involvement_decrease = 7 } }
+			1 = { set_temp_variable = { involvement_decrease = 8 } }
+			1 = { set_temp_variable = { involvement_decrease = 9 } }
+		}
+		subtract_from_variable = { HAI_involvement = involvement_decrease }
+		TNO_HCW_check_phase = yes
+		TNO_HCW_calc_values = yes
+	}
+}
+
+TNO_HCW_clamp_weariness = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_clamp_weariness; Executing."
+	clamp_variable = { var = HAI_weariness min = 0 max = 100 }
+	TNO_HCW_weariness_events = yes
+}
+TNO_HCW_weariness_events = {
+	hidden_effect = {
+		if = {
+			limit = {
+				USA = { check_variable = { HAI_weariness > 10 } }
+				NOT = { has_country_flag = norep_ev_1 }
+			}
+			if = {
+				limit = { NOT = { has_country_flag = norep_ev_1 } }
+				country_event = {
+					id = HIS_HAI_decision.12
+					days = 2
+				}
+				set_country_flag = norep_ev_1
+			}
+		}
+		else_if = {
+			limit = {
+				USA = { check_variable = { HAI_weariness > 20 } }
+				NOT = { has_country_flag = norep_ev_2 }
+			}
+			if = {
+				limit = { NOT = { has_country_flag = norep_ev_2 } }
+				country_event = {
+					id = HIS_HAI_decision.13
+					days = 2
+				}
+				set_country_flag = norep_ev_2
+			}
+		}
+		else_if = {
+			limit = {
+				USA = { check_variable = { HAI_weariness > 30 } }
+				NOT = { has_country_flag = norep_ev_3 }
+			}
+			if = {
+				limit = { NOT = { has_country_flag = norep_ev_3 } }
+				country_event = {
+					id = HIS_HAI_decision.14
+					days = 2
+				}
+				set_country_flag = norep_ev_3
+			}
+		}
+		else_if = {
+			limit = {
+				USA = { check_variable = { HAI_weariness > 40 } }
+				NOT = { has_country_flag = norep_ev_4 }
+			}
+			if = {
+				limit = { NOT = { has_country_flag = norep_ev_4 } }
+				country_event = {
+					id = HIS_HAI_decision.15
+					days = 2
+				}
+				set_country_flag = norep_ev_4
+			}
+		}
+		else_if = {
+			limit = {
+				USA = { check_variable = { HAI_weariness > 50 } }
+				NOT = { has_country_flag = norep_ev_5 }
+			}
+			if = {
+				limit = { NOT = { has_country_flag = norep_ev_5 } }
+				country_event = {
+					id = HIS_HAI_decision.16
+					days = 2
+				}
+				set_country_flag = norep_ev_5
+			}
+		}
+		else_if = {
+			limit = {
+				USA = { check_variable = { HAI_weariness > 60 } }
+				NOT = { has_country_flag = norep_ev_6 }
+			}
+			if = {
+				limit = { NOT = { has_country_flag = norep_ev_6 } }
+				country_event = {
+					id = HIS_HAI_decision.17
+					days = 2
+				}
+				set_country_flag = norep_ev_6
+			}
+		}
+		else_if = {
+			limit = {
+				USA = { check_variable = { HAI_weariness > 70 } }
+				NOT = { has_country_flag = norep_ev_7 }
+			}
+			if = {
+				limit = { NOT = { has_country_flag = norep_ev_7 } }
+				country_event = {
+					id = HIS_HAI_decision.18
+					days = 2
+				}
+				set_country_flag = norep_ev_7
+			}
+		}
+		else_if = {
+			limit = {
+				USA = { check_variable = { HAI_weariness > 80 } }
+				NOT = { has_country_flag = norep_ev_8 }
+			}
+			if = {
+				limit = { NOT = { has_country_flag = norep_ev_8 } }
+				country_event = {
+					id = HIS_HAI_decision.19
+					days = 2
+				}
+				set_country_flag = norep_ev_8
+			}
+		}
+		else_if = {
+			limit = {
+				USA = { check_variable = { HAI_weariness > 100 } }
+				NOT = { has_country_flag = norep_ev_9 }
+			}
+			if = {
+				limit = { NOT = { has_country_flag = norep_ev_9 } }
+				country_event = {
+					id = HIS_HAI_decision.20
+					days = 2
+				}
+				set_country_flag = norep_ev_9
+			}
+		}
+	}
+}
+
+TNO_HCW_increase_weariness_small = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_weariness_small; Executing."
+	custom_effect_tooltip = TNO_HCW_increase_weariness_small_tt
+	hidden_effect = {
+		random_list = {
+			1 = {
+				set_temp_variable = { weariness_increase = 2 }
+				modifier = {
+					factor = 0
+					OR = {
+						check_variable = { HAI_involvement > 9 }
+						HAI = {
+							OR = {
+								has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes }
+								has_country_leader = { character = HAI_Leon_Cantave ruling_only = yes }
+								AND = {
+									has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+									has_country_flag = HIS_HAI_lavaud_supporting_reform_coup
+								}
+							}
+						}
+					}
+				}
+			}
+			1 = { set_temp_variable = { weariness_increase = 3 } }
+			1 = { set_temp_variable = { weariness_increase = 5 } }
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { weariness_increase = 5 }
+		}
+		add_to_variable = { HAI_weariness = weariness_increase }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_weariness = yes
+	}
+}
+TNO_HCW_increase_weariness_medium = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_weariness_medium; Executing."
+	custom_effect_tooltip = TNO_HCW_increase_weariness_medium_tt
+	hidden_effect = {
+		random_list = {
+			1 = {
+				set_temp_variable = { weariness_increase = 7 }
+				modifier = {
+					factor = 0
+					OR = {
+						check_variable = { HAI_involvement > 9 }
+						HAI = {
+							OR = {
+								has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes }
+								has_country_leader = { character = HAI_Leon_Cantave ruling_only = yes }
+								AND = {
+									has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+									has_country_flag = HIS_HAI_lavaud_supporting_reform_coup
+								}
+							}
+						}
+					}
+				}
+			}
+			1 = { set_temp_variable = { weariness_increase = 9 } }
+			1 = { set_temp_variable = { weariness_increase = 11 } }
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { weariness_increase = 11 }
+		}
+		add_to_variable = { HAI_weariness = weariness_increase }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_weariness = yes
+	}
+}
+TNO_HCW_increase_weariness_large = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_weariness_large; Executing."
+	custom_effect_tooltip = TNO_HCW_increase_weariness_large_tt
+	hidden_effect = {
+		random_list = {
+			1 = {
+				set_temp_variable = { weariness_increase = 12 }
+				modifier = {
+					factor = 0
+					OR = {
+						check_variable = { HAI_involvement > 9 }
+						HAI = {
+							OR = {
+								has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes }
+								has_country_leader = { character = HAI_Leon_Cantave ruling_only = yes }
+								AND = {
+									has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+									has_country_flag = HIS_HAI_lavaud_supporting_reform_coup
+								}
+							}
+						}
+					}
+				}
+			}
+			1 = { set_temp_variable = { weariness_increase = 13 } }
+			1 = { set_temp_variable = { weariness_increase = 15 } }
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { weariness_increase = 15 }
+		}
+		add_to_variable = { HAI_weariness = weariness_increase }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_weariness = yes
+	}
+}
+
+TNO_HCW_decrease_weariness_small = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_weariness_small; Executing."
+	custom_effect_tooltip = TNO_HCW_decrease_weariness_small_tt
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { weariness_decrease = 2 } }
+			1 = { set_temp_variable = { weariness_decrease = 3 } }
+			1 = {
+				set_temp_variable = { weariness_decrease = 5 }
+				modifier = {
+					factor = 0
+					check_variable = { HAI_involvement > 9 }
+				}
+			}
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { weariness_decrease = 1 }
+		}
+		subtract_from_variable = { HAI_weariness = weariness_decrease }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_weariness = yes
+	}
+}
+TNO_HCW_decrease_weariness_medium = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_weariness_medium; Executing."
+	custom_effect_tooltip = TNO_HCW_decrease_weariness_medium_tt
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { weariness_decrease = 7 } }
+			1 = { set_temp_variable = { weariness_decrease = 9 } }
+			1 = {
+				set_temp_variable = { weariness_decrease = 11 }
+				modifier = {
+					factor = 0
+					check_variable = { HAI_involvement > 9 }
+				}
+			}
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { weariness_decrease = 5 }
+		}
+		subtract_from_variable = { HAI_weariness = weariness_decrease }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_weariness = yes
+	}
+}
+TNO_HCW_decrease_weariness_large = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_weariness_large; Executing."
+	custom_effect_tooltip = TNO_HCW_decrease_weariness_large_tt
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { weariness_decrease = 12 } }
+			1 = { set_temp_variable = { weariness_decrease = 13 } }
+			1 = {
+				set_temp_variable = { weariness_decrease = 15 }
+				modifier = {
+					factor = 0
+					check_variable = { HAI_involvement > 9 }
+				}
+			}
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { weariness_decrease = 10 }
+		}
+		subtract_from_variable = { HAI_weariness = weariness_decrease }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_weariness = yes
+	}
+}
+
+TNO_HCW_clamp_radicalism = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_clamp_radicalism; Executing."
+	if = {
+		limit = {
+			OR = {
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAI_CRUSH
+				}
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAC_CRUSH
+				}
+			}
+		}
+		clamp_variable = { var = HAI_radicalism min = 0 max = 79 }
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAI
+				}
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAC
+				}
+			}
+		}
+		clamp_variable = { var = HAI_radicalism min = 80 max = 100 }
+	}
+	else = {
+		clamp_variable = { var = HAI_radicalism min = 0 max = 100 }
+	}
+}
+TNO_HCW_increase_radicalism_small = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_radicalism_small; Executing."
+	custom_effect_tooltip = TNO_HCW_increase_radicalism_small_tt
+	hidden_effect = {
+		random_list = {
+			1 = {
+				set_temp_variable = { radicalism_increase = 2 }
+				modifier = {
+					factor = 0
+					OR = {
+						check_variable = { HAI_involvement > 9 }
+						HAI = {
+							OR = {
+								has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes }
+								has_country_leader = { character = HAI_Leon_Cantave ruling_only = yes }
+								AND = {
+									has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+									has_country_flag = HIS_HAI_lavaud_supporting_reform_coup
+								}
+							}
+						}
+					}
+				}
+			}
+			1 = { set_temp_variable = { radicalism_increase = 3 } }
+			1 = { set_temp_variable = { radicalism_increase = 5 } }
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { radicalism_increase = 5 }
+		}
+		add_to_variable = { HAI_radicalism = radicalism_increase }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_radicalism = yes
+	}
+}
+TNO_HCW_increase_radicalism_medium = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_radicalism_medium; Executing."
+	custom_effect_tooltip = TNO_HCW_increase_radicalism_medium_tt
+	hidden_effect = {
+		random_list = {
+			1 = {
+				set_temp_variable = { radicalism_increase = 7 }
+				modifier = {
+					factor = 0
+					OR = {
+						check_variable = { HAI_involvement > 9 }
+						HAI = {
+							OR = {
+								has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes }
+								has_country_leader = { character = HAI_Leon_Cantave ruling_only = yes }
+								AND = {
+									has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+									has_country_flag = HIS_HAI_lavaud_supporting_reform_coup
+								}
+							}
+						}
+					}
+				}
+			}
+			1 = { set_temp_variable = { radicalism_increase = 9 } }
+			1 = { set_temp_variable = { radicalism_increase = 11 } }
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { radicalism_increase = 11 }
+		}
+		add_to_variable = { HAI_radicalism = radicalism_increase }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_radicalism = yes
+	}
+}
+TNO_HCW_increase_radicalism_large = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_radicalism_large; Executing."
+	custom_effect_tooltip = TNO_HCW_increase_radicalism_large_tt
+	hidden_effect = {
+		random_list = {
+			1 = {
+				set_temp_variable = { radicalism_increase = 12 }
+				modifier = {
+					factor = 0
+					OR = {
+						check_variable = { HAI_involvement > 9 }
+						HAI = {
+							OR = {
+								has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes }
+								has_country_leader = { character = HAI_Leon_Cantave ruling_only = yes }
+								AND = {
+									has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+									has_country_flag = HIS_HAI_lavaud_supporting_reform_coup
+								}
+							}
+						}
+					}
+				}
+			}
+			1 = { set_temp_variable = { radicalism_increase = 13 } }
+			1 = { set_temp_variable = { radicalism_increase = 15 } }
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { radicalism_increase = 15 }
+		}
+		add_to_variable = { HAI_radicalism = radicalism_increase }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_radicalism = yes
+	}
+}
+
+TNO_HCW_decrease_radicalism_small = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_radicalism_small; Executing."
+	custom_effect_tooltip = TNO_HCW_decrease_radicalism_small_tt
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { radicalism_decrease = 2 } }
+			1 = { set_temp_variable = { radicalism_decrease = 3 } }
+			1 = {
+				set_temp_variable = { radicalism_decrease = 5 }
+				modifier = {
+					factor = 0
+					OR = {
+						check_variable = { HAI_involvement > 9 }
+						HAI = {
+							OR = {
+								has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes }
+								has_country_leader = { character = HAI_Leon_Cantave ruling_only = yes }
+								AND = {
+									has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+									has_country_flag = HIS_HAI_lavaud_supporting_reform_coup
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { radicalism_decrease = 1 }
+		}
+		subtract_from_variable = { HAI_radicalism = radicalism_decrease }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_radicalism = yes
+	}
+}
+TNO_HCW_decrease_radicalism_medium = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_radicalism_medium; Executing."
+	custom_effect_tooltip = TNO_HCW_decrease_radicalism_medium_tt
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { radicalism_decrease = 7 } }
+			1 = { set_temp_variable = { radicalism_decrease = 9 } }
+			1 = {
+				set_temp_variable = { radicalism_decrease = 11 }
+				modifier = {
+					factor = 0
+					OR = {
+						check_variable = { HAI_involvement > 9 }
+						HAI = {
+							OR = {
+								has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes }
+								has_country_leader = { character = HAI_Leon_Cantave ruling_only = yes }
+								AND = {
+									has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+									has_country_flag = HIS_HAI_lavaud_supporting_reform_coup
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { radicalism_decrease = 5 }
+		}
+		subtract_from_variable = { HAI_radicalism = radicalism_decrease }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_radicalism = yes
+	}
+}
+TNO_HCW_decrease_radicalism_large = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_radicalism_large; Executing."
+	custom_effect_tooltip = TNO_HCW_decrease_radicalism_large_tt
+	hidden_effect = {
+		random_list = {
+			1 = { set_temp_variable = { radicalism_decrease = 12 } }
+			1 = { set_temp_variable = { radicalism_decrease = 13 } }
+			1 = {
+				set_temp_variable = { radicalism_decrease = 15 }
+				modifier = {
+					factor = 0
+					OR = {
+						check_variable = { HAI_involvement > 9 }
+						HAI = {
+							OR = {
+								has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes }
+								has_country_leader = { character = HAI_Leon_Cantave ruling_only = yes }
+								AND = {
+									has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+									has_country_flag = HIS_HAI_lavaud_supporting_reform_coup
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = { check_variable = { HAI_involvement > 32 } }
+			set_temp_variable = { radicalism_decrease = 10 }
+		}
+		subtract_from_variable = { HAI_radicalism = radicalism_decrease }
+		TNO_HCW_calc_values = yes
+		TNO_HCW_clamp_radicalism = yes
+	}
+}
+
+TNO_HCW_increase_HAI_professionalism = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_HAI_professionalism; Executing."
+	custom_effect_tooltip = TNO_HCW_increase_HAI_professionalism_tt
+	hidden_effect = {
+		add_to_variable = { HAI.HCW_HAI_professionalism = 1 }
+		# TNO_HCW_increase_HAI_professionalism_check = yes
+	}
+}
+TNO_HCW_decrease_HAI_professionalism = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_decrease_HAI_professionalism; Executing."
+	custom_effect_tooltip = TNO_HCW_decrease_HAI_professionalism_tt
+	hidden_effect = {
+		subtract_from_variable = { HAI.HCW_HAI_professionalism = 1 }
+	}
+}
+TNO_HCW_increase_HAI_professionalism_check = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_increase_HAI_professionalism_check; Executing."
+	custom_effect_tooltip = USA_HCW_Security_Force_tt
+	if = {
+		limit = {
+			HAI = {
+				check_variable = { HAI.HCW_HAI_professionalism < 1 }
+			}
+		}
+		HAI = {
+			set_temp_variable = { control_winner = 1 }
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+				if = {
+					limit = {
+						check_variable = { HAI_gov_flip < 3 }
+					}
+					add_to_variable = { HAI_gov_flip = 1 }
+					custom_effect_tooltip = TNO_HCW_increase_HAI_professionalism_nothing_tt
+				}
+				else = {
+					TNO_HCW_increase_control_small = yes
+					set_variable = { HAI_gov_flip = 0 }
+				}
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			HAI = {
+				check_variable = { HAI.HCW_HAI_professionalism < 3 }
+			}
+		}
+		HAI = {
+			set_temp_variable = { control_winner = 1 }
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+				if = {
+					limit = {
+						check_variable = { HAI_reb_flip = 0 }
+					}
+					TNO_HCW_increase_control_small = yes
+					add_to_variable = { HAI_reb_flip = 1 }
+				}
+				else = {
+					set_variable = { HAI_reb_flip = 0 }
+					custom_effect_tooltip = TNO_HCW_increase_HAI_professionalism_nothing_tt
+				}
+			}
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+				if = {
+					limit = {
+						check_variable = { HAI_gov_flip = 0 }
+					}
+					TNO_HCW_increase_control_small = yes
+					add_to_variable = { HAI_gov_flip = 1 }
+				}
+				else = {
+					set_variable = { HAI_gov_flip = 0 }
+				}
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			HAI = {
+				check_variable = { HAI.HCW_HAI_professionalism < 5 }
+			}
+		}
+		HAI = {
+			set_temp_variable = { control_winner = 1 }
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+				if = {
+					limit = {
+						check_variable = { HAI_reb_flip < 3 }
+					}
+					add_to_variable = { HAI_reb_flip = 1 }
+				}
+				else = {
+					TNO_HCW_increase_control_small = yes
+					set_variable = { HAI_reb_flip = 0 }
+				}
+			}
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+				TNO_HCW_increase_control_small = yes
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			HAI = {
+				check_variable = { HAI.HCW_HAI_professionalism < 7 }
+			}
+		}
+		HAI = {
+			set_temp_variable = { control_winner = 1 }
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+				TNO_HCW_increase_control_small = yes
+			}
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+				if = {
+					limit = {
+						check_variable = { HAI_gov_flip < 3 }
+					}
+					TNO_HCW_increase_control_small = yes
+					add_to_variable = { HAI_gov_flip = 1 }
+				}
+				else = {
+					set_variable = { HAI_gov_flip = 0 }
+					TNO_HCW_increase_control_medium = yes
+				}
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			HAI = {
+				check_variable = { HAI.HCW_HAI_professionalism < 9 }
+			}
+		}
+		HAI = {
+			set_temp_variable = { control_winner = 1 }
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+				if = {
+					limit = {
+						check_variable = { HAI_reb_flip < 3 }
+					}
+					TNO_HCW_increase_control_small = yes
+					add_to_variable = { HAI_reb_flip = 1 }
+				}
+				else = {
+					set_variable = { HAI_reb_flip = 0 }
+					TNO_HCW_increase_control_medium = yes
+				}
+			}
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+				if = {
+					limit = {
+						check_variable = { HAI_gov_flip = 0 }
+					}
+					TNO_HCW_increase_control_medium = yes
+					add_to_variable = { HAI_gov_flip = 1 }
+				}
+				else = {
+					set_variable = { HAI_gov_flip = 0 }
+					TNO_HCW_increase_control_small = yes
+				}
+			}
+		}
+	}
+	else = {
+		HAI = {
+			set_temp_variable = { control_winner = 1 }
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+				if = {
+					limit = {
+						check_variable = { HAI_reb_flip = 0 }
+					}
+					TNO_HCW_increase_control_medium = yes
+					add_to_variable = { HAI_reb_flip = 1 }
+				}
+				else = {
+					set_variable = { HAI_reb_flip = 0 }
+					TNO_HCW_increase_control_small = yes
+				}
+			}
+			every_owned_state = {
+				limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+				TNO_HCW_increase_control_medium = yes
+			}
+		}
+	}
+}
+TNO_HCW_upgrade_professionalism = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_upgrade_professionalism; Executing."
+	HAI = {
+		if = {
+			limit = { has_idea = HAI_Professionalism_Army_3 }
+			swap_ideas = {
+				remove_idea = HAI_Professionalism_Army_3
+				add_idea = HAI_Professionalism_Army_2
+			}
+		}
+		else_if = {
+			limit = { has_idea = HAI_Professionalism_Army_2 }
+			swap_ideas = {
+				remove_idea = HAI_Professionalism_Army_2
+				add_idea = HAI_Professionalism_Army_1
+			}
+		}
+		else = {
+			remove_ideas = HAI_Professionalism_Army_1
+			load_oob = "HAI_professional"
+			318 = {
+				create_unit = { # I. Division d'infanterie
+					division = "name = \"I. Division d'infanterie'\" division_template = \"Division d'infanterie\" start_experience_factor = 0.11 start_equipment_factor = 1"
+					owner = HAI
+				}
+				create_unit = { # II. Division d'infanterie
+					division = "name = \"II. Division d'infanterie'\" division_template = \"Division d'infanterie\" start_experience_factor = 0.11 start_equipment_factor = 1"
+					owner = HAI
+				}
+			}
+		}
+	}
+}
+
+TNO_HCW_upgrade_advisors = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_upgrade_advisors; Executing."
+	HAI = {
+		if = {
+			limit = { has_idea = HAI_Advisory_Staff_0 }
+			swap_ideas = {
+				remove_idea = HAI_Advisory_Staff_0
+				add_idea = HAI_Advisory_Staff_1
+			}
+		}
+		else_if = {
+			limit = { has_idea = HAI_Advisory_Staff_1 }
+			swap_ideas = {
+				remove_idea = HAI_Advisory_Staff_1
+				add_idea = HAI_Advisory_Staff_2
+			}
+		}
+		else_if = {
+			limit = { has_idea = HAI_Advisory_Staff_2 }
+			swap_ideas = {
+				remove_idea = HAI_Advisory_Staff_2
+				add_idea = HAI_Advisory_Staff_3
+			}
+		}
+		else_if = {
+			limit = { has_idea = HAI_Advisory_Staff_3 }
+			swap_ideas = {
+				remove_idea = HAI_Advisory_Staff_3
+				add_idea = HAI_Advisory_Staff_4
+			}
+		}
+	}
+}
+TNO_HCW_downgrade_advisors = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HCW_downgrade_advisors; Executing."
+	HAI = {
+		if = {
+			limit = { has_idea = HAI_Advisory_Staff_1 }
+			swap_ideas = {
+				remove_idea = HAI_Advisory_Staff_1
+				add_idea = HAI_Advisory_Staff_0
+			}
+		}
+		else_if = {
+			limit = { has_idea = HAI_Advisory_Staff_2 }
+			swap_ideas = {
+				remove_idea = HAI_Advisory_Staff_2
+				add_idea = HAI_Advisory_Staff_1
+			}
+		}
+		else_if = {
+			limit = { has_idea = HAI_Advisory_Staff_3 }
+			swap_ideas = {
+				remove_idea = HAI_Advisory_Staff_3
+				add_idea = HAI_Advisory_Staff_2
+			}
+		}
+		else_if = {
+			limit = { has_idea = HAI_Advisory_Staff_4 }
+			swap_ideas = {
+				remove_idea = HAI_Advisory_Staff_4
+				add_idea = HAI_Advisory_Staff_3
+			}
+		}
+	}
+}
+
+TNO_HAI_uprising_start = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HAI_uprising_start; Executing."
+	set_global_flag = TNO_HIS_HAI_uprising_ongoing
+
+	for_each_scope_loop = {
+		array = USA.HAI_map_array
+		if = {
+			limit = { has_state_flag = HCW_demilitarized }
+			set_demilitarized_zone = no
+			create_unit = {
+				division = "name = \"Geriya Revolisyonè\" division_template = \"Geriya Revolisyonè\" start_experience_factor = 0.04"
+				owner = HAC
+			}
+		}
+		else_if = {
+			limit = { has_state_flag = HCW_transferred }
+			set_demilitarized_zone = no
+			create_unit = {
+				division = "name = \"Milis Revolisyonè\" division_template = \"Milis Revolisyonè\" start_experience_factor = 0.1"
+				owner = HAC
+			}
+		}
+	}
+
+	HAI = { add_ideas = GER_BOR_dont_join_wars_please }
+
+	if = {
+		limit = {
+			DOM = {
+				OR = {
+					has_government = socialist
+					has_government = communist
+				}
+			}
+		}
+		set_global_flag = HIS_revolutionary_front
+		DOM = {
+			create_faction = Hispaniolan_Revolutionary_Front
+			add_to_faction = HAC
+			add_ideas = HRF_Faction
+			HAC = { add_ideas = HRF_Faction }
+		}
+		HAC = {
+			declare_war_on = {
+				target = HAI
+				type = civil_war
+			}
+			DOM = {
+				add_to_war = {
+					targeted_alliance = HAC
+					enemy = HAI
+				}
+			}
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.60
+		#		hours = 10
+		#	}
+		#}
+	}
+	else = {
+		HAC = {
+			declare_war_on = {
+				target = HAI
+				type = civil_war
+			}
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.48
+				hours = 10
+			}
+		}
+	}
+
+	hidden_effect = {
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAI
+				}
+				NOT = {
+					DOM = {
+						OR = {
+							has_idea = Custom_TNO_war_buff
+							has_idea = Custom_TNO_HIS_front_line_stopper
+						}
+					}
+				}
+			}
+			HAI = {
+				apply_war_buff_with_5_divisions = yes
+			}
+		}
+		else_if = {
+			limit = {
+				has_game_rule = {
+					rule = HAITIAN_CIVIL_WAR_OUTCOME
+					option = HAITIAN_CIVIL_WAR_OUTCOME_HAC
+				}
+				NOT = {
+					DOM = {
+						OR = {
+							has_idea = Custom_TNO_war_buff
+							has_idea = Custom_TNO_HIS_front_line_stopper
+						}
+					}
+				}
+			}
+			HAC = {
+				apply_war_buff_with_5_divisions = yes
+			}
+		}
+	}
+}
+
+TNO_HAI_crush_check = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HAI_crush_check; Executing."
+	if = {
+		limit = { NOT = { has_global_flag = TNO_HCW_USA_withdrew } }
+		if = {
+			limit = {
+				has_global_flag = PPI_Trujillo_Victory
+				NOT = { has_global_flag = HIS_trujillo_blitz_evaded }
+			}
+			if = {
+				limit = { has_global_flag = HIS_trujillo_blitz_finished }
+				if = { # All communists crushed
+					limit = {
+						all_of_scopes = {
+							array = USA.HAI_map_array
+							has_state_flag = HCW_communists_crushed
+						}
+					}
+					TNO_HAI_civil_war_HAI_victory_crushed = yes
+				}
+				else_if = { # PPLN overwhelms government
+					limit = {
+						all_of_scopes = {
+							array = USA.HAI_map_array
+							has_state_flag = HCW_locked
+						}
+					}
+					TNO_HAI_civil_war_HAC_victory_crushed = yes
+				}
+			}
+		}
+		else_if = {
+			limit = { NOT = { has_global_flag = HIS_trujillo_blitz_trujillo_won } }
+			if = { # All communists crushed
+				limit = {
+					all_of_scopes = {
+						array = USA.HAI_map_array
+						has_state_flag = HCW_communists_crushed
+					}
+				}
+				TNO_HAI_civil_war_HAI_victory_crushed = yes
+			}
+			else_if = { # PPLN overwhelms government
+				limit = {
+					all_of_scopes = {
+						array = USA.HAI_map_array
+						has_state_flag = HCW_locked
+					}
+				}
+				TNO_HAI_civil_war_HAC_victory_crushed = yes
+			}
+		}
+	}
+}
+
+TNO_HAI_ability_check = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HAI_ability_check; Executing."
+	if = {
+		limit = {
+			NOT = {
+				HAI = { has_country_flag = HIS_HAI_united_front_active }
+				has_global_flag = TNO_HIS_HAI_uprising_ongoing
+				has_global_flag = HIS_trujillo_blitz_ongoing
+			}
+		}
+		# DECISION ABILITIES
+		# Comm
+		random_list = {
+			25 = {
+				random_scope_in_array = {
+					array = USA.HAI_map_array
+					limit = {
+						has_state_flag = HCW_bases_established
+						NOT = { has_state_flag = HCW_locked has_state_flag = HCW_transferred }
+					}
+					set_variable = { USA.HAI_random_state_sabotage_campaign = THIS }
+				}
+				# USA = { activate_mission = USA_HCW_sabotage_campaign }
+			}
+			15 = {
+				random_scope_in_array = {
+					array = USA.HAI_map_array
+					limit = { NOT = { has_state_flag = HCW_locked has_state_flag = HCW_transferred } }
+					set_variable = { USA.HAI_random_state_urban_infiltration = THIS }
+				}
+				# USA = { activate_mission = USA_HCW_urban_infiltration }
+			}
+			60 = {}
+		}
+
+		# Govt
+		if = {
+			limit = {
+				HAI = { has_country_flag = HCW_Supplied_Napalm_Defoliants }
+				TNO_HCW_has_air_force = yes
+			}
+			random = {
+				chance = 25
+				random_scope_in_array = {
+					array = USA.HAI_map_array
+					limit = { OR = { has_state_flag = HCW_locked has_state_flag = HCW_transferred } }
+					set_variable = { USA.HAI_random_state_bombing_campaign = THIS }
+				}
+				# USA = { activate_mission = USA_HCW_bombing_campaign }
+			}
+		}
+
+		# CHARACTER ABILITIES
+		if = { # papa doc
+			limit = {
+				HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } }
+				any_of_scopes = {
+					array = USA.HAI_map_array
+					NOT = { has_state_flag = HCW_locked }
+				}
+			}
+			random_scope_in_array = {
+				array = USA.HAI_map_array
+				limit = { NOT = { has_state_flag = HCW_locked has_state_flag = HCW_transferred } }
+				set_variable = { USA.HAI_random_state_purge_duvalier = THIS }
+			}
+		}
+		else_if = { # dictator lavaud and cantave
+			limit = {
+				HAI = {
+					OR = {
+						has_country_leader = { character = HAI_Leon_Cantave ruling_only = yes }
+						AND = {
+							has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+							NOT = { has_country_flag = HIS_HAI_lavaud_supporting_civilian_government }
+						}
+					}
+				}
+				any_of_scopes = {
+					array = USA.HAI_map_array
+					NOT = { has_state_flag = HCW_locked }
+				}
+			}
+			random_scope_in_array = {
+				array = USA.HAI_map_array
+				limit = { NOT = { has_state_flag = HCW_locked has_state_flag = HCW_transferred } }
+				set_variable = { USA.HAI_random_state_purge = THIS }
+			}
+		}
+		else_if = { # lavaud with civilian cabinet
+			limit = {
+				HAI = {
+					has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+					has_country_flag = HIS_HAI_lavaud_supporting_civilian_government
+				}
+			}
+			# USA = { activate_mission = USA_HCW_political_reform_lavaud }
+		}
+		else_if = { # lavaud with civilian cabinet
+			limit = {
+				HAI = {
+					OR = {
+						has_country_leader = { character = HAI_Pierre_Joseph_Louis_Dejoie ruling_only = yes }
+						has_country_leader = { character = HAI_Elie_Lescot ruling_only = yes }
+						has_country_leader = { character = HAI_Gerard_Lescot ruling_only = yes }
+					}
+				}
+			}
+			# USA = { activate_mission = USA_HCW_attracting_investment_oligarch }
+		}
+		else = { HAI = { country_event = { id = HIS_HAI.15 days = 30 random_days = 30 } } }
+	}
+	else = { HAI = { country_event = { id = HIS_HAI.15 days = 30 random_days = 30 } } }
+}
+
+TNO_HAI_civil_war_HAI_victory_crushed = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HAI_civil_war_HAI_victory_crushed; Executing." # Haiti crushed all the communists
+	if = {
+		limit = {
+			HAI = {
+				NOT = {
+					OR = {
+						has_government = socialist
+						has_government = communist
+					}
+				}
+			}
+		}
+		TNO_HAI_civil_war_clear_proxy = yes
+		set_global_flag = TNO_HAI_civil_war_government_victory
+		set_global_flag = TNO_HAI_civil_war_crushed_insurgency
+		USA = {
+			country_event = {
+				id = HIS_HAI_ugly.17
+				hours = 8
+			}
+		}
+		HAI = {
+			if = {
+				limit = { has_idea = HAI_Occupation }
+				swap_ideas = {
+					remove_idea = HAI_Occupation
+					add_idea = HAI_Renewed_Haitian_Sovereignty
+				}
+			}
+			if = {
+				limit = {
+					AND = {
+						NOT = { is_in_faction_with = USA }
+						NOT = { HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } } }
+					}
+				}
+				USA = { add_to_faction = HAI }
+				add_ideas = OFN_Dependent_Member
+				add_to_array = { global.OFN_members = HAI }
+			}
+			if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = HAI_Paul_Eugene_Magloire
+							ruling_only = yes
+						}
+						has_country_leader = {
+							character = HAI_Franck_Lavaud
+							ruling_only = yes
+						}
+					}
+				}
+				set_country_flag = HAI_Democratic_Republic_Skeleton
+			}
+			add_popularity = {
+				ideology = communist
+				popularity = -0.25
+			}
+			add_popularity = {
+				ideology = socialist
+				popularity = -0.2
+			}
+		}
+		DOM = { remove_ideas = DOM_Autonomous_Hinche }
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.54
+				hours = 10
+			}
+		}
+	}
+}
+
+TNO_HAI_civil_war_HAC_victory_crushed = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HAI_civil_war_HAC_victory_crushed; Executing."
+	TNO_HAI_civil_war_clear_proxy = yes
+	set_global_flag = TNO_HAI_civil_war_crushed_government
+	TNO_HAI_civil_war_HAC_victory = yes
+	HAI = {
+		remove_ideas = {
+			HIS_Hispaniola_War
+		}
+	}
+	DOM = {
+		remove_ideas = {
+			DOM_Autonomous_Hinche
+			HIS_Hispaniola_War
+		}
+	}
+}
+
+TNO_HAI_civil_war_HAI_victory_front = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HAI_civil_war_HAI_victory_front; Executing."
+	set_global_flag = TNO_HAI_civil_war_government_victory
+	USA = {
+		if = {
+			limit = {
+				NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+			}
+			country_event = {
+				id = HIS_HAI_ugly.17
+				hours = 8
+			}
+		}
+	}
+	HAI = {
+		white_peace = HAC
+		white_peace = DOM
+		if = {
+			limit = { has_idea = HAI_Occupation }
+			swap_ideas = {
+				remove_idea = HAI_Occupation
+				add_idea = HAI_Renewed_Haitian_Sovereignty
+			}
+		}
+		remove_ideas = {
+			HIS_Hispaniola_War
+		}
+
+		DOM = {
+			remove_ideas = {
+				HRF_Faction
+				DOM_Autonomous_Hinche
+				HIS_Hispaniola_War
+			}
+			dismantle_faction = yes
+		}
+		HAC = { remove_ideas = HRF_Faction }
+		annex_country = { target = HAC }
+		every_owned_state = {
+			remove_core_of = HAC
+		}
+		if = {
+			limit = {
+				AND = {
+					NOT = { is_in_faction_with = USA }
+					NOT = { HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } } }
+				}
+			}
+			USA = { add_to_faction = HAI }
+			add_ideas = OFN_Dependent_Member
+			add_to_array = { global.OFN_members = HAI }
+		}
+		transfer_state = 1706
+		1706 = {
+			remove_claim_by = DOM
+		}
+	}
+
+	if = {
+		limit = { HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } } }
+		HAI = { annex_country = { target = DOM } }
+		set_global_flag = HIS_HAI_annexed_DOM
+	}
+	else = {
+		DOM = {
+			USA = {
+				add_to_faction = DOM
+				puppet = DOM
+				set_autonomy = {
+					target = DOM
+					autonomy_state = autonomy_military_government
+				}
+			}
+
+			add_ideas = DOM_Pan_American_Force
+			remove_ideas = {
+				DOM_The_Dominican_Peoples_Revolution
+				DOM_The_Dominican_Cultural_Revolution
+				DOM_Starting_from_Scratch
+				DOM_Economic_Revolution
+				DOM_Autonomous_Hinche
+				DOM_Exodus
+				DOM_The_Living_Ghost
+			}
+
+			add_ideas = OFN_Interim_Authority
+			add_to_array = { global.OFN_members = DOM }
+
+			set_popularities = {
+				despotism = 32
+				paternalism = 19
+				liberalism = 12
+				socialist = 17
+				communist = 20
+			}
+			set_politics = { ruling_party = despotism }
+			promote_character = DOM_OFN_OAS_peacekeeping
+			set_party_name = {
+				ideology = despotism
+				name = DOM_trujillo_victory_OFN
+				long_name = DOM_trujillo_victory_OFN_long
+			}
+			set_cosmetic_tag = DOM_OFN_OAS
+			econ_join_sphere_USA = yes
+			set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+			econ_subtype_change = yes
+
+			country_event = {
+				id = HIS_puertoplata.20
+				days = 380
+				random_days = 80
+			}
+		}
+	}
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.61
+			hours = 10
+		}
+	}
+}
+
+TNO_HAI_civil_war_HAI_victory = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HAI_civil_war_HAI_victory; Executing." # Haiti beat the communists in the uprising
+	set_global_flag = TNO_HAI_civil_war_government_victory
+	USA = {
+		if = {
+			limit = {
+				NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+			}
+			country_event = {
+				id = HIS_HAI_ugly.17
+				hours = 8
+			}
+		}
+	}
+	HAI = {
+		white_peace = HAC
+		annex_country = { target = HAC }
+		every_owned_state = {
+			remove_core_of = HAC
+		}
+		if = {
+			limit = { has_idea = HAI_Occupation }
+			swap_ideas = {
+				remove_idea = HAI_Occupation
+				add_idea = HAI_Renewed_Haitian_Sovereignty
+			}
+		}
+		if = {
+			limit = {
+				AND = {
+					NOT = { is_in_faction_with = USA }
+					NOT = { HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } } }
+				}
+			}
+			USA = { add_to_faction = HAI }
+			add_ideas = OFN_Dependent_Member
+			add_to_array = { global.OFN_members = HAI }
+		}
+	}
+	DOM = { remove_ideas = DOM_Autonomous_Hinche }
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.53
+			hours = 10
+		}
+	}
+}
+
+TNO_HAI_civil_war_HAC_victory = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_HAI_civil_war_HAC_victory; Executing." # Communist Victory in the uprising
+	set_global_flag = TNO_HAI_civil_war_communist_victory
+	HAC = {
+		HAI_Jacques_Stephen_Alexis = { set_nationality = HAI }
+		HAI_Gerald_Brisson = { set_nationality = HAI }
+		HAI_Fred_Baptiste = { set_nationality = HAI }
+		remove_ideas = HRF_Faction
+	}
+	HAI = {
+		if = {
+			limit = { NOT = { has_global_flag = TNO_HAI_civil_war_crushed_government } }
+			white_peace = HAC
+		}
+		annex_country = { target = HAC transfer_troops = yes }
+		every_owned_state = {
+			remove_core_of = HAC
+		}
+		set_cosmetic_tag = HAI_communist_rev
+
+		delete_unit_template_and_units = { division_template = "Division d'infanterie" disband = yes }
+		delete_unit_template_and_units = { division_template = "Unité de Défense Territoriale" disband = yes }
+
+		remove_ideas = {
+			HAI_Mulatocratie
+			HAI_Mulatocratie_Lavaud
+			HAI_Le_Souverain
+			HAI_La_Cantavecratie
+			HAI_Occupation
+			HAI_Struggle_for_Sovereignty
+			HAI_La_Tonton_Macoute
+			HAI_Professionalism_Army_3
+			HAI_Professionalism_Army_2
+			HAI_Professionalism_Army_1
+		}
+		add_ideas = {
+			HAI_Haitian_Social_Revolution
+			HAI_LArmee_Rouge_dHaiti
+			HAI_Socialist_Economy
+			HAI_Exiles_and_Enemies
+		}
+
+		HAI_Jacques_Stephen_Alexis = {
+			remove_country_leader_role = { ideology = socialist_guevarism_subtype }
+			if = { # DOMINICAN AMAZONIST
+				limit = { DOM = { has_country_flag = DOM_amazonism_entrenched } }
+				add_country_leader_role = {
+					country_leader = {
+						desc = "POLITICS_HAI_JACQUES_STEPHEN_DESC"
+						expire = "1990.1.1"
+						ideology = communist_amazonism_subtype
+						traits = {}
+					}
+					promote_leader = yes
+				}
+				HAI = {
+					set_politics = { ruling_party = communist }
+					set_popularities = {
+						despotism = 6
+						communist = 32
+						socialist = 23
+						liberalism = 11
+						liberal_conservatism = 8
+						paternalism = 20
+					}
+					set_country_flag = HAI_amazonism_entrenched
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_global_flag = WAC_SCENARIO_1_PALF_VICTORY
+						has_global_flag = WAC_SCENARIO_2_PALF_VICTORY
+						has_global_flag = WAC_SCENARIO_3_PALF_VICTORY
+					}
+				}
+				add_country_leader_role = {
+					country_leader = {
+						desc = "POLITICS_HAI_JACQUES_STEPHEN_DESC"
+						expire = "1990.1.1"
+						ideology = socialist_panafricanism_subtype
+						traits = {}
+					}
+					promote_leader = yes
+				}
+				HAI = {
+					set_country_flag = HAI_panafricanism_entrenched
+					set_politics = { ruling_party = socialist }
+					set_popularities = {
+						despotism = 6
+						communist = 23
+						socialist = 32
+						liberalism = 11
+						liberal_conservatism = 8
+						paternalism = 20
+					}
+					if = {
+						limit = { has_global_flag = PACMEA_created }
+						set_temp_variable = { gdp_growth_temp = 0.2 }
+						econ_gdp_growth_change = yes
+						econ_join_sphere_CAO = yes
+					}
+				}
+			}
+			else = {
+				add_country_leader_role = {
+					country_leader = {
+						desc = "POLITICS_HAI_JACQUES_STEPHEN_DESC"
+						expire = "1990.1.1"
+						ideology = communist_marxism_leninism_subtype
+						traits = {}
+					}
+					promote_leader = yes
+				}
+				HAI = {
+					set_politics = { ruling_party = communist }
+					set_popularities = {
+						despotism = 6
+						communist = 32
+						socialist = 23
+						liberalism = 11
+						liberal_conservatism = 8
+						paternalism = 20
+					}
+				}
+			}
+		}
+
+		remove_from_array = { global.OFN_members = HAI }
+		econ_leave_sphere = yes
+		leave_faction = yes
+		remove_ideas = OFN_Dependent_Member
+
+		HAI = { USA = { set_embargo_PREV = yes } }
+		USA = { HAI = { set_embargo_PREV = yes } }
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Worker_Directed }
+		econ_subtype_change = yes
+
+		set_country_flag = HAI_Socialist_Republic_Skeleton
+		country_event = {
+			id = HIS_HAI_skel_taps.3
+			days = 20
+		}
+	}
+
+	if = {
+		limit = { has_global_flag = HIS_revolutionary_front }
+		DOM = {
+			white_peace = HAI
+			add_to_faction = HAI
+			HAI = {
+				add_ideas = HRF_Faction
+				transfer_state = 1706
+			}
+			remove_ideas = DOM_Autonomous_Hinche
+		}
+	}
+
+	USA = {
+		if = {
+			limit = { NOT = { has_global_flag = TNO_HCW_USA_withdrew } }
+			country_event = {
+				id = HIS_HAI_ugly.14
+				hours = 2
+			}
+		}
+	}
+
+	if = {
+		limit = { NOT = { has_global_flag = TNO_HAI_civil_war_crushed_government } }
+		if = {
+			limit = { has_global_flag = HIS_revolutionary_front }
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = hispaniola_news.62
+					hours = 6
+				}
+			}
+		}
+		else = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = hispaniola_news.12
+					hours = 6
+				}
+			}
+		}
+	}
+	else = {
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.55
+				hours = 6
+			}
+		}
+	}
+}
+
+TNO_HCW_fire_monthly_effect = {
+	318 = {
+		set_variable = { HCW_Communist_Control = 0 }
+		set_variable = { HCW_Government_Control = 0 }
+		clr_state_flag = HCW_locked
+	}
+
+	if = {
+		limit = {
+			HAI = {
+				any_controlled_state = {
+					AND = {
+						check_variable = { HCW_Government_Control > 89.99 }
+						NOT = { has_state_flag = HCW_communists_crushed }
+					}
+				}
+			}
+		}
+		custom_effect_tooltip = USA_HCW_Haiti_Eradicating_Communists_tt
+		if = {
+			limit = {
+				1728 = {
+					check_variable = { HCW_Government_Control > 89 }
+					NOT = { has_state_flag = HCW_communists_crushed }
+				}
+			}
+			1728 = {
+				hidden_effect = {
+					set_temp_variable = { control_winner = 1 }
+					TNO_HCW_increase_control_large = yes
+				}
+				set_state_flag = HCW_communists_crushed
+				custom_effect_tooltip = TNO_HCW_increase_control_large_govt_tt_no_target
+				custom_effect_tooltip = HCW_communists_crushed_tt
+			}
+		}
+		if = {
+			limit = {
+				1881 = {
+					check_variable = { HCW_Government_Control > 89 }
+					NOT = { has_state_flag = HCW_communists_crushed }
+				}
+			}
+			1881 = {
+				hidden_effect = {
+					set_temp_variable = { control_winner = 1 }
+					TNO_HCW_increase_control_large = yes
+				}
+				set_state_flag = HCW_communists_crushed
+				custom_effect_tooltip = TNO_HCW_increase_control_large_govt_tt_no_target
+				custom_effect_tooltip = HCW_communists_crushed_tt
+			}
+		}
+		if = {
+			limit = {
+				1880 = {
+					check_variable = { HCW_Government_Control > 89 }
+					NOT = { has_state_flag = HCW_communists_crushed }
+				}
+			}
+			1880 = {
+				hidden_effect = {
+					set_temp_variable = { control_winner = 1 }
+					TNO_HCW_increase_control_large = yes
+				}
+				set_state_flag = HCW_communists_crushed
+				custom_effect_tooltip = TNO_HCW_increase_control_large_govt_tt_no_target
+				custom_effect_tooltip = HCW_communists_crushed_tt
+			}
+		}
+		if = {
+			limit = {
+				1882 = {
+					check_variable = { HCW_Government_Control > 89 }
+					NOT = { has_state_flag = HCW_communists_crushed }
+				}
+			}
+			1882 = {
+				hidden_effect = {
+					set_temp_variable = { control_winner = 1 }
+					TNO_HCW_increase_control_large = yes
+				}
+				set_state_flag = HCW_communists_crushed
+				custom_effect_tooltip = TNO_HCW_increase_control_large_govt_tt_no_target
+				custom_effect_tooltip = HCW_communists_crushed_tt
+			}
+		}
+
+		USA = { hidden_effect = { TNO_HAI_crush_check = yes } }
+	}
+
+	USA = {
+		if = { # stage 1
+			limit = {
+				has_country_flag = TNO_HCW_base_phase
+			}
+			TNO_HCW_increase_radicalism_small = yes
+			TNO_HCW_increase_involvement_small = yes
+
+
+			HAI = {
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip < 3 } }
+						TNO_HCW_increase_control_small = yes
+						add_to_variable = { HAI_state_flip = 1 }
+					}
+					else = {
+						set_variable = { HAI_state_flip = 0 }
+						# TNO_HCW_increase_control_small = yes
+					}
+				}
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip < 3 } }
+						TNO_HCW_increase_control_small = yes
+						add_to_variable = { HAI_state_flip = 1 }
+					}
+					else = {
+						set_variable = { HAI_state_flip = 0 }
+						TNO_HCW_increase_control_medium = yes
+						add_to_variable = { HAI_state_flip = 1 }
+					}
+				}
+			}
+			HAC = {
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip < 3 } }
+						TNO_HCW_increase_control_small = yes
+						add_to_variable = { HAI_state_flip = 1 }
+					}
+					else = {
+						set_variable = { HAI_state_flip = 0 }
+						# TNO_HCW_increase_control_small = yes
+					}
+				}
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip < 3 } }
+						TNO_HCW_increase_control_small = yes
+						add_to_variable = { HAI_state_flip = 1 }
+					}
+					else = {
+						set_variable = { HAI_state_flip = 0 }
+						TNO_HCW_increase_control_medium = yes
+						add_to_variable = { HAI_state_flip = 1 }
+					}
+				}
+			}
+		}
+		else_if = { # stage 2
+			limit = {
+				has_country_flag = TNO_HCW_buildup_phase
+			}
+			TNO_HCW_increase_radicalism_medium = yes
+			TNO_HCW_increase_involvement_small = yes
+			if = {
+				limit = {
+					check_variable = { USA.HAI_radicalism > 69 }
+				}
+				if = {
+					limit = { check_variable = { HAI_weary_flip < 3 } }
+					add_to_variable = { HAI_weary_flip = 1 }
+				}
+				else = {
+					TNO_HCW_increase_weariness_small = yes
+					set_variable = { HAI_weary_flip = 0 }
+				}
+			}
+			HAI = {
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip_com < 3 } }
+						TNO_HCW_increase_control_small = yes
+						add_to_variable = { HAI_state_flip = 1 }
+					}
+					else_if = {
+						limit = { check_variable = { HAI_state_flip = 1 } }
+						TNO_HCW_increase_control_medium = yes
+						set_variable = { HAI_state_flip_com = 0 }
+					}
+				}
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip_com < 3 } }
+						TNO_HCW_increase_control_medium = yes
+						add_to_variable = { HAI_state_flip_com = 1 }
+					}
+					else = {
+						set_variable = { HAI_state_flip_com = 0 }
+						TNO_HCW_increase_control_large = yes
+					}
+				}
+			}
+			HAC = {
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip_com < 3 } }
+						TNO_HCW_increase_control_small = yes
+						add_to_variable = { HAI_state_flip = 1 }
+					}
+					else_if = {
+						limit = { check_variable = { HAI_state_flip = 1 } }
+						TNO_HCW_increase_control_medium = yes
+						set_variable = { HAI_state_flip_com = 0 }
+					}
+				}
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip_com < 3 } }
+						TNO_HCW_increase_control_medium = yes
+						add_to_variable = { HAI_state_flip_com = 1 }
+					}
+					else = {
+						set_variable = { HAI_state_flip_com = 0 }
+						TNO_HCW_increase_control_large = yes
+					}
+				}
+			}
+		}
+		else_if = { # stage 3
+			limit = {
+				has_country_flag = TNO_HCW_interventionism_phase
+			}
+			TNO_HCW_increase_radicalism_large = yes
+			TNO_HCW_increase_involvement_small = yes
+			if = {
+				limit = {
+					check_variable = { USA.HAI_radicalism > 69 }
+				}
+				if = {
+					limit = { check_variable = { HAI_weary_flip = 0 } }
+					add_to_variable = { HAI_weary_flip = 1 }
+				}
+				else = {
+					TNO_HCW_increase_weariness_small = yes
+					set_variable = { HAI_weary_flip = 0 }
+				}
+			}
+
+			HAI = {
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip < 3 } }
+						TNO_HCW_increase_control_medium = yes
+						add_to_variable = { HAI_state_flip = 1 }
+					}
+					else = {
+						set_variable = { HAI_state_flip = 0 }
+						TNO_HCW_increase_control_large = yes
+					}
+				}
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip_com < 4 } }
+						TNO_HCW_increase_control_large = yes 
+						add_to_variable = { HAI_state_flip_com = 1 }
+					}
+					else = { 
+						set_variable = { HAI_state_flip_com = 0 }
+						TNO_HCW_increase_control_medium = yes
+					}
+				}
+				if = {
+					limit = { has_country_flag = HAICW_bunker_down }
+					every_owned_state = {
+						limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+						TNO_HCW_increase_control_large = yes
+						hidden_effect = { # really fucking fast
+							TNO_HCW_increase_control_medium = yes
+						}
+					}
+				}
+			}
+			HAC = {
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip < 3 } }
+						TNO_HCW_increase_control_medium = yes
+						add_to_variable = { HAI_state_flip = 1 }
+					}
+					else = {
+						set_variable = { HAI_state_flip = 0 }
+						TNO_HCW_increase_control_large = yes
+					}
+				}
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+					if = {
+						limit = { check_variable = { HAI_state_flip_com < 4 } }
+						TNO_HCW_increase_control_large = yes 
+						add_to_variable = { HAI_state_flip_com = 1 }
+					}
+					else = { 
+						set_variable = { HAI_state_flip_com = 0 }
+						TNO_HCW_increase_control_medium = yes
+					}
+				}
+				if = {
+					limit = { has_country_flag = HAICW_bunker_down }
+					every_owned_state = {
+						limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+						TNO_HCW_increase_control_large = yes
+						hidden_effect = { # really fucking fast
+							TNO_HCW_increase_control_medium = yes
+						}
+					}
+				}
+			}
+		}
+
+		if = { # stage fuck
+			limit = {
+				has_country_flag = TNO_HCW_disengagement_phase
+			}
+			TNO_HCW_decrease_weariness_small = yes
+			TNO_HCW_decrease_involvement_medium = yes
+
+			HAI = {
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+					TNO_HCW_increase_control_small = yes
+				}
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+					TNO_HCW_increase_control_large = yes
+				}
+			}
+			HAC = {
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control < HCW_Government_Control } }
+					TNO_HCW_increase_control_small = yes
+				}
+				every_owned_state = {
+					limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+					TNO_HCW_increase_control_large = yes
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				USA = {
+					has_country_flag = USA_HCW_bombing_runs
+					check_variable = { HAI_bomb_flip = 0 }
+				}
+				HAI = {
+					any_core_state = {
+						check_variable = { HCW_Communist_Control > HCW_Government_Control }
+					}
+				}
+			}
+			custom_effect_tooltip = USA_HCW_effects_from_bombing_runs_tt
+			HAI = {
+				set_temp_variable = { control_winner = 1 }
+				every_core_state = {
+					limit = { check_variable = { HCW_Communist_Control > HCW_Government_Control } }
+					TNO_HCW_increase_control_medium = yes
+				}
+			}
+			USA = {
+				add_to_variable = { HAI_weary_flip = 1 }
+				add_to_variable = { HAI_bomb_flip = 1 }
+			}
+		}
+		else = {
+			USA = { set_variable = { HAI_bomb_flip = 0 } }
+			custom_effect_tooltip = USA_NO_BOMB_RUNS_tt
+		}
+
+		if = {
+			limit = {
+				DOM = {
+					OR = {
+						has_government = fascism
+						has_government = socialist
+					}
+				}
+				has_global_flag = HIS_trujillo_blitz_preparing
+			}
+			custom_effect_tooltip = USA_HCW_tensions_DR_tt
+			if = {
+				limit = {
+					has_country_flag = TNO_HCW_interventionism_phase
+				}
+				TNO_HCW_increase_tensions_medium = yes
+			}
+			else = {
+				TNO_HCW_increase_tensions_small = yes
+			}
+		}
+
+		## Security Force
+		TNO_HCW_increase_HAI_professionalism_check = yes
+		custom_effect_tooltip = USA_HCW_linebreak
+		TNO_HCW_check_haiti_status = yes
+		TNO_HCW_Calculate_Frame = yes
+
+		if = {
+			limit = {
+				check_variable = { global.HCW_locked_states > 0 }
+				USA = { NOT = { has_country_flag = HIS_HAI_cantave_coup } }
+			}
+			custom_effect_tooltip = USA_HCW_incoming_coup_tt
+			set_country_flag = HIS_HAI_cantave_coup
+			hidden_effect = { HAI = { country_event = { id = HIS_HAI.3 days = 14 } } }
+		}
+
+		if = {
+			limit = {
+				check_variable = { USA.HAI_involvement < USA.USA_HCW_disengagement_target_needed_check }
+				USA = { has_country_flag = TNO_HCW_disengagement_phase }
+			}
+			custom_effect_tooltip = USA_HCW_effects_from_hitting_target_tt
+			add_political_power = 20
+			TNO_HCW_decrease_weariness_small = yes
+
+			set_variable = { USA_HCW_disengagement_target_needed = HAI_involvement }
+			subtract_from_variable = { USA_HCW_disengagement_target_needed = 10 }
+			clamp_variable = { var = USA_HCW_disengagement_target_needed min = 15 }
+			set_variable = { USA_HCW_disengagement_target_needed_check = USA_HCW_disengagement_target_needed }
+			subtract_from_variable = { USA_HCW_disengagement_target_needed_check = 0.01 }
+		}
+		else_if = {
+			limit = { USA = { has_country_flag = TNO_HCW_disengagement_phase } }
+			custom_effect_tooltip = USA_HCW_effects_from_missing_target_tt
+			add_to_variable = { USA_HCW_missed_disengagement_targets = 1 }
+
+			add_stability = -0.01
+			add_war_support = -0.02
+
+			set_temp_variable = { protest_weeks = 2 }
+			custom_effect_tooltip = USA_all_voters_header_tt
+
+			set_variable = { USA_HCW_disengagement_target_needed = HAI_involvement }
+			subtract_from_variable = { USA_HCW_disengagement_target_needed = 10 }
+			clamp_variable = { var = USA_HCW_disengagement_target_needed min = 15 }
+			set_variable = { USA_HCW_disengagement_target_needed_check = USA_HCW_disengagement_target_needed }
+			subtract_from_variable = { USA_HCW_disengagement_target_needed_check = 0.01 }
+
+			if = { # NPP
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = paternalism
+					}
+				}
+
+				set_temp_variable = { USA_week_change_rural_dem = protest_weeks }
+				set_temp_variable = { USA_week_change_rural_rep = protest_weeks }
+
+				add_to_variable = { Demographic_Shift_black_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_hispanic_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_minority_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_nativists_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_urban_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_rural_dem_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_union_dem_Weeks = protest_weeks }
+
+				add_to_variable = { Demographic_Shift_black_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_hispanic_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_minority_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_nativists_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_urban_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_rural_rep_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_union_rep_Weeks = protest_weeks }
+
+				custom_effect_tooltip = USA_rural_dem_shift
+				custom_effect_tooltip = USA_rural_rep_shift
+			}
+
+			if = { # RDC
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+					}
+				}
+
+				set_temp_variable = { USA_week_change_rural_pro = protest_weeks }
+				set_temp_variable = { USA_week_change_rural_nat = protest_weeks }
+
+				add_to_variable = { Demographic_Shift_black_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_hispanic_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_minority_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_nativists_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_urban_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_rural_pro_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_union_pro_Weeks = protest_weeks }
+
+				add_to_variable = { Demographic_Shift_black_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_hispanic_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_minority_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_nativists_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_urban_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_rural_nat_Weeks = protest_weeks }
+				add_to_variable = { Demographic_Shift_union_nat_Weeks = protest_weeks }
+
+				custom_effect_tooltip = USA_rural_pro_shift
+				custom_effect_tooltip = USA_rural_nat_shift
+			}
+
+			set_temp_variable = { USA_week_change_black_foreign_policy_con = protest_weeks }
+			add_to_variable = { Policy_Shift_black_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_hispanic_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_minority_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_nativists_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_urban_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_rural_foreign_policy_con_Weeks = protest_weeks }
+			add_to_variable = { Policy_Shift_union_foreign_policy_con_Weeks = protest_weeks }
+			custom_effect_tooltip = USA_black_foreign_policy_con
+		}
+		if = {
+			limit = {
+				check_variable = { USA.HAI_involvement < 6 }
+				USA = { has_country_flag = TNO_HCW_disengagement_phase }
+			}
+			USA = { TNO_HCW_withdrawal = yes }
+		}
+
+		clr_country_flag = HAICW_single_month_decision_used
+	}
+	hidden_effect = { ZZZ = { activate_mission = ZZZ_USA_Haiti_Updates } }
+}
+
+##################
+## PUERTO PLATA ##
+##################
+# PREPARATION/LANDING
+TNO_MEX_PP_invasion_start = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_MEX_PP_invasion_start; Executing."
+	MEX = {
+		set_global_flag = PPI_proxy_war_preparation
+		set_variable = { USA.US_PP_supply = 80 }
+		set_variable = { USA.US_PP_supply_perc = 20 }
+		set_variable = { USA.US_PP_target_pos = 72 }
+		set_variable = { USA.USA_PP_Army = 2 }
+		set_variable = { USA.USA_PPI_supply_cost = 45 }
+		set_variable = { USA.PPI_infiltration_cost = 10 }
+		set_variable = { DOM.PP_insurgency_strength_DOM = 0 }
+		set_variable = { MEX.PP_mexican_american_cooperation = 0 } # 0-5 none, 6-10 poor, 11-15 decent, 16-20 high
+		add_to_variable = { MEX.PP_mexican_american_cooperation = USA.TEMP_mexican_american_cooperation } # This is for cooperation increase pre start.
+		set_variable = { MEX.pp_supply_decision_cost_cp = 8 }
+		set_variable = { MEX.pp_supply_decision_cost_pp = 8 }
+		set_variable = { MEX.pp_supply_decision_effect = 10 }
+
+		set_variable = { global.PP_spy_strength_CAL = 10 }
+		set_variable = { global.PP_spy_strength_DOM = 90 }
+
+		set_variable = { global.PP_spy_strength_CAL_multiplier = 1 }
+		set_variable = { global.PP_spy_strength_DOM_multiplier = 1 }
+		TNO_PP_calculate_spy = yes
+	}
+
+	DOM = {
+		proxy_war_set_up_dynamic_bombing_values = yes
+	}
+}
+
+TNO_USA_PP_invasion_start = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_USA_PP_invasion_start; Executing."
+	USA = {
+		TNO_fopo_add_puerto_plata_tab = yes
+
+		if = {
+			limit = { has_completed_focus = USA_Fuck_Trujillo }
+			set_temp_variable = { spy_strength_temp = 10 }
+			TNO_PP_spy_strength_increase_USA = yes
+		}
+
+		if = {
+			limit = { has_country_flag = USA_trujillo_conspiracy_2_operational_strength_flag }
+			set_temp_variable = { spy_strength_temp = 5 }
+			TNO_PP_spy_strength_increase_USA = yes
+		}
+	}
+}
+
+TNO_PP_cooperation_frame_check_increase = {
+	if = {
+		limit = { check_variable = { MEX.PP_mexican_american_cooperation > 5 }  }
+		set_variable = { MEX.PP_mexican_american_cooperation_frame = 2 }
+	}
+	if = {
+		limit = { check_variable = { MEX.PP_mexican_american_cooperation > 10 }  }
+		set_variable = { MEX.PP_mexican_american_cooperation_frame = 3 }
+	}
+	if = {
+		limit = { check_variable = { MEX.PP_mexican_american_cooperation > 15 }  }
+		set_variable = { MEX.PP_mexican_american_cooperation_frame = 4 }
+	}
+}
+
+TNO_PP_cooperation_frame_check_decrease = {
+	if = {
+		limit = { check_variable = { MEX.PP_mexican_american_cooperation < 16 } }
+		set_variable = { MEX.PP_mexican_american_cooperation_frame = 3 }
+	}
+	if = {
+		limit = { check_variable = { MEX.PP_mexican_american_cooperation < 11 } }
+		set_variable = { MEX.PP_mexican_american_cooperation_frame = 2 }
+	}
+	if = {
+		limit = { check_variable = { MEX.PP_mexican_american_cooperation < 6 } }
+		set_variable = { MEX.PP_mexican_american_cooperation_frame = 1 }
+	}
+}
+
+TNO_PP_cooperation_increase_low = {
+	custom_effect_tooltip = PP_cooperation_increase_low_tt
+	add_to_variable = { MEX.PP_mexican_american_cooperation = 1 }
+	clamp_variable = { var = MEX.PP_mexican_american_cooperation max = 20 min = 0 }
+	TNO_PP_cooperation_frame_check_increase = yes
+}
+
+TNO_PP_cooperation_increase_medium = {
+	custom_effect_tooltip = PP_cooperation_increase_medium_tt
+	add_to_variable = { MEX.PP_mexican_american_cooperation = 3 }
+	clamp_variable = { var = MEX.PP_mexican_american_cooperation max = 20 min = 0 }
+	TNO_PP_cooperation_frame_check_increase = yes
+}
+
+TNO_PP_cooperation_increase_high = {
+	custom_effect_tooltip = PP_cooperation_increase_high_tt
+	add_to_variable = { MEX.PP_mexican_american_cooperation = 5 }
+	clamp_variable = { var = MEX.PP_mexican_american_cooperation max = 20 min = 0 }
+	TNO_PP_cooperation_frame_check_increase = yes
+}
+
+TNO_PP_cooperation_decrease_low = {
+	custom_effect_tooltip = PP_cooperation_decrease_low_tt
+	subtract_from_variable = { MEX.PP_mexican_american_cooperation = 1 }
+	clamp_variable = { var = MEX.PP_mexican_american_cooperation max = 20 min = 0 }
+	TNO_PP_cooperation_frame_check_decrease = yes
+}
+
+TNO_PP_cooperation_decrease_medium = {
+	custom_effect_tooltip = PP_cooperation_decrease_medium_tt
+	subtract_from_variable = { MEX.PP_mexican_american_cooperation = 3 }
+	clamp_variable = { var = MEX.PP_mexican_american_cooperation max = 20 min = 0 }
+	TNO_PP_cooperation_frame_check_decrease = yes
+}
+
+TNO_PP_cooperation_decrease_high = {
+	custom_effect_tooltip = PP_cooperation_decrease_high_tt
+	subtract_from_variable = { MEX.PP_mexican_american_cooperation = 5 }
+	clamp_variable = { var = MEX.PP_mexican_american_cooperation max = 20 min = 0 }
+	TNO_PP_cooperation_frame_check_decrease = yes
+}
+
+TNO_USA_PP_invasion_supply_add = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_USA_PP_invasion_supply_add; Executing."
+	custom_effect_tooltip = USA_PP_invasion_supply_increase_tt
+	add_to_variable = { USA.US_PP_supply = invasion_supply_temp }
+	TNO_USA_PP_invasion_supply_clamp = yes
+	hidden_effect = { CAL = { TNO_USA_PPI_Check_Supply = yes } }
+}
+TNO_USA_PP_invasion_supply_decrease = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_USA_PP_invasion_supply_decrease; Executing."
+	custom_effect_tooltip = USA_PP_invasion_supply_decrease_tt
+	subtract_from_variable = { USA.US_PP_supply = invasion_supply_temp }
+	TNO_USA_PP_invasion_supply_clamp = yes
+	hidden_effect = { CAL = { TNO_USA_PPI_Check_Supply = yes } }
+}
+TNO_USA_PP_minimum_supply_add = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_USA_PP_minimum_supply_add; Executing."
+	custom_effect_tooltip = USA_PP_minimum_supply_increase_tt
+	add_to_variable = { USA.US_PP_supply_perc = invasion_minimum_supply_temp }
+	set_variable = { USA.US_PP_target_pos = USA.US_PP_supply_perc }
+	multiply_variable = { USA.US_PP_target_pos = 3.6 }
+	TNO_USA_PP_invasion_supply_clamp = yes
+}
+TNO_USA_PP_minimum_supply_decrease = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_USA_PP_minimum_supply_decrease; Executing."
+	custom_effect_tooltip = USA_PP_minimum_supply_decrease_tt
+	subtract_from_variable = { USA.US_PP_supply_perc = invasion_minimum_supply_temp }
+	set_variable = { USA.US_PP_target_pos = USA.US_PP_supply_perc }
+	multiply_variable = { USA.US_PP_target_pos = 3.6 }
+	TNO_USA_PP_invasion_supply_clamp = yes
+}
+TNO_USA_PP_invasion_supply_clamp = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_USA_PP_invasion_supply_clamp; Executing."
+	clamp_variable = {
+		var = USA.US_PP_supply
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = USA.US_PP_supply_perc
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = USA.US_PP_target_pos
+		min = 0
+		max = 360
+	}
+}
+
+TNO_PP_spy_strength_increase_USA = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_spy_strength_increase_USA; Executing."
+	multiply_temp_variable = { spy_strength_temp = global.PP_spy_strength_CAL_multiplier }
+	custom_effect_tooltip = TNO_PP_spy_strength_increase_CAL_tt
+	add_to_variable = { global.PP_spy_strength_CAL = spy_strength_temp }
+	TNO_PP_calculate_spy = yes
+}
+TNO_PP_spy_strength_decrease_USA = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_spy_strength_decrease_USA; Executing."
+	custom_effect_tooltip = TNO_PP_spy_strength_decrease_CAL_tt
+	subtract_from_variable = { global.PP_spy_strength_CAL = spy_strength_temp }
+	TNO_PP_calculate_spy = yes
+}
+TNO_PP_spy_strength_increase_DOM = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_spy_strength_increase_DOM; Executing."
+	multiply_temp_variable = { spy_strength_temp = global.PP_spy_strength_DOM_multiplier }
+	custom_effect_tooltip = TNO_PP_spy_strength_increase_DOM_tt
+	subtract_from_variable = { global.PP_spy_strength_CAL = spy_strength_temp }
+	TNO_PP_calculate_spy = yes
+}
+TNO_PP_spy_strength_decrease_DOM = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_spy_strength_decrease_DOM; Executing."
+	custom_effect_tooltip = TNO_PP_spy_strength_decrease_DOM_tt
+	add_to_variable = { global.PP_spy_strength_CAL = spy_strength_temp }
+	TNO_PP_calculate_spy = yes
+}
+
+TNO_PP_insurgency_strength_increase = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_insurgency_strength_increase; Executing."
+	custom_effect_tooltip = TNO_PP_insurgency_strength_increase_DOM_tt
+	add_to_variable = { DOM.PP_insurgency_strength_DOM = insurgency_strength_temp }
+	if = {
+		limit = { has_global_flag = PPI_landing_ongoing }
+		TNO_update_PP_revolts = yes
+	}
+}
+TNO_PP_insurgency_strength_decrease = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_insurgency_strength_decrease; Executing."
+	custom_effect_tooltip = TNO_PP_insurgency_strength_decrease_DOM_tt
+	subtract_from_variable = { DOM.PP_insurgency_strength_DOM = insurgency_strength_temp }
+	if = {
+		limit = { has_global_flag = PPI_landing_ongoing }
+		TNO_update_PP_revolts = yes
+	}
+}
+
+TNO_PP_calculate_spy = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_calculate_spy; Executing."
+	hidden_effect = {
+		clamp_variable = { var = global.PP_spy_strength_CAL min = 0 max = 100 }
+
+		set_variable = { global.PP_spy_strength_DOM = 100 }
+		subtract_from_variable = { global.PP_spy_strength_DOM = global.PP_spy_strength_CAL }
+
+		clamp_variable = { var = global.PP_spy_strength_DOM min = 0 max = 100 }
+	}
+}
+
+TNO_intialize_PP_revolts = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_intialize_PP_revolts; Executing."
+	set_variable = { DOM.DOM_revolts_stab = 0 }
+	set_variable = { DOM.DOM_revolts_stab_wk = 0 }
+	set_variable = { DOM.DOM_revolts_war_sup_wk = 0 }
+	set_variable = { DOM.DOM_revolts_org = 0 }
+	set_variable = { DOM.DOM_revolts_def = 0 }
+	set_variable = { DOM.DOM_revolts_cp = 0 }
+}
+
+TNO_update_PP_revolts = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_update_PP_revolts; Executing."
+	set_variable = { DOM.DOM_revolts_stab = DOM.PP_insurgency_strength_DOM }
+	divide_variable = { DOM.DOM_revolts_stab = -800 }
+	add_to_variable = { DOM.DOM_revolts_stab = -0.075 } #-0.075 - -0.2
+
+	set_variable = { DOM.DOM_revolts_stab_wk = DOM.PP_insurgency_strength_DOM }
+	divide_variable = { DOM.DOM_revolts_stab_wk = -10000 }
+	add_to_variable = { DOM.DOM_revolts_stab_wk = -0.005 } #-0.005 - -0.015
+
+	set_variable = { DOM.DOM_revolts_war_sup_wk = DOM.PP_insurgency_strength_DOM }
+	divide_variable = { DOM.DOM_revolts_war_sup_wk = -10000 }
+	add_to_variable = { DOM.DOM_revolts_war_sup_wk = -0.005 } #-0.005 - -0.015
+
+	set_variable = { DOM.DOM_revolts_org = DOM.PP_insurgency_strength_DOM }
+	divide_variable = { DOM.DOM_revolts_org = -1000 }
+	add_to_variable = { DOM.DOM_revolts_org = -0.25 } #-0.1 - -0.2
+
+	set_variable = { DOM.DOM_revolts_def = DOM.PP_insurgency_strength_DOM }
+	divide_variable = { DOM.DOM_revolts_def = -2000 }
+	add_to_variable = { DOM.DOM_revolts_def = -0.05 } #-0.05 - -0.1
+
+	set_variable = { DOM.DOM_revolts_cp = DOM.PP_insurgency_strength_DOM }
+	divide_variable = { DOM.DOM_revolts_cp = -333 }
+	add_to_variable = { DOM.DOM_revolts_cp = -0.2 } #-0.2 - -0.5
+
+	force_update_dynamic_modifier = yes
+}
+
+TNO_clear_PP_revolts = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_clear_PP_revolts; Executing."
+	if = {
+		limit = { has_dynamic_modifier = { modifier = DOM_Widespread_Revolts } }
+		remove_dynamic_modifier = { modifier = DOM_Widespread_Revolts }
+	}
+	else = {
+		remove_ideas = DOM_Significant_Revolts
+	}
+	clear_variable = DOM.DOM_revolts_stab
+	clear_variable = DOM.DOM_revolts_stab_wk
+	clear_variable = DOM.DOM_revolts_war_sup_wk
+	clear_variable = DOM.DOM_revolts_org
+	clear_variable = DOM.DOM_revolts_def
+	clear_variable = DOM.DOM_revolts_cp
+}
+
+TNO_Puerto_Plata_Landing_Start = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_Puerto_Plata_Landing_Start; Executing."
+	clr_global_flag = PPI_proxy_war_preparation
+	set_global_flag = PPI_landing_ongoing
+	every_country = {
+		limit = { is_ai = no }
+		play_song = tno_song_puerto_plata
+	}
+	if = {
+		limit = { check_variable = { USA_PP_Army > 5 } }
+		set_variable = { USA.US_PP_supply_decay = 9 }
+	}
+	else = {
+		set_variable = { USA.US_PP_supply_decay = 6 }
+	}
+
+	set_variable = { USA_PPI_starting_spy_strength = global.PP_spy_strength_CAL }
+
+	ZZZ = { activate_mission = ZZZ_PPI_Invasion_Ends }
+	DOM = {
+		DOM_Pedro_Benoit = {
+			set_character_flag = CAL_character
+			add_unit_leader_trait = anti_fascist
+		}
+		DOM_Francisco_Caamano = {
+			set_character_flag = CAL_character
+			add_unit_leader_trait = anti_fascist
+		}
+		DOM_Manolo_Tavarez_Justo = {
+			set_character_flag = CAL_character
+			add_corps_commander_role = {
+				traits = { guerrilla_veteran anti_fascist }
+				skill = 2
+				attack_skill = 2
+				defense_skill = 1
+				planning_skill = 3
+				logistics_skill = 2
+			}
+		}
+
+		every_character = {
+			limit = { has_character_flag = CAL_character }
+			set_nationality = CAL
+		}
+
+		add_timed_idea = { idea = HIS_trujillo_debuff days = 14 }
+		remove_ideas = DOM_Rising_Resistance
+
+		if = {
+			limit = {
+				USA = { has_country_flag = PPI_has_sleeper_cells }
+			}
+			hidden_effect = {
+				add_dynamic_modifier = { modifier = DOM_Widespread_Revolts }
+				TNO_intialize_PP_revolts = yes
+				set_variable = { DOM.PP_insurgency_strength_DOM = global.PP_spy_strength_CAL }
+				TNO_update_PP_revolts = yes
+			}
+		}
+		else = {
+			add_ideas = DOM_Significant_Revolts
+		}
+	}
+
+	CAL = {
+		1237 = {
+			set_demilitarized_zone = no
+			add_core_of = CAL
+		}
+		transfer_state = 1237
+
+		if = {
+			limit = {
+				check_variable = {
+					var = USA.US_PP_supply
+					value = USA.US_PP_supply_perc
+					compare = greater_than_or_equals
+				}
+			}
+			add_ideas = HIS_well_supplied_army
+		}
+		else = {
+			add_ideas = HIS_not_supplied_army
+		}
+		country_event = { # Weekly Check for Supply
+			id = HIS_puertoplata.11
+			days = 5
+		}
+		add_manpower = -39000
+
+		add_equipment_to_stockpile = {
+			type = infantry_equipment_2
+			amount = 750
+			producer = USA
+		}
+
+		add_equipment_to_stockpile = {
+			type = anti_tank_equipment_1
+			amount = 100
+			producer = USA
+		}
+
+		add_equipment_to_stockpile = {
+			type = motorized_equipment_2
+			amount = 100
+			producer = USA
+		}
+
+		add_equipment_to_stockpile = {
+			type = support_equipment_1
+			amount = 150
+			producer = USA
+		}
+
+		add_equipment_to_stockpile = {
+			type = artillery_equipment_3
+			amount = 50
+			producer = USA
+		}
+
+		if = {
+			limit = {
+				USA = { has_country_flag = USA_PPI_USAF_support }
+			}
+			add_equipment_to_stockpile = {
+				type = jet_fighter_equipment_2
+				amount = 20
+				producer = USA
+			}
+			add_equipment_to_stockpile = {
+				type = jet_CAS_equipment_1
+				amount = 10
+				producer = USA
+			}
+			set_fuel_ratio = 1
+			DOM = { add_ideas = PPI_USAF_bombing }
+		}
+		if = {
+			limit = {
+				USA = { has_country_flag = USA_PPI_USN_support }
+			}
+			add_timed_idea = {
+				idea = PPI_USN_support
+				days = 7
+			}
+		}
+
+		declare_war_on = {
+			target = DOM
+			type = annex_everything
+		}
+
+		add_timed_idea = { idea = HIS_legion_buff days = 10 }
+		fill_empty_minister_nochecks = yes
+	}
+
+	TNO_USA_PPI_load_oob = yes
+
+	if = {
+		limit = {
+			OR = {
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_BAL_CEASEFIRE
+				}
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_BAL_VICTORY
+				}
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_REV_VICTORY
+				}
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_DOM_AGREEMENT
+				}
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_RAM_VICTORY
+				}
+			}
+		}
+		CAL = {
+			add_ideas = Custom_TNO_INS_front_line_stopper
+		}
+		DOM = {
+			add_ideas = Custom_TNO_INS_front_line_stopper
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = PUERTO_PLATA_INVANSION_OUTCOME
+				option = PUERTO_PLATA_INVANSION_OUTCOME_DOM_VICTORY
+			}
+		}
+		DOM = { apply_war_buff_with_5_divisions = yes }
+	}
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.1
+			days = 1
+		}
+	}
+
+	HAI = {
+		country_event = { id = HIS_HAI.1 days = 140 random_days = 120 }
+		swap_ideas = {
+			remove_idea = HAI_Noirisme_Socialism
+			add_idea = HAI_Rising_PPLN_Insurgency
+		}
+	}
+}
+
+TNO_USA_PPI_Check_Supply = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_USA_PPI_Check_Supply; Executing."
+	if = {
+		limit = {
+			check_variable = {
+				var = USA.US_PP_supply
+				value = USA.US_PP_supply_perc
+				compare = greater_than_or_equals
+			}
+		}
+		if = {
+			limit = {
+				has_idea = HIS_not_supplied_army
+			}
+			swap_ideas = {
+				remove_idea = HIS_not_supplied_army
+				add_idea = HIS_well_supplied_army
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = HIS_well_supplied_army
+		}
+		swap_ideas = {
+			remove_idea = HIS_well_supplied_army
+			add_idea = HIS_not_supplied_army
+		}
+	}
+}
+
+TNO_USA_PPI_load_oob = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_USA_PPI_load_oob; Executing." # thank you Scars!!
+	CAL = {
+		load_oob = "CAL_Puerto_Plata_Template"
+
+		### INFANTRY BRIGADES ###
+		1237 = {
+			create_unit = { # Columna Legionaria 'La Exiliada'
+				division = "name = \"1era Columna Legionaria 'La Exiliada'\" division_template = \"Columna Legionaria\" start_experience_factor = 0.4 start_equipment_factor = 1"
+				owner = CAL
+				prioritize_location = 15597
+			}
+		}
+		1237 = {
+			create_unit = { # Columna Legionaria 'Matafachos'
+				division = "name = \"2da Columna Legionaria 'Matafachos'\" division_template = \"Columna Legionaria\" start_experience_factor = 0.4 start_equipment_factor = 1"
+				owner = CAL
+				prioritize_location = 15598
+			}
+		}
+
+		if = {
+			limit = {
+				MEX = {
+					has_country_flag = MEX_PPI_Legion_3_trained
+				}
+			}
+			1237 = {
+				create_unit = { # Columna Legionaria 'Victoriosa'
+					division = "name = \"3ra Columna Legionaria 'Victoriosa'\" division_template = \"Columna Legionaria\" start_experience_factor = 0.4 start_equipment_factor = 1"
+					owner = CAL
+					prioritize_location = 15597
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				MEX = {
+					has_country_flag = MEX_PPI_Legion_3
+				}
+			}
+			1237 = {
+				create_unit = { # Columna Legionaria 'Victoriosa'
+					division = "name = \"3ra Columna Legionaria 'Victoriosa'\" division_template = \"Columna Legionaria\" start_experience_factor = 0.2 start_equipment_factor = 1"
+					owner = CAL
+					prioritize_location = 15597
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				MEX = {
+					has_country_flag = MEX_PPI_Legion_4_trained
+				}
+			}
+			1237 = {
+				create_unit = { # Columna Legionaria 'Libertadora'
+					division = "name = \"4ta Columna Legionaria 'Libertadora'\" division_template = \"Columna Legionaria\" start_experience_factor = 0.4 start_equipment_factor = 1"
+					owner = CAL
+					prioritize_location = 15598
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				MEX = {
+					has_country_flag = MEX_PPI_Legion_4
+				}
+			}
+			1237 = {
+				create_unit = { # Columna Legionaria 'Libertadora'
+					division = "name = \"4ta Columna Legionaria 'Libertadora'\" division_template = \"Columna Legionaria\" start_experience_factor = 0.2 start_equipment_factor = 1"
+					owner = CAL
+					prioritize_location = 15598
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				MEX = {
+					has_country_flag = MEX_PPI_Legion_5_trained
+				}
+			}
+			1237 = {
+				create_unit = { # Columna Legionaria 'Luperón'
+					division = "name = \"5ta Columna Legionaria 'Luperón'\" division_template = \"Columna Legionaria\" start_experience_factor = 0.4 start_equipment_factor = 1"
+					owner = CAL
+					prioritize_location = 15598
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				MEX = {
+					has_country_flag = MEX_PPI_Legion_5
+				}
+			}
+			1237 = {
+				create_unit = { # Columna Legionaria 'Luperón'
+					division = "name = \"5ta Columna Legionaria 'Luperón'\" division_template = \"Columna Legionaria\" start_experience_factor = 0.2 start_equipment_factor = 1"
+					owner = CAL
+					prioritize_location = 15598
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				USA = {
+					has_country_flag = USA_PPI_Grupo_Blindado_trained
+				}
+			}
+			1237 = {
+				create_unit = { # Columna Blindada Legionaria
+					division = "name = \"Grupo Blindado Legionario '19 de Junio'\" division_template = \"Columna Blindada Legionaria\" start_experience_factor = 0.4 start_equipment_factor = 1"
+					owner = CAL
+					prioritize_location = 15597
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				USA = {
+					has_country_flag = USA_PPI_Grupo_Blindado
+				}
+			}
+			1237 = {
+				create_unit = { # Columna Blindada Legionaria
+					division = "name = \"Grupo Blindado Legionario '19 de Junio'\" division_template = \"Columna Blindada Legionaria\" start_experience_factor = 0.2 start_equipment_factor = 1"
+					owner = CAL
+					prioritize_location = 15597
+				}
+			}
+		}
+
+		## CUBAN BRIGADES ##
+		if = {
+			limit = {
+				MEX = {
+					has_country_flag = MEX_PPI_Cubana_1
+				}
+			}
+			1237 = {
+				create_unit = { # Batallón Expedicionario Revolucionario 'Hijos de Martí'
+					division = "name = \"1er Batallón Expedicionario Revolucionario 'Hijos de Martí'\" division_template = \"Batallon Expedicionario Revolucionario\" start_experience_factor = 0.5 start_equipment_factor = 1"
+					owner = CAL
+					prioritize_location = 15597
+				}
+			}
+		}
+		if = {
+			limit = {
+				MEX = {
+					has_country_flag = MEX_PPI_Cubana_2
+				}
+			}
+			1237 = {
+				create_unit = { # Batallón Expedicionario Revolucionario 'Comandante Guevara'
+					division = "name = \"2do Batallón Expedicionario Revolucionario 'Comandante Guevara'\" division_template = \"Batallon Expedicionario Revolucionario\" start_experience_factor = 0.5 start_equipment_factor = 1"
+					owner = CAL
+					prioritize_location = 15598
+				}
+			}
+		}
+	}
+}
+
+# CEASEFIRE/CIVIL WAR
+
+TNO_PPI_increase_preceasefire_tension = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_increase_ceasefire_tension; Executing."
+	custom_effect_tooltip = TNO_PPI_increase_preceasefire_tension_tt
+	add_to_variable = { MEX.TNO_PPI_preceasefire_tension = 5 }
+}
+
+TNO_PPI_decrease_preceasefire_tension = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_decrease_ceasefire_tension; Executing."
+	custom_effect_tooltip = TNO_PPI_decrease_preceasefire_tension_tt
+	subtract_from_variable = { MEX.TNO_PPI_preceasefire_tension = 5 }
+}
+
+TNO_PPI_increase_ceasefire_tension = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_increase_ceasefire_tension; Executing."
+	custom_effect_tooltip = TNO_PPI_increase_ceasefire_tension_tt
+	add_to_variable = { global.TNO_PPI_ceasefire_tension = ceasefire_tension_temp }
+	TNO_clamp_PPI_ceasefire = yes
+}
+
+TNO_PPI_decrease_ceasefire_tension = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_decrease_ceasefire_tension; Executing."
+	custom_effect_tooltip = TNO_PPI_decrease_ceasefire_tension_tt
+	subtract_from_variable = { global.TNO_PPI_ceasefire_tension = ceasefire_tension_temp }
+	TNO_clamp_PPI_ceasefire = yes
+}
+
+TNO_PPI_increase_ceasefire_tension_substantial = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_increase_ceasefire_tension_substantial; Executing."
+	custom_effect_tooltip = TNO_PPI_increase_ceasefire_tension_substantial_tt
+	add_to_variable = { global.TNO_PPI_ceasefire_tension = ceasefire_tension_temp }
+	TNO_clamp_PPI_ceasefire = yes
+}
+
+TNO_PPI_decrease_ceasefire_tension_substantial = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_decrease_ceasefire_tension_substantial; Executing."
+	custom_effect_tooltip = TNO_PPI_decrease_ceasefire_tension_substantial_tt
+	add_to_variable = { global.TNO_PPI_ceasefire_tension = ceasefire_tension_temp }
+	TNO_clamp_PPI_ceasefire = yes
+}
+
+TNO_CAL_PPI_increase_ceasefire_preparation = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_CAL_PPI_increase_ceasefire_preparation; Executing."
+	custom_effect_tooltip = USA_PPI_increase_ceasefire_preparation_tt
+	add_to_variable = { CAL.PPI_ceasefire_military_preparation = ceasefire_preparation_temp }
+	TNO_update_PP_milprep_CAL = yes
+	TNO_clamp_PPI_ceasefire = yes
+}
+TNO_CAL_PPI_decrease_ceasefire_preparation = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_CAL_PPI_decrease_ceasefire_preparation; Executing."
+	custom_effect_tooltip = USA_PPI_decrease_ceasefire_preparation_tt
+	subtract_from_variable = { CAL.PPI_ceasefire_military_preparation = ceasefire_preparation_temp }
+	TNO_update_PP_milprep_CAL = yes
+	TNO_clamp_PPI_ceasefire = yes
+}
+TNO_DOM_PPI_increase_ceasefire_preparation = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_DOM_PPI_increase_ceasefire_preparation; Executing."
+	custom_effect_tooltip = USA_PPI_increase_ceasefire_preparation_tt
+	add_to_variable = { DOM.PPI_ceasefire_military_preparation = ceasefire_preparation_temp }
+	TNO_update_PP_milprep_DOM = yes
+	TNO_clamp_PPI_ceasefire = yes
+}
+TNO_DOM_PPI_decrease_ceasefire_preparation = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_DOM_PPI_decrease_ceasefire_preparation; Executing."
+	custom_effect_tooltip = USA_PPI_decrease_ceasefire_preparation_tt
+	subtract_from_variable = { DOM.PPI_ceasefire_military_preparation = ceasefire_preparation_temp }
+	TNO_update_PP_milprep_DOM = yes
+	TNO_clamp_PPI_ceasefire = yes
+}
+
+TNO_clamp_PPI_ceasefire = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_clamp_PPI_ceasefire; Executing."
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = PUERTO_PLATA_INVANSION_OUTCOME
+				option = PUERTO_PLATA_INVANSION_OUTCOME_BAL_CEASEFIRE
+			}
+			USA = {
+				has_country_flag = USA_PP_ceasefire_balaguer
+			}
+		}
+		clamp_variable = {
+			var = global.TNO_PPI_ceasefire_tension
+			min = 0
+			max = 19
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = PUERTO_PLATA_INVANSION_OUTCOME
+				option = PUERTO_PLATA_INVANSION_OUTCOME_DOM_AGREEMENT
+			}
+		}
+		clamp_variable = {
+			var = global.TNO_PPI_ceasefire_tension
+			min = 0
+			max = 99
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = PUERTO_PLATA_INVANSION_OUTCOME
+				option = PUERTO_PLATA_INVANSION_OUTCOME_RAM_VICTORY
+			}
+		}
+		set_variable = {
+			global.TNO_PPI_ceasefire_tension = 100
+		}
+	}
+	else = {
+		clamp_variable = {
+			var = global.TNO_PPI_ceasefire_tension
+			min = 0
+			max = 100
+		}
+	}
+	clamp_variable = {
+		var = CAL.PPI_ceasefire_military_preparation
+		min = 0
+		max = 100
+	}
+	clamp_variable = {
+		var = DOM.PPI_ceasefire_military_preparation
+		min = 0
+		max = 100
+	}
+	if = {
+		limit = {
+			check_variable = { global.TNO_PPI_ceasefire_tension > 99 }
+		}
+		TNO_PPI_break_ceasefire = yes
+	}
+}
+
+TNO_PPI_break_ceasefire = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_break_ceasefire; Executing."
+	if = {
+		limit = { NOT = { has_global_flag = PPI_ceasefire_collapsed } }
+
+		USA = { remove_mission = USA_PPI_tensions_increase }
+		ZZZ = { remove_mission = ZZZ_PPI_DOM_CAL_Negotiations }
+
+		MEX = {
+			if = {
+				limit = { has_country_flag = MEX_Trujillo_Conspiracy_34_happened }
+				country_event = MEX_Trujillo_Conspiracy.35
+			}
+			else_if = {
+				limit = { has_country_flag = MEX_Trujillo_Conspiracy_28_happened }
+				country_event = MEX_Trujillo_Conspiracy.30
+			}
+		}
+
+		if = {
+			limit = { CAL = { check_variable = { CAL.PPI_ceasefire_military_preparation > DOM.PPI_ceasefire_military_preparation } } }
+			CAL = {
+				declare_war_on = {
+					target = DOM
+					type = civil_war
+				}
+			}
+		}
+		else = {
+			DOM = {
+				declare_war_on = {
+					target = CAL
+					type = civil_war
+				}
+			}
+		}
+
+		CAL = {
+			add_dynamic_modifier = { modifier = PPI_Military_Preparation }
+			TNO_initialize_PP_milprep = yes
+			TNO_update_PP_milprep_CAL = yes
+		}
+
+		DOM = {
+			add_ideas = PPI_civil_war
+			add_dynamic_modifier = { modifier = PPI_Military_Preparation }
+			TNO_initialize_PP_milprep = yes
+			TNO_update_PP_milprep_DOM = yes
+			country_event = {
+				id = HIS_DOM_ceasefire_skeleton.8
+				days = 60
+			}
+		}
+		CAL = { add_ideas = PPI_civil_war }
+
+		if = {
+			limit = {
+				OR = {
+					has_game_rule = {
+						rule = PUERTO_PLATA_INVANSION_OUTCOME
+						option = PUERTO_PLATA_INVANSION_OUTCOME_BAL_VICTORY
+					}
+					has_game_rule = {
+						rule = PUERTO_PLATA_INVANSION_OUTCOME
+						option = PUERTO_PLATA_INVANSION_OUTCOME_RAM_VICTORY
+					}
+				}
+			}
+			DOM = {
+				apply_war_buff_with_5_divisions = yes
+			}
+		}
+		else_if = {
+			limit = {
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_REV_VICTORY
+				}
+			}
+			CAL = {
+				apply_war_buff_with_5_divisions = yes
+			}
+		}
+
+		if = {
+			limit = {
+				DOM = {
+					has_country_leader = {
+						character = DOM_Jose_Rene_Roman
+						ruling_only = yes
+					}
+				}
+			}
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = hispaniola_news.70
+					days = 1
+				}
+			}
+			319 = { set_state_name = STATE_319 }
+			set_province_name = {
+				id = 7660
+				name = VICTORY_POINTS_7660
+			}
+			IBR = { country_event = { id = HIS_PP_ceasefire.23 } }
+			GER = { country_event = { id = HIS_PP_ceasefire.26 } }
+			DOM = {
+				add_stability = -0.2
+				set_politics = { ruling_party = fascism }
+				add_country_leader_role = {
+					character = DOM_Ramfis_Trujillo
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_RAMFIS_TRUJILLO_DESC"
+						expire = "1999.7.14"
+						ideology = fascism_subtype
+						traits = { }
+						id = -1
+					}
+				}
+				set_party_name = {
+					ideology = fascism
+					name = DOM_fascism_party
+					long_name = DOM_fascism_party_long
+				}
+				remove_ideas = {
+					DOM_The_Dominican_Revolution_0
+					DOM_The_Living_Ghost
+				}
+				add_ideas = {
+					DOM_Dios_Trujillo_Ramfis
+				}
+				set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Type_Corporatism }
+				econ_subtype_change = yes
+			}
+			MEX = {
+				set_variable = { trade_opinion_embargo@DOM = 1 }
+				add_opinion_modifier = { target = DOM modifier = TNO_embargo_100 }
+			}
+			DOM = {
+				add_opinion_modifier = { target = MEX modifier = TNO_embargoed_us_100 }
+				add_opinion_modifier = { target = CUB modifier = DOM_caribbean_tension }
+				add_opinion_modifier = { target = WIN modifier = DOM_caribbean_tension }
+				add_opinion_modifier = { target = MEX modifier = DOM_caribbean_tension }
+				add_opinion_modifier = { target = VEN modifier = DOM_caribbean_tension }
+				add_opinion_modifier = { target = USA modifier = USA_DOM_hostile_diplomacy }
+				remove_opinion_modifier = { target = MEX modifier = DOM_supported_anti_trujillo_coup }
+				remove_opinion_modifier = { target = USA modifier = DOM_supported_anti_trujillo_coup }
+				remove_opinion_modifier = { target = CUB modifier = DOM_supported_anti_trujillo_coup }
+			}
+			CUB = { add_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+			WIN = { add_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+			MEX = { add_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+			VEN = { add_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+			BRA = { add_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+			USA = { add_opinion_modifier = { target = DOM modifier = USA_DOM_hostile_diplomacy } }
+		}
+		else = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = hispaniola_news.15
+					days = 1
+				}
+			}
+		}
+
+		clr_global_flag = PPI_ceasefire_happening
+		set_global_flag = PPI_ceasefire_collapsed
+		set_global_flag = PPI_civil_war_ongoing
+	}
+}
+
+TNO_PP_brandenburger_manpower = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_brandenburger_manpower; Executing."
+	hidden_effect = {
+		clamp_variable = { var = global.PP_brandenburger_manpower min = 0 max = 100 }
+
+		set_variable = { global.PP_brandenburger_manpower_empty = 100 }
+		subtract_from_variable = { global.PP_brandenburger_manpower_empty = global.PP_brandenburger_manpower }
+
+		clamp_variable = { var = global.PP_brandenburger_manpower_empty min = 0 max = 100 }
+	}
+}
+
+TNO_PP_brandenburger_increase_GER = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_brandenburger_increase_GER; Executing."
+	custom_effect_tooltip = TNO_PP_brandenburger_increase_GER_tt
+	add_to_variable = { global.PP_brandenburger_manpower = brandenburger_temp }
+	TNO_PP_brandenburger_manpower = yes
+}
+
+TNO_PP_brandenburger_increase_GER_explosive = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_brandenburger_increase_GER_explosive; Executing."
+	custom_effect_tooltip = TNO_PP_brandenburger_increase_GER_explosive_tt
+	add_to_variable = { global.PP_brandenburger_manpower = brandenburger_temp }
+	TNO_PP_brandenburger_manpower = yes
+}
+
+TNO_PP_brandenburger_increase_GER_medic = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_brandenburger_increase_GER_medic; Executing."
+	custom_effect_tooltip = TNO_PP_brandenburger_increase_GER_medic_tt
+	add_to_variable = { global.PP_brandenburger_manpower = brandenburger_temp }
+	TNO_PP_brandenburger_manpower = yes
+}
+
+TNO_PP_brandenburger_decrease_GER = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PP_brandenburger_decrease_GER; Executing."
+	custom_effect_tooltip = TNO_PP_brandenburger_decrease_GER_tt
+	subtract_from_variable = { global.PP_brandenburger_manpower = brandenburger_temp }
+	TNO_PP_brandenburger_manpower = yes
+}
+
+# OUTCOMES
+TNO_debug_PPI_CAL_victory = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_debug_PPI_CAL_victory; Executing." # OUTDATED
+	DOM = {
+		save_global_event_target_as = losing_country
+		CAL_Alberto_Bayo = { set_nationality = DOM }
+		CAL_Manuel_Uribarri = { set_nationality = DOM }
+		CAL_William_Alexander_Morgan = { set_nationality = DOM }
+		#CAL_Eloy_Menoyo = { set_nationality = DOM }
+		#CAL_Rolando_Cubela = { set_nationality = DOM }
+		CAL_Horacio_Ornes = { set_nationality = DOM }
+	}
+	CAL = {
+		save_global_event_target_as = winning_country
+		white_peace = DOM
+	}
+
+	TNO_Puerto_Plata_closing = yes
+	TNO_PPI_CAL_victory = yes
+
+	log = "war_won"
+	set_global_flag = war_won
+	set_global_flag = show_peace_popup_alert
+	add_to_variable = { global.peace_popup_dirty = 1 }
+}
+
+TNO_debug_PPI_DOM_victory = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_debug_PPI_DOM_victory; Executing."
+	DOM = {
+		save_global_event_target_as = winning_country
+		white_peace = CAL
+	}
+	CAL = { save_global_event_target_as = losing_country }
+
+	TNO_Puerto_Plata_closing = yes
+	TNO_PPI_DOM_victory_trujillo = yes
+
+	log = "war_won"
+	set_global_flag = war_won
+	set_global_flag = show_peace_popup_alert
+	add_to_variable = { global.peace_popup_dirty = 1 }
+}
+
+TNO_Puerto_Plata_closing = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_Puerto_Plata_closing; Executing."
+	clr_global_flag = PPI_landing_ongoing
+	clr_global_flag = PPI_ceasefire_happening
+	set_global_flag = PPI_finished
+	DOM = { white_peace = CAL }
+
+	every_state = {
+		limit = { is_core_of = CAL }
+		CAL = { remove_state_core = PREV }
+	}
+
+	GER = {
+		TNO_fopo_remove_puerto_plata_tab = yes
+	}
+	IBR = {
+		TNO_fopo_remove_puerto_plata_tab = yes
+	}
+	MEX = {
+		TNO_fopo_remove_puerto_plata_tab = yes
+	}
+	USA = {
+		TNO_fopo_remove_puerto_plata_tab = yes
+		clear_variable = USA_PPI_starting_spy_strength
+	}
+	DOM = {
+		remove_ideas = {
+			PPI_USAF_bombing
+			PPI_USAF_bombing_2
+			PPI_USAF_bombing_3
+		}
+		TNO_clear_PP_revolts = yes
+		proxy_war_clear_dynamic_bombing = yes
+	}
+
+	if = {
+		limit = {
+			OR = {
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_DOM_VICTORY
+				}
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_BAL_VICTORY
+				}
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_RAM_VICTORY
+				}
+			}
+		}
+		DOM = { remove_war_buff = yes }
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = PUERTO_PLATA_INVANSION_OUTCOME
+				option = PUERTO_PLATA_INVANSION_OUTCOME_REV_VICTORY
+			}
+		}
+		CAL = { remove_war_buff = yes }
+	}
+}
+
+TNO_PPI_DOM_victory_trujillo = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_DOM_victory_trujillo; Executing." # Trujillo wins
+	set_global_flag = PPI_Trujillo_Victory
+	TNO_Puerto_Plata_closing = yes
+
+	DOM = {
+		remove_ideas = DOM_Modernizing_Military
+		add_ideas = {
+			DOM_The_Defense_State
+			DOM_Black_Spot_of_the_Caribbean
+		}
+		annex_country = {
+			target = CAL
+			transfer_troops = no
+		}
+		set_popularities = {
+			fascism = 54
+			ultranationalism = 8
+			despotism = 11
+			paternalism = 10
+			liberalism = 7
+			socialist = 10
+		}
+		transfer_state = 319
+	}
+
+	USA = {
+		country_event = { id = HIS_PP_flavor.6 days = 180 random_days = 100 }
+		custom_effect_tooltip = USA_HCW_incoming_coup_tt
+		hidden_effect = { HAI = { country_event = { id = HIS_HAI.5 days = 40 } } }
+		country_event = { id = USA_Trujillo_Conspiracy.12 days = 1 }
+	}
+	IBR = {
+		country_event = { id = HIS_PP_flavor.5 }
+	}
+	GER = {
+		country_event = { id = HIS_PP_flavor.8 }
+	}
+	MEX = {
+		country_event = { id = MEX_Trujillo_Conspiracy.7 }
+		country_event = { id = MEX_Mateos.271 days = 3 }
+	}
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.3
+			days = 1
+		}
+	}
+}
+
+TNO_PPI_DOM_victory_ramfis = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_DOM_victory_ramfis; Executing." # Ramfis wins
+
+	# TNO_Puerto_Plata_closing = yes
+
+	MEX = { country_event = { id = MEX_Puerto_Plata.8 } }
+	IBR = { country_event = { id = HIS_PP_ceasefire.24 } }
+	GER = { country_event = { id = HIS_PP_ceasefire.27 } }
+	USA = { country_event = { id = HIS_PP_ceasefire.29 } }
+}
+
+TNO_initialize_PP_milprep = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_initialize_PP_milprep; Executing."
+	set_variable = { PPI_milprep_org = 0 }
+	set_variable = { PPI_milprep_army = 0 }
+	set_variable = { PPI_milprep_initiative = 0 }
+	set_variable = { PPI_milprep_planning = 0 }
+}
+
+TNO_update_PP_milprep_DOM = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_update_PP_milprep_DOM; Executing."
+	set_variable = { DOM.PPI_milprep_org = DOM.PPI_ceasefire_military_preparation }
+	divide_variable = { DOM.PPI_milprep_org = 500 }
+	add_to_variable = { DOM.PPI_milprep_org = 0.05 }
+
+	set_variable = { DOM.PPI_milprep_army = DOM.PPI_ceasefire_military_preparation }
+	divide_variable = { DOM.PPI_milprep_army = 400 }
+
+	set_variable = { DOM.PPI_milprep_initiative = DOM.PPI_ceasefire_military_preparation }
+	divide_variable = { DOM.PPI_milprep_initiative = 800 }
+	add_to_variable = { DOM.PPI_milprep_initiative = 0.05 }
+
+	set_variable = { DOM.PPI_milprep_planning = DOM.PPI_ceasefire_military_preparation }
+	divide_variable = { DOM.PPI_milprep_planning = 200 }
+	add_to_variable = { DOM.PPI_milprep_planning = 0.16 }
+
+	force_update_dynamic_modifier = yes
+}
+TNO_update_PP_milprep_CAL = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_update_PP_milprep_CAL; Executing."
+	set_variable = { CAL.PPI_milprep_org = CAL.PPI_ceasefire_military_preparation }
+	divide_variable = { CAL.PPI_milprep_org = 500 }
+	add_to_variable = { CAL.PPI_milprep_org = 0.05 }
+
+	set_variable = { CAL.PPI_milprep_army = CAL.PPI_ceasefire_military_preparation }
+	divide_variable = { CAL.PPI_milprep_army = 400 }
+
+	set_variable = { CAL.PPI_milprep_initiative = CAL.PPI_ceasefire_military_preparation }
+	divide_variable = { CAL.PPI_milprep_initiative = 800 }
+	add_to_variable = { CAL.PPI_milprep_initiative = 0.05 }
+
+	set_variable = { CAL.PPI_milprep_planning = CAL.PPI_ceasefire_military_preparation }
+	divide_variable = { CAL.PPI_milprep_planning = 200 }
+	add_to_variable = { CAL.PPI_milprep_planning = 0.16 }
+
+	force_update_dynamic_modifier = yes
+}
+
+TNO_clear_PP_milprep = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_clear_PP_milprep; Executing."
+	meta_effect = {
+		text = {
+			remove_dynamic_modifier = { modifier = PPI_Military_Preparation }
+			clear_variable = [TAG].PPI_milprep_org
+			clear_variable = [TAG].PPI_milprep_army
+			clear_variable = [TAG].PPI_milprep_initiative
+			clear_variable = [TAG].PPI_milprep_planning
+		}
+		TAG = "[THIS.GetTag]"
+	}
+}
+
+TNO_PPI_DOM_ceasefire = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_DOM_ceasefire; Executing."
+	clr_global_flag = PPI_landing_ongoing
+	set_global_flag = PPI_ceasefire_happened
+
+	1706 = { set_state_name = STATE_1706_CAL }
+	319 = { set_state_name = STATE_319_CAL }
+	set_province_name = {
+		id = 7660
+		name = VICTORY_POINTS_7660_CAL
+	}
+
+	CAL = {
+		remove_ideas = {
+			HIS_well_supplied_army
+			HIS_not_supplied_army
+			CAL_PPI_cosmopolitan_brotherhood
+			CAL_PPI_rebels_of_fortune
+			CAL_PPI_Internal_Sectarianism
+		}
+		add_ideas = {
+			CAL_ceasefire_United_Front
+			CAL_ceasefire_Champions
+		}
+		add_state_core = 1237
+		transfer_state = 1237
+		add_state_core = 1709
+		transfer_state = 1709
+		add_state_core = 1708
+		transfer_state = 1708
+		set_capital = { state = 1709 }
+		set_cosmetic_tag = CAL_civil_war
+		set_party_name = {
+			ideology = paternalism
+			name = CAL_frente_unido_party
+			long_name = CAL_frente_unido_party_long
+		}
+		add_country_leader_role = {
+			character = CAL_Horacio_Ornes
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_HORACIO_ORNES_DESC"
+				expire = "1999.7.14"
+				ideology = paternalism_social_nationalism_subtype
+				traits = { }
+				id = -1
+			}
+		}
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+		econ_subtype_change = yes
+
+		load_oob = CAL_ceasefire_reinforcements
+	}
+
+	# Military Prep Bonus from Troops
+	CAL = {
+		set_temp_variable = { num_infantry = 0 }
+
+		every_country_division = {
+			# Checks if tank division is still alive, then if it is trained
+			if = {
+				limit = { division_has_majority_template = motorized }
+
+				if = {
+					limit = { USA = { has_country_flag = USA_PPI_Grupo_Blindado_trained } }
+					add_to_variable = { CAL.PPI_ceasefire_military_preparation = 10 }
+				}
+				else = {
+					add_to_variable = { CAL.PPI_ceasefire_military_preparation = 5 }
+				}
+			}
+
+			# Elite Infantry Check
+			#	1 for 5 prep, 2 for 10
+			else_if = {
+				limit = { division_has_majority_template = elite_infantry }
+
+				add_to_variable = { CAL.PPI_ceasefire_military_preparation = 5 }
+			}
+
+			# Infantry Check
+			#	Sum for prep bonus below
+			else_if = {
+				limit = { division_has_majority_template = infantry }
+
+				add_to_temp_variable = { num_infantry = 1 }
+			}
+		}
+
+		# Infantry Bonus
+		if = {
+			limit = { check_variable = { num_infantry = 1 } }
+			add_to_variable = { CAL.PPI_ceasefire_military_preparation = 3 }
+		}
+		else_if = {
+			limit = { check_variable = { num_infantry = 2 } }
+			add_to_variable = { CAL.PPI_ceasefire_military_preparation = 5 }
+		}
+		else_if = {
+			limit = { check_variable = { num_infantry = 3 } }
+			add_to_variable = { CAL.PPI_ceasefire_military_preparation = 10 }
+		}
+		else_if = {
+			limit = { check_variable = { num_infantry = 4 } }
+			add_to_variable = { CAL.PPI_ceasefire_military_preparation = 15 }
+		}
+		else_if = {
+			limit = { check_variable = { num_infantry = 5 } }
+			add_to_variable = { CAL.PPI_ceasefire_military_preparation = 20 }
+		}
+	}
+
+	DOM = {
+		white_peace = CAL
+		set_truce = {
+			target = CAL
+			days = 90
+		}
+		TNO_clear_PP_revolts = yes
+		proxy_war_clear_dynamic_bombing = yes
+		remove_all_ministers = yes
+		fill_empty_minister_nochecks = yes
+		remove_ideas = {
+			DOM_Dios_Trujillo
+			DOM_Blanqueamiento
+			PPI_USAF_bombing
+			PPI_USAF_bombing_2
+			PPI_USAF_bombing_3
+		}
+		add_ideas = {
+			DOM_ceasefire_Mobilization
+			DOM_ceasefire_New_State
+		}
+		swap_ideas = {
+			remove_idea = tno_political_parties_one_party_state
+			add_idea = tno_political_parties_controlled_opposition
+		}
+		swap_ideas = {
+			remove_idea = tno_trade_unions_illegal
+			add_idea = tno_trade_unions_state_controlled
+		}
+		swap_ideas = {
+			remove_idea = tno_public_meetings_outlawed
+			add_idea = tno_public_meetings_regulated
+		}
+		swap_ideas = {
+			remove_idea = tno_press_rights_propaganda_press
+			add_idea = tno_press_rights_censored_press
+		}
+		swap_ideas = {
+			remove_idea = tno_trade_laws_limited_exports
+			add_idea = tno_trade_laws_export_focus
+		}
+		swap_ideas = {
+			remove_idea = tno_income_taxation_elite_tax_exemptions
+			add_idea = tno_income_taxation_tax_havens
+		}
+	}
+
+	DOM = {
+		kill_country_leader = yes
+		add_country_leader_role = {
+			character = DOM_Joaquin_Balaguer
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_JOAQUIN_BALAGUER_DESC"
+				expire = "1999.7.14"
+				ideology = despotism_civilian_dictatorship_subtype
+				traits = { el_doctor }
+				id = -1
+			}
+		}
+		set_politics = { ruling_party = despotism }
+		set_popularities = {
+			fascism = 20
+			despotism = 25
+			paternalism = 37
+			liberalism = 7
+			socialist = 11
+		}
+
+		set_party_name = {
+			ideology = despotism
+			name = DOM_partido_dominicano_party
+			long_name = DOM_partido_dominicano_party_long
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			name = DOM_ultranationalism_party_puertoplata
+			long_name = DOM_ultranationalism_party_puertoplata_long
+		}
+		set_party_name = {
+			ideology = fascism
+			name = DOM_fascism_party_puertoplata
+			long_name = DOM_fascism_party_puertoplata_long
+		}
+
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+		econ_subtype_change = yes
+
+		remove_opinion_modifier = { target = CLC modifier = CLC_fascist_comrades }
+		remove_opinion_modifier = { target = STC modifier = CLC_fascist_comrades }
+		remove_opinion_modifier = { target = PAR modifier = CLC_fascist_comrades }
+		CLC = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+		STC = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+		PAR = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+	}
+
+	USA = {
+		set_variable = { USA_PPI_ceasefire_lobby_intervention_cost = 14 }
+		set_variable = { PPI_counteract_cost = 3 }
+		set_variable = { PPI_counteract_cost_triggervalue = 2.99 }
+		set_variable = { global.TNO_PPI_ceasefire_tension = 45 }
+
+		if = {
+			limit = { has_country_flag = USA_PPI_USN_support }
+			add_to_variable = { global.TNO_PPI_ceasefire_tension = 5 }
+		}
+		if = {
+			limit = { has_country_flag = USA_PPI_USAF_support }
+			add_to_variable = { global.TNO_PPI_ceasefire_tension = 10 }
+		}
+		add_to_variable = { global.TNO_PPI_ceasefire_tension = MEX.TNO_PPI_preceasefire_tension }
+	}
+
+	if = {
+		limit = {
+			OR = {
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_BAL_CEASEFIRE
+				}
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_BAL_VICTORY
+				}
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_REV_VICTORY
+				}
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_DOM_AGREEMENT
+				}
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_RAM_VICTORY
+				}
+			}
+		}
+		CAL = {
+			remove_ideas = Custom_TNO_INS_front_line_stopper
+		}
+		DOM = {
+			remove_ideas = Custom_TNO_INS_front_line_stopper
+		}
+	}
+
+	GER = {
+		set_variable = { global.PP_brandenburger_manpower = 50 }
+		set_variable = { global.PP_brandenburger_manpower_empty = 50 }
+	}
+
+	MEX = {
+		if = {
+			limit = { has_country_flag = MEX_Trujillo_Conspiracy_9_happened }
+			country_event = MEX_Trujillo_Conspiracy.10
+			country_event = {
+				id = MEX_Trujillo_Conspiracy.29 # 1st anniversary of the assasination
+				days = 366
+			}
+			country_event = {
+				id =  MEX_Mateos.270
+				days = 3
+			}
+		}
+	}
+
+	TNO_PP_brandenburger_manpower = yes
+}
+
+TNO_PPI_CAL_victory = { # THIS ONLY HAPPENS AFTER THE CIVIL WAR, DO NOT DEBUG IF CEASEFIRE->CIVIL WAR HAVE NOT BEEN TRIGGERED FIRST (may crash the game)
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_CAL_victory; Executing." # Rebels win
+	set_global_flag = PPI_Rebel_Victory
+	clr_global_flag = PPI_civil_war_ongoing
+	TNO_Puerto_Plata_closing = yes
+
+	CAL = { TNO_clear_PP_milprep = yes }
+
+	every_character = {
+		limit = { has_character_flag = CAL_character }
+		set_nationality = DOM
+	}
+
+	DOM = {
+		TNO_clear_PP_milprep = yes
+		annex_country = {
+			target = CAL
+			transfer_troops = yes
+		}
+
+		delete_unit_template_and_units = { division_template = "Batallon Expedicionario Revolucionario" disband = yes }
+		delete_unit_template_and_units = { division_template = "Columna Blindada Legionaria" disband = yes }
+		delete_unit_template_and_units = { division_template = "Brigada Rebelde del Ejército" disband = yes }
+		delete_unit_template_and_units = { division_template = "Guardia Presidencial" disband = yes }
+		delete_units = { division_template = "Brigada del Ejército" disband = yes }
+		1237 = {
+			create_unit = { # 1ra. Brigada del Ejército
+				division = "name = \"1ra. Brigada del Ejército\" division_template = \"Brigada del Ejército\" start_experience_factor = 0.21 start_equipment_factor = 1"
+				owner = DOM
+				prioritize_location = 15597
+			}
+			create_unit = { # 2da. Brigada del Ejército
+				division = "name = \"2da. Brigada del Ejército\" division_template = \"Brigada del Ejército\" start_experience_factor = 0.13 start_equipment_factor = 1"
+				owner = DOM
+				prioritize_location = 15597
+			}
+		}
+
+		add_ideas = {
+			DOM_The_Living_Ghost
+			DOM_The_Dominican_Revolution_0
+		}
+		remove_ideas = {
+			DOM_ceasefire_New_State
+			DOM_ceasefire_Mobilization
+			DOM_Modernizing_Military
+			DOM_Dios_Trujillo
+			DOM_Blanqueamiento
+			DOM_Rising_Resistance
+			PPI_civil_war
+		}
+		remove_all_ministers = yes
+		fill_empty_minister_nochecks = yes
+		econ_leave_sphere = yes
+		retire_country_leader = yes
+		set_politics = { ruling_party = despotism }
+		promote_character = DOM_Gobierno_de_Reconstruccion_Nacional
+		set_popularities = {
+			fascism = 14
+			ultranationalism = 8
+			paternalism = 35
+			liberalism = 21
+			socialist = 22
+		}
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+		econ_subtype_change = yes
+
+		set_party_name = {
+			ideology = fascism
+			name = DOM_fascism_party_puertoplata
+			long_name = DOM_fascism_party_puertoplata_long
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			name = DOM_ultranationalism_party_puertoplata
+			long_name = DOM_ultranationalism_party_puertoplata_long
+		}
+		set_party_name = {
+			ideology = despotism
+			name = DOM_despotism_party_puertoplata
+			long_name = DOM_despotism_party_puertoplata_long
+		}
+		set_party_name = {
+			ideology = liberalism
+			name = DOM_liberalism_party_puertoplata
+			long_name = DOM_liberalism_party_puertoplata_long
+		}
+
+		remove_opinion_modifier = { target = CLC modifier = CLC_fascist_comrades }
+		remove_opinion_modifier = { target = STC modifier = CLC_fascist_comrades }
+		remove_opinion_modifier = { target = PAR modifier = CLC_fascist_comrades }
+		CLC = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+		STC = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+		PAR = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+
+		remove_opinion_modifier = { target = IBR modifier = COL_iberia_love }
+		IBR = { remove_opinion_modifier = { target = DOM modifier = USA_we_support_them } }
+
+		remove_opinion_modifier = { target = USA modifier = USA_DOM_hostile_diplomacy }
+		USA = { remove_opinion_modifier = { target = DOM modifier = USA_DOM_hostile_diplomacy } }
+
+		remove_opinion_modifier = { target = CUB modifier = DOM_caribbean_tension }
+		remove_opinion_modifier = { target = WIN modifier = DOM_caribbean_tension }
+		remove_opinion_modifier = { target = MEX modifier = DOM_caribbean_tension }
+		remove_opinion_modifier = { target = VEN modifier = DOM_caribbean_tension }
+		CUB = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+		WIN = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+		MEX = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+		VEN = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+
+		country_event = {
+			id = HIS_puertoplata.122
+			hours = 1
+		}
+		country_event = {
+			id = HIS_puertoplata.12
+			days = 100
+		}
+	}
+
+	if = { # USA is supporting Balaguer
+		limit = { USA = { has_country_flag = USA_PP_ceasefire_balaguer } }
+		USA = { country_event = { id = HIS_PP_ceasefire.3 } }
+	}
+	else_if = { # USA is supporting the Legion
+		limit = { USA = { has_country_flag = USA_PP_ceasefire_legion } }
+		USA = { country_event = { id = HIS_PP_ceasefire.6 } }
+	}
+	else_if = { # Ramfis Civil War
+		limit = { MEX = { has_country_flag = MEX_Trujillo_Conspiracy_34_happened } }
+		USA = { country_event = { id = HIS_PP_flavor.2 } }
+	}
+	CUB = { country_event = { id = CUB_scripted.4 days = 73 } }
+	IBR = {
+		country_event = { id = HIS_PP_flavor.7 }
+	}
+	GER = {
+		country_event = { id = HIS_PP_flavor.10 }
+	}
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.2
+			days = 1
+		}
+	}
+}
+
+TNO_PPI_DOM_victory_balaguer = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_DOM_victory_balaguer; Executing." # Balaguer wins
+	set_global_flag = PPI_Balaguer_Victory
+	clr_global_flag = PPI_civil_war_ongoing
+	TNO_Puerto_Plata_closing = yes
+
+	CAL = { TNO_clear_PP_milprep = yes }
+
+	every_state = {
+		limit = { is_core_of = CAL }
+		CAL = { remove_state_core = PREV }
+	}
+
+	DOM = {
+		TNO_clear_PP_milprep = yes
+		remove_ideas = {
+			DOM_ceasefire_Mobilization
+			PPI_civil_war
+		}
+		country_event = {
+			id = HIS_PP_ceasefire.12
+			days = 400
+			random_days = 80
+		}
+		annex_country = {
+			target = CAL
+			transfer_troops = no
+		}
+		add_ideas = {
+			DOM_Doctor_Prescription
+		}
+		set_popularities = {
+			fascism = 11
+			despotism = 42
+			paternalism = 28
+			liberalism = 14
+			socialist = 5
+		}
+
+		if = { # USA is supporting Balaguer
+			limit = { USA = { has_country_flag = USA_PP_ceasefire_balaguer } }
+			USA = { country_event = { id = HIS_PP_ceasefire.2 } }
+
+			remove_opinion_modifier = { target = USA modifier = USA_DOM_hostile_diplomacy }
+			USA = { remove_opinion_modifier = { target = DOM modifier = USA_DOM_hostile_diplomacy } }
+		}
+		else_if = { # USA is supporting the Legion
+			limit = { USA = { has_country_flag = USA_PP_ceasefire_legion } }
+			USA = { country_event = { id = HIS_PP_ceasefire.5 } }
+		}
+
+		if = {
+			limit = { USA = { has_country_flag = USA_PP_ceasefire_balaguer } }
+			econ_join_sphere_USA = yes
+		}
+
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+		econ_subtype_change = yes
+	}
+	IBR = { country_event = { id = HIS_PP_ceasefire.21 } }
+	MEX = { country_event = { id = MEX_Puerto_Plata.8 } }
+
+	every_country = {
+		limit = { is_ai = no }
+		news_event = {
+			id = hispaniola_news.13
+			days = 1
+		}
+	}
+}
+
+TNO_PPI_DOM_negotiated_peace = {
+	log = "[GetDateText]: [Root.GetTag]: TNO_PPI_DOM_negotiated_peace; Executing."
+	set_global_flag = PPI_ceasefire_successful
+	hidden_effect = {
+		TNO_Puerto_Plata_closing = yes
+
+		CAL = { TNO_clear_PP_milprep = yes }
+		USA = { remove_mission = USA_PPI_tensions_increase }
+		MEX = { country_event = { id = MEX_Puerto_Plata.13 } }
+
+		every_state = {
+			limit = { is_core_of = CAL }
+			CAL = { remove_state_core = PREV }
+		}
+	}
+
+	DOM = {
+		annex_country = {
+			target = CAL
+			transfer_troops = no
+		}
+		add_country_leader_role = {
+			character = DOM_Joaquin_Balaguer
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_JOAQUIN_BALAGUER_DESC"
+				expire = "1999.7.14"
+				ideology = conservatism_paternalistic_conservatism_subtype
+				traits = { el_doctor }
+				id = -1
+			}
+		}
+		set_politics = { ruling_party = conservatism }
+
+		hidden_effect = {
+			set_popularities = {
+				fascism = 15
+				ultranationalism = 5
+				paternalism = 19
+				conservatism = 41
+				liberalism = 17
+				socialist = 3
+			}
+			set_party_name = {
+				ideology = conservatism
+				name = DOM_partido_reformista_party
+				long_name = DOM_partido_reformista_party_long
+			}
+
+			remove_opinion_modifier = { target = USA modifier = USA_DOM_hostile_diplomacy }
+			USA = { remove_opinion_modifier = { target = DOM modifier = USA_DOM_hostile_diplomacy } }
+			remove_opinion_modifier = { target = CLC modifier = CLC_fascist_comrades }
+			CLC = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+			remove_opinion_modifier = { target = STC modifier = CLC_fascist_comrades }
+			STC = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+			remove_opinion_modifier = { target = PAR modifier = CLC_fascist_comrades }
+			PAR = { remove_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+			remove_opinion_modifier = { target = WIN modifier = DOM_caribbean_tension }
+			WIN = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+			remove_opinion_modifier = { target = VEN modifier = DOM_caribbean_tension }
+			VEN = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+
+			TNO_clear_PP_milprep = yes
+			remove_ideas = {
+				DOM_ceasefire_Mobilization
+				DOM_ceasefire_New_State
+			}
+			add_ideas = {
+				DOM_Limits_Of_Tolerance
+				DOM_Doctor_Prescription
+			}
+
+			set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+			econ_subtype_change = yes
+
+			USA = { country_event = { id = HIS_PP_ceasefire.7 } }
+			IBR = { country_event = { id = HIS_PP_ceasefire.7 } }
+
+			if = {
+				limit = { USA = { has_country_flag = USA_PP_ceasefire_balaguer } }
+				econ_join_sphere_USA = yes
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = hispaniola_news.16
+					hours = 8
+				}
+			}
+		}
+	}
+}

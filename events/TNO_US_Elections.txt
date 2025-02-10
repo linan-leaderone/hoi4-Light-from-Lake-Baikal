@@ -1,0 +1,399 @@
+﻿add_namespace = us_elections
+add_namespace = us_elections_new
+add_namespace = USASJ
+
+country_event = {
+	id = us_elections.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event us_elections.1" }
+	hidden = yes
+	is_triggered_only = yes
+	option = {
+		US_elections_calculate_country_vars = yes
+	}
+}
+
+country_event = { #nomination
+	id = USASJ.1
+	title = USASJ.1.t
+	desc = USASJ.1.desc
+	picture = GFX_report_event_USA_supreme_court
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event USASJ.1"
+	}
+	is_triggered_only = yes
+	option = { #liberal
+		name = USASJ.1.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 100
+				has_game_rule = { rule = USA_SUPREME_COURT_APPOINTEES option = USA_SUPREME_COURT_APPOINTEES_ALWAYS_PROGRESSIVE }
+			}
+		}
+		custom_effect_tooltip = USASC_liberal_nomination_tt
+		hidden_effect = {
+			nominate_liberal = yes
+			random_list = {
+				25 = { country_event = { id = USASJ.2 days = 100 random_hours = 8640 } }
+				35 = { country_event = { id = USASJ.2 days = 700 random_hours = 8640 } }
+				25 = { country_event = { id = USASJ.2 days = 1000 random_hours = 8640 } }
+				15 = { country_event = { id = USASJ.2 days = 1825 random_hours = 42720 } }
+			}
+		}
+		recalculate_supreme_court = yes
+		hidden_effect = {
+			USA_supreme_court_consequences_lib = yes
+		}
+	}
+	option = { #conservative
+		name = USASJ.1.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 100
+				has_game_rule = { rule = USA_SUPREME_COURT_APPOINTEES option = USA_SUPREME_COURT_APPOINTEES_ALWAYS_CONSERVATIVE }
+			}
+		}
+		custom_effect_tooltip = USASC_conservative_nomination_tt
+		hidden_effect = {
+			nominate_conservative = yes
+			random_list = {
+				25 = { country_event = { id = USASJ.2 days = 100 random_hours = 8640 } }
+				35 = { country_event = { id = USASJ.2 days = 700 random_hours = 8640 } }
+				25 = { country_event = { id = USASJ.2 days = 1000 random_hours = 8640 } }
+				15 = { country_event = { id = USASJ.2 days = 1825 random_hours = 42720 } }
+			}
+		}
+		recalculate_supreme_court = yes
+		hidden_effect = {
+			USA_supreme_court_consequences_con = yes
+		}
+	}
+}
+
+country_event = { #prep
+	id = USASJ.2
+	hidden = yes
+	title = USASJ.2.t
+	desc = USASJ.2.desc
+	#picture = GFX_report_event_USA_supreme_court
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event USASJ.2"
+	}
+	is_triggered_only = yes
+	option = { #
+		name = USASJ.2.a
+		ai_chance = { factor = 1 }
+		if = {
+			limit = { USA_has_very_liberal_supreme_court = yes }
+			set_variable = { US_supreme_court_prev = 1 }
+		}
+		else_if = {
+			limit = { USA_has_liberal_supreme_court = yes }
+			set_variable = { US_supreme_court_prev = 2 }
+		}
+		else_if = {
+			limit = { USA_has_conservative_supreme_court = yes }
+			set_variable = { US_supreme_court_prev = 3 }
+		}
+		else_if = {
+			limit = { USA_has_very_conservative_supreme_court = yes }
+			set_variable = { US_supreme_court_prev = 4 }
+		}
+		USA_SJ_death = yes
+		country_event = { id = USASJ.3 days = 1 }
+		recalculate_supreme_court = yes
+	}
+}
+country_event = { #death
+	id = USASJ.3
+	title = USASJ.3.t
+	desc = USASJ.3.desc
+	picture = GFX_report_event_USA_supreme_court
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event USASJ.3"
+	}
+	is_triggered_only = yes
+	option = { #liberal
+		name = USASJ.3.a
+		ai_chance = { factor = 1 }
+		hidden_effect = {
+			#special cases under here
+			if = {
+				limit = {
+					date > 1965.2.2
+					USA_has_civil_rights = yes
+					check_variable = { bill_id < 1 }
+					OR = {
+						has_government = liberalism
+						has_government = progressivism
+					}
+					NOT = { has_country_flag = USASJ_Thurgood_fuss }
+				}
+				set_country_flag = USASJ_Thurgood_fuss
+				country_event = { id = USASJ.5 days = 5 }
+			}
+			#if no special cases apply, do the default dance
+			else = { country_event = { id = USASJ.1 days = 30 } }
+		}
+	}
+}
+country_event = { #REPORT DEBUG
+	id = USASJ.4
+	title = USASJ.4.t
+	desc = USASJ.4.desc
+	#picture = GFX_report_event_USA_supreme_court
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event USASJ.4"
+		recalculate_supreme_court = yes
+	}
+	is_triggered_only = yes
+	option = {
+		name = USASJ.4.a
+
+	}
+}
+###########################################################
+country_event = { #Thurgood Marshall chain
+	id = USASJ.5
+	title = USASJ.5.t
+	desc = USASJ.5.desc
+	picture = GFX_report_event_USA_supreme_court
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event USASJ.5"
+		recalculate_supreme_court = yes
+	}
+	is_triggered_only = yes
+	option = { #nominate thurgood marshall
+		name = USASJ.5.a
+		ai_chance = { factor = 15 } #ai will do this most of the time
+		#THE SENATE SHALL DECIDE YOUR FATE THURGOOD#
+		custom_effect_tooltip = USA_Let_Thurgood
+		hidden_effect = {
+			if = { #SAY GOODBYE OLD BILL (actually you can retake it)
+				limit = {
+					OR = {
+						has_country_flag = bill_enable_mission
+						has_country_flag = bill_enable_mission_hart
+					}
+				}
+				clr_country_flag = bill_enable_mission #no more bill!!!
+				set_country_flag = USA_thurgood_time #foci cancel!!!
+				#hart stuff!!!
+				set_country_flag = USA_chain_bill #hart foci cancel!!!
+				clr_country_flag = bill_enable_mission_hart #hart bills disappear!!!
+				#cancel hart bills!!!
+				clr_country_flag = USA_land_reform_act
+				clr_country_flag = USA_americas_choice_act
+				clr_country_flag = USA_responsibility_in_government_act
+				clr_country_flag = USA_workers_wekfare_act
+				clr_country_flag = USA_transport_ass_act
+				clr_country_flag = USA_federal_finance_act
+				clr_country_flag = USA_urban_divose_act
+				clr_country_flag = USA_libraries_act
+				clr_country_flag = USA_urban_affairs
+				clr_country_flag = USA_bad_bayh
+				clr_country_flag = USA_good_bayh
+				clr_country_flag = USA_ted_kennedy_healthcare_bill
+				clr_country_flag = USA_walter_reuther_pollution
+				clr_country_flag = USA_kissinger_pakt_embargo
+				clr_country_flag = USA_kissinger_popular_treaty
+				clr_country_flag = USA_kissinger_unpopular_treaty
+				clr_country_flag = USA_kissinger_PAST
+			}
+			USA_Let_Thurgood_In_Setup = yes
+			country_event = { id = USA_sen_bill.105 days = 15 }
+		}
+
+	}
+	option = { #the long awaited, years long anticipated option to nominate a conservative, formerly just a comment in the code of this event, is now a reality thanks to the wonders of copy and paste
+		name = USASJ.5.b
+		ai_chance = { factor = 1 } #ai should rarely if ever do this
+		custom_effect_tooltip = USASC_conservative_nomination_thurgood_tt
+		if = {
+			limit = {
+				has_government = liberalism
+			}
+			custom_effect_tooltip = USA_black_voters_header_tt #black people aren't happy you nominated a conservative instead of Thurgood when you said you would do so
+			set_temp_variable = { USA_week_change_black_pro = 4 }
+			add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_black_pro }
+			custom_effect_tooltip = USA_black_pro_shift
+		}
+		if = {
+			limit = {
+				has_government = progressivism
+			}
+			custom_effect_tooltip = USA_black_voters_header_tt #black people aren't happy you nominated a conservative instead of Thurgood when you said you would do so
+			set_temp_variable = { USA_week_change_black_dem = 4 }
+			add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_black_dem }
+			custom_effect_tooltip = USA_black_dem_shift
+		}
+		hidden_effect = {
+			nominate_conservative = yes
+			random_list = {
+				25 = { country_event = { id = USASJ.2 days = 100 random_hours = 8640 } }
+				35 = { country_event = { id = USASJ.2 days = 700 random_hours = 8640 } }
+				25 = { country_event = { id = USASJ.2 days = 1000 random_hours = 8640 } }
+				15 = { country_event = { id = USASJ.2 days = 1825 random_hours = 42720 } }
+			}
+		}
+		recalculate_supreme_court = yes
+		hidden_effect = {
+			USA_supreme_court_consequences_con = yes
+		}
+	}
+	#option about electing a conservative???? #you finally got your wish whoever this person was. likely not even on the team anymore. the memories
+}
+#go wild doc!
+# doc isn't here rught now..... this is mango territoru....
+
+country_event = {
+	id = us_elections_new.1
+	title = us_elections_new.1.t
+	desc = us_elections_new.1.desc
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event us_elections_new.1"
+		set_variable = { USA.RDC_popularvote = 0 }
+		set_variable = { USA.NPP_popularvote = 0 }
+		set_variable = { RD_electoral_votes = 0 }
+		set_variable = { NPP_electoral_vostes = 0 }
+		every_owned_state = {
+		limit = { has_state_flag = US_election_state }
+			clr_state_flag = npp_win_pres
+			clr_state_flag = rdc_win_pres
+			set_variable = { rdc_votes = 0 }
+			set_variable = { npp_votes = 0 }
+			US_hold_presidential_election_in_state_new = yes
+		}
+			
+		clr_country_flag = rep_can_pres
+		clr_country_flag = dem_can_pres
+		clr_country_flag = pro_can_pres
+		clr_country_flag = nat_can_pres
+		clr_country_flag = com_can_pres
+		clr_country_flag = anv_can_pres
+		clr_country_flag = USA_democrat_running
+		clr_country_flag = USA_republican_running
+		clr_country_flag = USA_progressive_running
+		clr_country_flag = USA_nationalist_running
+		clr_country_flag = USA_communist_running
+		clr_country_flag = USA_anv_running
+		#
+		clr_country_flag = USA_johnson_nominated # texas
+		clr_country_flag = USA_bennet_nominated # utah
+		clr_country_flag = USA_kennedy_nominated # mass
+		clr_country_flag = USA_wallace_nominated # alabama
+		clr_country_flag = USA_hart_nominated # michigan
+		clr_country_flag = USA_goldwater_nominated # arizona
+		clr_country_flag = USA_harrington_nominated # missouri
+		clr_country_flag = USA_smith_nominated # maine
+		clr_country_flag = USA_kirkpatrick_nominated # maryland
+		clr_country_flag = USA_romney_nominated # michigan
+		clr_country_flag = USA_scoop_nominated # washington
+		clr_country_flag = USA_schlafly_nominated # missouri
+		clr_country_flag = USA_hall_nominated # minnesota
+		clr_country_flag = USA_yockey_nominated # illinois
+	}
+	is_triggered_only = yes
+	option = {
+		name = us_elections_new.1.a
+		
+	}
+}
+
+country_event = {
+	id = us_elections_new.2
+	title = us_elections_new.2.t
+	desc = "pick ur race"
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event us_elections_new.2"
+	}
+	is_triggered_only = yes
+	option = {
+		name = "Hart v Chase Smith"
+		set_country_flag = USA_democrat_running
+		set_country_flag = USA_nationalist_running
+		# RDC 
+		set_variable = { USA.RDC_civil_rights_policy = 7 }
+		set_variable = { USA.RDC_domestic_policy_policy = 8 }
+		set_variable = { USA.RDC_economic_policy_policy = 7 }
+		set_variable = { USA.RDC_foreign_policy_policy = 6 }
+			set_country_flag = dem_can_pres
+		# NPP 
+		set_variable = { USA.NPP_civil_rights_policy = 6 }
+		set_variable = { USA.NPP_domestic_policy_policy = 5 }
+		set_variable = { USA.NPP_economic_policy_policy = 5 }
+		set_variable = { USA.NPP_foreign_policy_policy = 7 }
+			set_country_flag = nat_can_pres
+	}
+	option = {
+		name = "Bennet v Wallace"
+		set_country_flag = USA_republican_running
+		set_country_flag = USA_nationalist_running
+		# RDC 
+		set_variable = { USA.RDC_civil_rights_policy = 6 }
+		set_variable = { USA.RDC_domestic_policy_policy = 4 }
+		set_variable = { USA.RDC_economic_policy_policy = 5 }
+		set_variable = { USA.RDC_foreign_policy_policy = 6 }
+			set_country_flag = rep_can_pres
+		# NPP 
+		set_variable = { USA.NPP_civil_rights_policy = 2 }
+		set_variable = { USA.NPP_domestic_policy_policy = 2 }
+		set_variable = { USA.NPP_economic_policy_policy = 3 }
+		set_variable = { USA.NPP_foreign_policy_policy = 5 }
+			set_country_flag = nat_can_pres
+	}
+	option = {
+		name = "Romney v Schlafly"
+		set_country_flag = USA_republican_running
+		set_country_flag = USA_nationalist_running
+		# RDC 
+		set_variable = { USA.RDC_civil_rights_policy = 8 }
+		set_variable = { USA.RDC_domestic_policy_policy = 5 }
+		set_variable = { USA.RDC_economic_policy_policy = 5 }
+		set_variable = { USA.RDC_foreign_policy_policy = 7 }
+			set_country_flag = rep_can_pres
+		# NPP 
+		set_variable = { USA.NPP_civil_rights_policy = 4 }
+		set_variable = { USA.NPP_domestic_policy_policy = 3 }
+		set_variable = { USA.NPP_economic_policy_policy = 3 }
+		set_variable = { USA.NPP_foreign_policy_policy = 4 }
+			set_country_flag = nat_can_pres
+	}
+	option = {
+		name = "Goldwater v RFK"
+		set_country_flag = USA_republican_running
+		set_country_flag = USA_progressive_running
+		# RDC 
+		set_variable = { USA.RDC_civil_rights_policy = 4 }
+		set_variable = { USA.RDC_domestic_policy_policy = 3 }
+		set_variable = { USA.RDC_economic_policy_policy = 3 }
+		set_variable = { USA.RDC_foreign_policy_policy = 7 }
+			set_country_flag = rep_can_pres
+		# NPP 
+		set_variable = { USA.NPP_civil_rights_policy = 7 }
+		set_variable = { USA.NPP_domestic_policy_policy = 7 }
+		set_variable = { USA.NPP_economic_policy_policy = 6 }
+		set_variable = { USA.NPP_foreign_policy_policy = 9 }
+			set_country_flag = pro_can_pres
+	}
+	option = {
+		name = "Goldwater v Yockey"
+		set_country_flag = USA_republican_running
+		set_country_flag = USA_anv_running
+		# RDC 
+		set_variable = { USA.RDC_civil_rights_policy = 4 }
+		set_variable = { USA.RDC_domestic_policy_policy = 3 }
+		set_variable = { USA.RDC_economic_policy_policy = 3 }
+		set_variable = { USA.RDC_foreign_policy_policy = 7 }
+			set_country_flag = rep_can_pres
+		# NPP 
+		set_variable = { USA.NPP_civil_rights_policy = 1 }
+		set_variable = { USA.NPP_domestic_policy_policy = 1 }
+		set_variable = { USA.NPP_economic_policy_policy = 2 }
+		set_variable = { USA.NPP_foreign_policy_policy = 3 }
+			set_country_flag = anv_can_pres
+	}
+}

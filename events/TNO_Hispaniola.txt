@@ -1,0 +1,7466 @@
+add_namespace = HIS_general
+add_namespace = HIS_puertoplata
+add_namespace = HIS_PP_flavor
+add_namespace = HIS_PP_ceasefire
+add_namespace = HIS_puertoplata_shootdown
+add_namespace = HIS_hinche_negotiations
+add_namespace = hispaniola_news
+add_namespace = hispaniola_news_shootdown
+add_namespace = HIS_HAI
+add_namespace = HIS_HAI_skel_taps
+add_namespace = HIS_HAI_ugly
+add_namespace = HIS_HAI_decision
+add_namespace = HIS_DOM_ceasefire_skeleton
+add_namespace = HIS_DOM_Trujillo_Victory
+add_namespace = MEX_Puerto_Plata
+add_namespace = USA_Trujillo_Conspiracy
+
+country_event = { # Trujillo Dies (1968)
+	id = HIS_general.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_general.1" }
+	title = HIS_general.1.t
+	desc = HIS_general.1.desc
+	picture = GFX_report_event_IBR_big_meeting
+
+	is_triggered_only = yes
+	trigger = { has_country_leader = { character = DOM_Rafael_Trujillo ruling_only = yes } }
+
+	option = {
+		name = HIS_general.1.a
+		set_country_flag = DOM_trujillo_died
+
+		remove_all_ministers = yes
+		fill_empty_minister_nochecks = yes
+
+		swap_ideas = {
+			remove_idea = DOM_Dios_Trujillo
+			add_idea = DOM_Puppet_Caudillo
+		}
+
+		kill_country_leader = yes
+		add_country_leader_role = {
+			character = DOM_Ramfis_Trujillo
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_RAMFIS_TRUJILLO_DESC"
+				expire = "1999.7.14"
+				ideology = fascism_subtype
+				traits = { }
+				id = -1
+			}
+		}
+
+		country_event = {
+			id = HIS_DOM_Trujillo_Victory.1
+			days = 190
+		}
+		if = {
+			limit = { check_variable = { USA.HAI_blitz_tension < 75 } }
+			USA = {
+				country_event = { id = HIS_HAI.21 days = 7 }
+			}
+		}
+		if = {
+			limit = { has_global_flag = HIS_trujillo_blitz_ongoing }
+			if = {
+				limit = {
+					OR = {
+						AND = {
+							NOT = {
+								has_game_rule = {
+									rule = TRUJILLO_BLITZ_OUTCOME
+									option = TRUJILLO_BLITZ_OUTCOME_CASEFIRE_HAI
+								}
+							}
+							DOM = {
+								controls_province = 15584
+								controls_province = 15636
+							}
+						}
+						has_game_rule = {
+							rule = TRUJILLO_BLITZ_OUTCOME
+							option = TRUJILLO_BLITZ_OUTCOME_CASEFIRE_DOM
+						}
+					}
+				}
+				TNO_HIS_blitz_ceasefire_trujillo = yes
+			}
+			else =	{
+				TNO_HIS_blitz_ceasefire_haiti = yes
+			}
+		}
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { # trujillo dead news event
+				id = hispaniola_news.26
+				hours = 8
+			}
+		}
+	}
+}
+country_event = { # Trujillo Assassinated (1966/whenever after ceasefire) -> Triumvirate Assassination
+	id = HIS_general.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_general.2" }
+	title = HIS_general.2.t
+	desc = HIS_general.2.desc
+	picture = GFX_report_event_IBR_big_meeting
+
+	is_triggered_only = yes
+	trigger = {
+		has_country_leader = { character = DOM_Rafael_Trujillo ruling_only = yes }
+		OR = {
+			has_global_flag = HIS_trujillo_blitz_ceasefire_trujillo
+			has_global_flag = HIS_trujillo_blitz_ceasefire_haiti
+		}
+	}
+
+	option = {
+		name = HIS_general.2.a
+		set_country_flag = DOM_trujillo_assassinated
+
+		remove_all_ministers = yes
+		fill_empty_minister_nochecks = yes
+
+		swap_ideas = {
+			remove_idea = DOM_Dios_Trujillo
+			add_idea = DOM_Dios_Trujillo_Ramfis
+		}
+
+		kill_country_leader = yes
+		add_country_leader_role = {
+			character = DOM_Ramfis_Trujillo
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_RAMFIS_TRUJILLO_DESC"
+				expire = "1999.7.14"
+				ideology = fascism_subtype
+				traits = { }
+				id = -1
+			}
+		}
+		random_list = {
+			40 = { # Reid Triumvirate
+				modifier = {
+					factor = 0
+					OR = {
+						has_game_rule = { rule = DOM_TRUJILLO_SUCCESSOR option = DOM_TRUJILLO_SUCCESSOR_RAMFIS }
+						has_game_rule = { rule = DOM_TRUJILLO_SUCCESSOR option = DOM_TRUJILLO_SUCCESSOR_WESSIN }
+					}
+				}
+				country_event = {
+					id = HIS_DOM_ceasefire_skeleton.1
+					days = 40
+				}
+			}
+			30 = { # Wessin Coup
+				modifier = {
+					factor = 0
+					OR = {
+						has_game_rule = { rule = DOM_TRUJILLO_SUCCESSOR option = DOM_TRUJILLO_SUCCESSOR_RAMFIS }
+						has_game_rule = { rule = DOM_TRUJILLO_SUCCESSOR option = DOM_TRUJILLO_SUCCESSOR_REID }
+					}
+				}
+				country_event = {
+					id = HIS_DOM_ceasefire_skeleton.2
+					days = 90
+				}
+			}
+			30 = { # Ramfis stays
+				modifier = {
+					factor = 0
+					OR = {
+						has_game_rule = { rule = DOM_TRUJILLO_SUCCESSOR option = DOM_TRUJILLO_SUCCESSOR_REID }
+						has_game_rule = { rule = DOM_TRUJILLO_SUCCESSOR option = DOM_TRUJILLO_SUCCESSOR_WESSIN }
+					}
+				}
+			}
+		}
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { # trujillo dead news event
+				id = hispaniola_news.17
+				hours = 8
+			}
+		}
+	}
+}
+country_event = { # Dominican Republic worried (IBR)
+	id = HIS_puertoplata.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.1" }
+	title = HIS_puertoplata.1.t
+	desc = HIS_puertoplata.1.desc
+	picture = GFX_report_event_IBR_big_meeting
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_puertoplata.1.a
+	}
+}
+
+country_event = { # FBI report, start training Caribbean Legion, deccat becomes available (USA)
+	id = HIS_puertoplata.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.2" }
+	title = HIS_puertoplata.2.t
+	desc = HIS_puertoplata.2.desc
+	picture = GFX_report_event_USA_fbi
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_puertoplata.2.a
+
+		custom_effect_tooltip = DOM_puerto_plata_intervention_enabled_legion
+		hidden_effect = {
+			TNO_USA_PP_invasion_start = yes
+			IBR = { country_event = { id = HIS_puertoplata.3 days = 40 } }
+			add_command_power = 80
+		}
+		custom_effect_tooltip = PP_Command_Power_Loan_tt
+	}
+}
+
+country_event = { # Iberia catches wind of the plans, deccat becomes available (IBR)
+	id = HIS_puertoplata.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.3" }
+	title = HIS_puertoplata.3.t
+	desc = HIS_puertoplata.3.desc
+	picture = GFX_report_event_IBR_military_meeting
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_puertoplata.3.a
+
+		add_command_power = 10
+		custom_effect_tooltip = DOM_puerto_plata_intervention_enabled_trujillo
+		hidden_effect = {
+			TNO_fopo_add_puerto_plata_tab = yes
+			GER = { country_event = { id = HIS_puertoplata.4 days = 14 } }
+			USA = { country_event = { id = HIS_puertoplata.5 days = 121 } } # TODO replace this with USA PP event chain
+			if = {
+				limit = { USA = { is_ai = yes } }
+				USA = { add_command_power = 100 }
+			}
+			if = {
+				limit = { IBR = { is_ai = yes } }
+				IBR = { add_command_power = 100 }
+			}
+		}
+	}
+}
+
+country_event = { # German intelligence report, decision to get involved in Trujillo's side or not (GER)
+	id = HIS_puertoplata.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.4" }
+	title = HIS_puertoplata.4.t
+	desc = HIS_puertoplata.4.desc
+	picture = GFX_report_event_GER_abwehr_intelligence
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Yes
+		name = HIS_puertoplata.4.a
+
+		add_command_power = 10
+		custom_effect_tooltip = DOM_puerto_plata_intervention_enabled_trujillo
+		hidden_effect = {
+			TNO_fopo_add_puerto_plata_tab = yes
+			if = {
+				limit = { GER = { is_ai = yes } }
+				GER = { add_command_power = 100 }
+			}
+			set_variable = { PPI_infiltration_cost = 10 }
+		}
+	}
+}
+
+country_event = { # Report to the President, Operation in 60 days (USA)
+	id = HIS_puertoplata.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.5" }
+	title = HIS_puertoplata.5.t
+	desc = HIS_puertoplata.5.desc
+	picture = GFX_report_event_USA_fbi
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_puertoplata.5.a
+
+		add_command_power = 5
+		custom_effect_tooltip = HIS_puertoplata.5.a_tt
+		hidden_effect = {
+			ZZZ = { activate_mission = ZZZ_PPI_Invasion_Begins }
+			country_event = { id = HIS_puertoplata.14 days = 56 } # demils puerto plata state
+			IBR = { country_event = { id = HIS_puertoplata.6 } }
+			if = {
+				limit = {
+					GER = {
+						is_in_array = { TNO_active_conflicts = token:GC_PuertoPlata }
+					}
+				}
+				GER = { country_event = { id = HIS_puertoplata.7 } }
+			}
+		}
+	}
+}
+
+country_event = { # Invasion coming in the next couple of months (IBR)
+	id = HIS_puertoplata.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.6" }
+	title = HIS_puertoplata.6.t
+	desc = HIS_puertoplata.6.desc
+	picture = GFX_report_event_IBR_ship_guns
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_puertoplata.6.a
+
+		add_command_power = 5
+		custom_effect_tooltip = HIS_puertoplata.6.a_tt
+	}
+}
+
+country_event = { # Invasion coming in the next couple of months (GER)
+	id = HIS_puertoplata.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.7" }
+	title = HIS_puertoplata.7.t
+	desc = HIS_puertoplata.7.desc
+	picture = GFX_report_event_GER_child_german_soldiers
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_puertoplata.7.a
+
+		add_command_power = 5
+		custom_effect_tooltip = HIS_puertoplata.6.a_tt
+	}
+}
+
+country_event = { # The Invasion Begins (USA)
+	id = HIS_puertoplata.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.10" }
+	title = HIS_puertoplata.10.t
+	desc = HIS_puertoplata.10.desc
+	picture = GFX_report_event_generic_m_50_jet_bomber
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_puertoplata.10.a
+
+		custom_effect_tooltip = HIS_puertoplata.10_tt
+		custom_effect_tooltip = PP_Command_Power_Loan_Takeback_tt
+		hidden_effect = {
+			TNO_Puerto_Plata_Landing_Start = yes
+			add_command_power = -80
+			USA = {
+				set_temp_variable = { Victory_ID = 29 }
+				Cold_War_GUI_AddVictory = yes
+			}
+			GER = {
+				set_temp_variable = { Victory_ID = 29 }
+				Cold_War_GUI_AddVictory = yes
+			}
+			MEX = { country_event = { id = MEX_Puerto_Plata.5 } }
+		}
+	}
+}
+country_event = { #weekly event that gives the supply decay and checks if debuffs should be applied [DISABLED CURRENTLY]
+	id = HIS_puertoplata.11
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.11"
+		if = {
+			limit = {
+				country_exists = CAL
+				has_global_flag = PPI_landing_ongoing
+			}
+			subtract_from_variable = { USA.US_PP_supply = USA.US_PP_supply_decay }
+			TNO_USA_PPI_Check_Supply = yes
+			country_event = {
+				id = HIS_puertoplata.11
+				days = 7
+			}
+		}
+	}
+	hidden = yes
+	is_triggered_only = yes
+}
+
+country_event = { # Fate of the Legion
+	id = HIS_puertoplata.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.12" }
+	title = HIS_puertoplata.12.t
+	desc = HIS_puertoplata.12.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = { # Socialist putsch succeeds
+		name = HIS_puertoplata.12.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_PUTSCH option = DOM_PUTSCH_FAIL }
+			}
+		}
+
+		set_global_flag = HIS_DOM_socialist_revolution
+		remove_ideas = DOM_The_Dominican_Revolution_0
+		add_ideas = {
+			DOM_The_Dominican_Peoples_Revolution
+			DOM_Starting_from_Scratch
+			DOM_Economic_Revolution
+			DOM_Autonomous_Hinche
+		}
+		add_timed_idea = {
+			idea = DOM_Exodus
+			days = 750
+		}
+		HAC = { add_ideas = HAC_Through_the_Hinche_Highway }
+
+		set_variable = { USA.HCW_Hinche_frame = 2 }
+		set_variable = { USA.USA_HCW_dominican_assistance = 0 }
+
+		promote_character = DOM_Maximo_Antonio_Lopez_Molina
+		set_politics = { ruling_party = socialist }
+		set_popularities = {
+			despotism = 8
+			communist = 5
+			socialist = 40
+			liberalism = 13
+			liberal_conservatism = 9
+			paternalism = 13
+			progressivism = 12
+		}
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Worker_Directed }
+		econ_subtype_change = yes
+
+		country_event = {
+			id = HIS_puertoplata.15
+			days = 730
+		}
+		country_event = {
+			id = HIS_HAI.14
+			days = 21
+		}
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.5
+				hours = 8
+			}
+		}
+	}
+	option = { # Socialist putsch defeated
+		name = HIS_puertoplata.12.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_PUTSCH option = DOM_PUTSCH_SUCCESS }
+			}
+		}
+
+		set_global_flag = HIS_DOM_democratic_revolution
+		set_popularities = {
+			despotism = 30
+			communist = 3
+			socialist = 5
+			liberalism = 10
+			liberal_conservatism = 10
+			paternalism = 30
+			progressivism = 12
+		}
+
+		country_event = {
+			id = HIS_puertoplata.13
+			days = 32
+		}
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.6
+				hours = 8
+			}
+		}
+	}
+}
+country_event = { # annex CAL
+	id = HIS_puertoplata.122
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.122" }
+	title = HIS_puertoplata.122.t
+	desc = HIS_puertoplata.122.desc
+	picture = GFX_report_event_GER_child_german_soldiers
+
+	hidden = yes
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_puertoplata.122.a
+		annex_country = {
+			target = CAL
+			transfer_troops = yes
+		}
+		hidden_effect = {
+			MEX = { country_event = { id = MEX_Puerto_Plata.10 } }
+		}
+	}
+}
+
+country_event = { # Dominican Special Election
+	id = HIS_puertoplata.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.13" }
+	title = HIS_puertoplata.13.t
+	desc = HIS_puertoplata.13.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	immediate = { set_country_flag = DOM_elections_may_happen }
+
+	option = { # Bonnelly wins
+		name = HIS_puertoplata.13.a
+		ai_chance = {
+			factor = 60
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_ELECTION option = DOM_ELECTION_BOSCH }
+			}
+			modifier = {
+				factor = 40
+				NOT = { has_game_rule = { rule = DOM_ELECTION option = DOM_ELECTION_BOSCH } }
+				MEX = { has_country_flag = MEX_PPI_ceasefire_position_exiles_flag }
+			}
+		}
+
+		remove_ideas = DOM_The_Dominican_Revolution_0
+		add_ideas = {
+			DOM_The_Dominican_Revolution_2
+			DOM_Common_Sense_Program
+		}
+
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = liberalism
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.9
+				hours = 8
+			}
+		}
+		set_popularities = {
+			despotism = 8
+			communist = 5
+			socialist = 7
+			liberalism = 30
+			liberal_conservatism = 20
+			paternalism = 22
+			progressivism = 8
+		}
+		econ_join_sphere_USA = yes
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+		econ_subtype_change = yes
+	}
+	option = { # Bosch wins
+		name = HIS_puertoplata.13.b
+		ai_chance = {
+			factor = 40
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_ELECTION option = DOM_ELECTION_BONNELLY }
+			}
+		}
+
+		remove_ideas = DOM_The_Dominican_Revolution_0
+		add_ideas = {
+			DOM_The_Dominican_Revolution_1
+			DOM_Reform_Program
+		}
+
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = progressivism
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.10
+				hours = 8
+			}
+		}
+		set_popularities = {
+			despotism = 8
+			communist = 5
+			socialist = 10
+			liberalism = 15
+			liberal_conservatism = 10
+			paternalism = 17
+			progressivism = 35
+		}
+		econ_join_sphere_MEX = yes
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+		econ_subtype_change = yes
+	}
+}
+
+country_event = { # demilitarize puerto plata
+	id = HIS_puertoplata.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.14" }
+	title = HIS_puertoplata.14.t
+	desc = HIS_puertoplata.14.desc
+	hidden = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_puertoplata.14.a
+		1237 = { set_demilitarized_zone = yes }
+	}
+}
+
+
+country_event = { # Maximo becomes an Amazonism fan
+	id = HIS_puertoplata.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.15" }
+	title = HIS_puertoplata.15.t
+	desc = HIS_puertoplata.15.desc
+	hidden = yes
+
+	trigger = { has_country_leader = { character = DOM_Maximo_Antonio_Lopez_Molina ruling_only = yes } }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_puertoplata.15.a
+		add_country_leader_role = {
+			character = DOM_Maximo_Antonio_Lopez_Molina
+			promote_leader = yes
+			country_leader = {
+				expire = "1999.1.1"
+				ideology = communist_amazonism_subtype
+				traits = { }
+				id = -1
+			}
+		}
+		set_politics = { ruling_party = communist }
+		set_cosmetic_tag = DOM_communist_rev
+
+		set_popularities = {
+			despotism = 14
+			communist = 40
+			socialist = 0
+			liberalism = 10
+			liberal_conservatism = 9
+			paternalism = 17
+			progressivism = 10
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = hispaniola_news.8 hours = 8 }
+		}
+
+		remove_ideas = {
+			DOM_The_Living_Ghost
+			DOM_The_Dominican_Peoples_Revolution
+		}
+		add_ideas = DOM_The_Dominican_Cultural_Revolution
+
+		random_list = {
+			40 = {
+				modifier = {
+					factor = 0
+					has_game_rule = { rule = DOM_SOCIALIST_COUP option = DOM_SOCIALIST_COUP_NO }
+				}
+				modifier = {
+					factor = 0
+					has_global_flag = TNO_HAI_civil_war_communist_victory
+				}
+				modifier = {
+					factor = 0.5
+					check_variable = { USA.HAI_communist_average > 34 }
+				}
+				country_event = {
+					id = HIS_puertoplata.16
+					days = 50
+				}
+			}
+			60 = {
+				modifier = {
+					factor = 0
+					has_game_rule = { rule = DOM_SOCIALIST_COUP option = DOM_SOCIALIST_COUP_YES }
+				}
+				set_country_flag = DOM_amazonism_entrenched
+				if = {
+					limit = {
+						HAI = { NOT = { has_country_flag = HAI_panafricanism_entrenched } }
+						has_global_flag = TNO_HAI_civil_war_communist_victory
+					}
+					HAI = {
+						HAI_Jacques_Stephen_Alexis = {
+							remove_country_leader_role = { ideology = communist_marxism_leninism_subtype }
+							add_country_leader_role = {
+								country_leader = {
+									desc = "POLITICS_HAI_JACQUES_STEPHEN_DESC"
+									expire = "1990.1.1"
+									ideology = communist_amazonism_subtype
+									traits = {}
+								}
+								promote_leader = yes
+							}
+						}
+						set_politics = { ruling_party = communist }
+						set_popularities = {
+							despotism = 6
+							communist = 32
+							socialist = 23
+							liberalism = 11
+							liberal_conservatism = 8
+							paternalism = 20
+						}
+						set_country_flag = HAI_amazonism_entrenched
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { #Anti-Radical Coup
+	id = HIS_puertoplata.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.16" }
+	title = HIS_puertoplata.16.t
+	desc = HIS_puertoplata.16.desc
+	hidden = yes
+
+	trigger = { has_country_leader = { character = DOM_Maximo_Antonio_Lopez_Molina ruling_only = yes } }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_puertoplata.16.a
+
+		remove_ideas = DOM_The_Dominican_Cultural_Revolution
+		add_ideas = DOM_The_Dominican_Peoples_Revolution
+
+		drop_cosmetic_tag = yes
+		set_politics = { ruling_party = socialist }
+		retire_character = DOM_Maximo_Antonio_Lopez_Molina
+		promote_character = DOM_Manolo_Tavarez_Justo
+		set_popularities = {
+			despotism = 7
+			communist = 10
+			socialist = 37
+			liberalism = 10
+			liberal_conservatism = 9
+			paternalism = 17
+			progressivism = 10
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = { id = hispaniola_news.38 hours = 8 }
+		#}
+
+		if = {
+			limit = { NOT = { CUB = { has_government = socialist } } }
+			country_event = {
+				id = HIS_puertoplata.17
+				days = 50
+			}
+		}
+	}
+}
+
+country_event = { #Leader switch for anti-radical coup
+	id = HIS_puertoplata.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.17" }
+	title = HIS_puertoplata.17.t
+	desc = HIS_puertoplata.17.desc
+	hidden = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_puertoplata.17.a
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = socialist
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		promote_character = {
+			character = DOM_Juan_Emilio_Bosch_Gavino
+			ideology = socialist_revolutionary_gaitanismo_subtype
+		}
+		remove_ideas = {
+			DOM_Starting_from_Scratch
+			DOM_Economic_Revolution
+		}
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+		econ_subtype_change = yes
+		set_country_flag = DOM_elections_may_happen
+	}
+}
+
+country_event = { #1966 Dominican Elections
+	id = HIS_puertoplata.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.18" }
+	title = HIS_puertoplata.18.t
+	desc = HIS_puertoplata.18.desc
+	#picture =
+
+	trigger = { has_country_flag = DOM_elections_may_happen }
+
+	is_triggered_only = yes
+
+	option = { # Bonnelly wins
+		name = HIS_puertoplata.18.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_1966_ELECTION option = DOM_1966_ELECTION_BOSCH }
+			}
+		}
+
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = liberalism
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.40
+		#		hours = 8
+		#	}
+		#}
+		set_popularities = {
+			despotism = 8
+			communist = 5
+			socialist = 7
+			liberalism = 30
+			liberal_conservatism = 20
+			paternalism = 22
+			progressivism = 8
+		}
+		econ_join_sphere_USA = yes
+	}
+	option = { # Bosch wins
+		name = HIS_puertoplata.18.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_1966_ELECTION option = DOM_1966_ELECTION_BONNELLY }
+			}
+		}
+
+		country_event = { id = HIS_puertoplata.21 days = 120 random_days = 60 }
+
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = progressivism
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.41
+		#		hours = 8
+		#	}
+		#}
+		set_popularities = {
+			despotism = 8
+			communist = 5
+			socialist = 10
+			liberalism = 15
+			liberal_conservatism = 10
+			paternalism = 17
+			progressivism = 35
+		}
+		econ_join_sphere_MEX = yes
+	}
+}
+
+country_event = { #1970 Dominican Elections
+	id = HIS_puertoplata.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.19" }
+	title = HIS_puertoplata.19.t
+	desc = HIS_puertoplata.19.desc
+	#picture =
+
+	trigger = { has_country_flag = DOM_elections_may_happen }
+
+	is_triggered_only = yes
+
+	option = { # Bonnelly wins
+		name = HIS_puertoplata.19.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_1970_ELECTION option = DOM_1970_ELECTION_GUZMAN }
+			}
+		}
+
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = liberalism
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.43
+		#		hours = 8
+		#	}
+		#}
+		set_popularities = {
+			despotism = 8
+			communist = 5
+			socialist = 7
+			liberalism = 30
+			liberal_conservatism = 20
+			paternalism = 22
+			progressivism = 8
+		}
+	}
+	option = { # Guzman wins
+		name = HIS_puertoplata.19.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_1970_ELECTION option = DOM_1970_ELECTION_BONNELLY }
+			}
+		}
+
+		add_country_leader_role = {
+			character = DOM_Antonio_Guzman
+			promote_leader = yes
+			country_leader = {
+				expire = "1999.1.1"
+				ideology = progressivism_democratic_socialism_subtype
+				traits = { }
+				id = -1
+			}
+		}
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = progressivism
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.44
+		#		hours = 8
+		#	}
+		#}
+		set_popularities = {
+			despotism = 8
+			communist = 5
+			socialist = 10
+			liberalism = 15
+			liberal_conservatism = 10
+			paternalism = 17
+			progressivism = 35
+		}
+	}
+}
+
+country_event = { # leader switch for post-red DR occupation
+	id = HIS_puertoplata.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.20" }
+	title = HIS_puertoplata.20.t
+	desc = HIS_puertoplata.20.desc
+	hidden = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_puertoplata.20.a
+		USA = { end_puppet = DOM }
+		drop_cosmetic_tag = yes
+		remove_ideas = {
+			OFN_Interim_Authority
+			DOM_Pan_American_Force
+		}
+		add_ideas = OFN_Independent_Member
+		add_country_leader_role = {
+			character = DOM_Joaquin_Balaguer
+			promote_leader = yes
+			country_leader = {
+				expire = "1999.1.1"
+				ideology = conservatism_paternalistic_conservatism_subtype
+				traits = { el_doctor }
+				id = -1
+			}
+		}
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = conservatism
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		set_party_name = {
+			ideology = conservatism
+			name = DOM_partido_reformista_party
+			long_name = DOM_partido_reformista_party_long
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.63
+		#		hours = 12
+		#	}
+		#}
+		set_popularities = {
+			communist = 15
+			socialist = 5
+			liberalism = 10
+			liberal_conservatism = 10
+			conservatism = 45
+			paternalism = 5
+			progressivism = 10
+		}
+	}
+}
+
+country_event = { # Bosch Constitution
+	id = HIS_puertoplata.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.21" }
+	title = HIS_puertoplata.21.t
+	desc = HIS_puertoplata.21.desc
+	hidden = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_puertoplata.21.a
+		add_popularity = {
+			ideology = progressivism
+			popularity = 0.04
+		}
+		remove_ideas = DOM_The_Living_Ghost
+		add_ideas = DOM_Fourth_Dominican_Republic
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.65
+		#		hours = 8
+		#	}
+		#}
+	}
+}
+
+# Mexico Puerto Plata Events
+country_event = { # DFS vs. Dominican SIM
+	id = MEX_Puerto_Plata.1
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.1"}
+	title = MEX_Puerto_Plata.1.t
+	desc = MEX_Puerto_Plata.1.desc
+	picture = GFX_report_event_MEX_DFS_symbol
+
+	is_triggered_only = yes
+
+	option = {
+		name = MEX_Puerto_Plata.1.a
+		add_war_support = 0.02
+		hidden_effect = {
+			country_event = { id = MEX_Trujillo_Conspiracy.1 days = 7 } # Trujillo Conspiracy chain
+			country_event = {
+				id = MEX_Puerto_Plata.2
+				days = 31
+			}
+		}
+	}
+}
+
+country_event = { # Fidel and Gutierrez correspond about the Dominican Question
+	id = MEX_Puerto_Plata.2
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.2"}
+	title = MEX_Puerto_Plata.2.t
+	desc = MEX_Puerto_Plata.2.desc
+	picture = GFX_report_event_MEX_guiterrez
+
+	is_triggered_only = yes
+
+	option = {
+		name = MEX_Puerto_Plata.2.a
+		MEX_PRI_increase_corruption_dfs_low = yes
+		hidden_effect = {
+			country_event = {
+				id = MEX_Puerto_Plata.3
+				days = 14
+			}
+		}
+	}
+}
+
+country_event = { # Fidel and LM talk
+	id = MEX_Puerto_Plata.3
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.3"}
+	title = MEX_Puerto_Plata.3.t
+	desc = MEX_Puerto_Plata.3.desc
+	picture = GFX_report_event_MAD_phone_call
+
+	is_triggered_only = yes
+
+	option = {
+		name = MEX_Puerto_Plata.3.a
+		MEX_PRI_increase_power_dfs_low = yes
+		custom_effect_tooltip = DOM_puerto_plata_intervention_enabled_legion
+		custom_effect_tooltip = PP_Command_Power_MEX_tt
+		TNO_fopo_add_puerto_plata_tab = yes
+		hidden_effect = {
+			IBR = { country_event = { id = HIS_puertoplata.1 days = 21 } } # TODO Puerto Plata Invasion event chain for other countries
+			ZZZ = { activate_mission = ZZZ_PPI_CAL_training }
+			TNO_MEX_PP_invasion_start = yes
+			set_country_flag = MEX_succession_puerto_plata
+			add_command_power = 25
+			country_event = {
+				id = MEX_Puerto_Plata.4
+				days = 31
+			}
+		}
+	}
+}
+
+country_event = { # Gutierrez and Winston meet
+	id = MEX_Puerto_Plata.4
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.4"}
+	title = MEX_Puerto_Plata.4.t
+	desc = MEX_Puerto_Plata.4.desc
+	picture = GFX_report_event_MEX_winston_scott
+
+	is_triggered_only = yes
+
+	option = {
+		name = MEX_Puerto_Plata.4.a
+		TNO_PP_cooperation_increase_medium = yes
+		add_command_power = 5
+		hidden_effect = {
+			USA = { country_event = { id = HIS_puertoplata.2 days = 21 } }
+		}
+	}
+}
+
+country_event = { # The Invasion Begins (MEX)
+	id = MEX_Puerto_Plata.5
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.5"}
+	title = MEX_Puerto_Plata.5.t
+	desc = MEX_Puerto_Plata.5.desc
+	picture = GFX_report_event_MEX_nrm
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = MEX_Puerto_Plata.5.a
+		if = { limit = { has_country_flag = MEX_mexican_battalion_created }
+			custom_effect_tooltip = MEX_Puerto_Plata.5.tt
+		}
+		else = {
+			custom_effect_tooltip = MEX_Puerto_Plata.5.tt.1
+		}
+		hidden_effect = {
+			if = { limit = { has_country_flag = MEX_mexican_battalion_created }
+				set_country_flag = lan_puerto_plata_1
+				set_variable = { el_tapado_lan_puerto_plata = 3 }
+				set_country_flag = new_madrazo_stuff
+				add_to_variable = { MEX_Madrazo_gbp = 2 }
+			}
+		}
+	}
+}
+country_event = { # Trujillo Assasination, US Backs Legion
+	id = MEX_Puerto_Plata.6
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.6"}
+	title = MEX_Puerto_Plata.6.t
+	desc = MEX_Puerto_Plata.6.desc
+	picture = GFX_report_event_MEX_Mateos_final_year
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = MEX_Puerto_Plata.6.a
+		add_stability = 0.02
+		add_war_support = 0.02
+		army_experience = 20
+		MEX_SB_low_raise_Ordaz = yes
+		MEX_SB_low_raise_LAN = yes
+		add_opinion_modifier = { target = USA modifier = MEX_dominican_dalliance }
+	}
+}
+country_event = { # Planes leased to Cuba
+	id = MEX_Puerto_Plata.7
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.7"}
+	title = MEX_Puerto_Plata.7.t
+	desc = MEX_Puerto_Plata.7.desc
+	picture = GFX_report_event_generic_m_50_jet_bomber
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = MEX_Puerto_Plata.7.a
+	}
+}
+country_event = { # Trujillo Assasination - Balaguer Defeats Legion
+	id = MEX_Puerto_Plata.8
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.8"}
+	title = MEX_Puerto_Plata.8.t
+	desc = MEX_Puerto_Plata.8.desc
+	picture = GFX_report_event_MEX_nrm
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = MEX_Puerto_Plata.8.a
+		add_stability = -0.03
+		add_war_support = -0.03
+		army_experience = 10
+		MEX_decrease_cardenista_low = yes
+		MEX_SB_low_increase_stress = yes
+	}
+}
+country_event = { # America has Betrayed Us
+	id = MEX_Puerto_Plata.9
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.9"}
+	title = MEX_Puerto_Plata.9.t
+	desc = MEX_Puerto_Plata.9.desc
+	picture = GFX_report_event_MEX_Mateos_weow
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = MEX_Puerto_Plata.9.a
+		add_war_support = 0.05
+		army_experience = 20
+		MEX_SB_mid_raise_LAN = yes
+		set_variable = { el_tapado_lan_puerto_plata_ending = 3 }
+		set_country_flag = lan_puerto_plata_2
+		set_country_flag = new_madrazo_stuff
+		add_opinion_modifier = { target = USA modifier = MEX_dominican_betrayal }
+		if = {
+			limit = {
+				check_variable = { el_tapado_lan_puerto_plata = 1 }
+			}
+			set_variable = { el_tapado_lan_puerto_plata = 2 }
+		}
+		TNO_fopo_add_puerto_plata_tab = yes
+	}
+}
+country_event = { # CAL Civil War Victory (MEX)
+	id = MEX_Puerto_Plata.10
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.10"}
+	title = MEX_Puerto_Plata.10.t
+	desc = MEX_Puerto_Plata.10.desc
+	picture = GFX_report_event_MEX_gutierrez2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = MEX_Puerto_Plata.10.a
+		MEX_increase_cardenista_med = yes
+		add_popularity = {
+			ideology = socialist
+			popularity = 0.01
+		}
+		army_experience = 10
+		MEX_PRI_decrease_corruption_intellectuals_med = yes
+		hidden_effect = {
+			MEX = { set_variable = { trade_opinion_embargo@DOM = 0 } }
+			remove_opinion_modifier = {
+				target = DOM
+				modifier = TNO_embargo_100
+			}
+			DOM = {
+				remove_opinion_modifier = { target = MEX modifier = TNO_embargoed_us_100 }
+				remove_opinion_modifier = { target = CUB modifier = DOM_caribbean_tension }
+				remove_opinion_modifier = { target = WIN modifier = DOM_caribbean_tension }
+				remove_opinion_modifier = { target = MEX modifier = DOM_caribbean_tension }
+				remove_opinion_modifier = { target = VEN modifier = DOM_caribbean_tension }
+				add_opinion_modifier = { target = MEX modifier = DOM_supported_anti_trujillo_coup }
+				add_opinion_modifier = { target = CUB modifier = DOM_supported_anti_trujillo_coup }
+			}
+			CUB = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+			WIN = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+			MEX = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+			VEN = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+			BRA = { remove_opinion_modifier = { target = DOM modifier = DOM_caribbean_tension } }
+		}
+	}
+}
+country_event = { # Puerto Plata Fails, Mexico Turns to Japan
+	id = MEX_Puerto_Plata.11
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.11"}
+	title = MEX_Puerto_Plata.11.t
+	desc = MEX_Puerto_Plata.11.desc
+	picture = GFX_report_event_MEX_tequila
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = MEX_Puerto_Plata.11.a
+		add_stability = -0.03
+		add_war_support = -0.03
+		army_experience = 10
+		MEX_SB_mid_raise_Lozano = yes
+		set_variable = { el_tapado_lozano_puerto_plata_ending = 3 }
+		set_variable = { el_tapado_ordaz_puerto_plata_ending = 2 }
+		set_country_flag = lozano_puerto_plata_2
+		set_country_flag = new_lozano_stuff
+		MEX_SB_med_increase_stress = yes
+		add_opinion_modifier = { target = USA modifier = MEX_dominican_disaster }
+		if = {
+			limit = {
+				check_variable = { el_tapado_lozano_puerto_plata = 1 }
+			}
+			set_variable = { el_tapado_lozano_puerto_plata = 2 }
+		}
+		if = {
+			limit = {
+				check_variable = { el_tapado_lan_puerto_plata_ending = 1 }
+			}
+			set_variable = { el_tapado_lan_puerto_plata_ending = 2 }
+		}
+		TNO_fopo_remove_puerto_plata_tab = yes
+	}
+}
+country_event = { # Pupo Román Coup
+	id = MEX_Puerto_Plata.12
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.12"}
+	title = MEX_Puerto_Plata.12.t
+	desc = MEX_Puerto_Plata.12.desc
+	picture = GFX_report_event_MEX_Mateos_final_year
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = MEX_Puerto_Plata.12.a
+		add_stability = 0.03
+		add_war_support = 0.03
+		army_experience = 25
+		MEX_SB_mid_raise_Ordaz = yes
+		add_opinion_modifier = { target = USA modifier = MEX_dominican_partnership }
+
+		#set_variable = { el_tapado_ordaz_puerto_plata_ending = 3 }
+		#set_variable = { el_tapado_lozano_puerto_plata_ending = 2 }
+		#set_country_flag = ordaz_puerto_plata_2
+		#set_country_flag = new_ordaz_stuff
+		#if = {
+		#	limit = {
+		#		check_variable = { el_tapado_ordaz_puerto_plata = 1 }
+		#	}
+		#	set_variable = { el_tapado_ordaz_puerto_plata = 2 }
+		#}
+		#if = {
+		#	limit = {
+		#		check_variable = { el_tapado_lan_puerto_plata_ending = 1 }
+		#	}
+		#	set_variable = { el_tapado_lan_puerto_plata_ending = 2 }
+		#}
+	}
+}
+country_event = { # Balaguer Negotiates With the Legion
+	id = MEX_Puerto_Plata.13
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.13"}
+	title = MEX_Puerto_Plata.13.t
+	desc = MEX_Puerto_Plata.13.desc
+	picture = GFX_report_event_MEX_fidel_castro
+
+	is_triggered_only = yes
+
+	option = {
+		name = MEX_Puerto_Plata.13.a
+		add_war_support = -0.05
+		MEX_decrease_cardenista_low = yes
+		MEX_SB_med_increase_stress = yes
+		MEX_PRI_increase_corruption_intellectuals_med = yes
+		add_opinion_modifier = { target = USA modifier = MEX_dominican_devilry }
+		hidden_effect = { remove_opinion_modifier = { target = USA modifier = MEX_dominican_betrayal } }
+	}
+}
+country_event = { # Quisqueya Agreement
+	id = MEX_Puerto_Plata.14
+	immediate = {log = "[GetDateText]: [Root.GetName]: event MEX_Puerto_Plata.14"}
+	title = MEX_Puerto_Plata.14.t
+	desc = MEX_Puerto_Plata.14.desc
+	picture = GFX_report_event_MEX_mateos_ottawa
+
+	is_triggered_only = yes
+
+	option = {
+		name = MEX_Puerto_Plata.14.a
+		MEX_increase_cardenista_med = yes
+		MEX_increase_orthodox_low = yes
+		MEX_SB_low_decrease_stress = yes
+		MEX_PRI_increase_loyalty_intellectuals_med = yes
+		MEX_PRI_increase_power_intellectuals_med = yes
+		MEX_PRI_decrease_corruption_intellectuals_med = yes
+		add_opinion_modifier = { target = USA modifier = MEX_shared_dominican_triumph }
+		hidden_effect = { remove_opinion_modifier = { target = USA modifier = MEX_dominican_partnership } }
+	}
+}
+
+## Haiti
+country_event = { # The Haitian Civil War
+	id = HIS_HAI.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.1" }
+	title = HIS_HAI.1.t
+	desc = HIS_HAI.1.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_HAI.1.a
+		TNO_HAI_civil_war_start = yes
+	}
+}
+
+country_event = { # EMPTY
+	id = HIS_HAI.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.2" }
+	title = HIS_HAI.2.t
+	desc = HIS_HAI.2.desc
+	picture = GFX_report_event_IBR_big_meeting
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_HAI.2.a
+	}
+}
+
+country_event = { # Cantave anti-Communist Coup (shit's getting too bad in Haiti)
+	id = HIS_HAI.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.3" }
+	title = HIS_HAI.3.t
+	desc = HIS_HAI.3.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI.3.a
+		if = {
+			limit = {
+				HAI = {
+					NOT = {
+						OR = {
+							has_government = socialist
+							has_government = communist
+						}
+					}
+				}
+			}
+			set_country_flag = HIS_HAI_cantave_coup
+			kill_country_leader = yes
+			add_country_leader_role = {
+				character = HAI_Leon_Cantave
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_HAI_CANTAVE_DESC"
+					expire = "1999.1.1"
+					ideology = despotism_personalistic_dictatorship_subtype
+					traits = { }
+					id = -1
+				}
+			}
+			remove_all_ministers = yes
+			fill_empty_minister_nochecks = yes
+
+			swap_ideas = {
+				remove_idea = HAI_Mulatocratie
+				add_idea = HAI_La_Cantavecratie
+			}
+
+			set_politics = {
+				ruling_party = despotism
+				elections_allowed = no
+			}
+			set_popularities = {
+				despotism = 22
+				communist = 2
+				socialist = 11
+				liberalism = 15
+				liberal_conservatism = 20
+				paternalism = 30
+			}
+			set_party_name = {
+				ideology = despotism
+				name = HAI_paternalism_party
+				long_name = HAI_paternalism_party
+			}
+			leave_faction = yes
+			remove_ideas = OFN_Dependent_Member
+
+			country_event = { id = HIS_HAI.17 days = 500 random_days = 120 }
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = hispaniola_news.37
+					hours = 8
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Elections
+	id = HIS_HAI.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.4" }
+	title = HIS_HAI.4.t
+	desc = HIS_HAI.4.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		HAI = {
+			NOT = {
+				has_country_flag = HIS_HAI_lavaud_coup
+				has_country_flag = HIS_HAI_cantave_coup
+				has_global_flag = TNO_HAI_civil_war_communist_victory
+			}
+		}
+	}
+
+	option = {
+		name = HIS_HAI.4.a
+		set_country_flag = HIS_HAI_1964_elections
+
+		random_list = {
+			60 = { # Dejoie wins
+				modifier = {
+					factor = 1.5
+					check_variable = { HAI_involvement < 25 }
+				}
+				modifier = {
+					factor = 0
+					has_game_rule = {
+						rule = HAI_1964_ELECTIONS
+						option = HAI_1964_ELECTIONS_DUVALIER
+					}
+				}
+				add_popularity = {
+					ideology = paternalism
+					popularity = 0.06
+				}
+
+				country_event = {
+					id = HIS_HAI.9
+					days = 140
+					random_days = 100
+				}
+				if = {
+					limit = { has_global_flag = HIS_DOM_democratic_revolution }
+					USA = {
+						country_event = {
+							id = HIS_hinche_negotiations.2
+							days = 21
+							random_days = 70
+						}
+					}
+				}
+
+				#every_country = {
+				#	limit = { is_ai = no }
+				#	news_event = {
+				#		id = hispaniola_news.35
+				#		hours = 8
+				#	}
+				#}
+			}
+			40 = { # Duvalier wins
+				modifier = {
+					factor = 2
+					check_variable = { HAI_involvement > 29 }
+				}
+				modifier = {
+					factor = 0
+					OR = {
+						has_game_rule = {
+							rule = HAI_1964_ELECTIONS
+							option = HAI_1964_ELECTIONS_DEJOIE
+						}
+						has_game_rule = {
+							rule = HAI_1964_ELECTIONS
+							option = HAI_1964_ELECTIONS_LESCOT
+						}
+					}
+				}
+				set_country_flag = HIS_HAI_duvalier_elected
+				swap_ideas = {
+					remove_idea = HAI_Mulatocratie
+					add_idea = HAI_Le_Souverain
+				}
+				swap_ideas = {
+					remove_idea = HAI_Occupation
+					add_idea = HAI_Struggle_for_Sovereignty
+				}
+
+				add_popularity = {
+					ideology = liberal_conservatism
+					popularity = 0.08
+				}
+				add_popularity = {
+					ideology = paternalism
+					popularity = 0.12
+				}
+				set_party_name = {
+					ideology = liberalism
+					name = HAI_liberal_conservatism_party
+					long_name = HAI_liberal_conservatism_party_long
+				}
+				set_party_name = {
+					ideology = liberal_conservatism
+					name = HAI_paternalism_party
+					long_name = HAI_paternalism_party_long
+				}
+				set_party_name = {
+					ideology = paternalism
+					name = HAI_papa_doc_party
+					long_name = HAI_papa_doc_party_long
+				}
+				remove_all_ministers = yes
+				fill_empty_minister_nochecks = yes
+
+				add_country_leader_role = {
+					character = HAI_Francois_Duvalier
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_HAI_FRANCOIS_DUVALIER_DESC"
+						expire = "1999.1.1"
+						ideology = paternalism_right_wing_populism_subtype
+						traits = { papa_doc }
+						id = -1
+					}
+				}
+
+				HAI_Clement_Barbot = {
+					add_corps_commander_role = {
+						traits = { harsh_leader trait_reckless }
+						skill = 2
+						attack_skill = 4
+						defense_skill = 1
+						planning_skill = 2
+						logistics_skill = 3
+					}
+				}
+
+				country_event = { id = HIS_HAI.10 days = 500 random_days = 120 }
+
+				if = {
+					limit = { has_global_flag = HIS_DOM_democratic_revolution }
+					USA = {
+						country_event = {
+							id = HIS_hinche_negotiations.1
+							days = 14
+							random_days = 31
+						}
+					}
+				}
+
+				every_country = {
+					limit = { is_ai = no }
+					news_event = {
+						id = hispaniola_news.36
+						hours = 8
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Lavaud's Countercoup -> Legion lost and is fucking around Haiti
+	id = HIS_HAI.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.5" }
+	title = HIS_HAI.5.t
+	desc = HIS_HAI.5.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI.5.a
+		set_country_flag = HIS_HAI_lavaud_coup
+
+		kill_country_leader = yes
+		set_politics = { ruling_party = despotism }
+		add_country_leader_role = {
+			character = HAI_Franck_Lavaud
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_HAI_LAVAUD_DESC"
+				expire = "1999.1.1"
+				ideology = despotism_interim_government_subtype
+				traits = { }
+				id = -1
+			}
+		}
+		remove_all_ministers = yes
+		fill_empty_minister_nochecks = yes
+
+		add_country_leader_role = {
+			character = HAI_Elie_Lescot
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_HAI_LESCOT_DESC"
+				expire = "1999.1.1"
+				ideology = paternalism_oligarchy_subtype
+				traits = { }
+				id = -1
+			}
+		}
+		set_popularities = {
+			despotism = 15
+			communist = 17
+			socialist = 16
+			liberalism = 15
+			liberal_conservatism = 18
+			paternalism = 19
+		}
+		swap_ideas = {
+			remove_idea = HAI_Mulatocratie
+			add_idea = HAI_Mulatocratie_Lavaud
+		}
+
+		USA = {
+			country_event = {
+				id = HIS_HAI.6
+				days = 14
+			}
+		}
+
+		remove_from_array = { global.OFN_members = HAI }
+		leave_faction = yes
+		remove_ideas = OFN_Dependent_Member
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.22
+				hours = 8
+			}
+		}
+	}
+}
+
+country_event = { # THE CHOICE -> SUPPORT LAVAUD OR PRESSURE FOR CIVILIAN GOVERNMENT
+	id = HIS_HAI.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.6" }
+	title = HIS_HAI.6.t
+	desc = HIS_HAI.6.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Pressure for Civilian Govt.
+		name = HIS_HAI.6.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = HAI_LAVAUD_ELECTIONS_LAVAUD }
+			}
+		}
+		custom_effect_tooltip = HIS_HAI.6.a_tt
+		hidden_effect = { HAI = { set_country_flag = HIS_HAI_lavaud_supporting_civilian_government } }
+	}
+	option = { # Support the Reform Coup
+		name = HIS_HAI.6.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = HAI_LAVAUD_ELECTIONS_FIGNOLE }
+			}
+		}
+		custom_effect_tooltip = HIS_HAI.6.b_tt_1
+		custom_effect_tooltip = HIS_HAI.6.b_tt_2
+		hidden_effect = { HAI = { set_country_flag = HIS_HAI_lavaud_supporting_reform_coup } }
+	}
+}
+
+country_event = { # Lavaud Elections
+	id = HIS_HAI.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.7" }
+	title = HIS_HAI.7.t
+	desc = HIS_HAI.7.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI.7.a
+		random_list = {
+			1 = { # Lavaud
+				modifier = {
+					factor = 0
+					HAI = { has_country_flag = HIS_HAI_lavaud_supporting_civilian_government }
+				}
+				modifier = {
+					factor = 0
+					OR = {
+						AND = {
+							USA = { check_variable = { HAI_communist_average_final > HAI_government_average_final } }
+							has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = DEFAULT }
+						}
+						has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = HAI_LAVAUD_ELECTIONS_FIGNOLE }
+						has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = HAI_LAVAUD_ELECTIONS_HUDICOURT }
+					}
+				}
+				meta_effect = { #sets up next election date in country ui
+				text = {
+					set_politics = {
+						ruling_party = paternalism
+						last_election = "[current_election_date]"
+						elections_allowed = yes
+						election_frequency = 48
+					}
+				}
+				current_election_date = "[?global.date.GetDateStringNoHour]"
+				}
+				add_popularity = {
+					ideology = paternalism
+					popularity = 0.08
+				}
+				add_country_leader_role = {
+					character = HAI_Franck_Lavaud
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_HAI_LAVAUD_DESC"
+						expire = "1999.1.1"
+						ideology = paternalism_dominant_party_democracy_subtype
+						traits = { }
+						id = -1
+					}
+				}
+				swap_ideas = {
+					remove_idea = HAI_Mulatocratie_Lavaud
+					add_idea = HAI_La_Fausse_Democratie
+				}
+				#every_country = {
+				#	limit = { is_ai = no }
+				#	news_event = {
+				#		id = hispaniola_news.52
+				#		hours = 8
+				#	}
+				#}
+			}
+			1 = { # Fignolé
+				modifier = {
+					factor = 0
+					HAI = { has_country_flag = HIS_HAI_lavaud_supporting_reform_coup }
+				}
+				modifier = {
+					factor = 0
+					OR = {
+						AND = {
+							USA = { check_variable = { HAI_communist_average_final > HAI_government_average_final } }
+							has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = DEFAULT }
+						}
+						has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = HAI_LAVAUD_ELECTIONS_LAVAUD }
+						has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = HAI_LAVAUD_ELECTIONS_HUDICOURT }
+					}
+				}
+				meta_effect = { #sets up next election date in country ui
+				text = {
+					set_politics = {
+						ruling_party = liberal_conservatism
+						last_election = "[current_election_date]"
+						elections_allowed = yes
+						election_frequency = 48
+					}
+				}
+				current_election_date = "[?global.date.GetDateStringNoHour]"
+				}
+				add_popularity = {
+					ideology = liberal_conservatism
+					popularity = 0.08
+				}
+				add_country_leader_role = {
+					character = HAI_Daniel_Fignole
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_HAI_FIGNOLE_DESC"
+						expire = "1999.1.1"
+						ideology = liberal_conservatism_big_tent_subtype
+						traits = { }
+						id = -1
+					}
+				}
+				remove_ideas = HAI_Mulatocratie_Lavaud
+				swap_ideas = {
+					remove_idea = HAI_LUnite_Instable
+					add_idea = HAI_La_Renaissance_dHaiti
+				}
+				#every_country = {
+				#	limit = { is_ai = no }
+				#	news_event = {
+				#		id = hispaniola_news.50
+				#		hours = 8
+				#	}
+				#}
+			}
+			1 = { # Hudicourt
+				modifier = {
+					factor = 0
+					OR = {
+						AND = {
+							USA = { check_variable = { HAI_government_average_final > HAI_communist_average_final } }
+							has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = DEFAULT }
+						}
+						has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = HAI_LAVAUD_ELECTIONS_LAVAUD }
+						has_game_rule = { rule = HAI_LAVAUD_ELECTIONS option = HAI_LAVAUD_ELECTIONS_FIGNOLE }
+					}
+				}
+				meta_effect = { #sets up next election date in country ui
+				text = {
+					set_politics = {
+						ruling_party = progressivism
+						last_election = "[current_election_date]"
+						elections_allowed = yes
+						election_frequency = 48
+					}
+				}
+				current_election_date = "[?global.date.GetDateStringNoHour]"
+				}
+				add_popularity = {
+					ideology = progressivism
+					popularity = 0.1
+				}
+				add_country_leader_role = {
+					character = HAI_Max_Hudicourt
+					promote_leader = yes
+					country_leader = {
+						expire = "1999.1.1"
+						ideology = progressivism_left_wing_populism_subtype
+						traits = { }
+						id = -1
+					}
+				}
+				remove_ideas = HAI_Mulatocratie_Lavaud
+				swap_ideas = {
+					remove_idea = HAI_LUnite_Instable
+					add_idea = HAI_La_Renaissance_dHaiti
+				}
+				#every_country = {
+				#	limit = { is_ai = no }
+				#	news_event = {
+				#		id = hispaniola_news.51
+				#		hours = 8
+				#	}
+				#}
+			}
+		}
+	}
+}
+
+country_event = { # The Blitz
+	id = HIS_HAI.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.8" }
+	title = HIS_HAI.8.t
+	desc = HIS_HAI.8.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI.8.a
+		TNO_HIS_blitz_start = yes
+	}
+}
+
+country_event = { # Consolidated Oligarchy
+	id = HIS_HAI.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.9" }
+	title = HIS_HAI.9.t
+	desc = HIS_HAI.9.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = { NOT = { HAI = { has_country_flag = HIS_HAI_cantave_coup } } }
+
+	option = {
+		name = HIS_HAI.9.a
+		# new natspirits
+		set_temp_variable = { temp_econ_GDP_boost_percentage = 0.025 }
+		econ_GDP_boost_once_percentage = yes
+		add_popularity = {
+			ideology = paternalism
+			popularity = 0.08
+		}
+	}
+}
+
+country_event = { # Entrenched Duvalier - Constitutional Referendum
+	id = HIS_HAI.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.10" }
+	title = HIS_HAI.10.t
+	desc = HIS_HAI.10.desc
+
+	is_triggered_only = yes
+	trigger = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } }
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI.10.a
+		swap_ideas = {
+			remove_idea = HAI_Struggle_for_Sovereignty
+			add_idea = HAI_La_Tonton_Macoute
+		}
+
+		set_cosmetic_tag = HAI_duvalier
+
+		set_party_name = {
+			ideology = paternalism
+			name = HAI_liberal_conservatism_party
+			long_name = HAI_liberal_conservatism_party_long
+		}
+		set_party_name = {
+			ideology = despotism
+			name = HAI_papa_doc_party
+			long_name = HAI_papa_doc_party_long
+		}
+		set_politics = { ruling_party = despotism }
+		set_popularities = {
+			despotism = 45
+			communist = 10
+			socialist = 12
+			paternalism = 13
+			liberalism = 8
+			liberal_conservatism = 12
+		}
+		add_country_leader_role = {
+			character = HAI_Francois_Duvalier
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_HAI_FRANCOIS_DUVALIER_DESC"
+				expire = "1999.1.1"
+				ideology = despotism_personalistic_dictatorship_subtype
+				traits = { papa_doc }
+				id = -1
+			}
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = { id = hispaniola_news.57 hours = 8 }
+		#}
+	}
+}
+
+country_event = { # Professional Haitian Military
+	id = HIS_HAI.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.11" }
+	title = HIS_HAI.11.t
+	desc = HIS_HAI.11.desc
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_HAI.11.a
+		# new natspirits
+		# add a small OOB
+	}
+}
+
+country_event = { # Negotiated Civil War End
+	id = HIS_HAI.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.12" }
+	title = HIS_HAI.12.t
+	desc = HIS_HAI.12.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI.12.a
+		USA = {
+			TNO_HCW_calc_values = yes
+			set_variable = { HAI_government_average_final = HAI_government_average }
+			set_variable = { HAI_communist_average_final = HAI_communist_average }
+			TNO_HAI_civil_war_clear_proxy = yes
+		}
+		HAI = {
+			annex_country = {
+				target = HAC
+				transfer_troops = no
+			}
+			every_owned_state = { set_demilitarized_zone = no }
+			country_event = {
+				id = HIS_HAI.7
+				days = 30
+			}
+		}
+	}
+}
+
+country_event = { # PPLN Uprising
+	id = HIS_HAI.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.13" }
+	title = HIS_HAI.13.t
+	desc = HIS_HAI.13.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI.13.a
+		TNO_HAI_uprising_start = yes
+	}
+}
+
+country_event = { # Red DR support pulse
+	id = HIS_HAI.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.14" }
+	title = HIS_HAI.14.t
+	desc = HIS_HAI.14.desc
+
+	trigger = { USA = { is_in_array = { TNO_active_conflicts = token:GC_Haitian_Civil_War } } }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_HAI.14.a
+		USA = {
+			# activate_mission = USA_HCW_red_dr_assistance
+		}
+	}
+}
+
+country_event = { # Ability pulse
+	id = HIS_HAI.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.15" }
+	title = HIS_HAI.15.t
+	desc = HIS_HAI.15.desc
+
+	trigger = { USA = { is_in_array = { TNO_active_conflicts = token:GC_Haitian_Civil_War } } }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_HAI.15.a
+		USA = { TNO_HAI_ability_check = yes }
+	}
+}
+
+country_event = { # Disengagement pulse
+	id = HIS_HAI.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.16" }
+	title = HIS_HAI.16.t
+	desc = HIS_HAI.16.desc
+	hidden = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_HAI.16.a
+		if = {
+			limit = { NOT = { TNO_HCW_Phase_Disengagement = yes } }
+			if = {
+				limit = { NOT = { has_global_flag = HIS_trujillo_blitz_ongoing } }
+				# activate_mission = USA_HCW_demanding_disengagement
+			}
+			else = {
+				country_event = {
+					id = HIS_HAI.16
+					days = 7
+				}
+			}
+		}
+		else = {
+			if = {
+				limit = { NOT = { has_global_flag = HIS_trujillo_blitz_ongoing check_variable = { HAI_involvement < 16 } } }
+				# activate_mission = USA_HCW_disengagement_target
+			}
+			else = {
+				country_event = {
+					id = HIS_HAI.16
+					days = 7
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Constitutional Referendum - Cantave
+	id = HIS_HAI.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.17" }
+	title = HIS_HAI.17.t
+	desc = HIS_HAI.17.desc
+
+	is_triggered_only = yes
+	trigger = {
+		NOT = { has_global_flag = TNO_HAI_civil_war_communist_victory }
+	}
+
+	option = { # Cantave Wins
+		name = HIS_HAI.17.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = HAI_1967_REFERENDUM option = HAI_1967_REFERENDUM_MAGLOIRE }
+			}
+		}
+		set_country_flag = HCW_cantave_consolidated
+		# he gets to be dictator for life
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = hispaniola_news.58 hours = 8 }
+		}
+	}
+	option = { # Magloire Wins
+		name = HIS_HAI.17.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = HAI_1967_REFERENDUM option = HAI_1967_REFERENDUM_CANTAVE }
+			}
+		}
+		set_country_flag = HCW_cantave_failed
+		retire_country_leader = yes
+		set_politics = { ruling_party = paternalism }
+		retire_country_leader = yes
+		add_country_leader_role = {
+			character = HAI_Paul_Eugene_Magloire
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_HAI_MAGLOIRE_DESC"
+				expire = "1999.7.14"
+				ideology = paternalism_authoritarian_developmentalism_subtype
+				traits = { }
+				id = -1
+			}
+		}
+		set_popularities = {
+			socialist = 3
+			liberalism = 15
+			liberal_conservatism = 20
+			conservatism = 12
+			paternalism = 50
+		}
+		set_party_name = {
+			ideology = paternalism
+			name = HAI_liberal_conservatism_party
+			long_name = HAI_liberal_conservatism_party_long
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = hispaniola_news.59 hours = 8 }
+		}
+	}
+}
+
+country_event = { # Death of Papa Doc
+	id = HIS_HAI.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.18" }
+	title = HIS_HAI.18.t
+	desc = HIS_HAI.18.desc
+
+	trigger = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_HAI.18.a
+		kill_country_leader = yes
+		add_country_leader_role = {
+			character = HAI_Jean_Claude_Duvalier
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_HAI_JEAN_CLAUDE_DUVALIER_DESC"
+				expire = "1999.7.14"
+				ideology = despotism_personalistic_dictatorship_subtype
+				traits = { baby_doc }
+				id = -1
+			}
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.56
+				hours = 8
+			}
+		}
+	}
+}
+
+country_event = { # Blitz Tensions check pulse
+	id = HIS_HAI.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.19" }
+	title = HIS_HAI.19.t
+	desc = HIS_HAI.19.desc
+
+	is_triggered_only = yes
+	hidden = yes
+
+	option = {
+		name = HIS_HAI.19.a
+		USA = {
+			if = {
+				limit = {
+					NOT = { has_global_flag = HIS_trujillo_blitz_ongoing }
+					DOM = { has_country_leader = { character = DOM_Rafael_Trujillo ruling_only = yes } }
+					NOT = { check_variable = { USA.HAI_legitimacy > 74 } }
+				}
+				if = {
+					limit = {
+						check_variable = { USA.HAI_blitz_tension = 100 }
+						NOT = { has_country_flag = USA_HINCHE_AFFAIR_SCARY }
+					}
+					country_event = { # Hinche Incident
+						id = HIS_PP_flavor.9
+						days = 2
+						random_days = 5
+					}
+					set_country_flag = USA_HINCHE_AFFAIR_SCARY
+				}
+				if = {
+					limit = {
+						NOT = {
+							TNO_HCW_Phase_Disengagement = yes
+							has_country_flag = USA_HINCHE_AFFAIR_SCARY
+						}
+					}
+					country_event = { id = HIS_HAI.19 days = 7 }
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_global_flag = HIS_trujillo_blitz_ongoing }
+					check_variable = { USA.HAI_legitimacy > 74 }
+				}
+				country_event = { id = HIS_HAI.21 days = 7 }
+				clr_global_flag = HIS_trujillo_blitz_preparing
+				set_global_flag = HIS_trujillo_blitz_evaded
+				clear_variable = USA.HAI_blitz_tension
+			}
+		}
+	}
+}
+
+country_event = { # CIA report on Blitz preparations
+	id = HIS_HAI.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.20" }
+	title = HIS_HAI.20.t
+	desc = HIS_HAI.20.desc
+	picture = GFX_report_event_USA_fbi
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI.20.a
+	}
+}
+
+country_event = { # CIA report on Blitz preparations being aborted
+	id = HIS_HAI.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.21" }
+	title = HIS_HAI.21.t
+	desc = HIS_HAI.21.desc
+	picture = GFX_report_event_USA_fbi
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI.21.a
+		custom_effect_tooltip = HIS_HAI.21_tt
+		clr_global_flag = HIS_trujillo_blitz_preparing
+		set_global_flag = HIS_trujillo_blitz_evaded
+		clear_variable = USA.HAI_blitz_tension
+	}
+}
+
+country_event = { # Withdrawal pulse
+	id = HIS_HAI.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.22" }
+	title = HIS_HAI.22.t
+	desc = HIS_HAI.22.desc
+	hidden = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_HAI.22.a
+		if = {
+			limit = {
+				check_variable = { USA.HAI_communist_average > 24.99 }
+				NOT = { has_global_flag = HIS_trujillo_blitz_ongoing }
+			}
+			# activate_mission = USA_HCW_demanding_withdrawal
+		}
+		else = {
+			country_event = {
+				id = HIS_HAI.22
+				days = 7
+			}
+		}
+	}
+}
+
+country_event = { # Withdrawal effect
+	id = HIS_HAI.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.23" }
+	title = HIS_HAI.23.t
+	desc = HIS_HAI.23.desc
+	hidden = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_HAI.23.a
+		TNO_HAI_civil_war_clear_proxy = yes
+		set_global_flag = TNO_HAI_civil_war_crushed_government
+		TNO_HAI_civil_war_HAC_victory = yes
+		DOM = { remove_ideas = DOM_Autonomous_Hinche }
+		USA = {
+			country_event = {
+				id = HIS_HAI_ugly.16
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # Negotiated Peace pulse
+	id = HIS_HAI.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.24" }
+	title = HIS_HAI.24.t
+	desc = HIS_HAI.24.desc
+	hidden = yes
+
+	is_triggered_only = yes
+
+	trigger = { has_global_flag = HIS_HAI_civil_war_ongoing }
+
+	option = {
+		name = HIS_HAI.24.a
+		if = {
+			limit = {
+				OR = {
+					check_variable = { negotiate_peace_pulse_count > 2 }
+					AND = {
+						check_variable = { USA.HAI_involvement < 41 }
+						check_variable = { USA.HAI_radicalism < 41 }
+					}
+				}
+			}
+			# activate_mission = USA_HCW_negotiated_peace_lavaud
+		}
+		else = {
+			add_to_variable = { negotiate_peace_pulse_count = 1 }
+			country_event = {
+				id = HIS_HAI.24
+				days = 7
+			}
+		}
+	}
+}
+
+country_event = { # coalition gov
+	id = HIS_HAI.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.25" }
+	title = HIS_HAI.25.t
+	desc = HIS_HAI.25.desc
+	hidden = yes
+
+	is_triggered_only = yes
+
+
+	option = {
+		name = HIS_HAI.25.a
+		HAI = {
+			set_politics = {
+				ruling_party = despotism
+			}
+			set_party_name = {
+				ideology = despotism
+				name = HAI_socialist_party
+				long_name = HAI_socialist_party_long
+			}
+			add_country_leader_role = {
+				character = HAI_Max_Hudicourt
+				promote_leader = yes
+				country_leader = {
+					expire = "1999.1.1"
+					ideology = despotism_interim_government_subtype
+					traits = { }
+					id = -1
+				}
+			}
+
+			remove_from_array = { global.OFN_members = HAI }
+			econ_leave_sphere = yes
+			leave_faction = yes
+			remove_ideas = OFN_Dependent_Member
+
+			set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Worker_Directed }
+			econ_subtype_change = yes
+
+			set_country_flag = HAI_Socialist_Republic_Skeleton
+		}
+	}
+}
+
+country_event = { # war later
+	id = HIS_HAI.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI.26" }
+	title = HIS_HAI.26.t
+	desc = HIS_HAI.26.desc
+	hidden = yes
+
+	is_triggered_only = yes
+
+
+	option = {
+		name = HIS_HAI.26.a
+		set_global_flag = TNO_HIS_HAI_uprising_ongoing
+		HAC = {
+			declare_war_on = {
+				target = HAI
+				type = civil_war
+			}
+		}
+		HAI = {
+			leave_faction = yes
+			remove_ideas = OFN_Dependent_Member
+			set_country_flag = HAI_rejoin_post_war
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.48
+				hours = 10
+			}
+		}
+
+		hidden_effect = {
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = HAITIAN_CIVIL_WAR_OUTCOME
+						option = HAITIAN_CIVIL_WAR_OUTCOME_HAI
+					}
+					NOT = {
+						DOM = {
+							OR = {
+								has_idea = Custom_TNO_war_buff
+								has_idea = Custom_TNO_HIS_front_line_stopper
+							}
+						}
+					}
+				}
+				HAI = {
+					apply_war_buff_with_5_divisions = yes
+				}
+			}
+			else_if = {
+				limit = {
+					has_game_rule = {
+						rule = HAITIAN_CIVIL_WAR_OUTCOME
+						option = HAITIAN_CIVIL_WAR_OUTCOME_HAC
+					}
+					NOT = {
+						DOM = {
+							OR = {
+								has_idea = Custom_TNO_war_buff
+								has_idea = Custom_TNO_HIS_front_line_stopper
+							}
+						}
+					}
+				}
+				HAC = {
+					apply_war_buff_with_5_divisions = yes
+				}
+			}
+		}
+	}
+}
+
+## Flavor
+
+country_event = { # Victory event (USA)
+	id = HIS_PP_flavor.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_flavor.2" }
+	title = HIS_PP_flavor.2.t
+	desc = HIS_PP_flavor.2.desc
+	picture = GFX_report_event_HIS_puerto_plata_victory
+
+	is_triggered_only = yes
+
+	immediate = { set_country_flag = conclusion_victory }
+
+	option = {
+		name = HIS_PP_flavor.2.a
+		USA = {
+			set_country_flag = USA_puerto_plata_over
+		}
+		set_temp_variable = { conclusion_weeks = 4 }
+		set_temp_variable = { conclusion_bonus = 0.005 }
+		GER = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -50 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 4 }
+			set_temp_variable = { Victory_Points = 50 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA_proxy_conclusion_effect = yes
+	}
+}
+
+country_event = { # EMPTY
+	id = HIS_PP_flavor.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_flavor.3" }
+	title = HIS_PP_flavor.3.t
+	desc = HIS_PP_flavor.3.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_flavor.3.a
+	}
+}
+
+country_event = { # Defeat event (USA)
+	id = HIS_PP_flavor.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_flavor.4" }
+	title = HIS_PP_flavor.4.t
+	desc = HIS_PP_flavor.4.desc
+	picture = GFX_report_event_USA_oval_office
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_flavor.4.a
+		USA = {
+			set_country_flag = USA_puerto_plata_over
+		}
+		hidden_effect = { MEX = { country_event = { id = MEX_Puerto_Plata.11 } } }
+
+		set_temp_variable = { conclusion_weeks = 8 }
+		set_temp_variable = { conclusion_bonus = 0.015 }
+		USA_proxy_conclusion_effect = yes
+		GER = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 5 }
+			set_temp_variable = { Victory_Points = 100 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 1 }
+			set_temp_variable = { Victory_Points = -100 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+	}
+}
+
+country_event = { # Victory event (IBR)
+	id = HIS_PP_flavor.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_flavor.5" }
+	title = HIS_PP_flavor.5.t
+	desc = HIS_PP_flavor.5.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_flavor.5.a
+	}
+}
+
+country_event = { # Tensions Increase in Hinche
+	id = HIS_PP_flavor.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_flavor.6" }
+	title = HIS_PP_flavor.6.t
+	desc = HIS_PP_flavor.6.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_flavor.6.a
+		TNO_HCW_increase_tensions_medium = yes
+		# activate_mission = USA_HCW_tensions_increase
+		set_global_flag = HIS_trujillo_blitz_preparing # TODO activate AI strategy to invade haiti
+	}
+}
+
+country_event = { # Defeat event (IBR)
+	id = HIS_PP_flavor.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_flavor.7" }
+	title = HIS_PP_flavor.7.t
+	desc = HIS_PP_flavor.7.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_flavor.7.a
+	}
+}
+
+country_event = { # Victory event (GER)
+	id = HIS_PP_flavor.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_flavor.8" }
+	title = HIS_PP_flavor.8.t
+	desc = HIS_PP_flavor.8.desc
+	picture = GFX_report_event_GER_firing_squad
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_flavor.8.a
+		add_political_power = 50
+	}
+}
+
+country_event = { # Hinche Incident
+	id = HIS_PP_flavor.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_flavor.9" }
+	title = HIS_PP_flavor.9.t
+	desc = HIS_PP_flavor.9.desc
+	#picture =
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_PP_flavor.9.a
+		hidden_effect = {
+			HAI = {
+				country_event = {
+					id = HIS_HAI.8
+					days = 3
+					random_days = 2
+				}
+			}
+			#every_country = {
+			#	limit = { is_ai = no }
+			#	news_event = {
+			#		id = hispaniola_news.46
+			#		hours = 4
+			#	}
+			#}
+		}
+	}
+}
+
+country_event = { # Defeat event (GER)
+	id = HIS_PP_flavor.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_flavor.10" }
+	title = HIS_PP_flavor.10.t
+	desc = HIS_PP_flavor.10.desc
+	picture = GFX_report_event_GER_radio_espionage
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_flavor.10.a
+	}
+}
+
+country_event = { # Start of ceasefire for USA
+	id = HIS_PP_ceasefire.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.1" }
+	title = HIS_PP_ceasefire.1.t
+	desc = HIS_PP_ceasefire.1.desc
+	picture = GFX_report_event_HIS_defiance
+
+	is_triggered_only = yes
+
+	option = { # Support Legion
+		name = HIS_PP_ceasefire.1.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_CEASEFIRE option = DOM_CEASEFIRE_BALAGUER }
+			}
+		}
+		activate_mission = USA_PPI_ceasefire_ends
+		custom_effect_tooltip = USA_PP_ceasefire_legion_tt
+		hidden_effect = {
+			activate_mission = USA_PPI_tensions_increase
+			set_global_flag = PPI_ceasefire_happening
+			set_country_flag = USA_PP_ceasefire_legion
+			MEX = { country_event = { id = MEX_Puerto_Plata.6 days = 3 } }
+			country_event = { id = HIS_PP_ceasefire.13 days = 2 }
+			IBR = { country_event = { id = HIS_PP_ceasefire.10 } }
+			GER = {
+				set_country_flag = PPI_Legion_Decisions_Open
+				clr_country_flag = PPI_DR_Decisions_Open
+				country_event = { id = HIS_PP_ceasefire.9 }
+			}
+		}
+	}
+	option = { # Support Balaguer
+		name = HIS_PP_ceasefire.1.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_CEASEFIRE option = DOM_CEASEFIRE_LEGION }
+			}
+		}
+		activate_mission = USA_PPI_ceasefire_ends
+		custom_effect_tooltip = USA_PP_ceasefire_balaguer_tt
+		custom_effect_tooltip = MEX_PP_ceasefire_balaguer_tt
+		hidden_effect = {
+			activate_mission = USA_PPI_tensions_increase
+			set_global_flag = PPI_ceasefire_happening
+			set_country_flag = USA_PP_ceasefire_balaguer
+			MEX = { country_event = { id = MEX_Puerto_Plata.9 days = 3 } }
+			IBR = { country_event = { id = HIS_PP_ceasefire.11 } }
+			GER = {
+				set_country_flag = PPI_Legion_Decisions_Open
+				clr_country_flag = PPI_DR_Decisions_Open
+				country_event = { id = HIS_PP_ceasefire.9 }
+			}
+			CAL = {
+				if = {
+					limit = { has_idea = USA_military_advisors }
+					remove_ideas = USA_military_advisors
+				}
+			}
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = PUERTO_PLATA_INVANSION_OUTCOME
+						option = PUERTO_PLATA_INVANSION_OUTCOME_BAL_CEASEFIRE
+					}
+				}
+				set_variable = {
+					CCP_PPI_time_checker = 0
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Balaguer Victory - USA / Aiding Balaguer
+	id = HIS_PP_ceasefire.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.2" }
+	title = HIS_PP_ceasefire.2.t
+	desc = HIS_PP_ceasefire.2.desc
+	picture = GFX_report_event_HIS_defiance
+
+	is_triggered_only = yes
+
+	immediate = { set_country_flag = conclusion_victory }
+
+	option = {
+		name = HIS_PP_ceasefire.2.a
+		USA = {
+			set_country_flag = USA_puerto_plata_over
+		}
+
+		set_temp_variable = { conclusion_weeks = 2 }
+		set_temp_variable = { conclusion_bonus = 0.004 }
+		GER = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -50 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 5 }
+			set_temp_variable = { Victory_Points = 100 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA_proxy_conclusion_effect = yes
+	}
+}
+
+country_event = { # Legion Victory - USA / Aiding Balaguer
+	id = HIS_PP_ceasefire.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.3" }
+	title = HIS_PP_ceasefire.3.t
+	desc = HIS_PP_ceasefire.3.desc
+	picture = GFX_report_evemt_USA_nixon_sad
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.3.a
+		USA = {
+			set_country_flag = USA_puerto_plata_over
+		}
+
+		set_temp_variable = { conclusion_weeks = 6 }
+		set_temp_variable = { conclusion_bonus = 0.01 }
+		GER = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 4 }
+			set_temp_variable = { Victory_Points = 25 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -50 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA_proxy_conclusion_effect = yes
+	}
+}
+
+country_event = { #USA reaches out to iberia
+	id = HIS_PP_ceasefire.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.4" }
+	title = HIS_PP_ceasefire.4.t
+	desc = HIS_PP_ceasefire.4.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = { # Accept
+		name = HIS_PP_ceasefire.4.a
+		ai_chance = {
+			factor = 70
+		}
+		custom_effect_tooltip = HIS_PP_ceasefire.4.a_tt
+		effect_tooltip = {
+			set_temp_variable = { ceasefire_tension_temp = 10 }
+			TNO_PPI_decrease_ceasefire_tension = yes
+		}
+		hidden_effect = { USA = { country_event = { id = HIS_PP_ceasefire.19 } } }
+	}
+	option = { # Reject
+		name = HIS_PP_ceasefire.4.b
+		ai_chance = {
+			factor = 30
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = PUERTO_PLATA_INVANSION_OUTCOME
+					option = PUERTO_PLATA_INVANSION_OUTCOME_BAL_CEASEFIRE
+				}
+			}
+		}
+		custom_effect_tooltip = HIS_PP_ceasefire.4.b_tt
+		effect_tooltip = {
+			set_temp_variable = { ceasefire_tension_temp = 10 }
+			TNO_PPI_increase_ceasefire_tension = yes
+		}
+		hidden_effect = { USA = { country_event = { id = HIS_PP_ceasefire.20 } } }
+	}
+}
+
+country_event = { # Balaguer Victory - USA / Aiding Legion
+	id = HIS_PP_ceasefire.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.5" }
+	title = HIS_PP_ceasefire.5.t
+	desc = HIS_PP_ceasefire.5.desc
+	picture = GFX_report_event_USA_nixon_sad
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.5.a
+		USA = {
+			set_country_flag = USA_puerto_plata_over
+		}
+
+		set_temp_variable = { conclusion_weeks = 5 }
+		set_temp_variable = { conclusion_bonus = 0.01 }
+		GER = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 4 }
+			set_temp_variable = { Victory_Points = 25 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -75 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA_proxy_conclusion_effect = yes
+	}
+}
+
+country_event = { # Legion Victory - USA / Aiding Legion
+	id = HIS_PP_ceasefire.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.6" }
+	title = HIS_PP_ceasefire.6.t
+	desc = HIS_PP_ceasefire.6.desc
+	picture = GFX_report_event_generic_telephone
+
+	is_triggered_only = yes
+
+	immediate = { set_country_flag = conclusion_victory }
+
+	option = {
+		name = HIS_PP_ceasefire.6.a
+		USA = {
+			set_country_flag = USA_puerto_plata_over
+		}
+
+		set_temp_variable = { conclusion_weeks = 4 }
+		set_temp_variable = { conclusion_bonus = 0.005 }
+		GER = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -50 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 5 }
+			set_temp_variable = { Victory_Points = 100 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA_proxy_conclusion_effect = yes
+	}
+}
+
+country_event = { # Negotiated Peace with Iberia
+	id = HIS_PP_ceasefire.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.7" }
+	title = HIS_PP_ceasefire.7.t
+	desc = HIS_PP_ceasefire.7.desc
+	picture = GFX_report_event_generic_handshake_2
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { tag = USA }
+			set_country_flag = conclusion_victory
+		}
+	}
+
+	option = {
+		name = HIS_PP_ceasefire.7.a
+		if = {
+			limit = { tag = USA }
+			USA = {
+				set_country_flag = USA_puerto_plata_over
+			}
+
+			set_temp_variable = { conclusion_weeks = 3 }
+			set_temp_variable = { conclusion_bonus = 0.005 }
+			GER = {
+				set_temp_variable = { Victory_ID = 29 }
+				set_temp_variable = { Victory_Outcome = 1 }
+				set_temp_variable = { Victory_Points = -100 }
+				Cold_War_GUI_ManipulateVictory = yes
+			}
+			USA = {
+				set_temp_variable = { Victory_ID = 29 }
+				set_temp_variable = { Victory_Outcome = 4 }
+				set_temp_variable = { Victory_Points = 75 }
+				Cold_War_GUI_ManipulateVictory = yes
+			}
+			USA_proxy_conclusion_effect = yes
+		}
+	}
+}
+
+country_event = { # Start of ceasefire for GER
+	id = HIS_PP_ceasefire.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.9" }
+	title = HIS_PP_ceasefire.9.t
+	desc = HIS_PP_ceasefire.9.desc
+	picture = GFX_report_event_GER_army_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.9.a
+		hidden_effect = {
+			USA = {
+				set_variable = { global.PPI_ceasefire_end_days_GER = days_mission_timeout@USA_PPI_ceasefire_ends }
+				set_variable = { global.PPI_tensions_increase_days_GER = days_mission_timeout@USA_PPI_tensions_increase }
+			}
+		}
+		activate_mission = GER_PPI_ceasefire_ends
+		hidden_effect = { activate_mission = GER_PPI_tensions_increase }
+	}
+}
+
+country_event = { # Start of ceasefire for IBR - USA supports Rebels
+	id = HIS_PP_ceasefire.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.10" }
+	title = HIS_PP_ceasefire.10.t
+	desc = HIS_PP_ceasefire.10.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.10.a
+		hidden_effect = {
+			USA = {
+				set_variable = { global.PPI_ceasefire_end_days_IBR = days_mission_timeout@USA_PPI_ceasefire_ends }
+				set_variable = { global.PPI_tensions_increase_days_IBR = days_mission_timeout@USA_PPI_tensions_increase }
+			}
+		}
+		activate_mission = IBR_PPI_ceasefire_ends
+		hidden_effect = { activate_mission = IBR_PPI_tensions_increase }
+	}
+}
+
+country_event = { # Start of ceasefire for IBR - USA supports Balaguer
+	id = HIS_PP_ceasefire.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.11" }
+	title = HIS_PP_ceasefire.11.t
+	desc = HIS_PP_ceasefire.11.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.11.a
+		hidden_effect = {
+			USA = {
+				set_variable = { global.PPI_ceasefire_end_days_IBR = days_mission_timeout@USA_PPI_ceasefire_ends }
+				set_variable = { global.PPI_tensions_increase_days_IBR = days_mission_timeout@USA_PPI_tensions_increase }
+			}
+		}
+		activate_mission = IBR_PPI_ceasefire_ends
+		hidden_effect = { activate_mission = IBR_PPI_tensions_increase }
+	}
+}
+
+country_event = { # Balaguer Elections
+	id = HIS_PP_ceasefire.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.12" }
+	title = HIS_PP_ceasefire.12.t
+	desc = HIS_PP_ceasefire.12.desc
+	#picture =
+
+	trigger = { has_country_leader = { character = DOM_Joaquin_Balaguer ruling_only = yes } }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.12.a
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = paternalism
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		set_popularities = {
+			fascism = 11
+			despotism = 10
+			ultranationalism = 4
+			paternalism = 42
+			liberalism = 8
+			progressivism = 19
+			socialist = 6
+		}
+		add_country_leader_role = {
+			character = DOM_Joaquin_Balaguer
+			promote_leader = yes
+			country_leader = {
+				expire = "1999.7.14"
+				ideology = paternalism_controlled_democracy_subtype
+				traits = { el_doctor }
+				id = -1
+			}
+		}
+		set_party_name = {
+			ideology = paternalism
+			name = DOM_partido_reformista_party
+			long_name = DOM_partido_reformista_party_long
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.20
+		#		hours = 8
+		#	}
+		#}
+	}
+}
+
+country_event = { # Balaguer tells Nixon to fuck off
+	id = HIS_PP_ceasefire.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.13" }
+	title = HIS_PP_ceasefire.13.t
+	desc = HIS_PP_ceasefire.13.desc
+	picture = GFX_report_event_HIS_defiance
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.13.a
+		#custom_effect_tooltip =
+	}
+}
+
+country_event = { # Ceasefire Breaks Down - pro-Rebels
+	id = HIS_PP_ceasefire.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.14" }
+	title = HIS_PP_ceasefire.14.t
+	desc = HIS_PP_ceasefire.14.desc
+	picture = GFX_report_event_HIS_Search_And_Destroy
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.14.a
+	}
+}
+
+country_event = { # Ceasefire Breaks Down - pro-Balaguer
+	id = HIS_PP_ceasefire.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.15" }
+	title = HIS_PP_ceasefire.15.t
+	desc = HIS_PP_ceasefire.15.desc
+	picture = GFX_report_event_HIS_soldiers_jungle
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.15.a
+	}
+}
+
+country_event = { # Ceasefire Breaks Down - Iberia
+	id = HIS_PP_ceasefire.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.16" }
+	title = HIS_PP_ceasefire.16.t
+	desc = HIS_PP_ceasefire.16.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.16.a
+	}
+}
+
+country_event = { # BALAGUER VICTORY CEASEFIRE - 1966 ELECTION
+	id = HIS_PP_ceasefire.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.17" }
+	title = HIS_PP_ceasefire.17.t
+	desc = HIS_PP_ceasefire.17.desc
+	#picture =
+
+	trigger = { has_global_flag = PPI_ceasefire_successful }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.17.a
+		add_popularity = {
+			ideology = conservatism
+			popularity = 0.02
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.42
+		#		hours = 8
+		#	}
+		#}
+	}
+}
+country_event = { # BALAGUER VICTORY CEASEFIRE - 1970 ELECTION
+	id = HIS_PP_ceasefire.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.18" }
+	title = HIS_PP_ceasefire.18.t
+	desc = HIS_PP_ceasefire.18.desc
+	#picture =
+
+	trigger = { has_global_flag = PPI_ceasefire_successful }
+
+	is_triggered_only = yes
+
+	option = { # Reelect Balaguer
+		name = HIS_PP_ceasefire.18.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_1970_ELECTION option = DOM_1970_ELECTION_GUZMAN }
+			}
+		}
+		add_stability = 0.05
+		set_temp_variable = { temp_econ_GDP_boost_percentage = 0.03 }
+		econ_GDP_boost_once_percentage = yes
+		add_popularity = {
+			ideology = conservatism
+			popularity = 0.03
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.45
+		#		hours = 8
+		#	}
+		#}
+	}
+	option = { # Elect Guzman
+		name = HIS_PP_ceasefire.18.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_1970_ELECTION option = DOM_1970_ELECTION_BALAGUER }
+			}
+		}
+		add_country_leader_role = {
+			character = DOM_Antonio_Guzman
+			promote_leader = yes
+			country_leader = {
+				expire = "1999.1.1"
+				ideology = progressivism_democratic_socialism_subtype
+				traits = { }
+				id = -1
+			}
+		}
+		remove_ideas = {
+			DOM_Limits_Of_Tolerance
+			DOM_Doctor_Prescription
+		}
+		add_ideas = {
+			DOM_Mending_Our_Path
+		}
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = progressivism
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.64
+		#		hours = 8
+		#	}
+		#}
+		set_popularities = {
+			despotism = 8
+			communist = 5
+			socialist = 10
+			liberalism = 15
+			liberal_conservatism = 10
+			paternalism = 17
+			progressivism = 35
+		}
+	}
+}
+country_event = { # (USA) Iberia Accepted
+	id = HIS_PP_ceasefire.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.19" }
+	title = HIS_PP_ceasefire.19.t
+	desc = HIS_PP_ceasefire.19.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.19.a
+		set_global_flag = USA_IBR_reached_detente
+		set_temp_variable = { ceasefire_tension_temp = 10 }
+		TNO_PPI_decrease_ceasefire_tension = yes
+	}
+}
+country_event = { # (USA) Iberia Refused
+	id = HIS_PP_ceasefire.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.20" }
+	title = HIS_PP_ceasefire.20.t
+	desc = HIS_PP_ceasefire.20.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.20.a
+		custom_effect_tooltip = USA_PP_ceasefire_legion_tt
+		set_temp_variable = { ceasefire_tension_temp = 10 }
+		TNO_PPI_increase_ceasefire_tension = yes
+		hidden_effect = {
+			clr_country_flag = USA_PP_ceasefire_balaguer
+			set_country_flag = USA_PP_ceasefire_legion
+			country_event = { id = HIS_PP_ceasefire.13 days = 3 }
+		}
+	}
+}
+country_event = { # (Iberia) Balaguer Victory
+	id = HIS_PP_ceasefire.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.21" }
+	title = HIS_PP_ceasefire.21.t
+	desc = HIS_PP_ceasefire.21.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.21.a
+	}
+}
+
+country_event = { # (Iberia) Pupo Roman Coup
+	id = HIS_PP_ceasefire.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.22" }
+	title = HIS_PP_ceasefire.22.t
+	desc = HIS_PP_ceasefire.22.desc
+	picture = GFX_report_event_DOM_hector_trujillo
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.22.a
+	}
+}
+
+country_event = { # (Iberia) Trujillista Counter Coup
+	id = HIS_PP_ceasefire.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.23" }
+	title = HIS_PP_ceasefire.23.t
+	desc = HIS_PP_ceasefire.23.desc
+	picture = GFX_report_event_DOM_hector_trujillo
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.23.a
+	}
+}
+
+country_event = { # (Iberia) Ramfis Victory
+	id = HIS_PP_ceasefire.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.24" }
+	title = HIS_PP_ceasefire.24.t
+	desc = HIS_PP_ceasefire.24.desc
+	picture = GFX_report_event_DOM_hector_trujillo
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.24.a
+	}
+}
+
+country_event = { # (Germany) Pupo Roman Coup
+	id = HIS_PP_ceasefire.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.25" }
+	title = HIS_PP_ceasefire.25.t
+	desc = HIS_PP_ceasefire.25.desc
+	picture = GFX_report_event_DOM_pupo_roman
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.25.a
+	}
+}
+
+country_event = { # (Germany) Trujillista Counter Coup
+	id = HIS_PP_ceasefire.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.26" }
+	title = HIS_PP_ceasefire.26.t
+	desc = HIS_PP_ceasefire.26.desc
+	picture = GFX_report_event_DOM_roman_arrested
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.26.a
+	}
+}
+
+country_event = { # (Germany) Ramfis Victory
+	id = HIS_PP_ceasefire.27
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.27" }
+	title = HIS_PP_ceasefire.27.t
+	desc = HIS_PP_ceasefire.27.desc
+	picture = GFX_report_event_DOM_viva_trujillo
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.27.a
+	}
+}
+
+country_event = { # (USA) Quisqueya Agreement
+	id = HIS_PP_ceasefire.28
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.28" }
+	title = HIS_PP_ceasefire.28.t
+	desc = HIS_PP_ceasefire.28.desc
+	picture = GFX_report_event_DOM_pupo_roman
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { tag = USA }
+			set_country_flag = conclusion_victory
+		}
+	}
+
+	option = {
+		name = HIS_PP_ceasefire.28.a
+		set_temp_variable = { conclusion_weeks = 4 }
+		set_temp_variable = { conclusion_bonus = 0.005 }
+		GER = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -75 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 5 }
+			set_temp_variable = { Victory_Points = 125 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA_proxy_conclusion_effect = yes
+	}
+}
+
+country_event = { # (USA) Ramfis Victory
+	id = HIS_PP_ceasefire.29
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_PP_ceasefire.29" }
+	title = HIS_PP_ceasefire.29.t
+	desc = HIS_PP_ceasefire.29.desc
+	picture = GFX_report_event_DOM_viva_trujillo
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_PP_ceasefire.29.a
+		set_temp_variable = { conclusion_weeks = 8 }
+		set_temp_variable = { conclusion_bonus = 0.015 }
+		USA_proxy_conclusion_effect = yes
+		GER = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 4 }
+			set_temp_variable = { Victory_Points = 75 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { Victory_ID = 29 }
+			set_temp_variable = { Victory_Outcome = 1 }
+			set_temp_variable = { Victory_Points = -100 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+	}
+}
+
+country_event = { # Reid and his Triumvirate take over DR
+	id = HIS_DOM_ceasefire_skeleton.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_DOM_ceasefire_skeleton.1" }
+	title = HIS_DOM_ceasefire_skeleton.1.t
+	desc = HIS_DOM_ceasefire_skeleton.1.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_DOM_ceasefire_skeleton.1.a
+		add_ideas = DOM_National_Rescue
+		remove_ideas = {
+			DOM_Dios_Trujillo_Ramfis
+			DOM_The_Defense_State
+			DOM_The_Defense_State_2
+			DOM_Black_Spot_of_the_Caribbean
+			DOM_Black_Spot_of_the_Caribbean_2
+		}
+		set_country_flag = DOM_ceasefire_reid_triumvirate
+		set_politics = { ruling_party = paternalism }
+		set_popularities = {
+			fascism = 13
+			ultranationalism = 7
+			paternalism = 31
+			progressivism = 23
+			liberalism = 15
+			socialist = 8
+		}
+		promote_character = DOM_Donald_Reid_Cabral
+		set_party_name = {
+			ideology = paternalism
+			name = DOM_trujillo_victory_oligarchy
+			long_name = DOM_trujillo_victory_oligarchy_long
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			name = DOM_ultranationalism_party_puertoplata
+			long_name = DOM_ultranationalism_party_puertoplata_long
+		}
+		set_party_name = {
+			ideology = fascism
+			name = DOM_fascism_party_puertoplata
+			long_name = DOM_fascism_party_puertoplata_long
+		}
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Corporate_Oligopoly }
+		econ_subtype_change = yes
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.27
+		#		hours = 8
+		#	}
+		#}
+	}
+}
+
+country_event = { # Wessin y Wessin Coup
+	id = HIS_DOM_ceasefire_skeleton.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_DOM_ceasefire_skeleton.2" }
+	title = HIS_DOM_ceasefire_skeleton.2.t
+	desc = HIS_DOM_ceasefire_skeleton.2.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_DOM_ceasefire_skeleton.2.a
+		remove_ideas = {
+			DOM_Dios_Trujillo_Ramfis
+			DOM_Blanqueamiento
+			DOM_The_Defense_State
+			DOM_The_Defense_State_2
+			DOM_Black_Spot_of_the_Caribbean
+			DOM_Black_Spot_of_the_Caribbean_2
+		}
+		add_ideas = DOM_Auxiliary_Occupation
+		add_country_leader_role = {
+			character = DOM_Elias_Wessin_Wessin
+			promote_leader = yes
+			country_leader = {
+				expire = "1999.7.14"
+				ideology = despotism_military_junta_subtype
+				traits = { }
+				id = -1
+			}
+		}
+		set_politics = { ruling_party = despotism }
+		set_popularities = {
+			fascism = 8
+			ultranationalism = 0
+			despotism = 42
+			paternalism = 10
+			liberalism = 16
+			socialist = 24
+		}
+		set_party_name = {
+			ideology = despotism
+			name = DOM_trujillo_victory_junta
+			long_name = DOM_trujillo_victory_junta_long
+		}
+		set_party_name = {
+			ideology = ultranationalism
+			name = DOM_ultranationalism_party_puertoplata
+			long_name = DOM_ultranationalism_party_puertoplata_long
+		}
+		set_party_name = {
+			ideology = fascism
+			name = DOM_fascism_party_puertoplata
+			long_name = DOM_fascism_party_puertoplata_long
+		}
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+		econ_subtype_change = yes
+		USA = {
+			country_event = {
+				id = HIS_DOM_ceasefire_skeleton.3
+				hours = 3
+			}
+		}
+	}
+}
+
+country_event = { # Operation Power Pack
+	id = HIS_DOM_ceasefire_skeleton.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_DOM_ceasefire_skeleton.3" }
+	title = HIS_DOM_ceasefire_skeleton.3.t
+	desc = HIS_DOM_ceasefire_skeleton.3.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_DOM_ceasefire_skeleton.3.a
+		hidden_effect = {
+			country_event = {
+				id = HIS_DOM_ceasefire_skeleton.4
+				days = 20
+			}
+			#every_country = {
+			#	limit = { is_ai = no }
+			#	news_event = {
+			#		id = hispaniola_news.28
+			#		hours = 8
+			#	}
+			#}
+		}
+	}
+}
+
+country_event = { # Fate of the DR (USA)
+	id = HIS_DOM_ceasefire_skeleton.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_DOM_ceasefire_skeleton.4" }
+	title = HIS_DOM_ceasefire_skeleton.4.t
+	desc = HIS_DOM_ceasefire_skeleton.4.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = { # Keep the Junta
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_WESSIN option = DOM_WESSIN_ELECTION }
+			}
+		}
+		name = HIS_DOM_ceasefire_skeleton.4.a
+
+		custom_effect_tooltip = HIS_DOM_ceasefire_skeleton.4.a_tt
+		set_country_flag = DOM_ceasefire_skeleton_supported_junta
+		hidden_effect = {
+			DOM = {
+				country_event = {
+					id = HIS_DOM_ceasefire_skeleton.5
+					days = 240
+				}
+			}
+		}
+	}
+	option = { # Immediate Elections
+		name = HIS_DOM_ceasefire_skeleton.4.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = DOM_WESSIN option = DOM_WESSIN_JUNTA }
+			}
+		}
+
+		custom_effect_tooltip = HIS_DOM_ceasefire_skeleton.4.b_tt
+		set_country_flag = DOM_ceasefire_skeleton_supported_elections
+		hidden_effect = {
+			DOM = {
+				set_party_name = {
+					ideology = despotism
+					name = DOM_military_influence
+					long_name = DOM_military_influence_long
+				}
+				meta_effect = { #sets up next election date in country ui
+				text = {
+					set_politics = {
+						ruling_party = paternalism
+						last_election = "[current_election_date]"
+						elections_allowed = yes
+						election_frequency = 48
+					}
+				}
+				current_election_date = "[?global.date.GetDateStringNoHour]"
+				}
+				set_popularities = {
+					fascism = 10
+					despotism = 15
+					paternalism = 34
+					progressivism = 10
+					liberalism = 17
+					liberal_conservatism = 14
+				}
+				promote_character = DOM_Antonio_Guzman
+				country_event = {
+					id = HIS_DOM_ceasefire_skeleton.6
+					days = 50
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Garcia Godoy elected
+	id = HIS_DOM_ceasefire_skeleton.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_DOM_ceasefire_skeleton.5" }
+	title = HIS_DOM_ceasefire_skeleton.5.t
+	desc = HIS_DOM_ceasefire_skeleton.5.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_DOM_ceasefire_skeleton.5.a
+		meta_effect = { #sets up next election date in country ui
+		text = {
+			set_politics = {
+				ruling_party = liberal_conservatism
+				last_election = "[current_election_date]"
+				elections_allowed = yes
+				election_frequency = 48
+			}
+		}
+		current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		set_popularities = {
+			fascism = 10
+			paternalism = 8
+			progressivism = 18
+			liberalism = 12
+			liberal_conservatism = 34
+			despotism = 18
+		}
+		set_party_name = {
+			ideology = despotism
+			name = DOM_military_influence
+			long_name = DOM_military_influence_long
+		}
+		promote_character = DOM_Hector_Garcia_Godoy
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.29
+				hours = 8
+			}
+		}
+	}
+}
+
+country_event = { # Bosch elected
+	id = HIS_DOM_ceasefire_skeleton.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_DOM_ceasefire_skeleton.6" }
+	title = HIS_DOM_ceasefire_skeleton.6.t
+	desc = HIS_DOM_ceasefire_skeleton.6.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_DOM_ceasefire_skeleton.6.a
+		DOM = {
+			meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = progressivism
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 48
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+			}
+			promote_character = {
+				character = DOM_Juan_Emilio_Bosch_Gavino
+				ideology = progressivism_gaitanismo_subtype
+			}
+			set_popularities = {
+				despotism = 8
+				communist = 5
+				socialist = 10
+				liberalism = 15
+				liberal_conservatism = 10
+				paternalism = 17
+				progressivism = 35
+			}
+		}
+
+		add_ideas = DOM_Reform_Program
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.30
+				hours = 8
+			}
+		}
+	}
+}
+
+country_event = { # Bosch elected
+	id = HIS_DOM_ceasefire_skeleton.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_DOM_ceasefire_skeleton.7" }
+	title = HIS_DOM_ceasefire_skeleton.7.t
+	desc = HIS_DOM_ceasefire_skeleton.7.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_DOM_ceasefire_skeleton.7.a
+		USA = { end_puppet = DOM }
+		DOM = {
+			drop_cosmetic_tag = yes
+			remove_ideas = {
+				OFN_Interim_Authority
+				DOM_Pan_American_Force
+			}
+			add_ideas = OFN_Observer
+			leave_faction = yes
+			remove_from_array = { global.OFN_members = DOM }
+			meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = progressivism
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 48
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+			}
+			promote_character = {
+				character = DOM_Juan_Emilio_Bosch_Gavino
+				ideology = progressivism_gaitanismo_subtype
+			}
+			set_popularities = {
+				socialist = 6
+				liberalism = 17
+				liberal_conservatism = 24
+				paternalism = 9
+				progressivism = 30
+				ultranationalism = 4
+				fascism = 10
+			}
+		}
+
+		add_ideas = DOM_Reform_Program
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = hispaniola_news.31
+				hours = 8
+			}
+		}
+	}
+}
+
+country_event = { # Force engagement in civil war
+	id = HIS_DOM_ceasefire_skeleton.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_DOM_ceasefire_skeleton.8" }
+	title = HIS_DOM_ceasefire_skeleton.8.t
+	desc = HIS_DOM_ceasefire_skeleton.8.desc
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_DOM_ceasefire_skeleton.8.a
+		DOM = { add_ideas = HIS_DOM_hidden_rush_war }
+		CAL = { add_ideas = HIS_DOM_hidden_rush_war }
+	}
+}
+
+country_event = { # Power Struggle
+	id = HIS_DOM_Trujillo_Victory.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_DOM_Trujillo_Victory.1" }
+	title = HIS_DOM_Trujillo_Victory.1.t
+	desc = HIS_DOM_Trujillo_Victory.1.desc
+	picture = GFX_report_event_IBR_big_meeting
+
+	is_triggered_only = yes
+	trigger = { has_global_flag = HIS_trujillo_blitz_trujillo_won }
+
+	option = {
+		name = HIS_DOM_Trujillo_Victory.1.a
+
+		random_list = {
+			70 = { # Balaguer victory
+				modifier = {
+					factor = 0
+					has_game_rule = { rule = DOM_TRUJILLO_SUCCESSOR option = DOM_TRUJILLO_SUCCESSOR_RAMFIS }
+				}
+				set_country_flag = DOM_power_struggle_balaguer_victory
+
+				remove_ideas = {
+					DOM_Puppet_Caudillo
+					DOM_Dios_Trujillo_Ramfis
+					DOM_La_Patria_Nueva
+					DOM_Black_Spot_of_the_Caribbean
+					DOM_Black_Spot_of_the_Caribbean_2
+				}
+				if = {
+					limit = { has_global_flag = HIS_trujillo_blitz_trujillo_won }
+					add_ideas = DOM_A_New_State
+				}
+				else = {
+					add_ideas = DOM_ceasefire_New_State
+				}
+
+				kill_country_leader = yes
+				set_politics = { ruling_party = paternalism }
+				set_popularities = {
+					fascism = 22
+					ultranationalism = 10
+					paternalism = 48
+					liberalism = 8
+					progressivism = 12
+				}
+				add_country_leader_role = {
+					character = DOM_Joaquin_Balaguer
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_JOAQUIN_BALAGUER_STRUGGLE_DESC"
+						expire = "1999.7.14"
+						ideology = paternalism_transitioning_democracy_subtype
+						traits = { el_doctor }
+						id = -1
+					}
+				}
+
+				set_party_name = {
+					ideology = paternalism
+					name = DOM_partido_reformista_party
+					long_name = DOM_partido_reformista_party_long
+				}
+				set_party_name = {
+					ideology = ultranationalism
+					name = DOM_ultranationalism_party_puertoplata
+					long_name = DOM_ultranationalism_party_puertoplata_long
+				}
+				set_party_name = {
+					ideology = fascism
+					name = DOM_fascism_party_puertoplata
+					long_name = DOM_fascism_party_puertoplata_long
+				}
+
+				every_country = {
+					limit = { is_ai = no }
+					news_event = { # trujillo dead news event
+						id = hispaniola_news.32
+						hours = 8
+					}
+				}
+			}
+			30 = { # Ramfis victory
+				modifier = {
+					factor = 0
+					has_game_rule = { rule = DOM_TRUJILLO_SUCCESSOR option = DOM_TRUJILLO_SUCCESSOR_BALAGUER }
+				}
+				set_country_flag = DOM_power_struggle_ramfis_victory
+
+				retire_character = DOM_Joaquin_Balaguer
+				set_politics = { ruling_party = ultranationalism }
+				set_popularities = {
+					fascism = 18
+					ultranationalism = 30
+					despotism = 14
+					paternalism = 11
+					liberalism = 12
+					progressivism = 10
+					socialist = 5
+				}
+				add_country_leader_role = {
+					character = DOM_Ramfis_Trujillo
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_RAMFIS_TRUJILLO_PUPPET_DESC"
+						expire = "1999.7.14"
+						ideology = ultranationalism_esoteric_despotism_subtype
+						traits = { }
+						id = -1
+					}
+				}
+
+				every_country = {
+					limit = { is_ai = no }
+					news_event = { # trujillo dead news event
+						id = hispaniola_news.33
+						hours = 8
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Caamaño lands in Caracoles
+	id = HIS_DOM_Trujillo_Victory.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_DOM_Trujillo_Victory.2" }
+	title = HIS_DOM_Trujillo_Victory.2.t
+	desc = HIS_DOM_Trujillo_Victory.2.desc
+	#picture =
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_DOM_Trujillo_Victory.2.a
+
+		1710 = { set_demilitarized_zone = yes }
+
+		#every_country = {
+		#	limit = { is_ai = no }
+		#	news_event = {
+		#		id = hispaniola_news.34
+		#		hours = 8
+		#	}
+		#}
+	}
+}
+
+news_event = { # The Puerto Plata Invasion
+	id = hispaniola_news.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.1" }
+	title = hispaniola_news.1.t
+	desc = hispaniola_news.1.desc
+	picture = GFX_news_event_DOM_puerto_plata_invasion
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.1.a
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+				original_tag = CAL
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.1.b
+		trigger = {
+			OR = {
+				original_tag = DOM
+				original_tag = IBR
+				original_tag = GER
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.1.c
+		trigger = {
+			NOT = {
+				is_in_faction_with = USA
+				original_tag = GER
+				original_tag = DOM
+				original_tag = IBR
+				original_tag = CAL
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+}
+
+news_event = { # Puerto Plata Victory
+	id = hispaniola_news.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.2" }
+	title = hispaniola_news.2.t
+	desc = hispaniola_news.2.desc
+	picture = GFX_news_event_DOM_puerto_plata_victory
+
+	is_triggered_only = yes
+
+	option = {
+		name = hispaniola_news.2.a
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+				original_tag = DOM
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.2.b
+		trigger = {
+			original_tag = IBR
+		}
+	}
+	option = {
+		name = hispaniola_news.2.c
+		trigger = {
+			OR = {
+				is_in_faction_with = GER
+				original_tag = PAR
+				original_tag = STC
+				original_tag = CLC
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.2.d
+		trigger = {
+			NOT = {
+				is_in_faction_with = USA
+				is_in_faction_with = GER
+				original_tag = DOM
+				original_tag = IBR
+				original_tag = PAR
+				original_tag = STC
+				original_tag = CLC
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+}
+
+news_event = { # Puerto Plata Defeat
+	id = hispaniola_news.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.3" }
+	title = hispaniola_news.3.t
+	desc = hispaniola_news.3.desc
+	picture = GFX_news_event_DOM_puerto_plata_defeat
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.3.a
+		trigger = {
+			is_in_faction_with = USA
+		}
+	}
+	option = {
+		name = hispaniola_news.3.b
+		trigger = {
+			OR = {
+				original_tag = IBR
+				original_tag = DOM
+				original_tag = CLC
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.3.c
+		trigger = {
+			NOT = {
+				is_in_faction_with = USA
+				original_tag = DOM
+				original_tag = IBR
+				original_tag = CLC
+			}
+		}
+	}
+}
+
+news_event = { # Batista Executed
+	id = hispaniola_news.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.4" }
+	title = hispaniola_news.4.t
+	desc = hispaniola_news.4.desc
+	picture = GFX_news_event_CUB_batista_ded
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.4.a
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+				original_tag = DOM
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.4.b
+		trigger = {
+			original_tag = IBR
+		}
+	}
+	option = {
+		name = hispaniola_news.4.c
+		trigger = {
+			NOT = {
+				is_in_faction_with = USA
+				original_tag = DOM
+				original_tag = IBR
+			}
+		}
+	}
+}
+
+news_event = { # Socialist coup in the DR
+	id = hispaniola_news.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.5" }
+	title = hispaniola_news.5.t
+	desc = hispaniola_news.5.desc
+	picture = GFX_news_event_DOM_socialist_coup
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.5.a
+	}
+}
+
+news_event = { # Socialist putsch deafeated in DR
+	id = hispaniola_news.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.6" }
+	title = hispaniola_news.6.t
+	desc = hispaniola_news.6.desc
+	picture = GFX_news_event_DOM_socialist_coup_fail
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.6.a
+	}
+}
+
+news_event = { # Trujillo Ousted
+	id = hispaniola_news.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.7" }
+	title = hispaniola_news.7.t
+	desc = hispaniola_news.7.desc
+	picture = GFX_news_event_DOM_puerto_plata_ceasefire
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.7.a
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.7.b
+		trigger = {
+			OR = {
+				is_in_faction_with = GER
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.7.c
+		trigger = {
+			NOT = {
+				is_in_faction_with = USA
+				is_in_faction_with = GER
+				original_tag = IBR
+				original_tag = CAL
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.7.d
+		trigger = {
+			OR = {
+				original_tag = CAL
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.7.e
+		trigger = {
+			OR = {
+				original_tag = IBR
+			}
+		}
+	}
+}
+
+news_event = { # Maximo becomes an Amazonisn fan a news event
+	id = hispaniola_news.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.8" }
+	title = hispaniola_news.8.t
+	desc = hispaniola_news.8.desc
+	picture = GFX_news_event_DOM_maximo_amazonism
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.8.a
+		hidden_effect = {
+			DOM = {
+				remove_opinion_modifier = { target = CLC modifier = CLC_fascist_comrades }
+				remove_opinion_modifier = { target = STC modifier = CLC_fascist_comrades }
+				remove_opinion_modifier = { target = PAR modifier = CLC_fascist_comrades }
+				CLC = { reverse_add_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+				STC = { reverse_add_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+				PAR = { reverse_add_opinion_modifier = { target = DOM modifier = CLC_fascist_comrades } }
+			}
+		}
+	}
+}
+
+
+news_event = { # Bonnelly becomes a president of the DR a news event
+	id = hispaniola_news.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.9" }
+	title = hispaniola_news.9.t
+	desc = hispaniola_news.9.desc
+	picture = GFX_news_event_DOM_bonnelly_president
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.9.a
+	}
+}
+
+news_event = { # Bosch becomes a president of the DR a news event
+	id = hispaniola_news.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.10" }
+	title = hispaniola_news.10.t
+	desc = hispaniola_news.10.desc
+	picture = GFX_news_event_DOM_bosch_president
+
+	is_triggered_only = yes
+	option = {
+		trigger = {
+			NOT = {
+				OR = {
+					original_tag = MEX
+					original_tag = CUB
+				}
+			}
+		}
+		name = hispaniola_news.10.a
+	}
+	option = {
+		trigger = {
+			OR = {
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+		name = hispaniola_news.10.a
+		custom_effect_tooltip = hispaniola_news.10.tt
+	}
+}
+
+news_event = { # Trujillo's Blitz
+	id = hispaniola_news.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.11" }
+	title = hispaniola_news.11.t
+	desc = hispaniola_news.11.desc
+	picture = GFX_news_event_DOM_blitz
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.11.a
+	}
+}
+
+news_event = { # Haitian Revolution Successful
+	id = hispaniola_news.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.12" }
+	title = hispaniola_news.12.t
+	desc = hispaniola_news.12.desc
+	picture = GFX_news_event_HAI_revolution
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.12.a
+		trigger = {
+			DOM = {
+				NOT = {
+					has_government = socialist
+					has_government = communist
+				}
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.12.b
+		trigger = {
+			DOM = {
+				OR = {
+					has_government = socialist
+					has_government = communist
+				}
+			}
+		}
+	}
+}
+
+news_event = { # Balaguer Victory
+	id = hispaniola_news.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.13" }
+	title = hispaniola_news.13.t
+	desc = hispaniola_news.13.desc
+	picture = GFX_news_event_DOM_puerto_plata_balaguer_ceasefire_victory
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.13.a
+		trigger = {
+			OR = {
+				AND = {
+					is_in_faction_with = USA
+					has_country_flag = USA_PP_ceasefire_balaguer
+				}
+				original_tag = DOM
+				original_tag = IBR
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.13.b
+		trigger = {
+			OR = {
+				AND = {
+					is_in_faction_with = USA
+					has_country_flag = USA_PP_ceasefire_legion
+				}
+				original_tag = CAL
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.13.c
+		trigger = {
+			NOT = {
+				OR = {
+					is_in_faction_with = USA
+					original_tag = DOM
+					original_tag = IBR
+					original_tag = CAL
+					original_tag = MEX
+					original_tag = CUB
+				}
+			}
+		}
+	}
+}
+
+news_event = { # empty
+	id = hispaniola_news.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.14" }
+	title = hispaniola_news.14.t
+	desc = hispaniola_news.14.desc
+	#picture =
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.14.a
+	}
+}
+
+news_event = { # Ceasefire Breaks Down
+	id = hispaniola_news.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.15" }
+	title = hispaniola_news.15.t
+	desc = hispaniola_news.15.desc
+	picture = GFX_news_event_DOM_puerto_plata_ceasefire_war
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.15.a
+		trigger = {
+			OR = {
+				AND = {
+					is_in_faction_with = USA
+					has_country_flag = USA_PP_ceasefire_balaguer
+				}
+				original_tag = IBR
+				original_tag = DOM
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.15.b
+		trigger = {
+			OR = {
+				AND = {
+					is_in_faction_with = USA
+					has_country_flag = USA_PP_ceasefire_legion
+				}
+				original_tag = CAL
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.15.c
+		trigger = {
+			NOT = {
+				OR = {
+					is_in_faction_with = USA
+					original_tag = DOM
+					original_tag = IBR
+					original_tag = CAL
+					original_tag = MEX
+					original_tag = CUB
+					original_tag = GER
+				}
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.15.d
+		trigger = { original_tag = GER }
+	}
+}
+
+news_event = { # Negotiated Peace with Iberia
+	id = hispaniola_news.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.16" }
+	title = hispaniola_news.16.t
+	desc = hispaniola_news.16.desc
+	picture = GFX_news_event_DOM_puerto_plata_ceasefire_peace
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.16.a
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+				original_tag = IBR
+				original_tag = DOM
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.16.b
+		trigger = {
+			OR = {
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.16.c
+		trigger = {
+			NOT = {
+				OR = {
+					is_in_faction_with = USA
+					original_tag = DOM
+					original_tag = IBR
+					original_tag = MEX
+					original_tag = CUB
+				}
+			}
+		}
+	}
+}
+
+news_event = { # Trujillo Assassinated by Triumvirate
+	id = hispaniola_news.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.17" }
+	title = hispaniola_news.17.t
+	desc = hispaniola_news.17.desc
+	picture = GFX_news_event_DOM_puerto_plata_ceasefire
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.17.a
+	}
+}
+
+news_event = { # Dominican Republic Defeated
+	id = hispaniola_news.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.18" }
+	title = hispaniola_news.18.t
+	desc = hispaniola_news.18.desc
+	picture = GFX_news_event_DOM_trujillo_blitz_defeated
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.18.a
+		trigger = {
+			OR = {
+				original_tag = USA
+				is_in_faction_with = USA
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.18.b
+		trigger = {
+			original_tag = IBR
+		}
+	}
+	option = {
+		name = hispaniola_news.18.c
+		trigger = {
+			NOT = {
+				OR = {
+					original_tag = USA
+					is_in_faction_with = USA
+					original_tag = IBR
+				}
+			}
+		}
+	}
+}
+
+news_event = { # Shootdown
+	id = hispaniola_news.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.19" }
+	title = hispaniola_news.19.t
+	desc = hispaniola_news.19.desc
+	picture = GFX_news_event_DOM_puerto_plata_shootdown
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.19.a
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+				original_tag = DOM
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.19.b
+		trigger = {
+			original_tag = IBR
+		}
+	}
+	option = {
+		name = hispaniola_news.19.c
+		trigger = {
+			NOT = {
+				OR = {
+					is_in_faction_with = USA
+					original_tag = DOM
+					original_tag = IBR
+				}
+			}
+		}
+	}
+}
+
+news_event = { # Balaguer Elections
+	id = hispaniola_news.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.20" }
+	title = hispaniola_news.20.t
+	desc = hispaniola_news.20.desc
+	picture = GFX_news_event_DOM_balaguer
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.20.a
+	}
+}
+
+news_event = { # Haitian Civil War
+	id = hispaniola_news.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.21" }
+	title = hispaniola_news.21.t
+	desc = hispaniola_news.21.desc
+	picture = GFX_news_event_HAI_revolution
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.21.a
+		trigger = { NOT = { is_in_faction_with = USA } }
+	}
+
+	option = {
+		name = hispaniola_news.21.b
+		trigger = {
+			is_in_faction_with = USA
+		}
+	}
+}
+
+news_event = { # Lavaud Coup Haiti
+	id = hispaniola_news.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.22" }
+	title = hispaniola_news.22.t
+	desc = hispaniola_news.22.desc
+	picture = GFX_news_event_HAI_lavaud_coup
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.22.a
+	}
+}
+
+news_event = { # Trujillo Conquers Haiti
+	id = hispaniola_news.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.23" }
+	title = hispaniola_news.23.t
+	desc = hispaniola_news.23.desc
+	picture = GFX_news_event_DOM_trujillo_blitz_victory
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.23.a
+	}
+}
+
+news_event = { # pro-Trujillo Ceasefire
+	id = hispaniola_news.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.24" }
+	title = hispaniola_news.24.t
+	desc = hispaniola_news.24.desc
+	picture = GFX_news_event_DOM_trujillo_blitz_ceasefire_trujillo
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.24.a
+	}
+}
+
+news_event = { # pro-Haiti Ceasefire
+	id = hispaniola_news.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.25" }
+	title = hispaniola_news.25.t
+	desc = hispaniola_news.25.desc
+	picture = GFX_news_event_DOM_trujillo_blitz_ceasefire_haiti
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.25.a
+		trigger = {
+			OR = {
+				original_tag = USA
+				is_in_faction_with = USA
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.25.b
+		trigger = {
+			original_tag = IBR
+		}
+	}
+	option = {
+		name = hispaniola_news.25.c
+		trigger = {
+			NOT = {
+				OR = {
+					original_tag = USA
+					is_in_faction_with = USA
+					original_tag = IBR
+				}
+			}
+		}
+	}
+}
+
+news_event = { # Trujillo Dies (naturally)
+	id = hispaniola_news.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.26" }
+	title = hispaniola_news.26.t
+	desc = hispaniola_news.26.desc
+	picture = GFX_news_event_DOM_trujillo_death
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.26.a
+	}
+}
+
+news_event = { # Ramfis Ousted by Triumvirate
+	id = hispaniola_news.27
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.27" }
+	title = hispaniola_news.27.t
+	desc = hispaniola_news.27.desc
+	picture = GFX_news_event_DOM_ramfis_ousted
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.27.a
+	}
+}
+
+news_event = { # USA Occupies DR
+	id = hispaniola_news.28
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.28" }
+	title = hispaniola_news.28.t
+	desc = hispaniola_news.28.desc
+	picture = GFX_news_event_DOM_american_occupation
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.28.a
+	}
+}
+
+news_event = { # Garcia Godoy elected
+	id = hispaniola_news.29
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.29" }
+	title = hispaniola_news.29.t
+	desc = hispaniola_news.29.desc
+	picture = GFX_news_event_DOM_garcia_godoy
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.29.a
+	}
+}
+
+news_event = { # Bosch elected - American occupation
+	id = hispaniola_news.30
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.30" }
+	title = hispaniola_news.30.t
+	desc = hispaniola_news.30.desc
+	picture = GFX_news_event_DOM_bosch_president
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.30.a
+	}
+}
+
+news_event = { # Bosch elected - OFN-OAS occupation
+	id = hispaniola_news.31
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.31" }
+	title = hispaniola_news.31.t
+	desc = hispaniola_news.31.desc
+	picture = GFX_news_event_DOM_bosch_president
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.31.a
+	}
+}
+
+news_event = { # Balaguer dissolves the Caudillato
+	id = hispaniola_news.32
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.32" }
+	title = hispaniola_news.32.t
+	desc = hispaniola_news.32.desc
+	picture = GFX_news_event_DOM_balaguer_dissolves_caudillo
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.32.a
+	}
+}
+
+news_event = { # Ramfis deposes Balaguer
+	id = hispaniola_news.33
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.33" }
+	title = hispaniola_news.33.t
+	desc = hispaniola_news.33.desc
+	picture = GFX_news_event_DOM_ramfis_dissolves_presidency
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.33.a
+	}
+}
+
+news_event = { # Caamaño lands in Caracoles
+	id = hispaniola_news.34
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.34" }
+	title = hispaniola_news.34.t
+	desc = hispaniola_news.34.desc
+	picture = GFX_news_event_DOM_caracoles
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.34.a
+	}
+}
+
+news_event = { # Dejoie re-elected in Haiti
+	id = hispaniola_news.35
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.35" }
+	title = hispaniola_news.35.t
+	desc = hispaniola_news.35.desc
+	picture = GFX_news_event_HAI_dejoie_elected
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.35.a
+	}
+}
+
+news_event = { # Duvalier elected in Haiti
+	id = hispaniola_news.36
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.36" }
+	title = hispaniola_news.36.t
+	desc = hispaniola_news.36.desc
+	picture = GFX_news_event_HAI_duvalier_elected
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.36.a
+	}
+}
+
+news_event = { # Cantave coup in Haiti
+	id = hispaniola_news.37
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.37" }
+	title = hispaniola_news.37.t
+	desc = hispaniola_news.37.desc
+	picture = GFX_news_event_HAI_cantave_coup
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.37.a
+	}
+}
+
+news_event = { # Anti-Radical Coup DR
+	id = hispaniola_news.38
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.38" }
+	title = hispaniola_news.38.t
+	desc = hispaniola_news.38.desc
+	picture = GFX_news_event_DOM_moderate_coup
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.38.a
+	}
+}
+
+news_event = { # empty
+	id = hispaniola_news.39
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.39" }
+	title = hispaniola_news.39.t
+	desc = hispaniola_news.39.desc
+	#picture =
+	hidden = yes
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.39.a
+	}
+}
+
+news_event = { # Bonnelly 1966
+	id = hispaniola_news.40
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.40" }
+	title = hispaniola_news.40.t
+	desc = hispaniola_news.40.desc
+	picture = GFX_news_event_DOM_bonnelly_president
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.40.a
+	}
+}
+
+news_event = { # Bosch 1966
+	id = hispaniola_news.41
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.41" }
+	title = hispaniola_news.41.t
+	desc = hispaniola_news.41.desc
+	picture = GFX_news_event_DOM_bosch_president
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.41.a
+	}
+}
+
+news_event = { # Balaguer 1966
+	id = hispaniola_news.42
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.42" }
+	title = hispaniola_news.42.t
+	desc = hispaniola_news.42.desc
+	picture = GFX_news_event_DOM_balaguer
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.42.a
+	}
+}
+
+news_event = { # Bonelly 1970
+	id = hispaniola_news.43
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.43" }
+	title = hispaniola_news.43.t
+	desc = hispaniola_news.43.desc
+	picture = GFX_news_event_DOM_bonnelly_president
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.43.a
+	}
+}
+
+news_event = { # Guzman 1970
+	id = hispaniola_news.44
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.44" }
+	title = hispaniola_news.44.t
+	desc = hispaniola_news.44.desc
+	picture = GFX_news_event_DOM_antonio_guzman
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.44.a
+	}
+}
+
+news_event = { # Balaguer 1970
+	id = hispaniola_news.45
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.45" }
+	title = hispaniola_news.45.t
+	desc = hispaniola_news.45.desc
+	picture = GFX_news_event_DOM_balaguer
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.45.a
+	}
+}
+
+news_event = { # Hinche Incident
+	id = hispaniola_news.46
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.46" }
+	title = hispaniola_news.46.t
+	desc = hispaniola_news.46.desc
+	picture = GFX_news_event_HAI_hinche_incident
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.46.a
+	}
+}
+
+news_event = { # Haitian Civil War Ends (Negotiated)
+	id = hispaniola_news.47
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.47" }
+	title = hispaniola_news.47.t
+	desc = hispaniola_news.47.desc
+	picture = GFX_news_event_HAI_negotiated_peace
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.47.a
+	}
+}
+
+news_event = { # PPLN Uprising
+	id = hispaniola_news.48
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.48" }
+	title = hispaniola_news.48.t
+	desc = hispaniola_news.48.desc
+	picture = GFX_news_event_HAI_uprising
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.48.a
+	}
+}
+
+news_event = { # Dejoie Assassinated
+	id = hispaniola_news.49
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.49" }
+	title = hispaniola_news.49.t
+	desc = hispaniola_news.49.desc
+	picture = GFX_news_event_HAI_dejoie_assassinated
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.49.a
+	}
+}
+
+news_event = { # Fignole Elected
+	id = hispaniola_news.50
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.50" }
+	title = hispaniola_news.50.t
+	desc = hispaniola_news.50.desc
+	picture = GFX_news_event_HAI_fignole_elected
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.50.a
+	}
+}
+
+news_event = { # Hudicourt Elected
+	id = hispaniola_news.51
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.51" }
+	title = hispaniola_news.51.t
+	desc = hispaniola_news.51.desc
+	picture = GFX_news_event_HAI_hudicourt_elected
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.51.a
+	}
+}
+
+news_event = { # Lavaud Elected
+	id = hispaniola_news.52
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.52" }
+	title = hispaniola_news.52.t
+	desc = hispaniola_news.52.desc
+	picture = GFX_news_event_HAI_lavaud_elected
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.52.a
+	}
+}
+
+news_event = { # Government Victory in Haitian Civil War
+	id = hispaniola_news.53
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.53" }
+	title = hispaniola_news.53.t
+	desc = hispaniola_news.53.desc
+	picture = GFX_news_event_HAI_govt_victory
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.53.a
+	}
+}
+
+news_event = { # Communists Erradicated in Haiti
+	id = hispaniola_news.54
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.54" }
+	title = hispaniola_news.54.t
+	desc = hispaniola_news.54.desc
+	picture = GFX_news_event_HAI_govt_erradicated
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.54.a
+	}
+}
+
+news_event = { # Fall of Port-au-Prince
+	id = hispaniola_news.55
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.55" }
+	title = hispaniola_news.55.t
+	desc = hispaniola_news.55.desc
+	picture = GFX_news_event_HAI_comm_erradicated
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.55.a
+		trigger = {
+			OR = {
+				original_tag = USA
+				is_in_faction_with = USA
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.55.b
+		trigger = {
+			OR = {
+				has_government = socialist
+				has_government = communist
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.55.c
+		trigger = {
+			NOT = {
+				OR = {
+					original_tag = USA
+					is_in_faction_with = USA
+					has_government = socialist
+					has_government = communist
+				}
+			}
+		}
+	}
+}
+
+news_event = { # Death of Papa Doc
+	id = hispaniola_news.56
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.56" }
+	title = hispaniola_news.56.t
+	desc = hispaniola_news.56.desc
+	picture = GFX_news_event_HAI_duvalier_dies
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.56.a
+	}
+}
+
+news_event = { # Papa Doc Consolidates Power
+	id = hispaniola_news.57
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.57" }
+	title = hispaniola_news.57.t
+	desc = hispaniola_news.57.desc
+	picture = GFX_news_event_HAI_duvalier_consolidates
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.57.a
+	}
+}
+
+news_event = { # Cantave Consolidates Power
+	id = hispaniola_news.58
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.58" }
+	title = hispaniola_news.58.t
+	desc = hispaniola_news.58.desc
+	picture = GFX_news_event_HAI_cantave_consolidates
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.58.a
+	}
+}
+
+news_event = { # Paul Eugene Magloire Takes Over
+	id = hispaniola_news.59
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.59" }
+	title = hispaniola_news.59.t
+	desc = hispaniola_news.59.desc
+	picture = GFX_news_event_HAI_magloire_takes_over
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.59.a
+	}
+}
+
+news_event = { # The Hispaniolan Revolutionary War
+	id = hispaniola_news.60
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.60" }
+	title = hispaniola_news.60.t
+	desc = hispaniola_news.60.desc
+	picture = GFX_news_event_HIS_rev_war
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.60.a
+	}
+}
+
+news_event = { # The Hispaniolan Revolutionary War - Haiti Victory
+	id = hispaniola_news.61
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.61" }
+	title = hispaniola_news.61.t
+	desc = hispaniola_news.61.desc
+	picture = GFX_news_event_HIS_rev_war_haiti
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.61.a
+	}
+}
+news_event = { # The Hispaniolan Revolutionary War - Communist Victory
+	id = hispaniola_news.62
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.62" }
+	title = hispaniola_news.62.t
+	desc = hispaniola_news.62.desc
+	picture = GFX_news_event_HIS_rev_war_front
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.62.a
+	}
+}
+news_event = { # Balaguer Elected - Red DR occupation
+	id = hispaniola_news.63
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.63" }
+	title = hispaniola_news.63.t
+	desc = hispaniola_news.63.desc
+	picture = GFX_news_event_DOM_balaguer
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.63.a
+	}
+}
+
+news_event = { # Guzman 1970 - Balaguer Ceasefire
+	id = hispaniola_news.64
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.64" }
+	title = hispaniola_news.64.t
+	desc = hispaniola_news.64.desc
+	picture = GFX_news_event_DOM_antonio_guzman_balaguer
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.64.a
+	}
+}
+
+news_event = { # Bosch Constitution
+	id = hispaniola_news.65
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.65" }
+	title = hispaniola_news.65.t
+	desc = hispaniola_news.65.desc
+	picture = GFX_news_event_DOM_bosch_constitution
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.65.a
+	}
+}
+
+news_event = { # America Withdraws from Haiti
+	id = hispaniola_news.66
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.66" }
+	title = hispaniola_news.66.t
+	desc = hispaniola_news.66.desc
+	#picture =
+	hidden = yes #Temporary until loc written
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.66.a
+	}
+}
+
+news_event = { # Church denounces Trujillo
+	id = hispaniola_news.67
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.67" }
+	title = hispaniola_news.67.t
+	desc = hispaniola_news.67.desc
+	picture = GFX_news_event_DOM_church
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.67.a
+		custom_effect_tooltip = hispaniola_news.67_tt
+		trigger = {
+			NOT = {
+				OR = {
+					original_tag = GER
+					is_in_faction_with = GER
+					original_tag = USA
+					original_tag = MEX
+					original_tag = CUB
+					original_tag = VEN
+				}
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.67.b
+		custom_effect_tooltip = hispaniola_news.67_tt
+		trigger = {
+			OR = {
+				original_tag = GER
+				is_in_faction_with = GER
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.67.c
+		custom_effect_tooltip = hispaniola_news.67_tt
+		trigger = {
+			OR = {
+				original_tag = USA
+				original_tag = MEX
+				original_tag = CUB
+				original_tag = VEN
+			}
+		}
+	}
+}
+
+news_event = { # Trujillo assasinated
+	id = hispaniola_news.68
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.68" }
+	title = hispaniola_news.68.t
+	desc = hispaniola_news.68.desc
+	picture = GFX_news_event_DOM_puerto_plata_ceasefire
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.68.a
+	}
+}
+
+news_event = { # Quisqueya Agreement
+	id = hispaniola_news.69
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.69" }
+	title = hispaniola_news.69.t
+	desc = hispaniola_news.69.desc
+	picture = GFX_news_event_DOM_puerto_plata_ceasefire_peace
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.69.a
+		trigger = {
+			NOT = {
+				OR = {
+					original_tag = GER
+					is_in_faction_with = GER
+					original_tag = IBR
+					original_tag = USA
+					is_in_faction_with = USA
+					original_tag = MEX
+					original_tag = CUB
+					original_tag = VEN
+				}
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.69.b
+		trigger = {
+				OR = {
+					original_tag = GER
+					is_in_faction_with = GER
+					original_tag = IBR
+				}
+		}
+	}
+	option = {
+		name = hispaniola_news.69.c
+		trigger = {
+					original_tag = USA
+					is_in_faction_with = USA
+		}
+	}
+	option = {
+		name = hispaniola_news.69.d
+		trigger = {
+				OR = {
+					original_tag = MEX
+					original_tag = CUB
+					original_tag = VEN
+				}
+		}
+	}
+}
+
+news_event = { # Trujillista Coup Sparks Dominican Civil War
+	id = hispaniola_news.70
+	immediate = { log = "[GetDateText]: [Root.GetName]: event hispaniola_news.70" }
+	title = hispaniola_news.70.t
+	desc = hispaniola_news.70.desc
+	picture = GFX_news_event_DOM_ramfis_dissolves_presidency
+
+	is_triggered_only = yes
+	option = {
+		name = hispaniola_news.70.a
+		trigger = {
+			NOT = {
+				OR = {
+					original_tag = GER
+					original_tag = IBR
+					original_tag = USA
+					original_tag = MEX
+					original_tag = CUB
+				}
+			}
+		}
+	}
+	option = {
+		name = hispaniola_news.70.b
+		trigger = {
+					original_tag = GER
+		}
+	}
+	option = {
+		name = hispaniola_news.70.c
+		trigger = {
+					original_tag = IBR
+		}
+	}
+	option = {
+		name = hispaniola_news.70.d
+		trigger = {
+					original_tag = USA
+		}
+	}
+	option = {
+		name = hispaniola_news.70.e
+		trigger = {
+			OR = {
+				original_tag = MEX
+				original_tag = CUB
+			}
+		}
+	}
+}
+
+country_event = { # US Perspective MANPAD Flavor
+	id = HIS_puertoplata_shootdown.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata.shootdown.1" }
+	title = HIS_puertoplata_shootdown.1.t
+	desc = HIS_puertoplata_shootdown.1.desc
+	picture = GFX_report_event_generic_F105_shootdown
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_puertoplata_shootdown.1.a
+		custom_effect_tooltip = HIS_puertoplata_shootdown.1.a_tt
+		hidden_effect = {
+			DOM = {
+				proxy_war_reduce_bombing_effectiveness = yes
+			}
+		}
+	}
+}
+
+
+country_event = { # GER Perspective MANPAD Flavor
+	id = HIS_puertoplata_shootdown.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_puertoplata_shootdown.2" }
+	title = HIS_puertoplata_shootdown.2.t
+	desc = HIS_puertoplata_shootdown.2.desc
+	picture = GFX_report_event_HIS_manpads
+
+	is_triggered_only = yes
+
+	option = {
+		name = HIS_puertoplata_shootdown.2.a
+		custom_effect_tooltip = HIS_puertoplata_shootdown.2.a_tt
+	}
+}
+######## Hispanolia Ugly American Flavour Events
+
+country_event = { # Meet the Ugly American
+	id = HIS_HAI_ugly.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.1" }
+	title = HIS_HAI_ugly.1.t
+	desc = HIS_HAI_ugly.1.desc
+	picture = GFX_report_event_HIS_soldier_bag
+
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			HAI = {
+				swap_ideas = {
+					remove_idea = HAI_Rising_PPLN_Insurgency
+					add_idea = HAI_Protracted_Guerrilla_Campaign
+				}
+			}
+		}
+	}
+
+	option = {
+		name = HIS_HAI_ugly.1.a
+		set_global_flag = HIS_HAI_civil_war_ongoing
+		TNO_fopo_add_haitian_civil_war_tab = yes
+		hidden_effect = {
+			country_event = { id = HIS_HAI_ugly.2 days = 60 random_days = 40 }
+			USA = {
+				set_temp_variable = { Victory_ID = 34 }
+				Cold_War_GUI_AddVictory = yes
+				set_country_flag = TNO_HCW_base_phase
+				#activate_mission = USA_HCW_proxy_ticks
+			}
+			ZZZ = {
+				activate_mission = ZZZ_USA_Haiti_Updates
+			}
+		}
+		custom_effect_tooltip = USA_UA_haiti_long_haul_tt
+	}
+}
+country_event = { # Ugly American in Peace Corps
+	id = HIS_HAI_ugly.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.2" }
+	title = HIS_HAI_ugly.2.t
+	desc = HIS_HAI_ugly.2.desc
+	picture = GFX_report_event_HIS_american_soldier
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = HIS_HAI_civil_war_ongoing
+		NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+	}
+
+	option = {
+		name = HIS_HAI_ugly.2.a
+	}
+}
+country_event = { # Ugly American meets a truly Ugly American
+	id = HIS_HAI_ugly.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.3" }
+	title = HIS_HAI_ugly.3.t
+	desc = HIS_HAI_ugly.3.desc
+	picture = GFX_report_event_HIS_port_au_prince_building
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = HIS_HAI_civil_war_ongoing
+		NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+	}
+
+	option = {
+		name = HIS_HAI_ugly.3.a
+	}
+}
+country_event = { # Ugly American on a date
+	id = HIS_HAI_ugly.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.4" }
+	title = HIS_HAI_ugly.4.t
+	desc = HIS_HAI_ugly.4.desc
+	picture = GFX_report_event_HIS_port_au_prince_aerial_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = HIS_HAI_civil_war_ongoing
+		NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+	}
+
+	option = {
+		name = HIS_HAI_ugly.4.a
+		custom_effect_tooltip = HIS_HAI_ugly.4.tt
+	}
+}
+country_event = { # Ugly American kills a man
+	id = HIS_HAI_ugly.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.5" }
+	title = HIS_HAI_ugly.5.t
+	desc = HIS_HAI_ugly.5.desc
+	picture = GFX_report_event_HIS_shack
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = HIS_HAI_civil_war_ongoing
+		NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+	}
+
+	option = {
+		name = HIS_HAI_ugly.5.a
+	}
+}
+country_event = { # UA Kills a man pt 2
+	id = HIS_HAI_ugly.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.6" }
+	title = HIS_HAI_ugly.6.t
+	desc = HIS_HAI_ugly.6.desc
+	picture = GFX_report_event_HIS_shack
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = HIS_HAI_civil_war_ongoing
+		NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+	}
+
+	option = {
+		name = HIS_HAI_ugly.6.a
+	}
+}
+country_event = { # Ugly American visits Port-au-Prince Airport
+	id = HIS_HAI_ugly.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.7" }
+	title = HIS_HAI_ugly.7.t
+	desc = HIS_HAI_ugly.7.desc
+	picture = GFX_report_event_HIS_airport_arrive
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = HIS_HAI_civil_war_ongoing
+		NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+	}
+
+	option = {
+		name = HIS_HAI_ugly.7.a
+	}
+}
+country_event = { # Ugly American witness unit being wiped out
+	id = HIS_HAI_ugly.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.8" }
+	title = HIS_HAI_ugly.8.t
+	desc = HIS_HAI_ugly.8.desc
+	picture = GFX_report_event_HIS_soldiers_jungle
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = HIS_HAI_civil_war_ongoing
+		NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+	}
+
+	option = {
+		name = HIS_HAI_ugly.8.a
+	}
+}
+country_event = { # Ugly American reads attrocities
+	id = HIS_HAI_ugly.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.9" }
+	title = HIS_HAI_ugly.9.t
+	desc = HIS_HAI_ugly.9.desc
+	picture = GFX_report_event_generic_cigarette_butt
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = HIS_HAI_civil_war_ongoing
+		NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+	}
+
+	option = {
+		name = HIS_HAI_ugly.9.a
+	}
+}
+country_event = { # Ugly American writes his resignation letter
+	id = HIS_HAI_ugly.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.10" }
+	title = HIS_HAI_ugly.10.t
+	desc = HIS_HAI_ugly.10.desc
+	picture = GFX_report_event_generic_writing
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = HIS_HAI_civil_war_ongoing
+		NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+	}
+
+	option = {
+		name = HIS_HAI_ugly.10.a
+	}
+}
+country_event = { # Ugly American breaks up with date
+	id = HIS_HAI_ugly.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.11" }
+	title = HIS_HAI_ugly.11.t
+	desc = HIS_HAI_ugly.11.desc
+	picture = GFX_report_event_HIS_woman_in_dark
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		has_global_flag = HIS_HAI_civil_war_ongoing
+		NOT = { has_global_flag = TNO_HCW_USA_withdrew }
+	}
+
+	option = {
+		name = HIS_HAI_ugly.11.a
+		hidden_effect = {
+			country_event = { id = HIS_HAI_ugly.12 days = 20 }
+		}
+	}
+}
+country_event = { # Ugly American returns to America
+	id = HIS_HAI_ugly.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.12" }
+	title = HIS_HAI_ugly.12.t
+	desc = HIS_HAI_ugly.12.desc
+	picture = GFX_report_event_USA_white_house_front
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_ugly.12.a
+	}
+}
+country_event = { # Ugly American withdrawal
+	id = HIS_HAI_ugly.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.13" }
+	title = HIS_HAI_ugly.13.t
+	desc = HIS_HAI_ugly.13.desc
+	picture = GFX_report_event_generic_helicopter_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_ugly.13.a
+		hidden_effect = {
+			set_temp_variable = { Victory_ID = 34 }
+			set_temp_variable = { Victory_Outcome = 2 }
+			set_temp_variable = { Victory_Points = -75 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { conclusion_weeks = 6 }
+			set_temp_variable = { conclusion_bonus = 0.03 }
+			USA_proxy_conclusion_effect = yes
+			add_to_variable = { USA_unity = -1 }
+			US_elections_calculate_country_vars = yes
+		}
+	}
+}
+country_event = { # Ugly American gets lost
+	id = HIS_HAI_ugly.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.14" }
+	title = HIS_HAI_ugly.14.t
+	desc = HIS_HAI_ugly.14.desc
+	picture = GFX_report_event_HIS_port_au_prince_aerial_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_ugly.14.a
+		hidden_effect = {
+			country_event = {
+				id = HIS_HAI_ugly.15
+				hours = 3
+			}
+			set_temp_variable = { Victory_ID = 34 }
+			set_temp_variable = { Victory_Outcome = 1 }
+			set_temp_variable = { Victory_Points = -125 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { conclusion_weeks = 8 }
+			set_temp_variable = { conclusion_bonus = 0.05 }
+			USA_proxy_conclusion_effect = yes
+			add_to_variable = { USA_unity = -1 }
+			US_elections_calculate_country_vars = yes
+		}
+	}
+}
+country_event = { # Ugly American gets lost part 2
+	id = HIS_HAI_ugly.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.15" }
+	title = HIS_HAI_ugly.15.t
+	desc = HIS_HAI_ugly.15.desc
+	picture = GFX_report_event_HIS_shack
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_ugly.15.a
+		custom_effect_tooltip = HIS_HAI_ugly.15_tt
+	}
+}
+country_event = { # Ugly American returns to America
+	id = HIS_HAI_ugly.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.16" }
+	title = HIS_HAI_ugly.16.t
+	desc = HIS_HAI_ugly.16.desc
+	picture = GFX_report_event_generic_static
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_ugly.16.a
+	}
+}
+country_event = { # Ugly American returns to America (good ending)
+	id = HIS_HAI_ugly.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_ugly.17" }
+	title = HIS_HAI_ugly.17.t
+	desc = HIS_HAI_ugly.17.desc
+	picture = GFX_report_event_generic_cigarette_butt
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = { hidden_effect = { set_country_flag = conclusion_victory } }
+	option = {
+		name = HIS_HAI_ugly.17.a
+		hidden_effect = {
+			set_temp_variable = { Victory_ID = 34 }
+			set_temp_variable = { Victory_Outcome = 5 }
+			set_temp_variable = { Victory_Points = 125 }
+			Cold_War_GUI_ManipulateVictory = yes
+		}
+		USA = {
+			set_temp_variable = { conclusion_weeks = 7 }
+			set_temp_variable = { conclusion_bonus = 0.03 }
+			USA_proxy_conclusion_effect = yes
+			add_to_variable = { USA_unity = 1 }
+			US_elections_calculate_country_vars = yes
+		}
+	}
+}
+
+# Decision flavor
+
+country_event = { # HAITIAN RAIL
+	id = HIS_HAI_decision.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.1" }
+	title = HIS_HAI_decision.1.t
+	desc = HIS_HAI_decision.1.desc
+	picture = GFX_report_event_HIS_Revive_Haitian_Rail
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.1.a
+
+	}
+}
+country_event = { # HAITIAN AF
+	id = HIS_HAI_decision.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.2" }
+	title = HIS_HAI_decision.2.t
+	desc = HIS_HAI_decision.2.desc
+	picture = GFX_report_event_HIS_Build_The_Haitian_Airforce
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.2.a
+
+	}
+}
+country_event = { # HAITIAN NAPALM
+	id = HIS_HAI_decision.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.3" }
+	title = HIS_HAI_decision.3.t
+	desc = HIS_HAI_decision.3.desc
+	picture = GFX_report_event_HIS_Supply_Napalm_And_Defoliants
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.3.a
+
+	}
+}
+country_event = { # HAITIAN SURGE
+	id = HIS_HAI_decision.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.4" }
+	title = HIS_HAI_decision.4.t
+	desc = HIS_HAI_decision.4.desc
+	picture = GFX_report_event_HIS_Initiate_Troop_Surge
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.4.a
+
+	}
+}
+country_event = { # HAITIAN MACH
+	id = HIS_HAI_decision.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.5" }
+	title = HIS_HAI_decision.5.t
+	desc = HIS_HAI_decision.5.desc
+	picture = GFX_report_event_HIS_Establish_MACH
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.5.a
+
+	}
+}
+country_event = { # HAITIAN U2
+	id = HIS_HAI_decision.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.6" }
+	title = HIS_HAI_decision.6.t
+	desc = HIS_HAI_decision.6.desc
+	picture = GFX_report_event_HIS_Spy_Plane_Overflights
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.6.a
+
+	}
+}
+country_event = { # HAITIAN SEARCH AND DESTROY
+	id = HIS_HAI_decision.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.7" }
+	title = HIS_HAI_decision.7.t
+	desc = HIS_HAI_decision.7.desc
+	picture = GFX_report_event_HIS_Search_And_Destroy
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.7.a
+
+	}
+}
+country_event = { # HAITIAN PSY WARFARE
+	id = HIS_HAI_decision.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.8" }
+	title = HIS_HAI_decision.8.t
+	desc = HIS_HAI_decision.8.desc
+	picture = GFX_report_event_HIS_Lansdale's_Psychological_Warfare
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.8.a
+
+	}
+}
+country_event = { # HAITIAN OLD EQUIP
+	id = HIS_HAI_decision.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.9" }
+	title = HIS_HAI_decision.9.t
+	desc = HIS_HAI_decision.9.desc
+	picture = GFX_report_event_HIS_Transfer_Supply_Dumps
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.9.a
+
+	}
+}
+country_event = { # HAITIAN PLANES
+	id = HIS_HAI_decision.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.10" }
+	title = HIS_HAI_decision.10.t
+	desc = HIS_HAI_decision.10.desc
+	picture = GFX_report_event_HIS_Transfer_Air_Facilities
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.10.a
+
+	}
+}
+country_event = { # HAITIAN
+	id = HIS_HAI_decision.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.11" }
+	title = HIS_HAI_decision.11.t
+	desc = HIS_HAI_decision.11.desc
+	picture = GFX_report_event_HIS_Peace_With_Honor
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.11.a
+
+	}
+}
+country_event = { # HAITIAN PARADE
+	id = HIS_HAI_decision.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.12" }
+	title = HIS_HAI_decision.12.t
+	desc = HIS_HAI_decision.12.desc
+	picture = GFX_report_event_HIS_weariness_1_parade
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.12.a
+
+	}
+}
+country_event = { #
+	id = HIS_HAI_decision.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.13" }
+	title = HIS_HAI_decision.13.t
+	desc = HIS_HAI_decision.13.desc
+	picture = GFX_report_event_HIS_weariness_2_documentary
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.13.a
+
+	}
+}
+country_event = { #
+	id = HIS_HAI_decision.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.14" }
+	title = HIS_HAI_decision.14.t
+	desc = HIS_HAI_decision.14.desc
+	picture = GFX_report_event_HIS_weariness_3_aid_worker
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.14.a
+
+	}
+}
+country_event = { #
+	id = HIS_HAI_decision.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.15" }
+	title = HIS_HAI_decision.15.t
+	desc = HIS_HAI_decision.15.desc
+	picture = GFX_report_event_HIS_weariness_4_campus_protest
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.15.a
+
+	}
+}
+country_event = { #
+	id = HIS_HAI_decision.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.16" }
+	title = HIS_HAI_decision.16.t
+	desc = HIS_HAI_decision.16.desc
+	picture = GFX_report_event_HIS_weariness_5_protest_night
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.16.a
+
+	}
+}
+country_event = { #
+	id = HIS_HAI_decision.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.17" }
+	title = HIS_HAI_decision.17.t
+	desc = HIS_HAI_decision.17.desc
+	picture = GFX_report_event_HIS_weariness_6_candidate
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.17.a
+
+	}
+}
+country_event = { #
+	id = HIS_HAI_decision.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.18" }
+	title = HIS_HAI_decision.18.t
+	desc = HIS_HAI_decision.18.desc
+	picture = GFX_report_event_HIS_weariness_7_party_split
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.18.a
+
+	}
+}
+country_event = { #
+	id = HIS_HAI_decision.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.19" }
+	title = HIS_HAI_decision.19.t
+	desc = HIS_HAI_decision.19.desc
+	picture = GFX_report_event_HIS_weariness_8_soldier_strikes
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.19.a
+
+	}
+}
+country_event = { #
+	id = HIS_HAI_decision.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.20" }
+	title = HIS_HAI_decision.20.t
+	desc = HIS_HAI_decision.20.desc
+	picture = GFX_report_event_HIS_weariness_9_bombing
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.20.a
+
+	}
+}
+
+country_event = { # Haitian refugees
+	id = HIS_HAI_decision.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.21" }
+	title = HIS_HAI_decision.21.t
+	desc = HIS_HAI_decision.21.desc
+	picture = GFX_report_event_HIS_refugee_chain_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.21.a
+		hidden_effect = {
+			country_event = {
+				id = HIS_HAI_decision.22
+				days = 150
+			}
+		}
+	}
+}
+
+country_event = { # Haitian refugees CHECK - Hidden
+	id = HIS_HAI_decision.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.22" }
+	title = HIS_HAI_decision.22.t
+	desc = HIS_HAI_decision.22.desc
+	picture = GFX_report_event_USA_american_lawlessness
+	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.22.a
+		hidden_effect = {
+			if = {
+				limit = {
+					OR = {
+						has_government = liberalism
+						has_government = progressivism
+					}
+				}
+				country_event = {
+					id = HIS_HAI_decision.23
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = paternalism
+					}
+				}
+				country_event = {
+					id = HIS_HAI_decision.24
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Haitian refugees
+	id = HIS_HAI_decision.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.23" }
+	title = HIS_HAI_decision.23.t
+	desc = HIS_HAI_decision.23.desc
+	picture = GFX_report_event_HIS_refugee_chain_2_liberal
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.23.a
+	}
+}
+
+country_event = { # Haitian refugees
+	id = HIS_HAI_decision.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.24" }
+	title = HIS_HAI_decision.24.t
+	desc = HIS_HAI_decision.24.desc
+	picture = GFX_report_event_HIS_refugee_chain_2_conservative
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.24.a
+		hidden_effect = {
+			country_event = {
+				id = HIS_HAI_decision.25
+				days = 150
+			}
+		}
+	}
+}
+
+country_event = { # Haitian refugees
+	id = HIS_HAI_decision.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HIS_HAI_decision.25" }
+	title = HIS_HAI_decision.25.t
+	desc = HIS_HAI_decision.25.desc
+	picture = GFX_report_event_HIS_refugee_chain_3
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_decision.25.a
+	}
+}
+
+# Hinche
+
+country_event = { # Duvalier Demands Hinche
+	id = HIS_hinche_negotiations.1
+	title = HIS_hinche_negotiations.1.t
+	desc = HIS_hinche_negotiations.1.desc
+	picture = GFX_report_event_HIS_Duvalier_Demands_Hinche
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_hinche_negotiations.1.a
+		country_event = {
+			id = HIS_hinche_negotiations.3
+			days = 14
+		}
+	}
+}
+
+country_event = { # OAS Haitian Dialogue Over Hinche
+	id = HIS_hinche_negotiations.2
+	title = HIS_hinche_negotiations.2.t
+	desc = HIS_hinche_negotiations.2.desc
+	picture = GFX_report_event_HIS_Duvalier_Demands_Hinche
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_hinche_negotiations.2.a
+		country_event = {
+			id = HIS_hinche_negotiations.3
+			days = 14
+		}
+	}
+}
+
+country_event = { # Haiti and DR Meet In Miami
+	id = HIS_hinche_negotiations.3
+	title = HIS_hinche_negotiations.3.t
+	desc = HIS_hinche_negotiations.3.desc
+	picture = GFX_report_event_HIS_Haiti_DR_Meet_In_Miami
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_hinche_negotiations.3.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_HAI_PEACE }
+					has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_HAI_WAR }
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = HIS_hinche_negotiations.4
+				days = 4
+			}
+		}
+	}
+	option = {
+		name = HIS_hinche_negotiations.3.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					#has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_DOM_LEAVE }
+					has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_DOM_STAY }
+					has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_DOM_WAR }
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = HIS_hinche_negotiations.5
+				days = 4
+			}
+		}
+	}
+}
+country_event = { # Support The DR, Haiti Leaves Negotiations
+	id = HIS_hinche_negotiations.4
+	title = HIS_hinche_negotiations.4.t
+	desc = HIS_hinche_negotiations.4.desc
+	picture = GFX_report_event_HIS_Haiti_DR_Meet_In_Miami
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_hinche_negotiations.4.a #Haiti Remains In The OFN
+		trigger = {
+			HAI = {
+				OR = {
+					has_country_leader = { character = HAI_Pierre_Joseph_Louis_Dejoie ruling_only = yes }
+					has_country_leader = { character = HAI_Elie_Lescot ruling_only = yes }
+				}
+			}
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HINCHE_NEGOTIATIONS
+					option = HINCHE_NEGOTIATIONS_PRO_DOM_WAR
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = HIS_hinche_negotiations.6
+				days = 4
+			}
+		}
+	}
+	#option = {
+	#	name = HIS_hinche_negotiations.4.b #Haiti Leaves The OFN
+	#	trigger = {
+	#		HAI = {
+	#			OR = {
+	#			}
+	#		}
+	#	}
+	#	ai_chance = {
+	#		factor = 1
+	#		modifier = {
+	#			factor = 0
+	#			OR = {
+	#				has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_DOM_STAY }
+	#				has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_DOM_WAR }
+	#			}
+	#		}
+	#	}
+	#	hidden_effect = {
+	#		country_event = {
+	#			id = HIS_hinche_negotiations.7
+	#			days = 4
+	#		}
+	#	}
+	#}
+	option = {
+		name = HIS_hinche_negotiations.4.c #Haiti Prepares For An Attack
+		trigger = { HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } } }
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HINCHE_NEGOTIATIONS
+					option = HINCHE_NEGOTIATIONS_PRO_DOM_STAY
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = HIS_hinche_negotiations.8
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { # Support Haiti, DR Refuses
+	id = HIS_hinche_negotiations.5
+	title = HIS_hinche_negotiations.5.t
+	desc = HIS_hinche_negotiations.5.desc
+	picture = GFX_report_event_HIS_Haiti_DR_Meet_In_Miami
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_hinche_negotiations.5.a #US Attempts to Schmooze
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_HAI_WAR }
+			}
+		}
+		add_political_power = -30
+		set_temp_variable = { temp_econ_spending_amount = 0.05 }
+		econ_spend_money_once_effect_raw_money = yes
+		hidden_effect = {
+			country_event = {
+				id = HIS_hinche_negotiations.9
+				days = 4
+			}
+		}
+	}
+	option = {
+		name = HIS_hinche_negotiations.5.b #US Offers Nothing
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_HAI_PEACE }
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = HIS_hinche_negotiations.10
+				days = 4
+			}
+		}
+	}
+	option = {
+		name = HIS_hinche_negotiations.5.c #US Changes Support To DR
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_HAI_WAR }
+					has_game_rule = { rule = HINCHE_NEGOTIATIONS option = HINCHE_NEGOTIATIONS_PRO_HAI_PEACE }
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = HIS_hinche_negotiations.4
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { # Haiti Remains In The OFN
+	id = HIS_hinche_negotiations.6
+	title = HIS_hinche_negotiations.6.t
+	desc = HIS_hinche_negotiations.6.desc
+	picture = GFX_report_event_HIS_Haiti_And_The_OFN
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_hinche_negotiations.6.a
+		HAI = {
+			add_stability = -0.05
+			add_popularity = {
+				ideology = paternalism
+				popularity = -0.02
+			}
+			effect_tooltip = {
+				TNO_HCW_increase_radicalism_large = yes
+			}
+			custom_effect_tooltip = TNO_HCW_increase_control_large_comm_tt_no_target
+		}
+		TNO_HCW_increase_weariness_medium = yes
+		hidden_effect = {
+			TNO_HCW_increase_radicalism_large = yes
+			for_each_scope_loop = {
+				array = HAI_map_array
+				TNO_HCW_increase_control_large = yes
+			}
+		}
+	}
+}
+
+country_event = { # Haiti Leaves The OFN
+	id = HIS_hinche_negotiations.7
+	title = HIS_hinche_negotiations.7.t
+	desc = HIS_hinche_negotiations.7.desc
+	picture = GFX_report_event_HIS_Haiti_And_The_OFN
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_hinche_negotiations.7.a
+	}
+}
+country_event = { # Haiti Invades Hinche
+	id = HIS_hinche_negotiations.8
+	title = HIS_hinche_negotiations.8.t
+	desc = HIS_hinche_negotiations.8.desc
+	picture = GFX_report_event_HIS_Haiti_Attacks
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		hidden_effect = {
+			log = "[GetDate]: [Root.GetTag]: HAITI BORDER WAR FOR HINCHE; Executing."
+			HAI = {
+				remove_from_array = { global.OFN_members = HAI }
+				leave_faction = yes
+				remove_ideas = OFN_Dependent_Member
+				start_border_war = {
+					change_state_after_war = no
+					on_win = HIS_hinche_negotiations.12
+					attacker = {
+						state = 1881
+						num_provinces = 4
+					}
+					defender = {
+						state = 1706
+						num_provinces = 4
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = HIS_hinche_negotiations.8.a
+	}
+}
+country_event = { # DR Agrees To Cede Hinche
+	id = HIS_hinche_negotiations.9
+	title = HIS_hinche_negotiations.9.t
+	desc = HIS_hinche_negotiations.9.desc
+	picture = GFX_report_event_HIS_Haiti_And_The_OFN
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_hinche_negotiations.9.a
+			log = "[GetDate]: [Root.GetTag]: HAITI GETS HINCHE -- CEDED BY DR; Executing."
+		HAI = { transfer_state = 1706 }
+		DOM = {
+			set_temp_variable = { money_reserves_temp = 0.05 } econ_money_reserves_change_raw_money = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.02 } econ_GDP_boost_once_percentage = yes
+		}
+	}
+}
+country_event = { # DR Still Refuses
+	id = HIS_hinche_negotiations.10
+	title = HIS_hinche_negotiations.10.t
+	desc = HIS_hinche_negotiations.10.desc
+	picture = GFX_report_event_HIS_Haiti_And_The_OFN
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		trigger = { NOT = { HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } } } }
+		name = HIS_hinche_negotiations.10.a
+	}
+	option = {
+		trigger = { HAI = { has_country_leader = { character = HAI_Francois_Duvalier ruling_only = yes } } }
+		name = HIS_hinche_negotiations.10.b
+		hidden_effect = {
+			country_event = {
+				id = HIS_hinche_negotiations.11
+				days = 21
+			}
+		}
+	}
+}
+country_event = { # Haiti Attacks The DR
+	id = HIS_hinche_negotiations.11
+	title = HIS_hinche_negotiations.11.t
+	desc = HIS_hinche_negotiations.11.desc
+	picture = GFX_report_event_HIS_Haiti_Attacks
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		hidden_effect = {
+			log = "[GetDate]: [Root.GetTag]: HAITI BORDER WAR FOR HINCHE; Executing."
+			HAI = {
+				start_border_war = {
+					change_state_after_war = no
+					on_win = HIS_hinche_negotiations.12
+					attacker = {
+						state = 1881
+						num_provinces = 4
+					}
+					defender = {
+						state = 1706
+						num_provinces = 4
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = HIS_hinche_negotiations.11.a
+	}
+}
+country_event = {
+	id = HIS_hinche_negotiations.12
+	title = HIS_hinche_negotiations.12.t
+	desc = HIS_hinche_negotiations.12.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		hidden_effect = {
+			log = "[GetDate]: [Root.GetTag]: HAITI GETS HINCHE -- BORDER WAR RESULT; Executing."
+			HAI = { transfer_state = 1706 }
+		}
+	}
+	option = {
+		name = HIS_hinche_negotiations.12.a
+	}
+}
+
+# Skeleton check ins
+country_event = { # 1968 election, dem rep
+	id = HIS_HAI_skel_taps.1
+	title = HIS_HAI_skel_taps.1.t
+	desc = HIS_HAI_skel_taps.1.desc
+	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_skel_taps.1.a
+		remove_all_ministers = yes
+		if = {
+			limit = { HAI = { has_country_flag = HAI_Democratic_Republic_Skeleton } }
+			if = {
+				limit = {
+					HAI = {
+						OR = {
+							has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+							has_country_leader = { character = HAI_Paul_Eugene_Magloire ruling_only = yes }
+						}
+					}
+				}
+				random_list = {
+					60 = {
+						modifier = {
+						factor = 0
+							has_country_leader = { character = DOM_OFN_OAS_peacekeeping ruling_only = yes }
+						}
+						set_country_flag = HAI_autocrat_won_68
+					}
+					20 = {
+						retire_country_leader = yes
+						set_politics = {
+							ruling_party = paternalism
+						}
+						retire_country_leader = yes
+						promote_character = HAI_Daniel_Fignole
+						set_party_name = {
+							ideology = paternalism
+							name = HAI_liberal_conservatism_party
+							long_name = HAI_liberal_conservatism_party_long
+						}
+					}
+					20 = {
+						retire_country_leader = yes
+						set_politics = {
+							ruling_party = paternalism
+						}
+						retire_country_leader = yes
+						promote_character = HAI_Max_Hudicourt
+					}
+				}
+			}
+		}
+	}
+}
+country_event = { # 1972 election, dem rep
+	id = HIS_HAI_skel_taps.2
+	title = HIS_HAI_skel_taps.2.t
+	desc = HIS_HAI_skel_taps.2.desc
+	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HIS_HAI_skel_taps.2.a
+		remove_all_ministers = yes
+		if = {
+			limit = { HAI = { has_country_flag = HAI_Democratic_Republic_Skeleton } }
+			if = {
+				limit = {
+					HAI = {
+						OR = {
+							has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes }
+							has_country_leader = { character = HAI_Paul_Eugene_Magloire ruling_only = yes }
+						}
+					}
+				}
+				random_list = {
+					20 = {
+						retire_country_leader = yes
+						set_politics = {
+							ruling_party = paternalism
+						}
+						retire_country_leader = yes
+						promote_character = HAI_Daniel_Fignole
+						set_party_name = {
+							ideology = paternalism
+							name = HAI_liberal_conservatism_party
+							long_name = HAI_liberal_conservatism_party_long
+						}
+					}
+					20 = {
+						modifier = {
+						factor = 0
+							NOT = { has_country_leader = { character = HAI_Franck_Lavaud ruling_only = yes } }
+
+						}
+					}
+				}
+			}
+			else = { # actual democratic folks
+				random_list = {
+					1 = {
+						retire_country_leader = yes
+						set_politics = {
+							ruling_party = liberal_conservatism
+						}
+						retire_country_leader = yes
+						promote_character = HAI_Franck_Sylvain
+					}
+					1 = {
+						retire_country_leader = yes
+						set_politics = {
+							ruling_party = paternalism
+						}
+						retire_country_leader = yes
+						promote_character = HAI_Luckner_Cambronne
+					}
+					1 = {
+						retire_country_leader = yes
+						set_politics = {
+							ruling_party = progressivism
+						}
+						retire_country_leader = yes
+						promote_character = HAI_Clement_Jumelle
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Socialist Republic, Regime Reorg
+	id = HIS_HAI_skel_taps.3
+	title = HIS_HAI_skel_taps.3.t
+	desc = HIS_HAI_skel_taps.3.desc
+	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # triggered by victory
+		name = HIS_HAI_skel_taps.3.a
+		remove_all_ministers = yes
+		random_list = {
+			1 = { # Alexis
+				modifier = {
+					factor = 0
+					OR = {
+						has_game_rule = {
+							rule = HAI_SOCIALIST_REGIME
+							option = HAI_SOCIALIST_REGIME_HUDICOURT
+						}
+						has_game_rule = {
+							rule = HAI_SOCIALIST_REGIME
+							option = HAI_SOCIALIST_REGIME_AMBROISE
+						}
+					}
+				}
+				set_politics = {
+					ruling_party = socialist
+				}
+				HAC = {
+					HAI_Jacques_Stephen_Alexis = { set_nationality = HAI }
+				}
+				add_country_leader_role = {
+					character = HAI_Jacques_Stephen_Alexis
+					promote_leader = yes
+					country_leader = {
+						expire = "1999.1.1"
+						ideology = socialist_panafricanism_subtype
+						traits = { }
+						id = -1
+					}
+				}
+				set_cosmetic_tag = HAI_communist_rev
+			}
+			1 = { # Hudicourt
+				modifier = {
+					factor = 0
+					OR = {
+						has_country_leader = { character = HAI_Jacques_Stephen_Alexis ruling_only = yes }
+						has_game_rule = {
+							rule = HAI_SOCIALIST_REGIME
+							option = HAI_SOCIALIST_REGIME_ALEXIS
+						}
+						has_game_rule = {
+							rule = HAI_SOCIALIST_REGIME
+							option = HAI_SOCIALIST_REGIME_AMBROISE
+						}
+					}
+				}
+				set_politics = {
+					ruling_party = socialist
+				}
+				#retire_country_leader = yes
+				add_country_leader_role = {
+					character = HAI_Max_Hudicourt
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_HAI_HUDICOURT_DESC"
+						expire = "1999.1.1"
+						ideology = socialist_reformist_socialism_subtype
+						traits = { }
+						id = -1
+					}
+				}
+				country_event = {
+					id = HIS_HAI_skel_taps.4
+					days = 750
+				}
+			}
+			1 = { # Ambroise
+				modifier = {
+					factor = 3
+					DOM = {
+						has_government = socialist
+					}
+				}
+				modifier = {
+					factor = 0
+					OR = {
+						has_game_rule = {
+							rule = HAI_SOCIALIST_REGIME
+							option = HAI_SOCIALIST_REGIME_ALEXIS
+						}
+						has_game_rule = {
+							rule = HAI_SOCIALIST_REGIME
+							option = HAI_SOCIALIST_REGIME_HUDICOURT
+						}
+					}
+				}
+				set_politics = {
+					ruling_party = communist
+				}
+				#retire_country_leader = yes
+				promote_character = HAI_Jean_Jacques_Dessalines_Ambroise
+
+				if = { # follow the DR
+					limit = {
+						DOM = {
+							has_country_leader = {
+								character = DOM_Maximo_Antonio_Lopez_Molina
+								ruling_only = yes
+							}
+						}
+					}
+					set_politics = {
+						ruling_party = socialist
+					}
+					# retire_country_leader = yes
+					add_country_leader_role = {
+						character = HAI_Jean_Jacques_Dessalines_Ambroise
+						promote_leader = yes
+						country_leader = {
+							desc = ""
+							expire = "1999.1.1"
+							ideology = socialist_guevarism_subtype
+							traits = { }
+							id = -1
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						DOM = {
+							OR = {
+								has_country_leader = {
+									character = DOM_Manolo_Tavarez_Justo
+									ruling_only = yes
+								}
+								has_country_leader = {
+									character = DOM_Juan_Emilio_Bosch_Gavino
+									ruling_only = yes
+								}
+							}
+						}
+					}
+					set_politics = {
+						ruling_party = socialist
+					}
+					# retire_country_leader = yes
+					add_country_leader_role = {
+						character = HAI_Jean_Jacques_Dessalines_Ambroise
+						promote_leader = yes
+						country_leader = {
+							desc = ""
+							expire = "1999.1.1"
+							ideology = socialist_revolutionary_gaitanismo_subtype
+							traits = { }
+							id = -1
+						}
+					}
+				}
+			}
+		}
+	}
+}
+country_event = { # Hudicourt retires
+	id = HIS_HAI_skel_taps.4
+	title = HIS_HAI_skel_taps.4.t
+	desc = HIS_HAI_skel_taps.4.desc
+	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # triggered by victory
+		name = HIS_HAI_skel_taps.4.a
+		remove_all_ministers = yes
+		retire_country_leader = yes
+		add_country_leader_role = {
+			character = HAI_Clement_Jumelle
+			promote_leader = yes
+			country_leader = {
+				desc = ""
+				expire = "1999.1.1"
+				ideology = socialist_reformist_socialism_subtype
+				traits = { }
+				id = -1
+			}
+		}
+	}
+}
+country_event = { # Dejoie retires
+	id = HIS_HAI_skel_taps.5
+	title = HIS_HAI_skel_taps.5.t
+	desc = HIS_HAI_skel_taps.5.desc
+	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #
+		name = HIS_HAI_skel_taps.5.a
+		remove_all_ministers = yes
+		if = {
+			limit = {
+				HAI = {
+					has_country_leader = {
+						character = HAI_Pierre_Joseph_Louis_Dejoie
+						ruling_only = yes
+					}
+				}
+			}
+			retire_country_leader = yes
+			promote_character = HAI_Loise_Dejoie_Jr
+		}
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.1" }
+	title = USA_Trujillo_Conspiracy.1.t
+	desc = USA_Trujillo_Conspiracy.1.desc
+	picture = GFX_report_event_MEX_pistols_and_bullets
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.1.a
+		custom_effect_tooltip = USA_Trujillo_Conspiracy.1.a_tt
+		custom_effect_tooltip = PP_cooperation_increase_low_tt
+		add_to_variable = { USA.TEMP_mexican_american_cooperation = 1 }
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.2" }
+	title = USA_Trujillo_Conspiracy.2.t
+	desc = USA_Trujillo_Conspiracy.2.desc
+	picture = GFX_report_event_DOM_dearborn
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.2.a
+		set_temp_variable = { spy_strength_temp = 5 }
+		custom_effect_tooltip = TNO_PP_spy_strength_increase_CAL_USA_tt
+		set_country_flag = USA_trujillo_conspiracy_2_operational_strength_flag
+	}
+	option = {
+		name = USA_Trujillo_Conspiracy.2.b
+		trigger = {
+			MEX = { is_ai = yes }
+		}
+		custom_effect_tooltip = PP_cooperation_increase_medium_tt
+		add_to_variable = { USA.TEMP_mexican_american_cooperation = 3 }
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.3" }
+	title = USA_Trujillo_Conspiracy.3.t
+	desc = USA_Trujillo_Conspiracy.3.desc
+	picture = GFX_report_event_DOM_wimpys
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.3.a
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.4" }
+	title = USA_Trujillo_Conspiracy.4.t
+	desc = USA_Trujillo_Conspiracy.4.desc
+	picture = GFX_report_event_DOM_dearborn
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.4.a
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.5" }
+	title = USA_Trujillo_Conspiracy.5.t
+	desc = USA_Trujillo_Conspiracy.5.desc
+	picture = GFX_report_event_DOM_tony_imbert
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.5.a
+		add_command_power = 5
+	}
+	option = {
+		name = USA_Trujillo_Conspiracy.5.b
+		trigger = {
+			MEX = { is_ai = yes }
+		}
+		custom_effect_tooltip = PP_cooperation_increase_low_tt
+		hidden_effect = {
+			add_to_variable = { MEX.PP_mexican_american_cooperation = 2 }
+			clamp_variable = { var = MEX.PP_mexican_american_cooperation max = 20 min = 0 }
+			TNO_PP_cooperation_frame_check_increase = yes
+		}
+		add_command_power = -5
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.6" }
+	title = USA_Trujillo_Conspiracy.6.t
+	desc = USA_Trujillo_Conspiracy.6.desc
+	picture = GFX_report_event_MEX_The_DFS
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.6.a
+		trigger = {
+			MEX = { is_ai = yes }
+		}
+		custom_effect_tooltip = PP_cooperation_increase_low_tt
+		hidden_effect = {
+			add_to_variable = { MEX.PP_mexican_american_cooperation = 2 }
+			clamp_variable = { var = MEX.PP_mexican_american_cooperation max = 20 min = 0 }
+			TNO_PP_cooperation_frame_check_increase = yes
+		}
+	}
+	option = {
+		name = USA_Trujillo_Conspiracy.6.b
+		trigger = {
+			MEX = { is_ai = yes }
+		}
+		TNO_PP_cooperation_decrease_low = yes
+		set_temp_variable = { spy_strength_temp = 10 }
+		TNO_PP_spy_strength_increase_USA = yes
+	}
+	option = {
+		name = USA_Trujillo_Conspiracy.6.c
+		trigger = {
+			MEX = { is_ai = no }
+		}
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.7" }
+	title = USA_Trujillo_Conspiracy.7.t
+	desc = USA_Trujillo_Conspiracy.7.desc
+	picture = GFX_report_event_DOM_dearborn
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.7.a
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.8" }
+	title = USA_Trujillo_Conspiracy.8.t
+	desc = USA_Trujillo_Conspiracy.8.desc
+	picture = GFX_report_event_DOM_trujillo
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.8.a
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.9" }
+	title = USA_Trujillo_Conspiracy.9.t
+	desc = USA_Trujillo_Conspiracy.9.desc
+	picture = GFX_report_event_DOM_wimpys
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.9.a
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.10" }
+	title = USA_Trujillo_Conspiracy.10.t
+	desc = USA_Trujillo_Conspiracy.10.desc
+	picture = GFX_report_event_DOM_pupo_roman
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.10.a
+		hidden_effect = {
+			set_global_flag = PPI_ceasefire_happening
+		}
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.11" }
+	title = USA_Trujillo_Conspiracy.11.t
+	desc = USA_Trujillo_Conspiracy.11.desc
+	picture = GFX_report_event_DOM_assassins
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.11.a
+		hidden_effect = {
+			country_event = { id = HIS_PP_ceasefire.1 days = 1 }
+		}
+	}
+}
+
+country_event = {
+	id = USA_Trujillo_Conspiracy.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event USA_Trujillo_Conspiracy.12" }
+	title = USA_Trujillo_Conspiracy.12.t
+	desc = USA_Trujillo_Conspiracy.12.desc
+	picture = GFX_report_event_DOM_trujillo
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_Trujillo_Conspiracy.12.a
+		hidden_effect = {
+			country_event = { id = HIS_PP_flavor.4 }
+		}
+	}
+}

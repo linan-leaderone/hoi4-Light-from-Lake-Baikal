@@ -1,0 +1,2596 @@
+
+#  ________   ______   _______   ______   ______   __    __   ______    ______   ________        __       __   ______    ______            _____   ______   __       __  ________   ______         _______    ______   __    __  _______
+#  /        | /      \ /       \ /      | /      \ /  \  /  | /      \  /      \ /        |      /  |  _  /  | /      \  /      \          /     | /      \ /  \     /  |/        | /      \       /       \  /      \ /  \  /  |/       \
+#  $$$$$$$$/ /$$$$$$  |$$$$$$$  |$$$$$$/ /$$$$$$  |$$  \ $$ |/$$$$$$  |/$$$$$$  |$$$$$$$$/       $$ | / \ $$ |/$$$$$$  |/$$$$$$  |         $$$$$ |/$$$$$$  |$$  \   /$$ |$$$$$$$$/ /$$$$$$  |      $$$$$$$  |/$$$$$$  |$$  \ $$ |$$$$$$$  |
+#  $$ |__    $$ \__$$/ $$ |__$$ |  $$ |  $$ |  $$ |$$$  \$$ |$$ |__$$ |$$ | _$$/ $$ |__          $$ |/$  \$$ |$$ |  $$ |$$ |  $$ |            $$ |$$ |__$$ |$$$  \ /$$$ |$$ |__    $$ \__$$/       $$ |__$$ |$$ |  $$ |$$$  \$$ |$$ |  $$ |
+#  $$    |   $$      \ $$    $$/   $$ |  $$ |  $$ |$$$$  $$ |$$    $$ |$$ |/    |$$    |         $$ /$$$  $$ |$$ |  $$ |$$ |  $$ |       __   $$ |$$    $$ |$$$$  /$$$$ |$$    |   $$      \       $$    $$< $$ |  $$ |$$$$  $$ |$$ |  $$ |
+#  $$$$$/     $$$$$$  |$$$$$$$/    $$ |  $$ |  $$ |$$ $$ $$ |$$$$$$$$ |$$ |$$$$ |$$$$$/          $$ $$/$$ $$ |$$ |  $$ |$$ |  $$ |      /  |  $$ |$$$$$$$$ |$$ $$ $$/$$ |$$$$$/     $$$$$$  |      $$$$$$$  |$$ |  $$ |$$ $$ $$ |$$ |  $$ |
+#  $$ |_____ /  \__$$ |$$ |       _$$ |_ $$ \__$$ |$$ |$$$$ |$$ |  $$ |$$ \__$$ |$$ |_____       $$$$/  $$$$ |$$ \__$$ |$$ \__$$ |      $$ \__$$ |$$ |  $$ |$$ |$$$/ $$ |$$ |_____ /  \__$$ |      $$ |__$$ |$$ \__$$ |$$ |$$$$ |$$ |__$$ |
+#  $$       |$$    $$/ $$ |      / $$   |$$    $$/ $$ | $$$ |$$ |  $$ |$$    $$/ $$       |      $$$/    $$$ |$$    $$/ $$    $$/       $$    $$/ $$ |  $$ |$$ | $/  $$ |$$       |$$    $$/       $$    $$/ $$    $$/ $$ | $$$ |$$    $$/
+#  $$$$$$$$/  $$$$$$/  $$/       $$$$$$/  $$$$$$/  $$/   $$/ $$/   $$/  $$$$$$/  $$$$$$$$/       $$/      $$/  $$$$$$/   $$$$$$/         $$$$$$/  $$/   $$/ $$/      $$/ $$$$$$$$/  $$$$$$/        $$$$$$$/   $$$$$$/  $$/   $$/ $$$$$$$/
+# Scripted Effects
+# By Reich & OFN teams
+
+#################################################
+##=|   Espionage Mechanic Scripted Effects   |=##
+##======================| |====================##
+#################################################
+
+#Index; Search for these names using ctrl+f and you'll find the section they entitle.
+#	Setup
+#		Espionage_Initialize_Global_Vars
+#		Espionage_Initialize_USA_Vars
+#		Espionage_Initialize_GER_Vars
+#
+#	Update Effects
+#		Espionage_Training_Update
+#		Espionage_Research_Update
+#		Espionage_Success_Update
+#		Espionage_Budget_Update
+#
+#	Technology
+#		Espionage_Tech_ApplyEffect
+#		Espionage_Tech_ApplyCost
+#
+#	General
+#		Espionage_Enable
+#		Espionage_AddNetworkStrength
+#		Espionage_AddCapability
+#		Espionage_AddExpertise
+#		Espionage_FailureEffect_Setup
+#		Espionage_FailureEffect
+#		Espionage_SuccessEffect
+#
+#	Specific Effects
+#		See category for details
+#
+#	Old CIA Stuff
+#		USA_CIA_Rewards_Calculation
+#		USA_CIA_AI_startup_flags
+
+#################################################
+#                     Setup                     #
+#################################################
+
+### REGION ARRAY INDEXES ###
+@NorthAmerica = 0
+@CentralAmerica = 1
+@SouthAmerica = 2
+@Europe = 3
+@Russia = 4
+@Africa = 5
+@MiddleEast = 6
+@EastAsia = 7
+@SouthEastAsia = 8
+@Oceania = 9
+
+### VALUE DEFINES ###
+@BaseResearchSpeed   = 2.5 # Base speed for Research
+@BaseExpertiseGrowth = 5   # Base growth of Expertise/week
+@BaseMissionChance   = 45  # Base success chance for an operation
+@BaseEscapeChance    = 70  # Base escape chance for an operative on mission failure
+
+# This system is designed to make it easy for other regional agencies to hook in by unifying a number of variables and scripted effects. All steps will be explained.
+# Every nation gets its own intel variables. NETWORK STRENGTH is a measure of how strong an Agency's presence and operations are in a given region: the larger the number is, the likelier it becomes for the agency to successfully accomplish its mission in the region.
+# CAPABILITY is a measure of how effective the intel agency's efforts as a whole are. Therefore, any intel agency will want to raise its own capabilities by, for example, researching intel technologies.
+
+## Initialize system and global variables, run on game startup
+Espionage_Initialize_Global_Vars = {
+	# Global array of tags with intelligence agencies
+	clear_array = global.TNO_Espionage_CountriesWithAgencies
+	every_other_country = {
+		limit = { TNO_Espionage_AllowedTags = yes }
+		add_to_array = { global.TNO_Espionage_CountriesWithAgencies = THIS }
+		set_variable = { Espionage_SelectedRegion = token:Espionage_Map_EU }
+
+		# Localized Tech array
+		clear_array = TNO_Espionage_TechArray
+		add_to_array = { TNO_Espionage_TechArray = 0  }
+		resize_array = { TNO_Espionage_TechArray = 10 }
+
+		# Agency Stats
+		set_variable = { TNO_Espionage_Agents = 1 }
+		set_variable = { TNO_Espionage_AgentsTotal = 1 }
+		set_variable = { TNO_Espionage_EscapeChance = @BaseEscapeChance }
+		set_variable = { TNO_Espionage_Expertise = 0 }
+		set_variable = { TNO_Espionage_Budget = 0.1 }
+		set_variable = { TNO_Espionage_Investment = 0.025 }
+		set_variable = { TNO_Espionage_max_command_power = -25 }
+
+		# Research Values
+		set_variable = { TNO_Espionage_CurrentResearch = -1 }
+		set_variable = { TNO_Espionage_ResearchProgress = 0 }
+		set_variable = { TNO_Espionage_ResearchSpeed = @BaseResearchSpeed }
+	}
+
+	# Global regions array
+	clear_array = global.TNO_Espionage_Region
+	clear_array = global.TNO_Espionage_RegionX
+	clear_array = global.TNO_Espionage_RegionY
+
+	add_to_array = { global.TNO_Espionage_Region  = 0  }
+	resize_array = { global.TNO_Espionage_Region  = 10 }
+	add_to_array = { global.TNO_Espionage_RegionX = 0  }
+	resize_array = { global.TNO_Espionage_RegionX = 10 }
+	add_to_array = { global.TNO_Espionage_RegionY = 0  }
+	resize_array = { global.TNO_Espionage_RegionY = 10 }
+
+	# North America
+	set_variable = { global.TNO_Espionage_Region^0 = token:Espionage_Map_NA }
+	set_variable = { global.TNO_Espionage_RegionX^0 = -2 }
+	set_variable = { global.TNO_Espionage_RegionY^0 = -2 }
+
+	# Central America
+	set_variable = { global.TNO_Espionage_Region^1 = token:Espionage_Map_CA }
+	set_variable = { global.TNO_Espionage_RegionX^1 = 70 }
+	set_variable = { global.TNO_Espionage_RegionY^1 = 75 }
+
+	# South America
+	set_variable = { global.TNO_Espionage_Region^2 = token:Espionage_Map_SA }
+	set_variable = { global.TNO_Espionage_RegionX^2 = 103 }
+	set_variable = { global.TNO_Espionage_RegionY^2 = 107 }
+
+	# Europe
+	set_variable = { global.TNO_Espionage_Region^3 = token:Espionage_Map_EU }
+	set_variable = { global.TNO_Espionage_RegionX^3 = 215 }
+	set_variable = { global.TNO_Espionage_RegionY^3 = 2   }
+
+	# Russia
+	set_variable = { global.TNO_Espionage_Region^4 = token:Espionage_Map_RU }
+	set_variable = { global.TNO_Espionage_RegionX^4 = 277 }
+	set_variable = { global.TNO_Espionage_RegionY^4 = 1   }
+
+	# Africa
+	set_variable = { global.TNO_Espionage_Region^5 = token:Espionage_Map_AF }
+	set_variable = { global.TNO_Espionage_RegionX^5 = 205 }
+	set_variable = { global.TNO_Espionage_RegionY^5 = 70  }
+
+	# South Asia
+	set_variable = { global.TNO_Espionage_Region^6 = token:Espionage_Map_ME }
+	set_variable = { global.TNO_Espionage_RegionX^6 = 263 }
+	set_variable = { global.TNO_Espionage_RegionY^6 = 61  }
+
+	# East Asia
+	set_variable = { global.TNO_Espionage_Region^7 = token:Espionage_Map_EA }
+	set_variable = { global.TNO_Espionage_RegionX^7 = 14 }
+	set_variable = { global.TNO_Espionage_RegionY^7 = 41 }
+
+	# South-East Asia
+	set_variable = { global.TNO_Espionage_Region^8 = token:Espionage_Map_SEA }
+	set_variable = { global.TNO_Espionage_RegionX^8 = 352 }
+	set_variable = { global.TNO_Espionage_RegionY^8 = 81  }
+
+	# Oceania
+	set_variable = { global.TNO_Espionage_Region^9 = token:Espionage_Map_OC }
+	set_variable = { global.TNO_Espionage_RegionX^9 = 382 }
+	set_variable = { global.TNO_Espionage_RegionY^9 = 142 }
+
+	# Put the scripted effect for creating the intel agency vars in here, scoped to the appropriate nation.
+	USA = { Espionage_Initialize_USA_Vars = yes }
+	GER = { Espionage_Initialize_GER_Vars = yes }
+}
+
+# Since all of these variables are generated for the appropriate tag rather than globally, you must access them like
+# USA.Regional_Network^1
+# to get the CIA variable for Europe as any tag other than USA.
+
+## Initialize American-side variables
+Espionage_Initialize_USA_Vars = {
+	set_temp_variable = { Agency = token:Espionage_CIA }
+	set_variable = { TNO_Espionage_AgencyLeader = token:Espionage_Dulles }
+	set_variable = { USA_FBI_Lead = token:Espionage_Hoover }
+	set_variable = { USA_CIA_Lead = token:Espionage_Dulles }
+
+	# Regional Network Strenght variables
+	add_to_array = { Regional_Network = 15 } #0 - North America
+	add_to_array = { Regional_Network = 8  } #1 - Central America
+	add_to_array = { Regional_Network = 11 } #2 - South America
+	add_to_array = { Regional_Network = 6  } #3 - Europe
+	add_to_array = { Regional_Network = 0  } #4 - Russia
+	add_to_array = { Regional_Network = 5  } #5 - Africa
+	add_to_array = { Regional_Network = 9  } #6 - Middle East
+	add_to_array = { Regional_Network = 5  } #7 - Eastern Asia
+	add_to_array = { Regional_Network = 7  } #8 - South East Asia
+	add_to_array = { Regional_Network = 15 } #9 - Oceania
+	set_variable = { TNO_Espionage_Capability = 6 }
+
+	# Three more agents (4 in total)
+	set_variable = { TNO_Espionage_Agents = 4 }
+	set_variable = { TNO_Espionage_AgentsTotal = 4 }
+
+	# Mission Success and Mission Failure arrays utilize the same indexes and as the Network Strength arrays
+	# Be sure to point to the correct index when coding regional missions
+	add_to_array = { TNO_Espionage_MissionSuccess = 0  }
+	resize_array = { TNO_Espionage_MissionSuccess = 10 }
+	add_to_array = { TNO_Espionage_MissionFailure = 0  }
+	resize_array = { TNO_Espionage_MissionFailure = 10 }
+
+	# Other
+	Espionage_Enable = yes # CIA is active from the start
+	USA_CIA_AI_startup_flags = yes # Ai Code, consult Fedacking for details
+}
+
+## Initialize German-side variables
+Espionage_Initialize_GER_Vars = {
+	set_variable = { TNO_Espionage_Agency = token:Espionage_RSHA }
+	set_variable = { TNO_Espionage_AgencyLeader = token:Espionage_Gehlen }
+
+	# Regional Network Strenght variables
+	add_to_array = { Regional_Network = 4  } #0 - North America
+	add_to_array = { Regional_Network = 6  } #1 - Central America
+	add_to_array = { Regional_Network = 5  } #2 - South America
+	add_to_array = { Regional_Network = 14 } #3 - Europe
+	add_to_array = { Regional_Network = 9  } #4 - Russia
+	add_to_array = { Regional_Network = 11 } #5 - Africa
+	add_to_array = { Regional_Network = 11 } #6 - Middle East
+	add_to_array = { Regional_Network = 3  } #7 - Eastern Asia
+	add_to_array = { Regional_Network = 4  } #8 - South East Asia
+	add_to_array = { Regional_Network = 1  } #9 - Oceania
+	set_variable = { TNO_Espionage_Capability = 5 }
+
+	# Two more agents (3 in total)
+	set_variable = { TNO_Espionage_Agents = 3 }
+	set_variable = { TNO_Espionage_AgentsTotal = 3 }
+
+	# Mission Success and Mission Failure arrays utilize the same indexes and as the Network Strength arrays
+	# Be sure to point to the correct index when coding regional missions
+	add_to_array = { TNO_Espionage_MissionSuccess = 0 }
+	resize_array = { TNO_Espionage_MissionSuccess = 10 }
+	add_to_array = { TNO_Espionage_MissionFailure = 0 }
+	resize_array = { TNO_Espionage_MissionFailure = 10 }
+}
+
+#################################################
+#                 Update Effects                #
+#################################################
+
+## Training gain update (every week)
+Espionage_Training_Update = {
+	# Base training growth
+	set_temp_variable = { tempTrainProg = @BaseExpertiseGrowth }
+
+	# Addition from budget
+	set_temp_variable = { tempBudget = TNO_Espionage_Budget }
+	multiply_temp_variable = { tempBudget = 0.001 }
+	add_to_temp_variable = { tempTrainProg = tempBudget }
+
+	# Addition from research
+	add_to_temp_variable = { tempTrainProg = TNO_Espionage_Bonus_Expertise }
+	clamp_temp_variable = { var = tempTrainProg min = 0 max = 15 }
+
+	# Addition to the training var
+	add_to_variable = { TNO_Espionage_Expertise = tempTrainProg }
+	clamp_variable  = { var = TNO_Espionage_Expertise min = 0 max = 100 }
+}
+
+## Research Progress update (every week)
+Espionage_Research_Update = {
+	# Base research growth
+	set_temp_variable = { tempTechProg = @BaseResearchSpeed }
+
+	# Addition from budget
+	set_temp_variable = { tempBudget = TNO_Espionage_Budget }
+	multiply_temp_variable = { tempBudget = 0.002 }
+	add_to_temp_variable = { tempTechProg = tempBudget }
+
+	# Further boni that can be gained
+	add_to_temp_variable = { tempTechProg = TNO_Espionage_Bonus_Research }
+	clamp_temp_variable = { var = tempTechProg min = 0 max = 10 }
+
+	# Addition to the progress var
+	add_to_variable = { TNO_Espionage_ResearchProgress = tempTechProg }
+	clamp_variable  = { var = TNO_Espionage_ResearchProgress min = 0 max = 100 }
+	set_variable = { TNO_Espionage_ResearchSpeed = tempTechProg }
+
+	# Check if the current Research has been completed
+	if = {
+		limit = { check_variable = { TNO_Espionage_ResearchProgress = 100 } }
+		set_temp_variable = { Tech_i = TNO_Espionage_CurrentResearch }
+		Espionage_Tech_ApplyEffect = yes
+		set_variable = { TNO_Espionage_TechArray^TNO_Espionage_CurrentResearch = 1 }
+		set_variable = { TNO_Espionage_PastResearch = TNO_Espionage_CurrentResearch }
+		set_variable = { TNO_Espionage_ResearchProgress = 0 }
+		set_variable = { TNO_Espionage_CurrentResearch = -1 }
+
+		# Fire confirmation window
+		set_country_flag = TNO_Espionage_TechCompletionGUI_Open
+		scoped_sound_effect = "research_complete"
+		if = { # Simpler and more effective than making AI to click the close button
+			limit = { is_ai = yes }
+			clr_country_flag = TNO_Espionage_TechCompletionGUI_Open
+		}
+	}
+	else = { country_event = { id = TNO_Espionage.1 days = 7 } }
+}
+
+## Mission success & failure calc
+Espionage_Success_Update = {
+	set_temp_variable = { tempSuccess = @BaseMissionChance }
+
+	# Boni from budget size
+	set_temp_variable = { tempBudget = TNO_Espionage_Budget }
+	divide_temp_variable = { tempBudget = 2 }
+	add_to_temp_variable = { tempSuccess = tempBudget }
+
+	# Boni from researched thingies
+	add_to_temp_variable = { tempSuccess = TNO_Espionage_Bonus_Mission }
+
+	# Calculating stuff
+	for_each_loop = {
+		array = TNO_Espionage_MissionSuccess
+
+		# Set up base success chance determined above
+		set_variable = { TNO_Espionage_MissionSuccess^i = tempSuccess }
+
+		# Apply regional network strength modifiers, then clamp it
+		add_to_variable = { TNO_Espionage_MissionSuccess^i = Regional_Network^i }
+		add_to_variable = { TNO_Espionage_MissionSuccess^i = TNO_Espionage_Capability }
+		clamp_variable = { var = TNO_Espionage_MissionSuccess^i min = 0 max = 100 }
+
+		# Calculate mission failure chance
+		set_variable = { TNO_Espionage_MissionFailure^i = 100 }
+		subtract_from_variable = { TNO_Espionage_MissionFailure^i = TNO_Espionage_MissionSuccess^i }
+	}
+}
+
+## Updates Budget value every month
+Espionage_Budget_Update = {
+	if = {
+		limit = { has_country_flag = TNO_Espionage_Mech_Active }
+		add_to_variable = { TNO_Espionage_Budget = TNO_Espionage_Investment }
+		clamp_variable = { var = TNO_Espionage_Budget max = 1 }
+	}
+}
+
+#################################################
+#                   Technology                  #
+#################################################
+
+## Apply Tech effects, for once Research is complete
+Espionage_Tech_ApplyEffect = {
+	if = { # German Techs
+		limit = { tag = GER }
+		if = { # Modernized Fm/EloAufkl
+			limit = { check_variable = { Tech_i = 0 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_political_power_factor = 0.025 tooltip = TNO_Espionage_AddPPGrowth_tt }
+			set_temp_variable = { CapabilityChange = 2 } Espionage_AddCapability = yes
+		}
+		else_if = { # Sonderblindfunkdienst
+			limit = { check_variable = { Tech_i = 1 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_army_org_factor = 0.05 tooltip = TNO_Espionage_AddArmyOrg_tt }
+			set_country_flag = TNO_Espionage_ExpertiseLossReduction custom_effect_tooltip = TNO_Espionage_ExpertiseLossReduction_tt
+		}
+		else_if = { # ENTDECKER Recon Satellites
+			limit = { check_variable = { Tech_i = 2 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Research = 1 tooltip = TNO_Espionage_AddResearchSpeed_tt }
+			set_temp_variable = { CapabilityChange = 2 } Espionage_AddCapability = yes
+		}
+		else_if = { # 31211-5 Bugs
+			limit = { check_variable = { Tech_i = 3 } }
+			add_to_variable = { TNO_Espionage_Bonus_Research = 1 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_political_power_factor = 0.025 tooltip = TNO_Espionage_AddPPGrowth_tt }
+			add_to_variable = { TNO_Espionage_compliance_gain = 0.005 tooltip = TNO_Espionage_DailyCompliance_tt }
+		}
+		else_if = { # M-190 Cipher Machine
+			limit = { check_variable = { Tech_i = 4 } }
+			add_to_variable = { TNO_Espionage_Bonus_Expertise = 2 tooltip = TNO_Espionage_AddExpertiseGrowth_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Research = 0.5 tooltip = TNO_Espionage_AddResearchSpeed_tt }
+			set_temp_variable = { CapabilityChange = 1 } Espionage_AddCapability = yes
+		}
+		else_if = { # Nahkampf Training
+			limit = { check_variable = { Tech_i = 5 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Expertise = 1 tooltip = TNO_Espionage_AddExpertiseGrowth_tt }
+			add_to_variable = { TNO_Espionage_EscapeChance = 5 tooltip = TNO_Espionage_AddEscapeChance_tt }
+		}
+		else_if = { # UFT-421 Personal Radio
+			limit = { check_variable = { Tech_i = 6 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 10 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Research = 0.5 tooltip = TNO_Espionage_AddResearchSpeed_tt }
+			add_to_variable = { TNO_Espionage_EscapeChance = 5 tooltip = TNO_Espionage_AddEscapeChance_tt }
+		}
+		else_if = { # RS 50 Modified Camera
+			limit = { check_variable = { Tech_i = 7 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Expertise = 1 tooltip = TNO_Espionage_AddExpertiseGrowth_tt }
+			set_temp_variable = { CapabilityChange = 1 } Espionage_AddCapability = yes
+		}
+		else_if = { # Flecktarn B Camouflage
+			limit = { check_variable = { Tech_i = 8 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_army_org_factor = 0.025 tooltip = TNO_Espionage_AddArmyOrg_tt }
+			add_to_variable = { TNO_Espionage_EscapeChance = 2.5 tooltip = TNO_Espionage_AddEscapeChance_tt }
+		}
+		else_if = { # "Truth Serum"
+			limit = { check_variable = { Tech_i = 9 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Research = 1 tooltip = TNO_Espionage_AddResearchSpeed_tt }
+			set_country_flag = TNO_Espionage_ExpertiseGainIncrease custom_effect_tooltip = TNO_Espionage_ExpertiseGainIncrease_tt
+		}
+	}
+
+	else_if = { # American Techs
+		limit = { tag = USA }
+		if = { # Pigeon Camera
+			limit = { check_variable = { Tech_i = 0 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_army_org_factor = 0.05 tooltip = TNO_Espionage_AddArmyOrg_tt }
+			set_temp_variable = { CapabilityChange = 1 } Espionage_AddCapability = yes
+		}
+		else_if = { # Belly Buster
+			limit = { check_variable = { Tech_i = 1 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_political_power_factor = 0.015 tooltip = TNO_Espionage_AddPPGrowth_tt }
+			set_temp_variable = { CapabilityChange = 2 } Espionage_AddCapability = yes
+		}
+		else_if = { # Engraved Mirrors
+			limit = { check_variable = { Tech_i = 2 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_EscapeChance = 5 tooltip = TNO_Espionage_AddEscapeChance_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Expertise = 2 tooltip = TNO_Espionage_AddExpertiseGrowth_tt }
+		}
+		else_if = { # Cigarette Camera
+			limit = { check_variable = { Tech_i = 3 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Research = 1 tooltip = TNO_Espionage_AddResearchSpeed_tt }
+			set_temp_variable = { CapabilityChange = 1 } Espionage_AddCapability = yes
+		}
+		else_if = { # Miniature Compass
+			limit = { check_variable = { Tech_i = 4 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 10 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_EscapeChance = 2.5 tooltip = TNO_Espionage_AddEscapeChance_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Expertise = 1 tooltip = TNO_Espionage_AddExpertiseGrowth_tt }
+		}
+		else_if = { # Pipe Radio
+			limit = { check_variable = { Tech_i = 5 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Research = 1 tooltip = TNO_Espionage_AddResearchSpeed_tt }
+			set_country_flag = TNO_Espionage_ExpertiseLossReduction custom_effect_tooltip = TNO_Espionage_ExpertiseLossReduction_tt
+		}
+		else_if = { # Film Spike
+			limit = { check_variable = { Tech_i = 6 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Research = 1 tooltip = TNO_Espionage_AddResearchSpeed_tt }
+			add_to_variable = { TNO_Espionage_political_power_factor = 0.025 tooltip = TNO_Espionage_AddPPGrowth_tt }
+		}
+		else_if = { # Motion Detector
+			limit = { check_variable = { Tech_i = 7 } }
+			add_to_variable = { TNO_Espionage_political_power_factor = 0.025 tooltip = TNO_Espionage_AddPPGrowth_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Research = 2 tooltip = TNO_Espionage_AddResearchSpeed_tt }
+			add_to_variable = { TNO_Espionage_EscapeChance = 5 tooltip = TNO_Espionage_AddEscapeChance_tt }
+		}
+		else_if = { # Pictogram Counter
+			limit = { check_variable = { Tech_i = 8 } }
+			add_to_variable = { TNO_Espionage_army_org_factor = 0.025 tooltip = TNO_Espionage_AddArmyOrg_tt }
+			add_to_variable = { TNO_Espionage_compliance_gain = 0.005 tooltip = TNO_Espionage_DailyCompliance_tt }
+			set_temp_variable = { CapabilityChange = 2 } Espionage_AddCapability = yes
+		}
+		else_if = { # Hollow Coins
+			limit = { check_variable = { Tech_i = 9 } }
+			add_to_variable = { TNO_Espionage_Bonus_Mission = 5 tooltip = TNO_Espionage_AddMissionSuccess_tt }
+			add_to_variable = { TNO_Espionage_Bonus_Expertise = 1 tooltip = TNO_Espionage_AddExpertiseGrowth_tt }
+			set_country_flag = TNO_Espionage_ExpertiseGainIncrease custom_effect_tooltip = TNO_Espionage_ExpertiseGainIncrease_tt
+		}
+	}
+}
+
+## Apply the Research Cost for a particular tech
+Espionage_Tech_ApplyCost = {
+	if = { # German Techs
+		limit = { tag = GER }
+		if = { # Modernized Fm/EloAufkl
+			limit = { check_variable = { Tech_i = 0 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.1 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Sonderblindfunkdienst
+			limit = { check_variable = { Tech_i = 1 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.075 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # ENTDECKER Recon Satellites
+			limit = { check_variable = { Tech_i = 2 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.15 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # 31211-5 Bugs
+			limit = { check_variable = { Tech_i = 3 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.025 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # M-190 Cipher Machine
+			limit = { check_variable = { Tech_i = 4 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.05 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Nahkampf Training
+			limit = { check_variable = { Tech_i = 5 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.03 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # UFT-421 Personal Radio
+			limit = { check_variable = { Tech_i = 6 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.06 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # RS 50 Modified Camera
+			limit = { check_variable = { Tech_i = 7 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.02 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Flecktarn B Camouflage
+			limit = { check_variable = { Tech_i = 8 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.05 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # "Truth Serum"
+			limit = { check_variable = { Tech_i = 9 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.03 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+	}
+
+	else_if = { # American Techs
+		limit = { tag = USA }
+		if = { # Pigeon Camera
+			limit = { check_variable = { Tech_i = 0 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.1 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Belly Buster
+			limit = { check_variable = { Tech_i = 1 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.05 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Engraved Mirrors
+			limit = { check_variable = { Tech_i = 2 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.05 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Cigarette Camera
+			limit = { check_variable = { Tech_i = 3 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.05 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Miniature Compass
+			limit = { check_variable = { Tech_i = 4 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.15 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Pipe Radio
+			limit = { check_variable = { Tech_i = 5 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.1 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Film Spike
+			limit = { check_variable = { Tech_i = 6 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.05 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Motion Detector
+			limit = { check_variable = { Tech_i = 7 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.15 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Pictogram Counter
+			limit = { check_variable = { Tech_i = 8 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.1 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+		else_if = { # Hollow Coins
+			limit = { check_variable = { Tech_i = 9 } }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.05 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+		}
+	}
+}
+
+#################################################
+#                    General                    #
+#################################################
+
+## Enables the mechanic
+# Arguments: Agency
+Espionage_Enable = {
+	log = "[GetDateText]: [THIS.GetName]: Espionage_Enable; Executing"
+
+	if = {
+		limit = { TNO_Espionage_AllowedTags = no }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Espionage_Enable; Handed invalid (unallowed) tag. Breaking."
+	}
+	else_if = {
+		limit = { has_country_flag = TNO_Espionage_Mech_Active }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Espionage_Enable; Mechanic already enabled. Breaking."
+	}
+	else_if = {
+		limit = { NOT = { has_variable = Agency } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Espionage_Enable; Handed unset index. Breaking."
+	}
+	else = {
+		log = "[GetDateText]: [THIS.GetName]: Espionage_Enable; Activating."
+
+		custom_effect_tooltip = TNO_Espionage_Unlock_tt
+		set_country_flag = TNO_Espionage_Mech_Active
+		set_variable = { TNO_Espionage_Agency = Agency }
+		hidden_effect = { country_event = TNO_Espionage.0 }
+
+		# Dynmod
+		set_variable = { TNO_Espionage_political_power_factor = 0 }
+		set_variable = { TNO_Espionage_army_org_factor = 0 }
+		set_variable = { TNO_Espionage_compliance_gain = 0 }
+		hidden_effect = { add_dynamic_modifier = { modifier = TNO_Espionage_dynamic_modifier } }
+
+		# BoP GUI Setup
+		hidden_effect = {
+			set_temp_variable = { TabName = token:BoP_Tab_Espionage }
+			TNO_BoP_AddTab = yes
+		}
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: Espionage_Enable; Completed execution."
+}
+
+## Modify an Agency's Network Strength in a given region
+# Arguments: RegionNum, RegionID, NetworkChange (Default value: 2)
+Espionage_AddNetworkStrength = {
+	log = "[GetDateText]: [THIS.GetName]: Espionage_AddNetworkStrength; Executing"
+
+	if = {
+		limit = { TNO_Espionage_AllowedTags = no }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Espionage_AddNetworkStrength; Handed invalid (unallowed) tag. Breaking."
+	}
+	else_if = {
+		limit = { NOT = { has_variable = RegionNum } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Espionage_AddNetworkStrength; Handed unset index. Breaking."
+	}
+	else = {
+		log = "[GetDateText]: [THIS.GetName]: Espionage_AddNetworkStrength; Given RegionID: [TNO_Espionage_GetRegionTitleTooltip]  ([?RegionNum]) NetworkChange: [?NetworkChange?2]"
+
+		# Defining the tooltip
+		if = {
+			limit = { check_variable = { NetworkChange?2 > 0 } }
+			custom_effect_tooltip = TNO_Espionage_AddNetworkStrength_add_tt
+		}
+		else = {
+			custom_effect_tooltip = TNO_Espionage_AddNetworkStrength_sub_tt
+		}
+
+		# The actual math
+		add_to_variable = { Regional_Network^RegionNum = NetworkChange?2 }
+		clamp_variable = { var = Regional_Network^RegionNum min = 0 }
+		Espionage_Success_Update = yes
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: Espionage_AddNetworkStrength; Completed execution."
+}
+
+## Modify an Agency's Network Strength in a given region
+# Arguments: CapabilityChange (Default value: 2)
+Espionage_AddCapability = {
+	log = "[GetDateText]: [THIS.GetName]: Espionage_AddCapability; Executing"
+
+	if = {
+		limit = { TNO_Espionage_AllowedTags = no }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Espionage_AddCapability; Handed invalid (unallowed) tag. Breaking."
+	}
+	else = {
+		log = "[GetDateText]: [THIS.GetName]: Espionage_AddCapability; CapabilityChange: [?CapabilityChange?2]"
+
+		custom_effect_tooltip = TNO_Espionage_AddCapability_tt
+		add_to_variable = { TNO_Espionage_Capability = CapabilityChange?2 }
+		Espionage_Success_Update = yes
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: Espionage_AddCapability; Completed execution."
+}
+
+## Modify an Agency's Expertise value
+# Arguments: ExpertiseChange (Default value: 5)
+Espionage_AddExpertise = {
+	log = "[GetDateText]: [THIS.GetName]: Espionage_AddExpertise; Executing"
+
+	if = {
+		limit = { TNO_Espionage_AllowedTags = no }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: Espionage_AddExpertise; Handed invalid (unallowed) tag. Breaking."
+	}
+	else = {
+		log = "[GetDateText]: [THIS.GetName]: Espionage_AddExpertise; ExpertiseChange: [?ExpertiseChange?5]"
+
+		add_to_variable = { TNO_Espionage_Expertise = ExpertiseChange?5 tooltip = TNO_Espionage_AddExpertise_tt }
+		clamp_variable = { var = TNO_Espionage_Expertise min = 0 max = 100 }
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: Espionage_AddExpertise; Completed execution."
+}
+
+## Sets up mission failure effect
+# MUST BE FIRED BEFORE Espionage_FailureEffect, ON A "immediate = { }" EVENT BLOCK
+Espionage_FailureEffect_Setup = {
+	hidden_effect = {
+		if = {
+			limit = { check_variable = { TNO_Espionage_DeathChance < 100 } }
+			set_temp_variable = { TNO_Espionage_DeathChance = 100 }
+			subtract_from_temp_variable = { TNO_Espionage_DeathChance = TNO_Espionage_EscapeChance }
+			random_list = {
+				TNO_Espionage_EscapeChance = { set_country_flag = TNO_Espionage_AgentEscaped }
+				TNO_Espionage_DeathChance  = {  }
+			}
+		}
+	}
+}
+
+## Applies standard effects for an operation failure
+# MUST BE FIRED ONLY AFTER Espionage_FailureEffect_Setup HAS BEEN PREVIOUSLY FIRED IN A "immediate = { }" EVENT BLOCK
+Espionage_FailureEffect = {
+	# Expertise loss
+	if = {
+		limit = { has_country_flag = TNO_Espionage_ExpertiseLossReduction }
+		set_temp_variable = { ExpertiseChange = -5 }
+	}
+	else = {
+		set_temp_variable = { ExpertiseChange = -10 }
+	}
+
+	# Agent's fate
+	if = { # Agent returns (non-dangerous mission)
+		limit = { has_country_flag = TNO_Espionage_NonDangerous }
+		custom_effect_tooltip = TNO_Espionage_AgentReturns_tt
+		add_to_variable = { TNO_Espionage_Agents = 1 }
+		clr_country_flag = TNO_Espionage_NonDangerous
+	}
+	else_if = { # Agent escapes
+		limit = { has_country_flag = TNO_Espionage_AgentEscaped }
+		custom_effect_tooltip = TNO_Espionage_AgentReturns_tt
+		add_to_variable = { TNO_Espionage_Agents = 1 }
+		clr_country_flag = TNO_Espionage_AgentEscaped
+		add_to_temp_variable = { ExpertiseChange = -3 }
+	}
+	else = { # Agent dies
+		custom_effect_tooltip = TNO_Espionage_AgentDies_tt
+		add_to_temp_variable = { ExpertiseChange = -5 }
+		add_to_variable = { TNO_Espionage_AgentsTotal = -1 }
+	}
+
+	Espionage_AddExpertise = yes
+	clr_country_flag = TNO_Espionage_DoingSpecialMission
+}
+
+## Applies standard effects for an operation success
+Espionage_SuccessEffect = {
+	custom_effect_tooltip = TNO_Espionage_AgentReturns_tt
+	add_to_variable = { TNO_Espionage_Agents = 1 }
+	if = {
+		limit = { has_country_flag = TNO_Espionage_ExpertiseGainIncrease }
+		set_temp_variable = { ExpertiseChange = 10 } Espionage_AddExpertise = yes
+	}
+	else = {
+		set_temp_variable = { ExpertiseChange = 7 } Espionage_AddExpertise = yes
+	}
+	clr_country_flag = TNO_Espionage_DoingSpecialMission
+}
+
+#################################################
+#               Specific Effects                #
+#################################################
+
+## Espionage_AddNetworkStrength Specific Effects
+# NetworkChange must still be provided separately
+Espionage_AddNetworkStrength_NorthAmerica = {
+	set_temp_variable = { RegionNum = @NorthAmerica } # North America
+	set_temp_variable = { RegionID = token:Espionage_Map_NA }
+	Espionage_AddNetworkStrength = yes
+}
+Espionage_AddNetworkStrength_CentralAmerica = {
+	set_temp_variable = { RegionNum = @CentralAmerica } # Central America
+	set_temp_variable = { RegionID = token:Espionage_Map_CA }
+	Espionage_AddNetworkStrength = yes
+}
+Espionage_AddNetworkStrength_SouthAmerica = {
+	set_temp_variable = { RegionNum = @SouthAmerica } # South America
+	set_temp_variable = { RegionID = token:Espionage_Map_SA }
+	Espionage_AddNetworkStrength = yes
+}
+Espionage_AddNetworkStrength_Europe = {
+	set_temp_variable = { RegionNum = @Europe } # Europe
+	set_temp_variable = { RegionID = token:Espionage_Map_EU }
+	Espionage_AddNetworkStrength = yes
+}
+Espionage_AddNetworkStrength_Russia = {
+	set_temp_variable = { RegionNum = @Russia } # Russia
+	set_temp_variable = { RegionID = token:Espionage_Map_RU }
+	Espionage_AddNetworkStrength = yes
+}
+Espionage_AddNetworkStrength_Africa = {
+	set_temp_variable = { RegionNum = @Africa } # Africa
+	set_temp_variable = { RegionID = token:Espionage_Map_AF }
+	Espionage_AddNetworkStrength = yes
+}
+Espionage_AddNetworkStrength_MiddleEast = {
+	set_temp_variable = { RegionNum = @MiddleEast } # Middle East
+	set_temp_variable = { RegionID = token:Espionage_Map_ME }
+	Espionage_AddNetworkStrength = yes
+}
+Espionage_AddNetworkStrength_EastAsia = {
+	set_temp_variable = { RegionNum = @EastAsia } # East Asia
+	set_temp_variable = { RegionID = token:Espionage_Map_EA }
+	Espionage_AddNetworkStrength = yes
+}
+Espionage_AddNetworkStrength_SouthEastAsia = {
+	set_temp_variable = { RegionNum = @SouthEastAsia } # South East Asia
+	set_temp_variable = { RegionID = token:Espionage_Map_SEA }
+	Espionage_AddNetworkStrength = yes
+}
+Espionage_AddNetworkStrength_Oceania = {
+	set_temp_variable = { RegionNum = @Oceania } # Oceania
+	set_temp_variable = { RegionID = token:Espionage_Map_OC }
+	Espionage_AddNetworkStrength = yes
+}
+
+#################################################
+#                 Old CIA Stuff                 #
+#################################################
+## Jesus hell this code really needs a proper cleanup -Lamounier
+
+USA_CIA_Rewards_Calculation = {
+
+	####################################################
+	##### MIDDLE EAST
+	####################################################
+
+	if = {
+		limit = { has_country_flag = USA_CIA_Contacting_Israeli_Paramilitaries_Flag }
+		hidden_effect = {
+			IME = {
+				set_country_flag = USA_CIA_Irgun_Assistance
+			}
+		}
+		clr_country_flag = USA_CIA_Contacting_Israeli_Paramilitaries_Flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damaging_ger_encryption_me }
+		GER = { set_temp_variable = { NetworkChange = -3 } Espionage_AddNetworkStrength_MiddleEast = yes }
+		clr_country_flag = USA_CIA_damaging_ger_encryption_me
+	}
+
+	####################################################
+	##### EUROPE
+	####################################################
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damaging_ger_encryption_eu }
+		GER = { set_temp_variable = { NetworkChange = -3 } Espionage_AddNetworkStrength_Europe = yes }
+		clr_country_flag = USA_CIA_damaging_ger_encryption_eu
+	}
+
+	# Ireland
+	else_if = {
+		limit = { has_country_flag = USA_CIA_Fucking_Irish_Politics_Flag }
+		hidden_effect = {
+			IRE = { country_event = USA_CIA_UK.101 }
+		}
+		clr_country_flag = USA_CIA_Fucking_Irish_Politics_Flag
+	}
+
+	# GGN
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GGN_send_help_to_the_underground_flag }
+		hidden_effect = {
+			GGN = {
+				add_stability = -0.025
+			}
+		}
+		clr_country_flag = USA_CIA_GGN_send_help_to_the_underground_flag
+	}
+
+	# SER
+	else_if = {
+		limit = { has_country_flag = USA_CIA_SER_send_rifles_to_the_insurrection_flag }
+		hidden_effect = {
+			SER = { add_equipment_to_stockpile = { type = infantry_equipment amount = 1500 producer = USA } }
+		}
+		clr_country_flag = USA_CIA_SER_send_rifles_to_the_insurrection_flag
+	}
+
+	## England/Britain
+	# Stateroom
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_find_out_politics_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_found_out_politics_flag
+			if = {
+				limit = {
+					ENG = {
+						OR = {
+							has_country_flag = SLP_victorious
+							has_country_flag = SLP_victorious2
+						}
+					}
+				}
+				country_event = USA_CIA_UK.1
+			}
+			else_if = {
+				limit = {
+					ENG = {
+						OR = {
+							has_country_flag = NDL_victorious
+							has_country_flag = NDL_victorious2
+						}
+					}
+				}
+				country_event = USA_CIA_UK.2
+			}
+			else_if = {
+				limit = {
+					ENG = {
+						OR = {
+							has_country_flag = ENG_macmillan_victorious
+							has_country_flag = ENG_macmillan_victorious2
+						}
+					}
+				}
+				country_event = USA_CIA_UK.3
+			}
+			else_if = {
+				limit = {
+					ENG = {
+						OR = {
+							has_country_flag = ENG_Thatcher_victorious
+							has_country_flag = ENG_Thatcher_victorious2
+						}
+					}
+				}
+				country_event = USA_CIA_UK.4
+			}
+		}
+		clr_country_flag = USA_CIA_ENG_find_out_politics_flag
+	}
+	# Military
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_increase_military_loyalty_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_increase_military_loyalty_success_flag
+			country_event = USA_CIA_UK.10
+			ENG = { country_event = USA_CIA_UK.11 }
+		}
+		clr_country_flag = USA_CIA_ENG_increase_military_loyalty_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_decrease_military_loyalty_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_decrease_military_loyalty_success_flag
+			country_event = USA_CIA_UK.12
+			ENG = { country_event = USA_CIA_UK.13 }
+		}
+		clr_country_flag = USA_CIA_ENG_decrease_military_loyalty_flag
+	}
+	# SLP
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_slp_reduce_hardliners_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_slp_reduce_hardliners_success_flag
+			country_event = USA_CIA_UK.20
+			ENG = { country_event = USA_CIA_UK.21 }
+		}
+		clr_country_flag = USA_CIA_ENG_slp_reduce_hardliners_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_slp_increase_reform_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_slp_increase_reform_success_flag
+			country_event = USA_CIA_UK.22
+			ENG = { country_event = USA_CIA_UK.23 }
+		}
+		clr_country_flag = USA_CIA_ENG_slp_increase_reform_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_slp_increase_reformists_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_slp_increase_reformists_success_flag
+			country_event = USA_CIA_UK.24
+			ENG = { country_event = USA_CIA_UK.25 }
+		}
+		clr_country_flag = USA_CIA_ENG_slp_increase_reformists_flag
+	}
+	# NDL
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_ndl_decrease_liberals_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_ndl_decrease_liberals_success_flag
+			country_event = USA_CIA_UK.30
+			ENG = { country_event = USA_CIA_UK.31 }
+		}
+		clr_country_flag = USA_CIA_ENG_ndl_decrease_liberals_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_ndl_decrease_patriots_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_ndl_decrease_patriots_success_flag
+			country_event = USA_CIA_UK.32
+			ENG = { country_event = USA_CIA_UK.33 }
+		}
+		clr_country_flag = USA_CIA_ENG_ndl_decrease_patriots_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_ndl_increase_moderates_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_ndl_increase_moderates_success_flag
+			country_event = USA_CIA_UK.34
+			ENG = { country_event = USA_CIA_UK.35 }
+		}
+		clr_country_flag = USA_CIA_ENG_ndl_increase_moderates_flag
+	}
+	# SuperMac
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_mac_increase_macmillan_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_mac_increase_macmillan_success_flag
+			country_event = USA_CIA_UK.40
+			ENG = { country_event = USA_CIA_UK.41 }
+		}
+		clr_country_flag = USA_CIA_ENG_mac_increase_macmillan_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_mac_increase_liberals_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_mac_increase_liberals_success_flag
+			country_event = USA_CIA_UK.42
+			ENG = { country_event = USA_CIA_UK.43 }
+		}
+		clr_country_flag = USA_CIA_ENG_mac_increase_liberals_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_mac_increase_democratization_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_mac_increase_democratization_success_flag
+			country_event = USA_CIA_UK.44
+			ENG = { country_event = USA_CIA_UK.45 }
+		}
+		clr_country_flag = USA_CIA_ENG_mac_increase_democratization_flag
+	}
+	# Maggie
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_thatcher_party_influence_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_thatcher_og_influence_success_flag
+			country_event = USA_CIA_UK.50
+			ENG = { country_event = USA_CIA_UK.51 }
+		}
+		clr_country_flag = USA_CIA_ENG_thatcher_party_influence_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_thatcher_populist_support_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_thatcher_pop_sup_success_flag
+			country_event = USA_CIA_UK.52
+			ENG = { country_event = USA_CIA_UK.53 }
+		}
+		clr_country_flag = USA_CIA_ENG_thatcher_populist_support_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ENG_thatcher_elite_support_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_ENG_thatcher_eli_sup_success_flag
+			country_event = USA_CIA_UK.54
+			ENG = { country_event = USA_CIA_UK.55 }
+		}
+		clr_country_flag = USA_CIA_ENG_thatcher_elite_support_flag
+	}
+
+	#IBR
+	else_if = {
+		limit = { has_country_flag = USA_CIA_Iberia_Franco_Align }
+		set_country_flag = USA_CIA_Iberia_Franco_Align_success
+		IBR = { country_event = USA_CIA_IBR.1 }
+		clr_country_flag = USA_CIA_Iberia_Franco_Align
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_Iberia_Salazar_Align }
+		set_country_flag = USA_CIA_Iberia_Salazar_Align_success
+		IBR = { country_event = USA_CIA_IBR.2 }
+		clr_country_flag = USA_CIA_Iberia_Salazar_Align
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_Add_AAS_Resources }
+		set_country_flag = USA_CIA_AI_Add_AAS_Resources_success # This flag appplies to the ai
+		IBR = { country_event = USA_CIA_IBR.3 }
+		clr_country_flag = USA_CIA_Add_AAS_Resources
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_Reduce_Iberia_Terrorism }
+		set_country_flag = USA_CIA_Reduce_Iberia_Terrorism_success
+		IBR = { country_event = USA_CIA_IBR.4 }
+		clr_country_flag = USA_CIA_Reduce_Iberia_Terrorism
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_Stabilize_Iberia }
+		set_country_flag = USA_CIA_AI_Stabilize_Iberia_success # This flag appplies to the ai
+		IBR = { country_event = USA_CIA_IBR.6 }
+		clr_country_flag = USA_CIA_Stabilize_Iberia
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_Reform_Iberia }
+		set_country_flag = USA_CIA_AI_Reform_Iberia_success # This flag appplies to the ai
+		IBR = { country_event = USA_CIA_IBR.7 }
+		clr_country_flag = USA_CIA_Reform_Iberia
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_Iberian_Wars }
+		set_country_flag = USA_CIA_AI_Iberian_Wars_success # This flag appplies to the ai
+		hidden_effect = {
+			if = {
+				limit = {
+					country_exists = SPR
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						AND = {
+							has_government = progressivism
+							SPR = {
+								NOT = {
+									has_idea = SPR_Nicolas_Cotoner_hog
+								}
+							}
+						}
+						AND = {
+							has_government = communist
+							SPR = {
+								NOT = {
+									has_idea = SPR_juan_III_idea
+								}
+							}
+						}
+					}
+				}
+				SPR = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = POR
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+					}
+					NOT = {
+						country_exists = RPP
+					}
+				}
+				POR = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = RPP
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+						AND = {
+							has_government = communist
+							NOT = {
+								country_exists = PPR
+							}
+						}
+					}
+				}
+				RPP = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = PPR
+					has_government = communist
+				}
+				PPR = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = RIF
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+						has_government = progressivism
+						has_government = communist
+					}
+				}
+				RIF = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = GAL
+					OR = {
+						has_government = progressivism
+						has_government = communist
+					}
+				}
+				GAL = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = CTL
+					OR = {
+						has_government = progressivism
+						AND = {
+							has_government = communist
+							NOT = {
+								country_exists = CNT
+							}
+						}
+					}
+				}
+				CTL = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = BSQ
+					OR = {
+						has_government = communist
+						AND = {
+							has_government = progressivism
+							NOT = {
+								BSQ = {
+									has_idea = BSQ_Jose_Miguel_Benaran_hog
+								}
+							}
+						}
+					}
+				}
+				BSQ = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = TBA
+					has_government = communist
+				}
+				TBA = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = CNT
+					has_government = communist
+				}
+				CNT = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = IBR
+					has_government = paternalism
+				}
+				IBR = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = SPS
+					has_government = national_socialism
+					NOT = {
+						country_exists = FZL
+					}
+				}
+				SPS = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = FZL
+					has_government = national_socialism
+				}
+				FZL = {
+					add_equipment_to_stockpile = { type = infantry_equipment amount = 2000 producer = USA }
+					add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = USA }
+					add_equipment_to_stockpile = { type = artillery_equipment amount = 150 producer = USA }
+					add_equipment_to_stockpile = { type = motorized_equipment amount = 200 producer = USA }
+					add_equipment_to_stockpile = { type = fighter_equipment amount = 100 producer = USA }
+					add_equipment_to_stockpile = { type = MBT_chassis amount = 50 producer = USA }
+					add_equipment_to_stockpile = { type = IFV_chassis amount = 50 producer = USA }
+				}
+			}
+		}
+		clr_country_flag = USA_CIA_Iberian_Wars
+	}
+
+	else_if = {
+		limit = {
+			has_country_flag = USA_suriname_opp_active
+		}
+		clr_country_flag = USA_suriname_opp_active
+		USA = { set_country_flag = USA_successful_referendum_rigging }
+	}
+
+	### Germany
+
+	# Speer
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_weaken_reactionaries_early_flag }
+		GER = { country_event = USA_CIA_SGR.1 }
+		clr_country_flag = USA_CIA_GER_SGR_weaken_reactionaries_early_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_speer_radio_address_flag }
+
+		SGR = {
+			add_stability = 0.03
+			add_political_power = 75
+		}
+		clr_country_flag = USA_speer_radio_address_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_speer_send_weapons_flag }
+		send_equipment = {
+			equipment = support_equipment
+			amount = 125
+			target = SGR
+		}
+		send_equipment = {
+			equipment = infantry_equipment
+			amount = 1000
+			target = SGR
+		}
+		clr_country_flag = USA_speer_send_weapons_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_speer_support_internationally_flag }
+		SGR = {
+			add_political_power = 100
+			add_stability = 0.02
+			add_war_support = 0.05
+		}
+		clr_country_flag = USA_speer_support_internationally_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_speer_send_fighters_flag }
+		send_equipment = {
+			equipment = fighter_equipment
+			amount = 30
+			target = SGR
+		}
+		clr_country_flag = USA_speer_send_fighters_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_buff_regime_leaning_early_flag }
+		set_country_flag = USA_CIA_GER_SGR_buff_regime_leaning_early_success_flag
+		GER = { country_event = USA_CIA_SGR.2 }
+		clr_country_flag = USA_CIA_GER_SGR_buff_regime_leaning_early_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_boost_reformers_early_flag }
+		set_country_flag = USA_CIA_GER_SGR_boost_reformers_early_success_flag
+		GER = { country_event = USA_CIA_SGR.3 }
+		clr_country_flag = USA_CIA_GER_SGR_boost_reformers_early_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_weaken_reactionaries_middle_flag }
+		set_country_flag = USA_CIA_GER_SGR_weaken_reactionaries_middle_success_flag
+		GER = { country_event = USA_CIA_SGR.4 }
+		clr_country_flag = USA_CIA_GER_SGR_weaken_reactionaries_middle_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_buff_regime_leaning_middle_flag }
+		set_country_flag = USA_CIA_GER_SGR_buff_regime_leaning_middle_success_flag
+		GER = { country_event = USA_CIA_SGR.5 }
+		clr_country_flag = USA_CIA_GER_SGR_buff_regime_leaning_middle_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_boost_reformers_middle_flag }
+		set_country_flag = USA_CIA_GER_SGR_boost_reformers_middle_success_flag
+		GER = { country_event = USA_CIA_SGR.6 }
+		clr_country_flag = USA_CIA_GER_SGR_boost_reformers_middle_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_weaken_reactionaries_late_flag }
+		set_country_flag = USA_CIA_GER_SGR_weaken_reactionaries_late_success_flag
+		GER = { country_event = USA_CIA_SGR.9 }
+		clr_country_flag = USA_CIA_GER_SGR_weaken_reactionaries_late_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_buff_regime_leaning_late_flag }
+		set_country_flag = USA_CIA_GER_SGR_buff_regime_leaning_late_success_flag
+		GER = { country_event = USA_CIA_SGR.10 }
+		clr_country_flag = USA_CIA_GER_SGR_buff_regime_leaning_late_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_boost_reformers_late_flag }
+		set_country_flag = USA_CIA_GER_SGR_boost_reformers_late_success_flag
+		GER = { country_event = USA_CIA_SGR.11 }
+		clr_country_flag = USA_CIA_GER_SGR_boost_reformers_late_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_sabotage_repatriation_efforts_flag }
+		set_country_flag = USA_CIA_GER_SGR_sabotage_repatriation_efforts_success_flag
+		GER = { country_event = USA_CIA_SGR.7 }
+		clr_country_flag = USA_CIA_GER_SGR_sabotage_repatriation_efforts_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_SGR_sabotage_infrastructure_flag }
+		set_country_flag = USA_CIA_GER_SGR_sabotage_infrastructure_success_flag
+		GER = { country_event = USA_CIA_SGR.8 }
+		clr_country_flag = USA_CIA_GER_SGR_sabotage_infrastructure_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_political_sabotage_flag }
+		set_country_flag = USA_CIA_GER_BOR_political_sabotage_success_flag
+		GER = { country_event = USA_CIA_BOR.1 }
+		clr_country_flag = USA_CIA_GER_BOR_political_sabotage_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_political_sabotage_major_flag }
+		GER = { country_event = USA_CIA_BOR.2 }
+		clr_country_flag = USA_CIA_GER_BOR_political_sabotage_major_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_economic_sabotage_initial }
+		set_country_flag = USA_CIA_GER_BOR_economic_sabotage_initial_success_flag
+		GER = { country_event = USA_CIA_BOR.3 }
+		clr_country_flag = USA_CIA_GER_BOR_economic_sabotage_initial
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_economic_sabotage_second_flag }
+		set_country_flag = USA_CIA_GER_BOR_economic_sabotage_second_success_flag
+		GER = { country_event = USA_CIA_BOR.4 }
+		clr_country_flag = USA_CIA_GER_BOR_economic_sabotage_second_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_economic_sabotage_infrastructure_flag }
+		set_country_flag = USA_CIA_GER_BOR_economic_sabotage_infrastructure_success_flag
+		GER = { country_event = USA_CIA_BOR.5 }
+		clr_country_flag = USA_CIA_GER_BOR_economic_sabotage_infrastructure_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_economic_sabotage_infrastructure_second_flag }
+		set_country_flag = USA_CIA_GER_BOR_economic_sabotage_infrastructure_second_success_flag
+		GER = { country_event = USA_CIA_BOR.6 }
+		clr_country_flag = USA_CIA_GER_BOR_economic_sabotage_infrastructure_second_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_economic_sabotage_combined_flag }
+		set_country_flag = USA_CIA_GER_BOR_economic_sabotage_combined_success_flag
+		GER = { country_event = USA_CIA_BOR.7 }
+		clr_country_flag = USA_CIA_GER_BOR_economic_sabotage_combined_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_fuck_with_anti_reformist_dismantlement_flag }
+		set_country_flag = USA_CIA_GER_BOR_fuck_with_anti_reformist_dismantlement_success_flag
+		GER = { country_event = USA_CIA_BOR.8 }
+		clr_country_flag = USA_CIA_GER_BOR_fuck_with_anti_reformist_dismantlement_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_fuck_with_anti_reformist_dismantlement_2_flag }
+		set_country_flag = USA_CIA_GER_BOR_fuck_with_anti_reformist_dismantlement_2_success_flag
+		GER = { country_event = USA_CIA_BOR.9 }
+		clr_country_flag = USA_CIA_GER_BOR_fuck_with_anti_reformist_dismantlement_2_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_fuck_with_dismantlement_2_flag }
+		set_country_flag = USA_CIA_GER_BOR_fuck_with_dismantlement_2_success_flag
+		GER = { country_event = USA_CIA_BOR.10 }
+		clr_country_flag = USA_CIA_GER_BOR_fuck_with_dismantlement_2_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_fuck_with_anti_reformist_dismantlement_2_people_flag }
+		set_country_flag = USA_CIA_GER_BOR_fuck_with_dismantlement_2_people_success_flag
+		GER = { country_event = USA_CIA_BOR.11 }
+		clr_country_flag = USA_CIA_GER_BOR_fuck_with_anti_reformist_dismantlement_2_people_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_GER_BOR_fuck_with_anti_reformist_dismantlement_2_banks_flag }
+		set_country_flag = USA_CIA_GER_BOR_fuck_with_dismantlement_2_banks_success_flag
+		GER = { country_event = USA_CIA_BOR.12 }
+		clr_country_flag = USA_CIA_GER_BOR_fuck_with_anti_reformist_dismantlement_2_banks_flag
+	}
+
+	####################################################
+	##### RUSSIA
+	####################################################
+	# Unification Ops
+	else_if = { # Intel
+		limit = { has_country_flag = CIA_USA_Unification_Enemy_Intel_operation }
+		if = {
+			limit = { WSR = { has_country_flag = USA_CIA_receiving_intel } }
+			WSR = { country_event = USA_CIA_RUS.18 clr_country_flag = USA_CIA_receiving_intel }
+		}
+		if = {
+			limit = { WSB = { has_country_flag = USA_CIA_receiving_intel } }
+			WSB = { country_event = USA_CIA_RUS.18 clr_country_flag = USA_CIA_receiving_intel }
+		}
+
+		if = {
+			limit = { CSB = { has_country_flag = USA_CIA_receiving_intel } }
+			CSB = { country_event = USA_CIA_RUS.18 clr_country_flag = USA_CIA_receiving_intel }
+		}
+		if = {
+			limit = { FST = { has_country_flag = USA_CIA_receiving_intel } }
+			FST = { country_event = USA_CIA_RUS.18 clr_country_flag = USA_CIA_receiving_intel }
+		}
+
+		if = {
+			limit = { RWS = { has_country_flag = USA_CIA_receiving_intel } }
+			RWS = { country_event = USA_CIA_RUS.18 clr_country_flag = USA_CIA_receiving_intel }
+		}
+		if = {
+			limit = { SIB = { has_country_flag = USA_CIA_receiving_intel } }
+			SIB = { country_event = USA_CIA_RUS.18 clr_country_flag = USA_CIA_receiving_intel }
+		}
+		clr_country_flag = CIA_USA_Unification_Enemy_Intel_operation
+	}
+
+	else_if = { # Sabotage
+		limit = { has_country_flag = CIA_USA_Unification_Sabotage_operation }
+		if = {
+			limit = { WSR = { has_country_flag = USA_CIA_being_sabotaged } }
+			WSR = { country_event = USA_CIA_RUS.19 clr_country_flag = USA_CIA_being_sabotaged }
+		}
+		if = {
+			limit = { WSB = { has_country_flag = USA_CIA_being_sabotaged } }
+			WSB = { country_event = USA_CIA_RUS.19 clr_country_flag = USA_CIA_being_sabotaged }
+		}
+
+		if = {
+			limit = { CSB = { has_country_flag = USA_CIA_being_sabotaged } }
+			CSB = { country_event = USA_CIA_RUS.19 clr_country_flag = USA_CIA_being_sabotaged }
+		}
+		if = {
+			limit = { FST = { has_country_flag = USA_CIA_being_sabotaged } }
+			FST = { country_event = USA_CIA_RUS.19 clr_country_flag = USA_CIA_being_sabotaged }
+		}
+
+		if = {
+			limit = { RWS = { has_country_flag = USA_CIA_being_sabotaged } }
+			RWS = { country_event = USA_CIA_RUS.19 clr_country_flag = USA_CIA_being_sabotaged }
+		}
+		if = {
+			limit = { SIB = { has_country_flag = USA_CIA_being_sabotaged } }
+			SIB = { country_event = USA_CIA_RUS.19 clr_country_flag = USA_CIA_being_sabotaged }
+		}
+		clr_country_flag = CIA_USA_Unification_Sabotage_operation
+	}
+
+	else_if = {
+		limit = { has_country_flag = CIA_USA_RUS_Establishing_Safehouses }
+		hidden_effect = { # note for the future, i'm thinking of having different flavor events for this -oveja
+			every_country = {
+				limit = { has_country_flag = CIA_USA_RUS_Establishing_Safehouses_target }
+				set_country_flag = CIA_USA_RUS_Established_Safehouses_target
+				clr_country_flag = CIA_USA_RUS_Establishing_Safehouses_target
+			}
+			set_temp_variable = { NetworkChange = 5 } Espionage_AddNetworkStrength_Russia = yes
+		}
+		clr_country_flag = CIA_USA_RUS_Establishing_Safehouses
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damaging_ger_encryption_ru }
+		GER = { set_temp_variable = { NetworkChange = -3 } Espionage_AddNetworkStrength_Russia = yes }
+		clr_country_flag = USA_CIA_damaging_ger_encryption_ru
+	}
+
+	else_if = {
+		limit = { has_country_flag = CIA_USA_WRRF_GRAND_MARSHALL }
+		set_country_flag = CIA_USA_WRRF_GRAND_MARSHALL_success
+		WRS = { country_event = USA_CIA_RUS.20 }
+		clr_country_flag = CIA_USA_WRRF_GRAND_MARSHALL
+	}
+
+	# Magadan
+	else_if = {
+		limit = { has_country_flag = CIA_USA_Magadan_Increasing_Presence }
+		hidden_effect = {
+			set_country_flag = USA_CIA_Magadan_Increased_Presence # USE THIS FLAG TO ENABLE ADVANCED REGIONAL OPS IN MAGADAN
+
+			set_temp_variable = { ExpertiseChange = 25 } Espionage_AddExpertise = yes
+
+			MAG = {
+				country_event = USA_CIA_RUS.8
+			}
+		}
+		clr_country_flag = CIA_USA_Magadan_Increasing_Presence
+	}
+
+	else_if = {
+		limit = { has_country_flag = CIA_USA_Magadan_Supporting_Reformists }
+		hidden_effect = {
+			set_country_flag = CIA_USA_Magadan_Supporting_Reformists_success
+			set_temp_variable = { ExpertiseChange = 5 } Espionage_AddExpertise = yes
+
+			MAG = {
+				country_event = USA_CIA_RUS.7
+			}
+		}
+		clr_country_flag = CIA_USA_Magadan_Supporting_Reformists
+	}
+
+	# Buryatia
+	else_if = {
+		limit = { has_country_flag = USA_CIA_BRY_strengthen_bukharinist_wing_industry_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_BRY_strengthen_bukharinist_wing_industry_success_flag
+
+			set_temp_variable = { ExpertiseChange = 5 } Espionage_AddExpertise = yes
+
+			BRY = { country_event = USA_CIA_RUS.1 }
+		}
+		clr_country_flag = USA_CIA_BRY_strengthen_bukharinist_wing_industry_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_BRY_strengthen_bukharinist_wing_politics_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_BRY_strengthen_bukharinist_wing_politics_success_flag
+
+			set_temp_variable = { ExpertiseChange = 5 } Espionage_AddExpertise = yes
+
+			BRY = { country_event = USA_CIA_RUS.2 }
+		}
+		clr_country_flag = USA_CIA_BRY_strengthen_bukharinist_wing_politics_flag
+	}
+
+	# Irkutsk
+	else_if = {
+		limit = { has_country_flag = USA_CIA_IRK_strengthen_party_wing_industry_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_IRK_strengthen_party_wing_industry_success_flag
+
+			set_temp_variable = { ExpertiseChange = 5 } Espionage_AddExpertise = yes
+
+			IRK = { country_event = USA_CIA_RUS.15 }
+		}
+		clr_country_flag = USA_CIA_IRK_strengthen_party_wing_industry_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_IRK_strengthen_party_wing_politics_flag }
+		hidden_effect = {
+			set_country_flag = USA_CIA_IRK_strengthen_party_wing_politics_success_flag
+
+			set_temp_variable = { ExpertiseChange = 5 } Espionage_AddExpertise = yes
+
+			IRK = { country_event = USA_CIA_RUS.16 }
+		}
+		clr_country_flag = USA_CIA_IRK_strengthen_party_wing_politics_flag
+	}
+
+	#Novosibirsk
+	else_if = {
+		limit = { has_country_flag = USA_CIA_aligning_novosibirsk }
+		hidden_effect = {
+
+			set_temp_variable = { ExpertiseChange = 5 } Espionage_AddExpertise = yes
+
+			NOV = { NOV_USA_gain_mid_influence = yes }
+		}
+		clr_country_flag = USA_CIA_aligning_novosibirsk
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_disaligning_novosibirsk }
+		hidden_effect = {
+
+			set_temp_variable = { ExpertiseChange = 5 } Espionage_AddExpertise = yes
+
+			NOV = { NOV_JAP_lose_mid_influence = yes }
+		}
+		clr_country_flag = USA_CIA_disaligning_novosibirsk
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_invest_in_novosibirsk }
+		hidden_effect = {
+
+			set_temp_variable = { ExpertiseChange = 5 } Espionage_AddExpertise = yes
+
+			NOV = {
+				set_temp_variable = { money_reserves_temp = 0.1 } #already converted to billion
+				econ_money_reserves_change_raw_money = yes
+			}
+		}
+		clr_country_flag = USA_CIA_invest_in_novosibirsk
+	}
+
+	####################################################
+	##### OCEANIA
+	####################################################
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damaging_ger_encryption_au }
+		GER = { set_temp_variable = { NetworkChange = -3 } Espionage_AddNetworkStrength_Oceania = yes }
+		clr_country_flag = USA_CIA_damaging_ger_encryption_au
+	}
+
+	####################################################
+	##### NORTH AMERICA
+	####################################################
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damaging_ger_encryption_na }
+		GER = { set_temp_variable = { NetworkChange = -3 } Espionage_AddNetworkStrength_NorthAmerica = yes }
+		clr_country_flag = USA_CIA_damaging_ger_encryption_na
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damage_republicans }
+
+		custom_effect_tooltip = USA_all_voters_header_tt
+		set_temp_variable = { USA_week_change_union_dem = 1 }
+		add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_rural_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_minority_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_nativists_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_hispanic_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_union_dem_Weeks = USA_week_change_union_dem }
+		custom_effect_tooltip = USA_union_dem_shift
+
+		set_temp_variable = { USA_week_change_union_pro = 1 }
+		add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_rural_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_minority_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_nativists_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_hispanic_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_union_pro_Weeks = USA_week_change_union_pro }
+		custom_effect_tooltip = USA_union_pro_shift
+
+		set_temp_variable = { USA_week_change_union_nat = 1 }
+		add_to_variable = { Demographic_Shift_urban_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_black_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_minority_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_hispanic_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_union_nat_Weeks = USA_week_change_union_nat }
+		custom_effect_tooltip = USA_union_nat_shift
+
+		clr_country_flag = USA_CIA_damage_republicans
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damage_democrats }
+
+		custom_effect_tooltip = USA_all_voters_header_tt
+		set_temp_variable = { USA_week_change_union_rep = 1 }
+		add_to_variable = { Demographic_Shift_urban_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_black_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_minority_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_hispanic_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_union_rep_Weeks = USA_week_change_union_rep }
+		custom_effect_tooltip = USA_union_rep_shift
+
+		set_temp_variable = { USA_week_change_union_pro = 1 }
+		add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_rural_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_minority_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_nativists_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_hispanic_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_union_pro_Weeks = USA_week_change_union_pro }
+		custom_effect_tooltip = USA_union_pro_shift
+
+		set_temp_variable = { USA_week_change_union_nat = 1 }
+		add_to_variable = { Demographic_Shift_urban_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_black_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_minority_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_hispanic_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_union_nat_Weeks = USA_week_change_union_nat }
+		custom_effect_tooltip = USA_union_nat_shift
+
+		clr_country_flag = USA_CIA_damage_democrats
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damage_center }
+
+		custom_effect_tooltip = USA_all_voters_header_tt
+		set_temp_variable = { USA_week_change_union_dem = 1 }
+		add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_rural_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_minority_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_nativists_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_hispanic_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_union_dem_Weeks = USA_week_change_union_dem }
+		custom_effect_tooltip = USA_union_dem_shift
+
+		set_temp_variable = { USA_week_change_union_rep = 1 }
+		add_to_variable = { Demographic_Shift_urban_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_black_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_minority_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_hispanic_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_union_rep_Weeks = USA_week_change_union_rep }
+		custom_effect_tooltip = USA_union_rep_shift
+
+		set_temp_variable = { USA_week_change_union_nat = 1 }
+		add_to_variable = { Demographic_Shift_urban_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_black_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_minority_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_hispanic_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_union_nat_Weeks = USA_week_change_union_nat }
+		custom_effect_tooltip = USA_union_nat_shift
+
+		clr_country_flag = USA_CIA_damage_center
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damage_right }
+
+		custom_effect_tooltip = USA_all_voters_header_tt
+		set_temp_variable = { USA_week_change_union_dem = 1 }
+		add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_rural_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_minority_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_nativists_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_hispanic_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_union_dem_Weeks = USA_week_change_union_dem }
+		custom_effect_tooltip = USA_union_dem_shift
+
+		set_temp_variable = { USA_week_change_union_rep = 1 }
+		add_to_variable = { Demographic_Shift_urban_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_black_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_minority_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_hispanic_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_union_rep_Weeks = USA_week_change_union_rep }
+		custom_effect_tooltip = USA_union_rep_shift
+
+		set_temp_variable = { USA_week_change_union_pro = 1 }
+		add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_rural_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_minority_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_nativists_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_hispanic_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_union_pro_Weeks = USA_week_change_union_pro }
+		custom_effect_tooltip = USA_union_pro_shift
+
+		clr_country_flag = USA_CIA_damage_right
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damage_yockey }
+
+		custom_effect_tooltip = USA_all_voters_header_tt
+		set_temp_variable = { USA_week_change_union_dem = 1 }
+		add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_rural_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_minority_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_nativists_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_hispanic_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_union_dem_Weeks = USA_week_change_union_dem }
+		custom_effect_tooltip = USA_union_dem_shift
+
+		set_temp_variable = { USA_week_change_union_rep = 1 }
+		add_to_variable = { Demographic_Shift_urban_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_black_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_minority_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_hispanic_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_union_rep_Weeks = USA_week_change_union_rep }
+		custom_effect_tooltip = USA_union_rep_shift
+
+		set_temp_variable = { USA_week_change_union_pro = 1 }
+		add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_rural_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_minority_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_nativists_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_hispanic_pro_Weeks = USA_week_change_union_pro }
+		add_to_variable = { Demographic_Shift_union_pro_Weeks = USA_week_change_union_pro }
+		custom_effect_tooltip = USA_union_pro_shift
+
+		set_temp_variable = { USA_week_change_union_com = 2 }
+		add_to_variable = { Demographic_Shift_urban_com_Weeks = USA_week_change_union_com }
+		add_to_variable = { Demographic_Shift_rural_com_Weeks = USA_week_change_union_com }
+		add_to_variable = { Demographic_Shift_black_com_Weeks = USA_week_change_union_com }
+		add_to_variable = { Demographic_Shift_minority_com_Weeks = USA_week_change_union_com }
+		add_to_variable = { Demographic_Shift_nativists_com_Weeks = USA_week_change_union_com }
+		add_to_variable = { Demographic_Shift_hispanic_com_Weeks = USA_week_change_union_com }
+		add_to_variable = { Demographic_Shift_union_com_Weeks = USA_week_change_union_com }
+		custom_effect_tooltip = USA_union_com_shift
+
+		clr_country_flag = USA_CIA_damage_yockey
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damage_left }
+
+		custom_effect_tooltip = USA_all_voters_header_tt
+		set_temp_variable = { USA_week_change_union_dem = 1 }
+		add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_rural_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_minority_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_nativists_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_hispanic_dem_Weeks = USA_week_change_union_dem }
+		add_to_variable = { Demographic_Shift_union_dem_Weeks = USA_week_change_union_dem }
+		custom_effect_tooltip = USA_union_dem_shift
+
+		set_temp_variable = { USA_week_change_union_rep = 1 }
+		add_to_variable = { Demographic_Shift_urban_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_black_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_minority_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_hispanic_rep_Weeks = USA_week_change_union_rep }
+		add_to_variable = { Demographic_Shift_union_rep_Weeks = USA_week_change_union_rep }
+		custom_effect_tooltip = USA_union_rep_shift
+
+		set_temp_variable = { USA_week_change_union_nat = 1 }
+		add_to_variable = { Demographic_Shift_urban_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_black_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_minority_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_hispanic_nat_Weeks = USA_week_change_union_nat }
+		add_to_variable = { Demographic_Shift_union_nat_Weeks = USA_week_change_union_nat }
+		custom_effect_tooltip = USA_union_nat_shift
+
+		set_temp_variable = { USA_week_change_union_anv = 2 }
+		add_to_variable = { Demographic_Shift_urban_anv_Weeks = USA_week_change_union_anv }
+		add_to_variable = { Demographic_Shift_rural_anv_Weeks = USA_week_change_union_anv }
+		add_to_variable = { Demographic_Shift_black_anv_Weeks = USA_week_change_union_anv }
+		add_to_variable = { Demographic_Shift_minority_anv_Weeks = USA_week_change_union_anv }
+		add_to_variable = { Demographic_Shift_nativists_anv_Weeks = USA_week_change_union_anv }
+		add_to_variable = { Demographic_Shift_hispanic_anv_Weeks = USA_week_change_union_anv }
+		add_to_variable = { Demographic_Shift_union_anv_Weeks = USA_week_change_union_anv }
+		custom_effect_tooltip = USA_union_anv_shift
+
+		clr_country_flag = USA_CIA_damage_left
+	}
+
+	####################################################
+	##### CENTRAL AMERICA
+	####################################################
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damaging_ger_encryption_ca }
+		GER = { set_temp_variable = { NetworkChange = -3 } Espionage_AddNetworkStrength_CentralAmerica = yes }
+		clr_country_flag = USA_CIA_damaging_ger_encryption_ca
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_boosting_trade_influence_in_ca }
+		random_country = {
+			limit = {
+				OR = {
+					tag = CUB
+					tag = MEX
+					tag = GUA
+					tag = ELS
+					tag = HON
+					tag = NIC
+					tag = COS
+					tag = PAN
+					tag = HAI
+					tag = DOM
+				}
+			}
+			set_temp_variable = { temp_modifier = 20 }
+			USA = { add_to_trade_modifier_PREV = yes }
+			USA = {
+				set_temp_variable = { temp_modifier = 20 }
+				PREV = { add_to_trade_modifier_PREV = yes }
+			}
+		}
+		clr_country_flag = USA_CIA_boosting_trade_influence_in_ca
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_boosting_american_influence_in_ca }
+		add_political_power = 40
+		clr_country_flag = USA_CIA_boosting_american_influence_in_ca
+	}
+
+	####################################################
+	##### SOUTH AMERICA
+	####################################################
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damaging_ger_encryption_sa }
+		GER = { set_temp_variable = { NetworkChange = -3 } Espionage_AddNetworkStrength_SouthAmerica = yes }
+		clr_country_flag = USA_CIA_damaging_ger_encryption_sa
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_boosting_trade_influence_in_sa }
+		random_country = {
+			limit = {
+				OR = {
+					tag = COL
+					tag = ECU
+					tag = PRU
+					tag = BOL
+					tag = CHL
+					tag = ARG
+					tag = URG
+					tag = PAR
+					tag = BRA
+					tag = VEN
+				}
+			}
+			set_temp_variable = { temp_modifier = 20 }
+			USA = { add_to_trade_modifier_PREV = yes }
+			USA = {
+				set_temp_variable = { temp_modifier = 20 }
+				PREV = { add_to_trade_modifier_PREV = yes }
+			}
+		}
+		clr_country_flag = USA_CIA_boosting_trade_influence_in_sa
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_boosting_american_influence_in_sa }
+		add_political_power = 40
+		clr_country_flag = USA_CIA_boosting_american_influence_in_sa
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_boosting_UDN_in_senate_elections }
+		hidden_effect = {
+			BRA = {
+				random_list = {
+					1 = { BRA_boost_UDN_candidates_acre_high = yes }
+					1 = { BRA_boost_UDN_candidates_alagoas_high = yes }
+					1 = { BRA_boost_UDN_candidates_amazonas_high = yes }
+					1 = { BRA_boost_UDN_candidates_bahia_high = yes }
+					1 = { BRA_boost_UDN_candidates_ceara_high = yes }
+					1 = { BRA_boost_UDN_candidates_espirito_santo_high = yes }
+					1 = { BRA_boost_UDN_candidates_goias_high = yes }
+					1 = { BRA_boost_UDN_candidates_guanabara_high = yes }
+					1 = { BRA_boost_UDN_candidates_maranhao_high = yes }
+					1 = { BRA_boost_UDN_candidates_mato_grosso_high = yes }
+					1 = { BRA_boost_UDN_candidates_minas_gerais_high = yes }
+					1 = { BRA_boost_UDN_candidates_para_high = yes }
+					1 = { BRA_boost_UDN_candidates_paraiba_high = yes }
+					1 = { BRA_boost_UDN_candidates_parana_high = yes }
+					1 = { BRA_boost_UDN_candidates_pernambuco_high = yes }
+					1 = { BRA_boost_UDN_candidates_piaui_high = yes }
+					1 = { BRA_boost_UDN_candidates_rio_de_janeiro_high = yes }
+					1 = { BRA_boost_UDN_candidates_rio_grande_do_norte_high = yes }
+					1 = { BRA_boost_UDN_candidates_rio_grande_do_sul_high = yes }
+					1 = { BRA_boost_UDN_candidates_santa_catarina_high = yes }
+					1 = { BRA_boost_UDN_candidates_sao_paulo_high = yes }
+					1 = { BRA_boost_UDN_candidates_sergipe_high = yes }
+				}
+			}
+		}
+		clr_country_flag = USA_CIA_boosting_UDN_in_senate_elections
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_raising_lott_influence }
+		BRA = {
+			BRA_lottquadros_regular_increase_lott_influence = yes
+		}
+		clr_country_flag = USA_CIA_raising_lott_influence
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_raising_quadros_influence }
+		BRA = {
+			BRA_lottquadros_regular_increase_quadros_influence = yes
+		}
+		clr_country_flag = USA_CIA_raising_quadros_influence
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_ensuring_lacerda_get_nominated }
+		BRA = {
+			set_country_flag = BRA_CIA_helped_Lacerda_for_nomination
+		}
+		clr_country_flag = USA_CIA_ensuring_lacerda_get_nominated
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_BRA_ensure_lacerda_win_hundred_days }
+		BRA = {
+			BRA_hd_increase_lacerda_support_med = yes
+		}
+		clr_country_flag = USA_CIA_BRA_ensure_lacerda_win_hundred_days
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_boosting_lacerda_in_presidential_election }
+		hidden_effect = {
+			BRA = {
+				add_to_variable = { BRA_pres_support^1 = 5 }
+				add_to_variable = { BRA_pres_support^4 = 5 }
+				add_to_variable = { BRA_pres_support^7 = 5 }
+				add_to_variable = { BRA_pres_support^10 = 5 }
+				add_to_variable = { BRA_pres_support^13 = 5 }
+				add_to_variable = { BRA_pres_support^16 = 5 }
+				add_to_variable = { BRA_pres_support^19 = 5 }
+				add_to_variable = { BRA_pres_support^22 = 5 }
+				add_to_variable = { BRA_pres_support^25 = 5 }
+				BRA_redraw_pres_info = yes
+				BRA_pres_select_region = yes
+			}
+		}
+		clr_country_flag = USA_CIA_boosting_lacerda_in_presidential_election
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_boosting_kubitschek_in_presidential_election }
+		hidden_effect = {
+			BRA = {
+				add_to_variable = { BRA_pres_support^0 = 5 }
+				add_to_variable = { BRA_pres_support^3 = 5 }
+				add_to_variable = { BRA_pres_support^6 = 5 }
+				add_to_variable = { BRA_pres_support^9 = 5 }
+				add_to_variable = { BRA_pres_support^12 = 5 }
+				add_to_variable = { BRA_pres_support^15 = 5 }
+				add_to_variable = { BRA_pres_support^18 = 5 }
+				add_to_variable = { BRA_pres_support^21 = 5 }
+				add_to_variable = { BRA_pres_support^24 = 5 }
+				BRA_redraw_pres_info = yes
+				BRA_pres_select_region = yes
+			}
+		}
+		clr_country_flag = USA_CIA_boosting_kubitschek_in_presidential_election
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_boosting_adhemar_in_presidential_election }
+		hidden_effect = {
+			BRA = {
+				add_to_variable = { BRA_pres_support^2 = 5 }
+				add_to_variable = { BRA_pres_support^5 = 5 }
+				add_to_variable = { BRA_pres_support^8 = 5 }
+				add_to_variable = { BRA_pres_support^11 = 5 }
+				add_to_variable = { BRA_pres_support^14 = 5 }
+				add_to_variable = { BRA_pres_support^17 = 5 }
+				add_to_variable = { BRA_pres_support^20 = 5 }
+				add_to_variable = { BRA_pres_support^23 = 5 }
+				add_to_variable = { BRA_pres_support^26 = 5 }
+				BRA_redraw_pres_info = yes
+				BRA_pres_select_region = yes
+			}
+		}
+		clr_country_flag = USA_CIA_boosting_adhemar_in_presidential_election
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_increasing_brazilian_military_loyalty }
+		hidden_effect = { BRA = { BRA_military_increase_loyalty_med = yes } }
+		BRA = { country_event = USA_CIA_BRA.1 }
+		clr_country_flag = USA_CIA_increasing_brazilian_military_loyalty
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_decreasing_brazilian_military_loyalty }
+		hidden_effect = { BRA = { BRA_military_decrease_loyalty_med = yes } }
+		BRA = { country_event = USA_CIA_BRA.2 }
+		clr_country_flag = USA_CIA_decreasing_brazilian_military_loyalty
+	}
+
+	####################################################
+	##### EASTERN ASIA
+	####################################################
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damaging_ger_encryption_ea }
+		GER = { set_temp_variable = { NetworkChange = -3 } Espionage_AddNetworkStrength_EastAsia = yes }
+		clr_country_flag = USA_CIA_damaging_ger_encryption_ea
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_destabilize_japan_flag }
+		JAP = { country_event = { id = USA_CIA_JAP.1 } }
+		clr_country_flag = USA_CIA_destabilize_japan_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_fund_korean_resistance_flag }
+		JAP = { country_event = { id = USA_CIA_JAP.2 } }
+		clr_country_flag = USA_CIA_fund_korean_resistance_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_fund_vladivostok_resistance_flag }
+		JAP = { country_event = { id = USA_CIA_JAP.3 } }
+		clr_country_flag = USA_CIA_fund_vladivostok_resistance_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_fund_chinese_resistance_flag }
+		JAP = { country_event = { id = USA_CIA_JAP.4 } }
+		clr_country_flag = USA_CIA_fund_chinese_resistance_flag
+	}
+	else_if = {
+		limit = { has_country_flag = USA_CIA_fund_hawaii_resistance_flag }
+		JAP = { country_event = { id = USA_CIA_JAP.5 } }
+		clr_country_flag = USA_CIA_fund_hawaii_resistance_flag
+	}
+
+	####################################################
+	##### SOUTH EASTERN ASIA
+	####################################################
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damaging_ger_encryption_sea }
+		GER = { set_temp_variable = { NetworkChange = -3 } Espionage_AddNetworkStrength_SouthEastAsia = yes }
+		clr_country_flag = USA_CIA_damaging_ger_encryption_sea
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_buff_fri_flag }
+		every_country = {
+			limit = { is_in_faction_with = FRI }
+			country_event = { id = USA_CIA_ICW.1 }
+		}
+		clr_country_flag = USA_CIA_buff_fri_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_debuff_ins_flag }
+		every_country = {
+			limit = { is_in_faction_with = INS }
+			country_event = { id = USA_CIA_ICW.2 }
+		}
+		clr_country_flag = USA_CIA_debuff_ins_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_strike_ins_flag }
+		every_country = {
+			limit = { is_in_faction_with = INS }
+			country_event = { id = USA_CIA_ICW.3 }
+		}
+		clr_country_flag = USA_CIA_strike_ins_flag
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_influence_malaya }
+		if = {
+			limit = { check_variable = { TNO_razak_election_weight = 0 } }
+			USA = { country_event = { id = USA_CIA_MLY.1 } }
+		}
+		else_if = {
+			limit = { check_variable = { TNO_razak_election_weight = 1 } }
+			USA = { country_event = { id = USA_CIA_MLY.2 } }
+		}
+		else_if = {
+			limit = { check_variable = { TNO_razak_election_weight = 2 } }
+			USA = { country_event = { id = USA_CIA_MLY.3 } }
+		}
+		clr_country_flag = USA_CIA_influence_malaya
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_USAFIP_Operations_Domino_USAFIP }
+		USA = { country_event = { id = USA_CIA_MLY.4 } }
+		clr_country_flag = USA_CIA_USAFIP_Operations_Domino_USAFIP
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_Operations_Domino_FRI }
+		USA = { country_event = { id = USA_CIA_MLY.5 } }
+		FRI = {
+			set_country_flag = FRI_have_supply_lines
+		}
+		clr_country_flag = USA_CIA_Operations_Domino_FRI
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_Operations_Domino_MLY }
+		USA = { country_event = { id = USA_CIA_MLY.6 } }
+		add_political_power = 70
+		clr_country_flag = USA_CIA_Operations_Domino_MLY
+	}
+
+	####################################################
+	##### AFRICA
+	####################################################
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_damaging_ger_encryption_af }
+		GER = { set_temp_variable = { NetworkChange = -3 } Espionage_AddNetworkStrength_Africa = yes }
+		clr_country_flag = USA_CIA_damaging_ger_encryption_af
+	}
+
+	else_if = {
+		limit = { has_country_flag = USA_CIA_thermidor_madagascar }
+		custom_effect_tooltip = USA_CIA_MAD_thermidor_coup_incoming_tt
+		hidden_effect = {
+			MAD = { country_event = { id = MAD.24 days = 60 } }
+		}
+		clr_country_flag = USA_CIA_thermidor_madagascar
+	}
+
+	else = {
+		log = "[GetDateText]: [Root.GetName]: ERROR USA_CIA_Rewards_Calculation finished without checking flag"
+	}
+}
+
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######              _____     _____            _                                                           	#######
+#######       /\    |_   _|   / ____|          | |                                                          	#######
+#######      /  \     | |    | |      ___    __| |  ___                                                     	#######
+#######     / /\ \    | |    | |     / _ \  / _` | / _ \                                                    	#######
+#######    / ____ \  _| |_   | |____| (_) || (_| ||  __/                                                    	#######
+#######   /_/    \_\|_____|   \_____|\___/  \__,_| \___|                                                    	#######
+#######           _                        _                  _                                             	#######
+#######          | |                      | |                | |                                            	#######
+#######     __ _ | |__    __ _  _ __    __| |  ___   _ __    | |__    ___   _ __    ___                     	#######
+#######    / _` || '_ \  / _` || '_ \  / _` | / _ \ | '_ \   | '_ \  / _ \ | '_ \  / _ \                    	#######
+#######   | (_| || |_) || (_| || | | || (_| || (_) || | | |  | | | || (_) || |_) ||  __/                    	#######
+#######    \__,_||_.__/  \__,_||_| |_| \__,_| \___/ |_| |_|  |_| |_| \___/ | .__/  \___|                    	#######
+#######           _  _              _                            _         | |     _                        	#######
+#######          | || |            | |                          | |        |_|    | |                       	#######
+#######     __ _ | || |  __      __| |__    ___      ___  _ __  | |_  ___  _ __   | |__    ___  _ __  ___   	#######
+#######    / _` || || |  \ \ /\ / /| '_ \  / _ \    / _ \| '_ \ | __|/ _ \| '__|  | '_ \  / _ \| '__|/ _ \  	#######
+#######   | (_| || || |   \ V  V / | | | || (_) |  |  __/| | | || |_|  __/| |     | | | ||  __/| |  |  __/  	#######
+#######    \__,_||_||_|    \_/\_/  |_| |_| \___/    \___||_| |_| \__|\___||_|     |_| |_| \___||_|   \___|  	#######
+#######																											#######
+#######		- by Fedacking		- in memorial Lazergaz															#######
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
+
+USA_CIA_AI_startup_flags = {
+	if = {
+		limit = { is_ai = yes }
+
+		##############
+		### Europe ###
+		##############
+		random_list = {
+			100 = {
+				set_country_flag = CIA_AI_EUROPE_WILL_DO_FLAG
+
+				#Ireland
+				random_list = {
+					30 = { set_country_flag = CIA_AI_EUROPE_IRE_WILL_DO_FLAG }
+					70 = { } # Imagine caring about a little shitty island
+				}
+				### England
+				random_list = {
+					90 = { set_country_flag = CIA_AI_EUROPE_FEN_WILL_DO_FLAG }
+					10 = { } # "special relationship" lmao
+				}
+				random_list = {
+					60 = { set_country_flag = CIA_AI_EUROPE_ENG_POST_WAR_WILL_DO_FLAG }
+					40 = { } # They can manage their internal affairs
+				}
+				### Iberia
+				random_list = {
+					50 = {
+						set_country_flag = CIA_AI_EUROPE_IBR_WILL_DO_FLAG
+
+						# Which Caudilio do we like more?
+						random_list = {
+							50 = { set_country_flag = CIA_AI_EUROPE_IBR_SALAZAR }
+							50 = { set_country_flag = CIA_AI_EUROPE_IBR_FRANCO }
+						}
+					}
+					50 = { } #Surely the place is to stable to bother with right?
+				}
+
+				random_list = {
+					50 = { set_country_flag = CIA_AI_EUROPE_GER_WILL_DO_FLAG }
+					50 = { } #Lets ignore the Krauts
+				}
+
+				### Serbia
+				random_list = {
+					30 = { set_country_flag = CIA_AI_EUROPE_SERBIA_WILL_DO_FLAG }
+					70 = { } # Rip Serbia
+				}
+
+				### Norway
+				random_list = {
+					30 = { set_country_flag = CIA_AI_EUROPE_NORWAY_WILL_DO_FLAG }
+					70 = { } # Rip Serbia
+				}
+
+				### Poland
+				random_list = {
+					30 = { set_country_flag = CIA_AI_EUROPE_POLAND_WILL_DO_FLAG }
+					70 = { } # Rip Serbia
+				}
+			}
+			0 = {
+				#no Europe
+			}
+		}
+
+		##############
+		### Africa ###
+		##############
+		random_list = {
+			90 = {
+				set_country_flag = CIA_AI_AFRICA_WILL_DO_FLAG
+			}
+			10 = {
+				#no Africa
+			}
+		}
+
+		##############
+		### Russia ###
+		##############
+		random_list = {
+			60 = {
+				set_country_flag = CIA_AI_RUSSIA_WILL_DO_FLAG
+			}
+			40 = {
+				#no Russia
+			}
+		}
+
+		##############################
+		#### South East Asia Asia ####
+		##############################
+		random_list = {
+			35 = {
+				set_country_flag = CIA_AI_SEA_WILL_DO_FLAG
+			}
+			65 = {
+				#no SEA
+			}
+		}
+
+		########################
+		#### East Asia Asia ####
+		#########################
+		random_list = {
+			30 = {
+				set_country_flag = CIA_AI_EA_WILL_DO_FLAG
+			}
+			70 = {
+				#no EA
+			}
+		}
+	}
+}

@@ -1,0 +1,177 @@
+scripted_gui = {
+	OMO_2022_crystals_of_ponykind = {
+		window_name = "OMO_2022_crystals_of_ponykind"
+		context_type = decision_category
+		dirty = OMO_pony_crystals_dirty
+		properties = {
+			crystal_bar = {
+				frame = OMO_pony_crystals
+			}
+			cap_indicator = {
+				x = cap_indicator_x
+			}
+			cap_text = {
+				x = cap_text_x
+			}
+		}
+	}
+	OMO_2022_crisis_of_harmony = {
+		window_name = "OMO_2022_crisis_of_harmony"
+		context_type = decision_category
+		dirty = OMO_2022_crisis_human_influence
+		triggers = {
+			dial_warning_visible = {
+				OR = {
+					check_variable = { OMO_2022_crisis_pony_influence > 75 }
+					check_variable = { OMO_2022_crisis_human_influence > 75 }
+				}
+			}
+		}
+		properties = {
+			dial_arrow = {
+				frame = OMO_2022_crisis_human_influence
+			}
+		}
+	}
+	OMO_2022_demographics_opener = {
+		window_name = "OMO_2022_demographics_opener"
+		context_type = player_context
+		parent_window_token = politics_tab
+		visible = {
+			original_tag = OMO
+			has_country_flag = OMO_2022_demographics_active
+		}
+		triggers = {
+			gui_alert_visible = {
+				NOT = { has_country_flag = demographics_gui_alert_disable }
+			}
+		}
+		effects = {
+			open_button_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = demographics_gui_alert_disable }
+					}
+					set_country_flag = demographics_gui_alert_disable
+				}
+			}
+		}
+	}
+	OMO_2022_Project_Ferus = {
+		window_name = "OMO_2022_Project_Ferus_window"
+		context_type = player_context
+		visible = {
+			original_tag = OMO
+			has_country_flag = OMO_2022_project_ferus_displayed
+		}
+		effects = {
+			close_btn_click = {
+				clr_country_flag = OMO_2022_project_ferus_displayed
+			}
+			play_button_click = {
+				set_country_flag = { flag = OMO_2022_Ferus_audio_cooldown days = 1 value = 1 }
+				meta_effect = {
+					text = {
+						scoped_play_song = "Project_Ferus_[ID]"
+					}
+					ID = "[?OMO_2022_Ferus_SELECTED_ENTRY]"
+				}
+			}
+		}
+		triggers = {
+			play_button_visible = {
+				NOT = { check_variable = { OMO_2022_Ferus_SELECTED_ENTRY = 0 } }
+			}
+			transcription_title_visible = {
+				NOT = { check_variable = { OMO_2022_Ferus_SELECTED_ENTRY = 0 } }
+			}
+			transcription_desc_visible = {
+				NOT = { check_variable = { OMO_2022_Ferus_SELECTED_ENTRY = 0 } }
+			}
+			play_button_click_enabled = {
+				NOT = { has_country_flag = OMO_2022_Ferus_audio_cooldown }
+			}
+		}
+		
+		## GRIDBOX SHIT ##
+		dynamic_lists = {
+			entry_gridbox = {
+				array = OMO_2022_Ferus_Entries_Array
+				value = va
+				index = k
+				entry_container = "OMO_2022_Project_Ferus_Entry_[GET_OMO_2022_Ferus_Entry_Container]"
+			}
+		}
+		effects = {
+			character_entry_btn_click = {
+				if = { # Expands logs belonging to character
+					limit = {
+						set_temp_variable = { i_check = k }
+						add_to_temp_variable = { i_check = 1 }
+						OR = {
+							check_variable = { OMO_2022_Ferus_Entries_Array^i_check > 100 }
+							check_variable = { OMO_2022_Ferus_Entries_Array^i_check = 0 }
+						}
+					}
+					
+					# Initially removes array values after the character log to be readded later #
+					for_each_loop = {
+						array = OMO_2022_Ferus_Entries_Array
+						if = {
+							limit = {
+								check_variable = { i > k }
+							}
+							add_to_array = { removed = v }
+						}
+					}
+					for_each_loop = {
+						array = removed
+						if = {
+							limit = {
+								is_in_array = { array = OMO_2022_Ferus_Entries_Array value = v }
+							}
+							remove_from_array = { array = OMO_2022_Ferus_Entries_Array value = v }
+						}
+					}
+					
+					# Adds all of character's unlocked logs to the array
+					meta_effect = {
+						text = {
+							for_each_loop = {
+								array = OMO_2022_Ferus_[CHAR]_Entries
+								add_to_array = { OMO_2022_Ferus_Entries_Array = v }
+							}
+						}
+						CHAR = "[?va]"
+					}
+					
+					# Readds removed array values
+					for_each_loop = {
+						array = removed
+						add_to_array = { OMO_2022_Ferus_Entries_Array = v }
+					}
+					clear_array = removed
+				}
+				else = { # Collapses
+					meta_effect = {
+						text = {
+							for_each_loop = {
+								array = OMO_2022_Ferus_[CHAR]_Entries
+								if = {
+									limit = {
+										is_in_array = { array = OMO_2022_Ferus_Entries_Array value = v }
+									}
+									remove_from_array = { array = OMO_2022_Ferus_Entries_Array value = v }
+								}
+							}
+						}
+						CHAR = "[?va]"
+					}
+				}
+			}
+			log_entry_btn_click = {
+				set_variable = { OMO_2022_Ferus_SELECTED_ENTRY = va }
+			}
+		}
+	}
+}

@@ -1,0 +1,2003 @@
+### Original code by Pacifica
+### Reworked for GUI by willm
+
+###########
+## SETUP ##
+###########
+
+# initialises arrays
+RUS_urals_influence_initialise = {
+	for_loop_effect = {
+		start = 0
+		end = 4
+		add_to_array = { RUS_urals_receptiveness = 0 }
+		add_to_array = { RUS_urals_influence = 0 }
+		add_to_array = { RUS_urals_influence_tick = 0 }
+		add_to_array = { RUS_urals_investment_tick = 0 }
+		add_to_array = { RUS_urals_relations_level = 1 }
+		add_to_array = { RUS_urals_faction_exists = 0 }
+		add_to_array = { RUS_discredit_multiplier = 1 }
+	}
+
+	set_variable = { RUS_selected_ural_region = 1 }
+
+	849 = { set_state_flag = RUS_orenburg_state }
+	852 = { set_state_flag = RUS_orenburg_state }
+	652 = { set_state_flag = RUS_orenburg_state }
+
+	847 = { set_state_flag = RUS_beloretsk_state }
+	848 = { set_state_flag = RUS_beloretsk_state }
+
+	RUS_urals_set_receptiveness = yes
+	RUS_urals_calc_tick = yes
+	RUS_urals_set_region_owners = yes
+
+	# sets a variable to the rival tag. Used for interactions with the rival.
+	if = {
+		limit = { tag = WSR }
+		set_variable = { RUS_rival_tag = WSB.id }
+	}
+	else = { set_variable = { RUS_rival_tag = WSR.id } }
+
+	country_event = { # progress ticker
+		id = RUS_race_for_the_urals.101
+		days = 1
+	}
+	RUS_urals_dirty_variable = yes
+}
+
+RUS_urals_clear_rftu = {
+	clear_array = RUS_urals_receptiveness
+	clear_array = RUS_urals_influence
+	clear_array = RUS_urals_influence_tick
+	clear_array = RUS_urals_investment_tick
+	clear_array = RUS_urals_relations_level
+	clear_array = RUS_urals_faction_exists
+	clear_array = RUS_discredit_multiplier
+
+	clear_variable = RUS_selected_ural_region
+
+	clear_variable = RUS_urals_orenburg_owner
+	clear_variable = RUS_urals_orenburg_owner_tag
+	clear_variable = RUS_urals_ural_owner
+	clear_variable = RUS_urals_ural_owner_tag
+	clear_variable = RUS_urals_magnitogorsk_owner
+	clear_variable = RUS_urals_magnitogorsk_owner_tag
+	clear_variable = RUS_urals_orsk_owner
+	clear_variable = RUS_urals_orsk_owner_tag
+
+	clr_global_flag = WSR_INTEGRATING_MGN
+	clr_global_flag = WSB_INTEGRATING_MGN
+	clr_global_flag = WSR_INTEGRATING_ORE
+	clr_global_flag = WSB_INTEGRATING_ORE
+	clr_global_flag = WSR_INTEGRATING_URL
+	clr_global_flag = WSB_INTEGRATING_URL
+	clr_country_flag = BEGUN_SOUTHERN_URALS_CRISIS
+}
+
+
+# checks to see which factions exist and calls receptiveness SEs found at the bottom of the file
+RUS_urals_set_receptiveness = {
+	if = {
+		limit = { ORE = { exists = yes } }
+
+		set_variable = { RUS_urals_faction_exists^0 = 1 }
+
+		if = {
+			limit = { ORE = { has_government = socialist } }
+			RUS_urals_set_council_receptiveness = yes
+		}
+		else_if = {
+			limit = { ORE = { has_government = communist } }
+			RUS_urals_set_malenkov_receptiveness = yes
+		}
+		else_if = {
+			limit = { ORE = { has_government = paternalism } }
+			RUS_urals_set_burba_receptiveness = yes
+		}
+	}
+
+	if = {
+		limit = { URL = { exists = yes } }
+
+		set_variable = { RUS_urals_faction_exists^1 = 1 }
+
+		RUS_urals_set_league_receptiveness = yes
+	}
+
+	if = {
+		limit = { MGN = { exists = yes } }
+
+		set_variable = { RUS_urals_faction_exists^2 = 1 }
+
+		if = {
+			limit = { MGN = { has_government = despotism } }
+			RUS_urals_set_lysenko_receptiveness = yes
+		}
+		else_if = {
+			limit = { MGN = { has_government = communist } }
+			RUS_urals_set_nkvd_receptiveness = yes
+		}
+	}
+
+	if = {
+		limit = { DRL = { exists = yes } }
+
+		set_variable = { RUS_urals_faction_exists^3 = 1 }
+
+		set_variable = { RUS_urals_receptiveness^3 = 0 }
+	}
+}
+
+# Thanks to Pacifica for making all of these in the original
+RUS_urals_set_malenkov_receptiveness = {
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = liberal_conservatism
+						has_government = conservatism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.3 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.2 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.9 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+			}
+			else_if = {
+				limit = {
+					has_government = national_socialism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.3 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_urals_receptiveness^0 = 0 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			set_variable = { RUS_urals_receptiveness^0 = 1 }
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.8 }
+			}
+			else_if = {
+				limit = {
+					has_government = conservatism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.3 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_urals_receptiveness^0 = 0 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+}
+
+RUS_urals_set_burba_receptiveness = {
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = liberal_conservatism
+						has_government = conservatism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.9 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.2 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 1 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.2 }
+			}
+			else_if = {
+				limit = {
+					has_government = national_socialism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.9 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_urals_receptiveness^0 = 0 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.4 }
+			}
+			else_if = {
+				limit = {
+					has_government = conservatism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_urals_receptiveness^0 = 0 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+}
+
+RUS_urals_set_council_receptiveness = {
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = conservatism
+						has_government = liberal_conservatism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.2 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.5 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.5 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.05 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.02 }
+			}
+			else_if = {
+				limit = {
+					has_government = national_socialism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.05 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_urals_receptiveness^0 = 0 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			set_variable = { RUS_urals_receptiveness^0 = 0.4 }
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.15 }
+			}
+			else_if = {
+				limit = {
+					has_government = conservatism
+				}
+				set_variable = { RUS_urals_receptiveness^0 = 0.3 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_urals_receptiveness^0 = 0 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_ORE
+			}
+		}
+	}
+}
+
+RUS_urals_set_league_receptiveness = {
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = liberal_conservatism
+						has_government = conservatism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.85 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.9 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.05 }
+				if = {
+					limit = {
+						KOM = {
+							has_government = national_socialism
+						}
+					}
+					KOM = {
+						set_country_flag = RUS_CANNOT_NEGOTIATE_URL
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_URL
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.85 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.4 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.95 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.35 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.80 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.35 }
+			}
+			else_if = {
+				limit = {
+					has_government = national_socialism
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.05 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.75 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 0.9 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_urals_receptiveness^1 = 0 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_URL
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			set_variable = { RUS_urals_receptiveness^1 = 0.4 }
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 1 }
+			}
+			else_if = {
+				limit = {
+					has_government = conservatism
+				}
+				set_variable = { RUS_urals_receptiveness^1 = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_urals_receptiveness^1 = 0 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_URL
+			}
+		}
+	}
+}
+
+RUS_urals_set_lysenko_receptiveness = {
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = liberal_conservatism
+						has_government = conservatism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.6 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.8 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.15 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.05 }
+			}
+			else_if = {
+				limit = {
+					has_government = national_socialism
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.01 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.05 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_urals_receptiveness^2 = 0 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			set_variable = { RUS_urals_receptiveness^2 = 1 }
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.6 }
+			}
+			else_if = {
+				limit = {
+					has_government = conservatism
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_urals_receptiveness^2 = 0 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+			}
+		}
+	}
+}
+
+RUS_urals_set_nkvd_receptiveness = {
+	if = {
+		limit = {
+			tag = WSR
+		}
+		if = {
+			limit = {
+				original_tag = KOM
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = progressivism
+						has_government = liberalism
+						has_government = liberal_conservatism
+						has_government = conservatism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.1 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = fascism
+						has_government = national_socialism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = ultranationalism
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0 }
+				KOM = {
+					set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = socialist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.9 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = communist
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = WRS
+			}
+			if = {
+				limit = {
+					has_country_leader = {
+						character = WRS_Georgy_Zhukov
+						ruling_only = yes
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.9 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 1 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = SAM
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.15 }
+			}
+			else_if = {
+				limit = {
+					has_government = despotism
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.5 }
+			}
+			else_if = {
+				limit = {
+					has_government = national_socialism
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.01 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = VYT
+			}
+			if = {
+				limit = {
+					OR = {
+						has_government = paternalism
+						has_government = despotism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.01 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_government = conservatism
+						has_government = liberalism
+					}
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.05 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = PRM
+			}
+			set_variable = { RUS_urals_receptiveness^2 = 0 }
+			PRM = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			tag = WSB
+		}
+		if = {
+			limit = {
+				original_tag = TYM
+			}
+			set_variable = { RUS_urals_receptiveness^2 = 1 }
+		}
+		if = {
+			limit = {
+				original_tag = SVR
+			}
+			if = {
+				limit = {
+					has_government = paternalism
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.8 }
+			}
+			else_if = {
+				limit = {
+					has_government = conservatism
+				}
+				set_variable = { RUS_urals_receptiveness^2 = 0.25 }
+			}
+		}
+		if = {
+			limit = {
+				original_tag = OMS
+			}
+			set_variable = { RUS_urals_receptiveness^2 = 0 }
+			OMS = {
+				set_country_flag = RUS_CANNOT_NEGOTIATE_MGN
+			}
+		}
+	}
+}
+
+# checks with of the ural 4 own which states
+RUS_urals_set_region_owners = {
+	# orenburg
+	if = {
+		limit = {
+			852 = { is_owned_by = ORE }
+			849 = { is_owned_by = ORE }
+			652 = { is_owned_by = ORE }
+		}
+		set_variable = { RUS_urals_orenburg_owner = 0 }
+		set_variable = { RUS_urals_orenburg_owner_tag = ORE }
+	}
+	else_if = {
+		limit = {
+			852 = { is_owned_by = URL }
+			849 = { is_owned_by = URL }
+			652 = { is_owned_by = URL }
+		}
+		set_variable = { RUS_urals_orenburg_owner = 1 }
+		set_variable = { RUS_urals_orenburg_owner_tag = URL }
+	}
+	else_if = {
+		limit = {
+			852 = { is_owned_by = MGN }
+			849 = { is_owned_by = MGN }
+			652 = { is_owned_by = MGN }
+		}
+		set_variable = { RUS_urals_orenburg_owner = 2 }
+		set_variable = { RUS_urals_orenburg_owner_tag = MGN }
+	}
+	else_if = {
+		limit = {
+			852 = { is_owned_by = DRL }
+			849 = { is_owned_by = DRL }
+			652 = { is_owned_by = DRL }
+		}
+		set_variable = { RUS_urals_orenburg_owner = 3 }
+		set_variable = { RUS_urals_orenburg_owner_tag = DRL }
+	}
+	else = {
+		set_variable = { RUS_urals_orenburg_owner = -1 }
+	}
+
+	# urals
+	if = {
+		limit = {
+			847 = { is_owned_by = ORE }
+			848 = { is_owned_by = ORE }
+		}
+		set_variable = { RUS_urals_ural_owner = 0 }
+		set_variable = { RUS_urals_ural_owner_tag = ORE }
+	}
+	else_if = {
+		limit = {
+			847 = { is_owned_by = URL }
+			848 = { is_owned_by = URL }
+		}
+		set_variable = { RUS_urals_ural_owner = 1 }
+		set_variable = { RUS_urals_ural_owner_tag = URL }
+	}
+	else_if = {
+		limit = {
+			847 = { is_owned_by = MGN }
+			848 = { is_owned_by = MGN }
+		}
+		set_variable = { RUS_urals_ural_owner = 2 }
+		set_variable = { RUS_urals_ural_owner_tag = MGN }
+	}
+	else_if = {
+		limit = {
+			847 = { is_owned_by = DRL }
+			848 = { is_owned_by = DRL }
+		}
+		set_variable = { RUS_urals_ural_owner = 3 }
+		set_variable = { RUS_urals_ural_owner_tag = DRL }
+	}
+	else = { set_variable = { RUS_urals_ural_owner = -1 } }
+
+
+	# magnitogorsk
+	if = {
+		limit = {
+			582 = { is_owned_by = ORE }
+		}
+		set_variable = { RUS_urals_magnitogorsk_owner = 0 }
+		set_variable = { RUS_urals_magnitogorsk_owner_tag = ORE }
+	}
+	else_if = {
+		limit = {
+			582 = { is_owned_by = URL }
+		}
+		set_variable = { RUS_urals_magnitogorsk_owner = 1 }
+		set_variable = { RUS_urals_magnitogorsk_owner_tag = URL }
+	}
+	else_if = {
+		limit = {
+			582 = { is_owned_by = MGN }
+		}
+		set_variable = { RUS_urals_magnitogorsk_owner = 2 }
+		set_variable = { RUS_urals_magnitogorsk_owner_tag = MGN }
+	}
+	else_if = {
+		limit = {
+			582 = { is_owned_by = DRL }
+		}
+		set_variable = { RUS_urals_magnitogorsk_owner = 3 }
+		set_variable = { RUS_urals_magnitogorsk_owner_tag = DRL }
+	}
+	else = { set_variable = { RUS_urals_magnitogorsk_owner = -1 } }
+
+
+	# orsk
+	if = {
+		limit = {
+			846 = { is_owned_by = ORE }
+		}
+		set_variable = { RUS_urals_orsk_owner = 0 }
+		set_variable = { RUS_urals_orsk_owner_tag = ORE }
+	}
+	else_if = {
+		limit = {
+			846 = { is_owned_by = URL }
+		}
+		set_variable = { RUS_urals_orsk_owner = 1 }
+		set_variable = { RUS_urals_orsk_owner_tag = URL }
+	}
+	else_if = {
+		limit = {
+			846 = { is_owned_by = MGN }
+		}
+		set_variable = { RUS_urals_orsk_owner = 2 }
+		set_variable = { RUS_urals_orsk_owner_tag = MGN }
+	}
+	else_if = {
+		limit = {
+			846 = { is_owned_by = DRL }
+		}
+		set_variable = { RUS_urals_orsk_owner = 3 }
+		set_variable = { RUS_urals_orsk_owner_tag = DRL }
+	}
+	else = { set_variable = { RUS_urals_orsk_owner = -1 } }
+
+	RUS_urals_dirty_variable = yes
+}
+
+
+################
+## TICK CALCS ##
+################
+
+# calcs influence tick
+RUS_urals_calc_tick = {
+	set_variable = { RUS_urals_base_tick = army_fielded_manpower_k } # army_fielded_manpower_k is calculated in calculate_fielded_manpower in TNO_economy_scripted_effects
+	divide_variable = { RUS_urals_base_tick = 250 }
+
+	for_each_loop = {
+		array = RUS_urals_influence_tick
+		if = {
+			limit = { check_variable = { RUS_urals_faction_exists^i > 0 } }
+
+			set_variable = { RUS_urals_influence_tick^i = RUS_urals_base_tick }
+			multiply_variable = { RUS_urals_influence_tick^i = RUS_urals_receptiveness^i }
+			add_to_variable = { RUS_urals_influence_tick^i = RUS_urals_investment_tick^i }
+			multiply_variable = { RUS_urals_influence_tick^i = RUS_discredit_multiplier^i }
+		}
+	}
+}
+
+# applies influence tick
+RUS_urals_apply_tick = {
+	for_each_loop = {
+		array = RUS_urals_influence_tick
+		if = {
+			limit = { check_variable = { RUS_urals_faction_exists^i > 0 } }
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = SRL_RACE_FOR_URALS
+						option = SRL_RACE_FOR_URALS_FAVOR_WSR
+					}
+					tag = WSR
+				}
+				set_variable = { RUS_urals_influence_tick^i = 100 }
+			}
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = SRL_RACE_FOR_URALS
+						option = SRL_RACE_FOR_URALS_FAVOR_WSB
+					}
+					tag = WSB
+				}
+				set_variable = { RUS_urals_influence_tick^i = 100 }
+			}
+			add_to_variable = { RUS_urals_influence^i = RUS_urals_influence_tick^i }
+			clamp_variable = { var = RUS_urals_influence^i max = 100 }
+		}
+	}
+	RUS_urals_dirty_variable = yes
+}
+
+########################
+## GUI BUTTON EFFECTS ##
+########################
+
+# used to get the TAG id of the selected faction
+RUS_get_tag_string = {
+	if = {
+		limit = { check_variable = { RUS_selected_ural_faction = 0 } }
+		set_variable = { RUS_selected_ural_faction_tag = ORE }
+	}
+	else_if = {
+		limit = { check_variable = { RUS_selected_ural_faction = 1 } }
+		set_variable = { RUS_selected_ural_faction_tag = URL }
+	}
+	else_if = {
+		limit = { check_variable = { RUS_selected_ural_faction = 2 } }
+		set_variable = { RUS_selected_ural_faction_tag = MGN }
+	}
+	else_if = {
+		limit = { check_variable = { RUS_selected_ural_faction = 3 } }
+		set_variable = { RUS_selected_ural_faction_tag = DRL }
+	}
+}
+
+# updates dirty var for both factions
+RUS_urals_dirty_variable = {
+	add_to_variable = { WSR.RUS_RFTU_dirty = 1 }
+	add_to_variable = { WSB.RUS_RFTU_dirty = 1 }
+}
+
+RUS_urals_improve_relations = {
+	subtract_from_variable = { RUS_urals_influence^RUS_selected_ural_faction = 50 }
+	add_to_variable = { RUS_urals_relations_level^RUS_selected_ural_faction = 1 }
+	custom_effect_tooltip = RUS_RFTU_increase_relations_tt
+	RUS_urals_dirty_variable = yes
+}
+
+RUS_urals_decrease_relations = {
+	if = {
+		limit = { tag = WSR }
+		subtract_from_variable = { WSB.RUS_urals_relations_level^RUS_selected_ural_faction = 1 }
+		subtract_from_variable = { RUS_urals_influence^RUS_selected_ural_faction = 50 }
+	}
+	else_if = {
+		limit = { tag = WSB }
+		subtract_from_variable = { WSR.RUS_urals_relations_level^RUS_selected_ural_faction = 1 }
+		subtract_from_variable = { RUS_urals_influence^RUS_selected_ural_faction = 50 }
+	}
+	RUS_urals_dirty_variable = yes
+}
+
+RUS_urals_discredit_rival = {
+	if = {
+		limit = { tag = WSR }
+		subtract_from_variable = { RUS_urals_influence^RUS_selected_ural_faction = 50 }
+		set_variable = { WSB.RUS_discredit_multiplier^RUS_selected_ural_faction = 0.5 }
+		WSB = { RUS_urals_calc_tick = yes }
+	}
+	else_if = {
+		limit = { tag = WSB }
+		subtract_from_variable = { RUS_urals_influence^RUS_selected_ural_faction = 50 }
+		set_variable = { WSR.RUS_discredit_multiplier^RUS_selected_ural_faction = 0.5 }
+		WSR = { RUS_urals_calc_tick = yes }
+	}
+	RUS_urals_dirty_variable = yes
+}
+
+RUS_add_to_sphere = {
+
+	set_variable = { RUS_urals_relations_level^RUS_selected_ural_faction = 5 }
+	subtract_from_variable = { RUS_urals_influence^RUS_selected_ural_faction = 100 }
+
+	if = {
+		limit = { tag = WSR }
+
+		if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 0 } }
+			ORE = { RUS_puppet_keep_ideology = yes }
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 1 } }
+			URL = { RUS_puppet_keep_ideology = yes }
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 2 } }
+			MGN = { RUS_puppet_keep_ideology = yes }
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 3 } }
+			DRL = { RUS_puppet_keep_ideology = yes }
+		}
+	}
+
+	else_if = {
+		limit = { tag = WSB }
+
+		if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 0 } }
+			ORE = { RUS_puppet_keep_ideology = yes }
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 1 } }
+			URL = { RUS_puppet_keep_ideology = yes }
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 2 } }
+			MGN = { RUS_puppet_keep_ideology = yes }
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 3 } }
+			DRL = { RUS_puppet_keep_ideology = yes }
+		}
+	}
+	RUS_urals_dirty_variable = yes
+}
+
+RUS_integrate_country = {
+	if = {
+		limit = { check_variable = { RUS_selected_ural_faction = 0 } }
+		set_country_flag = RUS_integration_started_ore
+		activate_decision = RUS_integrate_orenburg
+	}
+	else_if = {
+		limit = { check_variable = { RUS_selected_ural_faction = 1 } }
+		set_country_flag = RUS_integration_started_url
+		activate_decision = RUS_integrate_ural_league
+	}
+	else_if = {
+		limit = { check_variable = { RUS_selected_ural_faction = 2 } }
+		set_country_flag = RUS_integration_started_mgn
+		activate_decision = RUS_integrate_magnitogorsk
+	}
+	subtract_from_variable = { RUS_urals_influence^RUS_selected_ural_faction = 50 }
+}
+
+RUS_remove_from_sphere = {
+
+
+	subtract_from_variable = { RUS_urals_influence^RUS_selected_ural_faction = 100 }
+
+	if = { # remove from WSB sphere
+		limit = { tag = WSR }
+
+		set_variable = { WSB.RUS_urals_relations_level^RUS_selected_ural_faction = 4 }
+
+		if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 0 } }
+			set_autonomy = {
+				target = ORE
+				autonomy_state = autonomy_free
+			}
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 1 } }
+			set_autonomy = {
+				target = URL
+				autonomy_state = autonomy_free
+			}
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 2 } }
+			set_autonomy = {
+				target = MGN
+				autonomy_state = autonomy_free
+			}
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 3 } }
+			set_autonomy = {
+				target = DRL
+				autonomy_state = autonomy_free
+			}
+		}
+	}
+
+	else_if = { # remove from WSR sphere
+		limit = { tag = WSB }
+
+		set_variable = { WSR.RUS_urals_relations_level^RUS_selected_ural_faction = 4 }
+
+		if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 0 } }
+			set_autonomy = {
+				target = ORE
+				autonomy_state = autonomy_free
+			}
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 1 } }
+			set_autonomy = {
+				target = URL
+				autonomy_state = autonomy_free
+			}
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 2 } }
+			set_autonomy = {
+				target = MGN
+				autonomy_state = autonomy_free
+			}
+		}
+		else_if = {
+			limit = { check_variable = { RUS_selected_ural_faction = 3 } }
+			set_autonomy = {
+				target = DRL
+				autonomy_state = autonomy_free
+			}
+		}
+	}
+	RUS_urals_dirty_variable = yes
+}
+
+
+###########################
+## ADD INFLUENCE EFFECTS ##
+###########################
+
+# There are 4 so the AI doesn't have to keep checking the GUI. There might be a more efficient way to do this, but it works
+RUS_add_influence_tick_orenburg = {
+	add_to_variable = { RUS_urals_investment_tick^RUS_urals_orenburg_owner = temp_tick_change }
+	custom_effect_tooltip = RUS_RFTU_investment_tick_tt
+	RUS_urals_calc_tick = yes
+	RUS_urals_dirty_variable = yes
+}
+
+RUS_add_influence_tick_beloretsk = {
+	add_to_variable = { RUS_urals_investment_tick^RUS_urals_ural_owner = temp_tick_change }
+	custom_effect_tooltip = RUS_RFTU_investment_tick_tt
+	RUS_urals_calc_tick = yes
+	RUS_urals_dirty_variable = yes
+}
+
+RUS_add_influence_tick_magnitogorsk = {
+	add_to_variable = { RUS_urals_investment_tick^RUS_urals_magnitogorsk_owner = temp_tick_change }
+	custom_effect_tooltip = RUS_RFTU_investment_tick_tt
+	RUS_urals_calc_tick = yes
+	RUS_urals_dirty_variable = yes
+}
+
+RUS_add_influence_tick_orsk = {
+	add_to_variable = { RUS_urals_investment_tick^RUS_urals_orsk_owner = temp_tick_change }
+	custom_effect_tooltip = RUS_RFTU_investment_tick_tt
+	RUS_urals_calc_tick = yes
+	RUS_urals_dirty_variable = yes
+}
+
+##########
+## MISC ##
+##########
+
+RUS_puppet_keep_ideology = {
+	THIS = {
+		if = {
+			limit = {
+				has_government = communist
+			}
+			set_temp_variable = { rulinggamerparty = 1 }
+		}
+		if = {
+			limit = {
+				has_government = socialist
+			}
+			set_temp_variable = { rulinggamerparty = 2 }
+		}
+		if = {
+			limit = {
+				has_government = progressivism
+			}
+			set_temp_variable = { rulinggamerparty = 3 }
+		}
+		if = {
+			limit = {
+				has_government = liberalism
+			}
+			set_temp_variable = { rulinggamerparty = 4 }
+		}
+		if = {
+			limit = {
+				has_government = liberal_conservatism
+			}
+			set_temp_variable = { rulinggamerparty = 5 }
+		}
+		if = {
+			limit = {
+				has_government = conservatism
+			}
+			set_temp_variable = { rulinggamerparty = 6 }
+		}
+		if = {
+			limit = {
+				has_government = paternalism
+			}
+			set_temp_variable = { rulinggamerparty = 7 }
+		}
+		if = {
+			limit = {
+				has_government = despotism
+			}
+			set_temp_variable = { rulinggamerparty = 8 }
+		}
+		if = {
+			limit = {
+				has_government = fascism
+			}
+			set_temp_variable = { rulinggamerparty = 9 }
+		}
+		if = {
+			limit = {
+				has_government = national_socialism
+			}
+			set_temp_variable = { rulinggamerparty = 10 }
+		}
+		if = {
+			limit = {
+				has_government = ultranationalism
+			}
+			set_temp_variable = { rulinggamerparty = 11 }
+		}
+	}
+	ROOT = {
+		set_autonomy = {
+			target = PREV
+			autonomy_state = autonomy_italy_reliant
+		}
+	}
+	hidden_effect = {
+		THIS = {
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 1 }
+				}
+				set_politics = {
+					ruling_party = communist
+				}
+				add_popularity = {
+					ideology = communist
+					popularity = 0.5
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = -0.5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 2 }
+				}
+				set_politics = {
+					ruling_party = socialist
+				}
+				add_popularity = {
+					ideology = socialist
+					popularity = 0.35
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = -0.5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 3 }
+				}
+				set_politics = {
+					ruling_party = progressivism
+				}
+				add_popularity = {
+					ideology = progressivism
+					popularity = 0.35
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = -0.5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 4 }
+				}
+				set_politics = {
+					ruling_party = liberalism
+				}
+				add_popularity = {
+					ideology = liberalism
+					popularity = 0.35
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = -0.5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 5 }
+				}
+				set_politics = {
+					ruling_party = liberal_conservatism
+				}
+				add_popularity = {
+					ideology = liberal_conservatism
+					popularity = 0.35
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = -0.5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 6 }
+				}
+				set_politics = {
+					ruling_party = conservatism
+				}
+				add_popularity = {
+					ideology = conservatism
+					popularity = 0.35
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = -0.5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 7 }
+				}
+				set_politics = {
+					ruling_party = paternalism
+				}
+				add_popularity = {
+					ideology = paternalism
+					popularity = 0.35
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = -0.5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 8 }
+				}
+				set_politics = {
+					ruling_party = despotism
+				}
+				add_popularity = {
+					ideology = despotism
+					popularity = 0.35
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = -0.5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 9 }
+				}
+				set_politics = {
+					ruling_party = fascism
+				}
+				add_popularity = {
+					ideology = fascism
+					popularity = 0.35
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = -0.5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 10 }
+				}
+				set_politics = {
+					ruling_party = national_socialism
+				}
+				add_popularity = {
+					ideology = national_socialism
+					popularity = 0.35
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = -0.5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { rulinggamerparty = 11 }
+				}
+				set_politics = {
+					ruling_party = ultranationalism
+				}
+				add_popularity = {
+					ideology = ultranationalism
+					popularity = 0.35
+				}
+			}
+		}
+	}
+}

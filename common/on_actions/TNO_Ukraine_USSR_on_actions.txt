@@ -1,0 +1,310 @@
+
+#  .88888.                                               dP 
+# d8'   `88                                              88 
+# 88        .d8888b. 88d888b. .d8888b. 88d888b. .d8888b. 88 
+# 88   YP88 88ooood8 88'  `88 88ooood8 88'  `88 88'  `88 88 
+# Y8.   .88 88.  ... 88    88 88.  ... 88       88.  .88 88 
+#  `88888'  `88888P' dP    dP `88888P' dP       `88888P8 dP 
+# General Use On-Actions
+on_actions = {
+	#  .d888888  dP                     dP            
+	# d8'    88  88                     88            
+	# 88aaaaa88a 88 .d8888b. 88d888b. d8888P .d8888b. 
+	# 88     88  88 88ooood8 88'  `88   88   Y8ooooo. 
+	# 88     88  88 88.  ... 88         88         88 
+	# 88     88  dP `88888P' dP         dP   `88888P' 
+	# UKR - Nazi Ukraine Alert Pulse
+	on_weekly_UKR = {
+		effect = {
+			if = {
+				limit = { UKR = { has_country_flag = UKR_bb_enabled } }
+				UKR_bb_alerts_pulse = yes
+			}
+		}
+	}
+
+	# UKS - Tankie Ukraine Alert Pulse
+	on_weekly_UKS = {
+		effect = {
+			if = {
+				limit = { UKS = { has_country_flag = UKR_bb_enabled } }
+				UKR_bb_alerts_pulse = yes
+			}
+		}
+	}
+
+	# FUK - Free Ukraine Alert Pulse
+	on_weekly_FUK = {
+		effect = {
+			if = {
+				limit = { FUK = { has_country_flag = UKR_bb_enabled } }
+				UKR_bb_alerts_pulse = yes
+			}
+		}
+	}
+
+	# BOV - Nat Ukraine Alert Pulse
+	on_weekly_BOV = {
+		effect = {
+			if = {
+				limit = { BOV = { has_country_flag = UKR_bb_enabled } }
+				UKR_bb_alerts_pulse = yes
+			}
+		}
+	}
+}
+
+# dP     dP          .d88888b  .d88888b   888888ba  
+# 88     88          88.    "' 88.    "'  88    `8b 
+# 88     88          `Y88888b. `Y88888b. a88aaaa8P' 
+# 88     88 88888888       `8b       `8b  88   `8b. 
+# Y8.   .8P          d8'   .8P d8'   .8P  88     88 
+# `Y88888P'           Y88888P   Y88888P   dP     dP 
+# UKS - Tankie Ukraine on_actions
+on_actions = {
+	# Pavlichenko Event on_actions
+	on_state_control_changed = {
+		effect = {
+			if = {
+				limit = {
+					ROOT = { tag = UKS }
+					OR = {
+						FROM = { tag = UKR }
+						FROM = { tag = FUK }
+						FROM = { tag = BOV }
+						#FROM = { tag = CRI } ?
+					}
+				}
+
+				# if = {
+				# 	limit = { FROM.FROM = { state = 221 } } # Kharkiv / Charkow
+				# 	country_event = { id = UKR_u_ssr_pavlichenko.8 }
+				# }
+				if = {
+					limit = { FROM.FROM = { state = 226 } } #Dnipropetrovsk / Reichenaustadt
+					country_event = { id = UKR_u_ssr_pavlichenko.9 }
+				}
+				else_if = {
+					limit = { FROM.FROM = { state = 1428 } } # Kyiv
+					country_event = { id = UKR_u_ssr_pavlichenko.10 }
+				}
+			}
+		}
+	}
+	# Galician War - Peace Setup
+	on_state_control_changed = {
+		effect = {
+			if = { # U-SSR Galician War
+				limit = {
+					has_global_flag = UKS_POL_GalicianWar
+					ROOT = { tag = UKS }
+					FROM = { tag = POL }
+				}
+				if = {
+					limit = {
+						FROM = {
+							OR = {
+								# All Ukrainian/Part-Ukrainian states are controlled by UKS
+								all_owned_state = {
+									OR = {
+										NOT = {
+											check_variable = { nationality = 164 }
+											check_variable = { nationality = 380 }
+										}
+										is_controlled_by = ROOT
+									}
+								}
+								# Or if Poland is just generally losing
+								surrender_progress > 0.6
+							}
+						}
+					}
+					UKR_Victory_GalicianWar = yes
+					ROOT = { country_event = UKR_u_ssr_postcw.10 }
+				}
+			}
+			else_if = { # UPA Stetsko Galician War
+				limit = {
+					has_global_flag = BOV_POL_GalicianWar_Stetsko
+					ROOT = { tag = BOV }
+					FROM = { tag = POL }
+				}
+
+				if = { # Conquest of Lviv
+					limit = {
+						ROOT = { NOT = { has_country_flag = BOV_took_lviv } }
+						FROM = {
+							1391 = {
+								is_controlled_by = ROOT
+							}
+						}
+					} 
+					ROOT = { country_event = BOV_stetsko_peace.9 }
+				}
+
+				if = { # Victory triggers
+					limit = {
+						FROM = {
+							OR = {
+								# All Ukrainian/Part-Ukrainian states are controlled by BOV
+								all_owned_state = {
+									OR = {
+										NOT = {
+											check_variable = { nationality = 164 }
+											check_variable = { nationality = 380 }
+										}
+										is_controlled_by = ROOT
+									}
+								}
+								# Or if Poland is just generally losing
+								surrender_progress > 0.6
+							}
+						}
+					}
+					if = { # War is won within three weeks
+						limit = {
+							has_global_flag = {
+								flag = BOV_POL_GalicianWar_Stetsko
+								days < 21
+							}
+						}
+						ROOT = { country_event = BOV_stetsko_peace.10 }
+					}
+					else_if = { # War is won within three to six weeks
+						limit = {
+							has_global_flag = {
+								flag = BOV_POL_GalicianWar_Stetsko
+								days < 42
+							}
+						}
+
+						# Peacedeal contained here
+						ROOT = { country_event = BOV_stetsko_peace.13 }
+					}
+					UKR_Victory_GalicianWar = yes
+				}
+			}
+			else_if = { # UPA Klyachkivsky Galician War
+				limit = {
+					has_global_flag = BOV_POL_GalicianWar_Klyachkivsky
+					ROOT = { tag = BOV }
+					FROM = { tag = POL }
+				}
+
+				if = { # Conquest of Lviv
+					limit = {
+						ROOT = { NOT = { has_country_flag = BOV_took_lviv } }
+						FROM = {
+							1391 = {
+								is_controlled_by = ROOT
+							}
+						}
+					}
+					ROOT = { country_event = BOV_Klyachkivsky_buildup.13 }
+				}
+
+				if = { # Victory triggers
+					limit = {
+						FROM = {
+							OR = {
+								# All Ukrainian/Part-Ukrainian states are controlled by BOV
+								all_owned_state = {
+									OR = {
+										NOT = {
+											check_variable = { nationality = 164 }
+											check_variable = { nationality = 380 }
+										}
+										is_controlled_by = ROOT
+									}
+								}
+								# Or if Poland is just generally losing
+								surrender_progress > 0.6
+							}
+						}
+					}
+					UKR_Victory_GalicianWar = yes
+					ROOT = { country_event = BOV_Klyachkivsky_buildup.15 }
+				}
+			}
+			else_if = { # UPA Shukhevych Galician War
+				limit = {
+					has_global_flag = BOV_POL_GalicianWar_Shukhevych
+					ROOT = { tag = BOV }
+					FROM = { tag = POL }
+				}
+
+				if = { # Conquest of Lviv
+					limit = {
+						ROOT = { NOT = { has_country_flag = BOV_took_lviv } }
+						FROM = {
+							1391 = {
+								is_controlled_by = ROOT
+							}
+						}
+					} 
+					if = { # Conquest of Lviv before 2 weeks of war
+						limit = {
+							has_global_flag = {
+								flag = BOV_POL_GalicianWar_Shukhevych
+								days < 14
+							}
+						}
+						ROOT = { country_event = BOV_Shukhevych_buildup.18 }
+					}
+					else = { # Conquest of Lviv after 2 weeks of war
+						ROOT = { country_event = BOV_Shukhevych_buildup.19 }
+					}
+				}
+
+				if = { # Victory triggers
+					limit = {
+						FROM = {
+							OR = {
+								# All Ukrainian/Part-Ukrainian states are controlled by BOV
+								all_owned_state = {
+									OR = {
+										NOT = {
+											check_variable = { nationality = 164 }
+											check_variable = { nationality = 380 }
+										}
+										is_controlled_by = ROOT
+									}
+								}
+								# Or if Poland is just generally losing
+								surrender_progress > 0.6
+							}
+						}
+					}
+					if = { # War is won within three weeks
+						limit = {
+							has_global_flag = {
+								flag = BOV_POL_GalicianWar_Shukhevych
+								days < 21
+							}
+						}
+						ROOT = { country_event = BOV_Shukhevych_buildup.25 }
+					}
+					else_if = { # War is won within three to five weeks
+						limit = {
+							has_global_flag = {
+								flag = BOV_POL_GalicianWar_Shukhevych
+								days < 35
+							}
+						}
+						ROOT = { country_event = BOV_Shukhevych_buildup.27 }
+					}
+					else_if = { # War is won within five to eight weeks
+						limit = {
+							has_global_flag = {
+								flag = BOV_POL_GalicianWar_Shukhevych
+								days < 56
+							}
+						}
+						ROOT = { country_event = BOV_Shukhevych_buildup.29 }
+					}
+					UKR_Victory_GalicianWar = yes
+				}
+			}
+		}
+	}
+}

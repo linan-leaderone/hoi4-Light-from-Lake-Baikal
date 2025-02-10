@@ -1,0 +1,4891 @@
+#  ██████╗ ███████╗██████╗ ███╗   ███╗ █████╗ ███╗   ██╗██╗   ██╗ #
+# ██╔════╝ ██╔════╝██╔══██╗████╗ ████║██╔══██╗████╗  ██║╚██╗ ██╔╝ #
+# ██║  ███╗█████╗  ██████╔╝██╔████╔██║███████║██╔██╗ ██║ ╚████╔╝  #
+# ██║   ██║██╔══╝  ██╔══██╗██║╚██╔╝██║██╔══██║██║╚██╗██║  ╚██╔╝   #
+# ╚██████╔╝███████╗██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║   ██║    #
+#  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝    #
+#Espionage Decisions
+
+#Index; Search for these names using ctrl+f and you'll find the section they entitle.
+#	Germany Espionage Decisions
+#		Special Missions
+#			Generic Special Missions
+#			Speer Special Missions
+#			Bormann Special Missions
+#		Standard Missions
+#			Generic Standard Missions
+#			Speer Standard Missions
+#			Bormann Standard Missions
+#		Debug
+
+### REGION ARRAY INDEXES ###
+@NorthAmerica = 0
+@CentralAmerica = 1
+@SouthAmerica = 2
+@Europe = 3
+@Russia = 4
+@Africa = 5
+@MiddleEast = 6
+@EastAsia = 7
+@SouthEastAsia = 8
+@Oceania = 9
+
+###############################
+# Germany Espionage Decisions #
+###############################
+GER_Espionage_category = {
+	#### Special Missions ####
+	GER_Espionage_special_header = {
+		icon = GFX_decision_generic_political_action
+		available = { hidden_trigger = { always = no } }
+	}
+
+	### Generic Special Missions ###
+	GER_Espionage_deploy_entdecker_sats = {
+		icon = GFX_decision_GER_espionage
+		available = {
+			TNO_Espionage_Ent_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			# TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = { check_variable = { TNO_Espionage_Budget > 0.074 } }
+		custom_cost_text = GER_Espionage_deploy_entdecker_sats_cost
+
+		days_remove = 100
+		days_re_enable = 60
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = GER
+				is_capital = yes
+			}
+		}
+
+		modifier = {
+			research_speed_Factor = 0.05
+			intel_network_gain_factor = 0.25
+			intelligence_agency_defense = 2
+		}
+
+		remove_effect = {
+			subtract_from_variable = { TNO_Espionage_Bonus_Research = 5 }
+			# clr_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_deploy_entdecker_sats"
+			custom_effect_tooltip = SGR_RND_entdecker_bonus_tt
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.075 }
+				add_to_variable = { TNO_Espionage_Bonus_Research = 5 }
+			}
+			# set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_west_russia = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			WSR = {
+				exists = yes
+				has_country_flag = RUS_regional_stage
+				NOT = {
+					has_country_flag = RUS_superregional_stage
+					OR = {
+						AND = {
+							has_global_flag = german_civil_war_speervic
+							original_tag = VYT
+						}
+						AND = {
+							has_country_leader = {
+								character = SAM_Mikhail_Oktan
+								ruling_only = yes
+							}
+							GER = { has_country_flag = GER_Espionage_oktan_failure }
+						}
+					}
+				}
+			}
+		}
+		available = {
+			TNO_Espionage_Fleck_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.054 }
+		}
+
+		custom_cost_text = GER_Espionage_sabotage_west_russia_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = WSR
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = GER_Espionage_sabotage_mission_success_tt
+					set_country_flag = GER_Espionage_WSR_target
+					hidden_effect = {
+						country_event = GER_Espionage.3
+						WSR = { country_event = GER_Espionage.4 }
+					}
+					effect_tooltip = {
+						WSR = {
+							add_stability = -0.05
+							add_political_power = -150
+							TNO_worsen_army_professionalism_low = yes
+							set_temp_variable = { gdp_growth_temp = -0.01 }
+							econ_gdp_growth_change = yes
+						}
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						WSR = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_west_russia"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.055 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_west_siberia = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			WSB = {
+				exists = yes
+				has_country_flag = RUS_regional_stage
+				NOT = { has_country_flag = RUS_superregional_stage }
+			}
+		}
+		available = {
+			TNO_Espionage_Fleck_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.059 }
+		}
+
+		custom_cost_text = GER_Espionage_sabotage_west_siberia_cost
+
+		days_remove = 45
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = WSB
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = GER_Espionage_sabotage_mission_success_tt
+					set_country_flag = GER_Espionage_WSB_target
+					hidden_effect = {
+						country_event = GER_Espionage.3
+						WSB = { country_event = GER_Espionage.4 }
+					}
+					effect_tooltip = {
+						WSB = {
+							add_stability = -0.05
+							add_political_power = -150
+							TNO_worsen_army_professionalism_low = yes
+							set_temp_variable = { gdp_growth_temp = -0.01 }
+							econ_gdp_growth_change = yes
+						}
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						WSB = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_west_siberia"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.060 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_central_siberia = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			CSB = {
+				exists = yes
+				has_country_flag = RUS_regional_stage
+				NOT = { has_country_flag = RUS_superregional_stage }
+			}
+		}
+		available = {
+			TNO_Espionage_Fleck_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.064 }
+		}
+
+		custom_cost_text = GER_Espionage_sabotage_central_siberia_cost
+
+		days_remove = 60
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = CSB
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = GER_Espionage_sabotage_mission_success_tt
+					set_country_flag = GER_Espionage_CSB_target
+					hidden_effect = {
+						country_event = GER_Espionage.3
+						CSB = { country_event = GER_Espionage.4 }
+					}
+					effect_tooltip = {
+						CSB = {
+							add_stability = -0.05
+							add_political_power = -150
+							TNO_worsen_army_professionalism_low = yes
+							set_temp_variable = { gdp_growth_temp = -0.01 }
+							econ_gdp_growth_change = yes
+						}
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						CSB = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_central_siberia"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.065 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_far_east = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			FST = {
+				exists = yes
+				has_country_flag = RUS_regional_stage
+				NOT = { has_country_flag = RUS_superregional_stage }
+			}
+		}
+		available = {
+			TNO_Espionage_Fleck_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.069 }
+		}
+
+		custom_cost_text = GER_Espionage_sabotage_far_east_cost
+
+		days_remove = 70
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = FST
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = GER_Espionage_sabotage_mission_success_tt
+					set_country_flag = GER_Espionage_FST_target
+					hidden_effect = {
+						country_event = GER_Espionage.3
+						FST = { country_event = GER_Espionage.4 }
+					}
+					effect_tooltip = {
+						FST = {
+							add_stability = -0.05
+							add_political_power = -150
+							TNO_worsen_army_professionalism_low = yes
+							set_temp_variable = { gdp_growth_temp = -0.01 }
+							econ_gdp_growth_change = yes
+						}
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						FST = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_far_east"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.070 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_RWS_unification_talks = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			WSR = {
+				has_country_flag = WSR_peace_decisions
+				has_country_flag = RUS_regional_stage
+				NOT = {
+					has_country_flag = RUS_fucked_up_horribly_war_time
+					has_country_flag = RUS_superregional_stage
+					has_war_with = WSB
+				}
+			}
+			WSB = {
+				has_country_flag = WSB_peace_decisions
+				has_country_flag = RUS_regional_stage
+				NOT = {
+					has_country_flag = RUS_fucked_up_horribly_war_time
+					has_country_flag = RUS_superregional_stage
+					has_war_with = WSR
+				}
+			}
+		}
+		available = {
+			TNO_Espionage_Sonder_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 25
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				OR = {
+					is_owned_and_controlled_by = WSR
+					is_owned_and_controlled_by = WSB
+				}
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = GER_Espionage_sabotage_mission_success_tt
+					hidden_effect = {
+						country_event = GER_Espionage.7
+						WSR = { country_event = GER_Espionage.8 }
+						WSB = { country_event = GER_Espionage.8 }
+					}
+					add_to_variable = { global.RWSUnificationTension = 10 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						WSR = { country_event = GER_Espionage.2 }
+						WSB = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_RWS_unification_talks"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_SIB_unification_talks = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			CSB = {
+				has_country_flag = WSR_peace_decisions
+				has_country_flag = RUS_regional_stage
+				NOT = {
+					has_country_flag = RUS_fucked_up_horribly_war_time
+					has_country_flag = RUS_superregional_stage
+					has_war_with = FST
+				}
+			}
+			FST = {
+				has_country_flag = WSB_peace_decisions
+				has_country_flag = RUS_regional_stage
+				NOT = {
+					has_country_flag = RUS_fucked_up_horribly_war_time
+					has_country_flag = RUS_superregional_stage
+					has_war_with = CSB
+				}
+			}
+		}
+		available = {
+			TNO_Espionage_Sonder_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 25
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				OR = {
+					is_owned_and_controlled_by = CSB
+					is_owned_and_controlled_by = FST
+				}
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = GER_Espionage_sabotage_mission_success_tt
+					hidden_effect = {
+						country_event = GER_Espionage.7
+						CSB = { country_event = GER_Espionage.8 }
+						FST = { country_event = GER_Espionage.8 }
+					}
+					add_to_variable = { global.SIBUnificationTension = 10 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						CSB = { country_event = GER_Espionage.2 }
+						FST = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_SIB_unification_talks"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_RUS_unification_talks = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			RWS = {
+				has_country_flag = RWS_peace_decisions
+				has_country_flag = RUS_superregional_stage
+				NOT = {
+					has_country_flag = RUS_fucked_up_horribly_war_time
+					has_war_with = SIB
+				}
+			}
+			SIB = {
+				has_country_flag = SIB_peace_decisions
+				has_country_flag = RUS_superregional_stage
+				NOT = {
+					has_country_flag = RUS_fucked_up_horribly_war_time
+					has_war_with = RWS
+				}
+			}
+		}
+		available = {
+			TNO_Espionage_Sonder_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 25
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				OR = {
+					is_owned_and_controlled_by = RWS
+					is_owned_and_controlled_by = SIB
+				}
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = GER_Espionage_sabotage_mission_success_tt
+					hidden_effect = {
+						country_event = GER_Espionage.7
+						RWS = { country_event = GER_Espionage.8 }
+						SIB = { country_event = GER_Espionage.8 }
+					}
+					add_to_variable = { global.RUSUnificationTension = 10 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						RWS = { country_event = GER_Espionage.2 }
+						SIB = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_RUS_unification_talks"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_contact_oktan = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			SAM = {
+				exists = yes
+				has_country_flag = RUS_regional_stage
+				has_country_leader = {
+					character = SAM_Mikhail_Oktan
+					ruling_only = yes
+				}
+			}
+		}
+		available = {
+			TNO_Espionage_Sonder_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 9 }
+			check_variable = { TNO_Espionage_Budget > 0.029 }
+		}
+
+		custom_cost_text = GER_Espionage_contact_oktan_cost
+
+		days_remove = 14
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = SAM
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.5
+						SAM = { country_event = GER_Espionage.6 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						SAM = { country_event = GER_Espionage.2 }
+					}
+					set_country_flag = GER_Espionage_oktan_failure
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_contact_oktan"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.030 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 10 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_aid_oktan = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = GER_Espionage_oktan_aid_unlock
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+			SAM = {
+				exists = yes
+				has_country_flag = RUS_regional_stage
+				has_country_leader = {
+					character = SAM_Mikhail_Oktan
+					ruling_only = yes
+				}
+			}
+			NOT = { has_global_flag = RUS_national_unification }
+		}
+		available = {
+			has_equipment = { infantry_equipment > 1999 }
+			has_equipment = { support_equipment > 749 }
+			has_equipment = { anti_tank_equipment > 349 }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 4 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = GER_Espionage_aid_oktan_cost
+
+		days_remove = 10
+		days_re_enable = 90
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = SAM
+				is_capital = yes
+			}
+		}
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			send_equipment = {
+				equipment = infantry_equipment
+				amount = 2000
+				target = SAM
+			}
+			send_equipment = {
+				equipment = support_equipment
+				amount = 750
+				target = SAM
+			}
+			send_equipment = {
+				equipment = anti_tank_equipment
+				amount = 350
+				target = SAM
+			}
+			add_to_variable = { TNO_Espionage_Agents = 1 }
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_aid_oktan"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 5 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_aid_onega = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			ONG = {
+				exists = yes
+				has_war_with = WSR
+			}
+		}
+		available = {
+			has_equipment = { infantry_equipment > 1999 }
+			has_equipment = { support_equipment > 749 }
+			has_equipment = { anti_tank_equipment > 349 }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 4 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = GER_Espionage_aid_oktan_cost
+
+		days_remove = 10
+		days_re_enable = 90
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = ONG
+				is_capital = yes
+			}
+		}
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			send_equipment = {
+				equipment = infantry_equipment
+				amount = 2000
+				target = ONG
+			}
+			send_equipment = {
+				equipment = support_equipment
+				amount = 750
+				target = ONG
+			}
+			send_equipment = {
+				equipment = anti_tank_equipment
+				amount = 350
+				target = ONG
+			}
+			add_to_variable = { TNO_Espionage_Agents = 1 }
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_aid_onega"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 5 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_aid_batovs_insurgency = { # DEPRECATED, OMSK USES RNG FOR AI'S SUCCESSFUL/UNSUCCESSFUL INSURGENCY
+		icon = GFX_decision_GER_espionage #Note from Auskom, above is unideal implementation, make this effect the RNG later
+		visible = {
+			#OR = {
+			#	TNO_Espionage_Viewing_Russia = yes
+			#	is_ai = yes
+			#}
+			#OMS = {
+			#	exists = yes
+			#	has_country_flag = OMS_batov_insurgency_flag
+			#}
+			#NOT = { has_global_flag = OMS_BatovInsurrectionSuccess }
+
+			always = no
+		}
+		available = {
+			TNO_Espionage_Sonder_Researched = yes
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_mission_success_70_tt
+				set_temp_variable = { RegionID = @Russia }
+				check_variable = { TNO_Espionage_MissionSuccess^RegionID > 69 }
+			}
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 29 }
+			check_variable = { TNO_Espionage_Budget > 0.059 }
+		}
+
+		custom_cost_text = GER_Espionage_aid_batovs_insurgency_cost
+
+		days_remove = 40
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = OMS
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.10
+						OMS = { country_event = GER_Espionage.11 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						OMS = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_aid_batovs_insurgency"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.060 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 30 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_fuck_men = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			OMO = {
+				exists = yes
+				has_country_flag = OMO_sudoplatovs_temptations
+				NOT = { has_country_flag = RUS_superregional_stage }
+			}
+			NOT = { has_global_flag = TNO_RUS_far_east_collapse }
+			NOT = { has_country_flag = GER_Espionage_disable_teufel }
+		}
+		available = {
+			TNO_Espionage_Sonder_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 45
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = OMO
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.12
+						OMO = { country_event = GER_Espionage.13 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						OMO = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_fuck_men"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_help_yockey = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_NorthAmerica = yes
+				is_ai = yes
+			}
+			if = {
+				limit = { has_global_flag = german_civil_war_bormannvic }
+				OR = {
+					has_country_flag = BOR_HVA_usa_unlock
+					has_country_flag = BOR_HVA_decisions_debug
+				}
+			}
+		}
+		available = {
+			if = {
+				limit = { has_global_flag = german_civil_war_speervic }
+				custom_trigger_tooltip = {
+					tooltip = SGR_RND_USA_leaning_tt
+					check_variable = {
+						var = SGR_Alignment
+						value = 0
+						compare = less_than_or_equals
+					}
+				}
+			}
+			NOT = { USA = { has_war = yes } }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 9 }
+			check_variable = { TNO_Espionage_Budget > 0.069 }
+		}
+
+		custom_cost_text = GER_Espionage_help_yockey_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = USA
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @NorthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.14
+						USA = { country_event = GER_Espionage.15 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						USA = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_help_yockey"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.070 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 10 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_discredit_l_npp = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_NorthAmerica = yes
+				is_ai = yes
+			}
+			if = {
+				limit = { has_global_flag = german_civil_war_bormannvic }
+				OR = {
+					has_country_flag = BOR_HVA_usa_unlock
+					has_country_flag = BOR_HVA_decisions_debug
+				}
+			}
+		}
+		available = {
+			if = {
+				limit = { has_global_flag = german_civil_war_speervic }
+				custom_trigger_tooltip = {
+					tooltip = SGR_RND_USA_leaning_tt
+					check_variable = {
+						var = SGR_Alignment
+						value = 0
+						compare = less_than_or_equals
+					}
+				}
+			}
+			NOT = { USA = { has_war = yes } }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 24 }
+			check_variable = { TNO_Espionage_Budget > 0.039 }
+		}
+
+		custom_cost_text = GER_Espionage_discredit_l_npp_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = USA
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @NorthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.16
+						USA = { country_event = GER_Espionage.17 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						USA = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_discredit_l_npp"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.040 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 25 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_disrupt_ofn_unity_canada = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_NorthAmerica = yes
+				is_ai = yes
+			}
+			if = {
+				limit = { has_global_flag = german_civil_war_bormannvic }
+				OR = {
+					has_country_flag = BOR_HVA_ofn_unlock
+					has_country_flag = BOR_HVA_decisions_debug
+				}
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 40
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = CAN
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @NorthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.18
+						USA = { country_event = GER_Espionage.19 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						USA = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_disrupt_ofn_unity_canada"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_disrupt_ofn_unity_australia = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Oceania = yes
+				is_ai = yes
+			}
+			if = {
+				limit = { has_global_flag = german_civil_war_bormannvic }
+				OR = {
+					has_country_flag = BOR_HVA_ofn_unlock
+					has_country_flag = BOR_HVA_decisions_debug
+				}
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 40
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = AST
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Oceania }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.20
+						USA = { country_event = GER_Espionage.21 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						USA = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_disrupt_ofn_unity_australia"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+	
+	GER_Espionage_assassinate_maurice_1 = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Africa = yes
+				is_ai = yes
+			}
+			has_global_flag = MAD_Maurice_Decisions
+			NOT = { has_global_flag = MAD_Maurice_Stage_2 }
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 14
+		fire_only_once = yes
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			add_to_variable = { TNO_Espionage_Agents = 1 }
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Africa }
+			custom_effect_tooltip = USA_Maurice_To_Death_tt
+			
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					
+					if = {
+						limit = {
+							NOT = { has_global_flag = MAD_Maurice_Stage_1_Locked }
+						}
+						hidden_effect = {
+							USA = { country_event = { id = MAD_Maurice.4 days = 14 } }
+							GER = { country_event = { id = MAD_Maurice.4 days = 14 } }
+						}
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					
+					if = {
+						limit = {
+							NOT = { has_global_flag = MAD_Maurice_Stage_1_Locked }
+						}
+						hidden_effect = {
+							USA = { country_event = { id = MAD_Maurice.41 days = 14 } }
+							GER = { country_event = { id = MAD_Maurice.41 days = 14 } }
+						}
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_assassinate_maurice_1"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+			set_global_flag = MAD_Maurice_Stage_1_Locked
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+	
+	GER_Espionage_assassinate_maurice_2 = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_CentralAmerica = yes
+				is_ai = yes
+			}
+			has_global_flag = MAD_Maurice_Decisions
+			has_global_flag = MAD_Maurice_Stage_2
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 14
+		fire_only_once = yes
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			add_to_variable = { TNO_Espionage_Agents = 1 }
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @CentralAmerica }
+			custom_effect_tooltip = USA_Maurice_To_Death_tt
+			
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					
+					if = {
+						limit = {
+							NOT = { has_global_flag = MAD_Maurice_Stage_2_Locked }
+						}
+						hidden_effect = {
+							USA = { country_event = { id = MAD_Maurice.5 days = 14 } }
+							GER = { country_event = { id = MAD_Maurice.5 days = 14 } }
+						}
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					
+					if = {
+						limit = {
+							NOT = { has_global_flag = MAD_Maurice_Stage_2_Locked }
+						}
+						hidden_effect = {
+							USA = { country_event = { id = MAD_Maurice.51 days = 14 } }
+							GER = { country_event = { id = MAD_Maurice.51 days = 14 } }
+							
+							JAP = { country_event = { id = MAD_Maurice.6 days = 70 } }
+						}
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_assassinate_maurice_2"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+			set_global_flag = MAD_Maurice_Stage_2_Locked
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_mandate_congo = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Africa = yes
+				is_ai = yes
+			}
+			COG = {
+				is_in_faction_with = USA
+				has_country_flag = OFN_MANDATE_not_decolonized
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = COG
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Africa }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.22
+						COG = { country_event = GER_Espionage.23 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						COG = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_mandate_congo"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_mandate_angola = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Africa = yes
+				is_ai = yes
+			}
+			ANG = {
+				is_in_faction_with = USA
+				has_country_flag = OFN_MANDATE_not_decolonized
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = ANG
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Africa }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.22
+						ANG = { country_event = GER_Espionage.23 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						ANG = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_mandate_angola"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_mandate_east = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Africa = yes
+				is_ai = yes
+			}
+			OR = {
+				MZB = {
+					is_in_faction_with = USA
+					has_country_flag = OFN_MANDATE_not_decolonized
+				}
+				USC = {
+					is_in_faction_with = USA
+					has_country_flag = OFN_MANDATE_not_decolonized
+				}
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				OR = {
+					is_owned_and_controlled_by = MZB
+					is_owned_and_controlled_by = USC
+				}
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Africa }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.22
+						MZB = { country_event = GER_Espionage.23 }
+						USC = { country_event = GER_Espionage.23 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						MZB = { country_event = GER_Espionage.2 }
+						USC = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_mandate_east"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_aid_the_aas = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Europe = yes
+				is_ai = yes
+			}
+			NOT = { has_global_flag = Iberian_Wars }
+			IBR = { has_country_flag = IBR_Terrorism_GUI }
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = IBR
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			country_event = GER_Espionage.26
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_aid_the_aas"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_push_iberia_to_authdem_council = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Europe = yes
+				is_ai = yes
+			}
+			NOT = { has_global_flag = Iberian_Wars }
+			IBR = {
+				OR = {
+					has_country_flag = legislature_council
+					has_country_flag = advisory_council
+				}
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = IBR
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Europe }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.27
+						IBR = { country_event = GER_Espionage.28 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						IBR = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_push_iberia_to_authdem_council"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_help_blue_division = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Europe = yes
+				is_ai = yes
+			}
+			SPS = {
+				exists = yes
+				has_war = yes
+			}
+			FSR = { exists = no }
+			FZL = { exists = no }
+			has_global_flag = Iberian_Anarchy_flag
+		}
+		available = {
+			if = {
+				limit = { has_global_flag = german_civil_war_speervic }
+				custom_trigger_tooltip = {
+					tooltip = SGR_RND_USA_leaning_tt
+					check_variable = { SGR_Alignment < 0.1 }
+				}
+			}
+			has_equipment = { infantry_equipment > 599 }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = SPS
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Europe }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.24
+						SPS = { country_event = GER_Espionage.25 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						SPS = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_help_blue_division"
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = -600
+				producer = GER
+			}
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_aid_spanish_fascists = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Europe = yes
+				is_ai = yes
+			}
+			OR = {
+				SPS = {
+					exists = yes
+					has_war = yes
+				}
+				FZL = {
+					exists = yes
+					has_war = yes
+				}
+			}
+			has_global_flag = Iberian_Anarchy_flag
+		}
+		available = {
+			if = {
+				limit = { has_global_flag = german_civil_war_speervic }
+				custom_trigger_tooltip = {
+					tooltip = SGR_RND_USA_leaning_tt
+					check_variable = { SGR_Alignment < 0.1 }
+				}
+			}
+			has_equipment = { infantry_equipment > 1999 }
+			has_equipment = { support_equipment > 749 }
+			has_equipment = { anti_tank_equipment > 349 }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 4 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = GER_Espionage_aid_oktan_cost
+
+		days_remove = 10
+		days_re_enable = 90
+
+		highlight_states = {
+			highlight_states_trigger = {
+				OR = {
+					is_owned_and_controlled_by = SPS
+					is_owned_and_controlled_by = FZL
+				}
+				is_capital = yes
+			}
+		}
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			if = {
+				limit = { country_exists = FZL }
+				send_equipment = {
+					equipment = infantry_equipment
+					amount = 2000
+					target = FZL
+				}
+				send_equipment = {
+					equipment = support_equipment
+					amount = 750
+					target = FZL
+				}
+				send_equipment = {
+					equipment = anti_tank_equipment
+					amount = 350
+					target = FZL
+				}
+			}
+			else = {
+				send_equipment = {
+					equipment = infantry_equipment
+					amount = 2000
+					target = SPS
+				}
+				send_equipment = {
+					equipment = support_equipment
+					amount = 750
+					target = SPS
+				}
+				send_equipment = {
+					equipment = anti_tank_equipment
+					amount = 350
+					target = SPS
+				}
+			}
+			add_to_variable = { TNO_Espionage_Agents = 1 }
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_aid_spanish_fascists"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 5 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_mess_with_battle_for_italy = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Europe = yes
+				is_ai = yes
+			}
+			ITA = {
+				is_in_faction = no
+				has_country_flag = bfi_active
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 45
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = ITA
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Europe }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = GER_Espionage.29
+						ITA = { country_event = GER_Espionage.30 }
+						USA = { country_event = GER_Espionage.30 }
+						JAP = { country_event = GER_Espionage.30 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						ITA = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_mess_with_battle_for_italy"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_launch_NOR_coup = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Europe = yes
+				is_ai = yes
+			}
+			has_global_flag = german_civil_war_bormannvic # make this available to more contenders in the future
+			has_country_flag = BOR_NOR_preparing_coup
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			OR = {
+				has_completed_focus = BOR_its_time_for_plan_b
+				has_completed_focus = BOR_final_preparations
+			}
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 3
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = NOR
+				is_capital = yes
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_launch_NOR_coup"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			clr_country_flag = BOR_NOR_preparing_coup
+			set_temp_variable = { RegionID = @Europe }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = GER_Espionage_coup_mission_success_tt
+					hidden_effect = { NOR = { set_country_flag = NORCoup_successful } }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = { NOR = { set_country_flag = NORCoup_failure } }
+				}
+			}
+			hidden_effect = { NOR = { country_event = bormann.1053 } }
+		}
+		ai_will_do = {
+			factor = 200
+		}
+	}
+
+	### Speer Special Missions ###
+
+	## Speer South America Operations
+	SGR_RND_establish_brazilian_bases = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			always = no
+		}
+		available = {
+			NOT = { BRA = { has_war = yes } }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 24 }
+			check_variable = { TNO_Espionage_Budget > 0.039 }
+		}
+
+		custom_cost_text = GER_Espionage_discredit_l_npp_cost
+
+		days_remove = 40
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = BRA
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			hidden_effect = {
+				country_event = RND.19
+				BRA = { country_event = RND.20 }
+			}
+			custom_effect_tooltip = SGR_RND_brazil_bases
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_establish_brazilian_bases"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.040 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 25 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	# Paraguay #
+
+	SGR_RND_assist_paraguay_bush_war_gov = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				hidden_trigger = {
+					has_country_flag = RND_unlock_paraguay_ops_1
+					PAR = {
+						NOT = {
+							has_country_leader = {
+								character = PAR_Federico_Chaves
+								ruling_only = yes
+							}
+						}
+					}
+				}
+				has_country_flag = GER_RND_PAR_dbg
+			}
+			OR = {
+				TNO_Espionage_Viewing_SouthAmerica = yes
+				is_ai = yes
+			}
+		}
+		available = {
+			NOT = { PAR = { has_war = yes } }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 24 }
+			check_variable = { TNO_Espionage_Budget > 0.039 }
+		}
+
+		custom_cost_text = GER_Espionage_discredit_l_npp_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = PAR
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @SouthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = RND.42
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_establish_brazilian_bases"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.040 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 25 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_assist_paraguay_bush_war_fdg = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				hidden_trigger = {
+					has_country_flag = RND_unlock_paraguay_ops_1
+					PAR = {
+						if = { # Democráticos
+							limit = {
+								has_country_leader = {
+									character = PAR_Federico_Chaves
+									ruling_only = yes
+								}
+							}
+						}
+					}
+				}
+				has_country_flag = GER_RND_PAR_dbg
+			}
+			OR = {
+				TNO_Espionage_Viewing_SouthAmerica = yes
+				is_ai = yes
+			}
+		}
+		available = {
+			NOT = { PAR = { has_war = yes } }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 24 }
+			check_variable = { TNO_Espionage_Budget > 0.039 }
+		}
+
+		custom_cost_text = GER_Espionage_discredit_l_npp_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = PAR
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @SouthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = RND.43
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_establish_brazilian_bases"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.040 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 25 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_find_che = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			AND = {
+				PAR = { exists = yes } 
+				OR = {
+					has_country_flag = GER_find_che
+					has_country_flag = GER_RND_PAR_dbg
+				}
+			}
+			OR = {
+				TNO_Espionage_Viewing_SouthAmerica = yes
+				is_ai = yes
+			}
+		}
+		available = {
+			NOT = { PAR = { has_war = yes } }
+			has_country_flag = GER_find_che
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 24 }
+			check_variable = { TNO_Espionage_Budget > 0.039 }
+		}
+
+		custom_cost_text = GER_Espionage_discredit_l_npp_cost
+
+		days_remove = 15
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = PAR
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @SouthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = RND.49
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_establish_brazilian_bases"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.040 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 25 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_assist_paraguay_beat_back_pcp = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				hidden_trigger = {
+					has_country_flag = RND_unlock_paraguay_ops_2
+					PAR = {
+						if = { # Che in power
+							limit = {
+								has_country_leader = {
+									character = PAR_Che_Guevara
+									ruling_only = yes
+								}
+							}
+						}
+					}
+				}
+				has_country_flag = GER_RND_PAR_dbg
+			}
+			OR = {
+				TNO_Espionage_Viewing_SouthAmerica = yes
+				is_ai = yes
+			}
+		}
+		available = {
+			NOT = { PAR = { has_war = yes } }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 24 }
+			check_variable = { TNO_Espionage_Budget > 0.039 }
+		}
+
+		custom_cost_text = GER_Espionage_discredit_l_npp_cost
+
+		days_remove = 15
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = PAR
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @SouthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = RND.46
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_establish_brazilian_bases"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.040 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 25 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_assist_paraguay_help_foreign_intervention = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				hidden_trigger = {
+					has_country_flag = RND_unlock_paraguay_ops_3
+					PAR = {
+						if = { # Soler in power
+							limit = {
+								has_country_leader = {
+									character = PAR_Miguel_Angel_Soler
+									ruling_only = yes
+								}
+							}
+						}
+					}
+				}
+				has_country_flag = GER_RND_PAR_dbg
+			}
+			OR = {
+				TNO_Espionage_Viewing_SouthAmerica = yes
+				is_ai = yes
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 24 }
+			check_variable = { TNO_Espionage_Budget > 0.039 }
+		}
+
+		custom_cost_text = GER_Espionage_discredit_l_npp_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = PAR
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @SouthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = RND.52
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_establish_brazilian_bases"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.040 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 25 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	### Speer Central Asia Operations ###
+	SGR_RND_funnel_korsimat_men = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			always = no
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 14
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = UTL
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					country_event = {
+						id = CA_RND_UVH.101
+					}
+					add_to_variable = { global.UTL_preparedness = 1 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						country_event = {
+							id = CA_RND_UVH.101
+						}
+						add_to_variable = { CA_Conference_tension_extra = 5 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_infiltrate_thailand"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_infiltrate_uzbekistan = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			always = no
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 14
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = UZB
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					UZB = {
+						add_war_support = -0.1
+						add_timed_idea = {
+							idea = Generic_war_exhaustion
+							days = 360
+						}
+					}
+					add_to_variable = { global.UTL_preparedness = 1 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						add_to_variable = { CA_Conference_tension_extra = 5 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_infiltrate_thailand"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+	SGR_RND_korsimat_prepare_the_sniper = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			always = no
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 14
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = UTL
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					UZB = {
+						add_manpower = 1
+					}
+					UTL = {
+						set_country_flag = TNO_UTL_Sniper_Set
+					}
+					add_to_variable = { global.UTL_preparedness = 1 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						add_to_variable = { CA_Conference_tension_extra = 5 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_infiltrate_thailand"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+	SGR_RND_assassinate_korsimat = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			always = no
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 14
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = UTL
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = {
+							id = CA_RND_UVH.201
+						}
+					}
+					add_to_variable = { global.UTL_preparedness = 1 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						hidden_effect = {
+							country_event = {
+								id = CA_RND_UVH.202
+							}
+						}
+						add_to_variable = { CA_Conference_tension_extra = 5 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_infiltrate_thailand"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_infiltrate_thailand = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+			OR = {
+				TNO_Espionage_Viewing_SouthEastAsia = yes
+				is_ai = yes
+			}
+		}
+		available = {
+			NOT = { THA = { has_war = yes } }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 40
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = THA
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @SouthEastAsia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = { country_event = RND.7 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						THA = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_infiltrate_thailand"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_infiltrate_mitsubishi = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+			OR = {
+				TNO_Espionage_Viewing_EastAsia = yes
+				is_ai = yes
+			}
+			has_country_flag = SGR_RND_Thailand_foothold
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_thailand_foothold_tt
+				has_country_flag = SGR_RND_Thailand_foothold
+			}
+			TNO_Espionage_Cipher_Researched = yes
+			NOT = { JAP = { has_war = yes } }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 25
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = JAP
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @EastAsia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = { country_event = RND.8 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						JAP = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_infiltrate_mitsubishi"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_survey_us_propaganda = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+			OR = {
+				TNO_Espionage_Viewing_NorthAmerica = yes
+				is_ai = yes
+			}
+		}
+		available = {
+			NOT = { USA = { has_war = yes } }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 35
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = USA
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @NorthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = { country_event = RND.9 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						USA = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_survey_us_propaganda"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_infiltrate_us_banking = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+			OR = {
+				TNO_Espionage_Viewing_NorthAmerica = yes
+				is_ai = yes
+			}
+			has_country_flag = SGR_RND_USA_foothold
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_usa_foothold_tt
+				has_country_flag = SGR_RND_USA_foothold
+			}
+			TNO_Espionage_Cipher_Researched = yes
+			NOT = { USA = { has_war = yes } }
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 40
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = USA
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @NorthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = { country_event = RND.10 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						USA = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_infiltrate_us_banking"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_aiding_vyatka = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			country_exists = VYT
+		}
+		available = {
+			TNO_Espionage_Sonder_Researched = yes
+			country_exists = VYT
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 40
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = VYT
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = RND.11
+						VYT = { country_event = RND.12 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						VYT = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_aiding_vyatka"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_unternehmen_rotbart_russia = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			OR = {
+				OMS = { has_country_flag = RUS_superregional_stage }
+				PRM = {
+					has_country_flag = RUS_superregional_stage
+					has_government = ultranationalism
+				}
+				WRS = {
+					has_country_flag = RUS_superregional_stage
+					has_country_leader = {
+						character = WRS_Mikhail_Tukhachevsky
+						ruling_only = yes
+					}
+				}
+				KOM = {
+					has_country_flag = RUS_superregional_stage
+					OR = {
+						has_country_leader = {
+							character = KOM_Ivan_Serov
+							ruling_only = yes
+						}
+						has_country_leader = {
+							character = KOM_Lev_Gumilyov
+							ruling_only = yes
+						}
+						has_country_leader = {
+							character = KOM_Sergey_Taboritsky
+							ruling_only = yes
+						}
+					}
+				}
+			}
+		}
+		available = {
+			TNO_Espionage_Sonder_Researched = yes
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_dangerous_russia_tt
+				OR = {
+					OMS = { has_country_flag = RUS_superregional_stage }
+					PRM = {
+						has_country_flag = RUS_superregional_stage
+						has_government = ultranationalism
+					}
+					WRS = {
+						has_country_flag = RUS_superregional_stage
+						has_country_leader = {
+							character = WRS_Mikhail_Tukhachevsky
+							ruling_only = yes
+						}
+					}
+					KOM = {
+						has_country_flag = RUS_superregional_stage
+						OR = {
+							has_country_leader = {
+								character = KOM_Ivan_Serov
+								ruling_only = yes
+							}
+							has_country_leader = {
+								character = KOM_Lev_Gumilyov
+								ruling_only = yes
+							}
+							has_country_leader = {
+								character = KOM_Sergey_Taboritsky
+								ruling_only = yes
+							}
+						}
+					}
+				}
+			}
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 40
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				OR = {
+					AND = {
+						is_owned_and_controlled_by = OMS
+						is_capital = yes
+					}
+					AND = {
+						is_owned_and_controlled_by = PRM
+						is_capital = yes
+					}
+					AND = {
+						is_owned_and_controlled_by = WRS
+						is_capital = yes
+					}
+					AND = {
+						is_owned_and_controlled_by = KOM
+						is_capital = yes
+					}
+				}
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						if = { # Russian Superregionals
+							limit = { country_exists = OMS }
+							country_event = RND.13
+						}
+						else_if = {
+							limit = { country_exists = PRM }
+							country_event = RND.15
+						}
+						else_if = {
+							limit = {
+								WRS = {
+									has_country_leader = {
+										character = WRS_Mikhail_Tukhachevsky
+										ruling_only = yes
+									}
+								}
+							}
+							country_event = RND.30
+						}
+						else_if = {
+							limit = {
+								KOM = {
+									has_country_leader = {
+										character = KOM_Ivan_Serov
+										ruling_only = yes
+									}
+								}
+							}
+							country_event = RND.31
+						}
+						else_if = {
+							limit = {
+								KOM = {
+									has_country_leader = {
+										character = KOM_Lev_Gumilyov
+										ruling_only = yes
+									}
+								}
+							}
+							country_event = RND.32
+						}
+						else_if = {
+							limit = {
+								KOM = {
+									has_country_leader = {
+										character = KOM_Sergey_Taboritsky
+										ruling_only = yes
+									}
+								}
+							}
+							country_event = RND.33
+						}
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						if = {
+							limit = { country_exists = OMS }
+							OMS = { country_event = GER_Espionage.2 }
+						}
+						else_if = {
+							limit = { country_exists = PRM }
+							PRM = { country_event = GER_Espionage.2 }
+						}
+						else_if = {
+							limit = { country_exists = WRS }
+							WRS = { country_event = GER_Espionage.2 }
+						}
+						else_if = {
+							limit = { country_exists = KOM }
+							KOM = { country_event = GER_Espionage.2 }
+						}
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_unternehmen_rotbart_russia"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_unternehmen_rotbart_siberia = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			AMR = { has_country_flag = RUS_superregional_stage }
+		}
+		available = {
+			TNO_Espionage_Sonder_Researched = yes
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_dangerous_russia_tt
+				AMR = { has_country_flag = RUS_superregional_stage }
+			}
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 40
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = AMR
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						if = { # Siberian Superregionals
+							limit = { country_exists = AMR }
+							country_event = RND.14
+						}
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						if = {
+							limit = { country_exists = AMR }
+							AMR = { country_event = GER_Espionage.2 }
+						}
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_unternehmen_rotbart_siberia"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SGR_RND_infiltrating_burgundy = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+			OR = {
+				TNO_Espionage_Viewing_Europe = yes
+				is_ai = yes
+			}
+			BRG = {
+				exists = yes
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_mission_success_75_tt
+				set_temp_variable = { RegionID = @Europe }
+				check_variable = { TNO_Espionage_MissionSuccess^RegionID > 74 }
+			}
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 29 }
+			check_variable = { TNO_Espionage_Budget > 0.074 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrating_burgundy_cost
+
+		days_remove = 75
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = BRG
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Europe }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = { country_event = RND.16 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						BRG = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_infiltrating_burgundy"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.075 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 30 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			}
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	### Bormann Special Missions ###
+	GER_BOR_HVA_infiltrate_burgundy = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Europe = yes
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_HVA_gave_gehlen_permission
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_mission_success_75_tt
+				set_temp_variable = { RegionID = @Europe }
+				check_variable = { TNO_Espionage_MissionSuccess^RegionID > 74 }
+			}
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 29 }
+			check_variable = { TNO_Espionage_Budget > 0.074 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrating_burgundy_cost
+
+		days_remove = 60
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = BRG
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			clr_country_flag = BOR_HVA_gave_gehlen_permission
+			set_temp_variable = { RegionID = @Europe }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = { country_event = HVA.1 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = { country_event = HVA.2 }
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_BOR_HVA_infiltrate_burgundy"
+			subtract_from_variable = { TNO_Espionage_Budget = 0.075 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 30 }
+			subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+	GER_BOR_HVA_assassinate_korsimat = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			OR = {
+				AND = {
+					OR = {
+						has_country_flag = TNO_CA_BORMANN_WORKING_WITH_BAYMIRZA
+						has_country_flag = TNO_CA_BORMANN_WORKING_WITH_VEYUUM
+					}
+					NOT = {
+						has_country_flag = TNO_CA_BORMANN_KORSIMAT_DEAD
+					}
+				}
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 14
+		fire_only_once = no
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = UTL
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = {
+							id = CA_Bormann.5
+						}
+						add_to_variable = { global.UTL_preparedness = 1 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						UTL = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_BOR_HVA_give_weapons_to_sphere_rebels"
+			subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+			subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_BOR_HVA_assassinate_baymirza = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			OR = {
+				AND = {
+					OR = {
+						has_country_flag = TNO_CA_BORMANN_WORKING_WITH_BAYMIRZA
+						has_country_flag = TNO_CA_BORMANN_WORKING_WITH_VEYUUM
+					}
+					NOT = {
+						has_country_flag = TNO_CA_BORMANN_BAYMIRZA_DEAD
+					}
+				}
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 14
+		fire_only_once = no
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = UTL
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = {
+							id = CA_Bormann.6
+						}
+						add_to_variable = { global.UTL_preparedness = 1 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						UTL = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_BOR_HVA_give_weapons_to_sphere_rebels"
+			subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+			subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_BOR_HVA_assassinate_veyuum = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Russia = yes
+				is_ai = yes
+			}
+			OR = {
+				AND = {
+					OR = {
+						has_country_flag = TNO_CA_BORMANN_WORKING_WITH_BAYMIRZA
+						has_country_flag = TNO_CA_BORMANN_WORKING_WITH_KORSIMAT
+					}
+					NOT = {
+						has_country_flag = TNO_CA_BORMANN_VEYUUM_DEAD
+					}
+				}
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 14
+		fire_only_once = no
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = UTL
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Russia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = {
+							id = CA_Bormann.7
+						}
+						add_to_variable = { global.UTL_preparedness = 1 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						UTL = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_BOR_HVA_give_weapons_to_sphere_rebels"
+			subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+			subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	#KISSU
+	GER_BOR_HVA_give_weapons_to_sphere_rebels = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_SouthEastAsia = yes
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_HVA_Sphere_underhanded_deals
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+		}
+		available = {
+			has_equipment = { infantry_equipment > 999 }
+			TNO_Espionage_Cipher_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = JAP
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			clr_country_flag = BOR_HVA_Sphere_underhanded_deals
+			set_temp_variable = { RegionID = @SouthEastAsia }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = HVA.4
+						JAP = { country_event = HVA.5 }
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						JAP = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_BOR_HVA_give_weapons_to_sphere_rebels"
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = -1000
+				producer = GER
+			}
+			subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+			subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_BOR_HVA_make_contact_with_china = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_EastAsia = yes
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_HVA_Sphere_china_mission
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+		}
+		available = {
+			TNO_Espionage_Sonder_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.019 }
+		}
+
+		custom_cost_text = GER_BOR_HVA_make_contact_with_china_cost
+
+		days_remove = 15
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = CHI
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			clr_country_flag = BOR_HVA_Sphere_china_mission
+			effect_tooltip = {
+				set_temp_variable = { RegionID = @EastAsia }
+				random_list = {
+					TNO_Espionage_MissionSuccess^RegionID = {
+						custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+						hidden_effect = {
+							country_event = HVA.3
+							CHI = { country_event = HVA.3 }
+						}
+					}
+					TNO_Espionage_MissionFailure^RegionID = {
+						custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+						hidden_effect = {
+							country_event = GER_Espionage.1
+							JAP = { country_event = GER_Espionage.2 }
+						}
+					}
+				}
+			}
+			hidden_effect = {
+				country_event = HVA.3
+				CHI = { country_event = HVA.3 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_BOR_HVA_make_contact_with_china"
+			subtract_from_variable = { TNO_Espionage_Budget = 0.020 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+			subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_BOR_HVA_iranian_counterinsurgency = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_MiddleEast = yes
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_HVA_Iran_mission
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+			NOT = { has_global_flag = Iranian_Civil_War }
+		}
+		available = {
+			TNO_Espionage_Nah_Researched = yes
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 24 }
+			check_variable = { TNO_Espionage_Budget > 0.059 }
+			has_army_experience > 9.99
+		}
+
+		custom_cost_text = GER_BOR_HVA_iranian_counterinsurgency_cost
+
+		days_remove = 30
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = PER
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			clr_country_flag = BOR_HVA_Iran_mission
+			country_event = HVA.7
+			hidden_effect = { PER = { country_event = HVA.7 } }
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_BOR_HVA_iranian_counterinsurgency"
+			hidden_effect = { army_experience = -10 }
+			subtract_from_variable = { TNO_Espionage_Budget = 0.060 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 25 }
+			subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_BOR_HVA_saudi_sabotage = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_MiddleEast = yes
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_HVA_saudi_sabotage_mission
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.059 }
+		}
+
+		custom_cost_text = GER_Espionage_sabotage_west_siberia_cost
+
+		days_remove = 25
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = SAU
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			clr_country_flag = BOR_HVA_saudi_sabotage_mission
+			set_temp_variable = { RegionID = @MiddleEast }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						country_event = HVA.8
+						every_other_country = {
+							limit = {
+								OR = {
+									tag = SAU
+									AND = {
+										tag = GUL
+										has_government = despotism
+									}
+									has_war_with = EGB
+									has_war_with = BIR
+									has_war_with = NYM
+									has_war_with = OMB
+								}
+							}
+							country_event = bormann.1209
+						}
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						every_other_country = {
+							limit = {
+								OR = {
+									tag = SAU
+									AND = {
+										tag = GUL
+										has_government = despotism
+									}
+									has_war_with = EGB
+									has_war_with = BIR
+									has_war_with = NYM
+									has_war_with = OMB
+								}
+							}
+							country_event = GER_Espionage.2
+						}
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_BOR_HVA_saudi_sabotage"
+			subtract_from_variable = { TNO_Espionage_Budget = 0.060 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+			subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_BOR_HVA_assassinate_speer = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_NorthAmerica = yes
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_HVA_speer_assassination_mission_quiet
+				has_country_flag = BOR_HVA_speer_assassination_mission_brutal
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 14
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = USA
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @NorthAmerica }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = {
+						if = {
+							limit = { has_country_flag = BOR_HVA_speer_assassination_mission_quiet }
+							clr_country_flag = BOR_HVA_speer_assassination_mission_quiet
+							country_event = HVA.9
+						}
+						else_if = {
+							limit = { has_country_flag = BOR_HVA_speer_assassination_mission_brutal }
+							clr_country_flag = BOR_HVA_speer_assassination_mission_brutal
+							country_event = HVA.10
+						}
+					}
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						USA = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_BOR_HVA_assassinate_speer"
+			subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+			subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_BOR_HVA_assassinate_erhard_kiesinger = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			OR = {
+				TNO_Espionage_Viewing_Europe = yes
+				is_ai = yes
+			}
+			OR = {
+				has_country_flag = BOR_HVA_go4_assassination_mission
+				has_country_flag = BOR_HVA_decisions_debug
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			TNO_Espionage_NoSpecialMission = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.049 }
+		}
+
+		custom_cost_text = SGR_RND_infiltrate_thailand_cost
+
+		days_remove = 24
+		fire_only_once = yes
+
+		highlight_states = {
+			highlight_states_trigger = {
+				is_owned_and_controlled_by = SWI
+				is_capital = yes
+			}
+		}
+
+		fixed_random_seed = no
+
+		remove_effect = {
+			clr_country_flag = BOR_HVA_go4_assassination_mission
+			clr_country_flag = TNO_Espionage_DoingSpecialMission
+			set_temp_variable = { RegionID = @Europe }
+			random_list = {
+				TNO_Espionage_MissionSuccess^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionSuccess_tt
+					hidden_effect = { country_event = HVA.11 }
+				}
+				TNO_Espionage_MissionFailure^RegionID = {
+					custom_effect_tooltip = TNO_Espionage_MissionFailure_tt
+					hidden_effect = {
+						country_event = GER_Espionage.1
+						SWI = { country_event = GER_Espionage.2 }
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_BOR_HVA_assassinate_erhard_kiesinger"
+			subtract_from_variable = { TNO_Espionage_Budget = 0.050 }
+			subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+			subtract_from_variable = { TNO_Espionage_Agents = 1 }
+			set_country_flag = TNO_Espionage_DoingSpecialMission
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	#### Standard Missions ####
+	GER_Espionage_standard_header = {
+		icon = GFX_decision_generic_political_action
+		available = { hidden_trigger = { always = no } }
+	}
+
+	### Generic Standard Missions ###
+	GER_Espionage_bug_enemies = {
+		icon = GFX_decision_GER_espionage
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_20_expertise_tt
+				check_variable = { TNO_Espionage_Expertise > 19 }
+				check_variable = { TNO_Espionage_Budget > 0.009 }
+			}
+			TNO_Espionage_Bugs_Researched = yes
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.009 }
+		}
+
+		custom_cost_text = GER_Espionage_bug_enemies_cost
+
+		days_remove = 28
+		days_re_enable = 90
+
+		modifier = { stability_weekly = 0.02 }
+
+		remove_effect = {
+			hidden_effect = {
+				add_to_variable = { TNO_Espionage_Agents = 1 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_bug_enemies"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+				subtract_from_variable = { TNO_Espionage_Budget = 0.010 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	GER_Espionage_sabotage_enemy = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_war = yes
+		}
+
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_25_expertise_tt
+				check_variable = { TNO_Espionage_Expertise > 24 }
+				check_variable = { TNO_Espionage_Budget > 0.019 }
+			}
+			TNO_Espionage_Sonder_Researched = yes
+			GER = { has_war = yes }
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 24 }
+			check_variable = { TNO_Espionage_Budget > 0.019 }
+		}
+
+		custom_cost_text = GER_Espionage_sabotage_enemy_cost
+
+		days_remove = 14
+		days_re_enable = 160
+
+		remove_effect = {
+			every_other_country = {
+				limit = { has_war_with = GER }
+				add_timed_idea = {
+					idea = GER_Espionage_spynetworks
+					days = 120
+				}
+			}
+			hidden_effect = {
+				add_to_variable = { TNO_Espionage_Agents = 1 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_sabotage_enemy"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Expertise = 25 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+				subtract_from_variable = { TNO_Espionage_Budget = 0.020 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 50
+		}
+	}
+
+	### Speer Standard Missions ###
+	SGR_RND_bribe_enemies = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+			NOT = {
+				has_country_flag = SGR_state_reich_disable
+			}
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_3_expertise_tt
+				check_variable = { TNO_Espionage_Expertise > 2 }
+				check_variable = { TNO_Espionage_Budget > 0.002 }
+			}
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 2 }
+			check_variable = { TNO_Espionage_Budget > 0.002 }
+		}
+
+		custom_cost_text = SGR_RND_bribe_enemies_cost
+
+		days_remove = 7
+		days_re_enable = 21
+
+		remove_effect = {
+			add_regime_stab_small = yes
+			hidden_effect = {
+				add_to_variable = { TNO_Espionage_Agents = 1 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_bribe_enemies"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Expertise = 3 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+				subtract_from_variable = { TNO_Espionage_Budget = 0.003 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				check_variable = { SGRRegimeStability < 0.3 }
+				factor = 300
+			}
+		}
+	}
+
+	SGR_RND_fake_news = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_5_expertise_tt
+				check_variable = { TNO_Espionage_Expertise > 4 }
+				check_variable = { TNO_Espionage_Budget > 0.004 }
+			}
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 4 }
+			check_variable = { TNO_Espionage_Budget > 0.004 }
+		}
+
+		custom_cost_text = SGR_RND_fake_news_cost
+
+		days_remove = 28
+		days_re_enable = 90
+
+
+		remove_effect = {
+			add_regime_stab_med = yes
+			hidden_effect = {
+				add_to_variable = { TNO_Espionage_Agents = 1 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_fake_news"
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Expertise = 5 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+				subtract_from_variable = { TNO_Espionage_Budget = 0.005 }
+			}
+		}
+
+		modifier = {
+			stability_weekly = 0.005
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				check_variable = { SGRRegimeStability < 0.3 }
+				factor = 300
+			}
+		}
+	}
+
+	SGR_RND_disappear_reactionaries = {
+		icon = GFX_decision_GER_espionage
+		visible = {
+			has_global_flag = german_civil_war_speervic
+		}
+		available = {
+			TNO_Espionage_AgentsAvailable = yes
+			custom_trigger_tooltip = {
+				tooltip = SGR_RND_20_expertise_tt
+				check_variable = { TNO_Espionage_Expertise > 19 }
+				check_variable = { TNO_Espionage_Budget > 0.009 }
+			}
+			TNO_Espionage_Radio_Researched = yes
+			national_socialism > 0.1
+		}
+
+		custom_cost_trigger = {
+			check_variable = { TNO_Espionage_Expertise > 19 }
+			check_variable = { TNO_Espionage_Budget > 0.009 }
+			national_socialism > 0.1
+		}
+
+		custom_cost_text = SGR_RND_disappear_reactionaries_cost
+
+		days_remove = 21
+		days_re_enable = 84
+
+		remove_effect = {
+			add_popularity = { ideology = national_socialism_2 popularity = -0.025 }
+			add_political_power = 50
+			add_stability = 0.025
+			hidden_effect = {
+				add_to_variable = { TNO_Espionage_Agents = 1 }
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SGR_RND_disappear_reactionaries"
+			decrease_regime_stab_small = yes
+			hidden_effect = {
+				subtract_from_variable = { TNO_Espionage_Expertise = 20 }
+				subtract_from_variable = { TNO_Espionage_Agents = 1 }
+				subtract_from_variable = { TNO_Espionage_Budget = 0.010 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 5
+		}
+	}
+
+	### Bormann Standard Missions ###
+
+
+	#### Debug ####
+	GER_Espionage_show_debug = {
+		icon = GFX_decision_generic_political_action
+		visible = {
+			NOT = { has_country_flag = GER_Espionage_debug_show }
+			is_ai = no
+			is_debug = yes
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_show_debug"
+			set_country_flag = GER_Espionage_debug_show
+		}
+	}
+	GER_Espionage_hide_debug = {
+		icon = GFX_decision_generic_political_action
+		visible = {
+			has_country_flag = GER_Espionage_debug_show
+			is_ai = no
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_hide_debug"
+			clr_country_flag = GER_Espionage_debug_show
+		}
+	}
+
+	GER_Espionage_debug_unite_russian_regionals = {
+		icon = GFX_decision_generic_political_action
+		visible = { has_country_flag = GER_Espionage_debug_show }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_debug_unite_russian_regionals"
+			random_get_regionals = yes
+		}
+	}
+
+	GER_Espionage_debug_unite_russian_superregionals = {
+		icon = GFX_decision_generic_political_action
+		visible = { has_country_flag = GER_Espionage_debug_show }
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_debug_unite_russian_superregionals"
+			random_get_superreg = yes
+		}
+	}
+
+	GER_Espionage_debug_oktan_unite = {
+		icon = GFX_decision_generic_political_action
+		visible = {
+			has_country_flag = GER_Espionage_debug_show
+			WSR = {
+				has_country_flag = RUS_regional_stage
+				NOT = {
+					has_country_leader = {
+						character = SAM_Mikhail_Oktan
+						ruling_only = yes
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_debug_oktan_unite"
+			SAM = {
+				annex_country = { target = WSR transfer_troops = yes }
+				promote_character = {
+					character = SAM_Mikhail_Oktan
+					ideology = national_socialism_subtype
+				}
+				clr_country_flag = SAM_Zykov
+				clr_country_flag = SAM_Bunyachenko
+				set_country_flag = SAM_Oktan
+				set_politics = { ruling_party = national_socialism }
+				clr_country_flag = RUS_regional_stage
+				unite_west_russia = yes
+			}
+		}
+	}
+
+	GER_Espionage_debug_father_unite = {
+		icon = GFX_decision_generic_political_action
+		visible = {
+			has_country_flag = GER_Espionage_debug_show
+			FST = {
+				has_country_flag = RUS_regional_stage
+				NOT = {
+					has_country_leader = {
+						character = OMO_Alexander_Men
+						ruling_only = yes
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision GER_Espionage_debug_father_unite"
+			OMO = {
+				annex_country = { target = FST transfer_troops = yes }
+				set_politics = { ruling_party = despotism }
+				clr_country_flag = RUS_regional_stage
+				unite_far_east = yes
+				set_country_flag = OMO_sudoplatovs_temptations
+			}
+		}
+	}
+}

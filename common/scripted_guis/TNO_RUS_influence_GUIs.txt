@@ -1,0 +1,403 @@
+scripted_gui = {
+	TNO_race_for_the_urals_gui = {
+		context_type = decision_category
+		window_name = "TNO_race_for_the_urals_gui"
+		dirty = RUS_RFTU_dirty
+
+		visible = {
+			always = yes
+		}
+
+		triggers = {
+			RUS_RFTU_improve_relations_click_enabled = {
+				check_variable = { RUS_urals_influence^RUS_selected_ural_faction > 49.999 }
+				check_variable = { RUS_urals_relations_level^RUS_selected_ural_faction < 4 }
+			}
+			RUS_RFTU_decrease_relations_click_enabled = {
+				check_variable = { RUS_urals_influence^RUS_selected_ural_faction > 49.999 }
+				if = {
+					limit = { tag = WSR }
+					check_variable = { WSB.RUS_urals_relations_level^RUS_selected_ural_faction > 1 }
+					check_variable = { WSB.RUS_urals_relations_level^RUS_selected_ural_faction < 5 }
+				}
+				else_if = {
+					limit = { tag = WSB }
+					check_variable = { WSR.RUS_urals_relations_level^RUS_selected_ural_faction > 1 }
+					check_variable = { WSR.RUS_urals_relations_level^RUS_selected_ural_faction < 5 }
+				}
+			}
+			RUS_RFTU_discredit_click_enabled = {
+				if = {
+					limit = { tag = WSR }
+					check_variable = { WSB.RUS_urals_influence_tick^RUS_selected_ural_faction > 0 }
+				}
+				else_if = {
+					limit = { tag = WSB }
+					check_variable = { WSR.RUS_urals_influence_tick^RUS_selected_ural_faction > 0 }
+				}
+				check_variable = { RUS_urals_influence^RUS_selected_ural_faction > 49.999 }
+			}
+			RUS_RFTU_invade_click_enabled = {
+				NOT = {
+					check_variable = { RUS_urals_relations_level^RUS_selected_ural_faction = 5 }
+					has_country_flag = RUS_RFTU_preparing_invasion
+				}
+			}
+
+			RUS_RFTU_sphere_visible = {
+				if = {
+					limit = { tag = WSR }
+					NOT = {
+						check_variable = { WSB.RUS_urals_relations_level^RUS_selected_ural_faction = 5 }
+					}
+
+				}
+				else_if = {
+					limit = { tag = WSB }
+					NOT = {
+						check_variable = { WSR.RUS_urals_relations_level^RUS_selected_ural_faction = 5 }
+					}
+				}
+				NOT = {
+					check_variable = { RUS_urals_relations_level^RUS_selected_ural_faction = 5 }
+				}
+			}
+
+			RUS_RFTU_sphere_click_enabled = {
+				check_variable = { RUS_urals_influence^RUS_selected_ural_faction = 100 }
+				check_variable = { RUS_urals_relations_level^RUS_selected_ural_faction = 4 }
+				if = {
+					limit = { check_variable = { RUS_selected_ural_faction = 0 } }
+					NOT = { has_war_with = ORE }
+				}
+				else_if = {
+					limit = { check_variable = { RUS_selected_ural_faction = 1 } }
+					NOT = { has_war_with = URL }
+				}
+				else_if = {
+					limit = { check_variable = { RUS_selected_ural_faction = 2 } }
+					NOT = { has_war_with = MGN }
+				}
+			}
+
+			RUS_RFTU_integrate_visible = {
+				check_variable = { RUS_urals_relations_level^RUS_selected_ural_faction = 5 }
+			}
+
+			RUS_RFTU_integrate_click_enabled = {
+				check_variable = { RUS_urals_influence^RUS_selected_ural_faction > 49.999 }
+				if = {
+					limit = { check_variable = { RUS_selected_ural_faction = 0 } }
+					NOT = {
+						has_war_with = ORE
+						has_country_flag = RUS_integration_started_ore
+					}
+				}
+				else_if = {
+					limit = { check_variable = { RUS_selected_ural_faction = 1 } }
+					NOT = {
+						has_war_with = URL
+						has_country_flag = RUS_integration_started_url
+					}
+				}
+				else_if = {
+					limit = { check_variable = { RUS_selected_ural_faction = 2 } }
+					NOT = {
+						has_war_with = MGN
+						has_country_flag = RUS_integration_started_mgn
+					}
+				}
+			}
+
+			RUS_RFTU_remove_from_sphere_visible = {
+				if = {
+					limit = { tag = WSR }
+					check_variable = { WSB.RUS_urals_relations_level^RUS_selected_ural_faction = 5 }
+
+				}
+				else_if = {
+					limit = { tag = WSB }
+					check_variable = { WSR.RUS_urals_relations_level^RUS_selected_ural_faction = 5 }
+				}
+			}
+
+			RUS_RFTU_remove_from_sphere_click_enabled = {
+				check_variable = { RUS_urals_influence^RUS_selected_ural_faction = 100 }
+				check_variable = { RUS_urals_relations_level^RUS_selected_ural_faction = 4 }
+			}
+
+			RUS_ural_influence_region_orenburg_visible = {
+				NOT = { check_variable = { RUS_urals_orenburg_owner = -1 } }
+			}
+
+			RUS_ural_influence_region_ural_league_visible = {
+				NOT = { check_variable = { RUS_urals_ural_owner = -1 } }
+			}
+
+			RUS_ural_influence_region_magnitogorsk_visible = {
+				NOT = { check_variable = { RUS_urals_magnitogorsk_owner = -1 } }
+			}
+
+			RUS_ural_influence_region_orsk_visible = {
+				NOT = { check_variable = { RUS_urals_orsk_owner = -1 } }
+			}
+
+		}
+
+		effects = {
+			RUS_ural_influence_region_orenburg_click = {
+				set_variable = { RUS_selected_ural_faction = RUS_urals_orenburg_owner }
+				RUS_get_tag_string = yes
+				set_variable = { RUS_selected_ural_region = 1 }
+				RUS_urals_dirty_variable = yes
+			}
+			RUS_ural_influence_region_ural_league_click = {
+				set_variable = { RUS_selected_ural_faction = RUS_urals_ural_owner }
+				RUS_get_tag_string = yes
+				set_variable = { RUS_selected_ural_region = 2 }
+				RUS_urals_dirty_variable = yes
+			}
+			RUS_ural_influence_region_magnitogorsk_click = {
+				set_variable = { RUS_selected_ural_faction = RUS_urals_magnitogorsk_owner }
+				RUS_get_tag_string = yes
+				set_variable = { RUS_selected_ural_region = 3 }
+				RUS_urals_dirty_variable = yes
+			}
+			RUS_ural_influence_region_orsk_click = {
+				set_variable = { RUS_selected_ural_faction = RUS_urals_orsk_owner }
+				RUS_get_tag_string = yes
+				set_variable = { RUS_selected_ural_region = 4 }
+				RUS_urals_dirty_variable = yes
+			}
+
+
+			RUS_RFTU_improve_relations_click = {
+				RUS_urals_improve_relations = yes
+				RUS_urals_dirty_variable = yes
+			}
+			RUS_RFTU_decrease_relations_click = {
+				RUS_urals_decrease_relations = yes
+				RUS_urals_dirty_variable = yes
+			}
+			RUS_RFTU_discredit_click = {
+				RUS_urals_discredit_rival = yes
+				RUS_urals_dirty_variable = yes
+				if = {
+					limit = { check_variable = { RUS_selected_ural_faction = 0 } }
+					country_event = { id = RUS_race_for_the_urals.102 days = 60 }
+				}
+				else_if = {
+					limit = { check_variable = { RUS_selected_ural_faction = 1 } }
+					country_event = { id = RUS_race_for_the_urals.103 days = 60 }
+				}
+				else_if = {
+					limit = { check_variable = { RUS_selected_ural_faction = 2 } }
+					country_event = { id = RUS_race_for_the_urals.104 days = 60 }
+				}
+			}
+			RUS_RFTU_sphere_click = {
+				RUS_add_to_sphere = yes
+				RUS_urals_dirty_variable = yes
+			}
+			RUS_RFTU_remove_from_sphere_click = {
+				RUS_remove_from_sphere = yes
+				RUS_urals_dirty_variable = yes
+			}
+			RUS_RFTU_invade_click = {
+				set_country_flag = RUS_RFTU_preparing_invasion
+				RUS_urals_dirty_variable = yes
+				activate_mission = RUS_RFTU_war_mission
+			}
+			RUS_RFTU_integrate_click = {
+				RUS_integrate_country = yes
+				RUS_urals_dirty_variable = yes
+			}
+
+		}
+
+		properties = {
+			RUS_ural_influence_region_magnitogorsk = {
+				frame = RUS_urals_relations_level^RUS_urals_magnitogorsk_owner
+			}
+			RUS_ural_influence_region_orenburg = {
+				frame = RUS_urals_relations_level^RUS_urals_orenburg_owner
+			}
+			RUS_ural_influence_region_orsk = {
+				frame = RUS_urals_relations_level^RUS_urals_orsk_owner
+			}
+			RUS_ural_influence_region_ural_league = {
+				frame = RUS_urals_relations_level^RUS_urals_ural_owner
+			}
+		}
+
+		ai_enabled = {
+			is_race_for_the_urals_player = yes
+		}
+
+		ai_test_interval = 168
+
+		ai_check = {
+			has_country_flag = BEGUN_SOUTHERN_URALS_CRISIS
+			NOT = {
+				has_global_flag = RUS_SOUTHERN_URALS_CRISIS_OVER
+			}
+		}
+
+		ai_weights = {
+			RUS_ural_influence_region_orenburg_click = {
+				ai_will_do = {
+					factor = 0
+					modifier = {
+						check_variable = { RUS_urals_influence^0 > 50 }
+						add = 100
+					}
+				}
+			}
+			RUS_ural_influence_region_ural_league_click = {
+				ai_will_do = {
+					factor = 0
+					modifier = {
+						check_variable = { RUS_urals_influence^1 > 50 }
+						add = 100
+					}
+				}
+			}
+			RUS_ural_influence_region_magnitogorsk_click = {
+				ai_will_do = {
+					factor = 0
+					modifier = {
+						check_variable = { RUS_urals_influence^3 > 50 }
+						add = 100
+					}
+				}
+			}
+			RUS_ural_influence_region_orsk_click = {
+				ai_will_do = {
+					factor = 0
+					modifier = {
+						check_variable = { RUS_urals_influence^4 > 50 }
+						add = 100
+					}
+				}
+			}
+
+			RUS_RFTU_improve_relations_click = {
+				ai_will_do = {
+					factor = 500
+				}
+			}
+			RUS_RFTU_decrease_relations_click = {
+				ai_will_do = {
+					factor = 15
+				}
+			}
+			RUS_RFTU_discredit_click = {
+				ai_will_do = {
+					factor = 1
+				}
+			}
+			RUS_RFTU_sphere_click = {
+				ai_will_do = {
+					factor = 500
+				}
+			}
+			RUS_RFTU_remove_from_sphere_click = {
+				ai_will_do = {
+					factor = 500
+				}
+			}
+			RUS_RFTU_integrate_click = {
+				ai_will_do = {
+					factor = 500
+				}
+			}
+			RUS_RFTU_invade_click = {
+				ai_will_do = {
+					factor = 0
+					modifier = {
+						date < 1968.0.01
+						add = -10000
+					}
+					modifier = {
+						date > 1968.07.01
+						add = 1000
+					}
+					modifier = {
+						has_government = ultranationalism
+						add = 35
+					}
+					modifier = {
+						has_government = national_socialism
+						add = 25
+					}
+					modifier = {
+						has_government = fascism
+						add = 10
+					}
+					modifier = {
+						DRL = { exists = yes }
+						add = 500
+					}
+					modifier = {
+						URL = { exists = yes }
+						check_variable = { RUS_urals_receptiveness^2 = 0 }
+						add = 5
+					}
+					modifier = {
+						MGN = { exists = yes }
+						check_variable = { RUS_urals_receptiveness^3 = 0 }
+						add = 5
+					}
+					modifier = {
+						ORE = { exists = yes }
+						check_variable = { RUS_urals_receptiveness^1 = 0 }
+						add = 5
+					}
+					modifier = {
+						ORE = { exists = yes }
+						NOT = {
+							check_variable = { RUS_urals_receptiveness^1 = 0 }
+						}
+						add = -10
+					}
+					modifier = {
+						URL = { exists = yes }
+						NOT = {
+							check_variable = { RUS_urals_receptiveness^2 = 0 }
+						}
+						add = -10
+					}
+					modifier = {
+						MGN = { exists = yes }
+						NOT = {
+							check_variable = { RUS_urals_receptiveness^3 = 0 }
+						}
+						add = -10
+					}
+					modifier = {
+						ORE = {
+							exists = yes
+							is_puppet_of = ROOT
+						}
+						add = -100
+					}
+					modifier = {
+						URL = {
+							exists = yes
+							is_puppet_of = ROOT
+						}
+						add = -100
+					}
+					modifier = {
+						MGN = {
+							exists = yes
+							is_puppet_of = ROOT
+						}
+						add = -100
+					}
+				}
+			}
+
+		}
+	}
+}

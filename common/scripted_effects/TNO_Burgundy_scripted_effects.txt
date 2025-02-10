@@ -1,0 +1,4670 @@
+### And so it begins.
+
+##########################################################
+######################## MONTHLY PULSE ###################
+##########################################################
+
+BRG_monthly_pulse_effect = {
+
+	BRG_Domestic_Monthly_Pops_Update = yes
+
+	BRG_Investigations_Monthly_Calculations = yes
+
+	BRG_Domestic_GUI_Clamp = yes
+
+	BRG_Monthly_Econ_Update = yes
+
+	if = {
+		limit = {
+			AND = {
+				has_country_flag = BRG_Revolt_Possible
+				is_ai = no
+				NOT = {
+					has_country_flag = BRG_Revolt_Happened
+				}
+			}		
+		}
+		BRG_Revolt_Calculation = yes
+	}
+	if = {
+		limit = { has_country_flag = BRG_Econ_Off }
+		BRG_Monthly_Economy_Constant = yes
+	}
+	if = {
+		limit = { has_country_flag = BRG_Operations_Unlocked }
+		BRG_Monthly_Operations_Update = yes
+	}
+}
+
+##########################################################
+######################## DOMESTIC ########################
+##########################################################
+
+BRG_Updating_State_Pops_Overlays = {
+	every_owned_state = {
+
+
+		################################
+		########
+		######## Calculating whether or not to do the overlays
+		########
+		################################
+		set_temp_variable = { BRG_Ratio_Check_Current_Cops = THIS.BRG_Cops_Pop_State_Counter }
+		set_temp_variable = { BRG_Ratio_Check_Current_Workers = THIS.BRG_Skilled_Worker_Pop }
+		set_temp_variable = { BRG_Ratio_Check_Current_Ratio = THIS.BRG_Cop_To_Worker_Ratio }
+
+		multiply_temp_variable = { BRG_Ratio_Check_Current_Cops = BRG_Ratio_Check_Current_Ratio } #### This is the "real" number of cops
+
+		if = { #### You do not have enough cops
+			limit = {
+				AND = {
+					check_variable = { BRG_Ratio_Check_Current_Cops < BRG_Ratio_Check_Current_Workers }
+						THIS = {
+							NOT = {
+								has_state_flag = BRG_State_Doesnt_Have_Enough_Cops
+							}
+						}
+					}
+				}
+				set_state_flag = BRG_State_Doesnt_Have_Enough_Cops
+			}
+
+		if = { ### You have equal or more than enough cops
+			limit = {
+				OR = {
+					check_variable = { BRG_Ratio_Check_Current_Cops = BRG_Ratio_Check_Current_Workers }
+					check_variable = { BRG_Ratio_Check_Current_Cops > BRG_Ratio_Check_Current_Workers }
+				}
+			}
+			clr_state_flag = BRG_State_Doesnt_Have_Enough_Cops
+		}
+
+
+		###########################
+		####
+		#### Calculating the Legion Gain tooltip math
+		####
+		###########################
+
+		set_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation = THIS.BRG_Cops_Pop_State_Counter }
+
+		multiply_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation = THIS.BRG_Cop_To_Worker_Ratio }
+
+		round_variable = BRG_Pop_Legion_Gain_Tooltip_Calculation #### This is the true number of cops
+
+		if = { #### You have more than enough cops to stave off rebellion
+			limit = {
+				OR = {
+					check_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation > THIS.BRG_Skilled_Worker_Pop }
+					check_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation = THIS.BRG_Skilled_Worker_Pop }
+				}
+			}
+
+			if = {
+				limit = {
+					NOT = {
+						THIS = {
+							has_state_flag = BRG_Himmler_Is_Gaining_Loyalty
+						}
+					}
+				}
+				set_state_flag = BRG_Himmler_Is_Gaining_Loyalty
+				clr_state_flag = BRG_Charlemagne_Gaining_Loyalty
+				clr_state_flag = BRG_Walloon_Gaining_Loyalty
+				clr_state_flag = BRG_Langemarck_Gaining_Loyalty
+				clr_state_flag = BRG_RPY_Gaining_Loyalty
+			}
+
+			divide_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation = THIS.BRG_Skilled_Worker_Pop }
+
+			multiply_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation = 3 }
+
+			round_temp_variable = BRG_Pop_Legion_Gain_Tooltip_Calculation
+
+			clamp_temp_variable = {
+				var = BRG_Pop_Legion_Gain_Tooltip_Calculation
+				min = -5
+				max = 7
+			}
+
+			set_variable = { THIS.BRG_Pop_Legion_Gain_Tooltip_Variable_Display = BRG_Pop_Legion_Gain_Tooltip_Calculation } #### This will display how much Himmler Will gain in each state
+		}
+
+
+		else = {
+
+		########################################################
+		#######
+		####### NOT ENOUGH WORKERS
+		#######
+		########################################################
+
+			set_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var = THIS.BRG_Skilled_Worker_Pop } #### It's now equal to the number of workers in each state
+
+			divide_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var = BRG_Pop_Legion_Gain_Tooltip_Calculation } #### Divide it by the true number of cops
+
+			multiply_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var = 3 } #### Multiplies it by 3 to get how much should be added/subtracted to the Legions and from Himmler
+
+			round_temp_variable = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var #### Rounds the Variables
+
+			clamp_temp_variable = {
+				var = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var #### Clamps the variable from -5 and 5
+				min = 0
+				max = 5
+			}
+
+			########################################################
+			####### TELLS YOU HOW MANY MORE COPS YOU NEED
+			########################################################
+
+			set_temp_variable = { BRG.BRG_Not_Enough_Workers_Tooltip_Calculation = BRG.BRG_Pop_Legion_Gain_Tooltip_Calculation }
+
+			subtract_from_temp_variable = { BRG.BRG_Not_Enough_Workers_Tooltip_Calculation = THIS.BRG_Skilled_Worker_Pop }
+
+			multiply_temp_variable = { BRG.BRG_Not_Enough_Workers_Tooltip_Calculation = -1 }
+
+			divide_temp_variable = { BRG.BRG_Not_Enough_Workers_Tooltip_Calculation = 2 }
+
+			set_variable = { THIS.BRG_How_Many_Cops_You_Need_Variable_Display = BRG.BRG_Not_Enough_Workers_Tooltip_Calculation }
+
+			if = { #### Walloon has a bigger increase in the states below
+				limit = {
+					OR = {
+						state = 34 ### Walloonien
+						state = 18 ### Kampen
+						state = 17 # Frieg whatever 
+					}
+				}
+
+				if = {
+					limit = {
+						NOT = {
+							BRG = { has_country_flag = BRG_walloon_dead }
+							THIS = {
+								has_state_flag = BRG_Walloon_Gaining_Loyalty
+							}
+						}
+					}
+					set_state_flag = BRG_Walloon_Gaining_Loyalty
+					clr_state_flag = BRG_Charlemagne_Gaining_Loyalty
+					clr_state_flag = BRG_Himmler_Is_Gaining_Loyalty
+					clr_state_flag = BRG_Langemarck_Gaining_Loyalty
+				}
+
+				multiply_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var = 1.2 } ### Multiplies the special Walloon case so it's larger
+
+				round_temp_variable = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var ### Rounds it
+
+				clamp_temp_variable = {
+					var = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var #### Clamps it
+					min = 0
+					max = 7
+				}
+
+				set_variable = { THIS.BRG_Pop_Legion_Gain_Tooltip_Variable_Display = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var } #### This will display how much the favored Legion will gain
+			}
+
+			if = { #### Langemarck has a bigger increase in the states below
+				limit = {
+					OR = {
+						state = 6 ### Flandern
+						state = 29 ### Pickardien
+					}
+				}
+
+				if = {
+					limit = {
+						NOT = {
+							THIS = {
+								has_state_flag = BRG_Langemarck_Gaining_Loyalty
+							}
+						}
+					}
+					set_state_flag = BRG_Langemarck_Gaining_Loyalty
+					clr_state_flag = BRG_Charlemagne_Gaining_Loyalty
+					clr_state_flag = BRG_Himmler_Is_Gaining_Loyalty
+					clr_state_flag = BRG_Walloon_Gaining_Loyalty
+				}
+
+				multiply_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var = 1.2 } ### Multiplies the special Langemarck case so it's larger
+
+				round_temp_variable = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var ### Rounds it
+
+				clamp_temp_variable = {
+					var = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var #### Clamps it
+					min = 0
+					max = 7
+				}
+
+				set_variable = { THIS.BRG_Pop_Legion_Gain_Tooltip_Variable_Display = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var } #### This will display how much the favored Legion will gain
+			}
+		
+
+			if = { ############ Pre Resistance Stuff 
+				limit = {
+					NOT = {
+						BRG = { has_country_flag = BRG_Resistance_On_GUI_Visible }
+					}
+				}
+
+				if = {
+					limit = {
+						NOT = {
+							state = 6 ### Flandern
+							state = 29 ### Pickardien
+							state = 34 ### Walloonien
+							state = 18 ### Kampen
+							state = 17 # Frieg whatever	
+						}
+					}
+
+					if = {
+						limit = {
+							NOT = {
+								BRG = { has_country_flag = BRG_charlemagne_dead }
+								THIS = {
+									has_state_flag = BRG_Charlemagne_Gaining_Loyalty
+								}
+							}
+						}
+
+						set_state_flag = BRG_Charlemagne_Gaining_Loyalty
+						clr_state_flag = BRG_Langemarck_Gaining_Loyalty
+						clr_state_flag = BRG_Himmler_Is_Gaining_Loyalty
+						clr_state_flag = BRG_Walloon_Gaining_Loyalty
+						clr_state_flag = BRG_RPY_Gaining_Loyalty
+					}
+
+					multiply_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var = 1.2 } ### Multiplies the special Charlemagne case so it's larger
+
+					round_temp_variable = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var ### Rounds it
+
+					clamp_temp_variable = {
+						var = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var #### Clamps it
+						min = 0
+						max = 7
+					}
+
+					set_variable = { THIS.BRG_Pop_Legion_Gain_Tooltip_Variable_Display = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var } #### This will display how much the favored Legion will gain
+
+				}
+			}
+		
+			if = { ############# Post Resistance 
+				limit = {
+					BRG = { has_country_flag = BRG_Resistance_On_GUI_Visible }
+				}
+				
+				#### This block is working, it's not firing the charla and RPY bits for some reason?
+
+				#### fire event BRG_political.50, option B to test this stuff If it works, you should be seeing a -0.01 stability and + 0.01 stability in the tooltip before you click the event 
+
+				#############################################
+				######### CHARLA 
+				#############################################
+
+				if = {
+					limit = {
+						NOT = {
+							state = 6 ### Flandern
+							state = 29 ### Pickardien
+							state = 34 ### Walloonien
+							state = 18 ### Kampen
+							state = 17 # Frieg whatever	
+							state = 15 # Normandie 
+						}
+					}
+
+					if = {
+						limit = {
+							NOT = {
+								BRG = { has_country_flag = BRG_resistance_dead }
+								THIS = {
+									has_state_flag = BRG_Charlemagne_Gaining_Loyalty
+								}
+							}
+						}
+						set_state_flag = BRG_Charlemagne_Gaining_Loyalty
+						clr_state_flag = BRG_Langemarck_Gaining_Loyalty
+						clr_state_flag = BRG_Himmler_Is_Gaining_Loyalty
+						clr_state_flag = BRG_Walloon_Gaining_Loyalty
+						clr_state_flag = BRG_RPY_Gaining_Loyalty
+					}
+
+					multiply_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var = 1.2 } ### Multiplies the special Charlemagne case so it's larger
+
+					round_temp_variable = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var ### Rounds it
+
+					clamp_temp_variable = {
+						var = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var #### Clamps it
+						min = 0
+						max = 7
+					}
+
+					set_variable = { THIS.BRG_Pop_Legion_Gain_Tooltip_Variable_Display = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var } #### This will display how much the favored Legion will gain
+				}
+
+				#############################################
+				######### RPY
+				#############################################
+
+				if = {
+					limit = {
+						state = 15 # Normandie
+					}
+
+
+					if = {
+						limit = {
+							NOT = {
+								THIS = {
+									has_state_flag = BRG_RPY_Gaining_Loyalty
+								}
+							}
+						}
+						set_state_flag = BRG_RPY_Gaining_Loyalty	
+						clr_state_flag = BRG_Charlemagne_Gaining_Loyalty
+						clr_state_flag = BRG_Langemarck_Gaining_Loyalty
+						clr_state_flag = BRG_Himmler_Is_Gaining_Loyalty
+						clr_state_flag = BRG_Walloon_Gaining_Loyalty
+					}
+					
+					multiply_temp_variable = { BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var = 1.2 } ### Multiplies the special Charlemagne case so it's larger
+
+					round_temp_variable = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var ### Rounds it
+
+					clamp_temp_variable = {
+						var = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var #### Clamps it
+						min = 0
+						max = 7
+					}
+
+					set_variable = { THIS.BRG_Pop_Legion_Gain_Tooltip_Variable_Display = BRG_Pop_Legion_Gain_Tooltip_Calculation_Workers_Var } #### This will display how much the favored Legion will gain
+				}
+			}
+		}
+	}
+	add_to_variable = { Burgundy_Domestic_GUI_dirty_var = 1 }
+}
+
+##############################################
+##### REVOLT SHIT 
+##############################################
+
+BRG_Revolt_Calculation = {
+
+	set_temp_variable = { BRG_Number_Of_States = controlled_states^num }
+
+	divide_temp_variable = { BRG_Number_Of_States = 2 }
+
+	set_temp_variable = { BRG_Number_Of_Uncontrolled_States = BRG.Burgundy_Uncontrolled_States_Array^num }
+
+	if = {
+		limit = {
+			check_variable = { BRG_Number_Of_Uncontrolled_States > BRG_Number_Of_States }
+		}
+		country_event = { id = BRG_collapse.101 } #Collapse Warning, 30 Days Preperation
+	}
+}
+
+BRG_Fire_Revolt = {
+	set_country_flag = BRG_Revolt_Happened
+	add_ideas = BRG_to_ashes
+	remove_ideas = { # Remove *all* of Burgundy's ideas
+		BRG_the_shadow_state
+		BRG_purge_the_rot
+		BRG_the_three_realms
+		BRG_arbeit_macht_frei
+		BRG_fight_to_germania
+		BRG_GCW_officer_assassinations
+		BRG_idea_fucking_with_sudwest
+		BRG_idea_grenzeschild
+		BRG_idea_das_burgundische_rohstoffamt
+		BRG_idea_fuel_rations
+		BRG_idea_education_tree_dynamic_modifier_placeholder
+		BRG_idea_project_gjallarhorn
+		BRG_idea_changed_plans
+		BRG_reduced_supply_consumption
+		BRG_humanitarian_aid
+		BRG_the_pipeline_cut
+		BRG_huttig_rage
+		BRG_Jean_Mabire_Thought
+		BRG_national_blackout
+		BRG_blood_diamonds
+		BRG_burgundian_gun_trade	
+	}
+	hidden_effect = {
+		if = {
+			limit = { has_character = BRG_Leon_Degrelle }
+			BRG_Leon_Degrelle = { set_nationality = BEL }
+		}
+		if = {
+			limit = { has_character = BRG_Bert_Eriksson }
+			BRG_Bert_Eriksson = { set_nationality = FLR }
+		}
+		remove_dynamic_modifier = {
+			modifier = BRG_Econ_Dynamic_Modifier
+		}
+		remove_dynamic_modifier = {
+			modifier = BRG_infra_tree_rodomo_dynamic_modifier
+		}
+		remove_dynamic_modifier = {
+			modifier = BRG_infra_tree_olberschaffungsburo
+		}
+		remove_dynamic_modifier = {
+			modifier = BRG_infra_tree_synthetics_boosts
+		}
+		remove_dynamic_modifier = {
+			modifier = BRG_famine_tree_modifier
+		}
+		remove_dynamic_modifier = {
+			modifier = BRG_education_tree_dynamic_modifier
+		}
+		set_variable = { nuclear_stockpile = 0 }
+		set_variable = { nuclear_global_coverage = 0 } 
+		remove_from_array = { global.nuclear_powers_array = BRG } #Removes Burgundy from the Nuclear Powers gui 
+	}
+	load_focus_tree = ZZZ_blank_focus
+
+	########################################################
+	###### CHARLA 
+	########################################################
+	
+	if = { ### Transfers all uncontrolled Charla states 
+		limit = { is_in_array = { BRG.Burgundy_Uncontrolled_States_Array = 1625.id } }
+		PIC = {
+			transfer_state = 1625
+			add_state_core = 1625
+		}
+	}
+
+	PIC = { ### Gives the base states 
+		transfer_state = 15
+		transfer_state = 16
+		transfer_state = 788
+		transfer_state = 1626
+		add_state_core = 15
+		add_state_core = 16
+		add_state_core = 788
+		add_state_core = 1626
+		add_state_core = 1625
+		add_state_core = 1635
+		set_capital = { state = 15 }
+		load_oob = "PIC_1962" ### Load OOB
+		add_ideas = BRG_from_the_ashes
+		set_cosmetic_tag = PIC_HGR
+
+		declare_war_on = { target = BRG type = annex_everything } ### Only hates Burgundy, willing to let the other shit slide
+	}
+
+	every_unit_leader = { ###### Give the generals
+		limit = {
+			OR = {
+				has_id = 307
+				has_id = 308
+				has_id = 309
+				has_id = 310
+				has_id = 311
+				has_id = 312
+				has_id = 313
+			}
+		}
+		set_nationality = PIC
+	}
+	
+	########################################################
+	###### WALLOON 
+	########################################################
+
+	if = {
+		limit = { is_in_array = { BRG.Burgundy_Uncontrolled_States_Array = 18.id } }
+		BEL = {
+			transfer_state = 18
+			add_state_core = 18
+		}
+	}
+
+	BEL = { ### State and OOB
+		transfer_state = 34 
+		add_state_core = 34
+		load_oob = "BEL_1962"
+		add_ideas = BRG_from_the_ashes
+		promote_character = BRG_Leon_Degrelle
+
+		### Hates flanders and Burgundy, wants the french to fuck off
+		declare_war_on = { target = BRG type = annex_everything }
+		# declare_war_on = { target = FLR type = annex_everything }
+	}
+
+	########################################################
+	###### LANGEMARCK 
+	########################################################
+
+	if = {
+		limit = { is_in_array = { BRG.Burgundy_Uncontrolled_States_Array = 29.id } }
+		FLR = {
+			transfer_state = 29
+			add_state_core = 29
+		}
+	}
+
+	FLR = { ### State and OOB
+		add_state_core = 6
+		transfer_state = 6 
+		add_state_core = 1734
+		transfer_state = 1734 
+		load_oob = "FLR_1962"
+		add_ideas = BRG_from_the_ashes
+
+		add_country_leader_role = {
+			character = BRG_Bert_Eriksson
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_BERT_ERIKSSON_COLLAPSE_DESC"
+				ideology = ultranationalism_ultramilitarism_subtype
+				traits = { }
+				expire = "1999.1.1"
+				id = -1
+			}
+		}
+
+		### Gives them generals 
+		BRG = { BRG_Jef_Francois = { set_nationality = FLR } }
+
+		### Hates DeGrelle, but doesn't care about Burgundy until they win the war. Although for now they declare war on Burgundy cause why not 
+		declare_war_on = { target = BRG type = annex_everything }
+		declare_war_on = { target = BEL type = annex_everything }
+	}
+
+	########################################################
+	###### RED POPPY 
+	########################################################
+
+	if = {
+		limit = {
+			BRG = {
+				NOT = { has_country_flag = BRG_resistance_dead }
+				has_country_flag = BRG_Resistance_On_GUI_Visible
+			}
+		}
+
+		15 = { ### Resets the names to french 
+			set_province_name = { id = 11563 name = VICTORY_POINTS_11563_fra } #Rouen
+			set_province_name = { id = 9434 name = VICTORY_POINTS_9434_fra } #Le Havre
+		}
+
+		RPY = { ### Gives states, OOB, equipment
+			transfer_state = 15
+			add_state_core = 15
+			add_state_core = 16
+			add_state_core = 17
+			add_state_core = 18
+			add_state_core = 29
+			add_state_core = 788
+			add_state_core = 1626
+			add_state_core = 1625
+			add_state_core = 1635
+			load_oob = "RPY_1962"
+			add_ideas = BRG_from_the_ashes
+
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 1400
+				producer = BRG #stolen
+			}
+
+			add_equipment_to_stockpile = {
+				type = APC_chassis
+				amount = 300
+				producer = BRG #stolen
+			}
+
+			### Declares war on everyone cause fuck you
+			declare_war_on = { target = BRG type = annex_everything }
+			declare_war_on = { target = PIC type = annex_everything }
+			declare_war_on = { target = BEL type = annex_everything }
+			declare_war_on = { target = FLR type = annex_everything }
+		}
+		PIC = { set_capital = { state = 788 } }
+	}
+
+	if = { ### If the famines begun, shut it off
+		limit = { has_country_flag = BRG_Famine_Begun }
+		clr_country_flag = BRG_Famine_Begun
+	}
+
+	BRG = {
+		BRG_Heinrich_Himmler = {
+			set_portraits = {
+				civilian = { large = "gfx/leaders/BRG/Portrait_Burgundy_Heinrich_Himmler_1972.dds" }
+			}
+		}
+		set_country_leader_description = { desc = "POLITICS_HEINRICH_HIMMLER_DESC_COLLAPSE" }
+		TNO_BRG_domestic_tree_swap = yes
+	}
+	BEL = {
+		set_country_leader_description = { desc = "POLITICS_LEON_DEGRELLE_COLLAPSE_DESC" }
+	}
+}
+
+BRG_AI_Collapse_Determine_Outcome = {
+
+	if = {
+		limit = {
+			country_exists = FRA
+			has_global_flag = BRG_AI_Collapse_Pakt_France
+		}
+		GER = { country_event = { id = BRG_ai_collapse.3 } }
+	}
+
+	else_if = {
+		limit = {
+			country_exists = FRA
+			has_global_flag = BRG_AI_Collapse_OFN_France
+		}
+
+		GER = { country_event = { id = BRG_ai_collapse.5 } }
+	}
+
+	else_if = {
+		limit = {
+			country_exists = FRA
+			has_global_flag = BRG_AI_Collapse_Neutral_France
+		}
+		GER = { country_event = { id = BRG_ai_collapse.11 } }
+	}
+
+	else_if = {
+		limit = {
+			OR = {
+				NOT = { country_exists = FRA }
+				has_global_flag = BRG_AI_Collapse_Italy_France
+			}
+		}
+		GER = { country_event = { id = BRG_ai_collapse.16 } }
+	}
+}
+
+BRG_Domestic_Monthly_Pops_Update = {
+
+	add_to_variable = { BRG_Cops_National_Reserve = BRG_Cops_Monthly_Gain }
+
+	#################### EDUCATION  ##########################
+
+	if = {
+		limit = { has_country_flag = BRG_Education_Crisis_Begun }
+
+		set_variable = { BRG_Indoctrination_Monthly_Adder = BRG_National_Indoctrination }
+
+		clamp_variable = {
+			var = BRG_Indoctrination_Monthly_Adder
+			min = 0
+			max = 100
+		}
+
+		subtract_from_variable = { BRG_Indoctrination_Monthly_Adder = 50 }
+		multiply_variable = { BRG_Indoctrination_Monthly_Adder = 0.1 }
+		round_variable = BRG_Indoctrination_Monthly_Adder
+
+		every_owned_state = {
+			subtract_from_variable = { THIS.WalloonSupport = BRG_Indoctrination_Monthly_Adder }
+			subtract_from_variable = { THIS.LangemarckSupport = BRG_Indoctrination_Monthly_Adder }
+			subtract_from_variable = { THIS.CharlemagneSupport = BRG_Indoctrination_Monthly_Adder }
+		}
+
+		multiply_variable = { BRG_Indoctrination_Monthly_Adder = 15 }
+		add_to_variable = { BRG_Cops_National_Reserve = BRG_Indoctrination_Monthly_Adder }
+		clamp_variable = {
+			var = BRG_National_Indoctrination
+			min = 0
+			max = 100
+		}
+	}
+
+	set_variable = { BRG_last_months_food_balance = 0 } #Famine thing, not worth its own check
+
+	##################### END EDUCATION ###################
+
+	every_owned_state = {
+
+
+		############# COPS STUFF ##########################
+
+		set_variable = { THIS.BRG_Pop_Legion_And_Resistance_Calculation = 0 }
+
+		set_variable = { THIS.BRG_Pop_Legion_And_Resistance_Calculation = THIS.BRG_Cops_Pop_State_Counter }
+
+		multiply_variable = { THIS.BRG_Pop_Legion_And_Resistance_Calculation = THIS.BRG_Cop_To_Worker_Ratio }
+
+		round_variable = THIS.BRG_Pop_Legion_And_Resistance_Calculation ### This is the true number of cops, which is num of cops multiplied by the ratio for each state
+
+		if = {
+			limit = { check_variable = { THIS.BRG_Pop_Legion_And_Resistance_Calculation > THIS.BRG_Skilled_Worker_Pop } }
+
+			divide_variable = { THIS.BRG_Pop_Legion_And_Resistance_Calculation = THIS.BRG_Skilled_Worker_Pop }
+
+			multiply_variable = { THIS.BRG_Pop_Legion_And_Resistance_Calculation = 3 }
+
+			round_variable = THIS.BRG_Pop_Legion_And_Resistance_Calculation
+
+			clamp_variable = {
+				var = THIS.BRG_Pop_Legion_And_Resistance_Calculation
+				min = -5
+				max = 7
+			}
+
+			if = {
+				limit = {
+					is_in_array = { BRG.Burgundy_Uncontrolled_States_Array = THIS.id }  ### If this controlled state was previously uncontrolled
+				}
+				remove_from_array = { BRG.Burgundy_Uncontrolled_States_Array = THIS.id } ### Removes from Array
+			}
+
+			subtract_from_variable = { BRG_Red_Poppy_National_Support = BRG_Pop_Legion_And_Resistance_Calculation }
+
+			add_to_variable = { THIS.HimmlerSupport = THIS.BRG_Pop_Legion_And_Resistance_Calculation } ## Add to Himmler
+
+			subtract_from_variable = { THIS.WalloonSupport = THIS.BRG_Pop_Legion_And_Resistance_Calculation } ## subtracts from Walloon
+
+			subtract_from_variable = { THIS.LangemarckSupport = THIS.BRG_Pop_Legion_And_Resistance_Calculation } ## subtracts from Lange
+
+			subtract_from_variable  = { THIS.CharlemagneSupport = THIS.BRG_Pop_Legion_And_Resistance_Calculation } ## subtracts from Charla
+
+			BRG_Domestic_GUI_Clamp = yes
+		}
+
+
+		else = {
+
+		########################################################
+		#######
+		####### NOT ENOUGH WORKERS
+		#######
+		########################################################
+
+			set_variable = { THIS.BRG_Too_Many_Workers_Resistance_Calculation = 0 } #### New Variable for the Division stuff to not fuck with the workers var
+
+			set_variable = { THIS.BRG_Too_Many_Workers_Resistance_Calculation = THIS.BRG_Skilled_Worker_Pop } #### It's now equal to the number of workers in each state
+
+			divide_variable = { THIS.BRG_Too_Many_Workers_Resistance_Calculation = THIS.BRG_Pop_Legion_And_Resistance_Calculation } #### Divide it by the true number of cops
+
+			multiply_variable = { THIS.BRG_Too_Many_Workers_Resistance_Calculation = 3 } #### Multiplies it by 3 to get how much should be added/subtracted to the Legions and from Himmler
+
+			round_variable = THIS.THIS.BRG_Too_Many_Workers_Resistance_Calculation #### Rounds the Variables
+
+			clamp_variable = {
+				var = THIS.BRG_Too_Many_Workers_Resistance_Calculation #### Clamps the variable from -5 and 5
+				min = 0
+				max = 6
+			}
+
+			add_to_variable  = { BRG_Red_Poppy_National_Support = THIS.BRG_Too_Many_Workers_Resistance_Calculation } #### Adds this to the national support variable
+
+			BRG_Domestic_GUI_Clamp = yes ### Clamp cause why not
+
+
+			if = {
+				limit = {
+					NOT = {
+						is_in_array = { BRG.Burgundy_Uncontrolled_States_Array = THIS.id }
+					}
+				}
+				add_to_array = { BRG.Burgundy_Uncontrolled_States_Array = THIS.id } ### Adds to the unctronlled states arrays
+			}
+
+
+			if = { #### Walloon has a bigger increase in the states below
+				limit = {
+						OR = {
+							state = 34 ### Walloonien
+							state = 18 ### Kampen
+							state = 17 # Frieg whatever 
+							}
+				}
+
+				set_variable = { BRG_Pop_Walloon_Special_Gain = 0 } #### Walloon gain variable
+
+				set_variable = { BRG_Pop_Walloon_Special_Gain = THIS.BRG_Too_Many_Workers_Resistance_Calculation } ##### Sets this new special gain variable to the aformentioned resistance calc
+
+				multiply_variable = { BRG_Pop_Walloon_Special_Gain = 1.2 } ### Multiplies the special Walloon case so it's larger
+
+				round_variable = BRG_Pop_Walloon_Special_Gain ### Rounds it
+
+				clamp_variable = {
+					var = BRG_Pop_Walloon_Special_Gain #### Clamps it
+					min = 0
+					max = 7
+				}
+
+				set_variable = { BRG_Pop_Other_Legions_Lower_Gain = 0 } ### Sets the variable for the other legions
+
+				set_variable = { BRG_Pop_Other_Legions_Lower_Gain = THIS.BRG_Too_Many_Workers_Resistance_Calculation } ##### Sets this new special gain variable to the aformentioned resistance calc
+
+				multiply_variable = { BRG_Pop_Other_Legions_Lower_Gain = 0.5 } ### Multiplies the special other Legions case so it's smaller
+
+				round_variable = BRG_Pop_Other_Legions_Lower_Gain ### Rounds it
+
+				clamp_variable = {
+					var = BRG_Pop_Other_Legions_Lower_Gain #### Clamps it
+					min = 0
+					max = 4
+				}
+
+				if = {
+					limit = {
+						BRG = {
+							NOT = { has_country_flag = BRG_walloon_dead }
+						}
+					}
+					add_to_variable = { THIS.WalloonSupport = BRG_Pop_Walloon_Special_Gain } #### Adds the special gain to WALLOON if they aren't dead
+				}
+
+				if = {
+					limit = {
+						BRG = {
+							NOT = { has_country_flag = BRG_charlemagne_dead }
+						}
+					}
+					add_to_variable = { THIS.CharlemagneSupport = BRG_Pop_Other_Legions_Lower_Gain } #### Adds the special decreased gain to Charle if they are still alive
+				}
+
+				add_to_variable = { THIS.LangemarckSupport = BRG_Pop_Other_Legions_Lower_Gain } #### Adds the special decreased gain to Langemarck
+
+				subtract_from_variable = { THIS.HimmlerSupport = BRG_Pop_Walloon_Special_Gain } #### Subtracts the special value from Himmler
+
+				BRG_Domestic_GUI_Clamp = yes #### Clamps all the stuff
+			}
+
+
+
+
+
+
+			if = { #### Langemarck has a bigger increase in the states below
+				limit = {
+						OR = {
+							state = 6 ### Flandern
+							state = 29 ### Pickardien
+							}
+				}
+
+				set_variable = { BRG_Pop_Langemarck_Special_Gain = 0 } #### Langemarck gain variable
+
+				set_variable = { BRG_Pop_Langemarck_Special_Gain = THIS.BRG_Too_Many_Workers_Resistance_Calculation } ##### Sets this new special gain variable to the aformentioned resistance calc
+
+				multiply_variable = { BRG_Pop_Langemarck_Special_Gain = 1.2 } ### Multiplies the special Langemarck case so it's larger
+
+				round_variable = BRG_Pop_Langemarck_Special_Gain ### Rounds it
+
+				clamp_variable = {
+					var = BRG_Pop_Langemarck_Special_Gain #### Clamps it
+					min = 0
+					max = 7
+				}
+
+				set_variable = { BRG_Pop_Other_Legions_Lower_Gain = 0 } ### Sets the variable for the other legions
+
+				set_variable = { BRG_Pop_Other_Legions_Lower_Gain = THIS.BRG_Too_Many_Workers_Resistance_Calculation } ##### Sets this new special gain variable to the aformentioned resistance calc
+
+				multiply_variable = { BRG_Pop_Other_Legions_Lower_Gain = 0.5 } ### Multiplies the special other Legions case so it's smaller
+
+				round_variable = BRG_Pop_Other_Legions_Lower_Gain ### Rounds it
+
+				clamp_variable = {
+					var = BRG_Pop_Other_Legions_Lower_Gain #### Clamps it
+					min = 0
+					max = 4
+				}
+
+				add_to_variable = { THIS.LangemarckSupport = BRG_Pop_Langemarck_Special_Gain } #### Adds the special gain to Langemarck
+
+				if = {
+					limit = {
+						BRG = {
+							NOT = { has_country_flag = BRG_walloon_dead } 
+						}
+					}
+					add_to_variable = { THIS.WalloonSupport = BRG_Pop_Other_Legions_Lower_Gain } #### Adds this lower gain to Walloon if they aren't dead
+				}
+
+				if = {
+					limit = {
+						BRG = {
+							NOT = { has_country_flag = BRG_charlemagne_dead }
+						}
+					}
+					add_to_variable = { THIS.CharlemagneSupport = BRG_Pop_Other_Legions_Lower_Gain } #### Adds the special decreased gain to Charle if they are still alive
+				}
+
+				subtract_from_variable = { THIS.HimmlerSupport = BRG_Pop_Langemarck_Special_Gain } #### Subtracts the special value from Himmler
+
+				BRG_Domestic_GUI_Clamp = yes #### Clamps all the stuff
+			}
+
+
+			#######################################
+			#### PRE RESISTANCE
+			#######################################
+
+
+			if = {
+				limit = {
+					NOT = {
+						BRG = { has_country_flag = BRG_Resistance_On_GUI_Visible }
+					}
+				}
+
+				if = { #### Charlemagne has a bigger increase in the states below
+					limit = {
+						NOT = {
+							OR = {
+								state = 6 ### Flandern
+								state = 29 ### Pickardien
+								state = 34 ### Walloonien
+								state = 18 ### Kampen
+								state = 1625 ### Reimen
+								state = 17 # Frieg whatever 
+							}
+						}
+					}
+
+				set_variable = { BRG_Pop_Charlemagne_Special_Gain = 0 } #### Charlemagne gain variable
+
+				set_variable = { BRG_Pop_Charlemagne_Special_Gain = THIS.BRG_Too_Many_Workers_Resistance_Calculation } ##### Sets this new special gain variable to the aformentioned resistance calc
+
+				multiply_variable = { BRG_Pop_Charlemagne_Special_Gain = 1.2 } ### Multiplies the special Charlemagne case so it's larger
+
+				round_variable = BRG_Pop_Charlemagne_Special_Gain ### Rounds it
+
+				clamp_variable = {
+					var = BRG_Pop_Charlemagne_Special_Gain #### Clamps it
+					min = 0
+					max = 7
+				}
+
+				set_variable = { BRG_Pop_Other_Legions_Lower_Gain = 0 } ### Sets the variable for the other legions
+
+				set_variable = { BRG_Pop_Other_Legions_Lower_Gain = THIS.BRG_Too_Many_Workers_Resistance_Calculation } ##### Sets this new special gain variable to the aformentioned resistance calc
+
+				multiply_variable = { BRG_Pop_Other_Legions_Lower_Gain = 0.5 } ### Multiplies the special other Legions case so it's smaller
+
+				round_variable = BRG_Pop_Other_Legions_Lower_Gain ### Rounds it
+
+				clamp_variable = {
+					var = BRG_Pop_Other_Legions_Lower_Gain #### Clamps it
+					min = 0
+					max = 4
+				}
+
+				if = {
+					limit = {
+						BRG = {
+							NOT = { has_country_flag = BRG_charlemagne_dead }
+						}
+					}
+					add_to_variable = { THIS.CharlemagneSupport = BRG_Pop_Charlemagne_Special_Gain } #### Adds the special gain to Charle if they are still alive
+				}
+
+				if = {
+					limit = {
+						BRG = {
+							NOT = { has_country_flag = BRG_walloon_dead }
+						}
+					}
+					add_to_variable = { THIS.WalloonSupport = BRG_Pop_Other_Legions_Lower_Gain } #### Adds this lower gain to Walloon if they aren't dead
+				}
+
+				add_to_variable = { THIS.LangemarckSupport = BRG_Pop_Other_Legions_Lower_Gain } #### Adds the lower gain to Langemarck
+
+				subtract_from_variable = { THIS.HimmlerSupport = BRG_Pop_Charlemagne_Special_Gain } #### Subtracts the special value from Himmler
+
+				BRG_Domestic_GUI_Clamp = yes #### Clamps all the stuff
+				}	
+			}
+
+
+			#######################################
+			#### POST RESISTANCE 
+			#######################################
+
+			if = {
+				limit = {
+					BRG = { has_country_flag = BRG_Resistance_On_GUI_Visible }
+				}
+
+
+				if = { #### Charlemagne has a bigger increase in the states below
+					limit = {
+						NOT = {
+							OR = {
+								state = 6 ### Flandern
+								state = 29 ### Kalen
+								state = 34 ### Walloonien
+								state = 18 ### Kampen
+								state = 1625 ### Reimen
+								state = 17 # Frieg whatever 
+								state = 15 # Normandie
+								state = 1626 # Pickardien
+							}
+						}
+					}
+
+				set_variable = { BRG_Pop_Charlemagne_Special_Gain = 0 } #### Charlemagne gain variable
+
+				set_variable = { BRG_Pop_Charlemagne_Special_Gain = THIS.BRG_Too_Many_Workers_Resistance_Calculation } ##### Sets this new special gain variable to the aformentioned resistance calc
+
+				multiply_variable = { BRG_Pop_Charlemagne_Special_Gain = 1.2 } ### Multiplies the special Charlemagne case so it's larger
+
+				round_variable = BRG_Pop_Charlemagne_Special_Gain ### Rounds it
+
+				clamp_variable = {
+					var = BRG_Pop_Charlemagne_Special_Gain #### Clamps it
+					min = 0
+					max = 7
+				}
+
+				set_variable = { BRG_Pop_Other_Legions_Lower_Gain = 0 } ### Sets the variable for the other legions
+
+				set_variable = { BRG_Pop_Other_Legions_Lower_Gain = THIS.BRG_Too_Many_Workers_Resistance_Calculation } ##### Sets this new special gain variable to the aformentioned resistance calc
+
+				multiply_variable = { BRG_Pop_Other_Legions_Lower_Gain = 0.5 } ### Multiplies the special other Legions case so it's smaller
+
+				round_variable = BRG_Pop_Other_Legions_Lower_Gain ### Rounds it
+
+				clamp_variable = {
+					var = BRG_Pop_Other_Legions_Lower_Gain #### Clamps it
+					min = 0
+					max = 4
+				}
+
+				if = {
+					limit = {
+						BRG = {
+							NOT = { has_country_flag = BRG_charlemagne_dead }
+						}
+					}
+					add_to_variable = { THIS.CharlemagneSupport = BRG_Pop_Charlemagne_Special_Gain } #### Adds the special gain to Charle if they are still alive
+				}
+
+				if = {
+					limit = {
+						BRG = {
+							NOT = { has_country_flag = BRG_walloon_dead }
+						}
+					}
+					add_to_variable = { THIS.WalloonSupport = BRG_Pop_Other_Legions_Lower_Gain } #### Adds this lower gain to Walloon if they aren't dead
+				}
+
+				add_to_variable = { THIS.LangemarckSupport = BRG_Pop_Other_Legions_Lower_Gain } #### Adds the lower gain to Langemarck
+
+				subtract_from_variable = { THIS.HimmlerSupport = BRG_Pop_Charlemagne_Special_Gain } #### Subtracts the special value from Himmler
+
+				BRG_Domestic_GUI_Clamp = yes #### Clamps all the stuff
+				}
+			
+			if = {
+				limit = {
+						state = 15 #Normandie
+					}
+
+
+				set_variable = { BRG_Pop_Resistance_Special_Gain = 0 } #### Resistance gain variable
+
+				set_variable = { BRG_Pop_Resistance_Special_Gain = THIS.BRG_Too_Many_Workers_Resistance_Calculation } ##### Sets this new special gain variable to the aformentioned resistance calc
+
+				multiply_variable = { BRG_Pop_Resistance_Special_Gain = 1.2 } ### Multiplies the special Resistance case so it's larger
+
+				round_variable = BRG_Pop_Resistance_Special_Gain ### Rounds it
+
+				clamp_variable = {
+					var = BRG_Pop_Resistance_Special_Gain #### Clamps it
+					min = 0
+					max = 7
+					}
+
+
+				set_variable = { BRG_Pop_Other_Legions_Lower_Gain = 0 } ### Sets the variable for the other legions
+
+				set_variable = { BRG_Pop_Other_Legions_Lower_Gain = THIS.BRG_Too_Many_Workers_Resistance_Calculation } ##### Sets this new special gain variable to the aformentioned resistance calc
+
+				multiply_variable = { BRG_Pop_Other_Legions_Lower_Gain = 0.5 } ### Multiplies the special other Legions case so it's smaller
+
+				round_variable = BRG_Pop_Other_Legions_Lower_Gain ### Rounds it
+				
+				if = {
+					limit = {
+						NOT = {
+							BRG = { has_country_flag = BRG_resistance_dead }
+							}
+						}
+						add_to_variable = { THIS.ResistanceSupport = BRG_Pop_Resistance_Special_Gain }
+					}
+				
+				if = {
+					limit = {
+						NOT = {
+							BRG = { has_country_flag = BRG_charlemagne_dead }
+						}
+					}
+					add_to_variable = { THIS.CharlemagneSupport = BRG_Pop_Charlemagne_Special_Gain } #### Adds the special gain to Charle if they are still alive
+				}
+				
+					subtract_from_variable = { THIS.HimmlerSupport = BRG_Pop_Resistance_Special_Gain } #### Subtracts the special value from Himmler
+
+					BRG_Domestic_GUI_Clamp = yes #### Clamps all the stuff
+				}
+			}
+
+			BRG_Domestic_GUI_Clamp = yes #### One more clamp cause why not
+		}
+
+
+
+	#############################################
+	####
+	#### WORKERS ADDITION STUFF
+	####
+	#############################################
+
+	add_to_variable = { THIS.BRG_Skilled_Worker_Pop = THIS.BRG_Skilled_Worker_Pop_Monthly_Change }
+
+	#### Add in new training thingy later once you get TT figured out
+
+
+
+
+
+		if = { #Are you starving yet?
+			limit = { BRG = { has_country_flag = BRG_Famine_Begun } }
+
+			##########FOOD PRODUCTION
+
+			set_temp_variable = { BRG_produced_food = BRG_state_food_production }
+
+			set_temp_variable = { BRG_food_modifier = BRG.BRG_food_income_base }
+
+			if = { #Food production more effective in rural areas
+				limit = {
+					OR = {
+						has_state_category = rural
+						has_state_category = town
+						has_state_category = pastoral
+						has_state_category = burgundian_mega_farm
+					}
+				}
+				if = {
+					limit = {
+						OR = {
+							has_state_category = rural
+							has_state_category = town
+							has_state_category = pastoral
+						}
+					}
+					add_to_temp_variable = { BRG_food_modifier = 0.5 }
+				}
+				else = {
+					add_to_temp_variable = { BRG_food_modifier = 2 }
+				}
+			}
+			if = { #Food production even more effective with maxed out agriculture socdev
+				limit = { BRG = { has_idea = tno_agriculture_modern } }
+				add_to_temp_variable = { BRG_food_modifier = 0.5 }
+			}
+			if = { #Food production drastically less effective in cities
+				limit = {
+					check_variable = { BRG_brutalist_city_level > 0 }
+				}	
+				set_temp_variable = { BRG_city_famine_penalty = BRG_brutalist_city_level }
+				multiply_temp_variable = { BRG_city_famine_penalty = 0.3 }
+				subtract_from_variable = { BRG_food_modifier = BRG_city_famine_penalty }
+			}
+
+			multiply_temp_variable = { BRG_produced_food = BRG_food_modifier }
+
+			add_to_variable = { BRG.BRG_National_Food_Reserve = BRG_produced_food }
+
+			add_to_variable = { BRG.BRG_last_months_food_balance = BRG_produced_food }
+
+
+
+			if = { #Prioritizing workers over cops
+				limit = {  BRG = { has_country_flag = BRG_Famine_Prioritize_Workers } }
+
+				###FOOD CONSUMPTION
+
+				set_temp_variable = { BRG_consumed_food =  BRG_Skilled_Worker_Pop } #Workers eat first
+				multiply_temp_variable = { BRG_consumed_food = BRG.BRG_food_consumption_base }
+				subtract_from_variable = { BRG.BRG_National_Food_Reserve = BRG_consumed_food }  #Calculate difference
+				subtract_from_variable = { BRG.BRG_last_months_food_balance = BRG_consumed_food }
+
+				if = {
+					limit = { check_variable = { BRG.BRG_National_Food_Reserve < 0 } } #If negative (Food Reserves overdrawn)
+
+					add_to_temp_variable = { BRG_monthly_worker_change = BRG.BRG_National_Food_Reserve } #Apply deficit
+					add_to_variable = { BRG.BRG_worker_deficit_points = 1 }
+					set_variable = { BRG.BRG_National_Food_Reserve = 0 } #Set Food Reserves to 0
+				}
+
+				set_temp_variable = { BRG_consumed_food =  BRG_Cops_Pop_State_Counter } #Cops eat now
+				multiply_temp_variable = { BRG_consumed_food = BRG.BRG_food_consumption_base }
+				multiply_temp_variable = { BRG_consumed_food = 0.5 } #Cops eating less
+				subtract_from_variable = { BRG.BRG_National_Food_Reserve = BRG_consumed_food } #Calculate difference
+				subtract_from_variable = { BRG.BRG_last_months_food_balance = BRG_consumed_food }
+				add_to_variable = { BRG.BRG_cop_deficit_points = 0.1 }
+				if = {
+					limit = { check_variable = { BRG.BRG_National_Food_Reserve < 0 } } #If negative (Food Reserves overdrawn)
+
+					add_to_temp_variable = { BRG_monthly_worker_change = BRG.BRG_National_Food_Reserve } #Apply deficit
+					add_to_variable = { BRG.BRG_cop_deficit_points = 1 }
+					set_variable = { BRG.BRG_National_Food_Reserve = 0 } #Set Food Reserves to 0
+				}
+
+			}
+
+			else_if = { #Prioritize cops over workers
+				limit = {  BRG = { has_country_flag = BRG_Famine_Prioritize_Cops } }
+
+				###FOOD CONSUMPTION
+
+				set_temp_variable = { BRG_consumed_food =  BRG_Cops_Pop_State_Counter } #Cops eat first
+				multiply_temp_variable = { THIS.BRG_consumed_food = BRG.BRG_food_consumption_base }
+				subtract_from_variable = { BRG.BRG_National_Food_Reserve = BRG_consumed_food }  #Calculate difference
+				subtract_from_variable = { BRG.BRG_last_months_food_balance = BRG_consumed_food }
+
+				if = {
+					limit = { check_variable = { BRG.BRG_National_Food_Reserve < 0 } } #If negative (Food Reserves overdrawn)
+
+					add_to_variable = { BRG_Cops_Pop_State_Counter = BRG.BRG_National_Food_Reserve } #Apply deficit
+					add_to_variable = { BRG.BRG_cop_deficit_points = 1 }
+					set_variable = { BRG.BRG_National_Food_Reserve = 0 } #Set Food Reserves to 0
+				}
+
+				set_temp_variable = { BRG_consumed_food =  BRG_Skilled_Worker_Pop } #Workers eat now
+				multiply_temp_variable = { BRG_consumed_food = BRG.BRG_food_consumption_base }
+				multiply_temp_variable = { BRG_consumed_food = 0.8 } #Workers eating less
+				add_to_variable = { BRG.BRG_worker_deficit_points = 0.1 }
+				subtract_from_variable = { BRG.BRG_National_Food_Reserve = BRG_consumed_food }  #Calculate difference
+				subtract_from_variable = { BRG.BRG_last_months_food_balance = BRG_consumed_food }
+
+				if = {
+					limit = { check_variable = { BRG.BRG_National_Food_Reserve < 0 } } #If negative (Food Reserves overdrawn)
+
+					add_to_temp_variable = { BRG_monthly_worker_change = BRG.BRG_National_Food_Reserve } #Apply deficit
+					add_to_variable = { BRG.BRG_worker_deficit_points = 1 }
+					set_variable = { BRG.BRG_National_Food_Reserve = 0 } #Set Food Reserves to 0
+				}
+			}
+			else = { #Favor neither side
+
+				###FOOD CONSUMPTION
+
+				set_temp_variable = { BRG_consumed_food = BRG_Skilled_Worker_Pop } #Both eat at the same time
+				add_to_temp_variable = { BRG_consumed_food =  BRG_Cops_Pop_State_Counter }
+				multiply_temp_variable = { BRG_consumed_food = BRG.BRG_food_consumption_base }
+				subtract_from_variable = { BRG.BRG_National_Food_Reserve = BRG_consumed_food }  #Calculate difference
+				subtract_from_variable = { BRG.BRG_last_months_food_balance = BRG_consumed_food }
+
+
+				if = {
+					limit = { check_variable = { BRG.BRG_National_Food_Reserve < 0 } } #If negative (Food Reserves overdrawn)
+					if = { #Sanity checks for more cops than workers
+						limit = { check_variable = { BRG_Skilled_Worker_Pop > BRG_Cops_Pop_State_Counter } }
+						set_temp_variable = { BRG_Demographic_Representation_Cop = BRG_Cops_Pop_State_Counter }
+						divide_temp_variable = { BRG_Demographic_Representation_Cop = BRG_Skilled_Worker_Pop }
+						set_temp_variable = { BRG_Cop_Decrease = BRG_Cops_Pop_State_Counter }
+						multiply_temp_variable = { BRG_Cop_Decrease = BRG_Demographic_Representation_Cop }
+						set_temp_variable = { BRG_Demographic_Representation_Worker = 1 }
+						subtract_from_temp_variable = { BRG_Demographic_Representation_Worker = BRG_Demographic_Representation_Cop }
+						set_temp_variable = { BRG_Worker_Decrease = BRG_Skilled_Worker_Pop }
+						multiply_temp_variable = { BRG_Worker_Decrease = BRG_Demographic_Representation_Worker }
+					}
+					else = { #Sanity checks for more cops than workers
+						set_temp_variable = { BRG_Demographic_Representation_Worker = BRG_Skilled_Worker_Pop }
+						divide_temp_variable = { BRG_Demographic_Representation_Worker = BRG_Cops_Pop_State_Counter }
+						set_temp_variable = { BRG_Worker_Decrease = BRG_Cops_Pop_State_Counter }
+						multiply_temp_variable = { BRG_Worker_Decrease = BRG_Demographic_Representation_Worker }
+						set_temp_variable = { BRG_Demographic_Representation_Cop = 1 }
+						subtract_from_temp_variable = { BRG_Demographic_Representation_Cop = BRG_Demographic_Representation_Worker }
+						set_temp_variable = { BRG_Cop_Decrease = BRG_Cops_Pop_State_Counter }
+						multiply_temp_variable = { BRG_Cop_Decrease = BRG_Demographic_Representation_Cop }
+					}
+					subtract_from_temp_variable = { BRG_monthly_worker_change =  BRG_Worker_Decrease } #Apply deficit
+					subtract_from_variable = { BRG_Cops_Pop_State_Counter =  BRG_Cop_Decrease } #Apply deficit
+					add_to_variable = { BRG.BRG_worker_deficit_points = 1 }
+					add_to_variable = { BRG.BRG_cop_deficit_points = 1 }
+					set_variable = { BRG.BRG_National_Food_Reserve = 0 } #Set Food Reserves to 0
+				}
+			}
+		}
+
+		add_to_variable = { BRG_Skilled_Worker_Pop = BRG_monthly_worker_change } ## Adds monthly change to the pops
+		round_variable = BRG_Skilled_Worker_Pop
+		round_variable = BRG_Cops_Pop_State_Counter
+
+		if = { limit = { check_variable = { nationality = 140 } }
+			add_to_variable = { BRG_Skilled_Worker_Pop = 200 }
+			add_to_variable = { BRG_Cops_National_Reserve = 200 }
+		}
+
+		if = { limit = { check_variable = { nationality = 123 } }
+			add_to_variable = { BRG_Skilled_Worker_Pop = -200 }
+			add_to_variable = { BRG_Cops_National_Reserve = -200 }
+		}
+
+	}
+
+
+	if = { #Famine checks
+		limit = { has_country_flag = BRG_Famine_Begun }
+		clamp_variable = {
+			var = BRG_National_Food_Reserve
+			min = 0
+			max = BRG_food_capacity
+		}
+		#Check for Famine penalties
+		if = {
+			limit = { check_variable = { BRG_cop_deficit_points > 39 } }
+			country_event = { id = BRG_agri.9 }
+		}
+		if = {
+			limit = { check_variable = { BRG_worker_deficit_points > 39 } }
+			country_event = { id = BRG_agri.10 }
+		}
+
+		if = { #Check for the activation of Famine Phase 2 or end of famine
+			limit = { has_completed_focus = BRG_the_final_measures }
+			if = {
+				limit = { has_country_flag = BRG_starvation_occured }
+				set_variable = { BRG_famine_stop_progress = 0 }
+				if = {
+					limit = { NOT = { has_country_flag = BRG_agriculture_phase_2 } }
+					add_to_variable = { BRG_second_famine_counter = 1 }
+					if = {
+						limit = { check_variable = { BRG_second_famine_counter > 2 } }
+						country_event = { id = BRG_unlock.9 }
+					}
+				}
+			}
+			else = {
+				set_variable = { BRG.BRG_second_famine_counter = 0 }
+				add_to_variable = { BRG_famine_stop_progress = 1 }
+				if = {
+					limit = { check_variable = { BRG_famine_stop_progress > 8 } }
+					country_event = { id = BRG_agri.11 }
+				}
+			}
+		}
+	}
+
+	if = { #Has the player fucked up Rodomo
+		limit = {
+			has_completed_focus = BRG_industrialbezirk_rodomo
+			check_variable = { 15.BRG_Skilled_Worker_Pop < 0 }
+		}
+		set_country_flag = BRG_rodomo_deficit_flag
+		activate_mission = BRG_failed_to_feed_the_beast
+
+	}
+
+
+	BRG_Updating_State_Pops_Overlays = yes #### Updates the overlay
+}
+
+
+##################################################################################################################################
+##############
+##############           OPERATIONS
+##############
+##################################################################################################################################
+
+BRG_Monthly_Operations_Update = {
+
+	add_to_variable = { BRG_Operations_Groundwork = BRG_Operations_Monthly_Groundwork_Gain } ### Adds to groundwork
+
+
+	if = { ### Walloon
+		limit = {
+			check_variable = { BRG_Operations_Target_Selector = 1 }
+		}
+		set_variable = { BRG_Operations_Targeted_Legion_Current_Sus = BRG_Operations_Walloon_Sus }
+	}
+
+	if = { ### Charlemagne
+		limit = {
+			check_variable = { BRG_Operations_Target_Selector = 2 }
+		}
+		set_variable = { BRG_Operations_Targeted_Legion_Current_Sus = BRG_Operations_Charlemagne_Sus }
+	}
+
+	if = { ### RPY
+		limit = {
+			check_variable = { BRG_Operations_Target_Selector = 3 }
+		}
+		set_variable = { BRG_Operations_Targeted_Legion_Current_Sus = BRG_Operations_RPY_Sus }
+	}
+
+
+	add_to_variable = { BRG_Operations_Targeted_Legion_Current_Sus = BRG_Operations_Targeted_Legion_Sus_Monthly_Gain } ### Adds to Legion sus 
+
+
+
+	if = { #### If the current Sus is over 100 
+		limit = {
+			check_variable = { BRG_Operations_Targeted_Legion_Current_Sus > 99 }
+		}
+
+		if = { ### Walloon
+			limit = {
+				check_variable = { BRG_Operations_Target_Selector = 1 }
+			}
+			country_event = { id = BRG_political.22 } ### Walloon figured us out and went underground
+		}
+
+		if = { ### Charlemagne
+			limit = {
+				check_variable = { BRG_Operations_Target_Selector = 2 }
+			}
+			country_event = { id = BRG_political.26 } ### Charlemagne figured us out and went underground
+		}
+
+		if = { ### RPY
+			limit = {
+				check_variable = { BRG_Operations_Target_Selector = 3 }
+			}
+			#country_event = { id = BRG_political.22 } ### RPY figured us out and went underground NEED TO MAKE THIS EVENT
+		}
+	}
+}
+
+BRG_Operations_Setup = {
+
+	set_temp_variable = { BRG_charlemagne_legion_sus_temp = BRG_Charla_Sus } #Starting legion sus = investigation sus/2
+	divide_temp_variable = { BRG_charlemagne_legion_sus_temp = 2 }
+
+	set_variable = { BRG_Operations_Charlemagne_Sus = BRG_charlemagne_legion_sus_temp }
+
+	set_temp_variable = { BRG_walloon_legion_sus_temp = BRG_Charla_Sus }
+	divide_temp_variable = { BRG_walloon_legion_sus_temp = 2 }
+
+	set_variable = { BRG_Operations_Walloon_Sus = BRG_walloon_legion_sus_temp }
+
+	set_temp_variable = { BRG_rpy_sus_temp = BRG_RPY_Sus }
+	divide_temp_variable = { BRG_rpy_sus_temp = 2 }
+
+
+	set_variable = { BRG_Operations_RPY_Sus = BRG_rpy_sus_temp }
+
+
+	set_variable = { BRG_operation_equipment_cost = 2000 }
+	set_variable = { BRG_operation_political_cost_small = 25 }
+	set_variable = { BRG_operation_political_cost_medium = 50 }
+	set_variable = { BRG_operation_political_cost_large = 75 }
+
+	set_country_flag = BRG_Operations_Unlocked
+}
+
+
+BRG_Operations_Dismantelement_Setup = {
+
+	if = { ### Walloon
+		limit = {
+			check_variable = { BRG_Operations_Target_Selector = 1 }
+		}
+		set_variable = { BRG_Operations_Targeted_Legion_Current_Sus = BRG_Operations_Walloon_Sus }
+	}
+
+	if = { ### Charlemagne
+		limit = {
+			check_variable = { BRG_Operations_Target_Selector = 2 }
+		}
+		set_variable = { BRG_Operations_Targeted_Legion_Current_Sus = BRG_Operations_Charlemagne_Sus }
+	}
+
+	if = { ### RPY
+		limit = {
+			check_variable = { BRG_Operations_Target_Selector = 3 }
+		}
+		set_variable = { BRG_Operations_Targeted_Legion_Current_Sus = BRG_Operations_RPY_Sus }
+	}
+
+	set_temp_variable = { BRG_Operations_Initial_Sucsess = 100 }
+
+	set_temp_variable = { BRG_Operations_Initial_Failure = BRG_Operations_Targeted_Legion_Current_Sus }
+
+	divide_temp_variable = { BRG_Operations_Initial_Failure = 4 }
+
+	subtract_from_temp_variable = { BRG_Operations_Initial_Sucsess = BRG_Operations_Initial_Failure }
+
+
+	if = { ### Walloon
+		limit = {
+			check_variable = { BRG_Operations_Target_Selector = 1 }
+		}
+
+		random_list = { #Success rtate based on amount of prep
+
+			BRG_Operations_Initial_Sucsess = { 
+				country_event = { id = BRG_political.20 days = 3 } 
+			}
+
+			BRG_Operations_Initial_Failure = { 
+				country_event = { id = BRG_political.21 days = 3 } 
+				}
+		}
+	}
+
+	if = { ### Charlemagne
+		limit = {
+			check_variable = { BRG_Operations_Target_Selector = 2 }
+		}
+
+		random_list = { #Success rtate based on amount of prep
+
+			BRG_Operations_Initial_Sucsess = { 
+				country_event = { id = BRG_political.24 days = 3 } 
+			}
+
+			BRG_Operations_Initial_Failure = { 
+				country_event = { id = BRG_political.25 days = 3 } 
+				}
+		}
+	}
+
+	if = { ### RPY
+		limit = {
+			check_variable = { BRG_Operations_Target_Selector = 3 }
+		}
+
+		random_list = { #Success rtate based on amount of prep
+
+			BRG_Operations_Initial_Sucsess = { 
+				country_event = { id = BRG_political.36 days = 3 } 
+			}
+
+			BRG_Operations_Initial_Failure = { 
+				country_event = { id = BRG_political.37 days = 3 } 
+			}
+		}
+	}	
+}
+
+##################################################################################################################################
+##############
+##############           END OPERATIONS
+##############
+##################################################################################################################################
+
+TNO_BRG_main_tree_swap = {
+	mark_focus_tree_layout_dirty = yes
+}
+
+TNO_BRG_domestic_tree_swap = {
+	mark_focus_tree_layout_dirty = yes
+}
+###Infrastructure Stuff
+BRG_increase_rodomo_cost = {
+	custom_effect_tooltip = BRG_increase_rodomo_costs
+	if = {
+		limit = { check_variable = { BRG_Rodomo_Cost < 25000 } }
+		custom_effect_tooltip = BRG_rodomo_worker_decrease_large
+		hidden_effect = {
+			15 = { subtract_from_variable = { BRG_Skilled_Worker_Pop_Monthly_Change = -900 } }
+			if = {
+				limit = { NOT = { has_country_flag = BRG_rodomo_accident_4 } }
+				country_event = { id = BRG_infra.15 days = 11 random_hours = 720 }
+			}
+		}
+	}
+	else_if ={
+		limit = { check_variable = { BRG_Rodomo_Cost < 20000 } }
+		custom_effect_tooltip = BRG_rodomo_worker_decrease_medium
+		hidden_effect = {
+			15 = { subtract_from_variable = { BRG_Skilled_Worker_Pop_Monthly_Change = -500 } }
+			if = {
+				limit = { NOT = { has_country_flag = BRG_rodomo_accident_3 } }
+				country_event = { id = BRG_infra.14 days = 21 random_hours = 720 }
+			}
+		}
+	}
+	else_if ={
+		limit = { check_variable = { BRG_Rodomo_Cost < 15000 } }
+		custom_effect_tooltip = BRG_rodomo_worker_decrease_small
+		hidden_effect = {
+			15 = { subtract_from_variable = { BRG_Skilled_Worker_Pop_Monthly_Change = -300 } }
+			if = {
+				limit = { NOT = { has_country_flag = BRG_rodomo_accident_2 } }
+				country_event = { id = BRG_infra.13 days = 18 random_hours = 720 }
+			}
+		}
+	}
+	else_if = {
+		limit = { check_variable = { BRG_Rodomo_Cost < 10000 } }
+		custom_effect_tooltip = BRG_rodomo_worker_decrease_minor
+		hidden_effect = {
+			15 = { subtract_from_variable = { BRG_Skilled_Worker_Pop_Monthly_Change = -150 } }
+			if = {
+				limit = { NOT = { has_country_flag = BRG_rodomo_accident_1 } }
+				country_event = { id = BRG_infra.12 days = 13 random_hours = 720 }
+			}
+		}
+	}
+}
+###nuclear shit
+TNO_Charlemagne_XP_Checks = {
+	#manpower
+	if = {
+		limit = {
+			check_variable = { charlemagne_manpower_level = 1 }
+			check_variable = { charlemagne_manpower_xp > 299.9 }
+		}
+
+		subtract_from_variable = { charlemagne_manpower_xp = 300 }
+		set_variable = { charlemagne_manpower_level = 2 }
+
+		set_variable = { charlemagne_manpower_xp_needed = 600 }
+	}
+	if = {
+		limit = {
+			check_variable = { charlemagne_manpower_level = 2 }
+			check_variable = { charlemagne_manpower_xp > 599.9 }
+		}
+
+		subtract_from_variable = { charlemagne_manpower_xp = 600 }
+		set_variable = { charlemagne_manpower_level = 3 }
+
+		set_variable = { charlemagne_manpower_xp_needed = 1200 }
+	}
+	if = {
+		limit = {
+			check_variable = { charlemagne_manpower_level = 3 }
+			check_variable = { charlemagne_manpower_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { charlemagne_manpower_xp = 1200 }
+		set_variable = { charlemagne_manpower_level = 4 }
+
+		set_variable = { charlemagne_manpower_xp_needed = 0 }
+	}
+	#money
+	if = {
+		limit = {
+			check_variable = { charlemagne_money_level = 1 }
+			check_variable = { charlemagne_money_xp > 299.9 }
+		}
+
+		subtract_from_variable = { charlemagne_money_xp = 300 }
+		set_variable = { charlemagne_money_level = 2 }
+
+		set_variable = { charlemagne_money_xp_needed = 600 }
+	}
+	if = {
+		limit = {
+			check_variable = { charlemagne_money_level = 2 }
+			check_variable = { charlemagne_money_xp > 599.9 }
+		}
+
+		subtract_from_variable = { charlemagne_money_xp = 600 }
+		set_variable = { charlemagne_money_level = 3 }
+
+		set_variable = { charlemagne_money_xp_needed = 1200 }
+	}
+	if = {
+		limit = {
+			check_variable = { charlemagne_money_level = 3 }
+			check_variable = { charlemagne_money_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { charlemagne_money_xp = 1200 }
+		set_variable = { charlemagne_money_level = 4 }
+
+		set_variable = { charlemagne_money_xp_needed = 0 }
+	}
+	#infantry equipment
+	if = {
+		limit = {
+			check_variable = { charlemagne_if_level = 1 }
+			check_variable = { charlemagne_if_xp > 299.9 }
+		}
+
+		subtract_from_variable = { charlemagne_if_xp = 300 }
+		set_variable = { charlemagne_if_level = 2 }
+
+		set_variable = { charlemagne_if_xp_needed = 600 }
+
+	}
+	if = {
+		limit = {
+			check_variable = { charlemagne_if_level = 2 }
+			check_variable = { charlemagne_if_xp > 599.9 }
+		}
+
+		subtract_from_variable = { charlemagne_if_xp = 600 }
+		set_variable = { charlemagne_if_level = 3 }
+
+		set_variable = { charlemagne_if_xp_needed = 1200 }
+	}
+	if = {
+		limit = {
+			check_variable = { charlemagne_if_level = 3 }
+			check_variable = { charlemagne_if_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { charlemagne_if_xp = 1200 }
+		set_variable = { charlemagne_if_level = 4 }
+
+		set_variable = { charlemagne_if_xp_needed = 0 }
+	}
+
+	###LANGEMARCK###
+	#manpower
+	if = {
+		limit = {
+			check_variable = { langemarck_manpower_level = 1 }
+			check_variable = { langemarck_manpower_xp > 299.9 }
+		}
+
+		subtract_from_variable = { langemarck_manpower_xp = 300 }
+		set_variable = { langemarck_manpower_level = 2 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { langemarck_manpower_xp_needed = 600 }
+	}
+	if = {
+		limit = {
+			check_variable = { langemarck_manpower_level = 2 }
+			check_variable = { langemarck_manpower_xp > 599.9 }
+		}
+
+		subtract_from_variable = { langemarck_manpower_xp = 600 }
+		set_variable = { langemarck_manpower_level = 3 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { langemarck_manpower_xp_needed = 1200 }
+	}
+	if = {
+		limit = {
+			check_variable = { langemarck_manpower_level = 3 }
+			check_variable = { langemarck_manpower_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { langemarck_manpower_xp = 1200 }
+		set_variable = { langemarck_manpower_level = 4 }
+
+		set_variable = { langemarck_manpower_xp_needed = 0 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+	}
+	#money
+	if = {
+		limit = {
+			check_variable = { langemarck_money_level = 1 }
+			check_variable = { langemarck_money_xp > 299.9 }
+		}
+
+		subtract_from_variable = { langemarck_money_xp = 300 }
+		set_variable = { langemarck_money_level = 2 }
+
+		set_variable = { langemarck_money_xp_needed = 600 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { langemarck_money_level = 2 }
+			check_variable = { langemarck_money_xp > 599.9 }
+		}
+
+		subtract_from_variable = { langemarck_money_xp = 600 }
+		set_variable = { langemarck_money_level = 3 }
+
+		set_variable = { langemarck_money_xp_needed = 1200 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { langemarck_money_level = 3 }
+			check_variable = { langemarck_money_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { langemarck_money_xp = 1200 }
+		set_variable = { langemarck_money_level = 4 }
+
+		set_variable = { langemarck_money_xp_needed = 0 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+	}
+	#infantry equipment
+	if = {
+		limit = {
+			check_variable = { langemarck_if_level = 1 }
+			check_variable = { langemarck_if_xp > 299.9 }
+		}
+
+		subtract_from_variable = { langemarck_if_xp = 300 }
+		set_variable = { langemarck_if_level = 2 }
+
+		set_variable = { langemarck_if_xp_needed = 600 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { langemarck_if_level = 2 }
+			check_variable = { langemarck_if_xp > 599.9 }
+		}
+
+		subtract_from_variable = { langemarck_if_xp = 600 }
+		set_variable = { langemarck_if_level = 3 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { langemarck_if_xp_needed = 1200 }
+	}
+	if = {
+		limit = {
+			check_variable = { langemarck_if_level = 3 }
+			check_variable = { langemarck_if_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { langemarck_if_xp = 1200 }
+		set_variable = { langemarck_if_level = 4 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { langemarck_if_xp_needed = 0 }
+	}
+	###WALLOON###
+	#manpower
+	if = {
+		limit = {
+			check_variable = { walloon_manpower_level = 1 }
+			check_variable = { walloon_manpower_xp > 299.9 }
+		}
+
+		subtract_from_variable = { walloon_manpower_xp = 300 }
+		set_variable = { walloon_manpower_level = 2 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { walloon_manpower_xp_needed = 600 }
+	}
+	if = {
+		limit = {
+			check_variable = { walloon_manpower_level = 2 }
+			check_variable = { walloon_manpower_xp > 599.9 }
+		}
+
+		subtract_from_variable = { walloon_manpower_xp = 600 }
+		set_variable = { walloon_manpower_level = 3 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { walloon_manpower_xp_needed = 1200 }
+	}
+	if = {
+		limit = {
+			check_variable = { walloon_manpower_level = 3 }
+			check_variable = { walloon_manpower_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { walloon_manpower_xp = 1200 }
+		set_variable = { walloon_manpower_level = 4 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { walloon_manpower_xp_needed = 0 }
+	}
+	#money
+	if = {
+		limit = {
+			check_variable = { walloon_money_level = 1 }
+			check_variable = { walloon_money_xp > 299.9 }
+		}
+
+		subtract_from_variable = { walloon_money_xp = 300 }
+		set_variable = { walloon_money_level = 2 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { walloon_money_xp_needed = 600 }
+	}
+	if = {
+		limit = {
+			check_variable = { walloon_money_level = 2 }
+			check_variable = { walloon_money_xp > 599.9 }
+		}
+
+		subtract_from_variable = { walloon_money_xp = 600 }
+		set_variable = { walloon_money_level = 3 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { walloon_money_xp_needed = 1200 }
+	}
+	if = {
+		limit = {
+			check_variable = { walloon_money_level = 3 }
+			check_variable = { walloon_money_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { walloon_money_xp = 1200 }
+		set_variable = { walloon_money_level = 4 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { walloon_money_xp_needed = 0 }
+
+	}
+	#infantry equipment
+	if = {
+		limit = {
+			check_variable = { walloon_if_level = 1 }
+			check_variable = { walloon_if_xp > 299.9 }
+		}
+
+		subtract_from_variable = { walloon_if_xp = 300 }
+		set_variable = { walloon_if_level = 2 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { walloon_if_xp_needed = 600 }
+
+	}
+	if = {
+		limit = {
+			check_variable = { walloon_if_level = 2 }
+			check_variable = { walloon_if_xp > 599.9 }
+		}
+
+		subtract_from_variable = { walloon_if_xp = 600 }
+		set_variable = { walloon_if_level = 3 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { walloon_if_xp_needed = 1200 }
+	}
+	if = {
+		limit = {
+			check_variable = { walloon_if_level = 3 }
+			check_variable = { walloon_if_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { walloon_if_xp = 1200 }
+		set_variable = { walloon_if_level = 4 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { walloon_if_xp_needed = 0 }
+	}
+	###HIMMLER##
+	#manpower
+	if = {
+		limit = {
+			check_variable = { himmler_manpower_level = 1 }
+			check_variable = { himmler_manpower_xp > 299.9 }
+		}
+
+		subtract_from_variable = { himmler_manpower_xp = 300 }
+		set_variable = { himmler_manpower_level = 2 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { himmler_manpower_xp_needed = 600 }
+	}
+	if = {
+		limit = {
+			check_variable = { himmler_manpower_level = 2 }
+			check_variable = { himmler_manpower_xp > 599.9 }
+		}
+
+		subtract_from_variable = { himmler_manpower_xp = 600 }
+		set_variable = { himmler_manpower_level = 3 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { himmler_manpower_xp_needed = 1200 }
+	}
+	if = {
+		limit = {
+			check_variable = { himmler_manpower_level = 3 }
+			check_variable = { himmler_manpower_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { himmler_manpower_xp = 1200 }
+		set_variable = { himmler_manpower_level = 4 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { himmler_manpower_xp_needed = 0 }
+	}
+	#money
+	if = {
+		limit = {
+			check_variable = { himmler_money_level = 1 }
+			check_variable = { himmler_money_xp > 299.9 }
+		}
+
+		subtract_from_variable = { himmler_money_xp = 300 }
+		set_variable = { himmler_money_level = 2 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { himmler_money_xp_needed = 600 }
+	}
+	if = {
+		limit = {
+			check_variable = { himmler_money_level = 2 }
+			check_variable = { himmler_money_xp > 599.9 }
+		}
+
+		subtract_from_variable = { himmler_money_xp = 600 }
+		set_variable = { himmler_money_level = 3 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { himmler_money_xp_needed = 1200 }
+	}
+	if = {
+		limit = {
+			check_variable = { himmler_money_level = 3 }
+			check_variable = { himmler_money_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { himmler_money_xp = 1200 }
+		set_variable = { himmler_money_level = 4 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+		set_variable = { himmler_money_xp_needed = 0 }
+	}
+	#infantry equipment
+	if = {
+		limit = {
+			check_variable = { himmler_if_level = 1 }
+			check_variable = { himmler_if_xp > 299.9 }
+		}
+
+		subtract_from_variable = { himmler_if_xp = 300 }
+		set_variable = { himmler_if_level = 2 }
+
+		set_variable = { himmler_if_xp_needed = 600 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { himmler_if_level = 2 }
+			check_variable = { himmler_if_xp > 599.9 }
+		}
+
+		subtract_from_variable = { himmler_if_xp = 600 }
+		set_variable = { himmler_if_level = 3 }
+		set_variable = { himmler_if_xp_needed = 1200 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { himmler_if_level = 3 }
+			check_variable = { himmler_if_xp > 1199.9 }
+		}
+
+		subtract_from_variable = { himmler_if_xp = 1200 }
+		set_variable = { himmler_if_level = 4 }
+		set_variable = { himmler_if_xp_needed = 0 }
+		every_owned_state = {
+			add_to_variable = { THIS.HimmlerSupport = 1 }
+		}
+	}
+	TNO_BRG_calculate_total_levels = yes
+	TNO_Level_Bonuses_Check = yes
+}
+TNO_Level_Bonuses_Check = {
+	set_variable = { brg_shelter_stab_boost_counter = himmler_total_level }
+	set_variable = { brg_shelter_himmler_loyalty_counter = himmler_total_level }
+	set_variable = { brg_consumer_goods_factor_counter = 0 }
+	divide_variable = { brg_shelter_stab_boost_counter = 2 }
+	divide_variable = { brg_consumer_goods_factor_counter = 3 }
+	subtract_from_variable = { brg_consumer_goods_factor_counter = himmler_total_level }
+
+	set_variable = { brg_shelter_stab_boost_counter_display = brg_shelter_stab_boost_counter }
+	set_variable = { brg_shelter_himmler_loyalty_counter_display = brg_shelter_himmler_loyalty_counter }
+	set_variable = { brg_consumer_goods_factor_counter_display = brg_consumer_goods_factor_counter }
+
+	divide_variable = { brg_shelter_stab_boost_counter = 100 }
+	divide_variable = { brg_consumer_goods_factor_counter = 100 }
+}
+TNO_BRG_calculate_total_levels = {
+	set_variable = { new_himmler_levels = 0 }
+	add_to_variable = { new_himmler_levels = himmler_if_level }
+	add_to_variable = { new_himmler_levels = himmler_money_level }
+	add_to_variable = { new_himmler_levels = himmler_manpower_level }
+	set_variable = { himmler_total_level = new_himmler_levels }
+
+	set_variable = { new_langemarck_levels = 0 }
+	add_to_variable = { new_langemarck_levels = langemarck_if_level }
+	add_to_variable = { new_langemarck_levels = langemarck_money_level }
+	add_to_variable = { new_langemarck_levels = langemarck_manpower_level }
+	set_variable = { langemarck_total_level = new_langemarck_levels }
+
+	set_variable = { new_walloon_levels = 0 }
+	add_to_variable = { new_walloon_levels = walloon_if_level }
+	add_to_variable = { new_walloon_levels = walloon_money_level }
+	add_to_variable = { new_walloon_levels = walloon_manpower_level }
+	set_variable = { walloon_total_level = new_walloon_levels }
+
+	set_variable = { new_charlemagne_levels = 0 }
+	add_to_variable = { new_charlemagne_levels = charlemagne_if_level }
+	add_to_variable = { new_charlemagne_levels = charlemagne_money_level }
+	add_to_variable = { new_charlemagne_levels = charlemagne_manpower_level }
+	set_variable = { charlemagne_total_level = new_charlemagne_levels }
+
+	set_variable = { BRG_national_shelter_level = 0 }
+	add_to_variable = { BRG_national_shelter_level = charlemagne_total_level }
+	add_to_variable = { BRG_national_shelter_level = walloon_total_level }
+	add_to_variable = { BRG_national_shelter_level = langemarck_total_level }
+	add_to_variable = { BRG_national_shelter_level = himmler_total_level }
+}
+
+TNO_BRG_clear_all_main_tree_triggers = {
+	custom_effect_tooltip = BRG_tree_nuke_tt
+
+	clr_country_flag = BRG_start_tree
+	clr_country_flag = BRG_WMD_flag
+	clr_country_flag = BRG_Schattenkrieg_flag
+	clr_country_flag = BRG_Predictable_Failure_flag
+	clr_country_flag = BRG_SA_War_flag
+	clr_country_flag = BRG_Public_Works_flag
+	clr_country_flag = BRG_Worker_Culture_flag
+	clr_country_flag = BRG_Education_Programs_flag
+	clr_country_flag = BRG_Oil_flag
+	clr_country_flag = BRG_Agriculture_flag
+}
+
+
+TNO_BRG_Clear_All_Evidence_Windows = {
+	clr_country_flag = BRG_Investigation_Walloon_Evidence_1_Flag
+	clr_country_flag = BRG_Investigation_Walloon_Evidence_2_Flag
+	clr_country_flag = BRG_Investigation_Walloon_Evidence_3_Flag
+	clr_country_flag = BRG_Investigation_Walloon_Evidence_4_Flag
+	clr_country_flag = BRG_Investigation_Walloon_Evidence_5_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Evidence_1_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_2_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_3_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_4_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_5_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_6_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_7_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_8_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_9_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_10_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_11_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_12_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_13_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_14_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_15_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_16_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_17_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_18_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_19_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_20_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_21_Flag
+	clr_country_flag = BRG_Investigation_CHR_Evidence_22_Flag
+
+	clr_country_flag = BRG_Investigation_RPY_Evidence_1_Flag
+	clr_country_flag = BRG_Investigation_RPY_Evidence_2_Flag
+	clr_country_flag = BRG_Investigation_RPY_Evidence_3_Flag
+	clr_country_flag = BRG_Investigation_RPY_Evidence_4_Flag
+	clr_country_flag = BRG_Investigation_RPY_Evidence_5_Flag
+	clr_country_flag = BRG_Investigation_RPY_Evidence_6_Flag
+	clr_country_flag = BRG_Investigation_RPY_Evidence_7_Flag
+	clr_country_flag = BRG_Investigation_RPY_Evidence_8_Flag
+	clr_country_flag = BRG_Investigation_RPY_Evidence_9_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Evidence_1_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_2_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_3_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_4_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_5_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_6_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_7_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_8_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_9_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_10_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_11_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_12_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_13_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_14_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_15_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_16_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_17_Flag
+	clr_country_flag = BRG_Investigation_WLN_Evidence_18_Flag
+}
+
+
+BRG_Investigations_Evidence_Flag_Clearing_Effect = {
+
+	###### DEGRELLE
+
+	clr_country_flag = BRG_Investigation_DeGrelle_Demolish_House_Operation_Flag
+	clr_country_flag = BRG_Investigation_DeGrelle_Watch_HQ_Operation_Flag
+	clr_country_flag = BRG_Investigation_DeGrelle_Raid_His_House_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_DeGrelle_Smuggle_Out_Records_Operation_Flag
+	clr_country_flag = BRG_Investigation_DeGrelle_Plant_An_Informant_Operation_Flag
+	clr_country_flag = BRG_Investigation_DeGrelle_Prepare_A_Raid_On_Bunker_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_DeGrelle_Watch_Trains_Operation_Flag
+	clr_country_flag = BRG_Investigation_DeGrelle_Track_His_Location_Operation_Flag
+	clr_country_flag = BRG_Investigation_DeGrelle_Interrogate_Conductor_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_DeGrelle_Check_Personal_Files_Operation_Flag
+	clr_country_flag = BRG_Investigation_DeGrelle_Plant_A_Tracking_Device_Operation_Flag
+	clr_country_flag = BRG_Investigation_DeGrelle_Check_Medical_Records_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_DeGrelle_Bug_His_Office_Operation_Flag
+	clr_country_flag = BRG_Investigation_DeGrelle_Plant_A_Mole_Operation_Flag
+	clr_country_flag = BRG_Investigation_DeGrelle_Authorize_A_Tail_Operation_Flag
+
+
+	####### RPY
+
+	clr_country_flag = BRG_Investigation_RPY_Search_Worker_Dorms_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Watching_Supply_Chains_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Comb_The_Factories_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_RPY_Interrogate_Driver_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Track_The_Trucks_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Look_Into_Their_Records_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_RPY_Watch_The_Garbagemen_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Look_Into_Disposal_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Test_The_Sludge_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_RPY_Install_Secret_Cameras_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Track_Warehouse_Logistics_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Shifting_Through_Garbage_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_RPY_Stake_Out_Shelburne_Operation_Flag
+	clr_country_flag =  BRG_Investigation_RPY_Track_Their_Residents_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Raiding_Shelburn_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_RPY_Search_Catacombs_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Set_Trap_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Search_Sewers_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_RPY_Decode_Address_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Find_Where_it_Was_Sent_Operation_Flag
+	clr_country_flag = BRG_Investigation_RPY_Look_Into_H_Operation_Flag
+
+
+	####### CHR
+
+	clr_country_flag = BRG_Investigation_CHR_Look_Into_Drug_Rumors_Operation_Flag # 1
+	clr_country_flag = BRG_Investigation_CHR_Observe_New_Territories_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Investigate_Nightly_Disturbances_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Stake_Out_Their_Streets_Operation_Flag # 2
+	clr_country_flag = BRG_Investigation_CHR_Analyze_Crystals_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Bribe_Dealer_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Map_Out_Distribution_Operation_Flag # 3
+	clr_country_flag = BRG_Investigation_CHR_Dig_Into_the_Paperwork_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Find_The_Lab_Complex_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Install_Secret_Cams_Operation_Flag # 4
+	clr_country_flag = BRG_Investigation_CHR_Deep_Cover_Operations_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Tap_Party_Phones_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Spy_On_Officers_Operation_Flag # 8
+	clr_country_flag = BRG_Investigation_CHR_Comb_Over_Budget_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Check_Germanification_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Investigate_School_System_Operation_Flag # 9
+	clr_country_flag = BRG_Investigation_CHR_Review_Supply_Inventory_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Trace_The_Cash_Flow_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Check_On_French_Subjugation_Operation_Flag # 10
+	clr_country_flag = BRG_Investigation_CHR_Interrogate_Surveying_Officers_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Check_On_Teaching_Curriculum_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Question_Teachers_Operation_Flag # 11
+	clr_country_flag = BRG_Investigation_CHR_Investigate_Power_Needs_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Find_Their_Motive_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Search_Dorms_Operation_Flag # 12
+	clr_country_flag = BRG_Investigation_CHR_Look_Into_The_Paperwork_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Comb_Over_Schools_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Look_Into_Manufactueres_Operation_Flag # 15
+	clr_country_flag = BRG_Investigation_CHR_Examine_Authors_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Find_Where_They_Went_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Sweep_The_Area_Operation_Flag # 16
+	clr_country_flag = BRG_Investigation_CHR_Stake_Out_The_Area_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Question_Locals_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Check_On_Storage_Site_Operation_Flag # 17
+	clr_country_flag = BRG_Investigation_CHR_Review_The_Transportation_Papers_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Comb_Over_Paintings_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Attempt_Crack_Code_Operation_Flag # 18
+	clr_country_flag = BRG_Investigation_CHR_Find_Where_It_Was_Made_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Look_Into_The_Artwork_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Check_Printing_History_Operation_Flag # 19
+	clr_country_flag = BRG_Investigation_CHR_Interrogate_the_Workers_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Look_Into_Supply_Chain_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Plant_Loyal_Moles_Operation_Flag # 20
+	clr_country_flag = BRG_Investigation_CHR_Install_Survielence_Equipment_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Use_It_To_Sneak_In_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_CHR_Investigate_The_Commander_Operation_Flag # 21
+	clr_country_flag = BRG_Investigation_CHR_Track_Their_Movements_Operation_Flag
+	clr_country_flag = BRG_Investigation_CHR_Take_Vehicles_For_Repair_Operation_Flag
+
+
+	####### WALLOON
+
+	clr_country_flag = BRG_Investigation_WLN_Look_Into_Morale_Operation_Flag # 1
+	clr_country_flag = BRG_Investigation_WLN_Review_Their_Command_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Check_Their_Finances_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Confiscate_Their_Files_Operation_Flag # 2
+	clr_country_flag = BRG_Investigation_WLN_Search_Dumpsters_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Bug_Their_Communications_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Analyzing_Message_Operation_Flag # 4
+	clr_country_flag = BRG_Investigation_WLN_Find_Rexist_Prop_Manufactuer_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Look_Into_Prop_Distribution_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Interrogate_Radio_Operators_Operation_Flag # 5
+	clr_country_flag = BRG_Investigation_WLN_Track_Interference_Source_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Decrypt_The_Message_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Raid_Safehouse_Operation_Flag # 6
+	clr_country_flag = BRG_Investigation_WLN_Stake_Out_Safehouse_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Infiltrate_The_Safehouse_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Find_What_It_Leads_To_Operation_Flag # 7
+	clr_country_flag = BRG_Investigation_WLN_Decode_Legend_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Question_The_OfficerS_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Verify_Its_Integrety_Operation_Flag # 13
+	clr_country_flag = BRG_Investigation_WLN_Look_Into_Receivers_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Confiscate_Their_Equipment_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Find_The_Motive_Operation_Flag # 11
+	clr_country_flag = BRG_Investigation_WLN_Look_Into_Distribution_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Identify_The_Supply_Chain
+
+	clr_country_flag = BRG_Investigation_WLN_Study_Their_Behavior_Operation_Flag # 12
+	clr_country_flag = BRG_Investigation_WLN_Investigate_Dissapearences_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Look_Into_Vehicle_Use_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Find_Who_Authorized_Them_Operation_Flag # 9
+	clr_country_flag = BRG_Investigation_WLN_Look_Over_Paperwork_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Investigate_The_Cargo_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Observe_The_Drills_Operation_Flag # 10
+	clr_country_flag = BRG_Investigation_WLN_Question_The_Trainers_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Check_On_Supply_Inventory_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Locate_Its_Destination_Operation_Flag # 14
+	clr_country_flag = BRG_Investigation_WLN_Find_Its_Source_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Investigate_Its_Usage_Operation_Flag
+
+	clr_country_flag = BRG_Investigation_WLN_Bug_Its_Authors_Operation_Flag # 15
+	clr_country_flag = BRG_Investigation_WLN_Find_Where_It_Was_Made_Operation_Flag
+	clr_country_flag = BRG_Investigation_WLN_Investigate_The_Officers_Operation_Flag
+
+	BRG_Domestic_GUI_Clamp = yes
+
+}
+
+
+BRG_Investigations_Operation_Sucsess_Unlocker_Effect = {
+
+
+##########################################################
+#########
+########## WLN
+##########
+##########################################################
+
+##################################
+#### WALLOON LEGION
+##################################
+
+### ACTION 1, LOOK INTO THEIR MORALE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Look_Into_Morale_Operation_Flag }
+
+		set_country_flag = BRG_WLN_Has_Unusual_Activites_Evidence
+
+		set_country_flag = BRG_WLN_Succseeded_Looking_Into_Morale_Flag
+	}
+
+### ACTION 2, LOOK OVER THEIR COMMAND
+
+	if = {
+		limit = { has_country_flag =  BRG_Investigation_WLN_Review_Their_Command_Operation_Flag }
+
+		set_country_flag = BRG_WLN_Has_Insulated_HQ_Evidence
+
+		set_country_flag = BRG_WLN_Succseeded_Looking_Into_The_Command
+	}
+
+### ACTION 3, CHECK THEIR FINANCES
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Check_Their_Finances_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Checking_Finances
+		}
+	}
+
+
+##################################
+#### AN INSULATED HQ
+##################################
+
+### ACTION 1, CONFISCATE THEIR FILES
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Confiscate_Their_Files_Operation_Flag }
+
+		custom_effect_tooltip = BRG_New_Evidence_Unlocked
+		add_to_variable = { BRG_Evidence_On_Walloon = 1 }
+
+		set_country_flag = BRG_WLN_Has_Autopsy_Evidence
+
+		set_country_flag = BRG_WLN_Succseeded_Confiscating_Files_Flag
+	}
+
+### ACTION 2, SEARCH THEIR DUMPSTERS
+
+	if = {
+		limit = { has_country_flag =  BRG_Investigation_WLN_Search_Dumpsters_Operation_Flag }
+
+		set_country_flag = BRG_WLN_Has_Rexist_Propaganda_Evidence
+
+		set_country_flag = BRG_WLN_Succseeded_Searching_Dumpsters
+	}
+
+### ACTION 3, BUG THEIR COMMUNICATIONS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Bug_Their_Communications_Operation_Flag }
+
+		set_country_flag = BRG_WLN_Has_Scrambled_Radio_Signals_Evidence
+
+		set_country_flag = BRG_WLN_Succseeded_Bugging_Communications
+	}
+
+##################################
+#### REXIST PROPAGANDA
+##################################
+
+### ACTION 1, ANAYLZE THE MESSAGE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Analyzing_Message_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Anaylzing_Propaganda
+		}
+	}
+
+### ACTION 2, FIND ITS MANUFACTURER
+
+	if = {
+		limit = { has_country_flag =  BRG_Investigation_WLN_Find_Rexist_Prop_Manufactuer_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Safehouse_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Safehouse_Evidence } }
+			set_country_flag = BRG_WLN_Has_Safehouse_Evidence
+		}
+	}
+
+### ACTION 3, LOOK INTO ITS DISTRIBUTION
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Look_Into_Prop_Distribution_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Look_Into_Distribution
+		}
+	}
+
+
+##################################
+#### SCRAMBLED RADIO SIGNALS
+##################################
+
+### ACTION 1, INTERROGATE THE OPERATORS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Interrogate_Radio_Operators_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Interrogating_Operators
+		}
+	}
+
+### ACTION 2, TRACK THE INTERFERENCE SOURCE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Track_Interference_Source_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Safehouse_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Safehouse_Evidence } }
+			set_country_flag = BRG_WLN_Has_Safehouse_Evidence
+		}
+	}
+
+### ACTION 3, DECRYPT THE MESSAGES
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Decrypt_The_Message_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Degrelle_Signoff_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag =  BRG_WLN_Has_Degrelle_Signoff_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Evidence_On_Walloon = 1 }
+			set_country_flag = BRG_WLN_Has_Degrelle_Signoff_Evidence
+		}
+	}
+
+
+##################################
+#### THEIR OLD SAFEHOUSE
+##################################
+
+### ACTION 1, RAID THE SAFEHOUSE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Raid_Safehouse_Operation_Flag }
+
+		set_country_flag = BRG_WLN_Has_Old_Maps_Evidence
+
+		set_country_flag = BRG_WLN_Succseeded_Infiltrating_Safehouse
+	}
+
+### ACTION 2, STAKE IT OUT
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Stake_Out_Safehouse_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Staking_Out_Safehouse
+		}
+	}
+
+### ACTION 3, INFLITRATE THE SAFEHOUSE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Infiltrate_The_Safehouse_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Infiltrating_Safehouse
+		}
+	}
+
+##################################
+####  CODED MAPS
+##################################
+
+### ACTION 1, FIND WHAT IT LEADS TO
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Find_What_It_Leads_To_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Lions_Den_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Lions_Den_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Evidence_On_Walloon = 1 }
+			set_country_flag = BRG_WLN_Has_Lions_Den_Evidence
+		}
+	}
+
+### ACTION 2, DECODE THE LEGEND
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Decode_Legend_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Decoding_The_Legend
+		}
+	}
+
+### ACTION 3, QUESTION THE OFFICERs
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Question_The_OfficerS_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Questioning_The_Officers
+		}
+	}
+
+
+##################################
+####  UNUSUAL ACTIVITY
+##################################
+
+### ACTION 1, STUDY THEIR BEHAVIOR
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Study_Their_Behavior_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Study_Their_Behavior
+		}
+	}
+
+### ACTION 2, INVESTIGATE THE DISSAPEARENCES
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Investigate_Dissapearences_Operation_Flag }
+
+		set_country_flag = BRG_Has_Training_Soldiers_Evidence
+
+		set_country_flag = BRG_WLN_Succseeded_Investigating_Dissapearence
+	}
+
+### ACTION 3, LOOK INTO THE VEHICLE USE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Look_Into_Vehicle_Use_Operation_Flag }
+
+		set_country_flag = BRG_Has_Mass_Convoys_Evidence
+
+		set_country_flag = BRG_WLN_Succseeded_Looking_Into_Vehicle_Use
+	}
+
+
+##################################
+####  MASS UNAPPROVED CONVOYS
+##################################
+
+### ACTION 1, FIND WHO AUTHORIZED THEM
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Find_Who_Authorized_Them_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Degrelle_Signoff_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Degrelle_Signoff_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Evidence_On_Walloon = 1 }
+			set_country_flag = BRG_WLN_Has_Degrelle_Signoff_Evidence
+		}
+	}
+
+### ACTION 2, LOOK OVER THE PAPERWORK
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Look_Over_Paperwork_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Looking_Over_Paperwork
+		}
+	}
+
+### ACTION 3, INVESTIGATE THE CARGO
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Investigate_The_Cargo_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Weapons_Caches_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Weapons_Caches_Evidence } }
+			set_country_flag = BRG_WLN_Has_Weapons_Caches_Evidence
+		}
+	}
+
+
+##################################
+####  NEW TRAINING REGIMENS
+##################################
+
+### ACTION 1, OBSERVE THE DRILLS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Observe_The_Drills_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Questioning_Trainers
+
+		}
+
+	}
+
+### ACTION 2, QUESTION THE TRAINERS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Question_The_Trainers_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Manufactuering_Guns_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Manufactuering_Guns_Evidence } }
+			set_country_flag = BRG_WLN_Has_Manufactuering_Guns_Evidence
+			set_country_flag = BRG_WLN_Succseeded_Observing_Drills
+		}
+	}
+
+### ACTION 3, CHECK ON THE INVENTORY
+
+	if = {
+		limit = { has_country_flag = RG_Investigation_WLN_Check_On_Supply_Inventory_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Weapons_Caches_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Weapons_Caches_Evidence } }
+			set_country_flag = BRG_WLN_Has_Weapons_Caches_Evidence
+		}
+	}
+
+
+##################################
+####  SEPERATE INDUSTRIAL
+##################################
+
+### ACTION 1, FIND THE MOTIVE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Find_The_Motive_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Operation_Leopold_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Operation_Leopold_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Evidence_On_Walloon = 1 }
+			set_country_flag = BRG_WLN_Has_Operation_Leopold_Evidence
+		}
+
+	}
+
+### ACTION 2, LOOK INTO THE DISTRIBUBTION
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Look_Into_Distribution_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Looking_Into_Distribution
+		}
+	}
+
+### ACTION 3, IDENTIFY THE SUPPLY CHAIN
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Identify_The_Supply_Chain }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Identifying_The_Supply_Chain
+		}
+	}
+
+
+##################################
+####  UNMARKED WEAPONS CACHES
+##################################
+
+### ACTION 1, LOCATE ITS DESTINATION
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Locate_Its_Destination_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Finding_Motive
+		}
+
+	}
+
+### ACTION 2, FIND ITS SOURCE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Find_Its_Source_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Manufactuering_Guns_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Manufactuering_Guns_Evidence } }
+			set_country_flag = BRG_WLN_Has_Manufactuering_Guns_Evidence
+			set_country_flag = BRG_WLN_Succseeded_Observing_Drills
+		}
+	}
+
+### ACTION 3, INVESTIGATE ITS USAGE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Investigate_Its_Usage_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Operation_Leopold_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Operation_Leopold_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Evidence_On_Walloon = 1 }
+			set_country_flag = BRG_WLN_Has_Operation_Leopold_Evidence
+		}
+	}
+
+
+##################################
+####  LEOPOLD PLAN
+##################################
+
+### ACTION 1, BUG ITS AUTHORS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Bug_Its_Authors_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Lions_Den_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Lions_Den_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Evidence_On_Walloon = 1 }
+			set_country_flag = BRG_WLN_Has_Lions_Den_Evidence
+		}
+
+	}
+
+### ACTION 2, FIND WHERE IT WAS MADE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Find_Where_It_Was_Made_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Find_Where_It_Was_Made
+		}
+	}
+
+### ACTION 3, INVESTIGATE THE OFFICERS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Investigate_The_Officers_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+
+			set_country_flag = BRG_Investigation_Failed_WLN_Investigating_Officers
+		}
+	}
+
+
+##################################
+#### DEGRELLE SIGNAL
+##################################
+
+### ACTION 1, FIND THE SOURCE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Verify_Its_Integrety_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Lions_Den_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Lions_Den_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Evidence_On_Walloon = 1 }
+			set_country_flag = BRG_WLN_Has_Lions_Den_Evidence
+		}
+
+
+	}
+
+### ACTION 2, LOOK INTO WHO RECEIVED IT
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Look_Into_Receivers_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Safehouse_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Safehouse_Evidence } }
+			set_country_flag = BRG_WLN_Has_Safehouse_Evidence
+			set_country_flag = BRG_WLN_Succseeded_Look_Into_Receivers
+		}
+	}
+
+### ACTION 3, CONFISCATE THEIR EQUIPMENT
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_Confiscate_Their_Equipment_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_WLN_Has_Lions_Den_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_WLN_Has_Lions_Den_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Evidence_On_Walloon = 1 }
+			set_country_flag = BRG_WLN_Has_Lions_Den_Evidence
+		}
+	}
+
+
+
+
+
+
+
+
+##########################################################
+#########
+########## CHR
+##########
+##########################################################
+
+##################################
+#### THE LEGION ITSELF
+##################################
+
+### ACTION 1, LOOK INTO DRUG RUMORS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Look_Into_Drug_Rumors_Operation_Flag }
+
+		set_country_flag = BRG_CHR_Has_Widespread_Meth_Use_Evidence
+	}
+
+### ACTION 2, OBSERVE THE NEW TERRITORIES
+
+	if = {
+		limit = { has_country_flag =  BRG_Investigation_CHR_Observe_New_Territories_Operation_Flag }
+		set_country_flag = BRG_Has_Bad_Education_Program_Evidence
+	}
+
+### ACTION 3, INVESTIGATE THE NIGHTLY DISTURBANCES
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Investigate_Nightly_Disturbances_Operation_Flag }
+		set_country_flag = BRG_CHR_Has_Nightly_Shit_Evidence
+	}
+
+
+##################################
+#### WIDESPREAD METH USE
+##################################
+
+### ACTION 1, STAKE OUT THEIR STREETS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Stake_Out_Their_Streets_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_Staking_Out_Streets
+		}
+	}
+
+### ACTION 2, ANAYLZE THE CRYSTALS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Analyze_Crystals_Operation_Flag }
+
+		set_country_flag = BRG_Has_Makes_Their_Own_Meth_Evidence
+	}
+
+### ACTION 3, BRIBE THE DEALERS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Bribe_Dealer_Operation_Flag }
+
+		set_country_flag = BRG_Has_Wild_Parties_Evidence
+	}
+
+
+##################################
+#### BLUE SKY
+##################################
+
+### ACTION 1, LOOK INTO DISTRIBUTION
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Map_Out_Distribution_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Looking_Into_Distribution
+		}
+
+	}
+
+### ACTION 2, DIG INTO THE PAPERWORK
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Dig_Into_the_Paperwork_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_CHR_Has_Signed_Charla_Papers_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_CHR_Has_Signed_Charla_Papers_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Large_Evidence = 1 }
+			add_to_variable = { BRG_Charla_Final_Pieces = 1 }
+			set_country_flag = BRG_CHR_Has_Signed_Charla_Papers_Evidence
+		}
+	}
+
+### ACTION 3, FIND THE LAB COMPLEX
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Find_The_Lab_Complex_Operation_Flag }
+
+		set_country_flag = BRG_Has_Dual_Lab_Production_Evidence
+	}
+
+
+##################################
+#### WILD PARTIES
+##################################
+
+### ACTION 1, INSTALL SECRET CAMERAS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Install_Secret_Cams_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_installing_Secret_Cameras
+		}
+	}
+
+### ACTION 2, DEEP COVER OPS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Deep_Cover_Operations_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_CHR_Has_Signed_Charla_Papers_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_CHR_Has_Signed_Charla_Papers_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Large_Evidence = 1 }
+			add_to_variable = { BRG_Charla_Final_Pieces = 1 }
+			set_country_flag = BRG_CHR_Has_Signed_Charla_Papers_Evidence
+		}
+	}
+
+### ACTION 3, TAP THE PARTY PHONES
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Tap_Party_Phones_Operation_Flag }
+		custom_effect_tooltip = BRG_New_Evidence_Unlocked
+		add_to_variable = { BRG_Large_Evidence = 1 }
+		set_country_flag = BRG_Has_Charla_Whores_Himself_Evidence
+	}
+
+
+
+#####################################
+#### LACLUSTER INTEGRATION PROGRAMS
+#####################################
+
+### ACTION 1, SPY ON THE OFFICERS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Spy_On_Officers_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Interrogate_Integrators
+		}
+	}
+
+### ACTION 2, COMB OVER THE BUDGET
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Comb_Over_Budget_Operation_Flag }
+		set_country_flag = BRG_Has_Underfunded_Education_Budget_Evidence
+	}
+
+### ACTION 3, CHECK THE GERMANIFICATION PROGRESS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Check_Germanification_Operation_Flag }
+		set_country_flag = BRG_Non_Existant_Germanification_Program
+	}
+
+
+#####################################
+#### NO REEDUCATION PROGRAM
+#####################################
+
+### ACTION 1, INVESTIGATE SCHOOL SYSTEM
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Investigate_School_System_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_CHR_Has_Dissapearing_Teachers_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_CHR_Has_Dissapearing_Teachers_Evidence } }
+			set_country_flag = BRG_CHR_Has_Dissapearing_Teachers_Evidence
+		}
+	}
+
+### ACTION 2, REVIEW SUPPLY INVENTORY
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Review_Supply_Inventory_Operation_Flag }
+		if = {
+			limit = { has_country_flag = BRG_CHR_Has_Destroyed_Schoolbooks_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_CHR_Has_Destroyed_Schoolbooks_Evidence } }
+			set_country_flag = BRG_CHR_Has_Destroyed_Schoolbooks_Evidence
+		}
+	}
+
+### ACTION 3, TRACE THE CASH FLOW
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Check_Germanification_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Tracing_Cash_flow
+		}
+	}
+
+
+#####################################
+#### GERMANIFICATION PROGRAM
+#####################################
+
+### ACTION 1, LOOK INTO FRENCH LANGUAGE SUBS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Check_On_French_Subjugation_Operation_Flag }
+		set_country_flag = BRG_CHR_Has_Unconfiscated_French_Books_Evidence
+	}
+
+### ACTION 2, INTERROGATE OFFICERS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Interrogate_Surveying_Officers_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Spying_On_Officers
+		}
+	}
+
+### ACTION 3, CHECK OVER THE TEACHING CURRICULUM
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Check_On_Teaching_Curriculum_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_CHR_Has_Destroyed_Schoolbooks_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_CHR_Has_Dissapearing_Teachers_Evidence } }
+			set_country_flag = BRG_CHR_Has_Destroyed_Schoolbooks_Evidence
+		}
+	}
+
+
+#####################################
+#### DESTROYED SCHOOLBOOKS
+#####################################
+
+### ACTION 1, QUESTION TEACHERS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Question_Teachers_Operation_Flag }
+		if = {
+			limit = { has_country_flag = BRG_CHR_Has_Dissapearing_Teachers_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_CHR_Has_Dissapearing_Teachers_Evidence } }
+			set_country_flag = BRG_CHR_Has_Dissapearing_Teachers_Evidence
+		}
+	}
+
+### ACTION 2, INVESTIGATE POWER NEEDS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Investigate_Power_Needs_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Power_Needs
+		}
+	}
+
+### ACTION 3, FIND THEIR MOTIVES
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Find_Their_Motive_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Find_Motive
+		}
+	}
+
+#####################################
+#### DISSAPEARING TEACHERS
+#####################################
+
+### ACTION 1, SEARCH THE DORMS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Search_Dorms_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Search_Dorms
+		}
+	}
+
+### ACTION 2, LOOK INTO THE PAPERWORK
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Look_Into_The_Paperwork_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Look_INto_Paperwork
+		}
+	}
+
+### ACTION 3, COMB OVER THE SCHOOLS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Comb_Over_Schools_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_Has_Underground_French_Schools_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_Has_Underground_French_Schools_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Large_Evidence = 1 }
+			add_to_variable = { BRG_Charla_Final_Pieces = 1 }
+			set_country_flag = BRG_Has_Underground_French_Schools_Evidence
+		}
+	}
+
+
+#####################################
+#### FRENCH BOOKS
+#####################################
+
+### ACTION 1, SEARCH THE DORMS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Look_Into_Manufactueres_Operation_Flag  }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Search_Dorms_2
+		}
+	}
+
+### ACTION 2, LOOK INTO THE PAPERWORK
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Examine_Authors_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_Has_Underground_French_Schools_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_Has_Underground_French_Schools_Evidence } }
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Large_Evidence = 1 }
+			add_to_variable = { BRG_Charla_Final_Pieces = 1 }
+			set_country_flag = BRG_Has_Underground_French_Schools_Evidence
+		}
+	}
+
+### ACTION 3, COMB OVER THE SCHOOLS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Find_Where_They_Went_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Comb_Over_Schools
+		}
+	}
+
+
+##################################
+#### UNSUAL NIGHTLY ACTIVITY
+##################################
+
+### ACTION 1, SWEEP THE AREA
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Sweep_The_Area_Operation_Flag }
+		set_country_flag = BRG_Has_Foreign_Tickets_Evidence
+	}
+
+### ACTION 2,  STAKE OUT THE AREA
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Stake_Out_The_Area_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Staking_Out_Area
+		}
+	}
+
+### ACTION 3, QUTSTION THE LOCALS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Question_Locals_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Questioning_the_Locals
+		}
+	}
+
+
+##################################
+#### FOREIGN TICKETS
+##################################
+
+### ACTION 1, ATTEMPT TO CRACK THE CODE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Attempt_Crack_Code_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Cracking_The_Code
+		}
+	}
+
+### ACTION 2, FIND WHERE IT WAS MADE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Find_Where_It_Was_Made_Operation_Flag }
+		set_country_flag = BRG_Has_Printing_Press_Evidence
+	}
+
+### ACTION 3, LOOK INTO ITS ARTWORK
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Look_Into_The_Artwork_Operation_Flag }
+		custom_effect_tooltip = BRG_New_Evidence_Unlocked
+		add_to_variable = { BRG_Large_Evidence = 1 }
+		set_country_flag = BRG_Has_Confiscated_Art_Evidence
+	}
+
+
+##################################
+#### CONFISCATED ART
+##################################
+
+### ACTION 1, CHECK ON STORAGE SITE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Check_On_Storage_Site_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Check_On_Storage_Site
+		}
+	}
+
+### ACTION 2, REVIEW TRASNPORTATION DOCS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Review_The_Transportation_Papers_Operation_Flag }
+		set_country_flag = BRG_Has_Transporting_Cultural_Objects_In_Tanks_Evidence
+	}
+
+### ACTION 3, COMB OVER PAINTINGS THEMSELVES
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Comb_Over_Paintings_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Combing_Over_Paintings
+		}
+	}
+
+
+##################################
+#### IMPROVISED PRINTING PRESS
+##################################
+
+### ACTION 1, CHECK PRINTING HISTORY
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Check_Printing_History_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_Has_Gala_Invitation_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_Has_Gala_Invitation_Evidence } }
+			set_country_flag = BRG_Has_Gala_Invitation_Evidence
+			custom_effect_tooltip = BRG_New_Evidence_Unlocked
+			add_to_variable = { BRG_Large_Evidence = 1 }
+		}
+	}
+
+### ACTION 2, INTERROGATE THE WORKERS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Interrogate_the_Workers_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_installing_Secret_Cameras
+		}
+	}
+
+### ACTION 3, LOOK INTO THE SUPPLY CHAIN
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Look_Into_Supply_Chain_Operation_Flag }
+
+
+		if = {
+			limit = { has_country_flag = BRG_Has_Transporting_Cultural_Objects_In_Tanks_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_Has_Transporting_Cultural_Objects_In_Tanks_Evidence } }
+			set_country_flag = BRG_Has_Transporting_Cultural_Objects_In_Tanks_Evidence
+		}
+	}
+
+
+
+##################################
+#### GALA INVITATION
+##################################
+
+### ACTION 1, PLANT LOYAL MOLES
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Plant_Loyal_Moles_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Planting_Moles
+		}
+	}
+
+### ACTION 2, INSTALL SURVIELENCE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Install_Survielence_Equipment_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_Has_French_High_Society_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_Has_French_High_Society_Evidence } }
+			set_country_flag = BRG_Has_French_High_Society_Evidence
+			add_to_variable = { BRG_Charla_Final_Pieces = 1 }
+		}
+	}
+
+### ACTION 3, USE IT TO SNEAK IN
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Use_It_To_Sneak_In_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Sneak_Into_Gala
+		}
+
+	}
+
+
+##################################
+#### TANKS TRANSPORTING ART
+##################################
+
+### ACTION 1, INVESTIGATE THE COMMANDER
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Investigate_The_Commander_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_Has_French_High_Society_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_Has_French_High_Society_Evidence } }
+			set_country_flag = BRG_Has_French_High_Society_Evidence
+			add_to_variable = { BRG_Charla_Final_Pieces = 1 }
+		}
+	}
+
+### ACTION 2, TRACK THEIR MOVEMENTS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Track_Their_Movements_Operation_Flag }
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_CHR_Sneak_Into_Gala
+		}
+	}
+
+### ACTION 3, TAKE VEHICLES IN FOR "REPAIR"
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_Take_Vehicles_For_Repair_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_Has_Gala_Invitation_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_Has_Gala_Invitation_Evidence } }
+			set_country_flag = BRG_Has_Gala_Invitation_Evidence
+		}
+
+	}
+
+
+##########################################################
+#########
+########## RPY
+##########
+##########################################################
+
+
+	##################################
+	#### MISSING EQUIPMENT
+	##################################
+
+	### ACTION 1, SEARCHING WORKERS DORMS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Search_Worker_Dorms_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_Searching_Workers_Dorms
+		}
+	}
+
+	### ACTION 2, WATCHING SUPPLY CHAIN
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Watching_Supply_Chains_Operation_Flag }
+
+		set_country_flag = BRG_RPY_Has_Pipe_Trucks_Missing_Evidence
+	}
+
+	### ACTION 3, COMB FACTORIES
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Comb_The_Factories_Operation_Flag }
+
+		set_country_flag = BRG_RPY_Has_Stolen_Wate_Products_Evidence
+	}
+
+
+	##################################
+	#### PIPE TRUCKS
+	##################################
+
+	### ACTION 1, INTERROGATE DRIVER
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Interrogate_Driver_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_RPY_Has_Stolen_Wate_Products_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_RPY_Has_Stolen_Wate_Products_Evidence } }
+			set_country_flag = BRG_RPY_Has_Stolen_Wate_Products_Evidence
+		}
+	}
+
+	### ACTION 2,  TRACKING TRUCKS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Track_The_Trucks_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_RPY_Has_Warehouse_36_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_RPY_Has_Warehouse_36_Evidence } }
+			set_country_flag = BRG_RPY_Has_Warehouse_36_Evidence
+		}
+	}
+
+	### ACTION 3,  LOOK INTO THEIR RECORDS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Look_Into_Their_Records_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_RPY_Looking_Into_Pipe_Records
+		}
+	}
+
+
+	##################################
+	#### INDUSTRIAL SLUDGE BEING STOLEN
+	##################################
+
+	### ACTION 1, WATCH OVER GARBAGEMEN
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Watch_The_Garbagemen_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_RPY_Looking_Into_Pipe_Records
+		}
+	}
+
+	### ACTION 2, LOOK INTO DISPOSAL SYSTEMS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Look_Into_Disposal_Operation_Flag }
+
+		if = {
+			limit = { has_country_flag = BRG_RPY_Has_Warehouse_36_Evidence }
+			hidden_effect = {
+				country_event = { id = BRG_political.9 }
+			}
+		}
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_RPY_Has_Warehouse_36_Evidence } }
+			set_country_flag = BRG_RPY_Has_Warehouse_36_Evidence
+		}
+	}
+
+	### ACTION 3, TEST THE SLUDGE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Test_The_Sludge_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_RPY_Testing_Sludge
+		}
+	}
+
+
+	##################################
+	#### WAREHOUSE 36
+	##################################
+
+	### ACTION 1, INSTALL SECRET CAMERAS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Install_Secret_Cameras_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_RPY_installing_Secret_Cameras
+		}
+	}
+
+	### ACTION 2, TRACK THEIR LOGISTICS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Track_Warehouse_Logistics_Operation_Flag }
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_RPY_Has_Shelburne_Evidence } }
+			set_country_flag = BRG_RPY_Has_Shelburne_Evidence
+		}
+	}
+
+	### ACTION 3, SIFT THROUGH THEIR GARBAGE
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Shifting_Through_Garbage_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_RPY_Sifting_Through_Warehouse_Garbage
+		}
+	}
+
+
+	##################################
+	#### SHELBURNE SAFEHOUSE
+	##################################
+
+	### ACTION 1, STAKE IT OUT
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Stake_Out_Shelburne_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_RPY_Staking_Out_Shelburne
+		}
+	}
+
+	### ACTION 2, TRACK THE RESIDENTS
+
+	if = {
+		limit = { has_country_flag =  BRG_Investigation_RPY_Track_Their_Residents_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_RPY_Tracking_Shelburne_Residents
+		}
+	}
+
+	### ACTION 3, RAID THE BUILDING
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Raiding_Shelburn_Operation_Flag }
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_RPY_Has_Trapdoor_Evidencee } }
+			set_country_flag = BRG_RPY_Has_Trapdoor_Evidencee
+		}
+	}
+
+
+
+	##################################
+	#### TRAPDOOR
+	##################################
+
+	### ACTION 1, SEARCH CATACOMBS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Search_Catacombs_Operation_Flag }
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_RPY_Has_Coded_Address_Evidence } }
+				set_country_flag = BRG_RPY_Has_Coded_Address_Evidence
+		}
+	}
+
+	### ACTION 2, SET A TRAP
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Set_Trap_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_RPY_Setting_A_Trap
+		}
+	}
+
+	### ACTION 3, SEARCH THE SEWERS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Search_Sewers_Operation_Flag }
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_RPY_Has_Worker_Prop_Evidence } }
+			set_country_flag = BRG_RPY_Has_Worker_Prop_Evidence
+		}
+	}
+
+
+	##################################
+	#### CODED ADRESS
+	##################################
+
+	### ACTION 1, DECODE ADRESS
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Decode_Address_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_RPY_Decoding_Address
+		}
+	}
+
+	### ACTION 2, FIND WHERE IT WAS SENT
+
+	if = {
+		limit = { has_country_flag =  BRG_Investigation_RPY_Find_Where_it_Was_Sent_Operation_Flag }
+
+		hidden_effect = {
+			country_event = { id = BRG_political.7 }
+			set_country_flag = BRG_Investigation_Failed_RPY_Finding_Where_It_Was_Sent
+		}
+	}
+
+	### ACTION 3, LOOK INTO H
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_Look_Into_H_Operation_Flag }
+
+		if = {
+			limit = { NOT = { has_country_flag = BRG_RPY_Has_Henri_Evidence } }
+			set_country_flag = BRG_RPY_Has_Henri_Evidence
+		}
+	}
+
+
+	##########################################################
+	#########
+	########## DEGRELLE
+	##########
+	##########################################################
+
+	if = {
+		limit = { has_country_flag = BRG_Investigating_DeGrelle }
+
+		##################################
+		#### DEGRELLE PORTRAIT SHIT
+		##################################
+
+		### ACTION 1, BUGGING HIS OFFICE
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Bug_His_Office_Operation_Flag }
+
+			if = {
+				limit = { has_country_flag = BRG_DeGrelle_Has_Erratic_Behav_Evidence }
+				hidden_effect = {
+					country_event = { id = BRG_political.9 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_country_flag = BRG_DeGrelle_Has_Erratic_Behav_Evidence } }
+				set_country_flag = BRG_DeGrelle_Has_Erratic_Behav_Evidence
+			}
+		}
+
+		### ACTION 2, PLANT A MOLE
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Plant_A_Mole_Operation_Flag }
+
+			hidden_effect = {
+				country_event = { id = BRG_political.7 }
+				set_country_flag = BRG_Investigation_Failed_Checking_Medical_Records
+			}
+		}
+
+		### ACTION 3, AUTHORIZE A TAIL
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Authorize_A_Tail_Operation_Flag }
+
+			if = {
+				limit = { has_country_flag = BRG_DeGrelle_Has_Travel_Records_Evidence }
+				hidden_effect = {
+					country_event = { id = BRG_political.9 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_country_flag = BRG_DeGrelle_Has_Travel_Records_Evidence } }
+				set_country_flag = BRG_DeGrelle_Has_Travel_Records_Evidence
+			}
+		}
+
+		##################################
+		#### ERRATIC BEHAVIOR, EVIDENCE 4
+		##################################
+
+		### ACTION 1, CHECK MED RECORDS
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Check_Medical_Records_Operation_Flag }
+			hidden_effect = {
+				country_event = { id = BRG_political.7 }
+				set_country_flag = BRG_Investigation_Failed_Checking_Medical_Records
+			}
+		}
+
+		### ACTION 2, PLANT A TACKING DEVICE
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Plant_A_Tracking_Device_Operation_Flag }
+
+			if = {
+				limit = { has_country_flag = BRG_DeGrelle_Has_Not_Home_Evidence }
+				hidden_effect = {
+					country_event = { id = BRG_political.9 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_country_flag = BRG_DeGrelle_Has_Not_Home_Evidence } }
+				set_country_flag = BRG_DeGrelle_Has_Not_Home_Evidence
+			}
+		}
+
+		### ACTION 3, CHECK HIS PERSONAL FILES
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Check_Personal_Files_Operation_Flag }
+
+			if = {
+				limit = { has_country_flag = BRG_DeGrelle_Has_Travel_Records_Evidence }
+				hidden_effect = {
+					country_event = { id = BRG_political.9 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_country_flag = BRG_DeGrelle_Has_Travel_Records_Evidence } }
+				set_country_flag = BRG_DeGrelle_Has_Travel_Records_Evidence
+			}
+		}
+
+
+		##################################
+		#### SUS TICKETS, EVIDENCE 5
+		##################################
+
+		### ACTION 1, WATCH THE TRAINS
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Watch_Trains_Operation_Flag }
+
+			if = {
+				limit = { has_country_flag = BRG_DeGrelle_Has_Bunker_42_Evidence }
+				hidden_effect = {
+					country_event = { id = BRG_political.9 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_country_flag = BRG_DeGrelle_Has_Bunker_42_Evidence } }
+				set_country_flag = BRG_DeGrelle_Has_Bunker_42_Evidence
+			}
+		}
+
+		### ACTION 2, TRACK HIS LOCATION
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Track_His_Location_Operation_Flag }
+
+			if = {
+				limit = { has_country_flag = BRG_DeGrelle_Has_Not_Home_Evidence }
+				hidden_effect = {
+					country_event = { id = BRG_political.9 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_country_flag = BRG_DeGrelle_Has_Not_Home_Evidence } }
+				set_country_flag = BRG_DeGrelle_Has_Not_Home_Evidence
+			}
+		}
+
+		### ACTION 3, INTERROGATE THE CONDUCTOR
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Interrogate_Conductor_Operation_Flag }
+			hidden_effect = {
+				country_event = { id = BRG_political.7 }
+				set_country_flag = BRG_Investigation_Walloon_Failed_Confronting_Conductor
+			}
+		}
+
+
+		###############################
+		### BUNKER 42, EVIDENCE 2
+		###############################
+
+
+		### ACTION 1, SMUGGLE OUT RECORDS
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Smuggle_Out_Records_Operation_Flag }
+
+			if = {
+				limit = { has_country_flag = BRG_DeGrelle_Has_Operation_Bodyguard_Evidence }
+				hidden_effect = {
+					country_event = { id = BRG_political.9 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_country_flag = BRG_DeGrelle_Has_Operation_Bodyguard_Evidence } }
+				set_country_flag = BRG_DeGrelle_Has_Operation_Bodyguard_Evidence
+			}
+		}
+
+		### ACTION 2, PLANT AN INFORMANT
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Plant_An_Informant_Operation_Flag }
+			hidden_effect = {
+				country_event = { id = BRG_political.7 }
+				set_country_flag = BRG_Investigation_Failed_Planting_Informant
+			}
+		}
+
+		### ACTION 3, PREPARE A RAID
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Prepare_A_Raid_On_Bunker_Operation_Flag }
+
+			if = {
+				limit = { has_country_flag = BRG_DeGrelle_Has_Operation_Bodyguard_Evidence }
+				hidden_effect = {
+					country_event = { id = BRG_political.9 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_country_flag = BRG_DeGrelle_Has_Operation_Bodyguard_Evidence } }
+				set_country_flag = BRG_DeGrelle_Has_Operation_Bodyguard_Evidence
+			}
+		}
+
+
+
+		####################################
+		#### HASNT BEEN HOME, EVIDENCE 3
+		####################################
+
+		### ACTION 1, RAID HOUSE
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Raid_His_House_Operation_Flag }
+			hidden_effect = {
+				country_event = { id = BRG_political.7 days = 1 }
+				set_country_flag = BRG_Investigation_Failed_Raiding_House
+			}
+		}
+
+		### ACTION 2, WATCH HQ
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Watch_HQ_Operation_Flag }
+
+			if = {
+				limit = { has_country_flag = BRG_DeGrelle_Has_Bunker_42_Evidence }
+				hidden_effect = {
+					country_event = { id = BRG_political.9 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_country_flag = BRG_DeGrelle_Has_Bunker_42_Evidence } }
+				set_country_flag = BRG_DeGrelle_Has_Bunker_42_Evidence
+			}
+		}
+
+		### ACTION 3, DEMOLISH HOUSE
+
+		if = {
+			limit = { has_country_flag = BRG_Investigation_DeGrelle_Demolish_House_Operation_Flag }
+
+			if = {
+				limit = { has_country_flag = BRG_DeGrelle_Has_Operation_Bodyguard_Evidence }
+				hidden_effect = {
+					country_event = { id = BRG_political.9 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_country_flag = BRG_DeGrelle_Has_Operation_Bodyguard_Evidence } }
+				set_country_flag = BRG_DeGrelle_Has_Operation_Bodyguard_Evidence
+			}
+		}
+	}
+}
+
+
+BRG_Investigation_Launcher_effect = {
+
+	set_country_flag = BRG_Currently_Doing_An_Investigation_DeGrelle
+
+	country_event = { id = BRG_political.2 }
+
+	country_event = { id = BRG_political.3 days = 10 }
+
+	if = {
+		limit = { has_country_flag = BRG_Walloon_Investigation_open_flag }
+		set_variable = { BRG_Temp_Sus_Calc_Var = BRG_Degrelle_Sus }
+	}
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_open_flag }
+		set_variable = { BRG_Temp_Sus_Calc_Var = BRG_RPY_Sus }
+	}
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_open_flag }
+		set_variable = { BRG_Temp_Sus_Calc_Var = BRG_Charla_Sus }
+	}
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_open_flag }
+		set_variable = { BRG_Temp_Sus_Calc_Var = BRG_WLN_Sus  }
+	}
+
+	round_variable = BRG_Temp_Sus_Calc_Var
+
+	set_variable = { BRG_Used_Intel_In_Operation = BRG_Temp_Sus_Calc_Var }
+
+	subtract_from_variable = { BRG_Gathered_Intelligence = BRG_Used_Intel_In_Operation }
+
+	set_variable = { BRG_Used_Intel_In_Operation = 0 }
+
+	BRG_Domestic_GUI_Clamp = yes
+
+	if = {
+		limit = { has_country_flag = BRG_Investigating_DeGrelle }
+
+		set_temp_variable = { BRG_Sus_Addition = BRG_Degrelle_Sus }
+
+		divide_temp_variable = { BRG_Sus_Addition = 7 }
+
+		add_to_variable = { BRG_Degrelle_Sus = BRG_Sus_Addition }
+
+		round_variable = BRG_DeGrelle_Sus
+
+		clamp_variable = {
+			var = BRG_Degrelle_Sus
+			min = 5
+			max = 100
+		}
+	}
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_open_flag }
+
+		set_temp_variable = { BRG_Sus_Addition = BRG_RPY_Sus }
+
+		divide_temp_variable = { BRG_Sus_Addition = 7 }
+
+		add_to_variable = { BRG_RPY_Sus = BRG_Sus_Addition }
+
+		round_variable = BRG_RPY_Sus
+
+		clamp_variable = {
+			var = BRG_RPY_Sus
+			min = 5
+			max = 100
+		}
+
+	}
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_open_flag }
+
+		set_temp_variable = { BRG_Sus_Addition = BRG_Charla_Sus }
+
+		divide_temp_variable = { BRG_Sus_Addition = 7 }
+
+		add_to_variable = { BRG_Charla_Sus = BRG_Sus_Addition }
+
+		round_variable = BRG_Charla_Sus
+
+
+		clamp_variable = {
+			var = BRG_Charla_Sus
+			min = 5
+			max = 100
+		}
+
+	}
+
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_open_flag }
+
+		set_temp_variable = { BRG_Sus_Addition = BRG_WLN_Sus }
+
+		divide_temp_variable = { BRG_Sus_Addition = 7 }
+
+		add_to_variable = { BRG_WLN_Sus = BRG_Sus_Addition }
+
+		round_variable = BRG_WLN_Sus
+
+		clamp_variable = {
+			var = BRG_WLN_Sus
+			min = 5
+			max = 100
+		}
+	}
+
+	BRG_Domestic_GUI_Clamp = yes
+}
+
+BRG_Investigation_Setup = {
+	if = {
+		limit = { has_country_flag = BRG_Investigation_CHR_open_flag }
+		set_variable = { BRG_Investigation_Current_Investigation_Sus = BRG_Charla_Sus }
+	}
+	if = {
+		limit = { has_country_flag = BRG_Investigation_WLN_open_flag }
+		set_variable = { BRG_Investigation_Current_Investigation_Sus = BRG_WLN_Sus }
+	}
+	if = {
+		limit = { has_country_flag = BRG_Investigation_RPY_open_flag }
+		set_variable = { BRG_Investigation_Current_Investigation_Sus = BRG_RPY_Sus }
+	}
+	if = {
+		limit = { has_country_flag = BRG_Investigating_DeGrelle }
+		set_variable = { BRG_Investigation_Current_Investigation_Sus = BRG_Degrelle_Sus }
+	}
+}
+
+
+BRG_Investigations_Monthly_Calculations = {
+
+	##### INTEL STUFF
+
+	add_to_variable = { BRG_Gathered_Intelligence = BRG_Monthly_Intel_Gain }
+
+	clamp_variable = {
+		var = BRG_Gathered_Intelligence
+		min = 0
+		max  = 100
+	}
+
+	#### DEGRELLE STUFF
+
+	if = {
+		limit = { has_country_flag = BRG_Investigating_DeGrelle }
+
+		add_to_variable = { BRG_Degrelle_Sus = -2 }
+	}
+
+	if = {
+		limit = { NOT = { has_country_flag = BRG_Investigating_DeGrelle  } }
+		add_to_variable = { BRG_Charla_Sus = -4 }
+		add_to_variable = { BRG_RPY_Sus = -4 }
+		add_to_variable = { BRG_WLN_Sus = -4 }
+	}
+
+	BRG_Domestic_GUI_Clamp = yes
+}
+
+##########################################################
+######################## GLOBAL PLANS ####################
+##########################################################
+
+BRG_GP_StartupDecisions = {
+	add_to_array = { BRG_Master_GP_Regions = 10 }
+	add_to_array = { BRG_Master_GP_Regions = 11 }
+	add_to_array = { BRG_Master_GP_Regions = 12 }
+	set_country_flag = BRG_Master_GP_Region3NotViewed
+}
+
+BRG_GP_Array_Check = { # It just works - Todd Howard (its prolly laggy af but this is the only way I could think of to do this - PrussianBlue)
+	if = {
+		limit = { is_ai = no }
+	
+		set_temp_variable = { current = 0 }
+		set_temp_variable = { region = 12 }
+		# For Each One Change the BRG_Master_GP_Region[continentidgoeshere]NotViewed, BRG_Master_GP_Region[continentidgoeshere], and set the decision id and region in current and region
+		if = {
+			limit = { AND = { has_global_flag = INS_war NOT = { has_country_flag = NorfolkInfiltrated } } }
+			if = {
+				limit = { NOT = { is_in_array = { array = BRG_GP_Decisions_Viewed value = current } } }
+				add_to_array = { BRG_Master_GP_Region3NotViewed = current } 
+				set_country_flag = BRG_Master_GP_Region3NotViewed
+			}
+			add_to_variable = { BRGTimesChecked^current = 1 }
+			add_to_array = { BRG_Master_GP_Regions = region } 
+			add_to_array = { BRG_GP_Decisions = current }
+		}
+		else = {
+			BRG_GP_Array_Reset = yes
+		}
+		set_temp_variable = { current = 1 }
+		set_temp_variable = { region = 12 }
+		if = {
+			limit = { AND = { has_global_flag = south_african_war_happening 
+			#NOT = { has_country_flag = SAWWarProp } # Delete this if it is not permanent
+			} }
+			if = {
+				limit = { NOT = { is_in_array = { array = BRG_GP_Decisions_Viewed value = current } } }
+				add_to_array = { BRG_Master_GP_Region3NotViewed = current }
+				set_country_flag = BRG_Master_GP_Region3NotViewed
+			}
+			add_to_variable = { BRGTimesChecked^current = 1 }
+			add_to_array = { BRG_Master_GP_Regions = region } 
+			add_to_array = { BRG_GP_Decisions = current }
+		}
+		else = {
+			BRG_GP_Array_Reset = yes
+		}
+	}
+	BRG_Frame_GP_Update = yes
+}
+
+BRG_Frame_GP_Update = {
+	for_each_loop = { 
+		array = BRG_Master_GP_Regions
+		value = v_region
+		set_variable = { BRG_Master_GP_Big_Array^v_region = 2 }	
+	}
+}
+
+BRG_GP_NukeCoverage_Update = {
+	for_each_loop = {
+		array = BRG_GP_NukeCoverage
+		index = NukeIDX
+		
+		clamp_variable = {
+			var = BRG_GP_NukeCoverage^NukeIDX
+			min = 5
+			max = 100
+		}
+	
+	}
+
+	set_temp_variable = { a = BRG_GP_NukeCoverage^0 }
+	clamp_temp_variable = { var = a min = 0 max = 50 }
+	set_temp_variable = { b = BRG_GP_NukeCoverage^1 }
+	clamp_temp_variable = { var = b min = 0 max = 100 }
+	set_temp_variable = { c = BRG_GP_NukeCoverage^2 }
+	clamp_temp_variable = { var = c min = 0 max = 50 }
+	set_temp_variable = { d = BRG_GP_NukeCoverage^3 }
+	clamp_temp_variable = { var = d min = 0 max = 80 }
+	set_temp_variable = { e = BRG_GP_NukeCoverage^4 }
+	clamp_temp_variable = { var = e min = 0 max = 50 }
+	set_temp_variable = { f = BRG_GP_NukeCoverage^5 }
+	clamp_temp_variable = { var = e min = 0 max = 50 }
+	set_temp_variable = { g = BRG_GP_NukeCoverage^6 }
+	clamp_temp_variable = { var = e min = 0 max = 80 }
+	set_temp_variable = { h = BRG_GP_NukeCoverage^7 }
+	clamp_temp_variable = { var = e min = 0 max = 50 }
+	add_to_temp_variable = { total = a }
+	add_to_temp_variable = { total = b }
+	add_to_temp_variable = { total = c }
+	add_to_temp_variable = { total = d }
+	add_to_temp_variable = { total = e }
+	add_to_temp_variable = { total = f }
+	add_to_temp_variable = { total = g }
+	add_to_temp_variable = { total = h }
+	divide_temp_variable = { total = 510 }
+	set_variable = { nuclear_global_coverage = total }
+	multiply_temp_variable = { total = 100 }
+	set_variable = { BRG_GP_NukeCoverage_Total_Var = total }
+}
+
+BRG_GP_Array_Reset = {
+	while_loop_effect = {
+		limit = { check_variable = { BRGTimesChecked^current > 0 } }
+		remove_from_array = { BRG_GP_Decisions = current } # For the sake of not using a meta effect...
+		remove_from_array = { BRG_Master_GP_Regions = region }
+	
+		remove_from_array = { BRG_Master_GP_Region0NotViewed = current }
+		remove_from_array = { BRG_Master_GP_Region1NotViewed = current }
+		remove_from_array = { BRG_Master_GP_Region2NotViewed = current }
+		remove_from_array = { BRG_Master_GP_Region3NotViewed = current }
+		remove_from_array = { BRG_Master_GP_Region4NotViewed = current }
+		remove_from_array = { BRG_Master_GP_Region5NotViewed = current }
+		remove_from_array = { BRG_Master_GP_Region6NotViewed = current }
+		remove_from_array = { BRG_Master_GP_Region7NotViewed = current }
+		subtract_from_variable = { BRGTimesViewed^current = 1 }
+	}
+}
+
+BRG_monthly_legion_check = {
+	if = {
+		limit = { 
+			NOT = {
+				has_country_flag = BRG_Revolt_Happened
+			}
+		}
+		set_temp_variable = { temp_brg_pp = tno_political_parties_effectiveness }
+		set_temp_variable = { temp_brg_rr = tno_religious_rights_effectiveness }
+		set_temp_variable = { temp_brg_ms = tno_military_supervision_effectiveness }
+		set_temp_variable = { temp_brg_e = tno_education_effectiveness }
+		set_temp_variable = { temp_brg_s = tno_security_effectiveness }
+		add_to_temp_variable = { temp_brg_pp = temp_brg_rr }
+		add_to_temp_variable = { temp_brg_pp = temp_brg_ms }
+		add_to_temp_variable = { temp_brg_pp = temp_brg_e }
+		add_to_temp_variable = { temp_brg_pp = temp_brg_s }
+		divide_temp_variable = { temp_brg_pp = 100 }
+		divide_temp_variable = { temp_brg_pp = 5 }
+		round_temp_variable = temp_brg_pp
+		set_temp_variable = { spe = temp_brg_pp } # Standard Policy Effect
+		set_temp_variable = { max_output = 5 } # The max legions can get
+		multiply_temp_variable = { spe = 4 }
+		subtract_from_temp_variable = { max_output = spe }
+		round_temp_variable = max_output
+		random_owned_state = {
+			random_list = {
+				35 = {
+					add_to_variable = { THIS.CharlemagneSupport = max_output }
+					subtract_from_variable = { THIS.HimmlerSupport = max_output }
+				}
+				35 = {
+					add_to_variable = { THIS.WalloonSupport = max_output }
+					subtract_from_variable = { THIS.HimmlerSupport = max_output }
+				}
+				30 = {
+					add_to_variable = { THIS.LangemarckSupport = max_output }
+					subtract_from_variable = { THIS.HimmlerSupport = max_output }
+				}
+			}
+		}
+		random_owned_state = {
+			random_list = {
+				35 = {
+					add_to_variable = { THIS.CharlemagneSupport = max_output }
+					subtract_from_variable = { THIS.HimmlerSupport = max_output }
+				}
+				35 = {
+					add_to_variable = { THIS.WalloonSupport = max_output }
+					subtract_from_variable = { THIS.HimmlerSupport = max_output }
+				}
+				30 = {
+					add_to_variable = { THIS.LangemarckSupport = max_output }
+					subtract_from_variable = { THIS.HimmlerSupport = max_output }
+				}
+			}
+		}
+		random_owned_state = {
+			random_list = {
+				35 = {
+					add_to_variable = { THIS.CharlemagneSupport = max_output }
+					subtract_from_variable = { THIS.HimmlerSupport = max_output }
+				}
+				35 = {
+					add_to_variable = { THIS.WalloonSupport = max_output }
+					subtract_from_variable = { THIS.HimmlerSupport = max_output }
+				}
+				30 = {
+					add_to_variable = { THIS.LangemarckSupport = max_output }
+					subtract_from_variable = { THIS.HimmlerSupport = max_output }
+				}
+			}
+		}
+	}
+}

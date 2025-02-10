@@ -1,0 +1,95 @@
+scripted_gui = {
+	GRO_REICHSSTAAT_eat_programm_container = {
+		context_type = selected_state_context
+		window_name = "GRO_REICHSSTAAT_eat_programm_screen"
+		parent_window_token = selected_state_view
+
+		visible = {
+			ROOT = {
+				original_tag = GRO
+			}
+			GRO = {
+				has_completed_focus = GRO_a_system_of_efficiency
+				# has_country_flag = GRO_REICHSSTAAT_soe_construction_visible
+			}
+			THIS = {
+				owner = { tag = GRO }
+			}
+		}
+
+		effects = {
+			GRO_REICHSSTAAT_construction_infra_button_click = {
+				#activate_targeted_decision = {
+				#	target = ROOT
+				#	decision = GRO_REICHSSTAAT_soe_build_infra
+				#}
+				#save_event_target_as = GRO_REICHSSTAAT_infra_build_state
+				#state_event = {
+				#	id = GRO_REICHSSTAAT.60
+				#	trigger_for = controller
+				#}
+				#state_event = {
+				#	id = GRO_REICHSSTAAT.61
+				#	trigger_for = controller
+				#	days = 1
+				#}
+
+				# state_event sucks -Atomic
+
+				GRO = { add_to_variable = { GRO.GRO_REICHSSTAAT_num_slave_workers = -200 } }
+				add_building_construction = { type = infrastructure level = 1 instant_build = yes }
+			}
+
+			GRO_REICHSSTAAT_construction_PU_button_click = {
+				add_to_variable = { EAT_loc_PU = 1 }
+				add_to_variable = { GRO.EAT_PU = 1 }
+				GRO = { add_to_variable = { GRO.GRO_REICHSSTAAT_num_slave_workers = -800 } }
+				set_state_flag = { flag = GRO_REICHSSTAAT_has_built_PU_here
+				
+				}
+			}
+			
+			GRO_REICHSSTAAT_construction_Prisons_button_click = {
+				add_building_construction = { type = prisons level = 1 instant_build = yes }
+				GRO = { add_to_variable = { GRO.GRO_REICHSSTAAT_num_slave_workers = -600 } }
+				
+			}
+		}
+		triggers = {
+			#GRO_REICHSSTAAT_extraction_button_click_enabled = {
+			#	check_variable = { GRO.GRO_REICHSSTAAT_num_slave_workers > 199 }
+			#	is_demilitarized_zone = no
+			#	is_owned_by = GRO
+			#	not = { has_state_flag = EAT_used_extraction }
+			#}
+			#GRO_REICHSSTAAT_extraction_button_click_enabled = 
+			
+			GRO_REICHSSTAAT_construction_infra_button_click_enabled = {
+				check_variable = { GRO.GRO_REICHSSTAAT_num_slave_workers > 199 }
+				is_demilitarized_zone = no
+				is_owned_by = GRO
+				infrastructure < 10
+			}
+
+
+
+			GRO_REICHSSTAAT_construction_PU_button_click_enabled = {
+				NOT = {
+					has_state_flag = GRO_REICHSSTAAT_has_built_PU_here
+				}
+				check_variable = { GRO.GRO_REICHSSTAAT_num_slave_workers > 799 }
+				is_demilitarized_zone = no
+				is_owned_by = GRO
+				not = { has_state_flag = GRO_REICHSSTAAT_has_built_PU_here }
+				
+
+			}
+			GRO_REICHSSTAAT_construction_Prisons_button_click_enabled = {
+				check_variable = { GRO.GRO_REICHSSTAAT_num_slave_workers > 599 }
+				is_demilitarized_zone = no
+				is_owned_by = GRO
+				check_variable = { building_level@prisons < 5 }
+			}
+		}
+	}
+}

@@ -1,0 +1,2865 @@
+﻿###################
+## French Events ##
+###################
+
+add_namespace = free_france
+add_namespace = free_france_reconstruction
+add_namespace = france_iberia_negotiations
+add_namespace = france_reclamation
+add_namespace = france_reclamation.proxy.USA
+add_namespace = france_reclamation.proxy.GER
+add_namespace = france_reclamation.proxy.IBR
+add_namespace = FFRnews
+
+country_event = { # de gaulle death
+	id = free_france.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france.1" }
+	title = free_france.1.t
+	desc = free_france.1.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = free_france.1.a
+
+		set_global_flag = FFR_degaulle_dead
+		if = {
+			limit = {
+				OR = {
+					has_global_flag = FFR_reconciliation_happened
+					has_global_flag = FFR_reclamation_successful
+				}
+			}
+			FRA = { country_event = { id = free_france.3 } }
+		}
+		else = {
+			FFR = { country_event = { id = W_AFRICA.8 } }
+		}
+	}
+}
+
+country_event = { # de gaulle death mainland edition
+	id = free_france.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france.3" }
+	title = free_france.3.t
+	desc = free_france.3.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = free_france.3.a
+
+		retire_character = FFR_Charles_de_Gaulle
+
+		if = { # Elections have happened
+			limit = { has_global_flag = FRA_postreclamation_elections }
+
+			if = { # de Gaulle President
+				limit = { has_country_flag = FRA_degaulle_elected }
+
+				set_country_flag = FRA_chabandelmas_succession
+				add_country_leader_role = {
+					character = FFR_Jacques_Chaban_Delmas
+					promote_leader = yes
+					country_leader = {
+						desc = "POLITICS_FRANCE_CHABAN_DELMAS"
+						ideology = conservatism_progressive_conservatism_subtype
+						expire = "1982.1.1"
+						id = -1
+					}
+				}
+
+				every_country = {
+					limit = { is_ai = no }
+					news_event = {
+						id = FFRnews.13
+						days = 1
+					}
+				}
+			}
+
+			else = {
+				every_country = {
+					limit = { is_ai = no }
+					news_event = {
+						id = FFRnews.10
+						days = 1
+					}
+				}
+			}
+		}
+		else = {
+			add_country_leader_role = {
+				character = FFR_Philippe_Leclerc
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_PHILIPPE_LECLERC_MAINLAND"
+					ideology = paternalism_provisional_government_subtype
+					expire = "1980.1.1"
+					id = -1
+				}
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FFRnews.10
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+#### RECONSTRUCTION ####
+country_event = { # empty
+	id = free_france_reconstruction.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.1" }
+	title = free_france_reconstruction.1.t
+	desc = free_france_reconstruction.1.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.1.a
+	}
+}
+
+country_event = { # empty
+	id = free_france_reconstruction.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.2" }
+	title = free_france_reconstruction.2.t
+	desc = free_france_reconstruction.2.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.2.a
+	}
+}
+
+country_event = { # starting the reconstruction
+	id = free_france_reconstruction.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.3" }
+	title = free_france_reconstruction.3.t
+	desc = free_france_reconstruction.3.desc
+	picture = GFX_report_event_RUS_devastated_village
+
+	trigger = {
+		NOT = { has_global_flag = FFR_reconstruction_started }
+		OR = {
+			AND = {
+				has_global_flag = WAC_over
+				FFR = { owns_state = 779 }
+			}
+			has_country_flag = FFR_reconstruction_debug
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.3.a
+
+		TNO_fopo_add_wafr_reconstruction_tab = yes
+		set_global_flag = FFR_reconstruction_started
+		activate_mission = USA_WAFR_reconstruction_timeout
+		if = {
+			limit = { has_country_flag = WAC_owns_infrastructure }
+			add_to_variable = { WAF_eco_reconstruct_prog = 7.5 }
+		}
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = WAR_FFR_OUTCOME
+					option = WAR_FFR_OUTCOME_FAILURE
+				}
+			}
+			set_variable = { WAF_mil_reconstruct_prog = 0 }
+			set_variable = { WAF_eco_reconstruct_prog = 0 }
+		}
+		else_if = {
+			limit = {
+				has_game_rule = {
+					rule = WAR_FFR_OUTCOME
+					option = WAR_FFR_OUTCOME_SUCCESSFUL
+				}
+			}
+			set_variable = { WAF_mil_reconstruct_prog = 100 }
+			set_variable = { WAF_eco_reconstruct_prog = 100 }
+		}
+	}
+}
+
+country_event = { # reconstruction aborted
+	id = free_france_reconstruction.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.4" }
+	title = free_france_reconstruction.4.t
+	desc = free_france_reconstruction.4.desc
+	#picture =
+	trigger = {
+		has_global_flag = FFR_reconstruction_started
+		NOT = {
+			has_global_flag = FFR_reconstruction_successful
+			has_global_flag = FFR_reconstruction_failed
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.4.a
+		if = {
+			limit = {
+				check_variable = { WAF_average_reconstruction > 69 }
+			}
+			WAF_reconstruction_complete = yes
+		}
+		else = {
+			hidden_effect = { country_event = free_france_reconstruction.6 }
+			TNO_fopo_remove_wafr_reconstruction_tab = yes
+			set_global_flag = FFR_reconstruction_failed
+		}
+	}
+}
+
+country_event = { # reconstruction a success (FFR in US Sphere)
+	id = free_france_reconstruction.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.5" }
+	title = free_france_reconstruction.5.t
+	desc = free_france_reconstruction.5.desc
+	picture = GFX_report_event_USA_coca_cola_ad
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.5.a
+		hidden_effect = {
+			every_country = {
+				limit = {
+					OR = {
+						is_ally_with = FFR
+						tag = FFR
+					}
+				}
+				econ_join_sphere_USA = yes
+			}
+			set_global_flag = FFR_joined_USA_econ_sphere
+			FFR = {
+				country_event = { id = france_iberia_negotiations.1 days = 40 }
+				clr_country_flag = HAS_ECON_SPHERE
+			}
+		}
+	}
+}
+
+country_event = { # reconstruction ran out of time (FFR doesn't fall to US Sphere)
+	id = free_france_reconstruction.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.6" }
+	title = free_france_reconstruction.6.t
+	desc = free_france_reconstruction.6.desc
+	picture = GFX_report_event_FFR_child_labor_cocoa_plantation2
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.6.a
+
+		hidden_effect = {
+			FFR = {
+				country_event = { id = france_iberia_negotiations.1 days = 40 }
+			}
+		}
+	}
+}
+country_event = { #US subsidizes Firestone expansion into West Africa #For USA
+	id = free_france_reconstruction.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.7" }
+	title = free_france_reconstruction.7.t
+	desc = free_france_reconstruction.7.desc
+	picture = GFX_report_event_generic_handshake
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.7.a
+		USA_increase_trust_in_government_small = yes
+		FFR = {
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.025 }
+			econ_GDP_boost_once_percentage = yes
+		}
+		every_country = {
+			limit = { is_in_faction_with = FFR }
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.015 }
+			econ_GDP_boost_once_percentage = yes
+		}
+		WAF_increase_reconstruction_eco_med = yes
+		hidden_effect = {
+			country_event = { id = free_france_reconstruction.8 days = 30 }
+		}
+	}
+}
+country_event = { #Locals don't like Firestone expansion, poor working conditions, at least US gets a bit of money for rubber control #For USA
+	id = free_france_reconstruction.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.8" }
+	title = free_france_reconstruction.8.t
+	desc = free_france_reconstruction.8.desc
+	picture = GFX_report_event_generic_newspaper
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.8.a
+		set_temp_variable = { money_reserves_temp = 0.15 }
+		econ_money_reserves_change_raw_money = yes
+		WAF_decrease_reconstruction_eco_low = yes
+	}
+}
+country_event = { #Hershey's Expands Operations to West Africa #For USA
+	id = free_france_reconstruction.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.9" }
+	title = free_france_reconstruction.9.t
+	desc = free_france_reconstruction.9.desc
+	picture = GFX_report_event_FFR_child_labor_cocoa_plantation2
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.9.a
+		USA_increase_trust_in_government_small = yes
+		FFR = {
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.05 }
+			econ_GDP_boost_once_percentage = yes
+		}
+		WAF_increase_reconstruction_eco_med = yes
+		hidden_effect = {
+			country_event = { id = free_france_reconstruction.10 days = 30 }
+		}
+	}
+}
+country_event = { #Locals don't like Hershey's working conditions, at least US gets a bit of money for cocoa control #For USA
+	id = free_france_reconstruction.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.10" }
+	title = free_france_reconstruction.10.t
+	desc = free_france_reconstruction.10.desc
+	picture = GFX_report_event_FFR_child_labor_cocoa_plantation
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.10.a
+		USA_decrease_optics_small = yes
+		set_temp_variable = { money_reserves_temp = 0.2 }
+		econ_money_reserves_change_raw_money = yes
+		WAF_decrease_reconstruction_eco_low = yes
+	}
+}
+country_event = { #DuPont Expands Operations to West Africa #For USA
+	id = free_france_reconstruction.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.11" }
+	title = free_france_reconstruction.11.t
+	desc = free_france_reconstruction.11.desc
+	picture = GFX_report_event_generic_handshake
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.11.a
+		FFR = {
+			set_temp_variable = { temp_econ_GDP_boost_percentage = 0.05 }
+			econ_GDP_boost_once_percentage = yes
+		}
+		WAF_increase_reconstruction_eco_med = yes
+		hidden_effect = {
+			country_event = { id = free_france_reconstruction.12 days = 30 }
+		}
+	}
+}
+country_event = { #Locals don't like DuPont working conditions, at least US gets a bit of money for whatever tf chemical stuff DuPont #For USA
+	id = free_france_reconstruction.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.12" }
+	title = free_france_reconstruction.12.t
+	desc = free_france_reconstruction.12.desc
+	picture = GFX_report_event_USA_army_reporter
+
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.12.a
+		USA_decrease_optics_medium = yes
+		set_temp_variable = { money_reserves_temp = 0.215 }
+		econ_money_reserves_change_raw_money = yes
+		WAF_decrease_reconstruction_eco_low = yes
+	}
+}
+country_event = { #Create Free French faction (West African Federation or French Community) + their own sphere if USA reconstruction failed
+	id = free_france_reconstruction.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event free_france_reconstruction.13" }
+	title = free_france_reconstruction.13.t
+	desc = free_france_reconstruction.13.desc
+	#picture =
+
+	hidden = yes
+	is_triggered_only = yes
+
+	option = {
+		name = free_france_reconstruction.13.a
+		if = {
+			limit = {
+				OR = {
+					has_global_flag = WAC_SCENARIO_2_FMA_VICTORY
+					has_global_flag = WAC_SCENARIO_3_FMA_VICTORY
+				}
+			}
+			if = {
+				limit = { has_global_flag = WAC_SCENARIO_3_FMA_VICTORY }
+				FTF = {
+					clr_country_flag = FMA_MEMBER
+					hidden_effect = { remove_faction_status = yes }
+					leave_faction = yes
+					econ_leave_sphere = yes
+				}
+				FFR = {
+					country_event = { # Invasion of FTF
+						id = west_african_crisis.108
+						days = 14
+					}
+				}
+			}
+			FFR = {
+				FFR_create_community = yes
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_global_flag = WAC_1_WAA_VICTORY
+					has_global_flag = WAC_2_WAA_VICTORY
+				}
+			}
+			if = {
+				limit = { country_exists = FTF }
+					FTF = {
+						clr_country_flag = WAA_MEMBER
+						hidden_effect = { remove_faction_status = yes }
+						leave_faction = yes
+						econ_leave_sphere = yes
+					}
+				WOL = {
+					country_event = { # Coup or Invasion of FTF
+						id = west_african_crisis.107
+						days = 14
+					}
+					#country_event = { # Invasion of Zarmaland
+					#	id = west_african_crisis.109
+					#	days = 50
+						#}
+				}
+			}
+			else = {
+				#WOL = {
+				#	country_event = { # Invasion of Zarmaland
+				#		id = west_african_crisis.109
+				#		days = 30
+				#	}
+				#}
+			}
+			WOL = {
+				WAA_create_federation = yes
+			}
+		}
+	}
+}
+#### IBERIA NEGOTIATIONS ####
+country_event = { # Checks if negotiations can happen
+	id = france_iberia_negotiations.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.1" }
+	title = france_iberia_negotiations.1.t
+	desc = france_iberia_negotiations.1.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	hidden = yes
+	is_triggered_only = yes
+
+	option = {#
+		name = france_iberia_negotiations.1.a
+
+		if = { # Iberian Wars haven't happened
+			limit = { NOT = { has_global_flag = Iberian_Wars } }
+			country_event = { id = france_iberia_negotiations.2 }
+		}
+
+		else_if = { # They happened but they're over
+			limit = {
+				has_global_flag = Iberian_Wars
+				NOT = { has_global_flag = IBW_happening }
+			}
+			if = {
+				limit = { IBR = { exists = yes } }
+				set_global_flag = IBR_FFR_post_war_aid
+			}
+			else_if = {
+				limit = { SPR = { exists = yes } }
+				set_global_flag = SPR_FFR_post_war_aid
+			}
+			country_event = { id = france_reclamation.1 days = 10 }
+		}
+
+		else_if = { # They're happening
+			limit = { has_global_flag = IBW_happening }
+			country_event = { id = france_reclamation.1 days = 10 }
+		}
+
+		else = {
+			# fuck Iberia
+			country_event = { id = france_reclamation.1 days = 10 }
+		}
+	}
+}
+
+country_event = { # Check if Iberia is in Grossraum/Zollverein or Latin Union
+	id = france_iberia_negotiations.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.2" }
+	title = france_iberia_negotiations.2.t
+	desc = france_iberia_negotiations.2.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	hidden = yes
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.2.a
+
+		if = { # Iberia is in Latin Union
+			limit = { FRA = { has_idea = FRA_latin_bloc }  }
+			# Iberia forces Reconciliation
+			country_event = { id = france_reclamation.1 days = 10 }
+		}
+
+		else = { # Iberia is good to go
+			IBR = { country_event = { id = france_iberia_negotiations.3 days = 7 } }
+			USA = { country_event = france_iberia_negotiations.40 }
+		}
+	}
+}
+
+country_event = { # Iberia gets notified of negotiations
+	id = france_iberia_negotiations.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.3" }
+	title = france_iberia_negotiations.3.t
+	desc = france_iberia_negotiations.3.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.3.a
+
+		custom_effect_tooltip = france_iberia_negotiations.3_tt
+		hidden_effect = {
+			country_event = { id = france_iberia_negotiations.4 days = 7 }
+		}
+	}
+}
+
+country_event = { # Leclerc arrives, negotiations begin
+	id = france_iberia_negotiations.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.4" }
+	title = france_iberia_negotiations.4.t
+	desc = france_iberia_negotiations.4.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.4.a
+
+		custom_effect_tooltip = france_iberia_negotiations.4_tt
+		hidden_effect = {
+			country_event = { id = france_iberia_negotiations.5 days = 3 }
+			set_variable = { IBR.FFR_negotiations_impasses = 0 }
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) KEY ISSUE: French Alignment
+	id = france_iberia_negotiations.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.5" }
+	title = france_iberia_negotiations.5.t
+	desc = france_iberia_negotiations.5.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.5.a
+		trigger = {
+			NOT = { has_global_flag = FFR_joined_USA_econ_sphere }
+		}
+
+		custom_effect_tooltip = france_iberia_negotiations.5.a_tt
+		hidden_effect = {
+			FFR = { country_event = { id = france_iberia_negotiations.6 } }
+			set_variable = { IBR.FFR_negotiations_1 = 1 } # Total
+		}
+		ai_chance = {
+			factor = 20
+		}
+	}
+
+	option = {
+		name = france_iberia_negotiations.5.b
+		trigger = {
+			NOT = { has_global_flag = FFR_joined_USA_econ_sphere }
+		}
+
+		custom_effect_tooltip = france_iberia_negotiations.5.b_tt
+		hidden_effect = {
+			FFR = { country_event = { id = france_iberia_negotiations.6 } }
+			set_variable = { IBR.FFR_negotiations_1 = 2 } # Economic
+		}
+		ai_chance = {
+			factor = 40
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_SUCCESS }
+			}
+		}
+	}
+
+	option = {
+		name = france_iberia_negotiations.5.c
+
+		custom_effect_tooltip = france_iberia_negotiations.5.c_tt
+		hidden_effect = {
+			country_event = { id = france_iberia_negotiations.10 days = 7 }
+			set_variable = { IBR.FFR_negotiations_1 = 3 } # Guarantees
+		}
+		ai_chance = {
+			factor = 60
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_SUCCESS }
+			}
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) Alignment offer
+	id = france_iberia_negotiations.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.6" }
+	title = france_iberia_negotiations.6.t
+	desc = france_iberia_negotiations.6.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Accept
+		name = france_iberia_negotiations.6.a
+		trigger = { IBR = { NOT = { check_variable = { IBR.FFR_negotiations_1 = 1 } } } }
+		ai_chance = { factor = 50
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_FAIL }
+			}
+		}
+
+		IBR = { country_event = { id = france_iberia_negotiations.10 days = 7 } }
+	}
+
+	option = { # Negotiate
+		name = france_iberia_negotiations.6.b
+		ai_chance = {
+			factor = 50
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_SUCCESS }
+			}
+		}
+
+		IBR = { country_event = { id = france_iberia_negotiations.7 days = 1 } }
+	}
+
+	option = { # Threaten to leave
+		name = france_iberia_negotiations.6.c
+		trigger = { IBR = { check_variable = { IBR.FFR_negotiations_1 = 1 } } }
+		ai_chance = {
+			factor = 0
+		}
+
+		IBR = {
+			add_to_variable = { IBR.FFR_negotiations_impasses = 2 }
+			country_event = { id = france_iberia_negotiations.31 days = 1 }
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Compromise?
+	id = france_iberia_negotiations.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.7" }
+	title = france_iberia_negotiations.7.t
+	desc = france_iberia_negotiations.7.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Accept
+		name = france_iberia_negotiations.7.a
+
+		if = {
+			limit = { check_variable = { IBR.FFR_negotiations_1 = 1 } }
+			custom_effect_tooltip = france_iberia_negotiations.7.a_tt_1
+		}
+
+		else = { custom_effect_tooltip = france_iberia_negotiations.7.a_tt_2 }
+
+		hidden_effect = {
+			country_event = { id = france_iberia_negotiations.10 days = 5 }
+		}
+
+		ai_chance = {
+			factor = 60
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_FAIL }
+			}
+		}
+	}
+
+	option = { # Reject
+		name = france_iberia_negotiations.7.b
+
+		custom_effect_tooltip = france_iberia_negotiations.7.b_tt
+		hidden_effect = {
+			add_to_variable = { IBR.FFR_negotiations_impasses = 1 }
+			FFR = { country_event = { id = france_iberia_negotiations.8 } }
+		}
+		ai_chance = {
+			factor = 40
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) Last Chance
+	id = france_iberia_negotiations.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.8" }
+	title = france_iberia_negotiations.8.t
+	desc = france_iberia_negotiations.8.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Accept
+		name = france_iberia_negotiations.8.a
+
+		IBR = { country_event = { id = france_iberia_negotiations.34 days = 1 } }
+		ai_chance = {
+			factor = 50
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_FAIL }
+			}
+		}
+	}
+
+	option = { # Reject
+		name = france_iberia_negotiations.8.b
+
+		IBR = { country_event = { id = france_iberia_negotiations.9 days = 1 } }
+		ai_chance = {
+			factor = 50
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Negotiations Fail
+	id = france_iberia_negotiations.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.9" }
+	title = france_iberia_negotiations.9.t
+	desc = france_iberia_negotiations.9.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.9.a
+
+		custom_effect_tooltip = france_iberia_negotiations.9_tt
+		hidden_effect = {
+			set_global_flag = IBR_FFR_negotiations_collapsed
+			FFR = { country_event = { id = france_iberia_negotiations.39 days = 1 } }
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) KEY ISSUE: Colonial Guarantees
+	id = france_iberia_negotiations.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.10" }
+	title = france_iberia_negotiations.10.t
+	desc = france_iberia_negotiations.10.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # No French claims on Iberian posessions
+		name = france_iberia_negotiations.10.a
+
+		custom_effect_tooltip = france_iberia_negotiations.10.a_tt
+		hidden_effect = {
+			FFR = { country_event = { id = france_iberia_negotiations.11 } }
+			set_variable = { IBR.FFR_negotiations_2 = 1 } # Remove claims
+		}
+		ai_chance = {
+			factor = 60
+		}
+	}
+
+	option = { # French Colonial continuation in Africa
+		name = france_iberia_negotiations.10.b
+
+		custom_effect_tooltip = france_iberia_negotiations.10.b_tt
+		hidden_effect = {
+			country_event = { id = france_iberia_negotiations.14 days = 7 }
+			set_variable = { IBR.FFR_negotiations_2 = 2 } # Continuation
+		}
+		ai_chance = {
+			factor = 40
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_SUCCESS }
+			}
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) Iberia asks for no claims in colonies
+	id = france_iberia_negotiations.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.11" }
+	title = france_iberia_negotiations.11.t
+	desc = france_iberia_negotiations.11.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Reject
+		name = france_iberia_negotiations.11.a
+
+		IBR = { country_event = { id = france_iberia_negotiations.12 days = 1 } }
+		ai_chance = {
+			factor = 65
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_SUCCESS }
+			}
+		}
+	}
+
+	option = { # Accept
+		name = france_iberia_negotiations.11.b
+
+		IBR = { country_event = { id = france_iberia_negotiations.14 days = 7 } }
+		ai_chance = {
+			factor = 35
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) They reject
+	id = france_iberia_negotiations.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.12" }
+	title = france_iberia_negotiations.12.t
+	desc = france_iberia_negotiations.12.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Push
+		name = france_iberia_negotiations.12.a
+
+		custom_effect_tooltip = france_iberia_negotiations.7.b_tt
+		hidden_effect = {
+			if = {
+				limit = { check_variable = { IBR.FFR_negotiations_impasses < 1 } }
+				FFR = { country_event = { id = france_iberia_negotiations.13 days = 7 } }
+				add_to_variable = { IBR.FFR_negotiations_impasses = 1 }
+			}
+			else = {
+				country_event = { id = france_iberia_negotiations.9 days = 1 }
+			}
+		}
+		ai_chance = {
+			factor = 50
+		}
+	}
+
+	option = { # Drop it
+		name = france_iberia_negotiations.12.b
+
+		custom_effect_tooltip = france_iberia_negotiations.12.b_tt
+		hidden_effect = {
+			country_event = { id = france_iberia_negotiations.14 days = 7 }
+			set_variable = { IBR.FFR_negotiations_2 = 2 } # Continuation
+		}
+		ai_chance = {
+			factor = 50
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) Last chance
+	id = france_iberia_negotiations.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.13" }
+	title = france_iberia_negotiations.13.t
+	desc = france_iberia_negotiations.13.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Reject
+		name = france_iberia_negotiations.13.a
+
+		IBR = { country_event = { id = france_iberia_negotiations.9 days = 1 } }
+		ai_chance = {
+			factor = 50
+		}
+	}
+
+	option = { # Accept
+		name = france_iberia_negotiations.13.b
+
+		IBR = { country_event = { id = france_iberia_negotiations.36 days = 1 } }
+		ai_chance = {
+			factor = 50
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Debts
+	id = france_iberia_negotiations.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.14" }
+	title = france_iberia_negotiations.14.t
+	desc = france_iberia_negotiations.14.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.14.a
+
+		custom_effect_tooltip = france_iberia_negotiations.14.a_tt
+		hidden_effect = {
+			FFR = { country_event = { id = france_iberia_negotiations.15 days = 1 } }
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) Iberia asks for interests on debt
+	id = france_iberia_negotiations.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.15" }
+	title = france_iberia_negotiations.15.t
+	desc = france_iberia_negotiations.15.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Accept
+		name = france_iberia_negotiations.15.a
+
+		IBR = { country_event = { id = france_iberia_negotiations.37 days = 1 } }
+		ai_chance = {
+			factor = 30
+		}
+	}
+
+	option = { # Reject
+		name = france_iberia_negotiations.15.b
+
+		IBR = { country_event = { id = france_iberia_negotiations.38 days = 1 } }
+		ai_chance = {
+			factor = 70
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_SUCCESS }
+			}
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) Reconstruction Funds
+	id = france_iberia_negotiations.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.16" }
+	title = france_iberia_negotiations.16.t
+	desc = france_iberia_negotiations.16.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Force high investment
+		name = france_iberia_negotiations.16.a
+		trigger = { IBR = { check_variable = { IBR.FFR_negotiations_3 = 1 } } }
+
+		IBR = { country_event = { id = france_iberia_negotiations.18 days = 2 } }
+		set_country_flag = FFR_negotiations_used_debts
+		ai_chance = {
+			factor = 60
+		}
+	}
+
+	option = { # Ask for high investment
+		name = france_iberia_negotiations.16.b
+		trigger = { IBR = { check_variable = { IBR.FFR_negotiations_3 = 2 } } }
+
+		IBR = { country_event = { id = france_iberia_negotiations.17 days = 2 } }
+		ai_chance = {
+			factor = 100
+		}
+	}
+
+	option = { # Settle for moderate investment
+		name = france_iberia_negotiations.16.c
+
+		IBR = { country_event = { id = france_iberia_negotiations.19 days = 2 } }
+		ai_chance = {
+			factor = 40
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Free France wants high Reconstruction funds
+	id = france_iberia_negotiations.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.17" }
+	title = france_iberia_negotiations.17.t
+	desc = france_iberia_negotiations.17.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Accept
+		name = france_iberia_negotiations.17.a
+
+		custom_effect_tooltip = france_iberia_negotiations.17.a_tt
+		hidden_effect = {
+			FFR = { country_event = { id = france_iberia_negotiations.20 days = 2 } }
+			set_variable = { IBR.FFR_negotiations_4 = 1 }
+		}
+		ai_chance = {
+			factor = 60
+		}
+	}
+
+	option = { # Reject
+		name = france_iberia_negotiations.17.b
+
+		custom_effect_tooltip = france_iberia_negotiations.7.b_tt
+		hidden_effect = {
+			if = {
+				limit = { check_variable = { IBR.FFR_negotiations_impasses < 1 } }
+				FFR = { country_event = { id = france_iberia_negotiations.20 days = 2 } }
+				add_to_variable = { IBR.FFR_negotiations_impasses = 1 }
+			}
+			else = {
+				country_event = { id = france_iberia_negotiations.9 days = 1 }
+			}
+		}
+		ai_chance = {
+			factor = 40
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_SUCCESS }
+			}
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) They forced high investment
+	id = france_iberia_negotiations.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.18" }
+	title = france_iberia_negotiations.18.t
+	desc = france_iberia_negotiations.18.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.18.a
+
+		custom_effect_tooltip = france_iberia_negotiations.17.a_tt
+		hidden_effect = {
+			FFR = { country_event = { id = france_iberia_negotiations.20 days = 2 } }
+			set_variable = { IBR.FFR_negotiations_4 = 1 }
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Regular investment
+	id = france_iberia_negotiations.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.19" }
+	title = france_iberia_negotiations.19.t
+	desc = france_iberia_negotiations.19.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.19.a
+
+		custom_effect_tooltip = france_iberia_negotiations.19.a_tt
+		hidden_effect = {
+			FFR = { country_event = { id = france_iberia_negotiations.20 days = 2 } }
+			set_variable = { IBR.FFR_negotiations_4 = 2 }
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) Military Aid
+	id = france_iberia_negotiations.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.20" }
+	title = france_iberia_negotiations.20.t
+	desc = france_iberia_negotiations.20.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Force ground support
+		name = france_iberia_negotiations.20.a
+		trigger = {
+			IBR = { check_variable = { IBR.FFR_negotiations_3 = 1 } }
+			NOT = { has_country_flag = FFR_negotiations_used_debts }
+		}
+
+		IBR = { country_event = { id = france_iberia_negotiations.23 days = 2 } }
+		ai_chance = {
+			factor = 100
+		}
+	}
+
+	option = { # Ground support
+		name = france_iberia_negotiations.20.b
+		trigger = {
+			OR = {
+				AND = {
+					IBR = { check_variable = { IBR.FFR_negotiations_3 = 1 } }
+					has_country_flag = FFR_negotiations_used_debts
+				}
+				IBR = { check_variable = { IBR.FFR_negotiations_3 = 2 } }
+			}
+		}
+
+		IBR = { country_event = { id = france_iberia_negotiations.21 days = 2 } }
+		ai_chance = {
+			factor = 60
+		}
+	}
+
+	option = { # Naval access
+		name = france_iberia_negotiations.20.c
+		trigger = {
+			OR = {
+				has_country_flag = FFR_negotiations_used_debts
+				NOT = { IBR = { check_variable = { IBR.FFR_negotiations_3 = 1 } } }
+			}
+		}
+
+		IBR = { country_event = { id = france_iberia_negotiations.22 days = 2 } }
+		ai_chance = {
+			factor = 40
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Free France wants increased military aid
+	id = france_iberia_negotiations.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.21" }
+	title = france_iberia_negotiations.21.t
+	desc = france_iberia_negotiations.21.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Force only naval support
+		name = france_iberia_negotiations.21.a
+		trigger = {
+			IBR = { check_variable = { IBR.FFR_negotiations_3 = 2 } }
+		}
+
+		custom_effect_tooltip = france_iberia_negotiations.21.a_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_5 = 2 } # Only Naval Support
+			set_variable = { IBR.FFR_negotiations_6 = 2 } # No Military Bases
+			FFR = { country_event = { id = france_iberia_negotiations.27 days = 4 } }
+		}
+		ai_chance = {
+			factor = 100
+		}
+	}
+
+	option = { # Accept
+		name = france_iberia_negotiations.21.b
+
+		custom_effect_tooltip = france_iberia_negotiations.21.b_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_5 = 1 } # Ground Support
+			set_variable = { IBR.FFR_negotiations_6 = 2 } # No Military Bases
+			FFR = { country_event = { id = france_iberia_negotiations.27 days = 4 } }
+		}
+		ai_chance = {
+			factor = 50
+		}
+	}
+
+	option = { # Naval Support
+		name = france_iberia_negotiations.21.c
+		trigger = {
+			NOT = {
+				IBR = { check_variable = { IBR.FFR_negotiations_3 = 2 } }
+			}
+		}
+
+		custom_effect_tooltip = france_iberia_negotiations.21.c_tt
+		custom_effect_tooltip = france_iberia_negotiations.7.b_tt
+		hidden_effect = {
+			if = {
+				limit = { check_variable = { IBR.FFR_negotiations_impasses < 1 } }
+				set_variable = { IBR.FFR_negotiations_5 = 2 } # Only Naval Support
+				set_variable = { IBR.FFR_negotiations_6 = 2 } # No Military Bases
+				FFR = { country_event = { id = france_iberia_negotiations.27 days = 4 } }
+			}
+			else = {
+				country_event = { id = france_iberia_negotiations.9 days = 1 }
+			}
+		}
+		ai_chance = {
+			factor = 30
+		}
+	}
+
+	option = { # Ask for military bases
+		name = france_iberia_negotiations.21.d
+		trigger = {
+			NOT = {
+				IBR = { check_variable = { IBR.FFR_negotiations_3 = 2 } }
+			}
+		}
+
+		custom_effect_tooltip = france_iberia_negotiations.21.d_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_5 = 1 } # Ground Support
+			set_variable = { IBR.FFR_negotiations_6 = 1 } # Military Bases
+			FFR = { country_event = { id = france_iberia_negotiations.24 days = 1 } }
+		}
+		ai_chance = {
+			factor = 50
+		}
+	}
+
+	option = { # Force military bases
+		name = france_iberia_negotiations.21.e
+		trigger = {
+			IBR = { check_variable = { IBR.FFR_negotiations_3 = 2 } }
+		}
+
+		custom_effect_tooltip = france_iberia_negotiations.21.e_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_5 = 1 } # Ground Support
+			set_variable = { IBR.FFR_negotiations_6 = 1 } # Military Bases
+			FFR = { country_event = { id = france_iberia_negotiations.27 days = 4 } }
+		}
+		ai_chance = {
+			factor = 50
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Free France wants only naval access
+	id = france_iberia_negotiations.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.22" }
+	title = france_iberia_negotiations.22.t
+	desc = france_iberia_negotiations.22.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Give them ground support too
+		name = france_iberia_negotiations.22.a
+
+		custom_effect_tooltip = france_iberia_negotiations.22.a_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_5 = 1 } # Ground Support
+			set_variable = { IBR.FFR_negotiations_6 = 2 } # No Military Bases
+			FFR = { country_event = { id = france_iberia_negotiations.27 days = 4 } }
+		}
+		ai_chance = {
+			factor = 50
+		}
+	}
+
+	option = { # Go with this
+		name = france_iberia_negotiations.22.b
+
+		custom_effect_tooltip = france_iberia_negotiations.22.b_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_5 = 2 } # Only Naval Support
+			set_variable = { IBR.FFR_negotiations_6 = 2 } # No Military Bases
+			FFR = { country_event = { id = france_iberia_negotiations.27 days = 4 } }
+		}
+		ai_chance = {
+			factor = 50
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) They forced ground support
+	id = france_iberia_negotiations.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.23" }
+	title = france_iberia_negotiations.23.t
+	desc = france_iberia_negotiations.23.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.23.a
+
+		custom_effect_tooltip = france_iberia_negotiations.23_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_5 = 1 } # Ground Support
+			set_variable = { IBR.FFR_negotiations_6 = 2 } # No Military Bases
+			FFR = { country_event = { id = france_iberia_negotiations.27 days = 5 } }
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) They want military bases
+	id = france_iberia_negotiations.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.24" }
+	title = france_iberia_negotiations.24.t
+	desc = france_iberia_negotiations.24.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Accept
+		name = france_iberia_negotiations.24.a
+
+		IBR = { country_event = { id = france_iberia_negotiations.25 days = 2 } }
+		ai_chance = {
+			factor = 40
+		}
+	}
+
+	option = { # Reject
+		name = france_iberia_negotiations.24.b
+
+		IBR = { country_event = { id = france_iberia_negotiations.26 days = 2 } }
+		set_variable = { IBR.FFR_negotiations_5 = 2 } # Only Naval Support
+		set_variable = { IBR.FFR_negotiations_6 = 2 } # No Military Bases
+		ai_chance = {
+			factor = 60
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) We get bases
+	id = france_iberia_negotiations.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.25" }
+	title = france_iberia_negotiations.25.t
+	desc = france_iberia_negotiations.25.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.25.a
+
+		custom_effect_tooltip = france_iberia_negotiations.25_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_5 = 1 } # Ground Support
+			set_variable = { IBR.FFR_negotiations_6 = 1 } # Military Bases
+			FFR = { country_event = { id = france_iberia_negotiations.27 days = 4 } }
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) We get no bases (bitches)
+	id = france_iberia_negotiations.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.26" }
+	title = france_iberia_negotiations.26.t
+	desc = france_iberia_negotiations.26.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.26.a
+
+		custom_effect_tooltip = france_iberia_negotiations.26_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_5 = 2 } # Only Naval Support
+			set_variable = { IBR.FFR_negotiations_6 = 2 } # No Military Bases
+			FFR = { country_event = { id = france_iberia_negotiations.27 days = 4 } }
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) International recognition
+	id = france_iberia_negotiations.27
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.27" }
+	title = france_iberia_negotiations.27.t
+	desc = france_iberia_negotiations.27.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Recognition
+		name = france_iberia_negotiations.27.a
+
+		IBR = { country_event = { id = france_iberia_negotiations.28 days = 2 } }
+		ai_chance = {
+			factor = 60
+		}
+	}
+	option = { # non-intervention
+		name = france_iberia_negotiations.27.b
+
+		IBR = { country_event = { id = france_iberia_negotiations.29 days = 2 } }
+		ai_chance = {
+			factor = 40
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_SUCCESS }
+			}
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) They want international recognition
+	id = france_iberia_negotiations.28
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.28" }
+	title = france_iberia_negotiations.28.t
+	desc = france_iberia_negotiations.28.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Accept
+		name = france_iberia_negotiations.28.a
+
+		custom_effect_tooltip = france_iberia_negotiations.28_a_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_7 = 1 } # Recognition
+			IBR = { country_event = { id = france_iberia_negotiations.30 days = 4 } }
+		}
+		ai_chance = {
+			factor = 30
+		}
+	}
+
+	option = { # Reject
+		name = france_iberia_negotiations.28.b
+
+		custom_effect_tooltip = france_iberia_negotiations.28_b_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_7 = 2 } # Non-Intervention
+			IBR = { country_event = { id = france_iberia_negotiations.30 days = 4 } }
+		}
+		ai_chance = {
+			factor = 70
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_SUCCESS }
+			}
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) They want non-intervention
+	id = france_iberia_negotiations.29
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.29" }
+	title = france_iberia_negotiations.29.t
+	desc = france_iberia_negotiations.29.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Accept
+		name = france_iberia_negotiations.29.a
+
+		custom_effect_tooltip = france_iberia_negotiations.29_a_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_7 = 2 } # Non-Intevention
+			IBR = { country_event = { id = france_iberia_negotiations.30 days = 4 } }
+		}
+		ai_chance = {
+			factor = 60
+		}
+	}
+
+	option = { # Recognize them too
+		name = france_iberia_negotiations.29.b
+
+		custom_effect_tooltip = france_iberia_negotiations.28_a_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_7 = 1 } # Recognition
+			IBR = { country_event = { id = france_iberia_negotiations.30 days = 4 } }
+		}
+		ai_chance = {
+			factor = 40
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH option = FREE_FRANCE_IBERIA_NEGOTIATIONS_PATH_SUCCESS }
+			}
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Negotiations Conclude
+	id = france_iberia_negotiations.30
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.30" }
+	title = france_iberia_negotiations.30.t
+	desc = france_iberia_negotiations.30.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_iberia_negotiations.30.a
+
+		custom_effect_tooltip = france_iberia_negotiations.30_tt
+		hidden_effect = {
+			set_global_flag = IBR_FFR_negotiations_successful
+			FFR = { country_event = { id = france_iberia_negotiations.39 days = 1 } }
+
+			if = {
+				limit = { check_variable = { IBR.FFR_negotiations_7 = 1 } }
+				every_country = {
+					limit = { is_ai = no }
+					news_event = {
+						id = FFRnews.8
+						days = 1
+					}
+				}
+			}
+			else = {
+				every_country = {
+					limit = { is_ai = no }
+					news_event = {
+						id = FFRnews.9
+						days = 1
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Free France threatens to leave (Alignment)
+	id = france_iberia_negotiations.31
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.31" }
+	title = france_iberia_negotiations.31.t
+	desc = france_iberia_negotiations.31.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Don't push the issue
+		name = france_iberia_negotiations.31.a
+
+		custom_effect_tooltip = france_iberia_negotiations.7.a_tt_2
+		hidden_effect = {
+			country_event = { id = france_iberia_negotiations.10 days = 5 }
+			set_variable = { IBR.FFR_negotiations_1 = 3 }
+		}
+		ai_chance = {
+			factor = 40
+		}
+	}
+
+	option = { # Seek a compromise
+		name = france_iberia_negotiations.31.b
+
+		custom_effect_tooltip = france_iberia_negotiations.31.b_tt
+		hidden_effect = {
+			FFR = { country_event = { id = france_iberia_negotiations.35 days = 1 } }
+		}
+		ai_chance = {
+			factor = 30
+		}
+	}
+
+	option = { # Call their bluff
+		name = france_iberia_negotiations.31.c
+
+		custom_effect_tooltip = france_iberia_negotiations.7.b_tt
+		hidden_effect = {
+			FFR = { country_event = { id = france_iberia_negotiations.32 } }
+		}
+		ai_chance = {
+			factor = 30
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) Iberia pushes the issue
+	id = france_iberia_negotiations.32
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.32" }
+	title = france_iberia_negotiations.32.t
+	desc = france_iberia_negotiations.32.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Give in
+		name = france_iberia_negotiations.32.a
+
+		IBR = { country_event = { id = france_iberia_negotiations.33 days = 1 } }
+		ai_chance = {
+			factor = 60
+		}
+	}
+
+	option = { # End the talks
+		name = france_iberia_negotiations.32.b
+
+		IBR = { country_event = { id = france_iberia_negotiations.9 days = 1 } }
+		ai_chance = {
+			factor = 40
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Free France gave in
+	id = france_iberia_negotiations.33
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.33" }
+	title = france_iberia_negotiations.33.t
+	desc = france_iberia_negotiations.33.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # cool
+		name = france_iberia_negotiations.33.a
+
+		custom_effect_tooltip = france_iberia_negotiations.33_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_1 = 1 }
+			country_event = { id = france_iberia_negotiations.10 days = 4 }
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Free France accepts offer
+	id = france_iberia_negotiations.34
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.34" }
+	title = france_iberia_negotiations.34.t
+	desc = france_iberia_negotiations.34.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # cool
+		name = france_iberia_negotiations.34.a
+
+		custom_effect_tooltip = france_iberia_negotiations.34.a_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_1 = 2 }
+			add_to_variable = { IBR.FFR_negotiations_compromises = 1 }
+			country_event = { id = france_iberia_negotiations.10 days = 4 }
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) Iberia wants a compromise
+	id = france_iberia_negotiations.35
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.35" }
+	title = france_iberia_negotiations.35.t
+	desc = france_iberia_negotiations.35.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # Yes
+		name = france_iberia_negotiations.35.a
+
+		IBR = { country_event = { id = france_iberia_negotiations.34 days = 1 } }
+		ai_chance = {
+			factor = 70
+		}
+	}
+
+	option = { # No
+		name = france_iberia_negotiations.35.a
+
+		IBR = { country_event = { id = france_iberia_negotiations.9 days = 1 } }
+		ai_chance = {
+			factor = 40
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Free France accepts offer
+	id = france_iberia_negotiations.36
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.36" }
+	title = france_iberia_negotiations.36.t
+	desc = france_iberia_negotiations.36.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # cool
+		name = france_iberia_negotiations.36.a
+
+		custom_effect_tooltip = france_iberia_negotiations.36.a_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_2 = 1 }
+			country_event = { id = france_iberia_negotiations.14 days = 5 }
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) High Interests
+	id = france_iberia_negotiations.37
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.37" }
+	title = france_iberia_negotiations.37.t
+	desc = france_iberia_negotiations.37.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # cool
+		name = france_iberia_negotiations.37.a
+
+		custom_effect_tooltip = france_iberia_negotiations.37.a_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_3 = 1 }
+			FFR = { country_event = { id = france_iberia_negotiations.16 days = 1 } }
+		}
+	}
+}
+
+country_event = { # Negotiations / (IBR) Moderate Interests
+	id = france_iberia_negotiations.38
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.38" }
+	title = france_iberia_negotiations.38.t
+	desc = france_iberia_negotiations.38.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # cool
+		name = france_iberia_negotiations.38.a
+
+		custom_effect_tooltip = france_iberia_negotiations.38.a_tt
+		hidden_effect = {
+			set_variable = { IBR.FFR_negotiations_3 = 2 }
+			FFR = { country_event = { id = france_iberia_negotiations.16 days = 1 } }
+		}
+	}
+}
+
+country_event = { # Negotiations / (FFR) Negotiations done
+	id = france_iberia_negotiations.39
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.39" }
+	title = france_iberia_negotiations.39.t
+	desc = france_iberia_negotiations.39.desc
+	picture = GFX_report_event_GER_ostsonne
+
+	is_triggered_only = yes
+
+	option = { # let's fucking gooo
+		name = france_iberia_negotiations.39.a
+
+		country_event = { id = france_reclamation.1 days = 1 }
+	}
+}
+
+country_event = { # Notified of negotiations (USA)
+	id = france_iberia_negotiations.40
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_iberia_negotiations.40" }
+	title = france_iberia_negotiations.40.t
+	desc = france_iberia_negotiations.40.desc
+	picture = GFX_report_event_IBR_big_meeting
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #
+		name = france_iberia_negotiations.40.a
+	}
+}
+
+#### RECLAMATION EVENTS ####
+country_event = { # Negotiations check
+	id = france_reclamation.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.1" }
+	title = france_reclamation.1.t
+	desc = france_reclamation.1.desc
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_reclamation.1.a
+		if = {
+			limit = {
+				FFR_check_no_negotiations = yes
+				NOT = { has_global_flag = FRA_civil_war_ongoing }
+			}
+
+			country_event = { id = france_reclamation.2 days = 35 }
+			USA = { country_event = { id = france_reclamation.5 days = 20 } }
+
+			if = { # IBR notified
+				limit = { has_global_flag = IBR_FFR_negotiations_successful }
+				IBR = { country_event = { id = france_reclamation.6 days = 20 } }
+			}
+		}
+		else_if = {
+			limit = {
+				FFR_check_failed_negotiations = yes
+				NOT = { has_global_flag = FRA_civil_war_ongoing }
+			}
+
+			country_event = { id = france_reclamation.2 days = 60 }
+			USA = { country_event = { id = france_reclamation.5 days = 40 } }
+
+			if = { # IBR notified
+				limit = { has_global_flag = IBR_FFR_negotiations_successful }
+				IBR = { country_event = { id = france_reclamation.6 days = 40 } }
+			}
+		}
+		else_if = {
+			limit = {
+				FFR_check_good_negotiations = yes
+				NOT = { has_global_flag = FRA_civil_war_ongoing }
+			}
+			country_event = { id = france_reclamation.3 days = 42 }
+		}
+		else = {
+			country_event = { id = france_reclamation.2 days = 20 }
+			USA = { country_event = { id = france_reclamation.5 days = 6 } }
+
+			if = { # IBR notified
+				limit = { has_global_flag = IBR_FFR_negotiations_successful }
+				IBR = { country_event = { id = france_reclamation.6 days = 6 } }
+			}
+		}
+	}
+}
+
+country_event = { # Reclamation
+	id = france_reclamation.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.2" }
+	title = france_reclamation.2.t
+	desc = france_reclamation.2.desc
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_reclamation.2.a
+
+		if = { # Case for if CW breaks out between negotations and start
+			limit = {
+				has_global_flag = FRA_civil_war_ongoing
+			}
+			FFR_begin_reclamation_civil_war = yes
+		}
+		else = {
+			FFR_begin_reclamation = yes
+		}
+	}
+}
+
+country_event = { # Reconciliation
+	id = france_reclamation.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.3" }
+	title = france_reclamation.3.t
+	desc = france_reclamation.3.desc
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_reclamation.3.a
+
+		FFR_reconciliation = yes
+	}
+}
+
+country_event = { # Reclamation triggered by civil war
+	id = france_reclamation.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.4" }
+	title = france_reclamation.4.t
+	desc = france_reclamation.4.desc
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_reclamation.4.a
+
+		if = { # iberian negotiations have happened
+			limit = {
+				has_global_flag = IBR_FFR_negotiations_successful
+				NOT = { has_global_flag = IBW_happening }
+			}
+
+			# start le trolling
+
+			FFR = { set_country_flag = stronger_reclamation }
+			FFR_begin_reclamation_civil_war = yes
+		}
+
+		else_if = { # iberian negotiations have failed and iberian wars are not happening
+			limit = {
+				has_global_flag = IBR_FFR_negotiations_collapsed
+				NOT = { has_global_flag = IBW_happening }
+			}
+
+			# start le trolling but weaker
+
+			FFR = { set_country_flag = weaker_reclamation }
+			FFR_begin_reclamation_civil_war = yes
+		}
+
+		else = {
+			USA = {
+				country_event = { # Reconstruction Aborted
+					id = free_france_reconstruction.4
+					days = 3
+				}
+			}
+			FFR = {
+				country_event = { # Negotiations with Iberia check
+					id = france_iberia_negotiations.1
+					days = 7
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Reclamation impending (USA)
+	id = france_reclamation.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.5" }
+	title = france_reclamation.5.t
+	desc = france_reclamation.5.desc
+	picture = GFX_report_event_IBR_canarias_ship
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_reclamation.5.a
+	}
+}
+
+country_event = { # Reclamation impending (IBR)
+	id = france_reclamation.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.6" }
+	title = france_reclamation.6.t
+	desc = france_reclamation.6.desc
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_reclamation.6.a
+	}
+}
+
+country_event = { # Ratify OFN Membership / Full
+	id = france_reclamation.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.7" }
+	title = france_reclamation.7.t
+	desc = france_reclamation.7.desc
+	picture = GFX_report_event_USA_OFN_meeting
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_reclamation.7.a
+
+		hidden_effect = {
+			every_country = {
+				limit = {
+					OR = {
+						is_in_faction_with = WOL
+						is_in_faction_with = FRA
+					}
+				}
+				econ_join_sphere_USA = yes
+				remove_faction_status = yes
+				leave_faction = yes
+				USA = { add_to_faction = PREV }
+				clr_country_flag = FMA_MEMBER
+				clr_country_flag = FRU_MEMBER
+				clr_country_flag = WAA_MEMBER
+				clr_country_flag = WAF_MEMBER
+				add_to_array = { global.OFN_members = THIS }
+				add_ideas = OFN_Independent_Member
+			}
+			FRA = {
+				econ_join_sphere_USA = yes
+				remove_faction_status = yes
+				clr_country_flag = FMA_MEMBER
+				clr_country_flag = FRU_MEMBER
+				clr_country_flag = WAA_MEMBER
+				clr_country_flag = WAF_MEMBER
+				add_to_array = { global.OFN_members = FRA }
+				add_ideas = OFN_Independent_Member
+			}
+
+			USA = {
+				add_to_faction = FRA
+			}
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FFRnews.19
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Ratify OFN Membership / Only France
+	id = france_reclamation.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.8" }
+	title = france_reclamation.8.t
+	desc = france_reclamation.8.desc
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_reclamation.8.a
+
+		hidden_effect = {
+			if = {
+				limit = { FRA = { is_faction_leader = yes } }
+				WOL = { set_faction_leader = yes }
+				every_country = {
+					limit = {
+						is_in_faction_with = WOL
+						NOT = { tag = FRA }
+					}
+					drop_cosmetic_tag = yes
+					remove_faction_status = yes
+					add_ideas = WAF_Faction
+					clr_country_flag = FMA_MEMBER
+					clr_country_flag = FRU_MEMBER
+					clr_country_flag = WAA_MEMBER
+					set_country_flag = WAF_MEMBER
+				}
+				WOL = { set_faction_name = West_African_Federation }
+			}
+			FRA = {
+				econ_join_sphere_USA = yes
+				remove_faction_status = yes
+				leave_faction = yes
+				clr_country_flag = FMA_MEMBER
+				clr_country_flag = FRU_MEMBER
+				add_to_array = { global.OFN_members = FRA }
+				add_ideas = OFN_Independent_Member
+			}
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = FFRnews.20
+					days = 1
+				}
+			}
+		}
+		USA = { add_to_faction = FRA }
+	}
+}
+
+country_event = { # De Gaulle in Paris
+	id = france_reclamation.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.9" }
+	title = france_reclamation.9.t
+	desc = france_reclamation.9.desc
+	picture = GFX_report_event_IBR_paris_eiffel_tower
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_reclamation.9.a
+	}
+}
+
+country_event = { # Leclerc in Paris
+	id = france_reclamation.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.10" }
+	title = france_reclamation.10.t
+	desc = france_reclamation.10.desc
+	picture = GFX_report_event_IBR_paris_eiffel_tower
+
+	is_triggered_only = yes
+
+	option = {
+		name = france_reclamation.10.a
+	}
+}
+
+################################
+## French Reclamation (Proxy) ##
+################################
+# - USA
+# - GER
+# - IBR
+
+#########
+## USA ##
+#########
+
+country_event = { # No Civil War
+	id = france_reclamation.proxy.USA.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.USA.1" }
+	title = france_reclamation.proxy.USA.1.t
+	desc = france_reclamation.proxy.USA.1.desc
+	picture = GFX_report_event_generic_destroyer_navy_1960
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france_reclamation.proxy.USA.1.a
+		# no volunteers or nuclear war lolhd
+#		if = {
+#			limit = { FRD = { exists = yes } }
+#			set_temp_variable = { target = FRD }
+#			set_temp_variable = { number = 4 }
+#			TNO_set_num_volunteers = yes
+#		}
+#		else = {
+#			set_temp_variable = { target = FFR }
+#			set_temp_variable = { number = 4 }
+#			TNO_set_num_volunteers = yes
+#		}
+		TNO_fopo_add_french_reclamation_tab = yes
+		add_dynamic_modifier = { modifier = USA_FFR_Reclamation_Modifier }
+	}
+}
+
+country_event = { # Civil War
+	id = france_reclamation.proxy.USA.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.USA.2" }
+	title = france_reclamation.proxy.USA.2.t
+	desc = france_reclamation.proxy.USA.2.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france_reclamation.proxy.USA.2.a
+		# no volunteers or nuclear war lolhd
+#		if = {
+#			limit = { FRD = { exists = yes } }
+#			set_temp_variable = { target = FRD }
+#			set_temp_variable = { number = 4 }
+#			TNO_set_num_volunteers = yes
+#		}
+#		else = {
+#			set_temp_variable = { target = FFR }
+#			set_temp_variable = { number = 4 }
+#			TNO_set_num_volunteers = yes
+#		}
+		TNO_fopo_add_french_reclamation_civil_war_tab = yes
+		add_dynamic_modifier = { modifier = USA_FFR_Reclamation_Modifier }
+	}
+}
+
+country_event = { # Loss
+	id = france_reclamation.proxy.USA.9998 # CORRECT ID ONCE MORE EVENTS COME IN
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.USA.9998" }
+	title = france_reclamation.proxy.USA.9998.t
+	desc = france_reclamation.proxy.USA.9998.desc
+	picture = GFX_report_event_GRO_firing_squad
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france_reclamation.proxy.USA.9998.a
+		set_temp_variable = { conclusion_weeks = 12 }
+		set_temp_variable = { conclusion_bonus = 0.05 }
+		USA_proxy_conclusion_effect = yes
+	}
+}
+
+country_event = { # Victory
+	id = france_reclamation.proxy.USA.9999 # CORRECT ID ONCE MORE EVENTS COME IN
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.USA.9999" }
+	title = france_reclamation.proxy.USA.9999.t
+	desc = france_reclamation.proxy.USA.9999.desc
+	picture = GFX_report_event_generic_burning_books
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = { set_country_flag = conclusion_victory }
+
+	option = {
+		name = france_reclamation.proxy.USA.9999.a
+		set_temp_variable = { conclusion_weeks = 10 }
+		set_temp_variable = { conclusion_bonus = 0.04 }
+		USA_proxy_conclusion_effect = yes
+	}
+}
+
+#########
+## GER ##
+#########
+
+country_event = { # No Civil War
+	id = france_reclamation.proxy.GER.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.GER.1" }
+	title = france_reclamation.proxy.GER.1.t
+	desc = france_reclamation.proxy.GER.1.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france_reclamation.proxy.GER.1.a
+		TNO_fopo_add_french_reclamation_tab = yes
+		if = {
+			limit = { FRA = { is_in_faction_with = GER } }
+			set_temp_variable = { target = FRA }
+			set_temp_variable = { number = 10 }
+			TNO_set_num_volunteers = yes
+		}
+		else = {
+			set_temp_variable = { target = FRA }
+			set_temp_variable = { number = 3 }
+			TNO_set_num_volunteers = yes
+		}
+	}
+}
+
+country_event = { # Civil War
+	id = france_reclamation.proxy.GER.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.GER.2" }
+	title = france_reclamation.proxy.GER.2.t
+	desc = france_reclamation.proxy.GER.2.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france_reclamation.proxy.GER.2.a
+		TNO_fopo_add_french_reclamation_civil_war_tab = yes
+		if = {
+			limit = { FRA = { is_in_faction_with = GER } }
+			set_temp_variable = { target = FRA }
+			set_temp_variable = { number = 3 }
+			TNO_set_num_volunteers = yes
+		}
+		else = {
+			set_temp_variable = { target = FRA }
+			set_temp_variable = { number = 2 }
+			TNO_set_num_volunteers = yes
+		}
+	}
+}
+
+country_event = { # Loss
+	id = france_reclamation.proxy.GER.9998 # CORRECT ID ONCE MORE EVENTS COME IN
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.GER.9998" }
+	title = france_reclamation.proxy.GER.9998.t
+	desc = france_reclamation.proxy.GER.9998.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france_reclamation.proxy.GER.9998.a
+		# i can't figure out german code
+		add_political_power = -100
+	}
+}
+
+country_event = { # Victory
+	id = france_reclamation.proxy.GER.9999 # CORRECT ID ONCE MORE EVENTS COME IN
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.GER.9999" }
+	title = france_reclamation.proxy.GER.9999.t
+	desc = france_reclamation.proxy.GER.9999.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france_reclamation.proxy.GER.9999.a
+		# i can't figure out german code
+		add_political_power = 100
+	}
+}
+
+#########
+## IBR ##
+#########
+
+country_event = { # No Civil War
+	id = france_reclamation.proxy.IBR.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.IBR.1" }
+	title = france_reclamation.proxy.IBR.1.t
+	desc = france_reclamation.proxy.IBR.1.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france_reclamation.proxy.IBR.1.a
+		TNO_fopo_add_french_reclamation_tab = yes
+		add_dynamic_modifier = { modifier = USA_FFR_Reclamation_Modifier }
+	}
+}
+
+country_event = { # Loss
+	id = france_reclamation.proxy.IBR.9998 # CORRECT ID ONCE MORE EVENTS COME IN
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.IBR.9998" }
+	title = france_reclamation.proxy.IBR.9998.t
+	desc = france_reclamation.proxy.IBR.9998.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france_reclamation.proxy.IBR.9998.a
+		subtract_from_variable = { IBRIberiaStability = 1 }
+		custom_effect_tooltip = IBR_sub_stability_small_tt
+		add_political_power = -100
+	}
+}
+
+country_event = { # Victory
+	id = france_reclamation.proxy.IBR.9999 # CORRECT ID ONCE MORE EVENTS COME IN
+	immediate = { log = "[GetDateText]: [Root.GetName]: event france_reclamation.proxy.IBR.9999" }
+	title = france_reclamation.proxy.IBR.9999.t
+	desc = france_reclamation.proxy.IBR.9999.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france_reclamation.proxy.IBR.9999.a
+		add_to_variable = { IBRIberiaStability = 1 }
+		custom_effect_tooltip = IBR_add_stability_small_tt
+		add_political_power = 100
+	}
+}
+
+# News
+news_event = { # Reclamation / Negotiations collapse
+	id = FFRnews.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.1" }
+	title = FFRnews.1.t
+	desc = FFRnews.1.desc
+	picture = GFX_news_event_FRA_reclamation
+
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			is_in_faction_with = GER
+			NOT = { original_tag = FRS }
+		}
+		name = FFRnews.1.a
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+	option = {
+		trigger = { original_tag = FFR }
+		name = FFRnews.1.b
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+	option = {
+		trigger = { original_tag = FRS }
+		name = FFRnews.1.c
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+	option = {
+		trigger = {
+			NOT = {
+				is_in_faction_with = GER
+				original_tag = FFR
+				original_tag = FRS
+			}
+		}
+		name = FFRnews.1.d
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+}
+
+news_event = { # Reclamation / No negotiations
+	id = FFRnews.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.2" }
+	title = FFRnews.2.t
+	desc = FFRnews.2.desc
+	picture = GFX_news_event_FRA_reclamation
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.2.a
+		trigger = { original_tag = FRS }
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+	option = {
+		name = FFRnews.2.b
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+				is_in_faction_with = FFR
+				is_in_faction_with = FRD
+			}
+		}
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+	option = {
+		name = FFRnews.2.c
+		trigger = {
+			NOT = {
+				original_tag = FRS
+				is_in_faction_with = USA
+				is_in_faction_with = FFR
+				is_in_faction_with = FRD
+				is_in_faction_with = GER
+			}
+		}
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+	option = {
+		name = FFRnews.2.d
+		trigger = {
+			is_in_faction_with = GER
+		}
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+}
+
+news_event = { # Reconciliation
+	id = FFRnews.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.3" }
+	title = FFRnews.3.t
+	desc = FFRnews.3.desc
+	picture = GFX_news_event_FRA_reconciliation
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.3.a
+		trigger = {
+			NOT = { is_in_faction_with = GER }
+		}
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECONCILIATION }
+		TNO_fire_super_event = yes
+	}
+	option = {
+		name = FFRnews.3.b
+		trigger = { is_in_faction_with = GER }
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECONCILIATION }
+		TNO_fire_super_event = yes
+	}
+}
+
+news_event = { # Reconciliation / Pinay
+	id = FFRnews.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.4" }
+	title = FFRnews.4.t
+	desc = FFRnews.4.desc
+	picture = GFX_news_event_FRA_reconciliation
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.4.a
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECONCILIATION }
+		TNO_fire_super_event = yes
+	}
+}
+
+news_event = { # Reclamation / Triggered by Civil War
+	id = FFRnews.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.5" }
+	title = FFRnews.5.t
+	desc = FFRnews.5.desc
+	picture = GFX_news_event_FRA_reclamation
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.5.a
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+}
+
+news_event = { # Reclamation / post-Civil War
+	id = FFRnews.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.6" }
+	title = FFRnews.6.t
+	desc = FFRnews.6.desc
+	picture = GFX_news_event_FRA_reclamation
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.6.a
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+				is_in_faction_with = FFR
+				is_in_faction_with = FRD
+			}
+		}
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+
+	option = {
+		name = FFRnews.6.b
+		trigger = {
+			is_in_faction_with = GER
+		}
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+
+	option = {
+		name = FFRnews.6.c
+		trigger = {
+			NOT = {
+				is_in_faction_with = GER
+				OR = {
+					is_in_faction_with = USA
+					is_in_faction_with = FFR
+					is_in_faction_with = FRD
+				}
+			}
+		}
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECLAMATION }
+		TNO_fire_super_event = yes
+	}
+}
+
+news_event = { # Reconciliation / Constitutional Monarchy
+	id = FFRnews.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.7" }
+	title = FFRnews.7.t
+	desc = FFRnews.7.desc
+	picture = GFX_news_event_FRA_reconciliation
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.7.a
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+				is_in_faction_with = FFR
+				is_in_faction_with = FRD
+			}
+		}
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECONCILIATION }
+		TNO_fire_super_event = yes
+	}
+
+	option = {
+		name = FFRnews.7.b
+		trigger = {
+			is_in_faction_with = GER
+		}
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECONCILIATION }
+		TNO_fire_super_event = yes
+	}
+
+	option = {
+		name = FFRnews.7.c
+		trigger = {
+			NOT = {
+				is_in_faction_with = GER
+				OR = {
+					is_in_faction_with = USA
+					is_in_faction_with = FFR
+					is_in_faction_with = FRD
+				}
+			}
+		}
+		set_temp_variable = { TNO_temp_super_event = token:SE_FRENCH_RECONCILIATION }
+		TNO_fire_super_event = yes
+	}
+}
+
+news_event = { # Negotiations / Free France recognized by Iberia
+	id = FFRnews.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.8" }
+	title = FFRnews.8.t
+	desc = FFRnews.8.desc
+	picture = "[FFR_GetSummitPicture]"
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.8.a
+	}
+}
+
+news_event = { # Negotiations / Free France-Iberia Talks Ends (no recognition)
+	id = FFRnews.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.9" }
+	title = FFRnews.9.t
+	desc = FFRnews.9.desc
+	picture = "[FFR_GetSummitPicture]"
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.9.a
+	}
+}
+
+news_event = { # de Gaulle dies (mainland edition) (not President)
+	id = FFRnews.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.10" }
+	title = FFRnews.10.t
+	desc = FFRnews.10.desc
+	picture = GFX_news_event_FFR_degaulle_dies
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.10.a
+	}
+}
+
+news_event = { # Reclamation Successful (de Gaulle)
+	id = FFRnews.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.11" }
+	title = FFRnews.11.t
+	desc = FFRnews.11.desc
+	picture = GFX_news_event_FFR_Reclamation_Success
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.11.a
+		trigger = {
+			is_in_faction_with = USA
+		}
+	}
+
+	option = {
+		name = FFRnews.11.b
+		trigger = {
+			is_in_faction_with = GER
+		}
+	}
+
+	option = {
+		name = FFRnews.11.c
+		trigger = { tag = FRA }
+	}
+
+	option = {
+		name = FFRnews.11.d
+		trigger = {
+			NOT = {
+				tag = FRA
+				is_in_faction_with = GER
+				OR = {
+					is_in_faction_with = USA
+					is_in_faction_with = FFR
+					is_in_faction_with = FRD
+				}
+			}
+		}
+	}
+}
+
+news_event = { # Reclamation Successful (Leclerc)
+	id = FFRnews.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.12" }
+	title = FFRnews.12.t
+	desc = FFRnews.12.desc
+	picture = GFX_news_event_FFR_Reclamation_Success
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.12.a
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+				is_in_faction_with = FFR
+				is_in_faction_with = FRD
+			}
+		}
+	}
+
+	option = {
+		name = FFRnews.12.b
+		trigger = {
+			is_in_faction_with = GER
+		}
+	}
+
+	option = {
+		name = FFRnews.12.c
+		trigger = {
+			NOT = {
+				is_in_faction_with = GER
+				OR = {
+					is_in_faction_with = USA
+					is_in_faction_with = FFR
+					is_in_faction_with = FRD
+				}
+			}
+		}
+	}
+}
+
+news_event = { # de Gaulle dies (mainland edition) (deluxe edition)
+	id = FFRnews.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.13" }
+	title = FFRnews.13.t
+	desc = FFRnews.13.desc
+	picture = GFX_news_event_FFR_degaulle_dies
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.13.a
+		trigger = {
+			OR = {
+				is_in_faction_with = USA
+				is_in_faction_with = FFR
+				is_in_faction_with = FRD
+			}
+		}
+	}
+
+	option = {
+		name = FFRnews.13.b
+		trigger = {
+			is_in_faction_with = GER
+		}
+	}
+
+	option = {
+		name = FFRnews.13.c
+		trigger = {
+			NOT = {
+				is_in_faction_with = GER
+				OR = {
+					is_in_faction_with = USA
+					is_in_faction_with = FFR
+					is_in_faction_with = FRD
+				}
+			}
+		}
+	}
+}
+
+news_event = { # de Gaulle elected
+	id = FFRnews.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.14" }
+	title = FFRnews.14.t
+	desc = FFRnews.14.desc
+	picture = GFX_news_event_FFR_charles_degaulle_elected
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.14.a
+	}
+}
+
+news_event = { # Chaban-Delmas elected
+	id = FFRnews.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.15" }
+	title = FFRnews.15.t
+	desc = FFRnews.15.desc
+	picture = GFX_news_event_FFR_chaban_delmas_elected
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.15.a
+	}
+}
+
+news_event = { # Lecanuet elected
+	id = FFRnews.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.16" }
+	title = FFRnews.16.t
+	desc = FFRnews.16.desc
+	picture = GFX_news_event_FFR_lecanuet_elected
+
+	is_triggered_only = yes
+
+	option = {
+		name = FFRnews.16.a
+	}
+}
+
+news_event = { # Mendes France elected
+	id = FFRnews.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.17" }
+	title = FFRnews.17.t
+	desc = FFRnews.17.desc
+	picture = GFX_news_event_FFR_mendes_france_elected
+
+	is_triggered_only = yes
+	option = {
+		name = FFRnews.17.a
+	}
+}
+
+news_event = { # Free France Defeated
+	id = FFRnews.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.18" }
+	title = FFRnews.18.t
+	desc = FFRnews.18.desc
+	picture = GFX_news_event_FFR_Reclamation_Fail
+
+	is_triggered_only = yes
+	option = {
+		name = FFRnews.18.a
+	}
+}
+
+news_event = { # France joins OFN (+West Africa)
+	id = FFRnews.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.19" }
+	title = FFRnews.19.t
+	desc = FFRnews.19.desc
+	picture = GFX_news_event_FFR_ofnpluswestafrica
+
+	is_triggered_only = yes
+	option = {
+		name = FFRnews.19.a
+	}
+}
+
+news_event = { # France joins OFN (Alone)
+	id = FFRnews.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event FFRnews.20" }
+	title = FFRnews.20.t
+	desc = FFRnews.20.desc
+	picture = GFX_news_event_FFR_ofn
+
+	is_triggered_only = yes
+	option = {
+		name = FFRnews.20.a
+	}
+}

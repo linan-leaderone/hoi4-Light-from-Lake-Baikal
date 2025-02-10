@@ -1,0 +1,533 @@
+	
+#schools is weighted on pop heavily and GDP (small)
+calculate_schools_bonus_state = {
+	set_temp_variable = { total_state_factor = 1 }
+	set_temp_variable = { b = 2 }
+	set_temp_variable = { c = 3 } #total_state_factor+b
+	multiply_temp_variable = { total_state_factor = local_gdp_percentage }
+	multiply_temp_variable = { b = local_pop_percentage }
+	add_to_temp_variable = { total_state_factor = b }
+	divide_temp_variable = { total_state_factor = c }
+	set_variable = { full_effect_schools_in_state = total_state_factor }
+}
+
+#offices is weighted on GDP heavily and on pop (small)
+calculate_offices_bonus_state = {
+	set_temp_variable = { total_state_factor = 3 }
+	set_temp_variable = { b = 1 }
+	set_temp_variable = { c = 4 } #total_state_factor+b
+	multiply_temp_variable = { total_state_factor = local_gdp_percentage }
+	multiply_temp_variable = { b = local_pop_percentage }
+	add_to_temp_variable = { total_state_factor = b }
+	divide_temp_variable = { total_state_factor = c }
+	set_variable = { full_effect_offices_in_state = total_state_factor }
+}
+
+#Hospitals are weighted on GDP, pop and land for coverage. Function gives the effect factor if state fully used.
+calculate_hospitals_bonus_state = {
+	set_temp_variable = { total_state_factor = 1 }
+	set_temp_variable = { b = 1 }
+	set_temp_variable = { c = 2 } #total_state_factor+b
+	multiply_temp_variable = { total_state_factor = local_gdp_percentage }
+	multiply_temp_variable = { b = local_pop_percentage }
+	add_to_temp_variable = { total_state_factor = b }
+	divide_temp_variable = { total_state_factor = c }
+	set_variable = { full_effect_hospitals_in_state = total_state_factor }
+}
+
+#Barracks are based on pop for coverage (would have liked on poverty too)
+calculate_barracks_bonus_state = {
+	set_variable = { full_effect_barracks_in_state = local_pop_percentage }
+}
+
+#Prisons are based on pop for coverage
+calculate_prisons_bonus_state = {
+	set_variable = { full_effect_prisons_in_state = local_pop_percentage }
+}
+
+
+schools_modifier_calc = {
+	set_temp_variable = { a = 12.5 }
+	set_variable = { schools_research_modifier = -5 }
+	multiply_temp_variable = { a = TNO_school_coverage }
+	add_to_variable = { schools_research_modifier = a }
+
+	set_temp_variable = { a = 20 }
+	set_variable = { schools_fac_max_efficiency_modifier = -10 }
+	multiply_temp_variable = { a = TNO_school_coverage }
+	add_to_variable = { schools_fac_max_efficiency_modifier = a }
+
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@schools_coverage_modifier }
+	multiply_variable = { schools_research_modifier = tech_cov_bonus }
+	divide_variable = { schools_research_modifier = 100 }
+	multiply_variable = { school_in_best_state_bonus_research = 12.5 }
+	multiply_variable = { school_in_best_state_bonus_research = tech_cov_bonus }
+	divide_variable = { school_in_best_state_bonus_research = 100 }
+
+	multiply_variable = { schools_fac_max_efficiency_modifier = tech_cov_bonus }
+	divide_variable = { schools_fac_max_efficiency_modifier = 100 }
+	multiply_variable = { school_in_best_state_bonus_fac_max_efficiency = 20 }
+	multiply_variable = { school_in_best_state_bonus_fac_max_efficiency = tech_cov_bonus }
+	divide_variable = { school_in_best_state_bonus_fac_max_efficiency = 100 }
+
+}
+
+offices_modifier_calc = {
+
+	set_temp_variable = { a = 12.5 }
+	set_variable = { offices_PP_modifier = -2.5 }
+	set_variable = { offices_supply_usage_modifier = -2.5 }
+	set_variable = { offices_attrition_modifier = -2.5 }
+
+	multiply_temp_variable = { a = TNO_office_coverage }
+
+	add_to_variable = { offices_PP_modifier = a }
+	add_to_variable = { offices_supply_usage_modifier = a }
+	add_to_variable = { offices_attrition_modifier = a }
+
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@offices_coverage_modifier }
+
+	multiply_variable = { offices_PP_modifier = tech_cov_bonus }
+	multiply_variable = { offices_supply_usage_modifier = tech_cov_bonus }
+	multiply_variable = { offices_attrition_modifier = tech_cov_bonus }
+
+	divide_variable = { offices_PP_modifier = 100 }
+	divide_variable = { offices_supply_usage_modifier = 100 }
+	divide_variable = { offices_attrition_modifier = 100 }
+
+
+
+	multiply_variable = { offices_supply_usage_modifier = -1 }
+	multiply_variable = { offices_attrition_modifier = -1 }
+}
+
+hospitals_modifier_calc = {
+	set_temp_variable = { a = 25 }
+	set_variable = { hospitals_pop_growth_modifier = -5 }
+	multiply_temp_variable = { a = TNO_hospital_coverage }
+	add_to_variable = { hospitals_pop_growth_modifier = a }
+
+	set_temp_variable = { a = 15 }
+	set_variable = { hospitals_org_regain_modifier = -5 }
+	multiply_temp_variable = { a = TNO_hospital_coverage }
+	add_to_variable = { hospitals_org_regain_modifier = a }
+
+	set_temp_variable = { a = 0.3 }
+	set_variable = { hospitals_healthcare_modifier = -0.1 }
+	multiply_temp_variable = { a = TNO_hospital_coverage }
+	add_to_variable = { hospitals_healthcare_modifier = a }
+	
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@hospitals_coverage_modifier }
+	multiply_variable = { hospitals_pop_growth_modifier = tech_cov_bonus }
+	divide_variable = { hospitals_pop_growth_modifier = 100 }
+
+
+
+	multiply_variable = { hospitals_org_regain_modifier = tech_cov_bonus }
+	divide_variable = { hospitals_org_regain_modifier = 100 }
+	
+
+
+	multiply_variable = { hospitals_healthcare_modifier = tech_cov_bonus }
+	divide_variable = { hospitals_healthcare_modifier = 100 }
+
+}
+
+barracks_modifier_calc = {
+	set_temp_variable = { a = 17.5 }
+	set_variable = { barracks_manpower_modifier = -2.5 }
+	multiply_temp_variable = { a = TNO_barrack_coverage }
+	add_to_variable = { barracks_manpower_modifier = a }
+
+	set_temp_variable = { a = 12.5 }
+	set_variable = { barracks_org_modifier = -2.5 }
+	multiply_temp_variable = { a = TNO_barrack_coverage }
+	add_to_variable = { barracks_org_modifier = a }
+
+	set_temp_variable = { a = 17.5 }
+	set_variable = { barracks_mob_speed_modifier = -2.5 }
+	multiply_temp_variable = { a = TNO_barrack_coverage }
+	add_to_variable = { barracks_mob_speed_modifier = a }
+
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@barracks_coverage_modifier }
+
+	multiply_variable = { barracks_org_modifier = tech_cov_bonus }
+	multiply_variable = { barracks_manpower_modifier = tech_cov_bonus }
+	multiply_variable = { barracks_mob_speed_modifier = tech_cov_bonus }
+
+	divide_variable = { barracks_org_modifier = 100 }
+	divide_variable = { barracks_manpower_modifier = 100 }
+	divide_variable = { barracks_mob_speed_modifier = 100 }
+	
+
+}
+
+prisons_modifier_calc = {
+	set_temp_variable = { a = 25 }
+	set_variable = { prisons_stab_modifier = -5 }
+	multiply_temp_variable = { a = TNO_prison_coverage }
+	add_to_variable = { prisons_stab_modifier = a }
+
+	set_temp_variable = { a = 12.5 }
+	set_variable = { prisons_compliance_modifier = -2.5 }
+	multiply_temp_variable = { a = TNO_prison_coverage }
+	add_to_variable = { prisons_compliance_modifier = a }
+
+	set_temp_variable = { a = 35 }
+	set_variable = { prisons_garrisons_modifier = -10 }
+	multiply_temp_variable = { a = TNO_prison_coverage }
+	add_to_variable = { prisons_garrisons_modifier = a }
+
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@prisons_coverage_modifier }
+	multiply_variable = { prisons_stab_modifier = tech_cov_bonus }
+	divide_variable = { prisons_stab_modifier = 100 }
+
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@prisons_coverage_modifier }
+	multiply_variable = { prisons_compliance_modifier = tech_cov_bonus }
+	divide_variable = { prisons_compliance_modifier = 100 }
+
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@prisons_coverage_modifier }
+	multiply_variable = { prisons_garrisons_modifier = tech_cov_bonus }
+	divide_variable = { prisons_garrisons_modifier = 100 }
+
+	multiply_variable = { prisons_garrisons_modifier = -1 }
+
+}
+extra_building_provided_bonus_calc = { #For the playuer only, effect of the extra best building
+	#prisons
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@prisons_coverage_modifier }
+	
+	multiply_variable = { prison_in_best_state_bonus_stab = 25 }
+	multiply_variable = { prison_in_best_state_bonus_stab = tech_cov_bonus }
+	divide_variable = { prison_in_best_state_bonus_stab = 100 }
+	
+	multiply_variable = { prison_in_best_state_bonus_garrisons = 12.5 }
+	multiply_variable = { prison_in_best_state_bonus_garrisons = tech_cov_bonus }
+	divide_variable = { prison_in_best_state_bonus_garrisons = 100 }
+	multiply_variable = { prison_in_best_state_bonus_garrisons = -1 }
+	
+	#barracks
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@barracks_coverage_modifier }
+	
+	multiply_variable = { barrack_in_best_state_bonus_manpower = 12.5 }
+	multiply_variable = { barrack_in_best_state_bonus_manpower = tech_cov_bonus }
+	divide_variable = { barrack_in_best_state_bonus_manpower = 100 }
+	
+	multiply_variable = { barrack_in_best_state_bonus_org = 17.5 }
+	multiply_variable = { barrack_in_best_state_bonus_org = tech_cov_bonus }
+	divide_variable = { barrack_in_best_state_bonus_org = 100 }
+
+	multiply_variable = { barrack_in_best_state_bonus_mob_speed = 17.5 }
+	multiply_variable = { barrack_in_best_state_bonus_mob_speed = tech_cov_bonus }
+	divide_variable = { barrack_in_best_state_bonus_mob_speed = 100 }
+	
+	#hospitals
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@hospitals_coverage_modifier }
+	
+	multiply_variable = { hospital_in_best_state_bonus_pop_growth = 25 }
+	multiply_variable = { hospital_in_best_state_bonus_pop_growth = tech_cov_bonus }
+	divide_variable = { hospital_in_best_state_bonus_pop_growth = 100 }
+	
+	multiply_variable = { hospital_in_best_state_bonus_org_regain = 15 }
+	multiply_variable = { hospital_in_best_state_bonus_org_regain = tech_cov_bonus }
+	divide_variable = { hospital_in_best_state_bonus_org_regain = 100 }
+	
+	multiply_variable = { hospital_in_best_state_bonus_healthcare = 15 }
+	multiply_variable = { hospital_in_best_state_bonus_healthcare = tech_cov_bonus }
+	divide_variable = { hospital_in_best_state_bonus_healthcare = 100 }
+	
+	#offices
+	
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@offices_coverage_modifier }
+	
+	multiply_variable = { office_in_best_state_bonus_pp = 12.5 }
+	multiply_variable = { office_in_best_state_bonus_pp = tech_cov_bonus }
+
+	divide_variable = { office_in_best_state_bonus_pp = 100 }
+
+	multiply_variable = { office_in_best_state_bonus_supply_usage = -1 }
+	multiply_variable = { office_in_best_state_bonus_attrition = -1 }
+	
+	#schools
+	set_temp_variable = { tech_cov_bonus = 1 }
+	add_to_temp_variable = { tech_cov_bonus = modifier@schools_coverage_modifier }
+	multiply_variable = { school_in_best_state_bonus_research = 12.5 }
+	multiply_variable = { school_in_best_state_bonus_research = tech_cov_bonus }
+	divide_variable = { school_in_best_state_bonus_research = 100 }
+
+	multiply_variable = { school_in_best_state_bonus_fac_max_efficiency = 20 }
+	multiply_variable = { school_in_best_state_bonus_fac_max_efficiency = tech_cov_bonus }
+	divide_variable = { school_in_best_state_bonus_fac_max_efficiency = 100 }
+}
+
+update_buildings_modifier = {
+	prisons_modifier_calc = yes
+	barracks_modifier_calc = yes
+	hospitals_modifier_calc = yes
+	offices_modifier_calc = yes
+	schools_modifier_calc = yes
+	if ={ limit = { is_ai = no }
+		extra_building_provided_bonus_calc = yes
+	}
+}
+
+control_stats = {
+	set_variable = { rax = 0 }
+	set_variable = { hosp = 0 }
+	set_variable = { schoo = 0 }
+	every_owned_state = {
+		add_to_variable = { PREV.rax = full_effect_barracks_in_state }
+		add_to_variable = { PREV.schoo = full_effect_schools_in_state }
+		add_to_variable = { PREV.hosp = full_effect_hospitals_in_state }
+	}
+	log = "School : [?schoo]"
+	log = "Barracks : [?rax]"
+	log = "Hospitals : [?hosp]"
+}
+
+debug_is_ai = {
+	if = {
+		limit = { is_ai = yes }
+		log = "yes"
+	}
+	else = {
+		log = "no"
+	}
+}
+
+debug_speed_test = {
+	log = "start speed test"
+	set_temp_variable = { var_counter = 0 }
+	for_loop_effect = {
+		end = 12
+		value = v_0
+		for_loop_effect = {
+			end = 1000
+			value = v_1
+
+			for_loop_effect = {
+				end = 1000
+				value = v_2
+
+				add_to_temp_variable = { var_counter = 2 }
+				clamp_temp_variable = { var = var_counter min = 0 max = v_2 }
+			}
+		}
+	}
+	log = "break speed test var_counter [?var_counter]"
+	set_temp_variable = { var_counter = 0 }
+	for_loop_effect = {
+		end = 12
+		value = v_0
+		for_loop_effect = {
+			end = 1000
+			value = v_1
+
+			for_loop_effect = {
+				end = 1000
+				value = v_2
+
+				add_to_temp_variable = { var_counter = 2 }
+				if = {
+					limit = { check_variable = { var_counter > v_2 } }
+					set_temp_variable = { var_counter = v_2 }
+				} else_if = {
+					limit = { check_variable = { var_counter < 0 } }
+					set_temp_variable = { var_counter = 0 }
+				}
+			}
+		}
+	}
+	log = "end speed test var_counter [?var_counter]"
+}
+
+debug_print_buildings = {
+	every_country = {
+		limit = { has_country_flag = tno_playable_country }
+		debug_print_buildings_country = yes
+	}
+}
+
+debug_destroy_all_buildings = {
+	set_temp_variable = { empty_slots = total_slot_calculation }
+
+	every_owned_state = {
+		set_building_level = { type = dockyard level = 0 instant_build = yes }
+		set_building_level = { type = synthetic_refinery level = 0 instant_build = yes }
+		set_building_level = { type = fuel_silo level = 0 instant_build = yes }
+		set_building_level = { type = thermoelectric_plant level = 0 instant_build = yes }
+		set_building_level = { type = nuclear_reactor level = 0 instant_build = yes }
+		set_building_level = { type = enrichment_plant level = 0 instant_build = yes }
+		set_building_level = { type = missile_silo level = 0 instant_build = yes }
+		set_building_level = { type = schools level = 0 instant_build = yes }
+		set_building_level = { type = offices level = 0 instant_build = yes }
+		set_building_level = { type = hospitals level = 0 instant_build = yes }
+		set_building_level = { type = barracks level = 0 instant_build = yes }
+		set_building_level = { type = prisons level = 0 instant_build = yes }
+	}
+}
+
+debug_add_best_school = {
+	var:best_state_for_schools = { add_building_construction = { type = schools level = 1 instant_build = yes } }
+}
+debug_add_best_office = {
+	var:best_state_for_office = { add_building_construction = { type = offices level = 1 instant_build = yes } }
+}
+debug_add_best_hospital = {
+	var:best_state_for_hospital = { add_building_construction = { type = hospitals level = 1 instant_build = yes } }
+}
+debug_add_best_barrack = {
+	var:best_state_for_barracks = { add_building_construction = { type = barracks level = 1 instant_build = yes } }
+}
+debug_add_best_prison = {
+	var:best_state_for_prisons = { add_building_construction = { type = prisons level = 1 instant_build = yes } }
+}
+
+debug_print_buildings_country = {
+	set_temp_variable = { starting_schools = total_schools }
+	set_temp_variable = { starting_offices = total_offices }
+	set_temp_variable = { starting_hospitals = total_hospitals }
+	set_temp_variable = { starting_barracks = total_barracks }
+	set_temp_variable = { starting_prisons = total_prisons }
+
+	debug_destroy_all_buildings = yes
+	calculate_building_variables = yes
+
+	# School
+	while_loop_effect = {
+		limit = {
+			check_variable = { empty_slots > 0 }
+			check_variable = { TNO_school_coverage < 0.5 }
+		}
+		subtract_from_temp_variable = { empty_slots = 1 }
+		debug_add_best_school = yes
+		calculate_building_variables = yes
+	}
+	set_temp_variable = { 50_schools = total_schools }
+	while_loop_effect = {
+		limit = {
+			check_variable = { empty_slots > 0 }
+			check_variable = { TNO_school_coverage < 1 }
+		}
+		subtract_from_temp_variable = { empty_slots = 1 }
+		debug_add_best_school = yes
+		calculate_building_variables = yes
+	}
+	set_temp_variable = { 100_schools = total_schools }
+
+	# Office
+	debug_destroy_all_buildings = yes
+	while_loop_effect = {
+		limit = {
+			check_variable = { empty_slots > 0 }
+			check_variable = { TNO_office_coverage < 0.5 }
+		}
+		subtract_from_temp_variable = { empty_slots = 1 }
+		debug_add_best_office = yes
+		calculate_building_variables = yes
+	}
+	set_temp_variable = { 50_offices = total_offices }
+	while_loop_effect = {
+		limit = {
+			check_variable = { empty_slots > 0 }
+			check_variable = { TNO_office_coverage < 1 }
+		}
+		subtract_from_temp_variable = { empty_slots = 1 }
+		debug_add_best_office = yes
+		calculate_building_variables = yes
+	}
+	set_temp_variable = { 100_offices = total_offices }
+	
+	# Hospital
+	debug_destroy_all_buildings = yes
+	while_loop_effect = {
+		limit = {
+			check_variable = { empty_slots > 0 }
+			check_variable = { TNO_hospital_coverage < 0.5 }
+		}
+		subtract_from_temp_variable = { empty_slots = 1 }
+		debug_add_best_hospital = yes
+		calculate_building_variables = yes
+	}
+	set_temp_variable = { 50_hospitals = total_hospitals }
+	while_loop_effect = {
+		limit = {
+			check_variable = { empty_slots > 0 }
+			check_variable = { TNO_hospital_coverage < 1 }
+		}
+		subtract_from_temp_variable = { empty_slots = 1 }
+		debug_add_best_hospital = yes
+		calculate_building_variables = yes
+	}
+	set_temp_variable = { 100_hospitals = total_hospitals }
+	
+	# Barracks
+	debug_destroy_all_buildings = yes
+	while_loop_effect = {
+		limit = {
+			check_variable = { empty_slots > 0 }
+			check_variable = { TNO_barrack_coverage < 0.5 }
+		}
+		subtract_from_temp_variable = { empty_slots = 1 }
+		debug_add_best_barrack = yes
+		calculate_building_variables = yes
+	}
+	set_temp_variable = { 50_barracks = total_barracks }
+	while_loop_effect = {
+		limit = {
+			check_variable = { empty_slots > 0 }
+			check_variable = { TNO_barrack_coverage < 1 }
+		}
+		subtract_from_temp_variable = { empty_slots = 1 }
+		debug_add_best_barrack = yes
+		calculate_building_variables = yes
+	}
+	set_temp_variable = { 100_barracks = total_barracks }
+	
+	# Prisons
+	debug_destroy_all_buildings = yes
+	while_loop_effect = {
+		limit = {
+			check_variable = { empty_slots > 0 }
+			check_variable = { TNO_prison_coverage < 0.5 }
+		}
+		subtract_from_temp_variable = { empty_slots = 1 }
+		debug_add_best_prison = yes
+		calculate_building_variables = yes
+	}
+	set_temp_variable = { 50_prisons = total_prisons }
+	while_loop_effect = {
+		limit = {
+			check_variable = { empty_slots > 0 }
+			check_variable = { TNO_prison_coverage < 1 }
+		}
+		subtract_from_temp_variable = { empty_slots = 1 }
+		debug_add_best_prison = yes
+		calculate_building_variables = yes
+	}
+	set_temp_variable = { 100_prisons = total_prisons }
+
+	log = "PYTHON_DEBUG_BUILDINGS;schools  ;[THIS.GetTag];[?starting_schools];[?num_owned_states];[?total_slot_calculation];[?50_schools];[?100_schools];[?production_units];[?modifier@production_speed_buildings_factor]"
+	#log = "PYTHON_DEBUG_BUILDINGS;offices  ;[THIS.GetTag];[?starting_offices];[?num_owned_states];[?total_slot_calculation];[?50_offices];[?100_offices];[?production_units];[?modifier@production_speed_buildings_factor]"
+	#log = "PYTHON_DEBUG_BUILDINGS;hospitals;[THIS.GetTag];[?starting_hospitals];[?num_owned_states];[?total_slot_calculation];[?50_hospitals];[?100_hospitals];[?production_units];[?modifier@production_speed_buildings_factor]"
+	#log = "PYTHON_DEBUG_BUILDINGS;barracks ;[THIS.GetTag];[?starting_barracks];[?num_owned_states];[?total_slot_calculation];[?50_barracks];[?100_barracks];[?production_units];[?modifier@production_speed_buildings_factor]"
+	#log = "PYTHON_DEBUG_BUILDINGS;prisons  ;[THIS.GetTag];[?starting_prisons];[?num_owned_states];[?total_slot_calculation];[?50_prisons];[?100_prisons];[?production_units];[?modifier@production_speed_buildings_factor]"
+}
+
+debug_test_colors = {
+	USA = { force_update_map_mode = { mapmode = tno_econ_building_map_mode } }
+	set_temp_variable = { g_clc = theoric_school }
+	divide_temp_variable = { g_clc = FROM.controller:school_in_best_empty_state }
+	log = "g_clc [?g_clc]"
+}

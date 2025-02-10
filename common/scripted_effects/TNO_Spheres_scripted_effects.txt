@@ -1,0 +1,245 @@
+### Economic Spheres
+TNO_Spheres_init = {			
+	### GERMAN SPHERE
+	GER = { set_variable = { ECON_SPHERE_LEADER = GER } }
+	for_each_scope_loop = {
+		array = GER.faction_members
+		set_variable = { ECON_SPHERE_LEADER = GER }
+	}
+	for_each_scope_loop = {
+		array = GER.subjects
+		set_variable = { ECON_SPHERE_LEADER = GER }
+	}
+
+	every_country = {
+		limit = {
+			OR = {
+				tag = GER
+				tag = IRE
+				tag = ULS
+				tag = WAL
+				tag = SWE
+				tag = FIN
+				tag = PER
+			}
+		}
+		set_variable = { ECON_SPHERE_LEADER = GER }
+	}
+
+	### AMERICAN SPHERE
+	for_each_scope_loop = {
+		array = USA.faction_members
+		set_variable = { ECON_SPHERE_LEADER = USA }
+	}
+	for_each_scope_loop = {
+		array = USA.subjects
+		set_variable = { ECON_SPHERE_LEADER = USA }
+	}
+
+	every_country = {
+		limit = {
+			OR = {
+				tag = USA
+				tag = SCO
+				tag = LIB
+				tag = SAF
+				tag = CLL
+				tag = COS
+				tag = PAN
+				tag = ECU
+				tag = HON
+				tag = GUA
+				tag = ELS
+				tag = NIC
+				tag = PRU
+				tag = VEN
+				tag = CHL
+				tag = URG
+			}
+		}
+		set_variable = { ECON_SPHERE_LEADER = USA }
+	}
+	
+	### JAPANESE SPHERE
+	for_each_scope_loop = {
+		array = JAP.faction_members
+		set_variable = { ECON_SPHERE_LEADER = JAP }
+	}
+	for_each_scope_loop = {
+		array = JAP.subjects
+		set_variable = { ECON_SPHERE_LEADER = JAP }
+	}
+
+	every_country = {
+		limit = {
+			OR = {
+				tag = JAP
+				tag = AMR
+				tag = SHO
+			}
+		}
+		set_variable = { ECON_SPHERE_LEADER = JAP }
+	}
+	
+	### ITALIAN SPHERE
+	for_each_scope_loop = {
+		array = ITA.subjects
+		set_variable = { ECON_SPHERE_LEADER = ITA }
+	}
+	
+	every_country = {
+		limit = {
+			OR = {
+				tag = MOC
+				tag = SNM
+				tag = VAC
+				tag = ITA
+				tag = SAU
+				tag = IRQ
+				tag = CRO
+				tag = OMA
+				tag = CLC
+				tag = SWI
+			}
+		}
+		set_variable = { ECON_SPHERE_LEADER = ITA }
+	}
+	
+	for_each_scope_loop = {
+		array = TUR.subjects
+		set_variable = { ECON_SPHERE_LEADER = TUR }
+	}
+	
+	every_country = {
+		limit = {
+			OR = {
+				tag = SNS
+				tag = BKU
+			}
+		}
+		set_variable = { ECON_SPHERE_LEADER = TUR }
+	}
+
+	### IBERIAN SPHERE 
+	for_each_scope_loop = {
+		array = IBR.subjects
+		set_variable = { ECON_SPHERE_LEADER = IBR }
+	}
+	
+	every_country = {
+		limit = {
+			OR = {
+				tag = PAD
+				tag = IBR
+				tag = COL
+				tag = DOM
+			}
+		}
+		set_variable = { ECON_SPHERE_LEADER = IBR }
+	}
+
+	### BRAZILIAN SPHERE
+	every_country = {
+		limit = {
+			OR = {
+				tag = BRA
+				tag = GUC
+			}
+		}
+		set_variable = { ECON_SPHERE_LEADER = BRA }
+	}
+
+	### Argie sphere
+	ARG = { set_country_flag = HAS_ECON_SPHERE }
+	every_country = {
+		limit = {
+			OR = {
+				tag = ARG
+				tag = PAR
+				tag = STC
+			}
+		}
+		set_variable = { ECON_SPHERE_LEADER = ARG }
+	}
+
+	### Mexican Sphere
+	MEX = {
+		set_country_flag = HAS_ECON_SPHERE
+		set_variable = { ECON_SPHERE_LEADER = MEX }
+	}
+}
+
+econ_recompile_all_spheres = {
+	hidden_effect = {
+		ZZZ = {
+			every_country = {
+				limit = {
+					has_country_flag = HAS_ECON_SPHERE
+				}
+				clear_array = econ_sphere_members
+				every_country = {
+					limit = {
+						check_variable = { ECON_SPHERE_LEADER = PREV }
+					}
+					add_to_array = { PREV.econ_sphere_members = THIS }
+				}
+	
+				set_variable = { total_econ_sphere_GDP = 0 }
+				set_variable = { total_econ_sphere_GDP_growth = 0 }
+	
+				for_each_scope_loop = {
+					array = econ_sphere_members
+					add_to_variable = { PREV.total_econ_sphere_GDP = THIS.GDP }	
+					add_to_variable = { PREV.total_econ_sphere_GDP_growth = THIS.GDP_growth }	
+				}
+	
+				set_variable = { econ_sphere_world_percent = total_econ_sphere_GDP }
+				divide_variable = { econ_sphere_world_percent = ZZZ.total_world_gdp }
+				multiply_variable = { econ_sphere_world_percent = 100 }
+				divide_variable = { total_econ_sphere_GDP_growth = 100 }
+				divide_variable = { total_econ_sphere_GDP_growth = econ_sphere_members^num }
+	
+				get_sorted_scored_countries = {
+					scorer = sphere_member_scorer
+					array = econ_sphere_members
+				}
+				
+				add_to_variable = { TNO_economy_GUI_dirty = 1 }
+			}
+		}
+		every_country = {
+			force_update_map_mode = {
+				mapmode = tno_econ_sphere_map_mode
+			}
+		}
+	}
+}
+
+# Scripted effect for Economic Sphere map mode
+econ_sphere_mapmode_get_sphere_members = {
+	if = {
+		limit = {
+			check_variable = { 
+				var = temp_sphere_idx
+				value = FROM.econ_sphere_members^num
+				#compare = less_than_or_equals
+				compare = less_than
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { FROM.econ_sphere_members^temp_sphere_idx = FROM }
+			}
+			
+			# Nothing happens and the loop is continued. This is so that sphere leader isn't displayed in list.
+			add_to_temp_variable = { temp_sphere_idx = 1 }
+			econ_sphere_mapmode_get_sphere_members = yes
+
+			else = {
+				custom_effect_tooltip = econ_sphere_map_mode_mapicon_tooltip_entry
+				add_to_temp_variable = { temp_sphere_idx = 1 }
+				econ_sphere_mapmode_get_sphere_members = yes
+			}
+		}
+	}
+}

@@ -1,0 +1,1032 @@
+#####################################################################################################
+#####################################################################################################
+##	  ________            ______      __    __              ____                   __    ___       ##
+##	 /_  __/ /_  ___     / ____/___  / /___/ /__  ____     / __ \___  ____  __  __/ /_  / (_)____  ##
+##	  / / / __ \/ _ \   / / __/ __ \/ / __  / _ \/ __ \   / /_/ / _ \/ __ \/ / / / __ \/ / / ___/  ##
+##	 / / / / / /  __/  / /_/ / /_/ / / /_/ /  __/ / / /  / _, _/  __/ /_/ / /_/ / /_/ / / / /__    ##
+##	/_/ /_/ /_/\___/   \____/\____/_/\__,_/\___/_/ /_/  /_/ |_|\___/ .___/\__,_/_.___/_/_/\___/    ##
+##                                                         		  /_/                              ##
+#####################################################################################################
+#####################################################################################################
+
+###################
+## Zlatoust tree ##
+## 	by Morrina	 ##
+###################
+shared_focus = {
+	id = ZLT_speculation_and_accumulation
+	icon = GFX_focus_generic_let_the_money_flow
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	x = 8
+	y = 0
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_speculation_and_accumulation"
+		country_event = {
+			id = ZLT.1
+			days = 1
+		}
+		add_political_power = 25
+	}
+}
+
+shared_focus = {
+	id = ZLT_stock_up
+	icon = GFX_focus_generic_gun_production
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_speculation_and_accumulation
+	}
+	x = -2
+	y = 1
+	relative_position_id = ZLT_speculation_and_accumulation
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_stock_up"
+		add_timed_idea = { idea = ZLT_stocking_up days = 365 }
+		set_temp_variable = { temp_econ_spending_amount = 0.05 }
+		econ_spend_money_once_effect_raw_money = yes
+		TNO_improve_training_policy_effectiveness_monthly_low = yes
+		add_equipment_to_stockpile = {
+			type = infantry_equipment_2
+			amount = 1750
+			producer = ZLT
+		}
+		add_equipment_to_stockpile = {
+			type = anti_tank_equipment_0
+			amount = 250
+			producer = ZLT
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_the_frontlines
+	icon = GFX_focus_RUS_proud_russian_army
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_stock_up
+	}
+	x = -4
+	y = 1
+	relative_position_id = ZLT_stock_up
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_the_frontlines"
+		army_experience = 15
+		add_doctrine_cost_reduction = {
+			name = land_doc_bonus
+			cost_reduction = 0.5
+			uses = 1
+			category = land_doctrine
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_flex_our_muscle
+	icon = GFX_focus_generic_diplomacy_expansion
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_the_frontlines
+	}
+	x = -1
+	y = 1
+	relative_position_id = ZLT_the_frontlines
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_flex_our_muscle"
+		set_temp_variable = { gdp_growth_temp = 0.5 }
+		econ_gdp_growth_change = yes
+		set_temp_variable = { money_reserves_temp = 0.1 }
+		econ_money_reserves_change_raw_money = yes
+
+		every_neighbor_country = {
+			limit = {
+				is_west_siberian_nation = yes
+			}
+			country_event = {
+				id = ZLT.2
+				days = 1
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_control_the_roads
+	icon = GFX_focus_generic_open_road
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_flex_our_muscle
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_flex_our_muscle
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_control_the_roads"
+		TNO_improve_security_policy_effectiveness_monthly_med = yes
+		TNO_improve_admin_efficiency_low = yes
+		random_owned_controlled_state = {
+			set_temp_variable = { state_value_multiplier_temp = 1.1 }
+			econ_state_value_change_multiply = yes
+		}
+		random_owned_controlled_state = {
+			add_building_construction = {
+				type = infrastructure
+				level = 2
+				instant_build = yes
+			}
+		}
+		random_owned_controlled_state = {
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_the_yugra_connection
+	icon = GFX_focus_generic_shady_deal
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_the_frontlines
+	}
+	prerequisite = {
+		focus = ZLT_guns_for_the_men
+	}
+	x = 1
+	y = 1
+	relative_position_id = ZLT_the_frontlines
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_the_yugra_connection"
+		YGR = {
+			country_event = {
+				id = ZLT.3
+				days = 1
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_a_mercenary_state
+	icon = GFX_focus_MAG_soldiers_without_borders
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_the_yugra_connection
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_the_yugra_connection
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_a_mercenary_state"
+		custom_effect_tooltip = ZLT_a_mercenary_state_tt
+		set_country_flag = ZLT_CAN_HIRE_MERCS
+	}
+}
+
+shared_focus = {
+	id = ZLT_pay_to_pass
+	icon = GFX_focus_generic_a_paying_job
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_control_the_roads
+	}
+	prerequisite = {
+		focus = ZLT_a_mercenary_state
+	}
+	x = 1
+	y = 1
+	relative_position_id = ZLT_control_the_roads
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_pay_to_pass"
+		custom_effect_tooltip = ZLT_pay_to_pass_tt
+		set_country_flag = ZLT_PAY_TO_PASS_FLAG
+		TNO_improve_immigration_policy_effectiveness_monthly_med = yes
+		set_temp_variable = { temp_econ_GDP_boost_percentage = 0.15 }
+		econ_GDP_boost_once_percentage = yes
+	}
+}
+
+shared_focus = {
+	id = ZLT_free_to_stay
+	icon = GFX_focus_generic_a_comfortable_barracks
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_pay_to_pass
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_pay_to_pass
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_free_to_stay"
+		#TNO_improve_minorities_policy_effectiveness_monthly_med = yes
+		set_temp_variable = { temp_econ_GDP_boost_percentage = 0.1 }
+		econ_GDP_boost_once_percentage = yes
+		set_temp_variable = { temp_econ_spending_amount = 0.150 }
+		econ_spend_money_once_effect_raw_money = yes
+		country_event = {
+			id = ZLT.5
+			days = 1
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_guns_for_the_men
+	icon = GFX_focus_generic_arms_shipments
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_stock_up
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_stock_up
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_guns_for_the_men"
+		TNO_improve_army_professionalism_med = yes
+
+		add_equipment_to_stockpile = {
+			type = infantry_equipment_2
+			amount = 3000
+			producer = ZLT
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_theres_always_a_price
+	icon = GFX_focus_generic_change_law_trade
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_guns_for_the_men
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_guns_for_the_men
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_theres_always_a_price"
+		add_political_power = 25
+		TNO_improve_unemployment_policy_effectiveness_monthly_med = yes
+		set_temp_variable = { temp_econ_GDP_boost_percentage = 0.05 }
+		econ_GDP_boost_once_percentage = yes
+		set_temp_variable = { temp_econ_spending_amount = 0.03 }
+		econ_spend_money_once_effect_raw_money = yes
+	}
+}
+
+shared_focus = {
+	id = ZLT_were_the_only_ones_selling_guns
+	icon = GFX_focus_generic_the_best_guns_money_can_buy
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_theres_always_a_price
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_theres_always_a_price
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_were_the_only_ones_selling_guns"
+		TNO_improve_trade_laws_policy_effectiveness_monthly_med = yes
+		set_temp_variable = { temp_econ_GDP_boost_percentage = 0.08 }
+		econ_GDP_boost_once_percentage = yes
+		add_tech_bonus = {
+			name = industry
+			bonus = 0.5
+			uses = 1
+			category = industry
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_the_siberian_mediator
+	icon = GFX_focus_generic_international_diplomacy
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_were_the_only_ones_selling_guns
+		focus = ZLT_fortify_zlatoust
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_were_the_only_ones_selling_guns
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_the_siberian_mediator"
+		every_country = {
+			limit = {
+				has_country_flag = ZLT_sphere_of_influence
+				NOT = {
+					has_government = ultranationalism
+				}
+			}
+			add_opinion_modifier = {
+				target = ZLT
+				modifier = ZLT_the_siberian_mediator_mod
+			}
+		}
+		country_event = {
+			id = ZLT.6
+			days = 1
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_the_bullish_charge
+	icon = GFX_focus_ZLT_bullish_charge
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_the_siberian_mediator
+		focus = ZLT_the_all_russian_contractor
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_the_siberian_mediator
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_the_bullish_charge"
+		add_war_support = 0.2
+		TNO_improve_immigration_policy_effectiveness_monthly_low = yes
+		TNO_improve_vote_franchise_policy_effectiveness_monthly_low = yes
+		country_event = {
+			id = ZLT.7
+			days = 1
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_dig_in
+	icon = GFX_focus_generic_fortify_the_border
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_speculation_and_accumulation
+	}
+	x = 2
+	y = 1
+	relative_position_id = ZLT_speculation_and_accumulation
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_dig_in"
+		TNO_improve_military_supervision_policy_effectiveness_monthly_med = yes
+		set_temp_variable = { temp_econ_spending_amount = 0.2 }
+		econ_spend_money_once_effect_raw_money = yes
+		573 = {
+			add_extra_state_shared_building_slots = 1
+			add_building_construction = {
+				type = bunker
+				level = 2
+				instant_build = yes
+				province = 10329
+			}
+			add_building_construction = {
+				type = bunker
+				level = 2
+				instant_build = yes
+				province = 12567
+			}
+		}
+		871 = {
+			add_extra_state_shared_building_slots = 1
+			add_building_construction = {
+				type = bunker
+				level = 2
+				instant_build = yes
+				province = 7228
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_sell_off_our_stock
+	icon = GFX_focus_generic_pay_wages
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_dig_in
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_dig_in
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_sell_off_our_stock"
+		custom_effect_tooltip = gain_loot_1
+		add_to_variable = { loot_amount = 1 }
+		set_temp_variable = { money_reserves_temp = 0.25 }
+		econ_money_reserves_change_raw_money = yes
+		add_equipment_to_stockpile = {
+			type = infantry_equipment_2
+			amount = -250
+			producer = ZLT
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_the_yugran_defense
+	icon = GFX_focus_generic_from_the_shadows
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_sell_off_our_stock
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_sell_off_our_stock
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_the_yugran_defense"
+		YGR = {
+			country_event = {
+				id = ZLT.8
+				days = 1
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_fortify_zlatoust
+	icon = GFX_focus_generic_fortification_building
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_the_yugran_defense
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_the_yugran_defense
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_fortify_zlatoust"
+		set_temp_variable = { pus_temp = 2.0 }
+		econ_pus_change = yes
+
+
+		573 = {
+			add_building_construction = {
+				type = bunker
+				level = 2
+				instant_build = yes
+				province = 10329
+			}
+			add_building_construction = {
+				type = bunker
+				level = 1
+				instant_build = yes
+				province = 12287
+			}
+			add_building_construction = {
+				type = bunker
+				level = 1
+				instant_build = yes
+				province = 10133
+			}
+			add_building_construction = {
+				type = bunker
+				level = 2
+				instant_build = yes
+				province = 12567
+			}
+	}
+		871 = {
+			add_building_construction = {
+				type = bunker
+				level = 1
+				instant_build = yes
+				province = 1808
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_the_all_russian_contractor
+	icon = GFX_focus_MAG_a_mercenary_force
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_fortify_zlatoust
+		focus = ZLT_were_the_only_ones_selling_guns
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_fortify_zlatoust
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_the_all_russian_contractor"
+		custom_effect_tooltip = ZLT_the_all_russian_contractor_tt
+		add_ideas = ZLT_warlord_interventions
+	}
+}
+
+shared_focus = {
+	id = ZLT_surpassing_forecasts
+	icon = GFX_focus_generic_foreign_investment
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_the_siberian_mediator
+		focus = ZLT_the_all_russian_contractor
+	}
+	x = 4
+	y = 1
+	relative_position_id = ZLT_the_siberian_mediator
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_surpassing_forecasts"
+		add_political_power = 120
+		TNO_improve_health_care_policy_effectiveness_monthly_med = yes
+		TNO_improve_education_policy_effectiveness_monthly_low = yes
+	}
+}
+
+shared_focus = {
+	id = ZLT_the_home_front
+	icon = GFX_focus_RUS_friends_in_russia
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_dig_in
+	}
+	x = 4
+	y = 1
+	relative_position_id = ZLT_dig_in
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_the_home_front"
+		add_stability = 0.15
+		TNO_improve_health_care_policy_effectiveness_monthly_low = yes
+		TNO_improve_regulations_policy_effectiveness_monthly_low = yes
+		TNO_improve_poverty_med = yes
+	}
+}
+
+shared_focus = {
+	id = ZLT_double_our_portfolio
+	icon = GFX_focus_generic_rights_of_corporations
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_sell_off_our_stock
+	}
+	prerequisite = {
+		focus = ZLT_the_home_front
+	}
+	x = 3
+	y = 1
+	relative_position_id = ZLT_sell_off_our_stock
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_double_our_portfolio"
+		set_temp_variable = { temp_econ_spending_amount = 0.15 }
+		econ_spend_money_once_effect_raw_money = yes
+		add_equipment_to_stockpile = {
+			type = infantry_equipment_2
+			amount = 2000
+			producer = ZLT
+		}
+		add_equipment_to_stockpile = {
+			type = support_equipment_1
+			amount = 250
+			producer = ZLT
+		}
+		add_equipment_to_stockpile = {
+			type = artillery_equipment_2
+			amount = 250
+			producer = ZLT
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_guns_for_factories
+	icon = GFX_focus_MAG_preliminary_arming
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_double_our_portfolio
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_double_our_portfolio
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_guns_for_factories"
+		TNO_improve_industrial_expertise_low = yes
+		add_equipment_to_stockpile = {
+			type = infantry_equipment_2
+			amount = -750
+			producer = ZLT
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_expanding_the_sprawl
+	icon = GFX_focus_generic_change_law_property
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_the_home_front
+	}
+	x = 1
+	y = 1
+	relative_position_id = ZLT_the_home_front
+	completion_reward = {
+		TNO_improve_poverty_low = yes
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_expanding_the_sprawl"
+		573 = {
+			add_building_construction = {
+				type = offices
+				level = 2
+				instant_build = yes
+			}
+		}
+		871 = {
+			add_building_construction = {
+				type = schools
+				level = 2
+				instant_build = yes
+			}
+		}
+		573 = {
+			add_building_construction = {
+				type = hospitals
+				level = 2
+				instant_build = yes
+			}
+		}
+		every_owned_state = {
+			add_extra_state_shared_building_slots = 3
+			add_building_construction = {
+				type = hospitals
+				level = 1
+				instant_build = yes
+			}
+		}
+		TNO_improve_healthcare_med = yes
+	}
+}
+
+shared_focus = {
+	id = ZLT_the_industry_never_ends
+	icon = GFX_focus_generic_standardizing_heavy_industry
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_expanding_the_sprawl
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_expanding_the_sprawl
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_the_industry_never_ends"
+		set_temp_variable = { gdp_growth_temp = 0.20 } econ_gdp_growth_change = yes
+		TNO_improve_poverty_low = yes
+	}
+}
+
+shared_focus = {
+	id = ZLT_dynamic_revolution
+	icon = GFX_focus_generic_ship_trade
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_the_industry_never_ends
+	}
+	prerequisite = {
+		focus = ZLT_guns_for_factories
+	}
+	x = -1
+	y = 1
+	relative_position_id = ZLT_the_industry_never_ends
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_dynamic_revolution"
+		set_temp_variable = { temp_econ_spending_amount = 0.05 }
+		econ_spend_money_once_effect_raw_money = yes
+		every_neighbor_country = {
+			limit = {
+				is_west_siberian_nation = yes
+			}
+			add_popularity = {
+				ideology = liberal_conservatism
+				popularity = 0.1
+			}
+			add_stability = -0.05
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_replace_and_restore
+	icon = GFX_focus_generic_settle_new_lands
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_dynamic_revolution
+	}
+	x = 0
+	y = 1
+	relative_position_id = ZLT_dynamic_revolution
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_replace_and_restore"
+		set_temp_variable = { temp_econ_spending_amount = 0.075 }
+		econ_spend_money_once_effect_raw_money = yes
+		573 = {
+			add_building_construction = {
+				type = thermoelectric_plant
+				level = 2
+				instant_build = yes
+			}
+		}
+		random_owned_controlled_state = {
+			add_extra_state_shared_building_slots = 1
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+		}
+		add_stability = 0.1
+	}
+}
+
+shared_focus = {
+	id = ZLT_guns_like_no_other
+	icon = GFX_focus_generic_advanced_weapons
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_free_to_stay
+		focus = ZLT_replace_and_restore
+	}
+	prerequisite = {
+		focus = ZLT_the_bullish_charge
+	}
+	prerequisite = {
+		focus = ZLT_surpassing_forecasts
+	}
+	x = 2
+	y = 1
+	relative_position_id = ZLT_free_to_stay
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_guns_like_no_other"
+
+		add_tech_bonus = {
+			name = infantry_weapons
+			bonus = 1
+			uses = 2
+			category = infantry_weapons
+		}
+
+	}
+}
+
+shared_focus = {
+	id = ZLT_out_of_our_pockets
+	icon = GFX_focus_USA_money_wall
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_free_to_stay
+		focus = ZLT_replace_and_restore
+	}
+	prerequisite = {
+		focus = ZLT_the_bullish_charge
+	}
+	prerequisite = {
+		focus = ZLT_surpassing_forecasts
+	}
+	x = 6
+	y = 1
+	relative_position_id = ZLT_free_to_stay
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_out_of_our_pockets"
+		TNO_improve_education_policy_effectiveness_monthly_high = yes
+		TNO_improve_health_care_policy_effectiveness_monthly_med = yes
+		TNO_improve_religious_rights_policy_effectiveness_monthly_med = yes
+		add_war_support = 0.15
+		add_political_power = -50
+	}
+}
+
+shared_focus = {
+	id = ZLT_industry_like_no_other
+	icon = GFX_focus_generic_industry_calls
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_free_to_stay
+		focus = ZLT_replace_and_restore
+	}
+	prerequisite = {
+		focus = ZLT_the_bullish_charge
+	}
+	prerequisite = {
+		focus = ZLT_surpassing_forecasts
+	}
+	x = 10
+	y = 1
+	relative_position_id = ZLT_free_to_stay
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_industry_like_no_other"
+		573 = {
+			add_building_construction = {
+				type = thermoelectric_plant
+				level = 2
+				instant_build = yes
+			}
+		}
+		573 = {
+			add_building_construction = {
+				type = thermoelectric_plant
+				level = 2
+				instant_build = yes
+			}
+		}
+		add_tech_bonus = {
+			name = industry
+			bonus = 1
+			uses = 1
+			category = industry
+		}
+	}
+}
+
+shared_focus = {
+	id = ZLT_into_the_soldiers
+	icon = GFX_focus_generic_veterans_of_the_world_war
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_guns_like_no_other
+	}
+	prerequisite = {
+		focus = ZLT_out_of_our_pockets
+	}
+	prerequisite = {
+		focus = ZLT_industry_like_no_other
+	}
+	x = 2
+	y = 1
+	relative_position_id = ZLT_guns_like_no_other
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_into_the_soldiers"
+		TNO_improve_training_policy_effectiveness_monthly_high = yes
+		TNO_improve_military_supervision_policy_effectiveness_monthly_high = yes
+		add_ideas = ZLT_zlatoust_security_forces
+	}
+}
+
+shared_focus = {
+	id = ZLT_into_the_defense_line
+	icon = GFX_focus_ITA_OLD_our_splendid_isolation
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_guns_like_no_other
+	}
+	prerequisite = {
+		focus = ZLT_out_of_our_pockets
+	}
+	prerequisite = {
+		focus = ZLT_industry_like_no_other
+	}
+	x = 6
+	y = 1
+	relative_position_id = ZLT_guns_like_no_other
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_into_the_defense_line"
+		add_ideas = ZLT_final_defenses
+	}
+}
+
+shared_focus = {
+	id = ZLT_our_shining_republic
+	icon = GFX_focus_ZLT_golden_republic
+	cost = 5.00
+	available_if_capitulated = no
+	ai_will_do = {
+		factor = 1
+	}
+	prerequisite = {
+		focus = ZLT_into_the_soldiers
+	}
+	prerequisite = {
+		focus = ZLT_into_the_defense_line
+	}
+	x = 2
+	y = 1
+	relative_position_id = ZLT_into_the_soldiers
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus ZLT_our_shining_republic"
+		add_stability = 0.2
+		add_political_power = 100
+		custom_effect_tooltip = gain_loot_2
+		add_to_variable = { loot_amount = 2 }
+	}
+}

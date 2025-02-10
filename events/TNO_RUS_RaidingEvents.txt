@@ -1,0 +1,727 @@
+﻿add_namespace = raiding
+
+### Raiding Events ###
+
+country_event = { #Raid Consent
+	id = raiding.100
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.100" }
+	title = raiding.100.t
+	desc = raiding.100.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.100.a
+		custom_effect_tooltip = raiding_border_war_start_tt
+		FROM = {
+			country_event = {
+				id = raiding.101
+			}
+		}
+	}
+	option = {
+		name = raiding.100.b
+		if = {
+			limit = { check_variable = { loot_amount > 0 } }
+			subtract_from_variable = { loot_amount = 1 }
+			custom_effect_tooltip = lose_loot_1
+			if = {
+				limit = { has_country_flag = RUS_Smuta_Enabled }
+				set_temp_variable = { Y = -0.1 }
+				RUS_Smuta_Supplies_Add_Y = yes
+			}
+		}
+		FROM = {
+			country_event = {
+				id = raiding.102
+				days = 1
+			}
+		}
+		set_temp_variable = { temp_month_income_gained = -2 }
+		econ_spend_money_once_effect_raw_money = yes
+	}
+}
+
+country_event = { #Raid Consent Accepted
+	id = raiding.101
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.101" }
+	title = raiding.101.t
+	desc = raiding.101.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.101.a
+		if = {
+			limit = {
+				NOT = {
+					has_war = yes
+					FROM = { has_war = yes }
+					is_in_faction_with = FROM
+					has_non_aggression_pact_with = FROM
+				}
+			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = var:FROM.attacker_state_vs_@ROOT
+					num_provinces = 4
+					on_win = raiding.1
+					on_lose = raiding.3
+					on_cancel = raiding.2
+				}
+
+				defender = {
+					state = var:FROM.defender_state_vs_@ROOT
+					num_provinces = 4
+					on_win = raiding.6
+					on_lose = raiding.4
+					on_cancel = raiding.5
+				}
+			}
+			set_border_war_data = {
+				attacker = var:FROM.defender_state_vs_@ROOT
+				defender = var:FROM.defender_state_vs_@ROOT
+				combat_width = 20
+			}
+			hidden_effect = {
+				remove_targeted_decision = { target = FROM decision = russia_initiate_raid }
+				activate_targeted_decision = { target = FROM decision = russia_raid_in_progress }
+				FROM = { clr_country_flag = russia_preparing_raid }
+			}
+		}
+		else = {
+			custom_effect_tooltip = raiding.101.a.tt
+			FROM = { clr_country_flag = russia_is_raid_target }
+			clr_country_flag = russia_preparing_raid
+		}
+	}
+}
+
+country_event = { #Raid Consent Denied
+	id = raiding.102
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.102" }
+	title = raiding.102.t
+	desc = raiding.102.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.102.a
+		add_political_power = 25
+		custom_effect_tooltip = gain_loot_1
+		add_to_variable = { loot_amount = 1 }
+		if = {
+			limit = { has_country_flag = RUS_Smuta_Enabled }
+			set_temp_variable = { Y = 0.1 }
+			RUS_Smuta_Supplies_Add_Y = yes
+		}
+		set_temp_variable = { temp_month_income_gained = 4 }
+		econ_money_reserves_change_month_income = yes
+		FROM = {
+			clr_country_flag = russia_is_raid_target
+		}
+		ROOT = {
+			clr_country_flag = russia_preparing_raid
+			set_country_flag = { flag = russia_raid_succeeded days = 60 value = 1 }
+		}
+	}
+}
+
+country_event = { #Raid Successful/Attacker
+	id = raiding.1
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event raiding.1"
+		set_country_flag = { flag = russia_raid_succeeded days = 60 value = 1 }
+	}
+	title = raiding.1.t
+	desc = raiding.1.d
+
+	picture = GFX_report_event_RUS_sappers
+	is_triggered_only = yes
+
+
+	option = {
+		name = raiding.1.a
+		#FROM.FROM.FROM = {
+		#	set_temp_variable = { num_factories = industrial_complex_level }
+		#	add_to_temp_variable = { num_factories = arms_factory_level }
+		#}
+		custom_effect_tooltip = gain_loot_1
+		add_to_variable = { loot_amount = 1 }
+		if = {
+			limit = { has_country_flag = RUS_Smuta_Enabled }
+			set_temp_variable = { Y = 0.1 }
+			RUS_Smuta_Supplies_Add_Y = yes
+		}
+		set_temp_variable = { temp_month_income_gained = 2 }
+		econ_money_reserves_change_month_income = yes
+		if = {
+			limit = {
+				original_tag = MGN
+				has_completed_focus = MGN_acquirement_of_subjects
+			}
+			custom_effect_tooltip = MGN_Gain_Subjects
+			add_to_variable = { lysenko_subjects = 150 }
+		}
+		set_temp_variable = { raiding_result = random }
+		divide_temp_variable = { num_factories = 50 }
+		add_to_temp_variable = { raiding_result = num_factories }
+		if = {
+			limit = { check_variable = { raiding_result < 0.31 } }
+			country_event = { id = raiding.8 days = 2 }
+		}
+		else_if = {
+			limit = {
+				check_variable = { raiding_result > 0.3 }
+				check_variable = { raiding_result < 0.61 }
+			}
+			country_event = { id = raiding.9 days = 2 }
+		}
+		else_if = {
+			limit = {
+				check_variable = { raiding_result > 0.6 }
+				check_variable = { raiding_result < 0.91 }
+			}
+			country_event = { id = raiding.10 days = 2 }
+		}
+		else_if = {
+			limit = { check_variable = { raiding_result > 0.91 } }
+			country_event = { id = raiding.7 days = 2 }
+		}
+		hidden_effect = {
+			ROOT = {
+				add_opinion_modifier = { target = THIS modifier = raided_us_modifier }
+			}
+		}
+	}
+}
+
+
+country_event = { #Raid Canceled/Attacker
+	id = raiding.2
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event raiding.2"
+		set_country_flag = { flag = russia_raid_failed days = 90 value = 1 }
+	}
+	title = raiding.2.t
+	desc = raiding.2.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.2.a
+		add_political_power = -50
+		hidden_effect = {
+			FROM = {
+				add_opinion_modifier = { target = ROOT modifier = raided_us_modifier }
+			}
+		}
+	}
+}
+
+country_event = { #Raid Failed/Attacker
+	id = raiding.3
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event raiding.3"
+		set_country_flag = { flag = russia_raid_failed days = 90 value = 1 }
+	}
+	title = raiding.3.t
+	desc = raiding.3.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.3.a
+		add_political_power = -50
+		add_manpower = -250
+		add_stability = -0.02
+		add_war_support = -0.02
+		hidden_effect = {
+			ROOT = {
+				add_opinion_modifier = { target = THIS modifier = raided_us_modifier }
+			}
+		}
+	}
+}
+
+country_event = { #Raid Successful/Defender
+	id = raiding.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.4" }
+	title = raiding.4.t
+	desc = raiding.4.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.4.a
+		#FROM.FROM.FROM = {
+		#	set_temp_variable = { num_factories = industrial_complex_level }
+		#	add_to_temp_variable = { num_factories = arms_factory_level }
+		#}
+		if = {
+			limit = { check_variable = { loot_amount > 0 } }
+			subtract_from_variable = { loot_amount = 1 }
+			custom_effect_tooltip = lose_loot_1
+			if = {
+				limit = { has_country_flag = RUS_Smuta_Enabled }
+				set_temp_variable = { Y = -0.1 }
+				RUS_Smuta_Supplies_Add_Y = yes
+			}
+		}
+		random_list = {
+			20 = {
+				country_event = { id = raiding.13 days = 2 }
+			}
+			20 = {
+				country_event = { id = raiding.14 days = 2 }
+			}
+			20 = {
+				country_event = { id = raiding.15 days = 2 }
+			}
+			20 = {
+				country_event = { id = raiding.16 days = 2 }
+			}
+			20 = {
+				country_event = { id = raiding.17 days = 2 }
+			}
+		}
+	}
+}
+
+country_event = { #Raid Canceled/Defender
+	id = raiding.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.5" }
+	title = raiding.5.t
+	desc = raiding.5.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.5.a
+		add_political_power = 30
+		add_stability = 0.02
+	}
+}
+
+country_event = { #Raid Failed/Defender
+	id = raiding.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.6" }
+	title = raiding.6.t
+	desc = raiding.6.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.6.a
+		add_political_power = 25
+		add_stability = 0.01
+		add_equipment_to_stockpile = { #Once the tech tree is finalised the type of guns you get would depend on the tech the person being raided has
+			type = infantry_equipment_0
+			amount = 175
+		}
+	}
+}
+
+country_event = { #Raid Victory/Factories
+	id = raiding.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.7" }
+	title = raiding.7.t
+	desc = raiding.7.d
+
+	picture = GFX_report_event_RUS_soldiers_bombed_city
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.7.a
+		random_list = {
+			50 = {
+				country_event = { id = raiding.11 days = 4 }
+			}
+			50 = {
+				country_event = { id = raiding.12 days = 4 }
+			}
+		}
+		set_temp_variable = { temp_month_income_gained = 4 }
+		econ_money_reserves_change_month_income = yes
+	}
+}
+
+country_event = { #Raid Victory/Cash
+	id = raiding.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.8" }
+	title = raiding.8.t
+	desc = raiding.8.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.8.a
+		add_stability = 0.02
+		add_war_support = 0.01
+		add_political_power = 25
+		set_temp_variable = { temp_month_income_gained = 4 }
+		econ_money_reserves_change_month_income = yes
+	}
+}
+
+country_event = { #Raid Victory/Equipment
+	id = raiding.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.9" }
+	title = raiding.9.t
+	desc = raiding.9.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.9.a
+		add_stability = 0.02
+		add_war_support = 0.02
+		add_equipment_to_stockpile = { #Once the tech tree is finalised the type of guns you get would depend on the tech the person being raided has
+			type = infantry_equipment_0
+			amount = 175
+		}
+	}
+}
+
+country_event = { #Raid Victory/Treasure!
+	id = raiding.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.10" }
+	title = raiding.10.t
+	desc = raiding.10.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.10.a
+		add_political_power = 75
+		set_temp_variable = { temp_month_income_gained = 6 }
+		econ_money_reserves_change_month_income = yes
+	}
+}
+
+country_event = { #Raid Victory/Toaster Factory
+	id = raiding.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.11" }
+	title = raiding.11.t
+	desc = raiding.11.d
+
+	picture = GFX_report_event_CAU_factory
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.11.a
+		add_stability = 0.02
+		set_temp_variable = { pus_temp = 1 }
+		econ_pus_change = yes
+	}
+}
+
+country_event = { #Raid Victory/Gun Factories
+	id = raiding.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.12" }
+	title = raiding.12.t
+	desc = raiding.12.d
+
+	picture = GFX_report_event_CAU_factory
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.12.a
+		add_war_support = 0.02
+	}
+}
+
+country_event = { #Raid Defeat/Cash Lost
+	id = raiding.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.13" }
+	title = raiding.13.t
+	desc = raiding.13.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.13.a
+		add_political_power = -50
+		add_stability = -0.02
+		add_manpower = -200
+		set_temp_variable = { temp_month_income_spent = 2 }
+		econ_spend_money_once_effect_month_income = yes
+	}
+}
+
+country_event = { #Raid Defeat/Garrison Slaugthered
+	id = raiding.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.14" }
+	title = raiding.14.t
+	desc = raiding.14.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.14.a
+		add_political_power = -25
+		add_manpower = -350
+		add_stability = -0.02
+		add_war_support = -0.02
+		set_temp_variable = { temp_month_income_paid = 2 }
+		econ_spend_money_once_effect_raw_money = yes
+	}
+}
+
+country_event = { #Raid Defeat/Factory Burnt
+	id = raiding.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.15" }
+	title = raiding.15.t
+	desc = raiding.15.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.15.a
+		add_political_power = -25
+		add_manpower = -150
+		add_stability = -0.03
+	}
+}
+
+country_event = { #Raid Defeat/Armoury Looted
+	id = raiding.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.16" }
+	title = raiding.16.t
+	desc = raiding.16.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.16.a
+		add_political_power = -25
+		add_manpower = -150
+		add_stability = -0.01
+		add_war_support = -0.02
+		set_temp_variable = { temp_month_income_paid = 4 }
+		econ_spend_money_once_effect_raw_money = yes
+	}
+}
+
+country_event = { #Raid Defeat/Villages Slaugthered
+	id = raiding.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.17" }
+	title = raiding.17.t
+	desc = raiding.17.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.17.a
+		add_political_power = -50
+		add_stability = -0.03
+		random_owned_controlled_state = {
+			add_manpower = -3000
+		}
+	}
+}
+
+country_event = { #Counter Raid Victory - URL/DRL
+	id = raiding.1000
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.1000" }
+	title = raiding.103.t
+	desc = raiding.103.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.104.a
+		add_political_power = 25
+		add_manpower = 250
+	}
+}
+
+country_event = { #Counter Raid Cancel - URL/DRL
+	id = raiding.1010
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.1010" }
+	title = raiding.104.t
+	desc = raiding.104.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.104.a
+	}
+}
+
+country_event = { #Counter Raid Defeat - URL/DRL
+	id = raiding.1020
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.1020" }
+	title = raiding.105.t
+	desc = raiding.105.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.105.a
+		add_manpower = -250
+	}
+}
+
+country_event = { #Counter Raid Victory - DRL/URL
+	id = raiding.103
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.103" }
+	title = raiding.103.t
+	desc = raiding.103.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.103.a
+		add_political_power = 25
+		add_manpower = 250
+	}
+}
+
+country_event = { #Counter Raid Cancel - DRL/URL
+	id = raiding.104
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.104" }
+	title = raiding.104.t
+	desc = raiding.104.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.104.a
+	}
+}
+
+country_event = { #Counter Raid Defeat - DRL/URL
+	id = raiding.105
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.105" }
+	title = raiding.105.t
+	desc = raiding.105.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.105.a
+		add_timed_idea = {
+			idea = URL_cannot_raid
+			days = 25
+		}
+		add_manpower = -250
+	}
+}
+
+country_event = { #Counter Raid Victory - URL/MGN
+	id = raiding.106
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.106" }
+	title = raiding.103.t
+	desc = raiding.103.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.103.a
+		add_political_power = 25
+		add_manpower = 250
+	}
+}
+
+country_event = { #Counter Raid Cancel - URL/MGN
+	id = raiding.107
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.107" }
+	title = raiding.104.t
+	desc = raiding.104.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.104.a
+	}
+}
+
+country_event = { #Counter Raid Defeat - URL/MGN
+	id = raiding.108
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.108" }
+	title = raiding.105.t
+	desc = raiding.105.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.105.a
+		add_manpower = -1000
+	}
+}
+
+country_event = { #Counter Raid Victory - MGN/URL
+	id = raiding.109
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.109" }
+	title = raiding.103.t
+	desc = raiding.103.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.103.a
+		add_political_power = 25
+		add_manpower = 250
+	}
+}
+
+country_event = { #Counter Raid Cancel - MGN/URL
+	id = raiding.110
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.110" }
+	title = raiding.104.t
+	desc = raiding.104.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.104.a
+	}
+}
+
+country_event = { #Counter Raid Defeat - MGN/URL
+	id = raiding.111
+	immediate = { log = "[GetDateText]: [Root.GetName]: event raiding.111" }
+	title = raiding.105.t
+	desc = raiding.105.d
+
+	picture = GFX_report_event_OMS_black_league
+	is_triggered_only = yes
+
+	option = {
+		name = raiding.105.a
+		add_timed_idea = {
+			idea = URL_cannot_raid
+			days = 25
+		}
+		add_manpower = -250
+	}
+}

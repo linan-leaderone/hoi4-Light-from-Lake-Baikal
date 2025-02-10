@@ -1,0 +1,934 @@
+FRA_debug_category = { #France Debug Category for TT3 Skeleton - to be deleted for PW
+	FRA_disable_debug = {
+		priority = 1000
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_disable_debug"
+			set_country_flag = FRA_debug_disabled
+		}
+	}
+	FRA_post_FBW_setup = {
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_post_FBW_setup"
+
+			retire_character = FRA_Jean_Louis_Tixier_Vignancour
+			retire_character = FRA_Charles_Huntziger
+
+			set_politics = {
+				ruling_party = despotism
+				name = FRS_despotism_party_interim
+				long_name = FRS_despotism_party_interim
+			}
+
+			add_country_leader_role = {
+				character = FRA_Conseil_des_Ministres
+				promote_leader = yes
+				country_leader = {
+					ideology = despotism_interim_government_subtype
+					expire = "1999.1.23.1"
+					id = -1
+				}
+			}
+			add_country_leader_role = {
+				character = FRA_Yves_Bouthillier
+				promote_leader = yes
+				country_leader = {
+					ideology = fascism_subtype
+					expire = "1999.1.23.1"
+					id = -1
+				}
+			}
+
+			remove_ideas = FRA_the_treaty_of_vichy
+			add_ideas = FRS_Generic_Vacant_sec
+
+			econ_leave_sphere = yes
+			leave_faction = yes
+
+			set_capital = { state = 19 }
+
+			BRG = {
+				add_political_power = 100
+
+				transfer_state = 15
+				transfer_state = 16
+				transfer_state = 788
+				transfer_state = 1625
+				transfer_state = 1626
+				transfer_state = 1635
+
+				16 = { set_state_name = STATE_16_brg }
+				788 = { set_state_name = STATE_788_brg }
+				1625 = { set_state_name = STATE_1625_brg }
+				1626 = { set_state_name = STATE_1626_brg }
+				1635 = { set_state_name = STATE_1635_brg }
+
+				every_owned_state = { set_demilitarized_zone = no }
+			}
+		}
+	}
+	FRA_poujade_debug = {
+		available = { has_country_leader = { character = FRA_Conseil_des_Ministres ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_poujade_debug"
+			set_country_flag = FRA_poujade_debug_enabled
+
+			remove_ideas = FRA_les_annees_noires
+
+			set_country_flag = FRA_poujade_elected
+			set_politics = {
+				ruling_party = paternalism
+				name = FRS_paternalism_party_poujade
+				long_name = FRS_paternalism_party_poujade_long
+			}
+			add_popularity = {
+				ideology = paternalism
+				popularity = 0.1
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Jerome_Carcopino_hog
+				FRA_Francois_Brigneau_for
+				FRA_Leon_Gingembre_eco
+				FRA_Marcel_Carpentier_sec
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.2070 days = 1 }
+			}
+		}
+	}
+	FRA_pou_civil_war = {
+		visible = { has_country_flag = FRA_poujade_debug_enabled }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_sid_civil_war"
+
+			FRA_civil_war_poujade_start = yes
+		}
+	}
+	FRA_sidos_debug = {
+		available = { has_country_leader = { character = FRA_Conseil_des_Ministres ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_sidos_debug"
+			set_country_flag = FRA_sidos_debug_enabled
+
+			remove_ideas = FRA_les_annees_noires
+
+			set_country_flag = FRA_sidos_elected
+			set_politics = { ruling_party = national_socialism }
+			add_popularity = {
+				ideology = national_socialism
+				popularity = 0.1
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Pierre_Drieu_la_Rochelle_hog
+				FRA_Louis_Darquier_de_Pellepoix_for
+				FRA_Jacques_Benoist_Mechin_eco
+				FRA_Jean_Marie_le_Pen_sec
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.2071 days = 1 }
+			}
+		}
+	}
+	FRA_sid_civil_war = {
+		visible = { has_country_flag = FRA_sidos_debug_enabled }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_sid_civil_war"
+
+			FRA_civil_war_sidos_start = yes
+		}
+	}
+	FRA_sid_join_german_sphere = {
+		visible = { has_country_flag = FRA_sidos_debug_enabled }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_sid_join_german_sphere"
+
+			add_ideas = {
+				Pakt_Bundnispartner
+				FRA_back_in_the_pakt
+				FRA_learning_from_the_reich
+			}
+			add_opinion_modifier = {
+				target = GER
+				modifier = FRA_europeanist_foreign_policy
+			}
+
+			GER = {
+				add_to_faction = FRA
+				add_opinion_modifier = {
+					target = FRA
+					modifier = FRA_europeanist_foreign_policy
+				}
+				set_temp_variable = { SeaZone_ID = 3 } # 3; North Atlantic
+				Cold_War_GUI_PowerProjection_AddSeaZone = yes
+			}
+
+			if = {
+				limit = { has_global_flag = german_civil_war_speervic }
+				join_zollverein = yes
+			}
+			else = {
+				econ_join_sphere_GER = yes
+			}
+		}
+	}
+	FRA_sid_join_italian_sphere = {
+		visible = { has_country_flag = FRA_sidos_debug_enabled }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_sid_join_italian_sphere"
+
+			set_country_flag = FRA_Italy_Aligned
+
+			add_ideas = {
+				FRA_mediterranean_brotherhood
+				FRA_learning_from_the_empire
+			}
+			add_opinion_modifier = {
+				target = ITA
+				modifier = FRA_europeanist_foreign_policy
+			}
+
+			ITA = {
+				add_opinion_modifier = {
+					target = FRA
+					modifier = FRA_europeanist_foreign_policy
+				}
+				add_to_faction = FRA
+			}
+
+			econ_join_sphere_ITA = yes
+		}
+	}
+	FRA_sid_join_iberian_sphere = {
+		visible = { has_country_flag = FRA_sidos_debug_enabled }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_sid_join_iberian_sphere"
+
+			set_country_flag = FRA_Iberia_Aligned
+
+			add_ideas = {
+				FRA_latin_bloc
+				FRA_across_the_pyrenees
+			}
+			add_opinion_modifier = {
+				target = IBR
+				modifier = FRA_europeanist_foreign_policy
+			}
+
+			IBR = {
+				add_ideas = FRA_latin_bloc
+				add_opinion_modifier = {
+					target = FRA
+					modifier = FRA_europeanist_foreign_policy
+				}
+			}
+
+			econ_join_sphere_IBR = yes
+		}
+	}
+	FRA_pinay_debug = {
+		available = { has_country_leader = { character = FRA_Conseil_des_Ministres ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_pinay_debug_enabled"
+			set_country_flag = FRA_pinay_debug_enabled
+
+			remove_ideas = FRA_les_annees_noires
+
+			set_country_flag = FRA_pinay_elected
+			set_politics = { ruling_party = conservatism }
+			add_popularity = {
+				ideology = conservatism
+				popularity = 0.1
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Jacques_Le_Roy_Ladurie_hog
+				FRA_Jacques_Tine_for
+				FRA_Paul_Delouvrier_eco
+				FRA_Pierre_Debizet_sec
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.2072 days = 1 }
+			}
+		}
+	}
+	FRA_pin_OAS_putsch = {
+		visible = { has_country_flag = FRA_pinay_debug_enabled }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_pin_OAS_putsch"
+
+			set_country_flag = FRA_OAS_coup
+			set_politics = { ruling_party = ultranationalism }
+			add_popularity = {
+				ideology = ultranationalism
+				popularity = 0.15
+			}
+
+			add_corps_commander_role = {
+				character = FRA_Pierre_Charton
+				skill = 2
+				attack_skill = 2
+				defense_skill = 2
+				planning_skill = 1
+				logistics_skill = 2
+				legacy_id = -1
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Jean_Jacques_Susini_hog
+				FRA_Joseph_Ortiz_for
+				FRA_Henry_Coston_eco
+				FRA_Pierre_Charton_sec
+			}
+
+			remove_ideas = {
+				FRA_the_OAS
+				FRA_delouvrier_plan
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.214 days = 1 }
+			}
+		}
+	}
+	FRA_pin_fourth_republic = {
+		visible = { has_country_flag = FRA_pinay_debug_enabled }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_pin_fourth_republic"
+
+			set_cosmetic_tag = FRA_republic
+			set_politics = {
+				ruling_party = conservatism
+				last_election = "1966.11.14"
+				election_frequency = 48
+				elections_allowed = yes
+			}
+			set_popularities = {
+				communist = 1
+				socialist = 6
+				progressivism = 16
+				liberalism = 20
+				liberal_conservatism = 16
+				conservatism = 24
+				paternalism = 6
+				fascism = 11
+			}
+
+			tno_vote_franchise_improve = yes
+			tno_press_rights_improve = yes
+			tno_public_meetings_improve = yes
+			tno_political_parties_improve = yes
+
+			remove_ideas = FRA_the_OAS
+			FRA_Raoul_Salan = { remove_unit_leader_role = yes }
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.215 days = 1 }
+			}
+		}
+	}
+	FRA_pin_PN_win = {
+		visible = { has_country_flag = FRA_pinay_debug_enabled }
+		available = { has_cosmetic_tag = FRA_republic }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_pin_PN_win"
+
+			set_politics = {
+				ruling_party = conservatism
+				last_election = "1970.8.13"
+				election_frequency = 48
+				elections_allowed = yes
+			}
+			add_popularity = {
+				ideology = conservatism
+				popularity = 0.1
+			}
+
+			country_event = {
+				id = FRA_SKELETON.30
+				days = 90
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.216 days = 1 }
+			}
+		}
+	}
+	FRA_pin_PTF_win = {
+		visible = { has_country_flag = FRA_pinay_debug_enabled }
+		available = { has_cosmetic_tag = FRA_republic }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_pin_PTF_win"
+
+			set_politics = {
+				ruling_party = progressivism
+				last_election = "1970.8.13"
+				election_frequency = 48
+				elections_allowed = yes
+			}
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.1
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Maurice_Pinot_hog
+				FRA_George_Dayan_for
+				FRA_Pierre_Mauroy_eco
+				FRA_Charles_Hernu_sec
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.217 days = 1 }
+			}
+		}
+	}
+	FRA_pin_RPN_win = {
+		visible = { has_country_flag = FRA_pinay_debug_enabled }
+		available = { has_cosmetic_tag = FRA_republic }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_pin_RPN_win"
+
+			set_politics = {
+				ruling_party = liberal_conservatism
+				last_election = "1970.8.13"
+				election_frequency = 48
+				elections_allowed = yes
+			}
+			add_popularity = {
+				ideology = liberal_conservatism
+				popularity = 0.1
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Charles_Pasqua_hog
+				FRA_Jacques_Chirac_for
+				FRA_Jean_Pierre_Fourcade_eco
+				FRA_Christian_Fouchet_sec
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.218 days = 1 }
+			}
+		}
+	}
+	FRA_pin_UDF_win = {
+		visible = { has_country_flag = FRA_pinay_debug_enabled }
+		available = { has_cosmetic_tag = FRA_republic }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_pin_UDF_win"
+
+			set_politics = {
+				ruling_party = liberalism
+				last_election = "1970.8.13"
+				election_frequency = 48
+				elections_allowed = yes
+			}
+			add_popularity = {
+				ideology = liberalism
+				popularity = 0.1
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Raymond_Barre_hog
+				FRA_Jean_Sauvagnargues_for
+				FRA_Olivier_Giscard_dEstaing_eco
+				FRA_Christian_Fouchet_sec
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.219 days = 1 }
+			}
+		}
+	}
+	FRA_pin_PN_collapse_dem = {
+		visible = { has_country_flag = FRA_pinay_debug_enabled }
+		available = { has_cosmetic_tag = FRA_republic }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_pin_PN_collapse_dem"
+
+			set_politics = {
+				ruling_party = conservatism
+				name = FRS_conservatism_party_pinay
+				long_name = FRS_conservatism_party_pinay_long
+			}
+		}
+	}
+	FRA_pin_PN_collapse_auth = {
+		visible = { has_country_flag = FRA_pinay_debug_enabled }
+		available = { has_cosmetic_tag = FRA_republic }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_pin_PN_collapse_auth"
+
+			set_politics = {
+				ruling_party = paternalism
+				name = FRS_conservatism_party_pinay
+				long_name = FRS_conservatism_party_pinay_long
+			}
+			set_popularities = {
+				communist = 1
+				socialist = 5
+				progressivism = 14
+				liberalism = 17
+				liberal_conservatism = 14
+				paternalism = 39
+				fascism = 10
+			}
+
+			add_country_leader_role = {
+				character = FRA_Antoine_Pinay
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_ANTOINE_PINAY_DESC"
+					ideology = paternalism_dominant_party_democracy_subtype
+					expire = "1999.1.23.1"
+					id = -1
+				}
+			}
+		}
+	}
+	FRA_bichelonne_debug = {
+		available = { has_country_leader = { character = FRA_Conseil_des_Ministres ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_bichelonne_debug"
+			set_country_flag = FRA_bichelonne_debug_enabled
+
+			remove_ideas = FRA_les_annees_noires
+
+			set_country_flag = FRA_bichelonne_elected
+			set_politics = {
+				ruling_party = despotism
+				name = FRS_despotism_party_bichelonne
+				long_name = FRS_despotism_party_bichelonne_long
+			}
+			add_popularity = {
+				ideology = despotism
+				popularity = 0.1
+			}
+
+			add_country_leader_role = {
+				character = FRA_Jean_Bichelonne
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_JEAN_BICHELONNE_DESC"
+					ideology = despotism_managerial_state_subtype
+					expire = "1999.1.23.1"
+					id = -1
+				}
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Francois_Lehideux_hog
+				FRA_Marcel_Peyrouton_for
+				FRA_Jean_Bichelonne_eco
+				FRA_Robert_Gibrat_sec
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.2073 days = 1 }
+			}
+		}
+	}
+	FRA_bic_milice_coup = {
+		visible = { has_country_flag = FRA_bichelonne_debug_enabled }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_bic_milice_coup"
+
+			set_politics = {
+				ruling_party = national_socialism
+				name = FMM_national_socialism_party
+				long_name = FMM_national_socialism_party_long
+			}
+
+			FRA_Joseph_Darnand = {
+				add_country_leader_role = {
+					promote_leader = yes
+					country_leader = {
+						ideology = national_socialism_subtype
+						expire = "1983.1.1"
+						id = -1
+					}
+				}
+				add_field_marshal_role = {
+					traits = { infantry_expert infantry_leader career_officer }
+					skill = 4
+					attack_skill = 4
+					defense_skill = 4
+					planning_skill = 2
+					logistics_skill = 3
+					legacy_id = 11908
+				}
+			}
+			add_corps_commander_role = {
+				character = FRA_Pierre_Constantini
+				skill = 2
+				attack_skill = 2
+				defense_skill = 2
+				planning_skill = 2
+				logistics_skill = 1
+				legacy_id = 11910
+			}
+			add_corps_commander_role = {
+				character = FRA_Noel_de_Tissot
+				traits = { infantry_expert infantry_leader career_officer }
+				skill = 2
+				attack_skill = 2
+				defense_skill = 2
+				planning_skill = 1
+				logistics_skill = 2
+				legacy_id = 11909
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Francis_Bout_de_lAn_hog
+				FRA_Pierre_Constantini_for
+				FRA_Maurice_Sabatier_eco
+				FRA_Noel_de_Tissot_sec
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.221 days = 1 }
+			}
+		}
+	}
+	FRA_bic_industrialist_coup = {
+		visible = { has_country_flag = FRA_bichelonne_debug_enabled }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_bic_industrialist_coup"
+
+			set_politics = {
+				ruling_party = despotism
+				name = FRS_despotism_party_industrialists
+				long_name = FRS_despotism_party_industrialists_long
+			}
+
+			add_country_leader_role = {
+				character = FRA_Comite_de_Coordination_Nationale
+				promote_leader = yes
+				country_leader = {
+					ideology = despotism_corporatocracy_subtype
+					expire = "1975.1.1.1"
+					id = -1
+				}
+			}
+
+			remove_all_ministers = yes
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.222 days = 1 }
+			}
+		}
+	}
+	FRA_gaxotte_debug = {
+		available = { has_country_leader = { character = FRA_Conseil_des_Ministres ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_gaxotte_debug"
+			set_country_flag = FRA_gaxotte_debug_enabled
+
+			remove_ideas = FRA_les_annees_noires
+
+			set_country_flag = FRA_gaxotte_elected
+			set_politics = {
+				ruling_party = despotism
+				name = FRS_despotism_party
+				long_name = FRS_despotism_party_long
+			}
+			add_popularity = {
+				ideology = despotism
+				popularity = 0.1
+			}
+
+			promote_character = FRA_Pierre_Gaxotte
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Lucien_Rebatet_hog
+				FRA_Philippe_Aries_for
+				FRA_Rene_Belin_eco
+				FRA_Jacques_Ploncard_dAssac_sec
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.2074 days = 1 }
+			}
+		}
+	}
+	FRA_gax_referendum_passes = {
+		visible = { has_country_flag = FRA_gaxotte_debug_enabled }
+		available = { has_country_leader = { character = FRA_Pierre_Gaxotte ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_gax_referendum_passes"
+
+			set_cosmetic_tag = FRA_kingdom
+
+			add_country_leader_role = {
+				character = FRA_Henri_VI
+				promote_leader = yes
+				country_leader = {
+					ideology = despotism_interim_government_subtype
+					expire = "1983.1.1"
+					id = -1
+				}
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Pierre_Pujo_hog
+				FRA_Jean_dOrmesson_for
+				FRA_Andre_de_La_Franquerie_eco
+				FRA_Nicolas_Kayanakis_sec
+			}
+		}
+	}
+	FRA_gax_petainist_coup = {
+		visible = { has_country_flag = FRA_gaxotte_debug_enabled }
+		available = { has_country_leader = { character = FRA_Henri_VI ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_gax_petainist_coup"
+
+			set_politics = { ruling_party = fascism }
+
+			drop_cosmetic_tag = yes
+
+			add_country_leader_role = {
+				character = FRA_Alphonse_Juin
+				promote_leader = yes
+				country_leader = {
+					ideology = fascism_subtype
+					expire = "1975.1.1.1"
+					id = -1
+				}
+			}
+
+			remove_all_ministers = yes
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.224 days = 1 }
+			}
+		}
+	}
+	FRA_gax_alphonse_juin_dies = {
+		visible = { has_country_flag = FRA_gaxotte_debug_enabled }
+		available = { has_country_leader = { character = FRA_Alphonse_Juin ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_gax_alphonse_juin_dies"
+
+			add_country_leader_role = {
+				character = FRA_Raoul_Salan
+				promote_leader = yes
+				country_leader = {
+					ideology = fascism_subtype
+					expire = "1975.1.1.1"
+					id = -1
+				}
+			}
+		}
+	}
+	FRA_gax_referendum_fails = {
+		visible = { has_country_flag = FRA_gaxotte_debug_enabled }
+		available = { has_country_leader = { character = FRA_Pierre_Gaxotte ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_gax_referendum_fails"
+
+			set_cosmetic_tag = FRA_kingdom
+
+			set_party_name = {
+				ideology = conservatism
+				name = FRS_despotism_party
+				long_name = FRS_despotism_party_long
+			}
+			set_party_name = {
+				ideology = paternalism
+				name = FRS_despotism_party
+				long_name = FRS_despotism_party_long
+			}
+			add_popularity = {
+				ideology = conservatism
+				popularity = 0.1
+			}
+			add_popularity = {
+				ideology = paternalism
+				popularity = 0.1
+			}
+			add_popularity = {
+				ideology = despotism
+				popularity = 0.175
+			}
+
+
+			add_country_leader_role = {
+				character = FRA_Henri_VII
+				promote_leader = yes
+				country_leader = {
+					ideology = despotism_interim_government_subtype
+					expire = "1983.1.1"
+					id = -1
+				}
+			}
+			add_country_leader_role = {
+				character = FRA_Olivier_Guichard
+				promote_leader = yes
+				country_leader = {
+					ideology = conservatism_paternalistic_conservatism_subtype
+					expire = "1983.1.1"
+					id = -1
+				}
+			}
+			add_country_leader_role = {
+				character = FRA_Jean_dOrmesson
+				promote_leader = yes
+				country_leader = {
+					ideology = paternalism_semi_constitutional_monarchy_subtype
+					expire = "1983.1.1"
+					id = -1
+				}
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Michel_dOrleans_hog
+				FRA_Jean_dOrmesson_for
+				FRA_Jacques_Rueff_eco
+				FRA_Marcel_Carpentier_sec
+			}
+		}
+	}
+	FRA_gax_guichard_wins = {
+		visible = { has_country_flag = FRA_gaxotte_debug_enabled }
+		available = { has_country_leader = { character = FRA_Henri_VII ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_gax_guichard_wins"
+
+			set_politics = { ruling_party = conservatism }
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Olivier_Guichard_hog
+				FRA_Maurice_Charretier_for
+				FRA_Jacques_Rueff_eco
+				FRA_Christian_Fouchet_sec
+			}
+
+			add_ideas = FRA_Henri_VII
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.225 days = 1 }
+			}
+		}
+	}
+	FRA_gax_dormesson_wins = {
+		visible = { has_country_flag = FRA_gaxotte_debug_enabled }
+		available = { has_country_leader = { character = FRA_Henri_VII ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_gax_dormesson_wins"
+
+			set_politics = { ruling_party = paternalism }
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Jean_dOrmesson_hog
+				FRA_Jean_Raspail_for
+				FRA_Andre_de_La_Franquerie_eco
+				FRA_Marcel_Carpentier_sec
+			}
+
+			add_ideas = FRA_Henri_VII
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.226 days = 1 }
+			}
+		}
+	}
+	FRA_gax_pujo_wins = {
+		visible = { has_country_flag = FRA_gaxotte_debug_enabled }
+		available = { has_country_leader = { character = FRA_Henri_VII ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_gax_pujo_wins"
+
+			add_country_leader_role = {
+				character = FRA_Pierre_Pujo
+				promote_leader = yes
+				country_leader = {
+					ideology = despotism_aristocratic_conservatism_subtype
+					expire = "1983.1.1"
+					id = -1
+				}
+			}
+
+			remove_all_ministers = yes
+			add_ideas = {
+				FRA_Pierre_Pujo_hog
+				FRA_Xavier_Vallat_for
+				FRA_Georges_Paul_Wagner_eco
+				FRA_Nicolas_Kayanakis_sec
+			}
+
+			add_ideas = FRA_Henri_VII
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.227 days = 1 }
+			}
+		}
+	}
+	FRA_gax_militias_coup = {
+		visible = { has_country_flag = FRA_gaxotte_debug_enabled }
+		available = { has_country_leader = { character = FRA_Pierre_Gaxotte ruling_only = yes } }
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: decision FRA_gax_militias_coup"
+
+			remove_ideas = FRA_the_OAS
+
+			set_politics = {
+				ruling_party = despotism
+				name = FRM_despotism_party
+				long_name = FRM_despotism_party_long
+			}
+
+			add_country_leader_role = {
+				character = FRA_Raoul_Salan
+				promote_leader = yes
+				country_leader = {
+					ideology = despotism_military_junta_subtype
+					expire = "1975.1.1.1"
+					id = -1
+				}
+			}
+
+			remove_all_ministers = yes
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { id = WORLD.228 days = 1 }
+			}
+		}
+	}
+}

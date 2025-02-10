@@ -1,0 +1,68 @@
+on_actions = {
+
+	on_capitulation = { # Zombies get a ton of troops if they take BRG
+		effect = {
+			if = {
+				limit = {
+					ROOT = {
+						tag = BRG
+					}
+					FROM = {
+						tag = ZOM
+					}
+				}
+				ZOM = { country_event = spook_temp.3 }
+			}
+		}
+	}
+
+	on_weekly_ZOM = { # Declare War Thingy
+		effect = {
+			if = {
+				limit = {
+					BRG = { exists = no }
+				}
+				every_country = {
+					limit = {
+						is_neighbor_of = ZOM
+						NOT = { has_war_with = ZOM }
+					}
+					ZOM = {
+						declare_war_on = {
+							target = PREV
+							type = annex_everything
+						}
+					}
+				}
+				if = {
+					limit = {
+						ZOM = { controls_state = 15 }
+					}
+					ZOM = {
+						load_oob = ZOM_radiosilence_small
+						load_oob = ZOM_radiosilence_small
+					}
+				}
+			}
+			ZOM = {
+				every_controlled_state = {
+					limit = { always = yes }
+					ZOM = { add_state_core = PREV }
+				}
+			}
+			every_country = {
+				limit = {
+					has_war_with = ZOM
+					NOT = { has_idea = ZOM_Rodomo_Virus }
+				}
+				add_ideas = ZOM_Rodomo_Virus
+			}
+			if = {
+				limit = {
+					has_global_flag = Zombie_Portraits
+				}
+				Update_Zombie_Portraits_Mussolini = yes ###Separated Mussolini from rest of effect to reduce weekly tick
+			}
+		}
+	}
+}

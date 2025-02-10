@@ -1,0 +1,187 @@
+TNO_start_mozambique_civil_war = {
+	set_global_flag = mozambique_civil_war_active
+	GZO = {
+		transfer_state = 544
+		transfer_state = 1071
+		transfer_state = 1073
+		transfer_state = 1072
+		set_capital = { state = 544 }
+		every_owned_state = { 
+			add_core_of = GZO
+			remove_core_of = GAZ
+		}
+		set_politics = { ruling_party = socialist }
+		GAZ = {
+			GAZ_Eduardo_Mondlane = { set_nationality = GZO }
+		}
+		promote_character = GAZ_Eduardo_Mondlane
+		set_popularities = {
+			communist = 32
+			ultranationalism = 0
+			socialist = 53
+			progressivism = 0
+			liberalism = 0
+
+			conservatism = 0
+			paternalism = 3
+			despotism = 12
+			fascism = 0
+			
+		}
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Worker_Directed }
+		econ_subtype_change = yes
+		declare_war_on = {
+			target = GAZ
+			type = civil_war
+		}
+		load_oob = GZO_civil_war
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = MOZAMBIQUE_CIVIL_WAR_OUTCOME
+					option = MOZAMBIQUE_CIVIL_WAR_OUTCOME_GZO
+				}
+			}
+			set_country_flag = request_strong_CCP_buff
+			apply_war_buff_with_10_divisions = yes
+		}
+		inherit_technology = GAZ
+	}
+	GAZ = {
+		TNO_startup_nation = yes
+		retire_country_leader = yes
+		promote_character = GAZ_Samora_Machel
+		set_politics = { ruling_party = socialist }
+		load_oob = GAZ_civil_war
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = MOZAMBIQUE_CIVIL_WAR_OUTCOME
+					option = MOZAMBIQUE_CIVIL_WAR_OUTCOME_GAZ
+				}
+			}
+			apply_war_buff_with_10_divisions = yes
+		}
+	}
+	# Adds to Ongoing Conflicts
+	USA = {
+		set_temp_variable = { Victory_ID = 21 }
+		Cold_War_GUI_AddVictory = yes
+	}
+	JAP = {
+		set_temp_variable = { Victory_ID = 21 }
+		Cold_War_GUI_AddVictory = yes
+	}
+	USA = { country_event = { id = GAZ.2 days = 3 } }
+	JAP = { country_event = { id = GAZ.3 days = 3 } }
+	news_event = WORLD.18143
+}
+
+TNO_start_devastation_calculation = {
+	set_variable = { mozambique_devastation = 0 }
+	set_variable = { mozambique_devastation_exponential_min = 1 }
+}
+
+TNO_devastation_calculation = {
+	set_variable = { mozambique_devastation_exponential_max = mozambique_devastation }
+	divide_variable = { mozambique_devastation_exponential_max = 10 }
+	add_to_variable = { mozambique_devastation_exponential_max = 1 }
+	
+	set_variable = { mozambique_devastation_exponential_min = mozambique_devastation_exponential_max }
+	divide_variable = { mozambique_devastation_exponential_min = 2 }
+	randomize_temp_variable = {
+		var = mozambique_throaway_variable
+		min = mozambique_devastation_exponential_min
+		max = mozambique_devastation_exponential_max
+	}
+	add_to_variable = { mozambique_devastation = mozambique_throaway_variable }
+	if = {
+		limit = {
+			country_exists = GAZ
+		}
+		add_to_variable = { mozambique_devastation = 1 }
+	}
+	if = {
+		limit = {
+			country_exists = GZO
+		}
+		add_to_variable = { mozambique_devastation = 1 }
+	}
+	if = {
+		limit = {
+			country_exists = GZS
+		}
+		add_to_variable = { mozambique_devastation = 1 }
+	}
+	if = {
+		limit = {
+			check_variable = { mozambique_devastation > 99 }
+			OR = {
+				has_game_rule = {
+					rule = MOZAMBIQUE_CIVIL_WAR_OUTCOME
+					option = MOZAMBIQUE_CIVIL_WAR_OUTCOME_GAZ
+				}
+				has_game_rule = {
+					rule = MOZAMBIQUE_CIVIL_WAR_OUTCOME
+					option = MOZAMBIQUE_CIVIL_WAR_OUTCOME_GZO
+				}
+				has_game_rule = {
+					rule = MOZAMBIQUE_CIVIL_WAR_OUTCOME
+					option = MOZAMBIQUE_CIVIL_WAR_OUTCOME_GZS
+				}
+			}
+		}
+		set_variable = { mozambique_devastation = 99 }
+	}
+	else_if = {
+		limit = {
+			NOT = {
+				check_variable = { ZZZ.mozambique_devastation > 100 }
+			}
+			USA = {
+				OR = {
+					has_country_flag = US_aid_mozambique_mondlane
+					has_country_flag = US_aid_mozambique_simango
+				}
+			}
+			has_game_rule = {
+				rule = MOZAMBIQUE_CIVIL_WAR_OUTCOME
+				option = MOZAMBIQUE_CIVIL_WAR_OUTCOME_DEVASTATION
+			}
+		}
+		set_variable = { mozambique_devastation = 101 }
+	}
+	if = {
+		limit = {
+			check_variable = { mozambique_devastation > 99 }
+		}
+		if = {
+			limit = { GAZ = { has_war_with = GZO } }
+			GAZ = { white_peace = GZO }
+		}
+		if = {
+			limit = { GAZ = { has_war_with = GZS } }
+			GAZ = { white_peace = GZS }
+		}
+		if = {
+			limit = { GZO = { has_war_with = GZS } }
+			GZO = { white_peace = GZS }
+		}
+		country_event = {
+			id = WORLD.18147
+			days = 2
+		}
+		set_global_flag = mozambican_cw_devastated
+		every_country = {
+			limit = {
+				exists = yes
+				OR = {
+					tag = GAZ
+					tag = GZO
+					tag = GZS
+				}
+			}
+			add_ideas = GAZ_devastated
+		}
+	}
+}

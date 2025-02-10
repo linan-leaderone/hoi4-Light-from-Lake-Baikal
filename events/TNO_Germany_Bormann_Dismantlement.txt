@@ -1,0 +1,4648 @@
+﻿#██████╗  ██████╗ ██████╗ ███╗   ███╗ █████╗ ███╗   ██╗███╗   ██╗#
+#██╔══██╗██╔═══██╗██╔══██╗████╗ ████║██╔══██╗████╗  ██║████╗  ██║#
+#██████╔╝██║   ██║██████╔╝██╔████╔██║███████║██╔██╗ ██║██╔██╗ ██║#
+#██╔══██╗██║   ██║██╔══██╗██║╚██╔╝██║██╔══██║██║╚██╗██║██║╚██╗██║#
+#██████╔╝╚██████╔╝██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║██║ ╚████║#
+#╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝#
+#Events
+
+# Used For Debug Do not Touch
+add_namespace = BOR_Dismantlement
+
+# Used
+add_namespace = BOR_Dismantlement_I
+# add_namespace = BOR_Dismantlement_II
+
+country_event = {
+	id = BOR_Dismantlement.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement.1" }
+	title = "Used to test Dismantlement"
+	desc = "Report me if I made it into release"
+	picture = GFX_report_event_GER_nazi_street
+
+	is_triggered_only = yes
+
+	option = {
+		name = "BOR_Kartenhaus_Dismantle_Reformists"
+
+		BOR_Kartenhaus_Dismantle_Reformists = yes
+	}
+
+	option = {
+		name = "BOR_Kartenhaus_Dismantle_Militarists"
+
+		BOR_Kartenhaus_Dismantle_Militarists = yes
+	}
+
+	option = {
+		name = "Nevermind."
+	}
+}
+
+country_event = {
+	id = BOR_Dismantlement.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement.2" }
+	title = "Temporary Dismantlement : )"
+	desc = "Dis I isn't done : )"
+	picture = GFX_report_event_GER_nazi_street
+
+	#fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "Dismantle the Reformists!"
+		trigger = { check_variable = { BOR_ReformistSupport < 50 } }
+
+		BOR_Kartenhaus_Dismantle_Reformists = yes
+		subtract_from_variable = { BOR_ReformistSupport = 10 } # Temporary
+		clamp_variable = { var = BOR_ReformistSupport min = 0 max = 100 }
+		# country_event = { id = BOR_Dismantlement.3 days = 100 }
+
+		remove_ideas_with_trait = security_minister
+		add_ideas = GER_Heinrich_Mueller_sec
+		clr_country_flag = BOR_Dismantlement_I_active
+	}
+
+	option = {
+		name = "Dismantle the Militarists!"
+		trigger = { check_variable = { BOR_MilitaristSupport < 50 } }
+
+		BOR_Kartenhaus_Dismantle_Militarists = yes
+		subtract_from_variable = { BOR_MilitaristSupport = 10 } # Temporary
+		clamp_variable = { var = BOR_MilitaristSupport min = 0 max = 100 }
+		# country_event = { id = BOR_Dismantlement.3 days = 100 }
+
+		remove_ideas_with_trait = security_minister
+		add_ideas = GER_Heinrich_Mueller_sec
+		clr_country_flag = BOR_Dismantlement_I_active
+	}
+}
+
+country_event = {
+	id = BOR_Dismantlement.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement.3" }
+	title = "Temporary Dismantlement : )"
+	desc = "Content May Resume"
+	picture = GFX_report_event_GER_nazi_street
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	# immediate = { country_event = { id = BOR_Dismantlement.3 days = 100 } }
+	
+	option = {
+		name = "Dismantle the Reformists!"
+		trigger = { check_variable = { BOR_ReformistSupport < 50 } }
+
+		BOR_Kartenhaus_Dismantle_Reformists = yes
+		subtract_from_variable = { BOR_ReformistSupport = 10 } # Temporary
+		clamp_variable = { var = BOR_ReformistSupport min = 0 max = 100 }
+	}
+
+	option = {
+		name = "Dismantle the Militarists!"
+		trigger = { check_variable = { BOR_MilitaristSupport < 50 } }
+
+		BOR_Kartenhaus_Dismantle_Militarists = yes
+		subtract_from_variable = { BOR_MilitaristSupport = 10 } # Temporary
+		clamp_variable = { var = BOR_MilitaristSupport min = 0 max = 100 }
+	}
+}
+
+# Dismantlement I temp skeleton
+country_event = {
+	id = BOR_Dismantlement.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement.4" }
+	title = "Dismantlement I Discovery Skeleton"
+	desc = "oh wow, the faction you did not ally with is planning a coup, big surprise. once you get >70% control, press that big red button in the kartenhaus screen to do the dismantlement"
+	picture = GFX_report_event_GER_nazi_street
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "cool"
+		set_country_flag = BOR_DiscoveryOccured
+		set_country_flag = BOR_Dismantlement_I_active
+		hidden_effect = { # Quick precaution to ensure that the AI doesn't get stuck for now
+			if = {
+				limit = { is_ai = yes }
+				country_event = { id = BOR_Dismantlement.5 days = 100 }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = BOR_Dismantlement.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement.5" }
+	title = "The AI fucked up"
+	desc = "You shouldn't be seeing this"
+	picture = GFX_report_event_GER_nazi_street
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "cool"
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = BOR_militarists_dismantled
+					has_country_flag = BOR_reformists_dismantled
+				}
+			}
+			clr_country_flag = BOR_DiscoveryOccured
+			country_event = BOR_Dismantlement.2
+		}
+	}
+}
+
+# Dismantlement I Anti-Ref Initiator
+country_event = {
+	id = BOR_Dismantlement.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement.6" }
+	title = "BOR_Dismantlement.6.t"
+	desc = "BOR_Dismantlement.6.desc"
+	picture = GFX_report_event_GER_nazi_street
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		NOT = { has_country_flag = BOR_PreparationInProgress }
+		has_country_flag = BOR_Dismantlement_I_active
+	}
+
+	option = {
+		name = "BOR_Dismantlement.6.a"
+		if = {
+			limit = { is_ai = no }
+			BOR_SIG_SP_0_10 = yes
+			BOR_SIG_SL_0_5_1 = yes
+			BOR_SIG_SL_1_5_1 = yes
+			BOR_SIG_SL_4_5_1 = yes
+		}
+		country_event = { id = BOR_Dismantlement_I.29 days = 2 }
+		set_country_flag = BOR_PreparationInProgress
+		clr_country_flag = BOR_DiscoveryOccured
+	}
+}
+
+# Dismantlement I Anti-Mil Initiator
+country_event = {
+	id = BOR_Dismantlement.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement.7" }
+	title = "BOR_Dismantlement.7.t"
+	desc = "BOR_Dismantlement.7.desc"
+	picture = GFX_report_event_GER_nazi_street
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		NOT = { has_country_flag = BOR_PreparationInProgress }
+		has_country_flag = BOR_Dismantlement_I_active
+	}
+
+	option = {
+		name = "BOR_Dismantlement.7.a"
+		if = {
+			limit = { is_ai = no }
+			BOR_SIG_SP_0_10 = yes
+			BOR_SIG_SL_0_5_1 = yes
+			BOR_SIG_SL_1_5_1 = yes
+			BOR_SIG_SL_4_5_1 = yes
+		}
+		country_event = { id = BOR_Dismantlement_I.117 days = 2 }
+		set_country_flag = BOR_PreparationInProgress
+		clr_country_flag = BOR_DiscoveryOccured
+	}
+}
+
+# Dismantlement II
+country_event = {
+	id = BOR_Dismantlement.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement.8" }
+	title = "BOR_Dismantlement.8.t"
+	desc = "BOR_Dismantlement.8.desc"
+	picture = GFX_report_event_GER_nazi_street
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		NOT = { has_country_flag = BOR_PreparationInProgress }
+		has_country_flag = BOR_Dismantlement_II_active
+	}
+
+	option = {
+		name = "BOR_Dismantlement.8.a"
+		if = {
+			limit = { is_ai = no }
+			BOR_SIG_SP_0_10 = yes
+			BOR_SIG_SL_0_5_1 = yes
+			BOR_SIG_SL_1_5_1 = yes
+			BOR_SIG_SL_4_5_1 = yes
+		}
+		country_event = { id = bor_disII_preparation.1 days = 2 }
+		set_country_flag = BOR_PreparationInProgress
+		clr_country_flag = BOR_DiscoveryOccured
+	}
+}
+
+# Quick AI boost event because it is braindead
+country_event = {
+	id = BOR_Dismantlement.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement.9" }
+	title = "AI boost event"
+	desc = "You shouldn't be seeing this"
+	picture = GFX_report_event_GER_nazi_street
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	hidden = yes
+
+	option = {
+		name = "Alright"
+		BOR_SIG_AP_0_10 = yes
+		BOR_SIG_AL_0_5_1 = yes
+		BOR_SIG_AP_1_10 = yes
+		BOR_SIG_AL_1_5_1 = yes
+		BOR_SIG_AL_4_5_1 = yes
+	}
+}
+
+###Dismantlement I Anti-Reformist###
+country_event = { #Anti-Bormie propaganda in Koln
+	id = BOR_Dismantlement_I.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.1" }
+	title = BOR_Dismantlement_I.1.t
+	desc = BOR_Dismantlement_I.1.desc
+	picture = GFX_report_event_GER_democracy_riot_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		set_country_flag = BOR_Dismantlement_I_active
+		set_country_flag = BOR_Dismantlement_I_AntiRef
+	}
+
+	option = {
+		name = BOR_Dismantlement_I.1.a
+		add_political_power = -10
+		hidden_effect = {
+			country_event = {
+				id = BOR_Dismantlement_I.2
+				days = 7
+			}
+		}
+	}
+}
+
+country_event = { #Cops arrest two hooligans who turn out to be enlisted Heer
+	id = BOR_Dismantlement_I.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.2" }
+	title = BOR_Dismantlement_I.2.t
+	desc = BOR_Dismantlement_I.2.desc
+	picture = GFX_report_event_GER_arrests
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Send them to be dealt with by the army
+		name = BOR_Dismantlement_I.2.a
+		BOR_SIG_AL_4_1_1 = yes
+		hidden_effect = {
+			country_event = {
+				id = BOR_Dismantlement_I.3
+				days = 5
+			}
+			set_country_flag = dism_okw_trusted
+		}
+	}
+	option = { #State authorities will handle this
+		name = BOR_Dismantlement_I.2.b
+		BOR_SIG_AP_0_4 = yes
+		BOR_SIG_SL_4_1_1 = yes
+		hidden_effect = {
+			country_event = {
+				id = BOR_Dismantlement_I.9
+				days = 5
+			}
+			set_country_flag = dism_okw_not_trusted
+		}
+	}
+}
+
+country_event = { #Troops get off with a slap on the wrist, something is wrong
+	id = BOR_Dismantlement_I.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.3" }
+	title = BOR_Dismantlement_I.3.t
+	desc = BOR_Dismantlement_I.3.desc
+	picture = GFX_report_event_generic_court_case_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Order the OKW to follow up
+		name = BOR_Dismantlement_I.3.a
+		country_event = {
+			id = BOR_Dismantlement_I.4
+			days = 2
+		}
+	}
+}
+
+country_event = { #Bormann meets with Schörner about the military being soft
+	id = BOR_Dismantlement_I.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.4" }
+	title = BOR_Dismantlement_I.4.t
+	desc = BOR_Dismantlement_I.4.desc
+	picture = GFX_report_event_GER_ferdinand_schorner
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = BOR_Dismantlement_I.4.a
+		hidden_effect = {
+			country_event = {
+				id = BOR_Dismantlement_I.5
+				days = 5
+			}
+		}
+	}
+}
+
+country_event = { #Schörner comes back complaining of interference from the OKH. Probably the usual feud with Speidel
+	id = BOR_Dismantlement_I.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.5" }
+	title = BOR_Dismantlement_I.5.t
+	desc = BOR_Dismantlement_I.5.desc
+	picture = GFX_speer_war_room
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Bormann will deal with this
+		name = BOR_Dismantlement_I.5.a
+		country_event = {
+			id = BOR_Dismantlement_I.6
+			days = 2
+		}
+	}
+}
+
+country_event = { #Bormann calls upon Speidel. Speidel seems uneasy
+	id = BOR_Dismantlement_I.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.6" }
+	title = BOR_Dismantlement_I.6.t
+	desc = BOR_Dismantlement_I.6.desc
+	picture = GFX_report_event_GER_speidel_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = BOR_Dismantlement_I.6.a
+		hidden_effect = {
+			country_event = { #Reichswerke exposed
+				id = BOR_Dismantlement_I.7
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { #Reichswerke exposed
+	id = BOR_Dismantlement_I.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.7" }
+	title = BOR_Dismantlement_I.7.t
+	desc = BOR_Dismantlement_I.7.desc
+	picture = GFX_report_event_generic_money
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Figure this shit out
+		name = BOR_Dismantlement_I.7.a
+		BOR_SIG_SP_7_5 = yes
+		hidden_effect = {
+			country_event = { #Execs deny involvement
+				id = BOR_Dismantlement_I.8
+				days = 1
+			}
+		}
+	}
+}
+country_event = { #Execs deny involvement, blame bankers
+	id = BOR_Dismantlement_I.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.8" }
+	title = BOR_Dismantlement_I.8.t
+	desc = BOR_Dismantlement_I.8.desc
+	picture = GFX_report_event_generic_corporate_board_meeting
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Hold Reichswerke accountable
+		name = BOR_Dismantlement_I.8.a
+		country_event = {
+			id = BOR_Dismantlement_I.13
+			days = 1
+		}
+	}
+
+	option = { #Pin it on the bankers
+		name = BOR_Dismantlement_I.8.b
+		country_event = {
+			id = BOR_Dismantlement_I.15
+			days = 1
+		}
+	}
+}
+
+country_event = { #Investigation reveals that this isn't the first incident
+	id = BOR_Dismantlement_I.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.9" }
+	title = BOR_Dismantlement_I.9.t
+	desc = BOR_Dismantlement_I.9.desc
+	picture = GFX_report_event_generic_court_case_2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #A state court will deal with them
+		name = BOR_Dismantlement_I.9.a
+		country_event = {
+			id = BOR_Dismantlement_I.10
+			days = 3
+		}
+	}
+
+	option = { #Let the military courts handle this
+		name = BOR_Dismantlement_I.9.b
+		country_event = {
+			id = BOR_Dismantlement_I.11
+			days = 3
+		}
+	}
+}
+
+country_event = { #State court sentences soldiers to a harsh sentence
+	id = BOR_Dismantlement_I.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.10" }
+	title = BOR_Dismantlement_I.10.t
+	desc = BOR_Dismantlement_I.10.desc
+	picture = GFX_report_event_generic_court_case_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Epic
+		name = BOR_Dismantlement_I.10.a
+		country_event = {
+			id = BOR_Dismantlement_I.12
+			days = 1
+		}
+	}
+}
+
+country_event = { #Military courts deal nothing but a slap on the wrist
+	id = BOR_Dismantlement_I.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.11" }
+	title = BOR_Dismantlement_I.11.t
+	desc = BOR_Dismantlement_I.11.desc
+	picture = GFX_report_event_generic_court_case_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Not epic
+		name = BOR_Dismantlement_I.11.a
+		add_political_power = -15
+		country_event = {
+			id = BOR_Dismantlement_I.12
+			days = 1
+		}
+	}
+}
+
+country_event = { #Bormie sits in the dark, angry about military or smth
+	id = BOR_Dismantlement_I.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.12" }
+	title = BOR_Dismantlement_I.12.t
+	desc = BOR_Dismantlement_I.12.desc
+	picture = GFX_report_event_GER_germania_night
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = BOR_Dismantlement_I.12.a
+		hidden_effect = {
+			country_event = {
+				id = BOR_Dismantlement_I.7
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { #Reichswerke held accountable
+	id = BOR_Dismantlement_I.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.13" }
+	title = BOR_Dismantlement_I.13.t
+	desc = BOR_Dismantlement_I.13.desc
+	picture = GFX_report_event_generic_court_case_3
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = BOR_Dismantlement_I.13.a
+		BOR_SIG_SP_7_2 = yes
+		hidden_effect = {
+			country_event = {
+				id = BOR_Dismantlement_I.14
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { #Looks like it was the banks after all
+	id = BOR_Dismantlement_I.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.14" }
+	title = BOR_Dismantlement_I.14.t
+	desc = BOR_Dismantlement_I.14.desc
+	picture = GFX_report_event_generic_court_case_4
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Fine, nab the bankers for questioning
+		name = BOR_Dismantlement_I.14.a
+		country_event = {
+			id = BOR_Dismantlement_I.15
+			days = 1
+		}
+	}
+}
+
+country_event = { #Bankers detained for questioning
+	id = BOR_Dismantlement_I.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.15" }
+	title = BOR_Dismantlement_I.15.t
+	desc = BOR_Dismantlement_I.15.desc
+	picture = GFX_report_event_IBR_basques_arrested
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Let's look into these bankers
+		name = BOR_Dismantlement_I.15.a
+		trigger = {
+			has_country_flag = dism_okw_trusted
+		}
+		hidden_effect = {
+			country_event = { #Speidel does shit
+				id = BOR_Dismantlement_I.16
+				days = 2
+			}
+		}
+	}
+
+	option = { #Let's look into these bankers but doomed
+		name = BOR_Dismantlement_I.15.b
+		trigger = {
+			has_country_flag = dism_okw_not_trusted
+		}
+		hidden_effect = {
+			country_event = {
+				id = BOR_Dismantlement_I.17
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { #Speidel leaves for Frankfurt
+	id = BOR_Dismantlement_I.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.16" }
+	title = BOR_Dismantlement_I.16.t
+	desc = BOR_Dismantlement_I.16.desc
+	picture = GFX_report_event_GER_orpo
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Pursue his trail
+		name = BOR_Dismantlement_I.16.a
+		hidden_effect = {
+			country_event = {
+				id = BOR_Dismantlement_I.18
+				days = 2
+			}
+		}
+	}
+
+	option = { #No need, focus on the banks
+		name = BOR_Dismantlement_I.16.b
+		hidden_effect = {
+			country_event = {
+				id = BOR_Dismantlement_I.17
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { #No way to pin true blame on the banks. Reichswerke are to blame
+	id = BOR_Dismantlement_I.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.17" }
+	title = BOR_Dismantlement_I.17.t
+	desc = BOR_Dismantlement_I.17.desc
+	picture = GFX_report_event_GER_court
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Make an example of their corruption
+		name = BOR_Dismantlement_I.17.a
+		hidden_effect = {
+			country_event = { #Reichswerke dudes sentenced for decades
+				id = BOR_Dismantlement_I.23
+				days = 3
+			}
+		}
+	}
+	option = { #Keep it quiet for now
+		name = BOR_Dismantlement_I.17.b
+		hidden_effect = {
+			country_event = { #Several of the detained bankers have been in contact with Heinemann
+				id = BOR_Dismantlement_I.24
+				days = 6
+			}
+		}
+	}
+}
+
+country_event = { #Schörner starts tailing Speidel
+	id = BOR_Dismantlement_I.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.18" }
+	title = BOR_Dismantlement_I.18.t
+	desc = BOR_Dismantlement_I.18.desc
+	picture = GFX_report_event_GER_schorner
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Let's see how this goes
+		name = BOR_Dismantlement_I.18.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.19
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # Speidel found with some aides meeting with Heinemann
+	id = BOR_Dismantlement_I.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.19" }
+	title = BOR_Dismantlement_I.19.t
+	desc = BOR_Dismantlement_I.19.desc
+	picture = GFX_report_event_GER_speidel_2
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Question his aide
+		name = BOR_Dismantlement_I.19.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.17
+				days = 7
+			}
+		}
+	}
+	option = { # Question his aide
+		name = BOR_Dismantlement_I.19.b
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.20
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Aide grabbed by Feldgendarm and questioned
+	id = BOR_Dismantlement_I.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.20" }
+	title = BOR_Dismantlement_I.20.t
+	desc = BOR_Dismantlement_I.20.desc
+	picture = GFX_report_event_GER_orpo
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.20.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.21
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { # The confession is brought to Bormann who orders the arrest of Heinemann and Speidel
+	id = BOR_Dismantlement_I.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.21" }
+	title = BOR_Dismantlement_I.21.t
+	desc = BOR_Dismantlement_I.21.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.21.a
+		BOR_SIG_SL_4_3_0 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.22
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { # Speidel evades capture, but Heineman is caught
+	id = BOR_Dismantlement_I.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.22" }
+	title = BOR_Dismantlement_I.22.t
+	desc = BOR_Dismantlement_I.22.desc
+	picture = GFX_report_event_IBR_pide_arrest
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.22.a
+		set_country_flag = BOR_HasHeinemann
+		BOR_SIG_SP_2_5 = yes
+		BOR_SIG_SP_4_2 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.26
+				days = 7
+			}
+		}
+	}
+}
+
+country_event = { # Reichswerke executives sentenced
+	id = BOR_Dismantlement_I.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.23" }
+	title = BOR_Dismantlement_I.23.t
+	desc = BOR_Dismantlement_I.23.desc
+	picture = GFX_report_event_generic_court_case_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.23.a
+		BOR_SIG_SP_7_10 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.26
+				days = 7
+			}
+		}
+	}
+}
+
+country_event = { # Bankers have been in contact with Heinemann
+	id = BOR_Dismantlement_I.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.24" }
+	title = BOR_Dismantlement_I.24.t
+	desc = BOR_Dismantlement_I.24.desc
+	picture = GFX_report_event_generic_corporate_board_meeting
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Bring him in
+		name = BOR_Dismantlement_I.24.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.25
+				days = 4
+			}
+		}
+	}
+	option = { # Ignore it
+		name = BOR_Dismantlement_I.24.b
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.26
+				days = 7
+			}
+		}
+	}
+}
+
+country_event = { # Heineman brought in, arousing suspicions
+	id = BOR_Dismantlement_I.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.25" }
+	title = BOR_Dismantlement_I.25.t
+	desc = BOR_Dismantlement_I.25.desc
+	picture = GFX_report_event_GER_court
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.25.a
+		set_country_flag = BOR_HasHeinemann
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.26
+				days = 5
+			}
+		}
+	}
+}
+
+country_event = { # Reichswerke reports recoed value loss
+	id = BOR_Dismantlement_I.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.26" }
+	title = BOR_Dismantlement_I.26.t
+	desc = BOR_Dismantlement_I.26.desc
+	picture = GFX_report_event_GER_unemployment
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.26.a
+		BOR_SIG_SP_7_10 = yes
+		BOR_SIG_SL_7_3_1 = yes
+		set_temp_variable = { temp_econ_GDP_boost_percentage = -0.03 }
+		econ_GDP_boost_once_percentage = yes
+		set_temp_variable = { gdp_growth_temp = -0.25 }
+		econ_gdp_growth_change = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.27
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # Frankfurt stock market plumments
+	id = BOR_Dismantlement_I.27
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.27" }
+	title = BOR_Dismantlement_I.27.t
+	desc = BOR_Dismantlement_I.27.desc
+	picture = GFX_report_event_generic_stock_market
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.27.a
+		econ_lower_credit_rating = yes
+		set_temp_variable = { temp_econ_GDP_boost_flat = -8 }
+		econ_GDP_boost_once_flat = yes
+		set_temp_variable = { gdp_growth_temp = -0.8 }
+		econ_gdp_growth_change = yes
+		add_stability = -0.04
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.28
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # News Report: shots being fired in Dresden - END OF DISCOVERY
+	id = BOR_Dismantlement_I.28
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.28" }
+	title = BOR_Dismantlement_I.28.t
+	desc = BOR_Dismantlement_I.28.desc
+	picture = GFX_report_event_GER_riotpolice
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.28.a
+		set_country_flag = BOR_DiscoveryOccured
+		add_stability = -0.02
+		add_war_support = -0.02
+		custom_effect_tooltip = BOR_Dismantlement_PreparationAvailable
+		hidden_effect = { country_event = { id = BOR_Dismantlement.6 days = 90 } } # Dismantlement I Initiator
+	}
+}
+
+country_event = { # Bormann finds out about the mutiny - PREPARATION BEGIN
+	id = BOR_Dismantlement_I.29
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.29" }
+	title = BOR_Dismantlement_I.29.t
+	desc = BOR_Dismantlement_I.29.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Bormann questions Heinemann
+		name = BOR_Dismantlement_I.29.a
+		trigger = { has_country_flag = BOR_HasHeinemann }
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.31
+				days = 2
+			}
+		}
+	}
+	option = { # Bormann tells Schörner to deal with Dresden
+		name = BOR_Dismantlement_I.29.a
+		trigger = { NOT = { has_country_flag = BOR_HasHeinemann } }
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.30
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # Schörner is sent to Dresden
+	id = BOR_Dismantlement_I.30
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.30" }
+	title = BOR_Dismantlement_I.30.t
+	desc = BOR_Dismantlement_I.30.desc
+	picture = GFX_report_event_GER_training
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.30.a
+		hidden_effect = {
+			country_event = {
+				id = BOR_Dismantlement_I.41
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Heinemann is questioned under fear of death
+	id = BOR_Dismantlement_I.31
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.31" }
+	title = BOR_Dismantlement_I.31.t
+	desc = BOR_Dismantlement_I.31.desc
+	picture = GFX_report_event_GER_heinemann
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.31.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.32
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Heinemann spills the beans, but doesn't give any names
+	id = BOR_Dismantlement_I.32
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.32" }
+	title = BOR_Dismantlement_I.32.t
+	desc = BOR_Dismantlement_I.32.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Tread carefuly
+		name = BOR_Dismantlement_I.32.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.33
+				days = 2
+			}
+		}
+	}
+	option = { # Order some arrests
+		name = BOR_Dismantlement_I.32.b
+		add_political_power = -20
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.37
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # Bormann receives intel of Speidel's possible involvement in Dresden
+	id = BOR_Dismantlement_I.33
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.33" }
+	title = BOR_Dismantlement_I.33.t
+	desc = BOR_Dismantlement_I.33.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.33.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.34
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Speidel's office raided, logs of meetings with the presidential chancellery
+	id = BOR_Dismantlement_I.34
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.34" }
+	title = BOR_Dismantlement_I.34.t
+	desc = BOR_Dismantlement_I.34.desc
+	picture = GFX_report_event_IBR_home_office_desk
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.34.a
+		BOR_SIG_AP_0_3 = yes
+		BOR_SIG_SL_0_3_0 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.35
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # Reports that Speidel has fled the Reich
+	id = BOR_Dismantlement_I.35
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.35" }
+	title = BOR_Dismantlement_I.35.t
+	desc = BOR_Dismantlement_I.35.desc
+	picture = GFX_report_event_generic_plane
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.35.a
+		BOR_SIG_SP_4_5 = yes
+		BOR_SIG_SL_4_5_0 = yes
+		add_popularity = { ideology = fascism popularity = -0.03 }
+		remove_unit_leader_role = GER_hans_speidel
+		hidden_effect = {
+			kill_ideology_leader = fascism
+			country_event = { 
+				id = BOR_Dismantlement_I.36
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Bormann knows now this is the time to act - END OF PREPARATION
+	id = BOR_Dismantlement_I.36
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.36" }
+	title = BOR_Dismantlement_I.36.t
+	desc = BOR_Dismantlement_I.36.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.36.a
+		custom_effect_tooltip = BOR_Dismantlement_ExecutionAvailable
+		if = { # AI continuation event
+			limit = { is_ai = yes }
+			country_event = BOR_Dismantlement_I.45
+		}
+		else = { set_country_flag = BOR_PreparationOccured }
+	}
+}
+
+country_event = { # Several party officials are arrested, all of whom were previously on watchlists
+	id = BOR_Dismantlement_I.37
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.37" }
+	title = BOR_Dismantlement_I.37.t
+	desc = BOR_Dismantlement_I.37.desc
+	picture = GFX_report_event_IBR_basques_arrested
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.37.a
+		BOR_SIG_SP_0_5 = yes
+		BOR_SIG_SL_0_2_0 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.38
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Bormann orders Schörner to go deal with Dresden
+	id = BOR_Dismantlement_I.38
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.38" }
+	title = BOR_Dismantlement_I.38.t
+	desc = BOR_Dismantlement_I.38.desc
+	picture = GFX_report_event_IRE_riot_gear
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.38.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.39
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Arrested individuals are unable to give any info since they aren't involved
+	id = BOR_Dismantlement_I.39
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.39" }
+	title = BOR_Dismantlement_I.39.t
+	desc = BOR_Dismantlement_I.39.desc
+	picture = GFX_report_event_IBR_prison_jail_cell
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.39.a
+		BOR_SIG_SP_0_3 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.40
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { # Party officials protest Bormann's arrests
+	id = BOR_Dismantlement_I.40
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.40" }
+	title = BOR_Dismantlement_I.40.t
+	desc = BOR_Dismantlement_I.40.desc
+	picture = GFX_report_event_GER_agreement
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.40.a
+		BOR_SIG_SL_0_5_1 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.41
+				days = 7
+			}
+		}
+	}
+}
+
+country_event = { # Dresden Massacre
+	id = BOR_Dismantlement_I.41
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.41" }
+	title = BOR_Dismantlement_I.41.t
+	desc = BOR_Dismantlement_I.41.desc
+	picture = GFX_report_event_GER_riot
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = { set_country_flag = BOR_DresdenMassacre }
+	
+	option = { #
+		name = BOR_Dismantlement_I.41.a
+		BOR_SIG_SP_4_10 = yes
+		BOR_SIG_AL_1_3_0 = yes
+		BOR_SIG_SL_1_3_2 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.42
+				days = 5
+			}
+		}
+	}
+}
+
+country_event = { # Germania highways are blocked
+	id = BOR_Dismantlement_I.42
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.42" }
+	title = BOR_Dismantlement_I.42.t
+	desc = BOR_Dismantlement_I.42.desc
+	picture = GFX_report_event_GER_germania_tank
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.42.a
+		BOR_SIG_AL_4_4_0 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.43
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Bormann realizes that he's in danger
+	id = BOR_Dismantlement_I.43
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.43" }
+	title = BOR_Dismantlement_I.43.t
+	desc = BOR_Dismantlement_I.43.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.43.a
+		BOR_SIG_SP_0_10 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.44
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # Militarist commanders rush to Germania - END OF PREPARATION
+	id = BOR_Dismantlement_I.44
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.44" }
+	title = BOR_Dismantlement_I.44.t
+	desc = BOR_Dismantlement_I.44.desc
+	picture = GFX_report_event_GER_germania_snow
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.44.a
+		custom_effect_tooltip = BOR_Dismantlement_ExecutionAvailable
+		if = { # AI continuation event
+			limit = { is_ai = yes }
+			if = {
+				limit = { has_country_flag = BOR_DresdenMassacre }
+				country_event = BOR_Dismantlement_I.50
+			}
+			else = { country_event = BOR_Dismantlement_I.45 }
+		}
+		else = { set_country_flag = BOR_PreparationOccured }
+	}
+}
+
+country_event = { # EXECUTION GOOD START - Speidel removed as chief of the OKH
+	id = BOR_Dismantlement_I.45
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.45" }
+	title = BOR_Dismantlement_I.45.t
+	desc = BOR_Dismantlement_I.45.desc
+	picture = GFX_report_event_GER_desk
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.45.a
+		clr_country_flag = BOR_PreparationInProgress
+		add_popularity = { ideology = fascism popularity = -0.06 }
+		remove_unit_leader_role = GER_hans_speidel
+		TNO_worsen_army_professionalism_low = yes
+		hidden_effect = {
+			kill_ideology_leader = fascism
+			country_event = { 
+				id = BOR_Dismantlement_I.46
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { # Globke arrested and questioned
+	id = BOR_Dismantlement_I.46
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.46" }
+	title = BOR_Dismantlement_I.46.t
+	desc = BOR_Dismantlement_I.46.desc
+	picture = GFX_report_event_GER_globke
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.46.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.47
+				days = 6
+			}
+		}
+	}
+}
+
+country_event = { # Deutsche Bank executives revealed to be behind the frauding of Reichswerke
+	id = BOR_Dismantlement_I.47
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.47" }
+	title = BOR_Dismantlement_I.47.t
+	desc = BOR_Dismantlement_I.47.desc
+	picture = GFX_report_event_generic_corporate_board_meeting
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.47.a
+		BOR_SIG_SP_11_10 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.48
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Reichswerke officials released from blame
+	id = BOR_Dismantlement_I.48
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.48" }
+	title = BOR_Dismantlement_I.48.t
+	desc = BOR_Dismantlement_I.48.desc
+	picture = GFX_report_event_IRE_prison
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.48.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.49
+				days = 6
+			}
+		}
+	}
+}
+
+country_event = { # Markets take one more hit, but will stabilize - DISMANTLEMENT GOOD END
+	id = BOR_Dismantlement_I.49
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.49" }
+	title = BOR_Dismantlement_I.49.t
+	desc = BOR_Dismantlement_I.49.desc
+	picture = GFX_report_event_generic_stock_market
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.49.a
+		clr_country_flag = BOR_Dismantlement_I_active
+		clr_country_flag = BOR_Dismantlement_I_AntiRef
+		custom_effect_tooltip = BOR_Dismantlement_Reformists
+		BOR_Kartenhaus_Dismantle_Reformists = yes
+		TNO_worsen_admin_efficiency_med = yes
+		set_variable = { BOR_ReformistSupport = 0 }
+		hidden_effect = { country_event = { id = bormannflavor.41 days = 300 } } # Heil Zeit Phase Ref Dismantlement
+	}
+}
+
+country_event = { # EXECUTION BAD START - Schörner returns to Germania
+	id = BOR_Dismantlement_I.50
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.50" }
+	title = BOR_Dismantlement_I.50.t
+	desc = BOR_Dismantlement_I.50.desc
+	picture = GFX_report_event_GER_germania_snow
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.50.a
+		clr_country_flag = BOR_PreparationInProgress
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.51
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # Globke decries the chaos as the work of the party chancellery
+	id = BOR_Dismantlement_I.51
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.51" }
+	title = BOR_Dismantlement_I.51.t
+	desc = BOR_Dismantlement_I.51.desc
+	picture = GFX_report_event_GER_globke
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.51.a
+		BOR_SIG_SP_0_5 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.52
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Bormann learns that OKH Feldgaendarmerie have arrested several members of the party chancellery
+	id = BOR_Dismantlement_I.52
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.52" }
+	title = BOR_Dismantlement_I.52.t
+	desc = BOR_Dismantlement_I.52.desc
+	picture = GFX_report_event_GER_court
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.52.a
+		BOR_SIG_SP_0_3 = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.53
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # Bormann orders the OKW and Orpo to solve the crisis "at any cost"
+	id = BOR_Dismantlement_I.53
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.53" }
+	title = BOR_Dismantlement_I.53.t
+	desc = BOR_Dismantlement_I.53.desc
+	picture = GFX_report_event_GER_orpo
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.53.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.54
+				days = 3
+			}
+		}
+	}
+}
+
+country_event = { # Speidel found dead
+	id = BOR_Dismantlement_I.54
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.54" }
+	title = BOR_Dismantlement_I.54.t
+	desc = BOR_Dismantlement_I.54.desc
+	picture = GFX_report_event_GER_speidel_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.54.a
+		add_popularity = { ideology = fascism popularity = -0.06 }
+		remove_unit_leader_role = GER_hans_speidel
+		TNO_worsen_army_professionalism_low = yes
+		hidden_effect = {
+			kill_ideology_leader = fascism
+			country_event = { 
+				id = BOR_Dismantlement_I.55
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { # Bormann releases Globke from his post, but he remains at large
+	id = BOR_Dismantlement_I.55
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.55" }
+	title = BOR_Dismantlement_I.55.t
+	desc = BOR_Dismantlement_I.55.desc
+	picture = GFX_report_event_GER_globke
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.55.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.56
+				days = 7
+			}
+		}
+	}
+}
+
+country_event = { # Markets continue to tumble - DISMANTLEMENT BAD END
+	id = BOR_Dismantlement_I.56
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.56" }
+	title = BOR_Dismantlement_I.56.t
+	desc = BOR_Dismantlement_I.56.desc
+	picture = GFX_report_event_generic_stock_market
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.56.a
+		clr_country_flag = BOR_Dismantlement_I_active
+		clr_country_flag = BOR_Dismantlement_I_AntiRef
+		set_temp_variable = { temp_econ_GDP_boost_percentage = -0.03 }
+		econ_GDP_boost_once_percentage = yes
+		custom_effect_tooltip = BOR_Dismantlement_Reformists
+		BOR_Kartenhaus_Dismantle_Reformists = yes
+		TNO_worsen_admin_efficiency_med = yes
+		set_variable = { BOR_ReformistSupport = 0 }
+	}
+}
+
+country_event = { # COLLAPSE - Reformists begin their coup by assassinating Bormann
+	id = BOR_Dismantlement_I.57
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.57" }
+	title = BOR_Dismantlement_I.57.t
+	desc = BOR_Dismantlement_I.57.desc
+	picture = GFX_report_event_GER_martin_bormann_intro
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.57.a
+		add_stability = -0.05
+		TNO_worsen_admin_efficiency_med = yes
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.58
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # They move on to seize key positions in Germania and then move to secure the OKW
+	id = BOR_Dismantlement_I.58
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.58" }
+	title = BOR_Dismantlement_I.58.t
+	desc = BOR_Dismantlement_I.58.desc
+	picture = GFX_report_event_AZH_coup2
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.58.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.59
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # They fail to secure the OKW, Schörner regroups
+	id = BOR_Dismantlement_I.59
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.59" }
+	title = BOR_Dismantlement_I.59.t
+	desc = BOR_Dismantlement_I.59.desc
+	picture = GFX_report_event_AZH_coup1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.59.a
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.60
+				days = 4
+			}
+		}
+	}
+}
+
+country_event = { # Schörner conducts a counter-coup
+	id = BOR_Dismantlement_I.60
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.60" }
+	title = BOR_Dismantlement_I.60.t
+	desc = BOR_Dismantlement_I.60.desc
+	picture = GFX_report_event_GER_communists_riot
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.60.a
+		add_stability = -0.05
+		hidden_effect = {
+			country_event = { 
+				id = BOR_Dismantlement_I.61
+				days = 2
+			}
+		}
+	}
+}
+
+country_event = { # With Bormann missing, Schörner proclaims himself to be the "provisional" leader of Germany - COLLAPSE END
+	id = BOR_Dismantlement_I.61
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.61" }
+	title = BOR_Dismantlement_I.61.t
+	desc = BOR_Dismantlement_I.61.desc
+	picture = GFX_report_event_GER_ferdinand_schorner
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.61.a
+		retire_country_leader = yes
+		set_politics = { ruling_party = ultranationalism }
+		add_popularity = { ideology = ultranationalism popularity = 0.5 }
+		remove_all_ministers = yes
+		add_ideas = {
+			GER_Eduard_Wagner_hog
+			GER_Theodor_Tolsdorff_sec
+			GER_Otto_Ernst_Remer_for
+			GER_Kurt_Schmucker_eco
+		}
+		hidden_effect = {
+			country_event = {
+				id = speer.99991
+				days = 3
+			}
+		}
+		BOR_Influence_Disable = yes
+		load_focus_tree = { tree = ZZZ_blank_focus keep_completed = no }
+		clr_country_flag = BOR_Dismantlement_I_active
+		clr_country_flag = BOR_Dismantlement_I_AntiRef
+		set_country_flag = BOR_SchornerCoup
+		TNO_Country_Closing_Screen_Show = yes
+	}
+}
+
+## Bormann Dismantlement I Anti-Militarist ##
+
+country_event = { # Deutsche Bank is selling IG Farben stocks
+	id = BOR_Dismantlement_I.100
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.100" }
+	title = BOR_Dismantlement_I.100.t
+	desc = BOR_Dismantlement_I.100.desc
+	picture = GFX_report_event_generic_corporate_board_meeting
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		set_country_flag = BOR_Dismantlement_I_active
+		set_country_flag = BOR_Dismantlement_I_AntiMil
+	}
+	
+	option = { #
+		name = BOR_Dismantlement_I.100.a
+		country_event = {
+			id = BOR_Dismantlement_I.101
+			days = 24
+		}
+	}
+}
+
+country_event = { # Bormann receives reports from Herrmann about Roenne allegedly scamming money from OKW
+	id = BOR_Dismantlement_I.101
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.101" }
+	title = BOR_Dismantlement_I.101.t
+	desc = BOR_Dismantlement_I.101.desc
+	picture = GFX_speer_war_room
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Dismiss it
+		name = BOR_Dismantlement_I.101.a
+		country_event = {
+			id = BOR_Dismantlement_I.105
+			days = 48
+		}
+	}
+	option = { # Investigate
+		name = BOR_Dismantlement_I.101.b
+		add_political_power = -20
+		country_event = {
+			id = BOR_Dismantlement_I.102
+			days = 14
+		}
+	}
+}
+
+country_event = { # Investigation reveals that Roenne is innocent, Herrmann has apparently been meeting Schörner more often than not
+	id = BOR_Dismantlement_I.102
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.102" }
+	title = BOR_Dismantlement_I.102.t
+	desc = BOR_Dismantlement_I.102.desc
+	picture = GFX_report_event_GER_ferdinand_schorner
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Confront Herrmann, leads to failure
+		name = BOR_Dismantlement_I.102.a
+		country_event = {
+			id = BOR_Dismantlement_I.103
+			days = 7
+		}
+	}
+	option = { # Send the Orpo to investigate
+		name = BOR_Dismantlement_I.102.b
+		add_political_power = -20
+		BOR_SIG_AP_6_3 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.104
+			days = 7
+		}
+	}
+	option = { # Dismiss it as simple heer infighting
+		name = BOR_Dismantlement_I.102.c
+		add_political_power = 10
+		country_event = {
+			id = BOR_Dismantlement_I.146
+			days = 7
+		}
+	}
+}
+
+country_event = { # Confronting Herrmann just leads to him lying his way out
+	id = BOR_Dismantlement_I.103
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.103" }
+	title = BOR_Dismantlement_I.103.t
+	desc = BOR_Dismantlement_I.103.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.103.a
+		BOR_SIG_AL_4_1_2 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.105
+			days = 30
+		}
+	}
+}
+
+country_event = { # Orpo shadowing reveals that Herrmann has had big contact with Fedor von Bock as well, a slaver and known militarist
+	id = BOR_Dismantlement_I.104
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.104" }
+	title = BOR_Dismantlement_I.104.t
+	desc = BOR_Dismantlement_I.104.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.104.a
+		country_event = {
+			id = BOR_Dismantlement_I.105
+			days = 21
+		}
+		set_country_flag = GER_BOR_DisI_AntiMil_ev1
+	}
+}
+
+country_event = { # Collector event 1 - Reichswerke is selling assets in Ukraine, highly anomalous due to infighting between them and IG Farben there
+	id = BOR_Dismantlement_I.105
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.105" }
+	title = BOR_Dismantlement_I.105.t
+	desc = BOR_Dismantlement_I.105.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Bormann orders Reichswerke to hold off, confronts Kehrl - Only available if evidence 1 has been found
+		name = BOR_Dismantlement_I.105.a
+		BOR_SIG_SP_7_3 = yes
+		BOR_SIG_SL_7_2_1 = yes
+		trigger = {
+			has_country_flag = GER_BOR_DisI_AntiMil_ev1
+		}
+		country_event = {
+			id = BOR_Dismantlement_I.106
+			days = 7
+		}
+	}
+	option = { # Bormann convenes the Wehrwirtschaftsführer
+		name = BOR_Dismantlement_I.105.b
+		trigger = {
+			NOT = { has_country_flag = GER_BOR_DisI_AntiMil_ev1 }
+		}
+		BOR_SIG_AP_7_2 = yes
+		BOR_SIG_AP_8_2 = yes
+		BOR_SIG_AP_9_2 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.110
+			days = 7
+		}
+	}
+	option = { # Bormann dismisses it
+		name = BOR_Dismantlement_I.105.c
+		country_event = {
+			id = BOR_Dismantlement_I.115
+			days = 24
+		}
+	}
+}
+
+country_event = { # REICHSWERKE BRANCH - Kehrl attempts to explain it away using technobabble
+	id = BOR_Dismantlement_I.106
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.106" }
+	title = BOR_Dismantlement_I.106.t
+	desc = BOR_Dismantlement_I.106.desc
+	picture = GFX_report_event_generic_corporate_board_meeting
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Bormie okays him away
+		name = BOR_Dismantlement_I.106.a
+		add_political_power = 20
+		country_event = {
+			id = BOR_Dismantlement_I.110
+			days = 10
+		}
+	}
+	option = { # Arrest Kehrl, Orpo investigation into Reichswerke
+		name = BOR_Dismantlement_I.106.b
+		BOR_SIG_SP_7_3 = yes
+		BOR_SIG_SL_7_2_1 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.107
+			days = 7
+		}
+	}
+}
+
+country_event = { # Several cheques have been made out in Kehrls name to Paul Pleiger from Reichswerke
+	id = BOR_Dismantlement_I.107
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.107" }
+	title = BOR_Dismantlement_I.107.t
+	desc = BOR_Dismantlement_I.107.desc
+	picture = GFX_report_event_IBR_guy_paper_meeting
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Confront Pleiger
+		name = BOR_Dismantlement_I.107.a
+		country_event = {
+			id = BOR_Dismantlement_I.109
+			days = 7
+		}	
+	}
+	option = { # Order the Orpo to follow the papertrail
+		name = BOR_Dismantlement_I.107.b
+		country_event = {
+			id = BOR_Dismantlement_I.108
+			days = 7
+		}
+	}
+}
+
+country_event = { # Papetrail leads directly to Schörner, it seems Herrmann has been passing OKW funds to Pleiger who money laundered them via Reichswerke to Schörner
+	id = BOR_Dismantlement_I.108
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.108" }
+	title = BOR_Dismantlement_I.108.t
+	desc = BOR_Dismantlement_I.108.desc
+	picture = GFX_report_event_GER_ferdinand_schorner
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.108.a
+		set_country_flag = GER_BOR_DisI_AntiMil_ev2
+		BOR_SIG_AP_0_3 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.115
+			days = 2
+		}	
+	}
+}
+
+country_event = { # Confronting Pleiger just leads to bullshit, he talks himself out
+	id = BOR_Dismantlement_I.109
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.109" }
+	title = BOR_Dismantlement_I.109.t
+	desc = BOR_Dismantlement_I.109.desc
+	picture = GFX_report_event_GER_germania_2
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.109.a
+		BOR_SIG_AP_7_5 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.115
+			days = 2
+		}
+	}
+}
+
+country_event = { # IF BORMIE DID NOT GET EV 1 - Convening the Wehrwirtschaftsführer, Geilenberg ain't present
+	id = BOR_Dismantlement_I.110
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.110" }
+	title = BOR_Dismantlement_I.110.t
+	desc = BOR_Dismantlement_I.110.desc
+	picture = GFX_report_event_generic_corporate_board_meeting
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.110.a
+		country_event = {
+			id = BOR_Dismantlement_I.111
+			days = 7
+		}
+	}
+}
+
+country_event = { # Abs claims he had nothing to do with the selling of these stocks, but that it rather was the overall Board of Directors of Deutsche Bank that voted on it.
+	id = BOR_Dismantlement_I.111
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.111" }
+	title = BOR_Dismantlement_I.111.t
+	desc = BOR_Dismantlement_I.111.desc
+	picture = GFX_report_event_GER_hermann_josef_abs
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Bormie confronts Abs
+		name = BOR_Dismantlement_I.111.a
+		country_event = {
+			id = BOR_Dismantlement_I.112
+			days = 7
+		}
+	}
+	option = { # Bormie asks him for more info
+		name = BOR_Dismantlement_I.111.b
+		BOR_SIG_AP_8_3 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.113
+			days = 7
+		}
+	}
+}
+
+country_event = { # Bormie can't scrounge any evidence up against Abs, it's a dead end
+	id = BOR_Dismantlement_I.112
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.112" }
+	title = BOR_Dismantlement_I.112.t
+	desc = BOR_Dismantlement_I.112.desc
+	picture = GFX_report_event_GER_hermann_josef_abs
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.112.a
+		BOR_SIG_SP_0_5 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.115
+			days = 2
+		}
+	}
+}
+
+country_event = { # Abs explains that Reichswerke has been selling assets off to no-name shell companies, which could be worth investigating
+	id = BOR_Dismantlement_I.113
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.113" }
+	title = BOR_Dismantlement_I.113.t
+	desc = BOR_Dismantlement_I.113.desc
+	picture = GFX_report_event_GER_hermann_josef_abs
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.113.a
+		country_event = {
+			id = BOR_Dismantlement_I.114
+			days = 7
+		}	
+	}
+}
+
+country_event = { # Following the paper trail it becomes clear that the money made off of these deals went directly to Schörner...
+	id = BOR_Dismantlement_I.114
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.114" }
+	title = BOR_Dismantlement_I.114.t
+	desc = BOR_Dismantlement_I.114.desc
+	picture = GFX_report_event_GER_radio_espionage
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.114.a
+		set_country_flag = GER_BOR_DisI_AntiMil_ev2
+		country_event = {
+			id = BOR_Dismantlement_I.115
+			days = 2
+		}
+	}
+}
+
+country_event = { # COLLECTOR 2 - Frankfurt Stock Market crash
+	id = BOR_Dismantlement_I.115
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.115" }
+	title = BOR_Dismantlement_I.115.t
+	desc = BOR_Dismantlement_I.115.desc
+	picture = GFX_report_event_generic_stock_market
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.115.a
+		set_temp_variable = { temp_econ_GDP_boost_percentage = -0.03 }
+		econ_GDP_boost_once_percentage = yes
+		set_temp_variable = { gdp_growth_temp = -0.8 }
+		econ_gdp_growth_change = yes
+		add_stability = -0.03
+		BOR_SIG_SL_1_4_1 = yes
+		BOR_SIG_SP_0_5 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.116
+			days = 2
+		}	
+	}
+}
+
+country_event = { # Schörner's department within OKW is completely unresponsibe - END OF DISCOVERY
+	id = BOR_Dismantlement_I.116
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.116" }
+	title = BOR_Dismantlement_I.116.t
+	desc = BOR_Dismantlement_I.116.desc
+	picture = GFX_speer_war_room
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.116.a
+		set_country_flag = BOR_DiscoveryOccured
+		BOR_SIG_SP_0_3 = yes
+		BOR_SIG_AL_4_4_2 = yes
+		BOR_SIG_AP_4_10 = yes
+		custom_effect_tooltip = BOR_Dismantlement_PreparationAvailable
+		hidden_effect = { country_event = { id = BOR_Dismantlement.7 days = 90 } } # Dismantlement I Initiator
+	}
+}
+
+country_event = { # START OF PREPARATION - Bormie's basically running to Speidel
+	id = BOR_Dismantlement_I.117
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.117" }
+	title = BOR_Dismantlement_I.117.t
+	desc = BOR_Dismantlement_I.117.desc
+	picture = GFX_report_event_GER_speidel_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #
+		name = BOR_Dismantlement_I.117.a
+		BOR_SIG_AL_4_1_0 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.118
+			days = 2
+		}	
+	}
+}
+
+country_event = { # Speidel convenes OKW one last time in hopes of scrounging up Schörner, he doesn't turn up
+	id = BOR_Dismantlement_I.118
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.118" }
+	title = BOR_Dismantlement_I.118.t
+	desc = BOR_Dismantlement_I.118.desc
+	picture = GFX_speer_war_room
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # If Bormie did not fully uncover the plot - OKW orders a full military inspection
+		name = BOR_Dismantlement_I.118.a
+		trigger = {
+			NOT = {
+				has_country_flag = GER_BOR_DisI_AntiMil_ev1
+				has_country_flag = GER_BOR_DisI_AntiMil_ev2
+			}
+		}
+		country_event = {
+			id = BOR_Dismantlement_I.119
+			days = 7
+		}
+	}
+	option = { # If Bormie fully uncovered the plot - FHO is sent out
+		name = BOR_Dismantlement_I.118.b
+		trigger = {
+			OR = {
+				has_country_flag = GER_BOR_DisI_AntiMil_ev1
+				has_country_flag = GER_BOR_DisI_AntiMil_ev2
+			}
+		}
+		country_event = {
+			id = BOR_Dismantlement_I.125
+			days = 7
+		}
+	}
+}
+
+country_event = { # Full military inspection
+	id = BOR_Dismantlement_I.119
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.119" }
+	title = BOR_Dismantlement_I.119.t
+	desc = BOR_Dismantlement_I.119.desc
+	picture = GFX_report_event_GER_training
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.119.a
+		country_event = {
+			id = BOR_Dismantlement_I.120
+			days = 7
+		}	
+	}
+}
+
+country_event = { # Schörner's still MIA, several units do not report
+	id = BOR_Dismantlement_I.120
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.120" }
+	title = BOR_Dismantlement_I.120.t
+	desc = BOR_Dismantlement_I.120.desc
+	picture = GFX_report_event_GER_germania_snow
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.120.a
+		BOR_SIG_AL_4_5_2 = yes
+		BOR_SIG_AP_4_10 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.121
+			days = 2
+		}	
+	}
+}
+
+country_event = { # Full lockdown of the Reich ordered
+	id = BOR_Dismantlement_I.121
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.121" }
+	title = BOR_Dismantlement_I.121.t
+	desc = BOR_Dismantlement_I.121.desc
+	picture = GFX_report_event_GER_germania_2
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.121.a
+		country_event = {
+			id = BOR_Dismantlement_I.122
+			days = 5
+		}	
+	}
+}
+
+country_event = { # Attempt on Bormie's life
+	id = BOR_Dismantlement_I.122
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.122" }
+	title = BOR_Dismantlement_I.122.t
+	desc = BOR_Dismantlement_I.122.desc
+	picture = GFX_report_event_AZH_bose_assassinates_assassin
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.122.a
+		BOR_SIG_SP_0_10 = yes
+		BOR_SIG_AP_4_3 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.123
+			days = 2
+		}	
+	}
+}
+
+country_event = { # Bormann survived, Wehrmacht units in Ostland seemingly mutiny over reports of his alleged death or lethal injury
+	id = BOR_Dismantlement_I.123
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.123" }
+	title = BOR_Dismantlement_I.123.t
+	desc = BOR_Dismantlement_I.123.desc
+	picture = GFX_report_event_GER_communists_riot
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.123.a
+		BOR_SIG_SP_0_10 = yes
+		BOR_SIG_SL_4_3_1 = yes
+		BOR_SIG_SL_4_3_0 = yes
+		BOR_SIG_AL_4_3_2 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.124
+			days = 2
+		}	
+	}
+}
+
+country_event = { # Bombing on Arnsbach Garrison - Roenne dies
+	id = BOR_Dismantlement_I.124
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.124" }
+	title = BOR_Dismantlement_I.124.t
+	desc = BOR_Dismantlement_I.124.desc
+	picture = GFX_report_event_generic_riot
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.124.a
+		remove_unit_leader_role = GER_alexis_von_roenne
+		BOR_SIG_SL_4_5_0 = yes
+		BOR_SIG_SP_0_3 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.128
+			days = 2
+		}	
+	}
+}
+
+country_event = { # FHO is set out on figuring out where Schörner is
+	id = BOR_Dismantlement_I.125
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.125" }
+	title = BOR_Dismantlement_I.125.t
+	desc = BOR_Dismantlement_I.125.desc
+	picture = GFX_report_event_GER_army_3
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.125.a
+		country_event = {
+			id = BOR_Dismantlement_I.126
+			days = 7
+		}	
+	}
+}
+
+country_event = { # No info on him yet, Reich borders are declared closed out of "security reasons"
+	id = BOR_Dismantlement_I.126
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.126" }
+	title = BOR_Dismantlement_I.126.t
+	desc = BOR_Dismantlement_I.126.desc
+	picture = GFX_report_event_GER_arrests
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.126.a
+		BOR_SIG_AP_0_3 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.127
+			days = 7
+		}	
+	}
+}
+
+country_event = { # Bomb attack on Arnsbach garrison, Roenne survives due to FHO forewarning
+	id = BOR_Dismantlement_I.127
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.127" }
+	title = BOR_Dismantlement_I.127.t
+	desc = BOR_Dismantlement_I.127.desc
+	picture = GFX_report_event_KOM_bombing
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.127.a
+		BOR_SIG_SL_4_1_2 = yes
+		country_event = {
+			id = BOR_Dismantlement_I.128
+			days = 2
+		}	
+		set_country_flag = GER_BOR_DisI_AntiMil_RoenneSurvived
+	}
+}
+
+country_event = { # COLLECTOR 3 - Complete lockdown of Germania, Bormann and Speidel lock themselves down to prepare
+	id = BOR_Dismantlement_I.128
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.128" }
+	title = BOR_Dismantlement_I.128.t
+	desc = BOR_Dismantlement_I.128.desc
+	picture = GFX_report_event_GER_germania_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.128.a
+		
+		country_event = {
+			id = BOR_Dismantlement_I.129
+			days = 5
+		}	
+	}
+}
+
+country_event = { # Schörner sighted by FHO in Riga - END OF PREPARATION
+	id = BOR_Dismantlement_I.129
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.129" }
+	title = BOR_Dismantlement_I.129.t
+	desc = BOR_Dismantlement_I.129.desc
+	picture = GFX_report_event_GER_schorner
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.129.a
+		custom_effect_tooltip = BOR_Dismantlement_ExecutionAvailable
+		if = { # AI continuation event
+			limit = { is_ai = yes }
+			if = {
+				limit = { has_country_flag = GER_BOR_DisI_AntiMil_RoenneSurvived }
+				country_event = BOR_Dismantlement_I.130
+			}
+			else = { country_event = BOR_Dismantlement_I.135 }
+		}
+		else = { set_country_flag = BOR_PreparationOccured }
+	}
+}
+
+country_event = { # IF ROENNE SURVIVED - Speidel advises against going balls deep in, instead he wants to assassinate Schörner
+	id = BOR_Dismantlement_I.130
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.130" }
+	title = BOR_Dismantlement_I.130.t
+	desc = BOR_Dismantlement_I.130.desc
+	picture = GFX_speer_war_room
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.130.a
+		clr_country_flag = BOR_PreparationInProgress
+		country_event = {
+			id = BOR_Dismantlement_I.131
+			days = 5
+		}	
+	}
+}
+
+country_event = { # Wehrmacht units are stationed at the border to Ostland just to be sure
+	id = BOR_Dismantlement_I.131
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.131" }
+	title = BOR_Dismantlement_I.131.t
+	desc = BOR_Dismantlement_I.131.desc
+	picture = GFX_report_event_GER_army_2
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.131.a
+		country_event = {
+			id = BOR_Dismantlement_I.132
+			days = 5
+		}	
+	}
+}
+
+country_event = { # FHO locates Schörner's position in a hospital in Riga
+	id = BOR_Dismantlement_I.132
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.132" }
+	title = BOR_Dismantlement_I.132.t
+	desc = BOR_Dismantlement_I.132.desc
+	picture = GFX_report_event_PHI_hospital
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.132.a
+		country_event = {
+			id = BOR_Dismantlement_I.133
+			days = 5
+		}	
+	}
+}
+
+country_event = { # FHO agents murder Schörner via radioactive isotopes
+	id = BOR_Dismantlement_I.133
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.133" }
+	title = BOR_Dismantlement_I.133.t
+	desc = BOR_Dismantlement_I.133.desc
+	picture = GFX_report_event_IBR_porcelain_cup
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.133.a
+		add_popularity = { ideology = ultranationalism popularity = -0.06 }
+		remove_unit_leader_role = GER_ferdinand_schorner
+		TNO_worsen_army_professionalism_low = yes
+		hidden_effect = { kill_ideology_leader = ultranationalism }
+		country_event = {
+			id = BOR_Dismantlement_I.134
+			days = 5
+		}	
+	}
+}
+
+country_event = { # Troops at the border to Ostland swoop in, pacify any of the few Schörnerite units that still dare to resist - EXECUTION ENDED
+	id = BOR_Dismantlement_I.134
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.134" }
+	title = BOR_Dismantlement_I.134.t
+	desc = BOR_Dismantlement_I.134.desc
+	picture = GFX_report_event_GER_arrests
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.134.a
+		remove_unit_leader_role = GER_otto_ernst_remer
+		custom_effect_tooltip = BOR_Dismantlement_Militarists
+		BOR_Kartenhaus_Dismantle_Militarists = yes
+		TNO_worsen_admin_efficiency_med = yes
+		clr_country_flag = BOR_Dismantlement_I_active
+		clr_country_flag = BOR_Dismantlement_I_AntiMil
+		set_variable = { BOR_MilitaristSupport = 0 }
+		hidden_effect = { country_event = { id = bormannflavor.40 days = 300 } } # Heil Zeit Phase Mil Dismantlement
+	}
+}
+
+country_event = { # If Roenne died - Speidel advises quick and decisive action 
+	id = BOR_Dismantlement_I.135
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.135" }
+	title = BOR_Dismantlement_I.135.t
+	desc = BOR_Dismantlement_I.135.desc
+	picture = GFX_speer_war_room
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.135.a
+		clr_country_flag = BOR_PreparationInProgress
+		country_event = {
+			id = BOR_Dismantlement_I.136
+			days = 5
+		}	
+	}
+}
+
+country_event = { # Wehrmacht swoops into Ostland, limited infighting
+	id = BOR_Dismantlement_I.136
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.136" }
+	title = BOR_Dismantlement_I.136.t
+	desc = BOR_Dismantlement_I.136.desc
+	picture = GFX_report_event_generic_battle
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.136.a
+		country_event = {
+			id = BOR_Dismantlement_I.137
+			days = 5
+		}	
+	}
+}
+
+country_event = { # Kriegsmarine blockades Riga
+	id = BOR_Dismantlement_I.137
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.137" }
+	title = BOR_Dismantlement_I.137.t
+	desc = BOR_Dismantlement_I.137.desc
+	picture = GFX_report_event_generic_destroyer_navy_1960
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.137.a
+		country_event = {
+			id = BOR_Dismantlement_I.138
+			days = 5
+		}	
+	}
+}
+
+country_event = { # Schörner is caught trying to escape in his hospital gown, executed on the spot
+	id = BOR_Dismantlement_I.138
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.138" }
+	title = BOR_Dismantlement_I.138.t
+	desc = BOR_Dismantlement_I.138.desc
+	picture = GFX_report_event_GER_ferdinand_schorner
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.138.a
+		add_popularity = { ideology = ultranationalism popularity = -0.06 }
+		remove_unit_leader_role = GER_ferdinand_schorner
+		TNO_worsen_army_professionalism_low = yes
+		hidden_effect = { kill_ideology_leader = ultranationalism }
+		country_event = {
+			id = BOR_Dismantlement_I.139
+			days = 5
+		}	
+	}
+}
+
+country_event = { # Remainder of rebellious units are being put down - END OF EXECUTION
+	id = BOR_Dismantlement_I.139
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.139" }
+	title = BOR_Dismantlement_I.139.t
+	desc = BOR_Dismantlement_I.139.desc
+	picture = GFX_report_event_GER_court
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.139.a
+		remove_unit_leader_role = GER_otto_ernst_remer
+		custom_effect_tooltip = BOR_Dismantlement_Militarists
+		BOR_Kartenhaus_Dismantle_Militarists = yes
+		TNO_worsen_admin_efficiency_med = yes
+		clr_country_flag = BOR_Dismantlement_I_active
+		clr_country_flag = BOR_Dismantlement_I_AntiMil
+		set_variable = { BOR_MilitaristSupport = 0 }
+		hidden_effect = { country_event = { id = bormannflavor.40 days = 300 } } # Heil Zeit Phase Mil Dismantlement
+	}
+}
+
+country_event = { # COLLAPSE - Bomb attack on OKW, Speidel and his closest supporters die
+	id = BOR_Dismantlement_I.140
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.140" }
+	title = BOR_Dismantlement_I.140.t
+	desc = BOR_Dismantlement_I.140.desc
+	picture = GFX_report_event_RUS_soldiers_bombed_city
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.140.a
+		add_popularity = { ideology = fascism popularity = -0.06 }
+		remove_unit_leader_role = GER_hans_speidel
+		remove_ideas = GER_BOR_speidels_okw
+		hidden_effect = { kill_ideology_leader = fascism }
+		country_event = {
+			id = BOR_Dismantlement_I.141
+			days = 2
+		}	
+	}
+}
+
+country_event = { # Bormie fucking runs, tells noone where he's hiding
+	id = BOR_Dismantlement_I.141
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.141" }
+	title = BOR_Dismantlement_I.141.t
+	desc = BOR_Dismantlement_I.141.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.141.a
+		add_stability = -0.05
+		TNO_worsen_admin_efficiency_med = yes
+		country_event = {
+			id = BOR_Dismantlement_I.142
+			days = 2
+		}	
+	}
+}
+
+country_event = { # Schörner goes public in Riga, declares himself provisional leader of OKW
+	id = BOR_Dismantlement_I.142
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.142" }
+	title = BOR_Dismantlement_I.142.t
+	desc = BOR_Dismantlement_I.142.desc
+	picture = GFX_report_event_GER_agreement
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.142.a
+		country_event = {
+			id = BOR_Dismantlement_I.143
+			days = 2
+		}	
+	}
+}
+
+country_event = { # With Bormann god knows where and no other option left, Schirach aligns with Schörner
+	id = BOR_Dismantlement_I.143
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.143" }
+	title = BOR_Dismantlement_I.143.t
+	desc = BOR_Dismantlement_I.143.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.143.a
+		country_event = {
+			id = BOR_Dismantlement_I.144
+			days = 2
+		}	
+	}
+}
+
+country_event = { # Schörner and Schirach form a provisional government for Germany - COLLAPSE ENDED
+	id = BOR_Dismantlement_I.144
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.144" }
+	title = BOR_Dismantlement_I.144.t
+	desc = BOR_Dismantlement_I.144.desc
+	picture = GFX_report_event_GER_schorner
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.144.a
+		retire_country_leader = yes
+		set_politics = { ruling_party = ultranationalism }
+		add_popularity = { ideology = ultranationalism popularity = 0.5 }
+		remove_all_ministers = yes
+		add_ideas = {
+			GER_Baldur_von_Schirach_hog
+			GER_Theodor_Tolsdorff_sec
+			GER_Otto_Ernst_Remer_for
+			GER_Kurt_Schmucker_eco
+		}
+		BOR_Influence_Disable = yes
+		load_focus_tree = { tree = ZZZ_blank_focus keep_completed = no }
+		clr_country_flag = BOR_Dismantlement_I_active
+		clr_country_flag = BOR_Dismantlement_I_AntiMil
+		set_country_flag = BOR_SchornerCoup
+		TNO_Country_Closing_Screen_Show = yes
+	}
+}
+
+country_event = { # Trying to track down Schörner reveals conflicting reports regarding his location
+	id = BOR_Dismantlement_I.145
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.145" }
+	title = BOR_Dismantlement_I.145.t
+	desc = BOR_Dismantlement_I.145.desc
+	picture = GFX_report_event_GER_ferdinand_schorner
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.145.a
+		country_event = {
+			id = BOR_Dismantlement_I.105
+			days = 7
+		}
+	}
+}
+
+country_event = { # Bormann dismisses it as simple Heer infighting
+	id = BOR_Dismantlement_I.146
+	immediate = { log = "[GetDateText]: [Root.GetName]: event BOR_Dismantlement_I.146" }
+	title = BOR_Dismantlement_I.146.t
+	desc = BOR_Dismantlement_I.146.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = BOR_Dismantlement_I.146.a
+		country_event = {
+			id = BOR_Dismantlement_I.105
+			days = 30
+		}
+	}
+}
+
+###################################
+# Bormann Dismantlement II Events #
+###################################
+# "Oh, shit." - Führer Martin Bormann
+
+#############
+# Discovery #
+#############
+add_namespace = bor_disII_discovery
+
+country_event = { # Gehlen finds out that there's an internal conspiracy brewing and informs Bormann
+	id = bor_disII_discovery.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.1" }
+	title = bor_disII_discovery.1.t
+	desc = bor_disII_discovery.1.desc
+	picture = GFX_report_event_GER_gehlen
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = { set_country_flag = BOR_Dismantlement_II_active }
+	
+	option = { # Nah he's making this up
+		name = bor_disII_discovery.1.a
+		ai_chance = { factor = 40 }
+		hidden_effect = { country_event = { id = bor_disII_discovery.2 hours = 8 } }
+	}
+	option = { # Alright, go ahead
+		name = bor_disII_discovery.1.b
+		ai_chance = { factor = 60 }
+		add_political_power = -20
+		hidden_effect = { country_event = { id = bor_disII_discovery.3 hours = 8 } }
+	}
+}
+
+country_event = { # Bormann brushes him off
+	id = bor_disII_discovery.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.2" }
+	title = bor_disII_discovery.2.t
+	desc = bor_disII_discovery.2.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Bormann's fine with everything
+		name = bor_disII_discovery.2.a
+		hidden_effect = { country_event = { id = bor_disII_discovery.7 days = 44 } }
+		set_country_flag = BOR_disII_bormann_brushed_gehlen
+	}
+}
+
+country_event = { # Bormann approves, Gehlen begins to dig in
+	id = bor_disII_discovery.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.3" }
+	title = bor_disII_discovery.3.t
+	desc = bor_disII_discovery.3.desc
+	picture = GFX_report_event_GER_gehlen
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_discovery.3.a
+		hidden_effect = { country_event = { id = bor_disII_discovery.4 days = 14 } }
+	}
+}
+
+country_event = { # Recorded info from the Reichstag shows discontent amongst the allied faction
+	id = bor_disII_discovery.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.4" }
+	title = bor_disII_discovery.4.t
+	desc = { text = bor_disII_discovery.4.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_discovery.4.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_reichstag
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = { set_country_flag = BOR_disII_discovery_allied_discontent }
+	
+	option = { # They're always unhappy, ignore it
+		name = bor_disII_discovery.4.a
+		hidden_effect = { country_event = { id = bor_disII_discovery.7 days = 30 } }
+	}
+	option = { # Investigate further
+		name = bor_disII_discovery.4.b
+		add_political_power = -20
+		hidden_effect = { country_event = { id = bor_disII_discovery.5 days = 10 } }
+	}
+}
+
+country_event = { # Several leading figures unhappy with Bormann's breakdown of dealings
+	id = bor_disII_discovery.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.5" }
+	title = bor_disII_discovery.5.t
+	desc = { text = bor_disII_discovery.5.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_discovery.5.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_agreement
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Cool, don't care
+		name = bor_disII_discovery.5.a
+		hidden_effect = { country_event = { id = bor_disII_discovery.7 days = 20 } }
+	}
+	option = { # Shadow them, gather more info
+		name = bor_disII_discovery.5.b
+		add_political_power = -20
+		hidden_effect = { country_event = { id = bor_disII_discovery.6 days = 10 } }
+	}
+}
+
+country_event = { # Shadowing reveals encounters with several high-level conservatives in the party
+	id = bor_disII_discovery.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.6" }
+	title = bor_disII_discovery.6.t
+	desc = { text = bor_disII_discovery.6.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_discovery.6.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_abwehr_intelligence
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_discovery.6.a
+		hidden_effect = { country_event = { id = bor_disII_discovery.7 days = 10 } }
+		set_country_flag = BOR_disII_discovery_internal_conspiracy
+	}
+}
+
+country_event = { # Some event about the Opposition doing a move and alerting Bormann
+	id = bor_disII_discovery.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.7" }
+	title = bor_disII_discovery.7.t
+	desc = bor_disII_discovery.7.desc
+	picture = GFX_report_event_GER_court
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # If Bormann brushed off Gehlen
+		name = bor_disII_discovery.7.a
+		trigger = { has_country_flag = BOR_disII_bormann_brushed_gehlen }
+		add_political_power = -50
+		hidden_effect = { country_event = { id = bor_disII_discovery.8 days = 4 } }
+	}
+	option = { # If Bormann gave Gehlen the go-ahead
+		name = bor_disII_discovery.7.b
+		trigger = { NOT = { has_country_flag = BOR_disII_bormann_brushed_gehlen } }
+		add_political_power = -50
+		hidden_effect = { country_event = { id = bor_disII_discovery.9 days = 2 } }
+	}
+}
+
+country_event = { # Bormann calls Gehlen and tells him to find out what's going on
+	id = bor_disII_discovery.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.8" }
+	title = bor_disII_discovery.8.t
+	desc = { text = bor_disII_discovery.8.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_discovery.8.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_gehlen
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_discovery.8.a
+		hidden_effect = { country_event = { id = bor_disII_discovery.11 days = 14 } }
+	}
+}
+
+country_event = { # Bormann is now certain that there are traitors after him again
+	id = bor_disII_discovery.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.9" }
+	title = bor_disII_discovery.9.t
+	desc = bor_disII_discovery.9.desc
+	picture = GFX_report_event_GER_gehlen
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Begin mobilizing the Orpo
+		name = bor_disII_discovery.9.a
+		ai_chance = { factor = 60 }
+		hidden_effect = { country_event = { id = bor_disII_discovery.10 days = 14 } }
+	}
+	option = { # Let Gehlen look into it discreetly
+		name = bor_disII_discovery.9.b
+		ai_chance = { factor = 40 }
+		hidden_effect = { country_event = { id = bor_disII_discovery.11 days = 14 } }
+	}
+}
+
+country_event = { # Bormann begins mobilizing the Orpo, alerting the Opposition
+	id = bor_disII_discovery.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.10" }
+	title = bor_disII_discovery.10.t
+	desc = bor_disII_discovery.10.desc
+	picture = GFX_report_event_GER_army_2 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_discovery.10.a
+		BOR_SIG_AP_6_3 = yes
+		set_country_flag = BOR_OppositionAlerted
+		hidden_effect = { country_event = { id = bor_disII_discovery.11 days = 8 } }
+	}
+}
+
+country_event = { # Gehlen finds out Müller's letter and reports it to Bormann
+	id = bor_disII_discovery.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.11" }
+	title = bor_disII_discovery.11.t
+	desc = { text = bor_disII_discovery.11.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_discovery.11.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_post_apoc_letter_quill
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_discovery.11.a
+		hidden_effect = { country_event = { id = bor_disII_discovery.12 days = 2 } }
+	}
+}
+
+country_event = { # Bormann grows paranoid over his SecMin being disloyal, wants him replaced
+	id = bor_disII_discovery.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.12" }
+	title = bor_disII_discovery.12.t
+	desc = { text = bor_disII_discovery.12.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_discovery.12.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_discovery.12.a
+		hidden_effect = { country_event = { id = bor_disII_discovery.13 days = 2 } }
+	}
+}
+
+country_event = { # Gehlen dig ups some dirt (or fabricates some) on Müller
+	id = bor_disII_discovery.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.13" }
+	title = bor_disII_discovery.13.t
+	desc = bor_disII_discovery.13.desc
+	picture = GFX_report_event_generic_office
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_discovery.13.a
+		hidden_effect = { country_event = { id = bor_disII_discovery.14 days = 2 } }
+	}
+}
+
+country_event = { # Orpo Coup - Müller is officially discharged from the Orpo's leadership, Gehlen becomes lead
+	id = bor_disII_discovery.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_discovery.14" }
+	title = bor_disII_discovery.14.t
+	desc = bor_disII_discovery.14.desc
+	picture = GFX_report_event_GER_arrests
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_discovery.14.a
+		set_country_flag = BOR_DiscoveryOccured
+		BOR_SIG_AL_6_4_1 = yes
+		add_political_power = 50
+		add_ideas = GER_BOR_internal_opposition
+		custom_effect_tooltip = GER_Reinhard_Gehlen_sec_addition_tt
+		custom_effect_tooltip = BOR_Dismantlement_PreparationAvailable
+		set_variable = { TNO_Espionage_AgencyLeader = token:Espionage_Gehlen_BOR }
+		hidden_effect = {
+			remove_ideas_with_trait = security_minister
+			add_ideas = GER_Reinhard_Gehlen_sec
+			country_event = { id = BOR_Dismantlement.8 days = 90 } # Dismantlement II Initiator
+		}
+		if = {
+			limit = { is_ai = yes }
+			country_event = { id = bor_disII_preparation.1 days = 2 }
+		}
+	}
+}
+
+###############
+# Preparation #
+###############
+add_namespace = bor_disII_preparation
+
+country_event = { # The Orpo is restructured under Gehlen's command
+	id = bor_disII_preparation.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.1" }
+	title = bor_disII_preparation.1.t
+	desc = bor_disII_preparation.1.desc
+	picture = GFX_report_event_GER_gehlen
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.1.a
+		hidden_effect = {
+			country_event = { id = bor_disII_preparation.2 days = 10 }
+			country_event = { id = bor_disII_pursuit.1 days = 42 }
+		}
+	}
+}
+
+country_event = { # Gehlen produces his preliminary report, detailing a few possible leads
+	id = bor_disII_preparation.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.2" }
+	title = bor_disII_preparation.2.t
+	desc = {
+		text = bor_disII_preparation.2.desc_muller_only
+		trigger = { has_country_flag = BOR_disII_bormann_brushed_gehlen }
+	}
+	desc = {
+		text = bor_disII_preparation.2.desc_allies_reformist
+		trigger = {
+			has_country_flag = BOR_militarists_dismantled
+			NOT = { has_country_flag = BOR_disII_bormann_brushed_gehlen }
+			NOT = { has_country_flag = BOR_disII_discovery_internal_conspiracy }
+		}
+	}
+	desc = {
+		text = bor_disII_preparation.2.desc_allies_militarist
+		trigger = {
+			has_country_flag = BOR_reformists_dismantled
+			NOT = { has_country_flag = BOR_disII_bormann_brushed_gehlen }
+			NOT = { has_country_flag = BOR_disII_discovery_internal_conspiracy }
+		}
+	}
+	desc = {
+		text = bor_disII_preparation.2.desc_full_reformist
+		trigger = {
+			has_country_flag = BOR_militarists_dismantled
+			has_country_flag = BOR_disII_discovery_internal_conspiracy
+		}
+	}
+	desc = {
+		text = bor_disII_preparation.2.desc_full_militarist
+		trigger = {
+			has_country_flag = BOR_reformists_dismantled
+			has_country_flag = BOR_disII_discovery_internal_conspiracy
+		}
+	}
+	picture = GFX_report_event_GER_nazi_newspaper
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # The Müller Connection
+		name = bor_disII_preparation.2.a
+		ai_chance = { factor = 10 }
+		hidden_effect = { country_event = { id = bor_disII_preparation.3 days = 4 } }
+	}
+	option = { # Allied Discontent
+		name = bor_disII_preparation.2.b
+		trigger = { NOT = { has_country_flag = BOR_disII_bormann_brushed_gehlen } }
+		ai_chance = { factor = 15 }
+		hidden_effect = { country_event = { id = bor_disII_preparation.17 days = 4 } }
+	}
+	option = { # A Conspiracy Amongst Our Own
+		name = bor_disII_preparation.2.c
+		trigger = { has_country_flag = BOR_disII_discovery_internal_conspiracy }
+		ai_chance = { factor = 20 }
+		hidden_effect = { country_event = { id = bor_disII_preparation.30 days = 4 } }
+	}
+}
+
+country_event = { # The Müller Connection - Müller's letter provides our best lead to the Opposition's membership, while Müller himself has been having some suspicious encounters...
+	id = bor_disII_preparation.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.3" }
+	title = bor_disII_preparation.3.t
+	desc = { text = bor_disII_preparation.3.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.3.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_generic_command_table
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Focus on the letter
+		name = bor_disII_preparation.3.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.4 days = 8 } }
+	}
+	option = { # Focus on Müller
+		name = bor_disII_preparation.3.b
+		hidden_effect = { country_event = { id = bor_disII_preparation.7 days = 14 } }
+	}
+}
+
+country_event = { # While the specific contents of the letter doesn't really help us, the return address might
+	id = bor_disII_preparation.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.4" }
+	title = bor_disII_preparation.4.t
+	desc = bor_disII_preparation.4.desc
+	picture = GFX_report_event_RUS_letter
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.4.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.5 days = 10 } }
+	}
+}
+
+country_event = { # A search is conducted in the building, it appears to have been recently evacuated
+	id = bor_disII_preparation.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.5" }
+	title = bor_disII_preparation.5.t
+	desc = bor_disII_preparation.5.desc
+	picture = GFX_report_event_GER_geneva
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.5.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.6 days = 4 } }
+	}
+}
+
+country_event = { # Nothing concrete is found, a total waste of time
+	id = bor_disII_preparation.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.6" }
+	title = bor_disII_preparation.6.t
+	desc = bor_disII_preparation.6.desc
+	picture = GFX_report_event_GER_police
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Back to Müller
+		name = bor_disII_preparation.6.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.7 days = 14 } }
+	}
+}
+
+country_event = { # Shadowing reveals that Müller has been in contact with several suspicous individuals since his sacking
+	id = bor_disII_preparation.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.7" }
+	title = bor_disII_preparation.7.t
+	desc = bor_disII_preparation.7.desc
+	picture = GFX_report_event_IBR_guy_paper_meeting
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.7.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.8 days = 20 } }
+	}
+}
+
+country_event = { # Captured correspondence reveals they have planned a meeting in a few days, how to proceed?
+	id = bor_disII_preparation.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.8" }
+	title = bor_disII_preparation.8.t
+	desc = bor_disII_preparation.8.desc
+	picture = GFX_report_event_GER_abwehr_intelligence
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Just observe for now
+		name = bor_disII_preparation.8.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.9 days = 6 } }
+	}
+	option = { # Burst in and arrest them
+		name = bor_disII_preparation.8.b
+		hidden_effect = { country_event = { id = bor_disII_preparation.12 days = 10 } }
+	}
+}
+
+country_event = { # The location is preemptively searched, nothing is found but a few bugs are planted
+	id = bor_disII_preparation.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.9" }
+	title = bor_disII_preparation.9.t
+	desc = bor_disII_preparation.9.desc
+	picture = GFX_report_event_generic_office
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.9.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.10 days = 4 } }
+	}
+}
+
+country_event = { # The observation is fruitful and the Orpo manages to acquire some names as well as a lead to an office
+	id = bor_disII_preparation.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.10" }
+	title = bor_disII_preparation.10.t
+	desc = bor_disII_preparation.10.desc
+	picture = GFX_report_event_IBR_meeting_table
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # 
+		name = bor_disII_preparation.10.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.11 days = 14 } }
+	}
+}
+
+country_event = { # Orpo agents break in, they find a safe with some documents, apparently belonging to Baldur von Schirach
+	id = bor_disII_preparation.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.11" }
+	title = bor_disII_preparation.11.t
+	desc = bor_disII_preparation.11.desc
+	picture = GFX_report_event_generic_paper_bundle
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.11.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.36 days = 14 } }
+	}
+}
+
+country_event = { # The operation goes awry, the Orpo is spotted before bursting in and most of the participants manage to flee (including Müller himself)
+	id = bor_disII_preparation.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.12" }
+	title = bor_disII_preparation.12.t
+	desc = bor_disII_preparation.12.desc
+	picture = GFX_report_event_generic_escape
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.12.a
+		hidden_effect = {
+			country_event = { id = bor_disII_preparation.14 days = 12 }
+			country_event = { id = bor_disII_preparation.13 days = 6 }
+		}
+	}
+}
+
+country_event = { # Protests over the arrest
+	id = bor_disII_preparation.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.13" }
+	title = bor_disII_preparation.13.t
+	desc = bor_disII_preparation.13.desc
+	picture = GFX_report_event_GER_agreement
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.13.a
+		add_political_power = -30
+		BOR_SIG_SL_0_2_1 = yes
+	}
+}
+
+country_event = { # The captured participants are taken to be interrogated
+	id = bor_disII_preparation.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.14" }
+	title = bor_disII_preparation.14.t
+	desc = bor_disII_preparation.14.desc
+	picture = GFX_report_event_GER_arrests
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.14.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.15 days = 18 } }
+	}
+}
+
+country_event = { # It takes a while, but eventually the captives break and spill the info
+	id = bor_disII_preparation.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.15" }
+	title = bor_disII_preparation.15.t
+	desc = bor_disII_preparation.15.desc
+	picture = GFX_report_event_GER_arrests
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.15.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.16 days = 6 } }
+	}
+}
+
+country_event = { # Not much useful info is managed to be extracted, although we do get a few names and a possible lead on a location
+	id = bor_disII_preparation.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.16" }
+	title = bor_disII_preparation.16.t
+	desc = bor_disII_preparation.16.desc
+	picture = GFX_report_event_GER_abwehr_intelligence
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.16.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.11 days = 10 } }
+	}
+}
+
+country_event = { # Allied Discontent - Bormann has evidence to suggest that the allied faction is becoming increasingly unhappy with his government
+	id = bor_disII_preparation.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.17" }
+	title = bor_disII_preparation.17.t
+	desc = { text = bor_disII_preparation.17.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.17.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_generic_command_table
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.17.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.18 days = 14 } }
+	}
+}
+
+country_event = { # Investigation suggests that the faction corp is on to something
+	id = bor_disII_preparation.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.18" }
+	title = bor_disII_preparation.18.t
+	desc = { text = bor_disII_preparation.18.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.18.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_generic_technology_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.18.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.19 days = 14 } }
+	}
+}
+
+country_event = { # Digging into the corps reveals unusual economic reports from IG Farben and Siemens/Reichswerke
+	id = bor_disII_preparation.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.19" }
+	title = bor_disII_preparation.19.t
+	desc = { text = bor_disII_preparation.19.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.19.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_abwehr_intelligence
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.19.a
+		hidden_effect = {
+			country_event = { id = bor_disII_preparation.21 days = 2 }
+			country_event = { id = bor_disII_preparation.20 days = 10 }
+		}
+	}
+}
+
+country_event = { # Meeting with the Wehrwirtschaftsführer, Bormie asks what's going on
+	id = bor_disII_preparation.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.20" }
+	title = bor_disII_preparation.20.t
+	desc = { text = bor_disII_preparation.20.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.20.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_IBR_meeting_table
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.20.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.22 days = 6 } }
+	}
+}
+
+country_event = { # Confronting Abs over IG Farben
+	id = bor_disII_preparation.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.21" }
+	title = bor_disII_preparation.21.t
+	desc = bor_disII_preparation.21.desc
+	picture = GFX_report_event_GER_hermann_josef_abs
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.21.a
+	}
+}
+
+country_event = { # The respective WeWiFü handwaves it as being emergency measures for the Oil Crisis
+	id = bor_disII_preparation.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.22" }
+	title = bor_disII_preparation.22.t
+	desc = { text = bor_disII_preparation.22.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.22.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_IBR_meeting_table
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # If you say so
+		name = bor_disII_preparation.22.a
+		ai_chance = { factor = 35 }
+		if = {
+			limit = { has_country_flag = BOR_reformists_dismantled }
+			BOR_SIG_AL_7_1_1 = yes
+		}
+		else_if = {
+			limit = { has_country_flag = BOR_militarists_dismantled }
+			BOR_SIG_AL_9_1_1 = yes
+		}
+		hidden_effect = { country_event = { id = bor_disII_preparation.23 days = 2 } }
+	}
+	option = { # This smells fishy
+		name = bor_disII_preparation.22.b
+		ai_chance = { factor = 65 }
+		add_political_power = -20
+		hidden_effect = { country_event = { id = bor_disII_preparation.28 days = 2 } }
+	}
+}
+
+country_event = { # Bormann is convinced
+	id = bor_disII_preparation.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.23" }
+	title = bor_disII_preparation.23.t
+	desc = { text = bor_disII_preparation.23.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.23.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_IBR_meeting_table
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.23.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.24 days = 10 } }
+	}
+}
+
+country_event = { # The Orpo continues to follow the papertrail
+	id = bor_disII_preparation.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.24" }
+	title = bor_disII_preparation.24.t
+	desc = { text = bor_disII_preparation.24.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.24.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_abwehr_intelligence
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.24.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.25 days = 14 } }
+	}
+}
+
+country_event = { # The trail eventually leads to Schirach and an office owned by him
+	id = bor_disII_preparation.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.25" }
+	title = bor_disII_preparation.25.t
+	desc = { text = bor_disII_preparation.25.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.25.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_generic_office
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.25.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.26 days = 4 } }
+	}
+}
+
+country_event = { # Schirach's been directing the economic efforts towards an unknown purpose
+	id = bor_disII_preparation.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.26" }
+	title = bor_disII_preparation.26.t
+	desc = { text = bor_disII_preparation.26.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.26.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_USA_ARPANET
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.26.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.27 days = 8 } }
+	}
+}
+
+country_event = { # Schirach's office is raided, several documents and correspondence inside a safe are apprehended
+	id = bor_disII_preparation.27
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.27" }
+	title = bor_disII_preparation.27.t
+	desc = bor_disII_preparation.27.desc
+	picture = GFX_report_event_IBR_AAS_raid
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.27.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.36 days = 14 } }
+	}
+}
+
+country_event = { # Bormann is suspicious and orders a further investigation into this matter
+	id = bor_disII_preparation.28
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.28" }
+	title = bor_disII_preparation.28.t
+	desc = { text = bor_disII_preparation.28.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.28.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.28.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.29 days = 16 } }
+	}
+}
+
+country_event = { # Recording of a meeting, Schirach and the corp are intentionally worsening the effects of the Crisis on Germany
+	id = bor_disII_preparation.29
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.29" }
+	title = bor_disII_preparation.29.t
+	desc = { text = bor_disII_preparation.29.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.29.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_post_apoc_record_player
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.29.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.27 days = 10 } }
+	}
+}
+
+country_event = { # A Conspiracy Amongst Our Own - Bormann has evidence to suggest that his own party is acting against him
+	id = bor_disII_preparation.30
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.30" }
+	title = bor_disII_preparation.30.t
+	desc = { text = bor_disII_preparation.30.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.30.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.30.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.31 days = 14 } }
+	}
+}
+
+country_event = { # An investigation is started on the Party Bureaucracy itself
+	id = bor_disII_preparation.31
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.31" }
+	title = bor_disII_preparation.31.t
+	desc = bor_disII_preparation.31.desc
+	picture = GFX_report_event_GER_abwehr_intelligence
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.31.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.32 days = 14 } }
+	}
+}
+
+country_event = { # Previously overlooked logs reveal several undocumented meetings between some high-level party members, including some that are in Bormann's cabinet
+	id = bor_disII_preparation.32
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.32" }
+	title = bor_disII_preparation.32.t
+	desc = { text = bor_disII_preparation.32.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.32.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_generic_technology_1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.32.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.33 days = 14 } }
+	}
+}
+
+country_event = { # Digging further reveals that they have struck several deals with various different SIGs
+	id = bor_disII_preparation.33
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.33" }
+	title = bor_disII_preparation.33.t
+	desc = { text = bor_disII_preparation.33.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.33.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_generic_handshake_2
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.33.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.34 days = 14 } }
+	}
+}
+
+country_event = { # Following the papertrail leads to the discovery of Schirach's prominence in this circle. This gives another lead into an office owned by Schirach
+	id = bor_disII_preparation.34
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.34" }
+	title = bor_disII_preparation.34.t
+	desc = bor_disII_preparation.34.desc
+	picture = GFX_report_event_USA_ARPANET
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.34.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.35 days = 8 } }
+	}
+}
+
+country_event = { # Schirach's office is raided, several documents and correspondence inside a safe are apprehended
+	id = bor_disII_preparation.35
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.35" }
+	title = bor_disII_preparation.35.t
+	desc = { text = bor_disII_preparation.35.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.35.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_IBR_AAS_raid
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.35.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.36 days = 8 } }
+	}
+}
+
+country_event = { # The documents spill the details - Schirach is masterminding a plot to remove Bormann from power
+	id = bor_disII_preparation.36
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.36" }
+	title = bor_disII_preparation.36.t
+	desc = { text = bor_disII_preparation.36.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_preparation.36.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_riotpolice
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.36.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.37 days = 2 } }
+	}
+}
+
+country_event = { # Final meeting between Gehlen & Bormann - Bormann is furious at this treachery, and he intends to completly uproot it by force
+	id = bor_disII_preparation.37
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.37" }
+	title = bor_disII_preparation.37.t
+	desc = bor_disII_preparation.37.desc
+	picture = GFX_report_event_GER_gehlen
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.37.a
+		hidden_effect = { country_event = { id = bor_disII_preparation.38 days = 12 } }
+	}
+}
+
+country_event = { # The Orpo is fully mobilized, placed on high alert, and ordered to await further instructions
+	id = bor_disII_preparation.38
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_preparation.38" }
+	title = bor_disII_preparation.38.t
+	desc = bor_disII_preparation.38.desc
+	picture = GFX_report_event_GER_police
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_preparation.38.a
+		custom_effect_tooltip = BOR_Dismantlement_ExecutionAvailable
+		if = { # AI continuation event
+			limit = { is_ai = yes }
+			country_event = bor_disII_execution.1
+		}
+		else = { set_country_flag = BOR_PreparationOccured }
+	}
+}
+
+###########
+# Pursuit #
+###########
+add_namespace = bor_disII_pursuit
+
+country_event = { # Economic forecasts show a further dip due to the Oil Crisis
+	id = bor_disII_pursuit.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_pursuit.1" }
+	title = bor_disII_pursuit.1.t
+	desc = bor_disII_pursuit.1.desc
+	picture = GFX_report_event_GER_unemployment
+	
+	trigger = {
+		has_country_flag = BOR_PreparationInProgress
+		NOT = { has_country_flag = BOR_SchirachCoup }
+	}
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_pursuit.1.a
+		BOR_SIG_SP_1_5 = yes
+		BOR_SIG_SL_1_1_1 = yes
+		add_stability = -0.05
+		set_temp_variable = { gdp_growth_temp = -1.2 }
+		econ_gdp_growth_change = yes
+		set_temp_variable = { temp_econ_GDP_boost_percentage = -0.05 }
+		econ_GDP_boost_once_percentage = yes
+		hidden_effect = {
+			if = {
+				limit = { has_country_flag = BOR_OppositionAlerted }
+				country_event = { id = bor_disII_pursuit.2 days = 14 }
+			}
+			else = { country_event = { id = bor_disII_pursuit.2 days = 20 } }
+		}
+	}
+}
+
+country_event = { # Surveillance reveals the Opposition is being bolder with its moves, supposedly there's been a change of plans
+	id = bor_disII_pursuit.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_pursuit.2" }
+	title = bor_disII_pursuit.2.t
+	desc = bor_disII_pursuit.2.desc
+	picture = GFX_report_event_GER_abwehr_intelligence
+	
+	trigger = {
+		has_country_flag = BOR_PreparationInProgress
+		NOT = { has_country_flag = BOR_SchirachCoup }
+	}
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_pursuit.2.a
+		if = {
+			limit = { has_country_flag = BOR_reformists_dismantled }
+			BOR_SIG_AP_7_10 = yes
+			BOR_SIG_AP_10_10 = yes
+		}
+		else_if = {
+			limit = { has_country_flag = BOR_militarists_dismantled }
+			BOR_SIG_AP_9_10 = yes
+			BOR_SIG_AP_2_10 = yes
+		}
+		hidden_effect = {
+			if = {
+				limit = { has_country_flag = BOR_OppositionAlerted }
+				country_event = { id = bor_disII_pursuit.3 days = 14 }
+			}
+			else = { country_event = { id = bor_disII_pursuit.3 days = 20 } }
+		}
+	}
+}
+
+country_event = { # Discontent amongst the German population rises, due to the Crisis
+	id = bor_disII_pursuit.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_pursuit.3" }
+	title = bor_disII_pursuit.3.t
+	desc = bor_disII_pursuit.3.desc
+	picture = GFX_report_event_GER_reichstag_protest
+	
+	trigger = {
+		has_country_flag = BOR_PreparationInProgress
+		NOT = { has_country_flag = BOR_SchirachCoup }
+	}
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_pursuit.3.a
+		BOR_SIG_SL_1_6_1 = yes
+		hidden_effect = {
+			if = {
+				limit = { has_country_flag = BOR_OppositionAlerted }
+				country_event = { id = bor_disII_pursuit.4 days = 14 }
+			}
+			else = { country_event = { id = bor_disII_pursuit.4 days = 20 } }
+		}
+	}
+}
+
+country_event = { # Father Joseph Ratzinger denounces Bormann's government in a sermon
+	id = bor_disII_pursuit.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_pursuit.4" }
+	title = bor_disII_pursuit.4.t
+	desc = bor_disII_pursuit.4.desc
+	picture = GFX_report_event_IBR_bishop_of_madrid
+	
+	trigger = {
+		has_country_flag = BOR_PreparationInProgress
+		NOT = { has_country_flag = BOR_SchirachCoup }
+	}
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_pursuit.4.a
+		BOR_SIG_AP_3_10 = yes
+		BOR_SIG_SL_3_6_1 = yes
+		if = {
+			limit = { has_country_flag = BOR_militarists_dismantled }
+			BOR_SIG_AL_3_6_0 = yes
+		}
+		else_if = {
+			limit = { has_country_flag = BOR_reformists_dismantled }
+			BOR_SIG_AL_3_3_2 = yes
+		}
+		TNO_worsen_religious_rights_policy_effectiveness_med = yes
+		hidden_effect = {
+			if = {
+				limit = { has_country_flag = BOR_OppositionAlerted }
+				country_event = { id = bor_disII_pursuit.5 days = 14 }
+			}
+			else = { country_event = { id = bor_disII_pursuit.5 days = 20 } }
+		}
+	}
+}
+
+country_event = { # Anti-government protests in Frankfurt
+	id = bor_disII_pursuit.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_pursuit.5" }
+	title = bor_disII_pursuit.5.t
+	desc = bor_disII_pursuit.5.desc
+	picture = GFX_report_event_GER_herbst_protest_1
+	
+	trigger = {
+		has_country_flag = BOR_PreparationInProgress
+		NOT = { has_country_flag = BOR_SchirachCoup }
+	}
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_pursuit.5.a
+		BOR_SIG_SP_1_10 = yes
+		BOR_SIG_SL_1_3_1 = yes
+		TNO_worsen_public_meetings_policy_effectiveness_med = yes
+		hidden_effect = {
+			if = {
+				limit = { has_country_flag = BOR_OppositionAlerted }
+				country_event = { id = bor_disII_pursuit.6 days = 14 }
+			}
+			else = { country_event = { id = bor_disII_pursuit.6 days = 20 } }
+		}
+	}
+}
+
+country_event = { # Several Party officials protest the government's actions
+	id = bor_disII_pursuit.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_pursuit.6" }
+	title = bor_disII_pursuit.6.t
+	desc = bor_disII_pursuit.6.desc
+	picture = GFX_report_event_GER_agreement
+	
+	trigger = {
+		has_country_flag = BOR_PreparationInProgress
+		NOT = { has_country_flag = BOR_SchirachCoup }
+	}
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_pursuit.6.a
+		BOR_SIG_SL_0_6_1 = yes
+		TNO_worsen_political_parties_policy_effectiveness_high = yes
+		hidden_effect = {
+			if = {
+				limit = { has_country_flag = BOR_OppositionAlerted }
+				country_event = { id = bor_disII_pursuit.7 days = 14 }
+			}
+			else = { country_event = { id = bor_disII_pursuit.7 days = 20 } }
+		}
+	}
+}
+
+country_event = { # The OKW is unresponsive, Speidel/Schörner's position is unknown
+	id = bor_disII_pursuit.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_pursuit.7" }
+	title = bor_disII_pursuit.7.t
+	desc = { text = bor_disII_pursuit.7.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_pursuit.7.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_riot
+	
+	trigger = {
+		has_country_flag = BOR_PreparationInProgress
+		NOT = { has_country_flag = BOR_SchirachCoup }
+	}
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_pursuit.7.a
+		BOR_SIG_SL_4_6_1 = yes
+		clr_country_flag = BOR_OppositionAlerted
+		set_country_flag = BOR_disII_pursuit_complete
+	}
+}
+
+#############
+# Execution #
+#############
+add_namespace = bor_disII_execution
+
+country_event = { # Bormann gives the order
+	id = bor_disII_execution.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.1" }
+	title = bor_disII_execution.1.t
+	desc = { text = bor_disII_execution.1.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_execution.1.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.1.a
+		hidden_effect = { country_event = { id = bor_disII_execution.2 days = 2 } }
+		clr_country_flag = BOR_PreparationInProgress
+	}
+}
+
+country_event = { # The Orpo marches on the main cities of the Reich
+	id = bor_disII_execution.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.2" }
+	title = bor_disII_execution.2.t
+	desc = bor_disII_execution.2.desc
+	picture = GFX_report_event_GER_riotpolice
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.2.a
+		hidden_effect = {
+			country_event = { id = bor_disII_execution.3 days = 1 random_days = 6 } # The Church
+			country_event = { id = bor_disII_execution.5 days = 1 random_days = 6 } # IG Farben
+			country_event = { id = bor_disII_execution.7 days = 1 random_days = 6 } # Party Bureaucracy
+			country_event = { id = bor_disII_execution.9 days = 1 random_days = 6 } # Heer
+			if = {
+				limit = { has_country_flag = BOR_reformists_dismantled }
+				country_event = { id = bor_disII_execution.11 days = 1 random_days = 6 } # Reichswerke/Slave Plantations
+			}
+			else_if = {
+				limit = { has_country_flag = BOR_militarists_dismantled }
+				country_event = { id = bor_disII_execution.13 days = 1 random_days = 6 } # Siemens/Intelligentsia
+			}
+			country_event = { id = bor_disII_execution.15 days = 9 } # von Schirach
+		}
+	}
+}
+
+country_event = { # The Church: at last, Bormann puts forward his plans for the complete elimination of the Christian churches in Germany
+	id = bor_disII_execution.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.3" }
+	title = bor_disII_execution.3.t
+	desc = bor_disII_execution.3.desc
+	picture = GFX_report_event_GER_cologne
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.3.a
+		add_stability = -0.08
+		set_variable = { tno_religious_rights_effectiveness = 8 }
+		# TNO_update_religious_rights_policy_effectiveness = yes
+		TNO_worsen_religious_rights_policy_effectiveness_low = yes
+		TNO_improve_religious_rights_policy_effectiveness_monthly_high = yes
+		hidden_effect = { country_event = { id = bor_disII_execution.4 days = 1 } }
+	}
+}
+
+country_event = { # Assaults on the churches; priests are arrested and their properties are confiscated
+	id = bor_disII_execution.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.4" }
+	title = bor_disII_execution.4.t
+	desc = bor_disII_execution.4.desc
+	picture = GFX_report_event_GER_riot
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.4.a
+		custom_effect_tooltip = BOR_Dismantlement_Church
+		set_variable = { BOR_SIG_DF_i = Church }
+		BOR_Kartenhaus_DismantleSIG = yes
+		set_temp_variable = { money_reserves_temp = 0.6 }
+		econ_money_reserves_change_raw_money = yes
+	}
+}
+
+country_event = { # IG Farben: with the help of Abs, the whole company is purged and his control over it is strenghtened
+	id = bor_disII_execution.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.5" }
+	title = bor_disII_execution.5.t
+	desc = { text = bor_disII_execution.5.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_execution.5.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_IBR_basques_arrested
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.5.a
+		BOR_SIG_SP_8_10 = yes
+		BOR_SIG_AL_8_6_1 = yes
+		hidden_effect = { country_event = { id = bor_disII_execution.6 days = 3 } }
+	}
+}
+
+country_event = { # Abs gets further involved in Bormann's government and is appointed EconMin
+	id = bor_disII_execution.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.6" }
+	title = bor_disII_execution.6.t
+	desc = bor_disII_execution.6.desc
+	picture = GFX_report_event_GER_hermann_josef_abs
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.6.a
+		BOR_SIG_AL_8_6_1 = yes
+		custom_effect_tooltip = GER_Hermann_Josef_Abs_eco_addition_tt
+		hidden_effect = {
+			remove_ideas_with_trait = economy_minister
+			add_ideas = GER_Hermann_Josef_Abs_eco
+		}
+	}
+}
+
+country_event = { # Bureaucracy: several members of the party on watchlists are purged, some removed, some arrested, most executed
+	id = bor_disII_execution.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.7" }
+	title = bor_disII_execution.7.t
+	desc = bor_disII_execution.7.desc
+	picture = GFX_report_event_GER_arrests
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.7.a
+		add_political_power = -100
+		BOR_SIG_SP_0_10 = yes
+		BOR_SIG_SL_0_3_0 = yes
+		BOR_SIG_SL_0_3_2 = yes
+		TNO_improve_political_parties_policy_effectiveness_high = yes
+		hidden_effect = { country_event = { id = bor_disII_execution.8 days = 1 } }
+	}
+}
+
+country_event = { # Most members of Bormann's cabinet are captured and purged
+	id = bor_disII_execution.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.8" }
+	title = bor_disII_execution.8.t
+	desc = bor_disII_execution.8.desc
+	picture = GFX_report_event_GER_firing_squad
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.8.a
+		BOR_SIG_AL_1_3_1 = yes
+		custom_effect_tooltip = GER_Gerhard_Klopfer_hog_addition_tt
+		hidden_effect = {
+			remove_ideas_with_trait = head_of_government
+			add_ideas = GER_Gerhard_Klopfer_hog
+			if = {
+				limit = { NOT = { has_idea = GER_Hermann_Josef_Abs_eco } }
+				remove_ideas_with_trait = economy_minister
+				add_ideas = GER_Generic_Vacant_eco
+			}
+		}
+	}
+}
+
+country_event = { # The Heer: firefights ensure along the barracks and other major military instalations, most special among them the OKW HQ
+	id = bor_disII_execution.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.9" }
+	title = { text = bor_disII_execution.9.t_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	title = { text = bor_disII_execution.9.t_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	desc = { text = bor_disII_execution.9.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_execution.9.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_GER_city_burning
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.9.a
+		BOR_SIG_SP_4_10 = yes
+		add_manpower = -687
+		TNO_worsen_army_professionalism_high = yes
+		random_owned_controlled_state = {
+			limit = { barracks > 0 }
+			damage_building = { type = barracks damage = 0.4 }
+		}
+		random_owned_controlled_state = {
+			limit = { barracks > 0 }
+			damage_building = { type = barracks damage = 0.4 }
+		}
+		hidden_effect = { country_event = { id = bor_disII_execution.10 days = 1 } }
+	}
+}
+
+country_event = { # An abortive attempt to conduct the coup is made, it fails and Speidel/Schörner is killed
+	id = bor_disII_execution.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.10" }
+	title = bor_disII_execution.10.t
+	desc = { text = bor_disII_execution.10.desc_reformist trigger = { has_country_flag = BOR_militarists_dismantled } }
+	desc = { text = bor_disII_execution.10.desc_militarist trigger = { has_country_flag = BOR_reformists_dismantled } }
+	picture = GFX_report_event_AZH_coup1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.10.a
+		trigger = { has_country_flag = BOR_militarists_dismantled }
+		BOR_SIG_SP_4_10 = yes
+		BOR_SIG_AL_4_5_1 = yes
+		BOR_SIG_SL_4_6_0 = yes
+		add_popularity = { ideology = fascism popularity = -0.06 }
+		remove_unit_leader_role = GER_hans_speidel
+		hidden_effect = { retire_character = GER_hans_speidel }
+		add_manpower = -139
+	}
+	option = { #
+		name = bor_disII_execution.10.b
+		trigger = { has_country_flag = BOR_reformists_dismantled }
+		BOR_SIG_SP_4_10 = yes
+		BOR_SIG_AL_4_5_1 = yes
+		BOR_SIG_SL_4_6_2 = yes
+		add_popularity = { ideology = ultranationalism popularity = -0.06 }
+		remove_unit_leader_role = GER_ferdinand_schorner
+		remove_unit_leader_role = GER_otto_ernst_remer
+		hidden_effect = { retire_character = GER_ferdinand_schorner }
+		add_manpower = -139
+	}
+}
+
+country_event = { # Reichswerke: Geilenberg is arrested, the company is put in the hands of a Bormie loyalist or is privatized and dismantled
+	id = bor_disII_execution.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.11" }
+	title = bor_disII_execution.11.t
+	desc = bor_disII_execution.11.desc
+	picture = GFX_report_event_IBR_basques_arrested
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { # Integrated
+		name = bor_disII_execution.11.a
+		BOR_SIG_SP_7_10 = yes
+		BOR_SIG_AL_7_6_1 = yes
+		set_temp_variable = { temp_econ_GDP_boost_percentage = -0.08 }
+		econ_GDP_boost_once_percentage = yes
+		hidden_effect = { country_event = { id = bor_disII_execution.12 days = 1 } }
+	}
+	option = { # Privatized and dismantled
+		name = bor_disII_execution.11.b
+		custom_effect_tooltip = BOR_Dismantlement_Reichswerke
+		set_variable = { BOR_SIG_DF_i = ZIndustry }
+		BOR_Kartenhaus_DismantleSIG = yes
+		set_temp_variable = { temp_econ_GDP_boost_percentage = -0.04 }
+		econ_GDP_boost_once_percentage = yes
+		TNO_worsen_industrial_expertise_med = yes
+		set_temp_variable = { money_reserves_temp = 1.6 }
+		econ_money_reserves_change_raw_money = yes
+		hidden_effect = { country_event = { id = bor_disII_execution.12 days = 1 } }
+	}
+}
+
+country_event = { # Plantations: the remainders of the plantations are seized by the government in preparation for the abolition of slavery
+	id = bor_disII_execution.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.12" }
+	title = bor_disII_execution.12.t
+	desc = bor_disII_execution.12.desc
+	picture = GFX_report_event_generic_prisoners_2
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.12.a
+		custom_effect_tooltip = BOR_Dismantlement_Plantations
+		set_variable = { BOR_SIG_DF_i = Plantations }
+		BOR_Kartenhaus_DismantleSIG = yes
+		set_variable = { BOR_ExtraRepatriatedSlaves = 0.1 }
+	}
+}
+
+country_event = { # Siemens: von Siemens is arrested, the company is put in the hands of a Bormie loyalist or is nationalized and dismantled
+	id = bor_disII_execution.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.13" }
+	title = bor_disII_execution.13.t
+	desc = bor_disII_execution.13.desc
+	picture = GFX_report_event_IBR_basques_arrested
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Integrated
+		name = bor_disII_execution.13.a
+		BOR_SIG_SP_9_10 = yes
+		BOR_SIG_AL_9_6_1 = yes
+		set_temp_variable = { temp_econ_GDP_boost_percentage = -0.01 }
+		econ_GDP_boost_once_percentage = yes
+		hidden_effect = { country_event = { id = bor_disII_execution.14 days = 1 } }
+	}
+	option = { # Nationalized and dismantled
+		name = bor_disII_execution.13.b
+		custom_effect_tooltip = BOR_Dismantlement_Siemens
+		set_variable = { BOR_SIG_DF_i = SIndustry }
+		BOR_Kartenhaus_DismantleSIG = yes
+		set_temp_variable = { temp_econ_GDP_boost_percentage = -0.04 }
+		econ_GDP_boost_once_percentage = yes
+		TNO_worsen_industrial_expertise_med = yes
+		set_temp_variable = { money_reserves_temp = 1.6 }
+		econ_money_reserves_change_raw_money = yes
+		hidden_effect = { country_event = { id = bor_disII_execution.14 days = 1 } }
+	}
+}
+
+country_event = { # Intelligentsia: raids are conducted on several universities, professors and student leaders are arrested
+	id = bor_disII_execution.14
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.14" }
+	title = bor_disII_execution.14.t
+	desc = bor_disII_execution.14.desc
+	picture = GFX_report_event_ITA_student_arrest
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.14.a
+		BOR_SIG_SP_2_10 = yes
+		BOR_SIG_AL_2_4_1 = yes
+		TNO_worsen_research_facilities_high = yes
+		TNO_worsen_academic_base_high = yes
+		random_owned_controlled_state = {
+			limit = { schools > 0 }
+			damage_building = { type = schools damage = 0.4 }
+		}
+		random_owned_controlled_state = {
+			limit = { schools > 0 }
+			damage_building = { type = schools damage = 0.4 }
+		}
+		random_owned_controlled_state = {
+			limit = { schools > 0 }
+			damage_building = { type = schools damage = 0.4 }
+		}
+	}
+}
+
+country_event = { # Schirach retreats to his compound
+	id = bor_disII_execution.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.15" }
+	title = bor_disII_execution.15.t
+	desc = bor_disII_execution.15.desc
+	picture = GFX_report_event_generic_riot
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.15.a
+		hidden_effect = { country_event = { id = bor_disII_execution.16 days = 4 } }
+	}
+}
+
+country_event = { # After a brief siege, he attempts to flee using a helicopter but is shot down
+	id = bor_disII_execution.16
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.16" }
+	title = bor_disII_execution.16.t
+	desc = bor_disII_execution.16.desc
+	picture = GFX_report_event_generic_revolution_colour
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.16.a
+		remove_ideas = GER_BOR_internal_opposition
+		if = {
+			limit = { has_country_flag = BOR_reformists_dismantled }
+			custom_effect_tooltip = BOR_Dismantlement_Militarists
+			BOR_Kartenhaus_Dismantle_Militarists = yes
+			set_variable = { BOR_MilitaristSupport = 0 }
+			set_country_flag = it_was_the_militarists_that_got_dismantled_in_disII # patchwork fix :)
+		}
+		else_if = {
+			limit = { has_country_flag = BOR_militarists_dismantled }
+			custom_effect_tooltip = BOR_Dismantlement_Reformists
+			BOR_Kartenhaus_Dismantle_Reformists = yes
+			set_variable = { BOR_ReformistSupport = 0 }
+			set_country_flag = it_was_the_reformists_that_got_dismantled_in_disII # patchwork fix :)
+		}
+		hidden_effect = { country_event = { id = bor_disII_execution.17 days = 2 } }
+	}
+}
+
+country_event = { # The Day After (recap event)
+	id = bor_disII_execution.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.17" }
+	title = bor_disII_execution.17.t
+	desc = { text = bor_disII_execution.17.desc_reformist trigger = { has_country_flag = it_was_the_reformists_that_got_dismantled_in_disII } }
+	desc = { text = bor_disII_execution.17.desc_militarist trigger = { has_country_flag = it_was_the_militarists_that_got_dismantled_in_disII } }
+	picture = GFX_report_event_generic_ruins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.17.a
+		if = {
+			limit = { has_idea = tno_admin_efficiency_deficient_administrative_systems }
+			swap_ideas = {
+				remove_idea = tno_admin_efficiency_deficient_administrative_systems
+				add_idea = tno_admin_efficiency_illegitimate_administration
+			}
+		}
+		else_if = {
+			limit = { has_idea = tno_admin_efficiency_functional_administrative_systems }
+			swap_ideas = {
+				remove_idea = tno_admin_efficiency_functional_administrative_systems
+				add_idea = tno_admin_efficiency_illegitimate_administration
+			}
+		}
+		else_if = {
+			limit = { has_idea = tno_admin_efficiency_streamlined_bureaucracy }
+			swap_ideas = {
+				remove_idea = tno_admin_efficiency_streamlined_bureaucracy
+				add_idea = tno_admin_efficiency_illegitimate_administration
+			}
+		}
+		else_if = {
+			limit = { has_idea = tno_admin_efficiency_well_oiled_machine }
+			swap_ideas = {
+				remove_idea = tno_admin_efficiency_well_oiled_machine
+				add_idea = tno_admin_efficiency_illegitimate_administration
+			}
+		}
+		set_temp_variable = { gdp_growth_temp = -2 }
+		econ_gdp_growth_change = yes
+		hidden_effect = {
+			country_event = { id = bor_disII_execution.18 days = 7 }
+			every_country = { news_event = { id = WORLD_REICH.120 days = 1 } }
+		}
+		clr_country_flag = it_was_the_militarists_that_got_dismantled_in_disII
+		clr_country_flag = it_was_the_reformists_that_got_dismantled_in_disII
+	}
+}
+
+country_event = { # Bormann holds a grand speech on the Volkshalle
+	id = bor_disII_execution.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_execution.18" }
+	title = bor_disII_execution.18.t
+	desc = bor_disII_execution.18.desc
+	picture = GFX_report_event_RUS_far_right_rally
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_execution.18.a
+		add_political_power = 100
+		add_popularity = { ideology = national_socialism popularity = 0.05 }
+		BOR_SIG_AP_0_10 = yes
+		set_country_flag = BOR_Closing
+		if = {
+			limit = { has_completed_focus = BOR_back_to_black }
+			clr_country_flag = BOR_Phase3
+		}
+		reload_GER_bormann_post_cw_tree = yes
+		clr_country_flag = BOR_Dismantlement_II_active
+	}
+}
+
+############
+# Collapse #
+############
+add_namespace = bor_disII_collapse
+
+country_event = { # In the Reichskanzlei, Bormann is informed by the Orpo of several unanounced Heer maneuvers in Germania
+	id = bor_disII_collapse.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_collapse.1" }
+	title = bor_disII_collapse.1.t
+	desc = bor_disII_collapse.1.desc
+	picture = GFX_report_event_GER_bormann_wins
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_collapse.1.a
+		hidden_effect = { country_event = { id = bor_disII_collapse.2 days = 1 } }
+	}
+}
+
+country_event = { # Bormann receives the info that the Reichstag has declared for his removal from the Führership
+	id = bor_disII_collapse.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_collapse.2" }
+	title = bor_disII_collapse.2.t
+	desc = bor_disII_collapse.2.desc
+	picture = GFX_report_event_GER_agreement
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_collapse.2.a
+		hidden_effect = { country_event = { id = bor_disII_collapse.3 days = 1 } }
+	}
+}
+
+country_event = { # Heer units arrive in the Chancellery, they're here to arrest Bormann
+	id = bor_disII_collapse.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_collapse.3" }
+	title = bor_disII_collapse.3.t
+	desc = bor_disII_collapse.3.desc
+	picture = GFX_report_event_AZH_coup1
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_collapse.3.a
+		hidden_effect = { country_event = { id = bor_disII_collapse.4 days = 1 } }
+	}
+}
+
+country_event = { # A firefight ensures, the building is extensively damaged but Bormann manages to flee
+	id = bor_disII_collapse.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_collapse.4" }
+	title = bor_disII_collapse.4.t
+	desc = bor_disII_collapse.4.desc
+	picture = GFX_report_event_GER_city_burning
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_collapse.4.a
+		64 = { damage_building = { type = offices damage = 0.7 } }
+		hidden_effect = { country_event = { id = bor_disII_collapse.5 days = 1 } }
+	}
+}
+
+country_event = { # In an emergency session of the Reichstag, von Schirach is declared as the replacement Führer
+	id = bor_disII_collapse.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event bor_disII_collapse.5" }
+	title = bor_disII_collapse.5.t
+	desc = bor_disII_collapse.5.desc
+	picture = GFX_report_event_GER_reichstag
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #
+		name = bor_disII_collapse.5.a
+		BOR_SIG_SP_0_10 = yes
+		remove_ideas = GER_BOR_internal_opposition
+		retire_country_leader = yes
+		remove_all_ministers = yes
+		if = {
+			limit = { has_country_flag = BOR_militarists_dismantled }
+			add_country_leader_role = {
+				character = GER_baldur_von_shirach
+				promote_leader = yes
+				country_leader = {
+					#desc = "POLITICS_BALDUR_VON_SCHIRACH_DESC"
+					expire = "1999.1.1.1"
+					ideology = national_socialism_subtype
+					traits = { dictator }
+				}
+			}
+			SGR = {
+				GER_ludwig_erhard = {
+					set_nationality = GER
+				}
+			}
+			add_ideas = { # Anti-ref failure cabinet
+				GER_Hans_Globke_hog
+				GER_Gustav_Heinemann_for
+				GER_Ludwig_Erhard_eco
+				GER_Heinrich_Mueller_sec
+			}
+		}
+		else_if = {
+			limit = { has_country_flag = BOR_reformists_dismantled }
+			add_country_leader_role = {
+				character = GER_baldur_von_shirach
+				promote_leader = yes
+				country_leader = {
+					#desc = "POLITICS_BALDUR_VON_SCHIRACH_DESC"
+					expire = "1999.1.1.1"
+					ideology = national_socialism_subtype
+					traits = { dictator }
+				}
+			}
+			add_ideas = { # Anti-mil failure cabinet
+				GER_Baldur_von_Schirach_hog
+				GER_Fedor_von_Bock_for
+				GER_Otto_Ernst_Remer_eco
+				GER_Heinrich_Mueller_sec
+			}
+		}
+
+		# set_country_flag = BOR_Failure
+		# reload_GER_bormann_post_cw_tree = yes
+		load_focus_tree = { tree = ZZZ_blank_focus keep_completed = no }
+
+		clr_country_flag = BOR_Dismantlement_II_active
+		set_country_flag = BOR_SchirachCoup
+		TNO_Country_Closing_Screen_Show = yes
+
+		hidden_effect = {
+			every_country = {
+				news_event = { id = WORLD_REICH.121 days = 1 }
+			}
+		}
+	}
+}

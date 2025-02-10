@@ -1,0 +1,914 @@
+############################
+## Cameroon Events
+############################
+
+add_namespace = CAO
+add_namespace = CAOnews
+
+########################################
+##### CAO 100 Civil War Collapse  ######
+########################################
+
+
+
+country_event = { #CAO Collapse
+	id = CAO.100
+	immediate = { log = "[GetDateText]: [Root.GetName]: event CAO.100" }
+	title = CAO.100.t
+	desc = CAO.100.desc
+	picture = GFX_report_event_GRO_african_rebels
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = CAO.100.a
+		add_to_array = { global.cameroon_collapse = THIS }
+
+		set_global_flag = global_cameroon_has_collapsed
+		remove_ideas = {
+			CAO_idea_tense_borders
+			CAO_idea_political_rivalries
+		}
+		add_popularity = {
+			ideology = socialist
+			popularity = -0.2
+		}
+		add_popularity = {
+			ideology = fascism
+			popularity = 0.15
+		}
+		set_politics = { ruling_party = fascism }
+		promote_character = CAO_Ahmadou_Ahidjo
+		set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Corporatism }
+		econ_type_change = yes
+
+		BFR = {
+			add_to_array = { global.cameroon_collapse = THIS }
+			add_state_core = 1187
+			transfer_state = 1187
+			inherit_technology = CAO
+			load_oob = "BFR_collapse"
+		}
+
+		CHD = {
+			add_to_array = { global.cameroon_collapse = THIS }
+			add_state_core = 660
+			add_state_core = 1202
+			add_state_core = 1203
+			add_state_core = 1204
+			add_state_core = 1205
+			add_state_core = 1206
+			add_state_core = 1207
+			add_state_claim = 1200
+			add_state_claim = 1201
+			transfer_state = 660
+			transfer_state = 1202
+			transfer_state = 1203
+			transfer_state = 1204
+			transfer_state = 1205
+			transfer_state = 1206
+			transfer_state = 1207
+			inherit_technology = CAO
+			load_oob = "CHD_collapse"
+
+			country_event = {
+				id = CAO.106
+				days = 2
+			}
+		}
+
+		NNG = {
+			add_to_array = { global.cameroon_collapse = THIS }
+			add_state_core = 1189
+			add_state_core = 558
+			transfer_state = 1189
+			transfer_state = 558
+			inherit_technology = CAO
+			load_oob = "NNG_collapse"
+		}
+
+		NGA = {
+			add_to_array = { global.cameroon_collapse = THIS }
+			add_state_core = 826
+			add_state_core = 1197
+			add_state_claim = 1198
+			add_state_claim = 1199
+			transfer_state = 826
+			transfer_state = 1197
+			inherit_technology = CAO
+			load_oob = "NGA_collapse"
+			random_list = {
+				1 = {
+					modifier = {
+						factor = 0
+						has_game_rule = { rule = NGA_LEADER_CHOICE option = NGA_LEADER_CHOICE_DESPOTISM }
+					}
+					set_politics = {
+						ruling_party = paternalism
+						elections_allowed = no
+					}
+					add_popularity = {
+						ideology = paternalism
+						popularity = 0.3
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						has_game_rule = { rule = NGA_LEADER_CHOICE option = NGA_LEADER_CHOICE_PATERNALISM }
+					}
+					set_politics = {
+						ruling_party = despotism
+						elections_allowed = no
+					}
+					add_popularity = {
+						ideology = despotism
+						popularity = 0.1
+					}
+				}
+			}
+		}
+
+
+		if = {
+			limit = { NOT = { has_global_flag = WAC_scenario_3 } }
+			NNG = {
+				country_event = {
+					id = CAO.103
+					days = 2
+				}
+			}
+		}
+
+		every_state = {
+			limit = {
+				is_core_of = CAO
+				NOT = { is_owned_by = CAO }
+			}
+			remove_core_of = CAO
+		}
+
+		load_oob = "CAO_collapse"
+		declare_war_on = { target = BFR type = annex_everything }
+		declare_war_on = { target = CHD type = annex_everything }
+		declare_war_on = { target = NNG type = annex_everything }
+		declare_war_on = { target = NGA type = annex_everything }
+		NNG = { declare_war_on = { target = BFR type = annex_everything } }
+		NGA = {
+			declare_war_on = { target = BFR type = annex_everything }
+			declare_war_on = { target = NNG type = annex_everything }
+		}
+		if = {
+			limit = { country_exists = YOR }
+			YOR = {
+				remove_ideas = YOR_idea_shield_against_socialism
+				add_to_array = { global.cameroon_collapse = THIS }
+				declare_war_on = { target = NGA type = annex_everything }
+				declare_war_on = { target = BFR type = annex_everything }
+				declare_war_on = { target = NNG type = annex_everything }
+			}
+			CAO = {
+				declare_war_on = { target = YOR type = annex_everything }
+			}
+		}
+
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = CAOnews.1
+				}
+			}
+		}
+	}
+}
+
+country_event = { # CAO victory (collapse)
+	id = CAO.101
+	immediate = { log = "[GetDateText]: [Root.GetName]: event CAO.101" }
+	title = CAO.101.t
+	desc = CAO.101.desc
+	picture = GFX_report_event_GRO_african_rebels
+	is_triggered_only = yes
+	#fire_only_once = yes
+
+	option = {
+		name = CAO.101.a
+		set_global_flag = global_cameroon_survived_collapse
+		add_popularity = {
+			ideology = socialist
+			popularity = -0.2
+		}
+		add_popularity = {
+			ideology = fascism
+			popularity = 0.15
+		}
+		CHD = {
+			transfer_state = 1206
+			transfer_state = 1207
+			transfer_state = 1202
+			transfer_state = 1203
+			transfer_state = 1204
+			transfer_state = 1205
+			transfer_state = 660
+
+			transfer_state = 1544
+			transfer_state = 1194
+			transfer_state = 1195
+			add_state_core = 1544
+			add_state_core = 1194
+			add_state_core = 1195
+			add_state_core = 1207
+
+			TNO_startup_nation = yes
+
+			CAO = { puppet = CHD }
+			CHF = { CHF_Ahmed_Koulamallah = { set_nationality = CHD } }
+			add_country_leader_role = {
+				character = CHF_Ahmed_Koulamallah
+				promote_leader = yes
+				country_leader = {
+					expire = "1985.1.1"
+					ideology = socialist_panafricanism_subtype
+					traits = { }
+					id = -1
+				}
+			}
+
+			set_politics = {
+				ruling_party = socialist
+				last_election = "1966.6.23"
+				election_frequency = 48
+				elections_allowed = no
+			}
+			set_popularities = {
+				socialist = 30
+				conservatism = 11
+				paternalism = 18
+				despotism = 10
+				fascism = 31
+			}
+
+			set_cosmetic_tag = CHD_CAOPuppet
+			set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Planned }
+			econ_type_change = yes
+		}
+
+		NGA = {
+			transfer_state = 826
+			#transfer_state = 1197
+			transfer_state = 1187
+			add_state_core = 1187
+
+			if = {
+				limit = {
+					NOT = { HAU = { owns_state = 1189 } }
+				}
+				transfer_state = 1189
+				add_state_core = 1189
+			}
+			if = {
+				limit = {
+					NOT = { HAU = { owns_state = 558 } }
+				}
+				transfer_state = 558
+				add_state_core = 558
+			}
+			if = {
+				limit = {
+					CAO = { owns_state = 825 }
+				}
+				transfer_state = 825
+				add_state_core = 825
+			}
+			if = {
+				limit = {
+					CAO = { owns_state = 1188 }
+				}
+				transfer_state = 1188
+				add_state_core = 1188
+			}
+
+			TNO_startup_nation = yes
+
+			CAO = { puppet = NGA }
+
+			set_politics = {
+				ruling_party = socialist
+				last_election = "1966.6.23"
+				election_frequency = 48
+				elections_allowed = no
+			}
+			set_popularities = {
+				socialist = 35
+				conservatism = 8
+				paternalism = 27
+				fascism = 30
+			}
+
+			set_cosmetic_tag = NGA_CAOPuppet
+			set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Planned }
+			econ_type_change = yes
+		}
+
+	}
+}
+
+country_event = { # CAO defeat (collapse)
+	id = CAO.102
+	immediate = { log = "[GetDateText]: [Root.GetName]: event CAO.102" }
+	title = CAO.102.t
+	desc = CAO.102.desc
+	picture = GFX_report_event_GRO_african_rebels
+	is_triggered_only = yes
+	#fire_only_once = yes
+
+	option = {
+		name = CAO.102.a
+		if = {
+			limit = { country_exists = NGA }
+			NGA = {
+				add_state_core = 1198
+				add_state_core = 1199
+				transfer_state = 1198
+				transfer_state = 1199
+				if = {
+					limit = {
+						CAO = { owns_state = 1187 }
+					}
+					add_state_core = 1187
+					transfer_state = 1187
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 558
+						}
+					}
+					add_state_core = 558
+					transfer_state = 558
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 1189
+						}
+					}
+					add_state_core = 1189
+					transfer_state = 1189
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 1188
+							owns_state = 825
+						}
+					}
+					add_state_core = 1188
+					add_state_core = 825
+					transfer_state = 1188
+					transfer_state = 825
+				}
+			}
+		}
+		else_if = {
+			limit = { country_exists = NNG }
+			NNG = {
+				add_state_core = 1198
+				add_state_core = 1199
+				transfer_state = 1198
+				transfer_state = 1199
+				if = {
+					limit = {
+						CAO = { owns_state = 1187 }
+					}
+					add_state_core = 1187
+					transfer_state = 1187
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 1189
+						}
+					}
+					add_state_core = 1189
+					transfer_state = 1189
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 1188
+							owns_state = 825
+						}
+					}
+					add_state_core = 1188
+					add_state_core = 825
+					transfer_state = 1188
+					transfer_state = 825
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 1197
+							owns_state = 826
+						}
+					}
+					add_state_core = 1197
+					add_state_core = 826
+					transfer_state = 1197
+					transfer_state = 826
+				}
+				if = {
+					limit = {
+						NOT = {
+							OR = {
+								country_exists = NGA
+								country_exists = YOR
+								country_exists = HAU
+							}
+						}
+					}
+					set_cosmetic_tag = NNG_unified
+				}
+			}
+		}
+		else_if = {
+			limit = { country_exists = YOR }
+			YOR = {
+				add_state_core = 1198
+				add_state_core = 1199
+				transfer_state = 1198
+				transfer_state = 1199
+				if = {
+					limit = {
+						CAO = { owns_state = 1187 }
+					}
+					add_state_core = 1187
+					transfer_state = 1187
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 558
+						}
+					}
+					add_state_core = 558
+					transfer_state = 558
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 1189
+						}
+					}
+					add_state_core = 1189
+					transfer_state = 1189
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 1197
+							owns_state = 826
+						}
+					}
+					add_state_core = 1197
+					add_state_core = 826
+					transfer_state = 1197
+					transfer_state = 826
+				}
+				if = {
+					limit = {
+						NOT = {
+							OR = {
+								country_exists = NGA
+								country_exists = NNG
+								country_exists = HAU
+							}
+						}
+					}
+					set_cosmetic_tag = YOR_unified
+				}
+			}
+		}
+		else_if = {
+			limit = { country_exists = HAU }
+			HAU = {
+				add_state_core = 1198
+				add_state_core = 1199
+				transfer_state = 1198
+				transfer_state = 1199
+				if = {
+					limit = {
+						CAO = { owns_state = 1187 }
+					}
+					add_state_core = 1187
+					transfer_state = 1187
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 558
+						}
+					}
+					add_state_core = 558
+					transfer_state = 558
+				}
+				if = {
+					limit = {
+						CAO = {
+							owns_state = 1197
+							owns_state = 826
+						}
+					}
+					add_state_core = 1197
+					add_state_core = 826
+					transfer_state = 1197
+					transfer_state = 826
+				}
+			}
+		}
+		else = {
+			NGA = {
+				add_state_core = 1197
+				add_state_core = 1188
+				add_state_core = 825
+				add_state_core = 558
+				add_state_core = 1198
+				add_state_core = 1199
+				add_state_core = 826
+				transfer_state = 1197
+				transfer_state = 826
+				transfer_state = 1198
+				transfer_state = 1199
+				transfer_state = 558
+				transfer_state = 1188
+				transfer_state = 825
+				if = {
+					limit = { NOT = { country_exists = BFR } }
+					add_state_core = 1187
+					transfer_state = 1187
+				}
+				if = {
+					limit = { NOT = { HAU = { owns_state = 1189 } } }
+					add_state_core = 1189
+					transfer_state = 1189
+				}
+				TNO_startup_nation = yes
+			}
+		}
+
+		if = {
+			limit = { country_exists = BFR }
+			BFR = {
+				country_event = {
+					id = CAO.105
+					days = 220
+				}
+			}
+		}
+
+		if = {
+			limit = { country_exists = CHD }
+			CHD = {
+				add_state_core = 1544
+				add_state_core = 1194
+				add_state_core = 1195
+
+				add_state_core = 1200
+				add_state_core = 1201
+				transfer_state = 1200
+				transfer_state = 1201
+			}
+			if = {
+				limit = { CAO = { owns_state = 660 } }
+				transfer_state = 660
+				transfer_state = 1205
+			}
+			if = {
+				limit = { CAO = { owns_state = 1544 } }
+				transfer_state = 1194
+				transfer_state = 1195
+				transfer_state = 1544
+			}
+		}
+		else_if = {
+			limit = { country_exists = CHF }
+			CHF = {
+				add_state_core = 1206
+				add_state_core = 1207
+				add_state_core = 1204
+				add_state_core = 1203
+				add_state_core = 1202
+
+				add_state_core = 1200
+				add_state_core = 1201
+				transfer_state = 1200
+				transfer_state = 1201
+
+				set_cosmetic_tag = CHF_unified
+			}
+			if = {
+				limit = { CAO = { owns_state = 1206 } }
+				transfer_state = 1202
+				transfer_state = 1203
+				transfer_state = 1204
+				transfer_state = 1206
+				transfer_state = 1207
+			}
+			if = {
+				limit = { CAO = { owns_state = 1544 } }
+				transfer_state = 1194
+				transfer_state = 1195
+				transfer_state = 1544
+			}
+		}
+		else_if = {
+			limit = { country_exists = KNM }
+			KNM = {
+				add_state_core = 1206
+				add_state_core = 1205
+				add_state_core = 1207
+				add_state_core = 1204
+				add_state_core = 1203
+				add_state_core = 1202
+
+				add_state_core = 1200
+				add_state_core = 1201
+				transfer_state = 1200
+				transfer_state = 1201
+			}
+			if = {
+				limit = { CAO = { owns_state = 660 } }
+				transfer_state = 660
+				transfer_state = 1205
+			}
+			if = {
+				limit = { CAO = { owns_state = 1206 } }
+				transfer_state = 1202
+				transfer_state = 1203
+				transfer_state = 1204
+				transfer_state = 1206
+				transfer_state = 1207
+			}
+		}
+		else = {
+			CHD = {
+				add_state_core = 660
+				add_state_core = 1202
+				add_state_core = 1203
+				add_state_core = 1204
+				add_state_core = 1205
+				add_state_core = 1206
+				add_state_core = 1207
+				add_state_core = 1200
+				add_state_core = 1201
+				transfer_state = 660
+				transfer_state = 1202
+				transfer_state = 1203
+				transfer_state = 1204
+				transfer_state = 1205
+				transfer_state = 1206
+				transfer_state = 1207
+				transfer_state = 1200
+				transfer_state = 1201
+				# should invade KNM later
+			}
+		}
+
+		CAO = {
+			remove_state_core = 1187
+			remove_state_core = 825
+			remove_state_core = 1188
+			remove_state_core = 826
+			remove_state_core = 1197
+			remove_state_core = 1189
+			remove_state_core = 558
+			remove_state_core = 1198
+			remove_state_core = 1199
+			remove_state_core = 1200
+			remove_state_core = 1201
+			remove_state_core = 1202
+			remove_state_core = 1203
+			remove_state_core = 1204
+			remove_state_core = 1205
+			remove_state_core = 1206
+			remove_state_core = 1207
+			remove_state_core = 660
+			remove_state_core = 1544
+			remove_state_core = 1194
+			remove_state_core = 1195
+
+			add_popularity = {
+				ideology = paternalism
+				popularity = 0.4
+			}
+			add_popularity = {
+				ideology = socialist
+				popularity = -0.2
+			}
+			retire_ideology_leader = paternalism
+			promote_character = CAO_Charles_Okala
+			set_politics = { ruling_party = paternalism }
+			set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+			econ_subtype_change = yes
+		}
+	}
+}
+
+country_event = { # Sokoto revolts
+	id = CAO.103
+	immediate = { log = "[GetDateText]: [Root.GetName]: event CAO.103" }
+	title = CAO.103.t
+	desc = CAO.103.desc
+	picture = GFX_report_event_GRO_african_rebels
+	is_triggered_only = yes
+	#fire_only_once = yes
+
+	option = {
+		name = CAO.103.a
+		HAU = {
+			add_to_array = { global.cameroon_collapse = THIS }
+			add_state_core = 1189
+			transfer_state = 1189
+			set_capital = {
+				state = 1189
+				remember_old_capital = no
+			}
+			load_oob = "HAU_collapse"
+			TNO_startup_nation = yes
+			set_country_flag = HAU_revolted
+			declare_war_on = { target = NNG type = annex_everything }
+			declare_war_on = { target = NGA type = annex_everything }
+			declare_war_on = { target = YOR type = annex_everything }
+			declare_war_on = { target = BFR type = annex_everything }
+			declare_war_on = { target = CAO type = annex_everything }
+		}
+	}
+}
+
+country_event = { # Sokoto Nigeria war check - Deprecated with removal of Invasion + Revolt become Nigeria unifier
+	id = CAO.104
+	immediate = { log = "[GetDateText]: [Root.GetName]: event CAO.104" }
+	title = CAO.104.t
+	desc = CAO.104.desc
+	picture = GFX_report_event_GRO_african_rebels
+	is_triggered_only = yes
+	#fire_only_once = yes
+	#trigger = { country_exists = NNG }
+
+	option = {
+		name = CAO.104.a
+		if = { # cameroon
+			limit = {
+				tag = CAO
+				has_global_flag = global_cameroon_survived_collapse
+				country_exists = HAU
+			}
+			every_country = {
+				limit = { has_war_with = HAU }
+				white_peace = HAU
+			}
+			CAO = {
+				add_popularity = {
+					ideology = fascism
+					popularity = -0.05
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				tag = HAU
+				has_country_flag = HAU_invaded
+				country_exists = ZAR
+			}
+			every_country = {
+				limit = { has_war_with = HAU }
+				white_peace = HAU
+			}
+			NGR = {
+				add_state_core = 832
+				add_state_core = 1542
+				transfer_state = 832
+				transfer_state = 1542
+				transfer_state = 835
+				transfer_state = 1221
+				transfer_state = 1220
+				TNO_startup_nation = yes
+
+				set_politics = { ruling_party = despotism }
+
+				set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Dirigisme }
+				econ_subtype_change = yes
+			}
+		}
+	}
+}
+
+country_event = { # Biafra Wins???
+	id = CAO.105
+	immediate = { log = "[GetDateText]: [Root.GetName]: event CAO.105" }
+	title = CAO.105.t
+	desc = CAO.105.desc
+	picture = GFX_report_event_GRO_african_rebels
+	is_triggered_only = yes
+	#fire_only_once = yes
+	trigger = { country_exists = BFR }
+
+	option = {
+		name = CAO.105.a
+		every_country = {
+			limit = { has_war_with = BFR }
+			white_peace = BFR
+		}
+		BFR = {
+			set_politics = { ruling_party = paternalism }
+			add_popularity = {
+				ideology = paternalism
+				popularity = 0.4
+			}
+		}
+		hidden_effect = {
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = CAOnews.2
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Saraland Civil War
+	id = CAO.106
+	immediate = { log = "[GetDateText]: [Root.GetName]: event CAO.106" }
+	title = CAO.106.t
+	desc = CAO.106.desc
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = CAO.106.a
+
+		CHF = {
+			add_to_array = { global.cameroon_collapse = THIS }
+			add_state_core = 660
+			add_state_core = 1205
+			transfer_state = 660
+			transfer_state = 1205
+			inherit_technology = CAO
+			load_oob = CHF_collapse
+
+			declare_war_on = {
+				target = CHD
+				type = civil_war
+			}
+
+		}
+		KNM = {
+			add_to_array = { global.cameroon_collapse = THIS }
+			declare_war_on = {
+				target = CHF
+				type = civil_war
+			}
+			declare_war_on = {
+				target = CHD
+				type = civil_war
+			}
+		}
+		CAO = {
+			declare_war_on = { target = KNM type = annex_everything }
+			declare_war_on = { target = CHF type = annex_everything }
+		}
+	}
+}
+
+news_event = { # Collapse of Cameroon
+	id = CAOnews.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event CAOnews.1" }
+	title = CAOnews.1.t
+	desc = CAOnews.1.desc
+	picture = GFX_news_event_CAO_cameroon_collapse
+
+	is_triggered_only = yes
+	#fire_only_once = yes
+
+	option = {
+		name = CAOnews.1.a
+	}
+}
+
+news_event = { # Biafran Independence
+	id = CAOnews.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event CAOnews.2" }
+	title = CAOnews.2.t
+	desc = CAOnews.2.desc
+	picture = GFX_news_event_BFR_biafra_independence
+
+	is_triggered_only = yes
+	#fire_only_once = yes
+
+	option = {
+		name = CAOnews.2.a
+	}
+}

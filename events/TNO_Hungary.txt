@@ -1,0 +1,805 @@
+####################
+## Hungary Events ##
+####################
+
+add_namespace = HUN_skeleton
+add_namespace = HUN_WORLD
+
+# HUN_skeleton.1   - Nov  2nd  1963 - Electoral Reform
+# HUN_skeleton.100 - Jan  21st 1964 - Struggle for the Military
+# HUN_skeleton.101 - Mar  23rd 1964 - Imredy Secures Power 
+# HUN_skeleton.102 - Nov  21st 1966 - Imredy Dies, Successors
+# HUN_skeleton.200 - Apr  10th 1965 - Horthy's New PM Dies
+# HUN_skeleton.201 - Sept 7th  1965 - Coalitions Form, Chaos in Streets
+# HUN_skeleton.202 - May  20th 1967 - 1967 Elections
+# HUN_skeleton.203 - Oct  15th 1965 - Arrow Cross Coup
+
+country_event = { # Electoral Reform
+	id = HUN_skeleton.1
+	title = HUN_skeleton.1.t
+	desc = HUN_skeleton.1.desc
+	#picture =
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_skeleton.1" }
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Reform Fails
+		name = HUN_skeleton.1.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HUNGARY_ELECTORAL_REFORM
+					option = HUNGARY_ELECTORAL_REFORM_PASS
+				}
+			}
+		}
+		country_event = {
+			id = HUN_skeleton.100
+			days = 80
+		}
+		set_party_name = {
+			ideology = fascism
+			name = HUN_fascism_merger_party
+			long_name = HUN_fascism_merger_party_long
+		}
+		set_party_name = {
+			ideology = national_socialism
+			name = HUN_national_socialism_merger_party
+			long_name = HUN_national_socialism_merger_party_long
+		}
+	}
+	option = { # Reform Passes
+		name = HUN_skeleton.1.b
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HUNGARY_ELECTORAL_REFORM
+					option = HUNGARY_ELECTORAL_REFORM_FAIL
+				}
+			}
+		}
+		HUN_Istvan_Horthy = {
+			remove_country_leader_role = { ideology = fascism_subtype }
+			add_country_leader_role = {
+				country_leader = {
+					desc = "POLITICS_ISTVAN_HORTHY_DESC"
+					expire = "1982.01.01"
+					ideology = despotism_interim_government_subtype
+					traits = {
+					}
+					id = -1
+				}
+				promote_leader = yes
+			}
+		}
+		set_politics = { ruling_party = despotism }
+		set_popularities = {
+			progressivism = 7
+			liberalism = 4
+			conservatism = 20
+			paternalism = 4
+			despotism = 25
+			fascism = 3
+			national_socialism = 26
+			national_socialism_1 = 11
+		}
+		set_party_name = {
+			ideology = despotism
+			name = HUN_despotism_horthy_party
+			long_name = HUN_despotism_horthy_party_long
+		}
+		fill_empty_minister_nochecks = yes
+		country_event = {
+			id = HUN_skeleton.200
+			days = 525
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = HUN_WORLD.4
+			}
+		}
+	}
+}
+
+country_event = { # Horthy-Bela Struggle for the military
+	id = HUN_skeleton.100
+	title = HUN_skeleton.100.t
+	desc = HUN_skeleton.100.desc
+	#picture =
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_skeleton.100" }
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = HUN_skeleton.100.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HUNGARY_MILLITARY_STRUGGLE
+					option = HUNGARY_MILLITARY_STRUGGLE_GERMAN
+				}
+			}
+		}
+		set_country_flag = HUN_imredy_independent
+		country_event = {
+			id = HUN_skeleton.101
+			days = 65
+		}
+		set_popularities = {
+			progressivism = 5
+			liberalism = 4
+			conservatism = 12
+			paternalism = 4
+			despotism = 7
+			fascism = 38
+			national_socialism = 20
+			national_socialism_1 = 10
+		}
+	}
+	option = { # German Support
+		name = HUN_skeleton.100.b
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HUNGARY_MILLITARY_STRUGGLE
+					option = HUNGARY_MILLITARY_STRUGGLE_INDEPENDENT
+				}
+			}
+		}
+		set_country_flag = HUN_imredy_german_backing
+		country_event = {
+			id = HUN_skeleton.101
+			days = 65
+		}
+		set_popularities = {
+			progressivism = 5
+			liberalism = 4
+			conservatism = 12
+			paternalism = 4
+			despotism = 4
+			fascism = 26
+			national_socialism = 35
+			national_socialism_1 = 10
+		}
+		set_party_name = {
+			ideology = national_socialism
+			name = HUN_national_socialism_german_imredy_party
+			long_name = HUN_national_socialism_german_imredy_party_long
+		}
+	}
+	#option = { # Military Coup
+	#	name = HUN_skeleton.100.c
+	#	set_country_leader_ideology = despotism_interim_government_subtype
+	#	set_politics = { ruling_party = despotism }
+	#	country_event = {
+	#		id = HUN_skeleton.xxx
+	#		days = 5
+	#	}
+	#}
+}
+
+country_event = { # Horthy's Final Gambit
+	id = HUN_skeleton.101
+	title = HUN_skeleton.101.t
+	desc = HUN_skeleton.101.desc
+	#picture =
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_skeleton.101" }
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Imredy Ousts Horthy
+		name = HUN_skeleton.101.a
+		retire_character = HUN_Istvan_Horthy
+		fill_empty_minister_nochecks = yes
+		if = {
+			limit = { has_country_flag = HUN_imredy_independent }
+		}
+		if = {
+			limit = { has_country_flag = HUN_imredy_german_backing }
+			HUN_Bela_Imredy = {
+				remove_country_leader_role = { ideology = fascism_subtype }
+				add_country_leader_role = {
+					country_leader = {
+						desc = "POLITICS_BELA_IMREDY_DESC"
+						expire = "1982.01.01"
+						ideology = national_socialism_subtype
+						traits = {
+						}
+						id = -1
+					}
+					promote_leader = yes
+				}
+			}
+			set_politics = { ruling_party = national_socialism }
+		}
+		country_event = {
+			id = HUN_skeleton.102
+			days = 970
+		}
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = HUN_WORLD.1
+			}
+		}
+	}
+	#option = { # Parliament Dissolved
+	#	name = HUN_skeleton.101.b
+	#	set_country_leader_ideology = despotism_interim_government_subtype
+	#	set_politics = { ruling_party = despotism }
+	#	country_event = {
+	#		id = HUN_skeleton.xxx
+	#		days = 5
+	#	}
+	#}
+}
+
+country_event = { # Imredy Dies
+	id = HUN_skeleton.102
+	title = HUN_skeleton.102.t
+	desc = HUN_skeleton.102.desc
+	#picture =
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_skeleton.102" }
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		trigger = { has_country_flag = HUN_imredy_independent }
+		name = HUN_skeleton.102.a
+		retire_character = HUN_Bela_Imredy
+		promote_character = HUN_Laszlo_Bardossy
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = HUN_WORLD.2
+			}
+		}
+	}
+	option = {
+		trigger = { has_country_flag = HUN_imredy_german_backing }
+		name = HUN_skeleton.102.b
+		retire_character = HUN_Bela_Imredy
+		promote_character = HUN_Andor_Jaross
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = HUN_WORLD.3
+			}
+		}
+	}
+}
+
+country_event = { # Our new PM is dead
+	id = HUN_skeleton.200
+	title = HUN_skeleton.200.t
+	desc = HUN_skeleton.200.desc
+	#picture =
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event HUN_skeleton.200"
+		# Not showing transitioning democracy subid in skeleton to avoid having to deal with renamings
+	}
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	#option = { # Imredy successfully drives Horthy from power
+	#	name = HUN_skeleton.200.a
+	#	country_event = {
+	#		id = HUN_skeleton.101
+	#		days = 5
+	#	}
+	#}
+	option = { # Horthy manages the chaos, for now
+		name = HUN_skeleton.200.b
+		country_event = {
+			id = HUN_skeleton.201
+			days = 150
+		}
+	}
+}
+
+country_event = { # Political situation is still tense
+	id = HUN_skeleton.201
+	title = HUN_skeleton.201.t
+	desc = HUN_skeleton.201.desc
+	#picture =
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event HUN_skeleton.201"
+		random_list = {
+			1 = {
+				set_country_flag = HUN_opposition_united
+				modifier = {
+					factor = 0
+					OR = {
+						has_game_rule = {
+							rule = HUNGARY_1967_ELECTIONS
+							option = HUNGARY_1967_ELECTIONS_CONSERVATIVE
+						}
+						has_game_rule = {
+							rule = HUNGARY_1967_ELECTIONS
+							option = HUNGARY_1967_ELECTIONS_LIBERAL
+						}
+					}
+				}
+			}
+			1 = {
+				set_country_flag = HUN_opposition_disunited
+				modifier = {
+					factor = 0
+					has_game_rule = {
+						rule = HUNGARY_1967_ELECTIONS
+						option = HUNGARY_1967_ELECTIONS_PATERNALIST
+					}
+				}
+			}
+		}
+	}
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Elections will proceed as normal
+		name = HUN_skeleton.201.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HUNGARY_COUP
+					option = HUNGARY_COUP_SUCCESS
+				}
+			}
+		}
+		country_event = {
+			id = HUN_skeleton.202
+			days = 620
+		}
+	}
+	option = { # UHHHH, military can help manage the situation till the election
+		name = HUN_skeleton.201.b
+		ai_chance = {
+			base = 1
+		}
+		set_politics = { ruling_party = despotism }
+		country_event = {
+			id = HUN_skeleton.203
+			days = 38
+		}
+	}
+}
+
+country_event = { # 1967 Elections
+	id = HUN_skeleton.202
+	title = HUN_skeleton.202.t
+	desc = HUN_skeleton.202.desc
+	#picture =
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_skeleton.202" }
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Supercoalition
+		trigger = { has_country_flag = HUN_opposition_united }
+		name = HUN_skeleton.202.a
+		HUN_Istvan_Horthy = {
+			remove_country_leader_role = { ideology = despotism_interim_government_subtype }
+			add_country_leader_role = {
+				country_leader = {
+					desc = "POLITICS_ISTVAN_HORTHY_DESC"
+					expire = "1982.01.01"
+					ideology = paternalism_dominant_party_democracy_subtype
+					traits = {
+					}
+					id = -1
+				}
+				promote_leader = yes
+			}
+		}
+
+		set_politics = {
+			ruling_party = paternalism
+			last_election = "1967.5.20"
+			elections_allowed = yes
+		}
+		set_popularities = {
+			progressivism = 12
+			liberalism = 7
+			conservatism = 27
+			paternalism = 13
+			despotism = 17
+			national_socialism = 9
+			national_socialism_1 = 15
+		}
+		set_party_name = {
+			ideology = paternalism
+			name = HUN_paternalism_big_coalition_party
+			long_name = HUN_paternalism_big_coalition_party_long
+		}
+		set_party_name = {
+			ideology = despotism
+			name = HUN_despotism_party
+			long_name = HUN_despotism_party_long
+		}
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = HUN_WORLD.5
+			}
+		}
+		
+		remove_ideas = HUN_Social_Upheaval
+	}
+	option = { # Conservative Coalition
+		trigger = { has_country_flag = HUN_opposition_disunited }
+		name = HUN_skeleton.202.b
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HUNGARY_1967_ELECTIONS
+					option = HUNGARY_1967_ELECTIONS_LIBERAL
+				}
+			}
+		}
+		HUN_Istvan_Horthy = {
+			remove_country_leader_role = { ideology = despotism_interim_government_subtype }
+			add_country_leader_role = {
+				country_leader = {
+					desc = "POLITICS_ISTVAN_HORTHY_DESC"
+					expire = "1982.01.01"
+					ideology = conservatism_agrarianism_subtype
+					traits = {
+					}
+					id = -1
+				}
+				promote_leader = yes
+			}
+		}
+
+		set_politics = {
+			ruling_party = conservatism
+			last_election = "1967.5.20"
+			elections_allowed = yes
+		}
+		set_popularities = {
+			progressivism = 15
+			liberalism = 11
+			conservatism = 34
+			paternalism = 6
+			despotism = 13
+			national_socialism = 9
+			national_socialism_1 = 12
+		}
+		set_party_name = {
+			ideology = conservatism
+			name = HUN_conservatism_small_coalition_party
+			long_name = HUN_conservatism_small_coalition_party_long
+		}
+		set_party_name = {
+			ideology = despotism
+			name = HUN_despotism_party
+			long_name = HUN_despotism_party_long
+		}
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = HUN_WORLD.6
+			}
+		}
+	}
+	option = { # Liberal Coalition
+		trigger = { has_country_flag = HUN_opposition_disunited }
+		name = HUN_skeleton.202.c
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HUNGARY_1967_ELECTIONS
+					option = HUNGARY_1967_ELECTIONS_CONSERVATIVE
+				}
+			}
+		}
+		HUN_Istvan_Horthy = {
+			remove_country_leader_role = { ideology = despotism_interim_government_subtype }
+			add_country_leader_role = {
+				country_leader = {
+					desc = "POLITICS_ISTVAN_HORTHY_DESC"
+					expire = "1982.01.01"
+					ideology = liberalism_national_liberal_subtype
+					traits = {
+					}
+					id = -1
+				}
+				promote_leader = yes
+			}
+		}
+
+		set_politics = {
+			ruling_party = liberalism
+			last_election = "1967.5.20"
+			elections_allowed = yes
+		}
+		set_popularities = {
+			progressivism = 15
+			liberalism = 25
+			conservatism = 20
+			paternalism = 6
+			despotism = 13
+			national_socialism = 9
+			national_socialism_1 = 12
+		}
+		set_party_name = {
+			ideology = liberalism
+			name = HUN_liberalism_small_coalition_party
+			long_name = HUN_liberalism_small_coalition_party_long
+		}
+		set_party_name = {
+			ideology = despotism
+			name = HUN_despotism_party
+			long_name = HUN_despotism_party_long
+		}
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = HUN_WORLD.7
+			}
+		}
+	}
+}
+
+country_event = { # Arrow Cross are storming the government
+	id = HUN_skeleton.203
+	title = HUN_skeleton.203.t
+	desc = HUN_skeleton.203.desc
+	#picture =
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_skeleton.203" }
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Military steps in to stop this stuff, elections. will. happen.
+		name = HUN_skeleton.203.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HUNGARY_COUP
+					option = HUNGARY_COUP_SUCCESS
+				}
+			}
+		}
+		country_event = {
+			id = HUN_skeleton.202
+			days = 582 # May 20th 1967
+		}
+	}
+	option = { # Military ignores Horthy pleas for help, Arrow Cross wins
+		name = HUN_skeleton.203.b
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = HUNGARY_COUP
+					option = HUNGARY_COUP_ELECTION
+				}
+			}
+		}
+		retire_character = HUN_Istvan_Horthy
+		HUN_Ferenc_Szalasi = {
+			remove_country_leader_role = { ideology = national_socialism_1_subtype }
+			add_country_leader_role = {
+				country_leader = {
+					desc = "POLITICS_FERENC_SZALASI_DESC"
+					expire = "1982.01.01"
+					ideology = national_socialism_subtype
+					traits = {
+					}
+					id = -1
+				}
+				promote_leader = yes
+			}
+		}
+		HUN_Andor_Jaross = {
+			remove_country_leader_role = { ideology = national_socialism_subtype }
+			add_country_leader_role = {
+				country_leader = {
+					desc = "POLITICS_ANDOR_JAROSS_DESC"
+					expire = "1982.01.01"
+					ideology = national_socialism_1_subtype
+					traits = {
+					}
+					id = -1
+				}
+				promote_leader = yes
+			}
+		}
+		set_politics = { ruling_party = national_socialism }
+		set_popularities = {
+			despotism = 17
+			national_socialism = 64
+			national_socialism_1 = 19
+		}
+		set_party_name = {
+			ideology = despotism
+			name = HUN_despotism_party
+			long_name = HUN_despotism_party_long
+		}
+		set_party_name = {
+			ideology = national_socialism
+			name = HUN_national_socialism_1_party
+			long_name = HUN_national_socialism_1_party_long
+		}
+		set_party_name = {
+			ideology = national_socialism_1
+			name = HUN_national_socialism_party
+			long_name = HUN_national_socialism_party_long
+		}
+		set_cosmetic_tag = HUN_arrow_cross
+		every_country = {
+			limit = { is_ai = no }
+			news_event = {
+				id = HUN_WORLD.8
+			}
+		}
+	}
+}
+
+##############################
+### Hungary World Events   ###
+##############################
+
+# Hungary - Imrédy Assumes Absolute Power
+news_event = {
+	id = HUN_WORLD.1
+	title = HUN_WORLD.1.t
+	desc = HUN_WORLD.1.desc
+	picture = GFX_news_event_HUN_imredy_regent
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_WORLD.1" }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HUN_WORLD.1.a
+	}
+}
+
+# Hungary - Imrédy Dies, Bardossy Seizes Power
+news_event = {
+	id = HUN_WORLD.2
+	title = HUN_WORLD.2.t
+	desc = HUN_WORLD.2.desc
+	picture = GFX_news_event_HUN_bardossy_regent
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_WORLD.2" }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HUN_WORLD.2.a
+	}
+}
+
+# Hungary - Imrédy Dies, Jaross Seizes Power
+news_event = {
+	id = HUN_WORLD.3
+	title = HUN_WORLD.3.t
+	desc = HUN_WORLD.3.desc
+	picture = GFX_news_event_HUN_jaross_regent
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_WORLD.3" }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HUN_WORLD.3.a
+	}
+}
+
+# Hungary - Imredy Fired, Horthy Annouces Reform
+news_event = {
+	id = HUN_WORLD.4
+	title = HUN_WORLD.4.t
+	desc = HUN_WORLD.4.desc
+	picture = GFX_news_event_HUN_horthy_reforms
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_WORLD.4" }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HUN_WORLD.4.a
+	}
+}
+
+# Hungary - MFP Dominant Coalition Win 1967 Hungary Election
+news_event = {
+	id = HUN_WORLD.5
+	title = HUN_WORLD.5.t
+	desc = HUN_WORLD.5.desc
+	picture = GFX_news_event_HUN_1967_elections
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_WORLD.5" }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HUN_WORLD.5.a
+	}
+}
+
+# Hungary - FKgP-PSZ Dominant Coalition Win 1967 Hungary Election
+news_event = {
+	id = HUN_WORLD.6
+	title = HUN_WORLD.6.t
+	desc = HUN_WORLD.6.desc
+	picture = GFX_news_event_HUN_1967_elections
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_WORLD.6" }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HUN_WORLD.6.a
+	}
+}
+
+# Hungary - PSZ-FKgP Dominant Coalition Win 1967 Hungary Election
+news_event = {
+	id = HUN_WORLD.7
+	title = HUN_WORLD.7.t
+	desc = HUN_WORLD.7.desc
+	picture = GFX_news_event_HUN_1967_elections
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_WORLD.7" }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HUN_WORLD.7.a
+	}
+}
+
+# Hungary - Arrow Cross Seizes Power
+news_event = {
+	id = HUN_WORLD.8
+	title = HUN_WORLD.8.t
+	desc = HUN_WORLD.8.desc
+	picture = GFX_news_event_HUN_arrow_cross_coup
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event HUN_WORLD.8" }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HUN_WORLD.8.a
+	}
+}

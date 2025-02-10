@@ -1,0 +1,164 @@
+#Fire the below in a unit leader scope
+
+is_BOR_unit_leader = {
+	OR = {
+		has_id = 3812
+		has_id = 3813
+		has_id = 3814
+		has_id = 3815
+		has_id = 3816
+	}
+}
+
+is_GRO_unit_leader = {
+	OR = {
+		has_id = 182
+		has_id = 183
+		has_id = 184
+		has_id = 185
+		has_id = 186
+	}
+}
+is_COG_unit_leader = {
+	OR = {
+		has_id = 177
+		has_id = 178
+		has_id = 179
+		has_id = 180
+		has_id = 181
+		has_id = 18100
+	}
+}
+is_ANG_unit_leader = {
+	OR = {
+		has_id = 187
+		has_id = 188
+		has_id = 189
+		has_id = 190
+		has_id = 191
+	}
+}
+
+SAF_is_desert_unit_leader = {
+	OR = {
+		has_id = 3801
+		has_id = 3805
+		has_id = 3807
+	}
+}
+
+SAF_is_hill_unit_leader = {
+	OR = {
+		has_id = 3806
+	}
+}
+
+is_GRO_general = {
+	OR = {
+		has_id = 184
+		has_id = 185
+		has_id = 186
+	}
+}
+
+is_MadCW_over = {
+	has_global_flag = MAD_CW_Happening
+	OR = {
+		AND = {
+			country_exists = MAD
+			NOT = { country_exists = MDG }
+			NOT = { country_exists = MDM }
+		}
+		AND = {
+			country_exists = MDG
+			NOT = { country_exists = MAD }
+			NOT = { country_exists = MDM }
+		}
+		AND = {
+			country_exists = MDM
+			NOT = { country_exists = MAD }
+			NOT = { country_exists = MDG }
+		}
+	}
+}
+
+SAF_can_sign_OFN_ceasefire = {
+	if = {
+		limit = {
+			GRO = {
+				OR = {
+					has_cosmetic_tag = GRO_REICHSSTAAT
+					has_cosmetic_tag = GRO_REICHSSTAAT_2
+					has_cosmetic_tag = GRO_REICHSSTAAT_3
+				}
+			}
+		}
+		BOR = { surrender_progress > 0.999 }
+		GRO = { surrender_progress > 0.349 }
+	}
+	else = {
+		OR = {
+			AND = {
+				BOR = { surrender_progress > 0.999 }
+				custom_trigger_tooltip = {
+					tooltip = SAFWAR_combined_over_100
+					set_temp_variable = { RK_surrender_progress = ANG.surrender_progress }
+					add_to_temp_variable = { RK_surrender_progress = COG.surrender_progress }
+					add_to_temp_variable = { RK_surrender_progress = GRO.surrender_progress }
+					check_variable = { RK_surrender_progress > 1 }
+				}
+			}
+			ANG = { surrender_progress > 0.999 }
+			COG = { surrender_progress > 0.999 }
+			GRO = { surrender_progress > 0.999 }
+		}
+	}
+}
+
+SAF_can_sign_Schild_ceasefire = {
+	if = {
+		limit = {
+			GRO = {
+				OR = {
+					has_cosmetic_tag = GRO_REICHSSTAAT
+					has_cosmetic_tag = GRO_REICHSSTAAT_2
+					has_cosmetic_tag = GRO_REICHSSTAAT_3
+				}
+			}
+		}
+		OR = {
+			BOR = { surrender_progress < 0.75 }
+			SAF = { surrender_progress > 0.5 }
+		}
+		GRO = { surrender_progress < 1 }
+	}
+	else = {
+		OR = {
+			BOR = { surrender_progress < 0.75 }
+			SAF = { surrender_progress > 0.5 }
+		}
+		ANG = { surrender_progress < 1 }
+		COG = { surrender_progress < 1 }
+		GRO = { surrender_progress < 1 }
+	}
+}
+
+SAF_can_sign_stalemate_ceasefire = {
+	SAF_can_sign_OFN_ceasefire = no
+	SAF_can_sign_Schild_ceasefire = no
+}
+
+is_bechuanaland_state = {
+	OR = {
+		state = 884
+		state = 1045
+		state = 1049
+		state = 1048
+		state = 1047
+		state = 1046
+		state = 1044
+		state = 542
+		state = 1050
+		state = 545 #Rommelstadt, controlled by GRO
+	}
+}

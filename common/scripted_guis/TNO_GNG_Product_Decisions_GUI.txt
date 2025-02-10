@@ -1,0 +1,127 @@
+scripted_gui = {
+	GNG_Product_Decisions_GUI = {
+		context_type = decision_category
+		window_name = "GNG_Product_Decisions_GUI"
+		dirty = GNG_product_decisions_dirty_variable
+
+		visible = {
+			always = yes
+		}
+		triggers = {
+			GNG_no_current_product_visible = {
+				check_variable = { GNG_product_cycle_active = 0 }
+			}
+			GNG_days_to_next_cycle_visible = {
+				check_variable = { GNG_show_days_to_next_cycle_visible = 1 }
+			}
+			GNG_product_image_visible = {
+				check_variable = { GNG_product_cycle_active = 1 }
+			}
+		}
+		properties = {
+			GNG_Research_Bar_1 = {
+				frame = GNG_ARR_research_bars^1
+			}
+			GNG_Research_Bar_2 = {
+				frame = GNG_ARR_research_bars^2
+			}
+			GNG_Research_Bar_3 = {
+				frame = GNG_ARR_research_bars^3
+			}
+			GNG_Research_Bar_4 = {
+				frame = GNG_ARR_research_bars^4
+			}
+			GNG_Research_Bar_5 = {
+				frame = GNG_ARR_research_bars^5
+			}
+			GNG_Product_Decisions_GUI_Performance_Bar = {
+				frame = GNG_product_performance
+			}
+			GNG_product_image = {
+				image = "[TNO_GNG_Product_Decision_GUI_Get_Product]"
+			}
+		}
+		triggers = {
+			GNG_Product_Decisions_GUI_Product_visible = {
+				check_variable = { GNG_product_cycle_active = 1 }
+			}
+			GNG_Product_Decisions_GUI_Specs_visible = {
+				check_variable = { GNG_product_cycle_active = 1 }
+			}
+			GNG_Product_Decisions_GUI_Quality_visible = {
+				check_variable = { GNG_product_cycle_active = 1 }
+			}
+			GNG_Product_Decisions_GUI_Approval_visible = {
+				check_variable = { GNG_product_cycle_active = 1 }
+			}
+			GNG_Product_Decisions_GUI_Market_visible = {
+				check_variable = { GNG_product_cycle_active = 1 }
+			}
+			GNG_Product_Decisions_GUI_Profitability_visible = {
+				check_variable = { GNG_product_cycle_active = 1 }
+			}
+			GNG_Product_Decisions_GUI_Product_Cycle_Effect_visible = {
+				check_variable = { GNG_product_cycle_active = 1 }
+				has_country_flag = GNG_show_effects_for_product_cycle
+			}
+			GNG_Product_Cycle_IJA_Animation_visible = {
+				has_country_flag = GNG_disable_all_mechanics_IJA
+			}
+		}
+		effects = {
+			GNG_Product_Decisions_GUI_Product_History_click = {
+				if = {
+					limit = { NOT = { has_country_flag = GNG_product_history_open } }
+					set_country_flag = GNG_product_history_open
+				}
+				else_if = {
+					limit = { has_country_flag = GNG_product_history_open }
+					clr_country_flag = GNG_product_history_open
+				}
+			}
+			GNG_Product_Decisions_GUI_Performance_Bar_click = {
+				add_to_variable = { GNG_product_decisions_dirty_variable = 0.01 }
+				set_country_flag = GNG_show_effects_for_product_cycle
+			}
+			GNG_Product_Decisions_GUI_Product_Cycle_Effect_click = {
+				GNG_show_effects_for_product_cycle = yes
+				custom_effect_tooltip = GNG_clear_show_effects_for_product_cycle_tt
+				clr_country_flag = GNG_show_effects_for_product_cycle
+				add_to_variable = { GNG_product_decisions_dirty_variable = 0.01 }
+			}
+		}
+	}
+	GNG_product_decisions_history = { ##For Product History, Do Later
+		context_type = player_context
+		window_name = "TNO_GNG_Product_History_Display_clip"
+		visible = { has_country_flag = GNG_product_history_open }
+		effects = {
+			TNO_GNG_product_history_close_button_click = {
+				if = {
+					limit = { NOT = { has_country_flag = GNG_product_history_open } }
+					set_country_flag = GNG_product_history_open
+				}
+				else_if = {
+					limit = { has_country_flag = GNG_product_history_open }
+					clr_country_flag = GNG_product_history_open
+				}
+			}
+		}
+		dynamic_lists = {
+			GNG_product_history_gridbox = {
+				array = GNG_product_history
+				index = GNG_product_history_i
+				entry_container = GNG_product_list_history
+				value = GNG_product_id
+			}
+		}
+		properties = {
+			product_letterhead = {
+				frame = GNG_product_manufactorer_faction^GNG_product_id
+			}
+			product_symbol = {
+				frame = GNG_product_manufactorer_faction^GNG_product_id
+			}
+		}
+	}
+}

@@ -1,0 +1,3740 @@
+bfi_gui_decision_category = {
+
+	#Instruction to the Italy player to select an issue, can be made selectable for testing. Not intended to effect anything
+	bfi_ita_select_issue = {
+		allowed = { tag = ITA }
+		visible = {
+			check_variable = { bfi_current_issue = 0 }
+			has_country_flag = bfi_ita_select_issue_flag
+		}
+		fire_only_once = yes
+		complete_effect = {
+			country_event = BFI.90
+		}
+	}
+
+	bfi_select_level_instructions = {
+		allowed = { tag = ITA }
+		visible = {
+			NOT = { check_variable = { bfi_current_issue = 0 } }
+			has_country_flag = bfi_selecting_level
+			ITA = { has_country_flag = bfi_active }
+		}
+		fire_only_once = yes
+		complete_effect = {
+			country_event = BFI.91
+		}
+	}
+
+	bfi_influence_italy_decision = {
+		allowed = { tag = ITA }
+		visible = {
+			NOT = { check_variable = { bfi_current_issue = 0 } }
+			ITA = { has_country_flag = bfi_influence }
+			ITA = { has_country_flag = bfi_active }
+		}
+		fire_only_once = yes
+		complete_effect = {
+			country_event = BFI.92
+		}
+	}
+
+	#missions you need to complete as you progress through the battle
+	#1st mission, Italy needs to pick an issue
+	bfi_pick_issue_mission = {
+		allowed = { tag = ITA }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = bfi_italy_pick_issue_activate_tt
+				NOT = { check_variable = { bfi_current_issue = 0 } }
+			}
+		}
+		activation = { always = no } # Will activate by command
+		is_good = no
+		selectable_mission = no
+		days_mission_timeout = 14
+		timeout_effect = {
+			custom_effect_tooltip = bfi_italy_pick_issue_less_independent_tt
+			BFI_increase_usa_influence_high = yes
+			BFI_increase_japan_influence_high = yes
+			activate_mission = bfi_pick_issue_mission
+		}
+		complete_effect = {
+			clr_country_flag = bfi_ita_select_issue_flag
+			USA = { set_country_flag = bfi_selecting_level }
+			USA = { activate_mission = bfi_select_level_mission }
+			JAP = { set_country_flag = bfi_selecting_level }
+			JAP = { activate_mission = bfi_select_level_mission }
+			ITA = { set_country_flag = bfi_selecting_level }
+			ITA = { activate_mission = bfi_select_level_mission }
+		}
+	}
+
+	#2nd mission, all countries need to select a negotiation level. This mission shows up to all nations
+	bfi_select_level_mission = {
+		allowed = {
+			tag = ITA
+			tag = USA
+			tag = JAP
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = BFI_selected_level_tt
+				NOT = { has_country_flag = bfi_selecting_level }
+			}
+		}
+		activation = { always = no } # Will activate by command
+		is_good = no
+		selectable_mission = no
+		days_mission_timeout = 14
+		timeout_effect = {
+			if = {
+				limit = { tag = USA }
+				BFI_increase_japan_influence_high = yes
+			}
+			if = {
+				limit = { tag = JAP }
+				BFI_increase_usa_influence_high = yes
+			}
+			if = {
+				limit = { tag = ITA }
+				BFI_increase_usa_influence_high = yes
+				BFI_increase_japan_influence_high = yes
+			}
+			clr_country_flag = bfi_selecting_level
+			if = {
+				limit = {
+					NOT = { ITA = { has_country_flag = bfi_selecting_level } }
+					NOT = { USA = { has_country_flag = bfi_selecting_level } }
+					NOT = { JAP = { has_country_flag = bfi_selecting_level } }
+				}
+				ITA = { set_country_flag = bfi_influence }
+				ITA = { activate_mission = bfi_influence_italy_mission }
+				hidden_effect = {
+					ITA = { activate_mission = bfi_influence_italy_mission_JAP }
+					ITA = { activate_mission = bfi_influence_italy_mission_USA }
+					USA = { activate_mission = bfi_influence_italy_mission_ITA }
+					USA = { activate_mission = bfi_influence_italy_mission_JAP }
+					JAP = { activate_mission = bfi_influence_italy_mission_ITA }
+					JAP = { activate_mission = bfi_influence_italy_mission_USA }
+				}
+			}
+		}
+		complete_effect = {
+			if = {
+				limit = {
+					NOT = { ITA = { has_country_flag = bfi_selecting_level } }
+					NOT = { USA = { has_country_flag = bfi_selecting_level } }
+					NOT = { JAP = { has_country_flag = bfi_selecting_level } }
+				}
+				ITA = { set_country_flag = bfi_influence }
+				ITA = { activate_mission = bfi_influence_italy_mission }
+				hidden_effect = {
+					ITA = { activate_mission = bfi_influence_italy_mission_JAP }
+					ITA = { activate_mission = bfi_influence_italy_mission_USA }
+					USA = { activate_mission = bfi_influence_italy_mission_ITA }
+					USA = { activate_mission = bfi_influence_italy_mission_JAP }
+					JAP = { activate_mission = bfi_influence_italy_mission_ITA }
+					JAP = { activate_mission = bfi_influence_italy_mission_USA }
+				}
+			}
+		}
+	}
+
+	#3rd mission, opens after all countries have selected a negotiation level 
+	bfi_influence_italy_mission = {
+		allowed = { tag = ITA }
+		available = { always = no }
+		activation = {
+			custom_trigger_tooltip = {
+				tooltip = BFI_italy_abandoned_internationalism_tt
+				always = no
+			}
+		}
+		is_good = yes
+		selectable_mission = no
+		days_mission_timeout = 40 # was 60, lowered for dev testing purposes
+		timeout_effect = {
+			hidden_effect = {
+				add_to_variable = { global.bfi_issues_resolved = 1 }
+				ITA = { clr_country_flag = bfi_influence }
+				ITA = { set_country_flag = bfi_ita_select_issue }
+				BFI_calculate_issue_winner = yes
+				if = {
+					limit = { check_variable = { global.bfi_issues_resolved = 5 } }
+					clr_country_flag = bfi_active
+					clr_country_flag = TNO_BFI_GUI_Italy_Window_visible
+					BattleForItaly_checkWinner = yes
+					BFI_Italy_joins_winner = yes
+				}
+				else = {
+					USA = { set_variable = { bfi_negotiation_level = -1 } }
+					JAP = { set_variable = { bfi_negotiation_level = -1 } }
+					ITA = { set_variable = { bfi_negotiation_level = -1 } }
+					set_variable = { ITA.bfi_current_issue = 0 }
+					activate_mission = bfi_pick_issue_mission
+					# Adding new points
+					USA = { add_to_variable = { bfi_points_available = bfi_point_next_issue } }
+					JAP = { add_to_variable = { bfi_points_available = bfi_point_next_issue } }
+					USA = { set_variable = { bfi_point_next_issue = 2 } }
+					JAP = { set_variable = { bfi_point_next_issue = 2 } }
+				}
+			}
+			custom_effect_tooltip = BFI_italy_issue_resolve_resolution_tt
+		}
+	}
+
+	#Shows what the players chose
+	#bfi_influence_italy_mission_dummy = {
+	bfi_influence_italy_mission_ITA = {
+		allowed = {
+			OR = {
+				tag = USA
+				tag = JAP
+			}
+		}
+		available = { always = no }
+		activation = { always = no }
+		is_good = yes
+		selectable_mission = no
+		days_mission_timeout = 40 # was 60, lowered for dev testing purposes
+		timeout_effect = {
+			custom_effect_tooltip = BFI_interact_with_italy_timer_tt
+		}
+	}
+	bfi_influence_italy_mission_USA = {
+		allowed = {
+			OR = {
+				tag = USA
+				tag = JAP
+			}
+		}
+		available = { always = no }
+		activation = { always = no }
+		is_good = yes
+		selectable_mission = no
+		days_mission_timeout = 40 # was 60, lowered for dev testing purposes
+		timeout_effect = {
+			custom_effect_tooltip = BFI_interact_with_italy_timer_tt
+		}
+	}
+	bfi_influence_italy_mission_JAP = {
+		allowed = {
+			OR = {
+				tag = USA
+				tag = JAP
+			}
+		}
+		available = { always = no }
+		activation = { always = no }
+		is_good = yes
+		selectable_mission = no
+		days_mission_timeout = 40 # was 60, lowered for dev testing purposes
+		timeout_effect = {
+			custom_effect_tooltip = BFI_interact_with_italy_timer_tt
+		}
+	}
+
+
+	#things that get you points
+	bfi_gain_points_USA = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			check_variable = { global.bfi_issues_resolved < 4 }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = bfi_less_than_4_points_tt
+				check_variable = { bfi_point_next_issue < 4 }
+			}
+		}
+		ai_will_do = {
+			base = 0
+			modifier = {
+				add = 1
+				check_variable = { bfi_point_next_issue = 2 }
+			}
+		}
+		cost = 60
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_gain_points_USA points at [?bfi_point_next_issue]"
+			custom_effect_tooltip = bfi_gain_points_tt
+			if  = {
+				limit = {
+					check_variable = { bfi_point_next_issue = 3 }
+				}
+				if = {
+					limit = { USA_RD_ruling_party = yes }
+					hidden_effect = {
+						every_owned_state = {
+							limit = { can_have_elections_in_state = yes }
+							add_to_variable = { NPP_popularity = 0.025 }
+							subtract_from_variable = { RD_popularity = 0.025 }
+						}
+					}
+					custom_effect_tooltip = USA_RD_popularity_decrease_low
+				}
+				else = {
+					custom_effect_tooltip = USA_NPP_popularity_decrease_low
+					hidden_effect = {
+						every_owned_state = {
+							limit = { can_have_elections_in_state = yes }
+							add_to_variable = { RD_popularity = 0.025 }
+							subtract_from_variable = { NPP_popularity = 0.025 }
+						}
+					}
+				}
+			}
+			add_to_variable = { bfi_point_next_issue = 1 }
+		}
+	}
+
+	bfi_gain_points_JAP = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			check_variable = { global.bfi_issues_resolved < 4 }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = bfi_less_than_4_points_tt
+				check_variable = { bfi_point_next_issue < 4 }
+			}
+		}
+		ai_will_do = {
+			base = 0
+			modifier = {
+				add = 1
+				check_variable = { bfi_point_next_issue = 2 }
+			}
+		}
+		cost = 60
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_gain_points_USA points at [?bfi_point_next_issue]"
+			custom_effect_tooltip = bfi_gain_points_tt
+			if  = {
+				limit = {
+					check_variable = { bfi_point_next_issue > 2 }
+				}
+				JAP_PM_decrease_power_small = yes
+			}
+			add_to_variable = { bfi_point_next_issue = 1 }
+		}
+	}
+
+
+	###############################################
+	#### Decisions to influence the situations ####
+	###############################################
+
+	## Usa decisions
+	# Issue 1
+	BFI_USA_increase_influence_issue_1_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_1_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_1_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_1_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_1_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_1_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_1_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_1_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 2
+	BFI_USA_increase_influence_issue_2_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_2_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_2_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_2_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_2_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_2_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_2_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_2_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 3
+	BFI_USA_increase_influence_issue_3_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_3_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_3_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_3_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_3_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_3_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_3_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_3_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 4
+	BFI_USA_increase_influence_issue_4_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_4_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_4_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_4_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_4_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_4_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_4_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_4_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 5
+	BFI_USA_increase_influence_issue_5_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_5_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_5_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_5_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_5_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_5_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_5_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_5_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 6
+	BFI_USA_increase_influence_issue_6_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_6_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_6_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_6_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_6_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_6_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_6_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_6_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 7
+	BFI_USA_increase_influence_issue_7_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_7_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_7_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_7_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_7_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_7_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_7_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_7_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 8
+	BFI_USA_increase_influence_issue_8_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_8_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_8_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_8_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_8_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_8_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_8_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_8_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 9
+	BFI_USA_increase_influence_issue_9_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_9_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_9_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_9_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_9_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_9_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_9_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_9_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 10
+	BFI_USA_increase_influence_issue_10_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_10_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_10_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_10_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_10_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_10_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_10_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_10_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 11
+	BFI_USA_increase_influence_issue_11_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_11_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_11_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_11_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_11_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_11_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_11_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_11_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 12
+	BFI_USA_increase_influence_issue_12_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_12_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_12_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_12_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_12_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_12_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_12_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_12_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 13
+	BFI_USA_increase_influence_issue_13_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_13_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_13_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_13_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_13_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_13_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_13_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_13_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 14
+	BFI_USA_increase_influence_issue_14_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_14_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_14_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_14_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_14_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_14_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_14_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_14_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+	# Issue 15
+	BFI_USA_increase_influence_issue_15_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_influence_issue_15_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_influence_dec_tt
+		}
+	}
+	BFI_USA_anti_JAP_influence_issue_15_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_anti_JAP_influence_issue_15_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = BFI_USA_anti_JAP_influence_issue_dec_tt
+		}
+	}
+	BFI_USA_increase_independence_issue_15_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_increase_independence_issue_15_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_USA_increase_independence_dec_tt
+		}
+	}
+	BFI_USA_decrease_independence_issue_15_dec = {
+		allowed = { tag = USA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_USA_decrease_independence_issue_15_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_USA_decrease_independence_dec_tt
+		}
+	}
+
+	## Japan Decisions
+
+	# Issue 1
+	BFI_JAP_increase_influence_issue_1_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_1_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_1_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_1_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_1_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_1_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_1_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_1_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 2
+	BFI_JAP_increase_influence_issue_2_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_2_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_2_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_2_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_2_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_2_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_2_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_2_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 3
+	BFI_JAP_increase_influence_issue_3_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_3_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_3_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_3_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_3_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_3_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_3_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_3_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 4
+	BFI_JAP_increase_influence_issue_4_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_4_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_4_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_4_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_4_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_4_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_4_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_4_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 5
+	BFI_JAP_increase_influence_issue_5_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_5_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_5_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_5_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_5_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_5_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_5_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_5_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 6
+	BFI_JAP_increase_influence_issue_6_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_6_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_6_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_6_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_6_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_6_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_6_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_6_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 7
+	BFI_JAP_increase_influence_issue_7_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_7_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_7_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_7_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_7_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_7_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_7_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_7_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 8
+	BFI_JAP_increase_influence_issue_8_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_8_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_8_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_8_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_8_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_8_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_8_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_8_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 9
+	BFI_JAP_increase_influence_issue_9_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_9_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_9_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_9_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_9_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_9_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_9_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_9_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 10
+	BFI_JAP_increase_influence_issue_10_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_10_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_10_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_10_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_10_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_10_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_10_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_10_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 11
+	BFI_JAP_increase_influence_issue_11_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_11_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_11_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_11_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_11_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_11_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_11_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_11_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 12
+	BFI_JAP_increase_influence_issue_12_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_12_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_12_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_12_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_12_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_12_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_12_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_12_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 13
+	BFI_JAP_increase_influence_issue_13_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_13_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_13_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_13_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_13_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_13_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_13_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_13_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 14
+	BFI_JAP_increase_influence_issue_14_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_14_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_14_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_14_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_14_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_14_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_14_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_14_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+	# Issue 15
+	BFI_JAP_increase_influence_issue_15_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_influence_issue_15_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_influence_dec_tt
+		}
+	}
+	BFI_JAP_anti_USA_influence_issue_15_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_anti_USA_influence_issue_15_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_anti_USA_influence_issue_dec_tt
+		}
+	}
+	BFI_JAP_increase_independence_issue_15_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_increase_independence_issue_15_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_increase_independence_dec_tt
+		}
+	}
+	BFI_JAP_decrease_independence_issue_15_dec = {
+		allowed = { tag = JAP }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision BFI_JAP_decrease_independence_issue_15_dec"
+			BFI_increase_usa_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = BFI_JAP_decrease_independence_dec_tt
+		}
+	}
+
+	## Italy Decisions
+	# Issue 1
+	bfi_ITA_independence_issue_1_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_1_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+		}
+	}
+	bfi_ITA_USA_influence_issue_1_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_1_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+		}
+	}
+	bfi_ITA_JAP_influence_issue_1_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_1_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+		}
+	}
+	bfi_ITA_anti_USA_issue_1_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_1_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_1_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 1 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_1_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 2
+	bfi_ITA_independence_issue_2_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_2_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+			TNO_worsen_trade_laws_policy_effectiveness_med = yes
+		}
+	}
+	bfi_ITA_USA_influence_issue_2_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_2_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+			TNO_improve_trade_laws_policy_effectiveness_low = yes
+			set_temp_variable = { gdp_growth_temp = 0.1 }
+			econ_gdp_growth_change = yes
+		}
+	}
+	bfi_ITA_JAP_influence_issue_2_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_2_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+			TNO_improve_trade_laws_policy_effectiveness_low = yes
+			set_temp_variable = { gdp_growth_temp = 0.1 }
+			econ_gdp_growth_change = yes
+		}
+	}
+	bfi_ITA_anti_USA_issue_2_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_2_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+			TNO_improve_trade_laws_policy_effectiveness_med = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = -0.005 }
+			econ_GDP_boost_once_percentage = yes
+
+		}
+	}
+	bfi_ITA_anti_JAP_issue_2_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 2 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_2_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+			TNO_improve_trade_laws_policy_effectiveness_med = yes
+			set_temp_variable = { temp_econ_GDP_boost_percentage = -0.005 }
+			econ_GDP_boost_once_percentage = yes
+		}
+	}
+
+	#Issue 3
+	bfi_ITA_independence_issue_3_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_3_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+		}
+	}
+	bfi_ITA_USA_influence_issue_3_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_3_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+		}
+	}
+	bfi_ITA_JAP_influence_issue_3_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_3_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+		}
+	}
+	bfi_ITA_anti_USA_issue_3_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_3_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_3_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 3 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_3_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 4
+	bfi_ITA_independence_issue_4_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_4_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+		}
+	}
+	bfi_ITA_USA_influence_issue_4_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_4_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+		}
+	}
+	bfi_ITA_JAP_influence_issue_4_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_4_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+		}
+	}
+	bfi_ITA_anti_USA_issue_4_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_4_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_4_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 4 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_4_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 5
+	bfi_ITA_independence_issue_5_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_5_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+			TNO_improve_academic_base_med = yes
+		}
+	}
+	bfi_ITA_USA_influence_issue_5_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_5_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+			TNO_improve_academic_base_low = yes
+		}
+	}
+	bfi_ITA_JAP_influence_issue_5_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_5_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+			TNO_improve_academic_base_low = yes
+		}
+	}
+	bfi_ITA_anti_USA_issue_5_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_5_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_5_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 5 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_5_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 6
+	bfi_ITA_independence_issue_6_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_6_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+			TNO_improve_agriculture_low = yes
+		}
+	}
+	bfi_ITA_USA_influence_issue_6_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_6_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+		}
+	}
+	bfi_ITA_JAP_influence_issue_6_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_6_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+		}
+	}
+	bfi_ITA_anti_USA_issue_6_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_6_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_6_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 6 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_6_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 7
+	bfi_ITA_independence_issue_7_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_7_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+			set_temp_variable = { civilian_costs_temp = 0.02 }
+			econ_civilian_costs_tooltip = yes
+			hidden_effect = {
+				add_ideas = ITA_BFI_increased_subsidies_for_eni
+			}
+		}
+	}
+	bfi_ITA_USA_influence_issue_7_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_7_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+			add_timed_idea = { idea = bfi_ITA_USA_influence_issue_7_dec_misc_income days = 90 }
+			hidden_effect = {
+				add_ideas = ITA_BFI_lower_oil_rates
+			}
+		}
+	}
+	bfi_ITA_JAP_influence_issue_7_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_7_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+			add_timed_idea = { idea = bfi_ITA_JAP_influence_issue_7_dec_misc_income days = 90 }
+			hidden_effect = {
+				add_ideas = ITA_BFI_lower_oil_rates
+			}
+		}
+	}
+	bfi_ITA_anti_USA_issue_7_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_7_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+			add_timed_idea = { idea = bfi_ITA_anti_USA_issue_7_dec_misc_income days = 90 }
+			hidden_effect = {
+				add_ideas = ITA_BFI_higher_oil_rates
+			}
+		}
+	}
+	bfi_ITA_anti_JAP_issue_7_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 7 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_7_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+			add_timed_idea = { idea = bfi_ITA_anti_JAP_issue_7_dec_misc_income days = 90 }
+			hidden_effect = {
+				add_ideas = ITA_BFI_higher_oil_rates
+			}
+		}
+	}
+
+	#Issue 8
+	bfi_ITA_independence_issue_8_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_8_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+		}
+	}
+	bfi_ITA_USA_influence_issue_8_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_8_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+		}
+	}
+	bfi_ITA_JAP_influence_issue_8_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_8_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+		}
+	}
+	bfi_ITA_anti_USA_issue_8_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_8_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_8_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 8 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_8_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 9
+	bfi_ITA_independence_issue_9_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_9_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+			set_temp_variable = { gdp_growth_temp = -0.08 }
+			econ_gdp_growth_change = yes
+		}
+	}
+	bfi_ITA_USA_influence_issue_9_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_9_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+			TNO_improve_poverty_low = yes
+		}
+	}
+	bfi_ITA_JAP_influence_issue_9_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_9_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+			TNO_improve_poverty_low = yes
+		}
+	}
+	bfi_ITA_anti_USA_issue_9_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_9_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+			set_temp_variable = { temp_econ_GDP_boost_percentage = -0.005 }
+			econ_GDP_boost_once_percentage = yes
+		}
+	}
+	bfi_ITA_anti_JAP_issue_9_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 9 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_9_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+			set_temp_variable = { temp_econ_GDP_boost_percentage = -0.005 }
+			econ_GDP_boost_once_percentage = yes
+		}
+	}
+
+	#Issue 10
+	bfi_ITA_independence_issue_10_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_10_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+		}
+	}
+	bfi_ITA_USA_influence_issue_10_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_10_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+		}
+	}
+	bfi_ITA_JAP_influence_issue_10_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_10_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+		}
+	}
+	bfi_ITA_anti_USA_issue_10_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_10_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_10_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 10 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_10_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 11
+	bfi_ITA_independence_issue_11_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_11_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+		}
+	}
+	bfi_ITA_USA_influence_issue_11_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_11_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+		}
+	}
+	bfi_ITA_JAP_influence_issue_11_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_11_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+		}
+	}
+	bfi_ITA_anti_USA_issue_11_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_11_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_11_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 11 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_11_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 12
+	bfi_ITA_independence_issue_12_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_12_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+			TNO_improve_industrial_expertise_low = yes
+		}
+	}
+	bfi_ITA_USA_influence_issue_12_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_12_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+			TNO_improve_industrial_equipment_low = yes
+		}
+	}
+	bfi_ITA_JAP_influence_issue_12_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_12_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+			TNO_improve_industrial_equipment_low = yes
+		}
+	}
+	bfi_ITA_anti_USA_issue_12_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_12_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_12_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 12 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_12_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 13
+	bfi_ITA_independence_issue_13_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_13_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+			nuclear_funding_minimal_increase_med = yes
+		}
+	}
+	bfi_ITA_USA_influence_issue_13_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_13_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+		}
+	}
+	bfi_ITA_JAP_influence_issue_13_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_13_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+		}
+	}
+	bfi_ITA_anti_USA_issue_13_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_13_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_13_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 13 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_13_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 14
+	bfi_ITA_independence_issue_14_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_14_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+		}
+	}
+	bfi_ITA_USA_influence_issue_14_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_14_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+			army_experience = 10
+		}
+	}
+	bfi_ITA_JAP_influence_issue_14_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_14_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+			army_experience = 10
+		}
+	}
+	bfi_ITA_anti_USA_issue_14_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_14_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_14_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 14 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_14_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+	#Issue 15
+	bfi_ITA_independence_issue_15_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_independence_issue_15_dec"
+			BFI_increase_italy_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_independence_issue_tt
+			set_temp_variable = { military_costs_temp = 0.025 }
+			econ_military_costs_tooltip = yes
+			hidden_effect = {
+				add_ideas = ITA_BFI_increased_SIM_funding
+			}
+		}
+	}
+	bfi_ITA_USA_influence_issue_15_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_USA_influence_issue_15_dec"
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_USA_influence_issue_tt
+		}
+	}
+	bfi_ITA_JAP_influence_issue_15_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_JAP_influence_issue_15_dec"
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_JAP_influence_issue_tt
+		}
+	}
+	bfi_ITA_anti_USA_issue_15_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_USA_issue_15_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_japan_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_USA_issue_tt
+		}
+	}
+	bfi_ITA_anti_JAP_issue_15_dec = {
+		allowed = { tag = ITA }
+		visible = {
+			ITA = { has_country_flag = bfi_active }
+			ITA = { has_country_flag = bfi_influence }
+			check_variable = { ITA.bfi_current_issue = 15 }
+		}
+		available = { }
+		ai_will_do = { base = 0 }
+		fire_only_once = yes
+		cost = 50
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision bfi_ITA_anti_JAP_issue_15_dec"
+			BFI_increase_italy_influence_med = yes
+			BFI_increase_usa_influence_med = yes
+			custom_effect_tooltip = bfi_ITA_anti_JAP_issue_tt
+		}
+	}
+
+}

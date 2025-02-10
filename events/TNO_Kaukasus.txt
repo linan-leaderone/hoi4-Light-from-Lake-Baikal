@@ -1,0 +1,280 @@
+﻿############################
+## Kaukasia Events
+############################
+
+add_namespace = cau
+
+## Debug ###
+
+### SKELTON EVENTS ###
+
+country_event = { #Josias goes monarchist
+	id = cau.10002
+	immediate = { log = "[GetDateText]: [Root.GetName]: event cau.10002" }
+	title = cau.10002.t
+	desc = cau.10002.desc
+	picture = GFX_report_event_CAU_soccer
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = cau.10002.a #stays Burgsys
+		ai_chance = {
+			factor = 7
+			modifier = {
+				factor = 0
+				GER = { NOT = { has_country_flag = heydrich_for_germany } } 
+				has_game_rule = { rule = CAU_IDEOLOGY_PATH option = CAU_IDEOLOGY_PATH_DESPOT }
+			}
+		}
+	}
+
+	option = { #goes monarchist
+		name = cau.10002.b
+		clr_country_flag = CAU_policy_josias_burgsys
+		set_country_flag = CAU_policy_josias_crowned
+		ai_chance = {
+			factor = 3
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = CAU_IDEOLOGY_PATH option = CAU_IDEOLOGY_PATH_NATIONALSOCIALISM }
+					has_game_rule = { rule = CAU_IDEOLOGY_PATH option = CAU_IDEOLOGY_PATH_BURGSYS }
+					GER = { has_country_flag = heydrich_for_germany }
+				}
+			}
+		}
+	}
+}
+
+country_event = { #business plot
+	id = cau.10003
+	immediate = { log = "[GetDateText]: [Root.GetName]: event cau.10003" }
+	title = cau.10003.t
+	desc = cau.10003.desc
+	picture = GFX_report_event_CAU_soccer
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #nothing happens
+		name = cau.10003.a
+		ai_chance = {
+			factor = 7
+			modifier = {
+				factor = 100000
+				GER = { has_country_flag = heydrich_for_germany }
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = CAU_IDEOLOGY_PATH option = CAU_IDEOLOGY_PATH_NATIONALSOCIALISM }
+					GER = { NOT = { has_country_flag = heydrich_for_germany } }
+				}
+			}
+		}
+	}
+
+	option = { #plot happens
+		name = cau.10003.b
+		set_politics = {
+			ruling_party = national_socialism
+		}
+		promote_character = CAU_paul_pleiger
+		remove_ideas = {
+			CAU_KarlHeinz_Burger_sec
+			CAU_Paul_Pleiger_for
+		}
+		add_ideas = {
+			CAU_Otto_Stapf_sec
+			CAU_Eugen_Ott_for
+		}
+		clr_country_flag = CAU_policy_josias_burgsys
+		clr_country_flag = CAU_policy_josias_crowned
+		set_country_flag = CAU_policy_business_plot
+		add_popularity = {
+			ideology = national_socialism
+			popularity = 0.4
+		}
+		ai_chance = {
+			factor = 3
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = { rule = CAU_IDEOLOGY_PATH option = CAU_IDEOLOGY_PATH_DESPOT }
+					has_game_rule = { rule = CAU_IDEOLOGY_PATH option = CAU_IDEOLOGY_PATH_BURGSYS }
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = cau.10004
+	immediate = { log = "[GetDateText]: [Root.GetName]: event cau.10004" }
+	title = cau.10004.t
+	desc = cau.10004.desc
+	picture = GFX_report_event_CAU_soccer
+
+	trigger = {
+		has_country_flag = CAU_policy_josias_crowned
+	}
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	option = {
+		name = cau.10004.a
+		set_politics = {
+			ruling_party = despotism
+		}
+		add_country_leader_role = {
+			character = CAU_josias_zu_waldeck_und_pyrmont
+			promote_leader = yes
+			country_leader = {
+				desc = "POLITICS_KAISER_JOSIAS_DESC"
+				expire = "1999.1.1"
+				ideology = despotism_absolute_monarchy_subtype
+				id = -1
+			}
+		}
+		set_country_leader_name = { name = CAU_josias_i }
+		set_country_leader_portrait = {
+			portrait = "gfx/leaders/CAU/Portrait_Caucasus_Josias_Kaiser.dds"
+		}
+
+		add_popularity = {
+			ideology = despotism
+			popularity = 0.4
+		}
+		every_country = {
+			news_event = {
+				id = WORLD_REICH.1800
+				days = 1
+			}
+		}
+	}
+}
+
+country_event = {
+	id = cau.10005
+	immediate = { log = "[GetDateText]: [Root.GetName]: event cau.10005" }
+	title = cau.10005.t
+	desc = cau.10005.desc
+	picture = GFX_report_event_CAU_soccer
+
+	trigger = {
+		has_country_flag = CAU_policy_business_plot
+	}
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	option = {
+		name = cau.10005.a
+		set_country_flag = CAU_policy_business_bormann
+		give_resource_rights = { receiver = BGR state = 1552 resources = { oil aluminium rubber tungsten steel chromium uranium } }
+		give_resource_rights = { receiver = BGR state = 229 resources = { oil aluminium rubber tungsten steel chromium uranium } }
+		give_resource_rights = { receiver = BGR state = 1554 resources = { oil aluminium rubber tungsten steel chromium uranium } }
+		ai_chance = {
+			factor = 5
+		}
+		BGR = {
+			country_event = {
+				id = bormann.103
+				days = 1
+			}
+		}
+	}
+	#option = {
+	#	name = cau.10005.b
+	#	set_country_flag = CAU_policy_business_goering
+	#	give_resource_rights = {
+	#		receiver = GGR
+	#		state = 229
+	#		resources = { oil aluminium rubber tungsten steel chromium uranium }
+	#	}
+	#	give_resource_rights = { receiver = GGR state = 1552 resources = { oil aluminium rubber tungsten steel chromium uranium } }
+	#	give_resource_rights = { receiver = GGR state = 229 resources = { oil aluminium rubber tungsten steel chromium uranium } }
+	#	give_resource_rights = { receiver = GGR state = 1554 resources = { oil aluminium rubber tungsten steel chromium uranium } }
+	#	ai_chance = {
+	#		factor = 5
+	#	}
+	#	GGR = {
+	#		country_event = {
+	#			id = goering.57
+	#			days = 1
+	#		}
+	#	}
+	#}
+}
+
+### INTRO EVENTS ###
+
+country_event = { # Lost Legion Event - Intergrate into events properly at some point love Debbel <3
+	id = cau.789
+	immediate = { log = "[GetDateText]: [Root.GetName]: event cau.789" }
+	title = cau.789.t
+	desc = cau.789.desc
+	picture = GFX_report_event_CAU_fear_and_loathing
+
+	is_triggered_only = yes
+
+	option = {
+		name = cau.789.a
+		hidden_effect = {
+			country_event = {
+				id = SPQR.50
+				days = 2
+			}
+			every_country = {
+				limit = {
+					NOT = {
+						tag = RMN
+					}
+				}
+				country_event = {
+					id = cau.790
+					days = 4
+				}
+			}
+		}
+	}
+	option = {
+		name = cau.789.b
+	}
+}
+
+country_event = { # Lost Legion Event 2 - Intergrate into events properly at some point love Debbel <3
+	id = cau.788
+	immediate = { log = "[GetDateText]: [Root.GetName]: event cau.788" }
+	title = cau.788.t
+	desc = cau.788.desc
+	picture = GFX_report_event_ROM_legion
+
+	is_triggered_only = yes
+
+	option = {
+		name = cau.788.a
+		hidden_effect = {
+			country_event = {
+				id = cau.789
+				days = 1
+			}
+		}
+	}
+}
+
+country_event = { # Lost Legion Event 2 - Intergrate into events properly at some point love Debbel <3
+	id = cau.790
+	immediate = { log = "[GetDateText]: [Root.GetName]: event cau.790" }
+	title = cau.790.t
+	desc = cau.790.desc
+	picture = GFX_report_event_ROM_guns
+
+	is_triggered_only = yes
+
+	option = {
+		name = cau.790.a
+		hidden_effect = {
+
+		}
+	}
+}

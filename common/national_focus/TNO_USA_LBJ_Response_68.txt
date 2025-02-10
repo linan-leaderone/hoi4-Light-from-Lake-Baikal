@@ -1,0 +1,838 @@
+
+
+# LBJ Reaction if he lose his re ellection
+# - Coded First by Jungle Rat, if you work here write your name as well
+# - Walker Of Chaos modified this so the 68 presidential candidates can load it
+# - DocOverbuild3 actually finished the thing
+
+#######################################################################
+
+######################### LBJ REACTION FOCUS TREE - BY JUNGLE RAT - 03/12/19
+#########################
+
+#######################################################################
+
+
+
+
+shared_focus = {
+	id = USA_LBJReac_Naivety_Johnson
+	icon = GFX_focus_USA_johnson_presidency
+	x = 0
+	y = 0
+	cost = 1.00
+	offset = {
+		x = -5
+		y = 9
+		trigger = {
+			has_government = paternalism
+		}
+	}
+	offset = {
+		x = 2
+		y = 9
+		trigger = {
+			has_government = conservatism
+		}
+	}
+	available_if_capitulated = yes
+	allow_branch = {
+		OR = {
+			has_country_flag = USA_test_response_tree
+			has_country_flag = USA_64_D_RDC_Past
+		}
+		NOT = {
+			has_country_flag = USA_finished_response
+		}
+	}
+	ai_will_do = {
+		factor = 1000000
+	}
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Naivety_Johnson"
+
+		add_political_power = 50
+		add_stability = 0.03
+
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+			custom_effect_tooltip = USA_urban_voters_header_tt
+			set_temp_variable = { USA_week_change_urban_nat = 4 }
+			add_to_variable = { Demographic_Shift_urban_nat_Weeks = USA_week_change_urban_nat }
+			custom_effect_tooltip = USA_urban_nat_shift
+		}
+
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+			custom_effect_tooltip = USA_urban_voters_header_tt
+			set_temp_variable = { USA_week_change_urban_rep = 4 }
+			add_to_variable = { Demographic_Shift_urban_rep_Weeks = USA_week_change_urban_rep }
+			custom_effect_tooltip = USA_urban_rep_shift
+		}
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_Already_Great
+	icon = GFX_focus_USA_a_city_on_a_hill
+	x = -2
+	y = 1
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Naivety_Johnson
+	}
+
+	ai_will_do = {
+		factor = 1000000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Already_Great"
+		remove_dynamic_modifier = { modifier = USA_LBJ_great_society_modifier }
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_How_Many_Agencies
+	icon = GFX_focus_USA_only_american_future
+	x = -3
+	y = 2
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Already_Great
+	}
+
+	ai_will_do = {
+		factor = 1000000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_How_Many_Agencies"
+
+		remove_ideas = {
+			USA_LBJ_task_forces
+			USA_LBJ_OEO_idea
+		}	
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_Slash_Budget
+	icon = GFX_focus_generic_out_of_depression
+	x = -1
+	y = 2
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Already_Great
+	}
+
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Slash_Budget"
+
+		custom_effect_tooltip = LBJ_response_slash_budgets
+
+		set_variable = { econ_research_expenditures_minimal_pct = 25 }
+		set_variable = { econ_research_expenditures_maximal_pct = 75 }
+		
+		set_variable = { econ_social_expenditures_minimal_pct = 25 }
+		set_variable = { econ_social_expenditures_maximal_pct = 75 }
+		
+		set_variable = { econ_admin_expenditures_minimal_pct = 25 }
+		set_variable = { econ_admin_expenditures_maximal_pct = 75 }
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_Could_be_Usefull
+	icon = GFX_focus_generic_economic_opportunity
+	x = -3
+	y = 3
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_How_Many_Agencies
+	}
+	prerequisite = {
+		focus = USA_LBJReac_Slash_Budget
+	}
+
+	mutually_exclusive = { focus = USA_LBJReac_Era_of_Big_G_is_over }
+
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Could_be_Usefull"
+
+		custom_effect_tooltip = USA_LBJ_Tree_reaction_could_be_useful
+
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+
+			custom_effect_tooltip = USA_union_voters_header_tt
+			set_temp_variable = { USA_week_change_union_pro = 4 }
+			add_to_variable = { Demographic_Shift_union_pro_Weeks = USA_week_change_union_pro }
+			custom_effect_tooltip = USA_union_pro_shift
+		}
+
+
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+			custom_effect_tooltip = USA_union_voters_header_tt
+			set_temp_variable = { USA_week_change_union_dem = 4 }
+			add_to_variable = { Demographic_Shift_union_dem_Weeks = USA_week_change_union_dem }
+			custom_effect_tooltip = USA_union_dem_shift
+
+		}
+	}
+}
+
+
+shared_focus = {
+	id = USA_LBJReac_Targeted_Funding
+	icon = GFX_focus_generic_ease_price_controls
+	x = -3
+	y = 4
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Could_be_Usefull
+	}
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Targeted_Funding"
+		set_temp_variable = { gdp_growth_temp = 1.00 }
+		econ_gdp_growth_change = yes
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_Era_of_Big_G_is_over
+	icon = GFX_focus_generic_government_purge
+	x = -1
+	y = 3
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_How_Many_Agencies
+	}
+	prerequisite = {
+		focus = USA_LBJReac_Slash_Budget
+	}
+	ai_will_do = {
+		factor = 1000
+	}
+	bypass = { has_idea = tno_health_care_support_for_emergencies }
+	mutually_exclusive = { focus = USA_LBJReac_Could_be_Usefull }
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Era_of_Big_G_is_over"
+		add_political_power = -90
+
+		tno_pensions_worsen = yes
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+
+			custom_effect_tooltip = USA_rural_voters_header_tt
+			set_temp_variable = { USA_week_change_rural_rep = 4 }
+			add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_rural_rep }
+			custom_effect_tooltip = USA_rural_rep_shift
+		}
+
+
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+			custom_effect_tooltip = USA_rural_voters_header_tt
+			set_temp_variable = { USA_week_change_rural_nat = 4 }
+			add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_rural_nat }
+			custom_effect_tooltip = USA_rural_nat_shift
+		}
+
+	}
+}
+
+
+shared_focus = {
+	id = USA_LBJReac_Shutter_Office
+	icon = GFX_focus_generic_money
+	x = -1
+	y = 4
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Era_of_Big_G_is_over
+	}
+	ai_will_do = {
+		factor = 1000
+	}
+	bypass = { has_idea = tno_unemployment_trinket_subsidies }
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Shutter_Office"
+		tno_unemployment_worsen = yes
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_End_Social_Security
+	icon = GFX_focus_USA_social_security_question
+	x = -2
+	y = 5
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Shutter_Office
+		focus = USA_LBJReac_Targeted_Funding
+	}
+	ai_will_do = {
+		factor = 1000
+	}
+	bypass = { has_idea = tno_pensions_trinket_pensions }
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_End_Social_Security"
+
+		tno_pensions_worsen = yes
+		tno_income_taxation_worsen = yes
+
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+			custom_effect_tooltip = USA_union_voters_header_tt
+			set_temp_variable = { USA_week_change_union_dem = 8 }
+			add_to_variable = { Demographic_Shift_union_dem_Weeks = USA_week_change_union_dem }
+			custom_effect_tooltip = USA_union_dem_shift
+			
+			custom_effect_tooltip = USA_urban_voters_header_tt
+			set_temp_variable = { USA_week_change_urban_dem = 8 }
+			add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_urban_dem }
+			custom_effect_tooltip = USA_urban_dem_shift
+		}
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+			custom_effect_tooltip = USA_union_voters_header_tt
+			set_temp_variable = { USA_week_change_union_pro = 8 }
+			add_to_variable = { Demographic_Shift_union_pro_Weeks = USA_week_change_union_pro }
+			custom_effect_tooltip = USA_union_pro_shift
+			
+			custom_effect_tooltip = USA_urban_voters_header_tt
+			set_temp_variable = { USA_week_change_urban_pro = 8 }
+			add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_urban_pro }
+			custom_effect_tooltip = USA_urban_pro_shift
+
+
+		}
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_Rocked_Boat
+	icon = GFX_focus_USA_america_is_on_fire
+	x = 2
+	y = 1
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Naivety_Johnson
+	}
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Rocked_Boat"
+
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+			custom_effect_tooltip = USA_rural_voters_header_tt
+			set_temp_variable = { USA_week_change_rural_rep = 4 }
+			add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_rural_rep }
+			custom_effect_tooltip = USA_rural_rep_shift
+		}
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+			custom_effect_tooltip = USA_rural_voters_header_tt
+			set_temp_variable = { USA_week_change_rural_nat = 4 }
+			add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_rural_nat }
+			custom_effect_tooltip = USA_rural_nat_shift
+		}
+	}
+}
+shared_focus = {
+	id = USA_LBJReac_Coddle_South
+	icon = GFX_focus_USA_reassure_dixiecrats
+	x = 1
+	y = 2
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Rocked_Boat
+	}
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		add_political_power = 25
+
+		custom_effect_tooltip = USA_LBJ_Tree_reaction_misunderstood_south
+
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Coddle_South"
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+
+			custom_effect_tooltip = USA_rural_voters_header_tt
+			set_temp_variable = { USA_week_change_rural_rep = 4 }
+			add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_rural_rep }
+			custom_effect_tooltip = USA_rural_rep_shift
+			
+			custom_effect_tooltip = USA_nativists_voters_header_tt
+			set_temp_variable = { USA_week_change_nativists_rep = 6 }
+			add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_nativists_rep }
+			custom_effect_tooltip = USA_nativists_rep_shift
+		}
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+
+
+			custom_effect_tooltip = USA_rural_voters_header_tt
+			set_temp_variable = { USA_week_change_rural_nat = 4 }
+			add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_rural_nat }
+			custom_effect_tooltip = USA_rural_nat_shift
+			
+			custom_effect_tooltip = USA_nativists_voters_header_tt
+			set_temp_variable = { USA_week_change_nativists_nat = 6 }
+			add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_nativists_nat }
+			custom_effect_tooltip = USA_nativists_nat_shift
+		}
+		add_to_variable = { USA_NPP_FR_Response_Vote_Count = 2 }
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_Unshackle_Police
+		icon = GFX_focus_generic_hold_the_police_accountable
+	x = 3
+	y = 2
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Rocked_Boat
+	}
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Unshackle_Police"
+
+		add_stability = 0.02
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+
+			custom_effect_tooltip = USA_rural_voters_header_tt
+			set_temp_variable = { USA_week_change_rural_rep = 4 }
+			add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_rural_rep }
+			custom_effect_tooltip = USA_rural_rep_shift
+		
+			custom_effect_tooltip = USA_nativists_voters_header_tt
+			set_temp_variable = { USA_week_change_nativists_rep = 6 }
+			add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_nativists_rep }
+			custom_effect_tooltip = USA_nativists_rep_shift
+		}
+
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+			custom_effect_tooltip = USA_rural_voters_header_tt
+			set_temp_variable = { USA_week_change_rural_nat = 4 }
+			add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_rural_nat }
+			custom_effect_tooltip = USA_rural_nat_shift
+			
+			custom_effect_tooltip = USA_nativists_voters_header_tt
+			set_temp_variable = { USA_week_change_nativists_nat = 6 }
+			add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_nativists_nat }
+			custom_effect_tooltip = USA_nativists_nat_shift
+			
+		}
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_Cant_Change_it_Now
+	icon = GFX_focus_generic_our_duty_to_the_people
+	x = 1
+	y = 3
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Coddle_South
+	}
+	prerequisite = {
+		focus = USA_LBJReac_Unshackle_Police
+	}
+	mutually_exclusive = { focus = USA_LBJReac_Do_Whats_Right }
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		add_political_power = -20
+		add_stability = 0.02
+		custom_effect_tooltip = USA_LBJ_Tree_reaction_south_pissed
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+			
+			USA_remove_10_RR_RDC_approval = yes
+			USA_remove_10_LD_RDC_approval = yes
+			
+			custom_effect_tooltip = USA_urban_voters_header_tt
+			set_temp_variable = { USA_week_change_urban_pro = 6 }
+			add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_urban_pro }
+			custom_effect_tooltip = USA_urban_pro_shift
+			
+			custom_effect_tooltip = USA_black_voters_header_tt
+			set_temp_variable = { USA_week_change_black_pro = 8 }
+			add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_black_pro }
+			custom_effect_tooltip = USA_black_pro_shift
+		}
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+
+			USA_add_10_LD_RDC_approval = yes
+			USA_add_10_RR_RDC_approval = yes
+			
+			custom_effect_tooltip = USA_urban_voters_header_tt
+			set_temp_variable = { USA_week_change_urban_dem = 6 }
+			add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_urban_dem }
+			custom_effect_tooltip = USA_urban_dem_shift
+			
+			custom_effect_tooltip = USA_black_voters_header_tt
+			set_temp_variable = { USA_week_change_black_dem = 8 }
+			add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_black_dem }
+			custom_effect_tooltip = USA_black_dem_shift
+		}
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Cant_Change_it_Now"
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_Enforce_the_Provisions
+	icon = GFX_focus_USA_keep_a_majority_by_any_means
+	x = 1
+	y = 4
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Cant_Change_it_Now
+	}
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		custom_effect_tooltip = USA_LBJ_Tree_reaction_North_AA_pleased
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+
+			USA_add_10_LD_RDC_approval = yes
+			USA_add_10_RR_RDC_approval = yes
+			
+			custom_effect_tooltip = USA_urban_voters_header_tt
+			set_temp_variable = { USA_week_change_urban_dem = 3 }
+			add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_urban_dem }
+			custom_effect_tooltip = USA_urban_dem_shift
+			set_temp_variable = { USA_week_change_urban_rep = 3 }
+			add_to_variable = { Demographic_Shift_urban_rep_Weeks = USA_week_change_urban_rep }
+			custom_effect_tooltip = USA_urban_rep_shift
+			
+			custom_effect_tooltip = USA_black_voters_header_tt
+			set_temp_variable = { USA_week_change_black_dem = 3 }
+			add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_black_dem }
+			custom_effect_tooltip = USA_black_dem_shift
+			set_temp_variable = { USA_week_change_black_rep = 3 }
+			add_to_variable = { Demographic_Shift_black_rep_Weeks = USA_week_change_black_rep }
+			custom_effect_tooltip = USA_black_rep_shift
+			
+			custom_effect_tooltip = USA_nativists_voters_header_tt
+			set_temp_variable = { USA_week_change_nativists_nat = 4 }
+			add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_nativists_nat }
+			custom_effect_tooltip = USA_nativists_nat_shift
+		}
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+			custom_effect_tooltip = USA_urban_voters_header_tt
+			set_temp_variable = { USA_week_change_urban_pro = 3 }
+			add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_urban_pro }
+			custom_effect_tooltip = USA_urban_pro_shift
+			set_temp_variable = { USA_week_change_urban_nat = 3 }
+			add_to_variable = { Demographic_Shift_urban_nat_Weeks = USA_week_change_urban_nat }
+			custom_effect_tooltip = USA_urban_nat_shift
+			
+			custom_effect_tooltip = USA_black_voters_header_tt
+			set_temp_variable = { USA_week_change_black_pro = 3 }
+			add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_black_pro }
+			custom_effect_tooltip = USA_black_pro_shift
+			set_temp_variable = { USA_week_change_black_nat = 3 }
+			add_to_variable = { Demographic_Shift_black_nat_Weeks = USA_week_change_black_nat }
+			custom_effect_tooltip = USA_black_nat_shift
+			
+			custom_effect_tooltip = USA_nativists_voters_header_tt
+			set_temp_variable = { USA_week_change_nativists_rep = 4 }
+			add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_nativists_rep }
+			custom_effect_tooltip = USA_nativists_rep_shift
+
+			custom_effect_tooltip = USA_add_NPP_unity
+			add_to_variable = { USA_NPP_Unity = 2 }
+		}
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Enforce_the_Provisions"
+	}
+}
+
+
+shared_focus = {
+	id = USA_LBJReac_Do_Whats_Right
+	icon = GFX_focus_USA_repeal_the_civil_rights_act
+	x = 3
+	y = 3
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Coddle_South
+	}
+	prerequisite = {
+		focus = USA_LBJReac_Unshackle_Police
+	}
+	mutually_exclusive = { focus = USA_LBJReac_Cant_Change_it_Now }
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		add_political_power = 30
+		add_stability = -0.02
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Do_Whats_Right"
+
+		custom_effect_tooltip = USA_LBJ_Tree_reaction_south_pleased
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+			
+			USA_remove_10_RR_RDC_approval = yes
+			USA_remove_10_LD_RDC_approval = yes
+			
+			custom_effect_tooltip = USA_urban_voters_header_tt
+			set_temp_variable = { USA_week_change_urban_pro = 6 }
+			add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_urban_pro }
+			custom_effect_tooltip = USA_urban_pro_shift
+			
+			custom_effect_tooltip = USA_black_voters_header_tt
+			set_temp_variable = { USA_week_change_black_pro = 8 }
+			add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_black_pro }
+			custom_effect_tooltip = USA_black_pro_shift
+		}
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+
+			USA_add_10_LD_RDC_approval = yes
+			USA_add_10_RR_RDC_approval = yes
+			
+			custom_effect_tooltip = USA_urban_voters_header_tt
+			set_temp_variable = { USA_week_change_urban_dem = 6 }
+			add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_urban_dem }
+			custom_effect_tooltip = USA_urban_dem_shift
+			
+			custom_effect_tooltip = USA_black_voters_header_tt
+			set_temp_variable = { USA_week_change_black_dem = 8 }
+			add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_black_dem }
+			custom_effect_tooltip = USA_black_dem_shift
+		}
+
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_Pull_our_Support
+		icon = GFX_focus_USA_bend_to_the_segregationists
+	x = 3
+	y = 4
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Do_Whats_Right
+	}
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		add_to_variable = { USA_NPP_FR_Response_Vote_Count = 5 }
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Pull_our_Support"
+		custom_effect_tooltip = USA_LBJ_Tree_reaction_North_AA_pissed
+		add_stability = -0.01
+		add_political_power = -45
+		
+			if = {
+				limit = { has_country_flag = USA_68_R_RDC }
+
+				custom_effect_tooltip = USA_urban_voters_header_tt
+				set_temp_variable = { USA_week_change_urban_pro = 6 }
+				add_to_variable = { Demographic_Shift_urban_pro_Weeks = USA_week_change_urban_pro }
+				custom_effect_tooltip = USA_urban_pro_shift
+				
+				custom_effect_tooltip = USA_black_voters_header_tt
+				set_temp_variable = { USA_week_change_black_pro = 8 }
+				add_to_variable = { Demographic_Shift_black_pro_Weeks = USA_week_change_black_pro }
+				custom_effect_tooltip = USA_black_pro_shift
+				
+			}
+			if = {
+				limit = { has_country_flag = USA_68_FR_NPP }
+
+
+				custom_effect_tooltip = USA_urban_voters_header_tt
+				set_temp_variable = { USA_week_change_urban_dem = 6 }
+				add_to_variable = { Demographic_Shift_urban_dem_Weeks = USA_week_change_urban_dem }
+				custom_effect_tooltip = USA_urban_dem_shift
+				
+				custom_effect_tooltip = USA_black_voters_header_tt
+				set_temp_variable = { USA_week_change_black_dem = 8 }
+				add_to_variable = { Demographic_Shift_black_dem_Weeks = USA_week_change_black_dem }
+				custom_effect_tooltip = USA_black_dem_shift
+			}
+			add_to_variable = { USA_NPP_FR_Response_Vote_Count = 5 }
+	}
+}
+
+
+shared_focus = {
+	id = USA_LBJReac_Quiet_Gutting
+	icon = GFX_focus_USA_stacking_the_bench
+	x = -1
+	y = 1
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Pull_our_Support
+		focus = USA_LBJReac_Enforce_the_Provisions
+	}
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Pull_our_Support
+	completion_reward = {
+
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+
+			USA_remove_5_LD_RDC_approval = yes
+			USA_remove_5_RR_RDC_approval = yes
+		}
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+
+			custom_effect_tooltip = USA_subtract_NPP_unity
+			add_to_variable = { USA_NPP_Unity = -1 }
+		}
+		if = {
+			limit = { has_idea = tno_racial_integration_enforced_integration }
+			swap_ideas = {
+				remove_idea = tno_racial_integration_enforced_integration
+				add_idea = tno_racial_integration_integrated_military
+			}
+		}
+		if = {
+			limit = { has_idea = tno_vote_franchise_promoted_voting }
+			swap_ideas = {
+				remove_idea = tno_vote_franchise_promoted_voting
+				add_idea = tno_vote_franchise_universal
+			}
+		}
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Quiet_Gutting"
+	}
+}
+
+shared_focus = {
+	id = USA_LBJReac_Back_on_Track
+	icon = GFX_focus_USA_tape_together_the_seams
+	x = 0
+	y = 6
+	cost = 1.00
+	available_if_capitulated = yes
+	prerequisite = {
+		focus = USA_LBJReac_Quiet_Gutting
+	}
+
+	prerequisite = {
+		focus = USA_LBJReac_End_Social_Security
+	}
+
+	ai_will_do = {
+		factor = 1000
+	}
+	relative_position_id = USA_LBJReac_Naivety_Johnson
+	completion_reward = {
+		add_political_power = 40
+		add_stability = 0.03
+		if = {
+			limit = { has_country_flag = USA_68_R_RDC }
+			custom_effect_tooltip = USA_all_voters_header_tt
+			set_temp_variable = { USA_week_change_union_rep = 4 }
+			add_to_variable = { Demographic_Shift_union_rep_Weeks = USA_week_change_union_rep }
+			custom_effect_tooltip = USA_union_rep_shift
+			
+			add_to_variable = { Demographic_Shift_urban_rep_Weeks = USA_week_change_union_rep }
+			add_to_variable = { Demographic_Shift_rural_rep_Weeks = USA_week_change_union_rep }
+			add_to_variable = { Demographic_Shift_nativists_rep_Weeks = USA_week_change_union_rep }
+			add_to_variable = { Demographic_Shift_black_rep_Weeks = USA_week_change_union_rep }
+			add_to_variable = { Demographic_Shift_hispanic_rep_Weeks = USA_week_change_union_rep }
+			add_to_variable = { Demographic_Shift_minority_rep_Weeks = USA_week_change_union_rep }
+		}
+		if = {
+			limit = { has_country_flag = USA_68_FR_NPP }
+			custom_effect_tooltip = USA_all_voters_header_tt
+			set_temp_variable = { USA_week_change_union_nat = 4 }
+			add_to_variable = { Demographic_Shift_union_nat_Weeks = USA_week_change_union_nat }
+			custom_effect_tooltip = USA_union_nat_shift
+			
+			add_to_variable = { Demographic_Shift_urban_nat_Weeks = USA_week_change_union_nat }
+			add_to_variable = { Demographic_Shift_rural_nat_Weeks = USA_week_change_union_nat }
+			add_to_variable = { Demographic_Shift_nativists_nat_Weeks = USA_week_change_union_nat }
+			add_to_variable = { Demographic_Shift_black_nat_Weeks = USA_week_change_union_nat }
+			add_to_variable = { Demographic_Shift_hispanic_nat_Weeks = USA_week_change_union_nat }
+			add_to_variable = { Demographic_Shift_minority_nat_Weeks = USA_week_change_union_nat }
+		}
+		hidden_effect = {
+			remove_ideas = USA_LBJ_task_forces
+			remove_ideas = USA_LBJ_OEO_idea
+			remove_ideas = USA_LBJ_pilot_programs_1
+			remove_ideas = USA_LBJ_pilot_programs_2
+			remove_ideas = USA_LBJ_pilot_programs_3
+			remove_ideas = USA_LBJ_pilot_programs_4
+			remove_ideas = USA_LBJ_healthcare_programs_1
+			remove_ideas = USA_LBJ_healthcare_programs_2
+			remove_ideas = USA_LBJ_healthcare_programs_3
+			remove_ideas = USA_LBJ_healthcare_programs_4
+				#remove_ideas = USA_LBJ_temp_healthcare_plans
+			remove_ideas = USA_LBJ_immigration_bonus
+				#remove_ideas = USA_LBJ_school_bonus
+			remove_ideas = USA_LBJ_school_bonus_2
+				#remove_ideas = USA_LBJ_funding_diverted_social_programs
+			remove_ideas = USA_LBJ_race_riots_1
+			remove_ideas = USA_LBJ_race_riots_2
+			remove_ideas = USA_LBJ_race_riots_3
+			remove_ideas = USA_LBJ_race_riots_4
+			remove_ideas = USA_LBJ_race_riots_5
+		}
+		log = "[GetDateText]: [Root.GetName]: Focus USA_LBJReac_Back_on_Track"
+		set_country_flag = USA_finished_response
+	}
+}

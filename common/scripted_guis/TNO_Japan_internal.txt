@@ -1,0 +1,399 @@
+scripted_gui = {
+	TNO_Japan_Internal_GUI_open = {
+		context_type = player_context
+		parent_window_token = politics_tab
+		window_name = "TNO_Japan_Internal_GUI_open"
+
+		visible = {
+			tag = JAP
+			NOT = { has_country_flag = JAP_dlc_failed }
+		}
+
+		effects = {
+			Japan_Internal_GUI_Open_Button_click = {
+				if = {
+					limit = { NOT = { has_country_flag = JAP_Internal_GUI_open_flag } }
+					set_country_flag = JAP_Internal_GUI_open_flag
+				}
+				else_if = {
+					limit = { has_country_flag = JAP_Internal_GUI_open_flag }
+					clr_country_flag = JAP_Internal_GUI_open_flag
+				}
+				clr_country_flag = gui_alert_visible
+			}
+		}
+
+		triggers = {
+			gui_alert_visible = {
+				has_country_flag = gui_alert_visible
+			}
+		}
+	}
+
+	TNO_Japan_Internal_GUI_main = {
+		context_type = player_context
+		parent_window_token = TNO_Japan_Internal_GUI_open
+		window_name = "TNO_Japan_Internal_GUI_main"
+
+		visible = {
+			has_country_flag = JAP_Internal_GUI_open_flag
+		}
+
+		triggers = {
+			Japan_Internal_GUI_higashikuni_cover_bg_visible = { has_idea = JAP_showa_emperor_hop }
+			Japan_Internal_GUI_higashikuni_cover_marquee_L_visible = { has_idea = JAP_showa_emperor_hop }
+			Japan_Internal_GUI_higashikuni_cover_marquee_R_visible = { has_idea = JAP_showa_emperor_hop }
+			Japan_Internal_GUI_muto_cover_bg_visible = { has_idea = JAP_showa_emperor_muto }
+			Japan_Internal_GUI_muto_cover_marquee_L_visible = { has_idea = JAP_showa_emperor_muto }
+			Japan_Internal_GUI_muto_cover_marquee_R_visible = { has_idea = JAP_showa_emperor_muto }
+		}
+
+		dynamic_lists = {
+			TNO_Japan_Internal_GUI_Seats_GridBox = {
+				array = JAP_Diet_Seats_display
+				index = i
+				change_scope = no
+
+				entry_container = TNO_Japan_Internal_GUI_Seats_Entry
+			}
+		}
+
+		effects = {
+			Japan_Internal_GUI_Military_Button_click = {
+				if = {
+					limit = { NOT = { has_country_flag = JAP_Internal_GUI_Military_open_flag } }
+					set_country_flag = JAP_Internal_GUI_Military_open_flag
+				}
+				else_if = {
+					limit = { has_country_flag = JAP_Internal_GUI_Military_open_flag }
+					clr_country_flag = JAP_Internal_GUI_Military_open_flag
+				}
+			}
+			TNO_Japan_Internal_GUI_close_button_click = {
+				clr_country_flag = JAP_Internal_GUI_open_flag
+			}
+			Japan_Internal_GUI_Box_Left_1_Button_click = {		#Kido
+				set_country_flag = JAP_faction_info_window_open
+				set_variable = { JAP_selected_diet_faction = 1 }
+			}
+			Japan_Internal_GUI_Box_Left_2_Button_click = {		#Takagi
+				set_country_flag = JAP_faction_info_window_open
+				set_variable = { JAP_selected_diet_faction = 2 }
+			}
+			Japan_Internal_GUI_Box_Middle_Button_click = {		#Miki
+				set_country_flag = JAP_faction_info_window_open
+				set_variable = { JAP_selected_diet_faction = 3 }
+			}
+			Japan_Internal_GUI_Box_Right_2_Button_click = {		#Ino
+				set_country_flag = JAP_faction_info_window_open
+				set_variable = { JAP_selected_diet_faction = 4 }
+			}
+			Japan_Internal_GUI_Box_Right_1_Button_click = {		#Kaya
+				set_country_flag = JAP_faction_info_window_open
+				set_variable = { JAP_selected_diet_faction = 5 }
+			}
+		}
+
+		properties = {
+
+			Japan_Internal_GUI_Portrait_Right_2 = {
+				image = "[JAP_Internal_GUI_GetFascistLeader]"
+			}
+
+			Japan_Internal_GUI_Portrait_Left_1 = {
+				image = "[JAP_Internal_GUI_GetAuthDemLeader]"
+			}
+
+			Japan_Internal_GUI_Portrait_Right_1 = {
+				image = "[JAP_Internal_GUI_GetDespotLeader]"
+			}
+
+			TNO_Japan_Internal_GUI_Seats_Entry_Box = {
+				frame = JAP_Diet_Seats_display^i
+			}
+
+			Japan_Internal_GUI_Gov_Stab_Progbar = {
+				frame = JAP_government_stability
+			}
+
+		}
+	}
+
+	TNO_Japan_Internal_GUI_faction_info_window_open = {
+		context_type = player_context
+		#parent_window_name = "TNO_SGR_Economy_GUI"
+		window_name = "TNO_Japan_Internal_GUI_faction_info_window"
+
+		visible = {
+			has_country_flag = JAP_faction_info_window_open
+		}
+
+		triggers = {
+			Japan_faction_info_window_button_1_visible = {
+				check_variable = { JAP_action_1_days_left = 0 }
+				NOT = { check_variable = { JAP_Diet_Faction_Power^JAP_selected_diet_faction > 0.75 } }
+				NOT = { check_variable = { JAP_Diet_Faction_Power^JAP_selected_diet_faction < 0.025 } }
+				has_political_power > 24.99
+			}
+			Japan_faction_info_window_button_2_visible = {
+				check_variable = { JAP_action_2_days_left = 0 }
+				NOT = { check_variable = { JAP_Diet_Faction_Power^JAP_selected_diet_faction > 0.75 } }
+				NOT = { check_variable = { JAP_Diet_Faction_Power^JAP_selected_diet_faction < 0.025 } }
+				has_political_power > 24.99
+			}
+			Japan_faction_info_window_button_3_visible = {
+				check_variable = { JAP_action_3_days_left = 0 }
+				has_political_power > 49.99
+			}
+		}
+
+		effects = {
+			Japan_faction_info_close_button_click = {
+				clr_country_flag = JAP_faction_info_window_open
+				set_variable = { JAP_selected_diet_faction = -1 }
+			}
+			Japan_faction_info_window_button_1_click = {
+				set_country_flag = JAP_GUI_action_1_taken
+				JAP_diet_action_1_effect = yes
+				hidden_effect = {
+					set_variable = { JAP_action_1_days_left = 15 }
+					country_event = { id = japdietgui.2 }
+				}
+			}
+			Japan_faction_info_window_button_2_click = {
+				set_country_flag = JAP_GUI_action_2_taken
+				JAP_diet_action_2_effect = yes
+				hidden_effect = {
+					set_variable = { JAP_action_2_days_left = 15 }
+					country_event = { id = japdietgui.3 }
+				}
+			}
+			Japan_faction_info_window_button_3_click = {
+				set_country_flag = JAP_GUI_action_3_taken
+				JAP_diet_action_3_effect = yes
+				hidden_effect = {
+					set_variable = { JAP_action_3_days_left = 31 }
+					country_event = { id = japdietgui.4 }
+				}
+			}
+		}
+	}
+
+	TNO_Japan_Internal_GUI_Military_Window = {
+		context_type = player_context
+		parent_window_token = TNO_Japan_Internal_GUI_main
+		window_name = "TNO_Japan_Internal_GUI_Military_Window"
+
+		visible = {
+			has_country_flag = JAP_Internal_GUI_Military_open_flag
+		}
+
+		triggers = {
+			Japan_Internal_GUI_Sidebar_IJA_Button_1_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_25_political_power_tt
+					has_political_power > 24.99
+				}
+				NOT = { has_country_flag = IJA_action_1_taken }
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_increase_funding_tt
+					check_variable = { econ_army_expenditures_maximal_pct < 95 }
+				}
+			}
+			Japan_Internal_GUI_Sidebar_IJA_Button_2_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_10_army_experience_tt
+					has_army_experience > 9.99
+				}
+				NOT = { has_country_flag = IJA_action_2_taken }
+			}
+			Japan_Internal_GUI_Sidebar_IJA_Button_3_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_25_political_power_tt
+					has_political_power > 24.99
+				}
+				NOT = { has_country_flag = IJA_action_3_taken }
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_decrease_funding_tt
+					check_variable = { econ_army_expenditures_minimal_pct > 10 }
+				}
+			}
+			Japan_Internal_GUI_Sidebar_IJA_Button_4_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_5_army_experience_tt
+					has_army_experience > 4.99
+				}
+				NOT = { has_country_flag = IJA_action_4_taken }
+			}
+			Japan_Internal_GUI_Sidebar_IJN_Button_1_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_25_political_power_tt
+					has_political_power > 24.99
+				}
+				NOT = { has_country_flag = IJN_action_1_taken }
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_increase_funding_tt
+					check_variable = { econ_naval_expenditures_maximal_pct < 95 }
+				}
+			}
+			Japan_Internal_GUI_Sidebar_IJN_Button_2_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_10_navy_experience_tt
+					has_navy_experience > 9.99
+				}
+				NOT = { has_country_flag = IJN_action_2_taken }
+			}
+			Japan_Internal_GUI_Sidebar_IJN_Button_3_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_25_political_power_tt
+					has_political_power > 24.99
+				}
+				NOT = { has_country_flag = IJN_action_3_taken }
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_decrease_funding_tt
+					check_variable = { econ_naval_expenditures_minimal_pct > 10 }
+				}
+			}
+			Japan_Internal_GUI_Sidebar_IJN_Button_4_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_5_navy_experience_tt
+					has_navy_experience > 4.99
+				}
+				NOT = { has_country_flag = IJN_action_4_taken }
+			}
+			Japan_Internal_GUI_Sidebar_Tension_Button_1_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_25_political_power_25_command_power_tt
+					has_political_power > 24.99
+					command_power > 24.99
+				}
+				NOT = { has_country_flag = Tension_action_1_taken }
+			}
+			Japan_Internal_GUI_Sidebar_Tension_Button_2_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_50_political_power_50_command_power_tt
+					has_political_power > 49.99
+					command_power > 49.99
+				}
+				NOT = { has_country_flag = Tension_action_2_taken }
+			}
+			Japan_Internal_GUI_Sidebar_Tension_Button_3_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_25_political_power_tt
+					has_political_power > 24.99
+				}
+				NOT = { has_country_flag = Tension_action_3_taken }
+			}
+			Japan_Internal_GUI_Sidebar_Tension_Button_4_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = Japan_Internal_GUI_100_political_power_tt
+					has_political_power > 99.99
+				}
+				NOT = { has_country_flag = Tension_action_4_taken }
+			}
+		}
+
+		effects = {
+			TNO_Japan_Internal_GUI_Military_close_button_click = {
+				clr_country_flag = JAP_Internal_GUI_Military_open_flag
+			}
+			Japan_Internal_GUI_Sidebar_IJA_Button_1_click = {
+				set_country_flag = IJA_action_1_taken
+				JAP_IJA_increase_budget = yes
+				hidden_effect = { add_political_power = -25 }
+				army_funding_maximal_increase_low = yes
+				army_funding_minimal_increase_low = yes
+			}
+			Japan_Internal_GUI_Sidebar_IJA_Button_2_click = {
+				set_country_flag = IJA_action_2_taken
+				JAP_IJA_promote_officers = yes
+				army_experience = -10
+			}
+			Japan_Internal_GUI_Sidebar_IJA_Button_3_click = {
+				set_country_flag = IJA_action_3_taken
+				JAP_IJA_decrease_budget = yes
+				hidden_effect = { add_political_power = -25 }
+				army_funding_maximal_decrease_low = yes
+				army_funding_minimal_decrease_low = yes
+			}
+			Japan_Internal_GUI_Sidebar_IJA_Button_4_click = {
+				set_country_flag = IJA_action_4_taken
+				JAP_IJA_demote_officers = yes
+				army_experience = -5
+			}
+			Japan_Internal_GUI_Sidebar_IJN_Button_1_click = {
+				set_country_flag = IJN_action_1_taken
+				JAP_IJN_increase_budget = yes
+				hidden_effect = { add_political_power = -25 }
+				naval_funding_maximal_increase_low = yes
+				naval_funding_minimal_increase_low = yes
+			}
+			Japan_Internal_GUI_Sidebar_IJN_Button_2_click = {
+				set_country_flag = IJN_action_2_taken
+				JAP_IJN_promote_officers = yes
+				navy_experience = -10
+			}
+			Japan_Internal_GUI_Sidebar_IJN_Button_3_click = {
+				set_country_flag = IJN_action_3_taken
+				JAP_IJN_decrease_budget = yes
+				hidden_effect = { add_political_power = -25 }
+				naval_funding_maximal_decrease_low = yes
+				naval_funding_minimal_decrease_low = yes
+			}
+			Japan_Internal_GUI_Sidebar_IJN_Button_4_click = {
+				set_country_flag = IJN_action_4_taken
+				JAP_IJN_demote_officers = yes
+				navy_experience = -5
+			}
+			Japan_Internal_GUI_Sidebar_Tension_Button_1_click = {
+				set_country_flag = Tension_action_1_taken
+				JAP_Tension_interservice_programs = yes
+				hidden_effect = {
+					add_political_power = -25
+					add_command_power = -25
+				}
+				TNO_improve_training_policy_effectiveness_low = yes
+			}
+			Japan_Internal_GUI_Sidebar_Tension_Button_2_click = {
+				set_country_flag = Tension_action_2_taken
+				country_event = {
+					id = japdietgui.6
+					days = 180
+				}
+				JAP_Tension_encourage_wargames = yes
+				add_political_power = -50
+				add_command_power = -50
+			}
+			Japan_Internal_GUI_Sidebar_Tension_Button_3_click = {
+				set_country_flag = Tension_action_3_taken
+				country_event = {
+					id = japdietgui.7
+					days = 48
+				}
+				JAP_Tension_fight_corruption = yes
+				add_political_power = -25
+			}
+			Japan_Internal_GUI_Sidebar_Tension_Button_4_click = {
+				set_country_flag = Tension_action_4_taken
+				country_event = {
+					id = japdietgui.8
+					days = 360
+				}
+				JAP_Tension_remove_command_role = yes
+				add_political_power = -100
+			}
+		}
+
+		properties = {
+			Japan_Internal_GUI_ProgressBar_IJA = {
+				frame = JAP_IJA_support
+			}
+			Japan_Internal_GUI_ProgressBar_IJN = {
+				frame = JAP_IJN_support
+			}
+			Japan_Internal_GUI_ProgressBar_Tension = {
+				frame = JAP_Tension
+			}
+		}
+	}
+}

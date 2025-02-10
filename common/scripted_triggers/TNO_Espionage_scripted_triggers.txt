@@ -1,0 +1,258 @@
+
+#  ________   ______   _______   ______   ______   __    __   ______    ______   ________        __       __   ______    ______            _____   ______   __       __  ________   ______         _______    ______   __    __  _______  
+#  /        | /      \ /       \ /      | /      \ /  \  /  | /      \  /      \ /        |      /  |  _  /  | /      \  /      \          /     | /      \ /  \     /  |/        | /      \       /       \  /      \ /  \  /  |/       \ 
+#  $$$$$$$$/ /$$$$$$  |$$$$$$$  |$$$$$$/ /$$$$$$  |$$  \ $$ |/$$$$$$  |/$$$$$$  |$$$$$$$$/       $$ | / \ $$ |/$$$$$$  |/$$$$$$  |         $$$$$ |/$$$$$$  |$$  \   /$$ |$$$$$$$$/ /$$$$$$  |      $$$$$$$  |/$$$$$$  |$$  \ $$ |$$$$$$$  |
+#  $$ |__    $$ \__$$/ $$ |__$$ |  $$ |  $$ |  $$ |$$$  \$$ |$$ |__$$ |$$ | _$$/ $$ |__          $$ |/$  \$$ |$$ |  $$ |$$ |  $$ |            $$ |$$ |__$$ |$$$  \ /$$$ |$$ |__    $$ \__$$/       $$ |__$$ |$$ |  $$ |$$$  \$$ |$$ |  $$ |
+#  $$    |   $$      \ $$    $$/   $$ |  $$ |  $$ |$$$$  $$ |$$    $$ |$$ |/    |$$    |         $$ /$$$  $$ |$$ |  $$ |$$ |  $$ |       __   $$ |$$    $$ |$$$$  /$$$$ |$$    |   $$      \       $$    $$< $$ |  $$ |$$$$  $$ |$$ |  $$ |
+#  $$$$$/     $$$$$$  |$$$$$$$/    $$ |  $$ |  $$ |$$ $$ $$ |$$$$$$$$ |$$ |$$$$ |$$$$$/          $$ $$/$$ $$ |$$ |  $$ |$$ |  $$ |      /  |  $$ |$$$$$$$$ |$$ $$ $$/$$ |$$$$$/     $$$$$$  |      $$$$$$$  |$$ |  $$ |$$ $$ $$ |$$ |  $$ |
+#  $$ |_____ /  \__$$ |$$ |       _$$ |_ $$ \__$$ |$$ |$$$$ |$$ |  $$ |$$ \__$$ |$$ |_____       $$$$/  $$$$ |$$ \__$$ |$$ \__$$ |      $$ \__$$ |$$ |  $$ |$$ |$$$/ $$ |$$ |_____ /  \__$$ |      $$ |__$$ |$$ \__$$ |$$ |$$$$ |$$ |__$$ |
+#  $$       |$$    $$/ $$ |      / $$   |$$    $$/ $$ | $$$ |$$ |  $$ |$$    $$/ $$       |      $$$/    $$$ |$$    $$/ $$    $$/       $$    $$/ $$ |  $$ |$$ | $/  $$ |$$       |$$    $$/       $$    $$/ $$    $$/ $$ | $$$ |$$    $$/ 
+#  $$$$$$$$/  $$$$$$/  $$/       $$$$$$/  $$$$$$/  $$/   $$/ $$/   $$/  $$$$$$/  $$$$$$$$/       $$/      $$/  $$$$$$/   $$$$$$/         $$$$$$/  $$/   $$/ $$/      $$/ $$$$$$$$/  $$$$$$/        $$$$$$$/   $$$$$$/  $$/   $$/ $$$$$$$/  
+# Scripted Effects
+# By Reich & OFN teams
+
+#################################################
+##=|   Espionage Mechanic Scripted Triggers  |=##
+##======================| |====================##
+#################################################
+
+#Index; Search for these names using ctrl+f and you'll find the section they entitle.
+#	General
+#		TNO_Espionage_AllowedTags
+#		TNO_Espionage_ActiveTags
+#		TNO_Espionage_AgentsAvailable
+#		TNO_Espionage_ResearchCosts
+#
+#	Regions
+#		TNO_Espionage_Viewwing_NorthAmerica
+#		TNO_Espionage_Viewwing_CentralAmerica
+#		TNO_Espionage_Viewwing_SouthAmerica
+#		TNO_Espionage_Viewwing_Europe
+#		TNO_Espionage_Viewwing_Russia
+#		TNO_Espionage_Viewwing_Africa
+#		TNO_Espionage_Viewwing_MiddleEast
+#		TNO_Espionage_Viewwing_EastAsia
+#		TNO_Espionage_Viewwing_SouthEastAsia
+#		TNO_Espionage_Viewwing_Oceania
+#
+#	Technology
+#		TNO_Espionage_FmElo_Researched
+#		TNO_Espionage_Sonder_Researched
+#		TNO_Espionage_Ent_Researched
+#		TNO_Espionage_Bugs_Researched
+#		TNO_Espionage_Cipher_Researched
+#		TNO_Espionage_Nah_Researched
+#		TNO_Espionage_Radio_Researched
+#		TNO_Espionage_Camera_Researched
+#		TNO_Espionage_Fleck_Researched
+#		TNO_Espionage_Truth_Researched
+
+#################################################
+#                    General                    #
+#################################################
+
+TNO_Espionage_AllowedTags = {
+	OR = {
+		original_tag = GER
+		original_tag = USA
+	}
+}
+
+TNO_Espionage_ActiveTags = {
+	TNO_Espionage_AllowedTags = yes
+	has_country_flag = TNO_Espionage_Mech_Active
+}
+
+TNO_Espionage_AgentsAvailable = {
+	custom_trigger_tooltip = {
+		tooltip = TNO_Espionage_AgentsAvailable_tt
+		check_variable = { TNO_Espionage_Agents > 0 }
+	}
+}
+
+TNO_Espionage_NoSpecialMission = {
+	custom_trigger_tooltip = {
+		tooltip = TNO_Espionage_NoSpecialMission_tt
+		NOT = { has_country_flag = TNO_Espionage_DoingSpecialMission }
+	}
+}
+
+TNO_Espionage_ResearchCosts = {
+	if = { # German Techs
+		limit = { tag = GER }
+		if = { # Modernized Fm/EloAufkl
+			limit = { check_variable = { Tech_i = 0 } }
+			set_temp_variable = { N = 100 } # Funding Cost
+			set_temp_variable = { M = 50  } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Sonderblindfunkdienst
+			limit = { check_variable = { Tech_i = 1 } }
+			set_temp_variable = { N = 75 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # ENTDECKER Recon Satellites
+			limit = { check_variable = { Tech_i = 2 } }
+			set_temp_variable = { N = 150 } # Funding Cost
+			set_temp_variable = { M = 50  } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # 31211-5 Bugs
+			limit = { check_variable = { Tech_i = 3 } }
+			set_temp_variable = { N = 25 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # M-190 Cipher Machine
+			limit = { check_variable = { Tech_i = 4 } }
+			set_temp_variable = { N = 50 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Nahkampf Training
+			limit = { check_variable = { Tech_i = 5 } }
+			set_temp_variable = { N = 30 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # UFT-421 Personal Radio
+			limit = { check_variable = { Tech_i = 6 } }
+			set_temp_variable = { N = 60 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # RS 50 Modified Camera
+			limit = { check_variable = { Tech_i = 7 } }
+			set_temp_variable = { N = 20 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Flecktarn B Camouflage
+			limit = { check_variable = { Tech_i = 8 } }
+			set_temp_variable = { N = 50 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # "Truth Serum"
+			limit = { check_variable = { Tech_i = 9 } }
+			set_temp_variable = { N = 30 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+	}
+
+	else_if = { # American Techs
+		limit = { tag = USA }
+		if = { # Pigeon Camera
+			limit = { check_variable = { Tech_i = 0 } }
+			set_temp_variable = { N = 100 } # Funding Cost
+			set_temp_variable = { M = 50  } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Belly Buster
+			limit = { check_variable = { Tech_i = 1 } }
+			set_temp_variable = { N = 50 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Engraved Mirrors
+			limit = { check_variable = { Tech_i = 2 } }
+			set_temp_variable = { N = 50 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Cigarette Camera
+			limit = { check_variable = { Tech_i = 3 } }
+			set_temp_variable = { N = 50 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Miniature Compass
+			limit = { check_variable = { Tech_i = 4 } }
+			set_temp_variable = { N = 150 } # Funding Cost
+			set_temp_variable = { M = 50  } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Pipe Radio
+			limit = { check_variable = { Tech_i = 5 } }
+			set_temp_variable = { N = 100 } # Funding Cost
+			set_temp_variable = { M = 50  } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Film Spike
+			limit = { check_variable = { Tech_i = 6 } }
+			set_temp_variable = { N = 50 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Motion Detector
+			limit = { check_variable = { Tech_i = 7 } }
+			set_temp_variable = { N = 150 } # Funding Cost
+			set_temp_variable = { M = 50  } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Pictogram Counter
+			limit = { check_variable = { Tech_i = 8 } }
+			set_temp_variable = { N = 100 } # Funding Cost
+			set_temp_variable = { M = 50  } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+		else_if = { # Hollow Coins
+			limit = { check_variable = { Tech_i = 9 } }
+			set_temp_variable = { N = 50 } # Funding Cost
+			set_temp_variable = { M = 50 } # Expertise Cost
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt   divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+			custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+		}
+	}
+}
+
+#################################################
+#                    Regions                    #
+#################################################
+
+TNO_Espionage_Viewing_NorthAmerica	 = { check_variable = { Espionage_SelectedRegion = token:Espionage_Map_NA } }
+TNO_Espionage_Viewing_CentralAmerica = { check_variable = { Espionage_SelectedRegion = token:Espionage_Map_CA } }
+TNO_Espionage_Viewing_SouthAmerica   = { check_variable = { Espionage_SelectedRegion = token:Espionage_Map_SA } }
+TNO_Espionage_Viewing_Europe		 = { check_variable = { Espionage_SelectedRegion = token:Espionage_Map_EU } }
+TNO_Espionage_Viewing_Russia		 = { check_variable = { Espionage_SelectedRegion = token:Espionage_Map_RU } }
+TNO_Espionage_Viewing_Africa		 = { check_variable = { Espionage_SelectedRegion = token:Espionage_Map_AF } }
+TNO_Espionage_Viewing_MiddleEast	 = { check_variable = { Espionage_SelectedRegion = token:Espionage_Map_ME } }
+TNO_Espionage_Viewing_EastAsia		 = { check_variable = { Espionage_SelectedRegion = token:Espionage_Map_EA } }
+TNO_Espionage_Viewing_SouthEastAsia  = { check_variable = { Espionage_SelectedRegion = token:Espionage_Map_SEA } }
+TNO_Espionage_Viewing_Oceania		 = { check_variable = { Espionage_SelectedRegion = token:Espionage_Map_OC } }
+
+#################################################
+#                   Technology                  #
+#################################################
+
+TNO_Espionage_FmElo_Researched  = { set_temp_variable = { Tech_i = 0 } custom_trigger_tooltip = { tooltip = TNO_Espionage_Tech_Researched_tt check_variable = { TNO_Espionage_TechArray^Tech_i = 1 } } }
+TNO_Espionage_Sonder_Researched = { set_temp_variable = { Tech_i = 1 } custom_trigger_tooltip = { tooltip = TNO_Espionage_Tech_Researched_tt check_variable = { TNO_Espionage_TechArray^Tech_i = 1 } } }
+TNO_Espionage_Ent_Researched    = { set_temp_variable = { Tech_i = 2 } custom_trigger_tooltip = { tooltip = TNO_Espionage_Tech_Researched_tt check_variable = { TNO_Espionage_TechArray^Tech_i = 1 } } }
+TNO_Espionage_Bugs_Researched   = { set_temp_variable = { Tech_i = 3 } custom_trigger_tooltip = { tooltip = TNO_Espionage_Tech_Researched_tt check_variable = { TNO_Espionage_TechArray^Tech_i = 1 } } }
+TNO_Espionage_Cipher_Researched = { set_temp_variable = { Tech_i = 4 } custom_trigger_tooltip = { tooltip = TNO_Espionage_Tech_Researched_tt check_variable = { TNO_Espionage_TechArray^Tech_i = 1 } } }
+TNO_Espionage_Nah_Researched    = { set_temp_variable = { Tech_i = 5 } custom_trigger_tooltip = { tooltip = TNO_Espionage_Tech_Researched_tt check_variable = { TNO_Espionage_TechArray^Tech_i = 1 } } }
+TNO_Espionage_Radio_Researched  = { set_temp_variable = { Tech_i = 6 } custom_trigger_tooltip = { tooltip = TNO_Espionage_Tech_Researched_tt check_variable = { TNO_Espionage_TechArray^Tech_i = 1 } } }
+TNO_Espionage_Camera_Researched = { set_temp_variable = { Tech_i = 7 } custom_trigger_tooltip = { tooltip = TNO_Espionage_Tech_Researched_tt check_variable = { TNO_Espionage_TechArray^Tech_i = 1 } } }
+TNO_Espionage_Fleck_Researched  = { set_temp_variable = { Tech_i = 8 } custom_trigger_tooltip = { tooltip = TNO_Espionage_Tech_Researched_tt check_variable = { TNO_Espionage_TechArray^Tech_i = 1 } } }
+TNO_Espionage_Truth_Researched  = { set_temp_variable = { Tech_i = 9 } custom_trigger_tooltip = { tooltip = TNO_Espionage_Tech_Researched_tt check_variable = { TNO_Espionage_TechArray^Tech_i = 1 } } }

@@ -1,0 +1,372 @@
+add_namespace = CUB_scripted
+
+country_event = { #What to do?
+	id = CUB_scripted.1
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event CUB_scripted.1"
+	}
+	title = CUB_scripted.1.t
+	desc = CUB_scripted.1.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Democracy
+		name = CUB_scripted.1.a
+		ai_chance = {
+			factor = 65
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = CUB_DEMOCRACY option = CUB_DEMOCRACY_NO }
+			}
+		}
+		country_event = { id = CUB_scripted.2 days = 65 }
+	}
+
+	option = { #Dictatorship
+		name = CUB_scripted.1.b
+		ai_chance = {
+			factor = 35
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = CUB_DEMOCRACY option = CUB_DEMOCRACY_YES }
+			}
+		}
+		country_event = { id = CUB_scripted.3 days = 65 }
+	}
+}
+
+country_event = {
+	id = CUB_scripted.2
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event CUB_scripted.2"
+		set_popularities = {
+			paternalism = 30
+			progressivism = 30
+			socialist = 35
+			communist = 5
+		}
+		remove_ideas = {
+			CUB_idea_uncertain_direction
+			CUB_idea_question_democracy
+		}
+		add_ideas = {
+			tno_political_parties_multiparty_system
+			tno_vote_franchise_promoted_voting
+		}
+		set_party_name = {
+			ideology = socialist
+			long_name = CUB_orthodoxo_party_long
+			name = CUB_orthodoxo_party
+		}
+		set_party_name = {
+			ideology = paternalism
+			long_name = CUB_progressivism_party_long
+			name = CUB_progressivism_party
+		}
+	}
+	title = CUB_scripted.2.t
+	desc = CUB_scripted.2.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Castro
+		name = CUB_scripted.2.a
+		ai_chance = {
+			factor = 1
+		}
+		promote_character = {
+			character = CUB_Fidel_Castro
+			ideology = socialist_left_wing_nationalism_subtype
+		}
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = socialist
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 48
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		add_popularity = {
+			ideology = socialist
+			popularity = 0.1
+		}
+		set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Planned }
+		econ_type_change = yes
+		remove_all_ministers = yes
+		add_ideas = {
+			CUB_Raul_Castro_hog
+			CUB_Celia_Sanchez_for
+			CUB_Raul_Cepero_Bonilla_eco
+			CUB_Camilo_Cienfuegos_sec
+		}
+		random_list = {
+			1 = {
+				modifier = {
+					factor = 0
+					has_game_rule = { rule = CUB_1962_ELECTIONS option = CUB_1962_ELECTIONS_FIDEL }
+				}
+				country_event = { id = CUB_scripted.5 days = 1460 }
+			}
+			2 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_game_rule = { rule = CUB_1962_ELECTIONS option = CUB_1962_ELECTIONS_ECHEVARRIA }
+						has_game_rule = { rule = CUB_1962_ELECTIONS option = CUB_1962_ELECTIONS_SOCARRAS }
+					}
+				}
+				#Castro gets elected forever
+			}
+		}
+		hidden_effect = {
+			every_country = {
+				news_event = { id = LATAM_news.191 }
+			}
+			MEX = {
+				country_event = { id = MEX_Mateos.236 days = 165 }
+			}	
+		}
+	}
+}
+
+country_event = {
+	id = CUB_scripted.3
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event CUB_scripted.3"
+		set_popularities = {
+			despotism = 70
+			liberalism = 20
+			socialist = 5
+			communist = 5
+		}
+		set_party_name = {
+			ideology = despotism
+			long_name = CUB_castro_party_long
+			name = CUB_castro_party
+		}
+		remove_ideas = {
+			CUB_idea_uncertain_direction
+			CUB_idea_question_democracy
+		}
+		add_ideas = {
+			tno_political_parties_controlled_opposition
+		}
+	}
+	title = CUB_scripted.3.t
+	desc = CUB_scripted.3.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Castro
+		name = CUB_scripted.3.a
+		promote_character = {
+			character = CUB_Fidel_Castro
+			ideology = despotism_institutional_despotism_subtype
+		}
+		set_country_leader_description = {
+			ideology = despotism
+			desc = POLITICS_FIDEL_CASTRO_DICTATOR_DESC
+		}
+		set_politics = {
+			ruling_party = despotism
+		}
+		hidden_effect = {
+			CUB_Celia_Sanchez = {
+				remove_advisor_role = {
+					slot = foreign_minister
+				}
+				add_advisor_role = {
+					advisor = {
+						slot = foreign_minister
+						idea_token = CUB_Celia_Sanchez_dic_for
+						traits = {
+							foreign_minister
+						}
+						ledger = civilian
+						cost = -1
+						can_be_fired = no
+						ai_will_do = { factor = 0 }
+					}
+				}
+			}
+			CUB_Raul_Cepero_Bonilla = {
+				remove_advisor_role = {
+					slot = economy_minister
+				}
+				add_advisor_role = {
+					advisor = {
+						slot = economy_minister
+						idea_token = CUB_Raul_Cepero_Bonilla_dic_eco
+						traits = {
+							economy_minister
+						}
+						ledger = civilian
+						cost = -1
+						can_be_fired = no
+						ai_will_do = { factor = 0 }
+					}
+				}
+			}
+		}
+		remove_all_ministers = yes
+		add_ideas = {
+			CUB_Raul_Castro_hog
+			CUB_Celia_Sanchez_dic_for
+			CUB_Raul_Cepero_Bonilla_dic_eco
+			CUB_Manuel_Pineiro_sec
+		}
+		hidden_effect = {
+			every_country = {
+				news_event = { id = LATAM_news.194 }
+			}
+			MEX = {
+				country_event = { id = MEX_Mateos.192 days = 165 }
+			}
+		}
+	}
+}
+
+country_event = { #Cuba joins the OFN
+	id = CUB_scripted.4
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event CUB_scripted.4"
+	}
+	title = CUB_scripted.4.t
+	desc = CUB_scripted.4.desc
+	picture = x
+
+	is_triggered_only = yes
+	trigger = {
+	}
+	fire_only_once = yes
+
+	option = { #Yes
+		name = CUB_scripted.4.a
+		if = {
+			limit = {
+				NOT = {
+					CUB = { has_government = despotism }
+					USA = { has_country_flag = USA_PP_ceasefire_balaguer }
+				}
+			}
+			add_ideas = OFN_Independent_Member
+			add_ideas = CUB_idea_hidden_trade_to_us
+			add_opinion_modifier = { target = USA modifier = USA_CUB_ally_of_the_legion }
+			USA = { add_opinion_modifier = { target = CUB modifier = USA_CUB_ally_of_the_legion } }
+			USA = {
+				add_to_faction = CUB
+				add_to_array = { OFN_members = CUB }
+			}
+		}
+	}
+}
+
+country_event = { #1966 Cuba Election - Castro Resigns
+	id = CUB_scripted.5
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event CUB_scripted.5"
+	}
+	title = CUB_scripted.5.t
+	desc = CUB_scripted.5.desc
+	picture = x
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Echeverria
+		name = CUB_scripted.5.a
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = CUB_1962_ELECTIONS option = CUB_1962_ELECTIONS_SOCARRAS }
+			}
+		}
+		promote_character = {
+			character = CUB_Jose_Antonio_Echeverria
+			ideology = liberalism_christian_liberalism_subtype
+		}
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = progressivism
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 48
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = 0.1
+		}
+		set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Social_Market }
+		econ_subtype_change = yes
+		remove_all_ministers = yes
+		add_ideas = {
+			CUB_Rolando_Cubela_Secades_hog
+			CUB_Faure_Chomon_Mediavilla_for
+			CUB_Manuel_Urrutia_Lleo_eco
+			CUB_Eloy_Gutierrez_Menoyo_sec
+		}
+		hidden_effect = {
+			every_country = {
+				news_event = { id = LATAM_news.192 }
+			}
+		}
+	}
+
+	option = { #Prio
+		name = CUB_scripted.5.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_game_rule = { rule = CUB_1962_ELECTIONS option = CUB_1962_ELECTIONS_ECHEVARRIA }
+			}
+		}
+		promote_character = {
+			character = CUB_Carlos_Prio_Socarras
+			ideology = paternalism_left_wing_corporatism_subtype
+		}
+		meta_effect = { #sets up next election date in country ui
+			text = {
+				set_politics = {
+					ruling_party = paternalism
+					last_election = "[current_election_date]"
+					elections_allowed = yes
+					election_frequency = 48
+				}
+			}
+			current_election_date = "[?global.date.GetDateStringNoHour]"
+		}
+		add_popularity = {
+			ideology = paternalism
+			popularity = 0.1
+		}
+		set_temp_variable = { TNO_economy_type_temp = token:Econ_Type_Corporatism }
+		econ_type_change = yes
+		remove_all_ministers = yes
+		add_ideas = {
+			CUB_Ramon_Grau_hog
+			CUB_Carlos_Hevia_for
+			CUB_Felipe_Pazos_Roque_eco
+			CUB_Ramon_Barquin_sec
+		}
+		hidden_effect = {
+			every_country = {
+				news_event = { id = LATAM_news.193 }
+			}
+		}
+	}
+}

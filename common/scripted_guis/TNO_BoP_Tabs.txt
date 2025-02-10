@@ -1,0 +1,46 @@
+scripted_gui = {
+	TNO_BoP_Tabs = {
+		context_type = player_context
+		parent_window_name = powerbalanceview
+		window_name = "powerbalanceview_tabs"
+
+		dynamic_lists = {
+			tab_grid = {
+				array = TNO_BoP_Tabs
+				index = Tab_i
+				value = Tab_v
+				entry_container = powerbalanceview_tabs_container
+			}
+		}
+
+		properties = {
+			tab      = { frame = TNO_BoP_Tabs_Frames^Tab_i }
+			tab_icon = { image = "GFX_[?Tab_v.GetTokenKey]_Icon" }
+		}
+
+		effects = {
+			tab_click = {
+				# Set tab frames
+				for_each_loop = {
+					array = TNO_BoP_Tabs_Frames
+					set_variable = { TNO_BoP_Tabs_Frames^i = 0 }
+				}
+				set_variable = { TNO_BoP_Tabs_Frames^Tab_i = 2 }
+
+				# Set tab decision
+				meta_effect = {
+					text = {
+						remove_power_balance = { id = [OLD_TAB]_[TAG] }
+						set_power_balance = { id = [TAB_TYPE]_[TAG] }
+					}
+					TAG = "[THIS.GetTag]"
+					OLD_TAB = "[?TNO_BoP_SelectedTab.GetTokenKey]"
+					TAB_TYPE = "[?Tab_v.GetTokenKey]"
+				}
+
+				# Set tab GUI
+				set_variable = { TNO_BoP_SelectedTab = Tab_v }
+			}
+		}
+	}
+}

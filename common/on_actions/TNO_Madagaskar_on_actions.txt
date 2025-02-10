@@ -1,0 +1,174 @@
+on_actions = {
+	on_startup = {
+		effect = {
+			GER = { country_event = { id = MAD_GER.1 days = 341 } } # Madagascar funnies start here
+		}
+	}
+
+	on_daily_ZZZ = {
+		effect = {
+			if = { # checks madagascar phase
+				limit = { has_global_flag = MAD_civil_war_ongoing }
+				if = {
+					limit = {
+						MDM = { NOT = { any_owned_state = { region = 180 } } }
+						NOT = { ZZZ = { owns_state = 1597 } }
+					}
+					ZZZ = {
+						transfer_state = 1597
+					}
+				}
+				if = { # move to phase 2
+					limit = {
+						TNO_fopo_MADCW_War_Stage_1 = yes
+						NOT = {
+							MDM = {
+								OR = {
+									owns_state = 1970
+									owns_state = 1974
+									owns_state = 1975
+									owns_state = 1969
+								}
+							}
+						}
+					}
+
+					if = {
+						limit = {
+							MAD = {
+								owns_state = 1970
+								owns_state = 1974
+							}
+						}
+						MAD = { transfer_state = 1864 }
+					}
+					else_if = {
+						limit = {
+							MDG = {
+								owns_state = 1970
+								owns_state = 1974
+							}
+						}
+						MDG = { transfer_state = 1864 }
+					}
+					if = {
+						limit = {
+							MDG = {
+								owns_state = 1970
+							}
+						}
+						MDG = { transfer_state = 1971 }
+					}
+					if = {
+						limit = {
+							MDG = {
+								owns_state = 1974
+							}
+						}
+						MDG = { transfer_state = 1972 }
+					}
+
+					MAD = { add_dynamic_modifier = { modifier = MAD_major_participant } }
+					MDG = { add_dynamic_modifier = { modifier = MAD_major_participant } }
+					MDM = { add_dynamic_modifier = { modifier = MAD_settlement } }
+
+					set_variable = { MAD.MADCW_war_stage = 2 }
+					set_variable = { global.MAD_war_prog = 66 }
+					MAD = {
+						declare_war_on = {
+							target = MDM
+							type = annex_everything
+						}
+						declare_war_on = {
+							target = MDG
+							type = annex_everything
+						}
+					}
+					MDG = {
+						declare_war_on = {
+							target = MDM
+							type = annex_everything
+						}
+					}
+				}
+				if = { # move to phase 3
+					limit = {
+						TNO_fopo_MADCW_War_Stage_2 = yes
+						OR = {
+							NOT = {
+								MDM = {
+									OR = {
+										owns_state = 1859
+										owns_state = 1861
+										owns_state = 1864
+										owns_state = 1971
+										owns_state = 1972
+									}
+								}
+							}
+							NOT = { country_exists = MDM }
+						}
+					}
+					MAD = { remove_dynamic_modifier = { modifier = MAD_major_participant } }
+					MDG = { remove_dynamic_modifier = { modifier = MAD_major_participant } }
+					MAD = {
+						every_owned_state = {
+							limit = {
+								OR = {
+									has_dynamic_modifier = { modifier = MAD_No_Authority }
+									has_dynamic_modifier = { modifier = MAD_Isolated_Authority }
+								}
+							}
+							if = {
+								limit = { has_dynamic_modifier = { modifier = MAD_No_Authority } }
+								remove_dynamic_modifier = { modifier = MAD_No_Authority }
+							}
+							else = {
+								remove_dynamic_modifier = { modifier = MAD_Isolated_Authority }
+							}
+							add_dynamic_modifier = { modifier = MAD_Hostile_Territory }
+						}
+					}
+					MDM = {
+						every_owned_state = {
+							limit = {
+								OR = {
+									has_dynamic_modifier = { modifier = MAD_No_Authority }
+									has_dynamic_modifier = { modifier = MAD_Isolated_Authority }
+								}
+							}
+							if = {
+								limit = { has_dynamic_modifier = { modifier = MAD_No_Authority } }
+								remove_dynamic_modifier = { modifier = MAD_No_Authority }
+							}
+							else = {
+								remove_dynamic_modifier = { modifier = MAD_Isolated_Authority }
+							}
+							add_dynamic_modifier = { modifier = MAD_Hostile_Territory }
+						}
+					}
+					MDG = {
+						every_owned_state = {
+							limit = {
+								OR = {
+									has_dynamic_modifier = { modifier = MAD_No_Authority }
+									has_dynamic_modifier = { modifier = MAD_Isolated_Authority }
+								}
+							}
+							if = {
+								limit = { has_dynamic_modifier = { modifier = MAD_No_Authority } }
+								remove_dynamic_modifier = { modifier = MAD_No_Authority }
+							}
+							else = {
+								remove_dynamic_modifier = { modifier = MAD_Isolated_Authority }
+							}
+							add_dynamic_modifier = { modifier = MAD_Hostile_Territory }
+						}
+					}
+					set_variable = { MAD.MADCW_war_stage = 3 }
+					set_variable = { global.MAD_war_prog = 100 }
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,837 @@
+conclude_south_african_war = {
+	clr_global_flag = south_african_war_happening
+	clr_global_flag = south_african_war_ceasefires_enabled
+	#clr_global_flag = SAF_no_ceasefire
+
+	set_global_flag = SAF_WAR_OVER
+
+	clear_array = global.SAW_participant
+
+	USA = {
+		clr_country_flag = USA_show_south_africa_tree
+		clr_country_flag = USA_SAF_CIA_Send_Guns_Enabled
+		if = { # Clears manpower depletion if no mandates
+			limit = { NOT = { has_global_flag = SAF_OFN_Victory } }
+			clear_variable = USA_manpower_depletion_SAW
+		}
+	}
+	hidden_effect = {
+		every_country = {
+			limit = {
+				OR = {
+					tag = USA
+					tag = SAF
+					tag = CAN
+					tag = NZL
+					tag = AST
+					tag = BRA
+				}
+			}
+			remove_ideas = {
+				USA_SAW_breaking_thru_front_1
+				USA_SAW_breaking_thru_front_2
+				USA_SAW_breaking_thru_front_3
+				USA_SAW_breaking_thru_front_4
+				USA_SAW_controlling_skies
+				USA_SAW_controlling_skies_bombing_1
+				USA_SAW_controlling_skies_bombing_2
+				USA_SAW_controlling_skies_cas_1
+				USA_SAW_controlling_skies_cas_2
+				USA_SAW_Operation_Angel_idea
+				USA_SAW_Coordinated_Logistics_idea
+			}
+		}
+		BRA = {
+			if = {
+				limit = {
+					NOT = { has_country_flag = BRA_SAW_ends_event }
+				}
+				set_country_flag = BRA_SAW_ends_event
+				country_event = { id = brazil.110 days = 1 }
+			}
+			TNO_fopo_remove_saw_tab = yes
+			set_temp_variable = { target = SAF }
+			TNO_clear_num_volunteers = yes
+		}
+		SWE = {
+			if = {
+				limit = {
+					set_temp_variable = {
+						target = GRO
+					}
+					TNO_volunteer_cap_greater_0 = yes
+				}
+				set_temp_variable = { target = GRO }
+				TNO_clear_num_volunteers = yes
+			}
+		}
+		if = {
+			limit = { country_exists = SAF }
+			SAF = {
+				delete_unit_template_and_units = {
+					division_template = "Reserve Troops"
+				}
+			}
+			SAF = {
+				delete_unit_template_and_units = {
+					division_template = "Militia"
+				}
+			}
+		}
+		SAF = {
+			clr_country_flag = USA_entered_war
+			remove_ideas = {
+				USA_SAF_WAR_RD_CORDS_Mission_One
+				USA_SAF_WAR_RD_CORDS_Mission_Two
+				SAF_Unconventional_Tactics
+				SAF_Unconventional_Tactics_2
+				SAF_Coluna_Infernal
+				SAF_Coluna_Infernal_2
+				SAF_Boer_Viet_Cong
+				SAF_American_training
+				SAF_SAW_Streamlined_Logistics_idea
+				BRA_brazilian_tech_assistance
+				BRA_brazilian_search_and_destroy_operations
+			}
+		}
+
+		GRO = {
+			remove_ideas = {
+				SAF_Unconventional_Tactics_RK
+				SAF_Unconventional_Tactics_RK_2
+				SAF_Unconventional_Tactics_RK_3
+				COG_Soldiers_Of_Fortune
+			}
+		}
+
+		ANG = {
+			remove_ideas = {
+				SAF_Unconventional_Tactics_RK
+				SAF_Unconventional_Tactics_RK_2
+				SAF_Unconventional_Tactics_RK_3
+				BRA_saw_blockade
+			}
+		}
+
+		COG = {
+			remove_ideas = {
+				SAF_Unconventional_Tactics_RK
+				SAF_Unconventional_Tactics_RK_2
+				SAF_Unconventional_Tactics_RK_3
+				BRA_saw_blockade
+			}
+		}
+
+		BOR = {
+			remove_ideas = {
+				SAF_Unconventional_Tactics_RK
+				SAF_Unconventional_Tactics_RK_2
+				SAF_Unconventional_Tactics_RK_3
+				GRO_Insurgency_Training_idea
+			}
+		}
+
+		USA = {
+			if = { # Mandates didn't form
+				limit = {
+					NOT = {
+						has_country_flag = USA_SAW_Full_Vic
+					}
+				}
+			}
+			clr_country_flag = USA_SAF_WAR_Currently_Doing_Domestic_Action
+			clr_country_flag = USA_SAF_WAR_Currently_Doing_Military_Action
+			clr_country_flag = USA_SAF_WAR_Increased_Draft
+			clr_country_flag = USA_SAF_WAR_Increased_Draft_Exemptions
+			clr_country_flag = USA_In_The_SAF_WAR
+			TNO_fopo_remove_saw_tab = yes
+
+			set_temp_variable = { target = SAF }
+			TNO_clear_num_volunteers = yes
+
+			remove_ideas = {
+				USA_LBJ_Advisors_No_More
+				USA_conscription_riot
+				USA_SAF_WAR_Expanded_Role_1
+				USA_SAF_WAR_Expanded_Role_2
+				USA_SAF_WAR_Expanded_Role_3
+				USA_SAF_WAR_NPP_General_Bonus
+				USA_SAF_WAR_NPP_Stable_Front
+				USA_SAF_WAR_NPP_fluid_front
+				USA_SAW_Ost_Jungle_Warriors
+				USA_SAW_Ost_Defoliants
+				USA_SAW_Sudwest_Desert_Rats
+				USA_SAW_Operation_Monsoon_Rain_idea
+				USA_SAW_Operation_Solar_Eclipse_idea
+				USA_SAW_Intense_Air_Support_idea
+				USA_SAW_Helicopter_Gunships_idea
+				USA_SAW_Armoured_Offensive_idea
+				USA_SAW_Zentral_Naval_Invasion
+			}
+
+			if = {
+				limit = { has_idea = tno_draft_exemptions_none }
+				tno_draft_exemptions_improve = yes
+			}
+			TNO_worsen_conscription_policy_effectiveness_monthly_low = yes
+
+			country_event = { id = USA.culture.2 days = 14 } #People on the streets talking about the war ending
+			USA_reload_presidential_tree = yes
+		}
+		GER = {
+			clr_country_flag = GER_SAW_intervention
+			clr_country_flag = south_africa_policing
+
+			set_temp_variable = { target = COG }
+			TNO_clear_num_volunteers = yes
+			set_temp_variable = { target = ANG }
+			TNO_clear_num_volunteers = yes
+			set_temp_variable = { target = GRO }
+			TNO_clear_num_volunteers = yes
+			set_temp_variable = { target = BOR }
+			TNO_clear_num_volunteers = yes
+
+			clear_variable = GER_advisor_level
+			clear_variable = GER_policing_variable
+			clear_array = global.afrika_schild_members
+			if = {
+				limit = { has_global_flag = german_civil_war_bormannvic }
+				GER_Bormann_SAF_conclude_SAW = yes
+			}
+			else_if = {
+				limit = { has_global_flag = german_civil_war_speervic }
+				SGR_conclude_SAW = yes
+			}
+		}
+		IBR = {
+			if = {
+				limit = { has_country_flag = IBR_completed_SAF }
+				if = {
+					limit = { has_global_flag = SAF_OFN_Victory }
+					country_event = { id = iberia.314 days = 7 }
+				}
+				else_if = {
+					limit = { has_global_flag = SAF_Schild_Victory }
+					country_event = { id = iberia.319 days = 7 }
+				}
+				else = {
+					country_event = { id = iberia.323 days = 7 }
+				}
+				clr_country_flag = IBR_completed_SA
+			}
+			remove_opinion_modifier = {
+				target = USA
+				modifier = IBR_SAF_support
+			}
+			remove_opinion_modifier = {
+				target = SAF
+				modifier = IBR_SAF_support
+			}
+			country_event = { id = iberia.326 days = 1 }
+			set_temp_variable = { target = SAF }
+			TNO_clear_num_volunteers = yes
+		}
+		CAN = {
+			set_temp_variable = { target = SAF }
+			TNO_clear_num_volunteers = yes
+		}
+		AST = {
+			set_temp_variable = { target = SAF }
+			TNO_clear_num_volunteers = yes
+		}
+		NZL = {
+			set_temp_variable = { target = SAF }
+			TNO_clear_num_volunteers = yes
+		}
+		WIN = {
+			set_temp_variable = { target = SAF }
+			TNO_clear_num_volunteers = yes
+		}
+		BRG = {
+			set_temp_variable = { target = SAF }
+			TNO_clear_num_volunteers = yes
+			set_temp_variable = { target = GRO }
+			TNO_clear_num_volunteers = yes
+		}
+		####################
+		# REMOVE BUFFS
+		####################
+
+		SAF = {
+			remove_ideas = RK_SAF_war_AI_bonus
+		}
+		USA = {
+			remove_ideas = RK_SAF_war_AI_bonus
+		}
+		COG = {
+			remove_ideas = RK_SAF_war_AI_bonus
+		}
+		ANG = {
+			remove_ideas = RK_SAF_war_AI_bonus
+		}
+		GRO = {
+			remove_ideas = RK_SAF_war_AI_bonus
+		}
+
+		COG = {
+			remove_dynamic_modifier = { modifier = COG_SAW_buff }
+		}
+		ANG = {
+			remove_dynamic_modifier = { modifier = ANG_SAW_buff }
+		}
+		GRO = {
+			remove_dynamic_modifier = { modifier = GRO_SAW_buff }
+		}
+		SAF = {
+			remove_dynamic_modifier = { modifier = SAF_SAW_buff }
+		}
+		BOR = {
+			remove_dynamic_modifier = { modifier = BOR_SAW_buff }
+		}
+
+
+		#REMOVE RUBBERBANDS
+		USA = {
+			remove_dynamic_modifier = {
+				modifier = SAW_rubberband_dynmod_USA
+			}
+		}
+		SAF = {
+			remove_dynamic_modifier = {
+				modifier = SAW_rubberband_dynmod_SAF
+			}
+		}
+		COG = {
+			remove_dynamic_modifier = {
+				modifier = SAW_rubberband_dynmod_COG
+			}
+		}
+		ANG = {
+			remove_dynamic_modifier = {
+				modifier = SAW_rubberband_dynmod_ANG
+			}
+		}
+		GRO = {
+			remove_dynamic_modifier = {
+				modifier = SAW_rubberband_dynmod_GRO
+			}
+		}
+		BOR = {
+			remove_dynamic_modifier = {
+				modifier = SAW_rubberband_dynmod_BOR
+			}
+		}
+
+		GRO = {
+			if = {
+				limit = {
+					OR = {
+						has_cosmetic_tag = GRO_REICHSSTAAT
+						has_cosmetic_tag = GRO_REICHSSTAAT_2
+						has_cosmetic_tag = GRO_REICHSSTAAT_3
+					}
+				}
+				remove_faction_status = yes
+				dismantle_faction = yes
+				every_owned_state = {
+					add_core_of = GRO
+				}
+				if = { #Removes Boer Part of tree
+					limit = {
+						NOT = { country_exists = BOR }
+					}
+					load_focus_tree = { tree = GRO_grossafrikanischer_reichsstaat_no_boers keep_completed = yes }
+				}
+				if = {
+					limit = {
+						country_exists = BOR
+					}
+					BOR = { remove_faction_status = yes }
+				}
+			}
+		}
+	}
+	USA_SAW_conclusion_events = yes
+}
+
+USA_SAW_conclusion_events = {
+	if = { # Total Schild Victory
+		limit = { has_global_flag = SAF_Schild_Victory }
+		USA = {
+			if = { # Nixon
+				limit = { has_country_leader = { character = USA_Richard_Nixon ruling_only = yes } }
+				country_event = {
+					id = saw_report.1
+				}
+			}
+			else_if = { # JFK
+				limit = { has_country_leader = { character = USA_John_F_Kennedy ruling_only = yes } }
+				country_event = {
+					id = saw_report.4
+				}
+			}
+			else_if = { # McCorcmack
+				limit = { has_country_leader = { character = USA_John_McCormack ruling_only = yes } }
+				country_event = {
+					id = saw_report.8
+				}
+			}
+			else_if = { # LBJ
+				limit = { has_country_leader = { character = USA_Lyndon_B_Johnson ruling_only = yes } }
+				country_event = {
+					id = saw_report.14
+				}
+			}
+			else_if = { # Wallace
+				limit = { has_country_leader = { character = USA_George_Wallace ruling_only = yes } }
+				country_event = {
+					id = saw_report.24
+				}
+			}
+			else_if = { # RFK
+				limit = { has_country_leader = { character = USA_Robert_F_Kennedy ruling_only = yes } }
+				country_event = {
+					id = saw_report.29
+				}
+			}
+			else_if = { # Bennett
+				limit = { has_country_leader = { character = USA_Wallace_F_Bennett ruling_only = yes } }
+				country_event = {
+					id = saw_report.19
+				}
+			}
+		}
+	}
+	else_if = { # Total OFN Victory
+		limit = { has_global_flag = SAF_OFN_Victory }
+		USA = {
+			if = { # Nixon
+				limit = { has_country_leader = { character = USA_Richard_Nixon ruling_only = yes } }
+				country_event = {
+					id = saw_report.2
+				}
+			}
+			else_if = { # JFK
+				limit = { has_country_leader = { character = USA_John_F_Kennedy ruling_only = yes } }
+				country_event = {
+					id = saw_report.3
+				}
+			}
+			else_if = { # McCorcmack
+				limit = { has_country_leader = { character = USA_John_McCormack ruling_only = yes } }
+				country_event = {
+					id = saw_report.9
+				}
+			}
+			else_if = { # LBJ
+				limit = { has_country_leader = { character = USA_Lyndon_B_Johnson ruling_only = yes } }
+				country_event = {
+					id = saw_report.13
+				}
+			}
+			else_if = { # Wallace
+				limit = { has_country_leader = { character = USA_George_Wallace ruling_only = yes } }
+				country_event = {
+					id = saw_report.23
+				}
+			}
+			else_if = { # RFK
+				limit = { has_country_leader = { character = USA_Robert_F_Kennedy ruling_only = yes } }
+				country_event = {
+					id = saw_report.28
+				}
+			}
+			else_if = { # Bennett
+				limit = { has_country_leader = { character = USA_Wallace_F_Bennett ruling_only = yes } }
+				country_event = {
+					id = saw_report.18
+				}
+			}
+			set_country_flag = USA_SAF_WAR_Insurgency_Activated
+		}
+	}
+	else_if = { # Pakt Ceasefire
+		limit = { has_global_flag = SAF_Schild_Ceasefire }
+		USA = {
+			if = { # McCorcmack
+				limit = { has_country_leader = { character = USA_John_McCormack ruling_only = yes } }
+				country_event = {
+					id = saw_report.7
+				}
+			}
+			else_if = { # LBJ
+				limit = { has_country_leader = { character = USA_Lyndon_B_Johnson ruling_only = yes } }
+				country_event = {
+					id = saw_report.12
+				}
+			}
+			else_if = { # Wallace
+				limit = { has_country_leader = { character = USA_George_Wallace ruling_only = yes } }
+				country_event = {
+					id = saw_report.22
+				}
+			}
+			else_if = { # RFK
+				limit = { has_country_leader = { character = USA_Robert_F_Kennedy ruling_only = yes } }
+				country_event = {
+					id = saw_report.27
+				}
+			}
+			else_if = { # Bennett
+				limit = { has_country_leader = { character = USA_Wallace_F_Bennett ruling_only = yes } }
+				country_event = {
+					id = saw_report.17
+				}
+			}
+		}
+	}
+	else_if = { # OFN Ceasefire
+		limit = { has_global_flag = SAF_OFN_Ceasefire }
+		USA = {
+			if = { # McCorcmack
+				limit = { has_country_leader = { character = USA_John_McCormack ruling_only = yes } }
+				country_event = {
+					id = saw_report.6
+				}
+			}
+			else_if = { # LBJ
+				limit = { has_country_leader = { character = USA_Lyndon_B_Johnson ruling_only = yes } }
+				country_event = {
+					id = saw_report.11
+				}
+			}
+			else_if = { # Wallace
+				limit = { has_country_leader = { character = USA_George_Wallace ruling_only = yes } }
+				country_event = {
+					id = saw_report.21
+				}
+			}
+			else_if = { # RFK
+				limit = { has_country_leader = { character = USA_Robert_F_Kennedy ruling_only = yes } }
+				country_event = {
+					id = saw_report.26
+				}
+			}
+			else_if = { # Bennett
+				limit = { has_country_leader = { character = USA_Wallace_F_Bennett ruling_only = yes } }
+				country_event = {
+					id = saw_report.16
+				}
+			}
+		}
+	}
+	else_if = { # Stalemate
+		limit = { has_global_flag = SAF_Stalemate }
+		USA = {
+			if = { # McCorcmack
+				limit = { has_country_leader = { character = USA_John_McCormack ruling_only = yes } }
+				country_event = {
+					id = saw_report.5
+				}
+			}
+			else_if = { # LBJ
+				limit = { has_country_leader = { character = USA_Lyndon_B_Johnson ruling_only = yes } }
+				country_event = {
+					id = saw_report.10
+				}
+			}
+			else_if = { # Wallace
+				limit = { has_country_leader = { character = USA_George_Wallace ruling_only = yes } }
+				country_event = {
+					id = saw_report.20
+				}
+			}
+			else_if = { # RFK
+				limit = { has_country_leader = { character = USA_Robert_F_Kennedy ruling_only = yes } }
+				country_event = {
+					id = saw_report.25
+				}
+			}
+			else_if = { # Bennett
+				limit = { has_country_leader = { character = USA_Wallace_F_Bennett ruling_only = yes } }
+				country_event = {
+					id = saw_report.15
+				}
+			}
+		}
+	}
+}
+
+USA_proxy_conclusion_effect = {
+	# Since the election code has changed, this effect has been simplified to simply being a compilation of existing USA election effects.
+	# Set a number of weeks as the temp variable "conclusion_weeks".
+	# To add instant party popularity, set a bonus value for popularity change as the temp variable "conclusion_bonus" (At the most go with 0.05).
+	# The bonuses add to popularity, the weeks are counters on foreign policy opinion
+	# Set flag "conclusion_victory", otherwise it will apply negative effects.
+	# For reference, the highest week duration you should give is around 26 (about 6 months), adjust as you feel necessary depending on the situation.
+	# You should fire this effect within the USA scope.
+	# This can also be used for diplo conflicts, though they should probably get smaller effects than proxies.
+	# Other effects such as vanilla ones (stability, war support, political power), or effects from ingame mechanics (such as Homefront mechanic Optics, Trust in Government, etc) should be given outside this effect.
+
+
+	if = { # Victory
+		limit = { has_country_flag = conclusion_victory }
+		custom_effect_tooltip = USA_all_voters_header_tt
+		set_temp_variable = { USA_week_change_black_foreign_policy_lib = conclusion_weeks }
+		add_to_variable = { Policy_Shift_black_foreign_policy_lib_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_hispanic_foreign_policy_lib_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_minority_foreign_policy_lib_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_nativists_foreign_policy_lib_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_urban_foreign_policy_lib_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_rural_foreign_policy_lib_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_union_foreign_policy_lib_Weeks = conclusion_weeks }
+		custom_effect_tooltip = USA_black_foreign_policy_lib
+
+		if = { # RDC
+			limit = {
+				OR = {
+					check_variable = { USA.presidents_party = 1 } # REP
+					check_variable = { USA.presidents_party = 2 } # DEM
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { USA.presidents_party = 1 } # REP
+				}
+				custom_effect_tooltip = USA_rep_shift_proxy_conclusion
+				add_to_variable = { USA_BONUS_rural_rep_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_urban_rep_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_nativists_rep_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_union_rep_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_black_rep_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_minority_rep_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_hispanic_rep_val = conclusion_bonus }
+			}
+			if = {
+				limit = {
+					check_variable = { USA.presidents_party = 2 } # DEM
+				}
+				custom_effect_tooltip = USA_dem_shift_proxy_conclusion
+				add_to_variable = { USA_BONUS_rural_dem_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_urban_dem_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_nativists_dem_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_union_dem_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_black_dem_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_minority_dem_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_hispanic_dem_val = conclusion_bonus }
+			}
+			hidden_effect = { #all factions get more approval
+				USA_add_5_HR_RDC_approval = yes
+				USA_add_5_RR_RDC_approval = yes
+				USA_add_5_LD_RDC_approval = yes
+				USA_add_5_DC_RDC_approval = yes
+			}
+		}
+		else_if = { # NPP
+			limit = {
+				OR = {
+					check_variable = { USA.presidents_party = 3 } # Marxists
+					check_variable = { USA.presidents_party = 4 } # Progressives
+					check_variable = { USA.presidents_party = 5 } # Sovereignists
+					check_variable = { USA.presidents_party = 6 } # Nationalists
+				}
+			}
+
+			# SCRIPTED EFFECTS
+
+			if = {
+				limit = {
+					check_variable = { USA.presidents_party = 4 } # Progressives
+				}
+				custom_effect_tooltip = USA_pro_shift_proxy_conclusion
+				add_to_variable = { USA_BONUS_rural_pro_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_urban_pro_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_nativists_pro_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_union_pro_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_black_pro_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_minority_pro_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_hispanic_pro_val = conclusion_bonus }
+			}
+
+			if = {
+				limit = {
+					check_variable = { USA.presidents_party = 6 } # Nationalists
+				}
+				custom_effect_tooltip = USA_nat_shift_proxy_conclusion
+				add_to_variable = { USA_BONUS_rural_nat_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_urban_nat_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_nativists_nat_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_union_nat_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_black_nat_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_minority_nat_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_hispanic_nat_val = conclusion_bonus }
+			}
+
+			if = {
+				limit = {
+					check_variable = { USA.presidents_party = 3 } # Marxists
+				}
+				custom_effect_tooltip = USA_com_shift_proxy_conclusion
+				add_to_variable = { USA_BONUS_rural_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_urban_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_nativists_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_union_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_black_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_minority_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_hispanic_com_val = conclusion_bonus }
+			}
+
+			if = {
+				limit = {
+					check_variable = { USA.presidents_party = 5 } # Sovereignists
+				}
+				custom_effect_tooltip = USA_anv_shift_proxy_conclusion
+				add_to_variable = { USA_BONUS_rural_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_urban_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_nativists_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_union_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_black_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_minority_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_hispanic_anv_val = conclusion_bonus }
+			}
+		}
+	}
+
+	else = { # Defeat
+		custom_effect_tooltip = USA_all_voters_header_tt
+		set_temp_variable = { USA_week_change_black_foreign_policy_con = conclusion_weeks }
+		add_to_variable = { Policy_Shift_black_foreign_policy_con_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_hispanic_foreign_policy_con_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_minority_foreign_policy_con_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_nativists_foreign_policy_con_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_urban_foreign_policy_con_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_rural_foreign_policy_con_Weeks = conclusion_weeks }
+		add_to_variable = { Policy_Shift_union_foreign_policy_con_Weeks = conclusion_weeks }
+		custom_effect_tooltip = USA_black_foreign_policy_con
+		if = { # RDC
+			limit = {
+				OR = {
+					check_variable = { USA.presidents_party = 1 } # REP
+					check_variable = { USA.presidents_party = 2 } # DEM
+				}
+			}
+			custom_effect_tooltip = USA_pro_shift_proxy_conclusion
+			custom_effect_tooltip = USA_nat_shift_proxy_conclusion
+			add_to_variable = { USA_BONUS_rural_pro_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_rural_nat_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_urban_pro_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_urban_nat_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_nativists_pro_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_nativists_nat_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_union_pro_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_union_nat_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_black_pro_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_black_nat_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_minority_pro_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_minority_nat_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_hispanic_pro_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_hispanic_nat_val = conclusion_bonus }
+
+			# communism shift
+			add_to_variable = { USA_BONUS_rural_com_val = conclusion_bonus }
+			custom_effect_tooltip = USA_com_shift_proxy_conclusion
+
+			add_to_variable = { USA_BONUS_urban_com_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_nativists_com_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_union_com_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_black_com_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_minority_com_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_hispanic_com_val = conclusion_bonus }
+
+			# nazi shift
+			add_to_variable = { USA_BONUS_rural_anv_val = conclusion_bonus }
+			custom_effect_tooltip = USA_anv_shift_proxy_conclusion
+
+			add_to_variable = { USA_BONUS_urban_anv_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_nativists_anv_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_union_anv_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_black_anv_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_minority_anv_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_hispanic_anv_val = conclusion_bonus }
+
+			set_temp_variable = { temp_USA_RDC_controversy = -.2 }
+			set_temp_variable = { temp_USA_controversy_weeks = conclusion_weeks }
+			USA_RDC_controversy = yes
+
+
+			hidden_effect = {
+				USA_remove_5_HR_RDC_approval = yes
+				USA_remove_5_RR_RDC_approval = yes
+				USA_remove_5_LD_RDC_approval = yes
+				USA_remove_5_DC_RDC_approval = yes
+			}
+		}
+		else_if = { # NPP
+			limit = {
+				OR = {
+					check_variable = { USA.presidents_party = 3 } # Marxists
+					check_variable = { USA.presidents_party = 4 } # Progressives
+					check_variable = { USA.presidents_party = 5 } # Sovereignists
+					check_variable = { USA.presidents_party = 6 } # Nationalists
+				}
+			}
+			custom_effect_tooltip = USA_dem_shift_proxy_conclusion
+			custom_effect_tooltip = USA_rep_shift_proxy_conclusion
+
+			# they don't have party unity apparently
+
+			add_to_variable = { USA_BONUS_rural_dem_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_rural_rep_val = conclusion_bonus }
+
+			add_to_variable = { USA_BONUS_urban_dem_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_urban_rep_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_nativists_dem_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_nativists_rep_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_union_dem_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_union_rep_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_black_dem_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_black_rep_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_minority_dem_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_minority_rep_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_hispanic_dem_val = conclusion_bonus }
+			add_to_variable = { USA_BONUS_hispanic_rep_val = conclusion_bonus }
+
+			if = { # if right wing -> shift to communism
+				limit = {
+					OR = {
+						check_variable = { USA.presidents_party = 5 } # Sovereignists
+						check_variable = { USA.presidents_party = 6 } # Nationalists
+					}
+				}
+
+				add_to_variable = { USA_BONUS_rural_com_val = conclusion_bonus }
+				custom_effect_tooltip = USA_com_shift_proxy_conclusion
+
+				add_to_variable = { USA_BONUS_urban_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_nativists_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_union_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_black_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_minority_com_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_hispanic_com_val = conclusion_bonus }
+			}
+
+			else_if = { # if left wing -> shift to nazism
+				limit = {
+					OR = {
+						check_variable = { USA.presidents_party = 3 } # Marxists
+						check_variable = { USA.presidents_party = 4 } # Progressives
+					}
+				}
+
+				add_to_variable = { USA_BONUS_rural_anv_val = conclusion_bonus }
+				custom_effect_tooltip = USA_anv_shift_proxy_conclusion
+
+				add_to_variable = { USA_BONUS_urban_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_nativists_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_union_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_black_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_minority_anv_val = conclusion_bonus }
+				add_to_variable = { USA_BONUS_hispanic_anv_val = conclusion_bonus }
+			}
+			set_temp_variable = { temp_USA_NPP_controversy = -.2 }
+			set_temp_variable = { temp_USA_controversy_weeks = conclusion_weeks }
+			USA_NPP_controversy = yes
+		}
+	}
+	clr_country_flag = conclusion_victory
+}

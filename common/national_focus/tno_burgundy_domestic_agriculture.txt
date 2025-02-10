@@ -1,0 +1,664 @@
+shared_focus = {
+	id = BRG_das_landwirtschaftsamt
+	icon = GFX_focus_BRG_das_landwirtschaftsamt
+	cost = 4.00
+	x = 31
+	y = 0
+	offset = {
+		x = 10
+		y = 0
+		trigger = {
+			has_country_flag = BRG_fall_ragnarchar_allowed
+		}
+	}
+	allow_branch = { has_country_flag = BRG_agriculture_phase_1 } 
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_das_landwirtschaftsamt"
+		country_event = { id = BRG_agri.1 }
+		set_variable = { BRG_national_food_boost = 0.05 }
+		set_variable = { BRG_food_rationing = 0 }
+		set_variable = { BRG_famine_agriculture_gain = 0 }
+		set_variable = { BRG_famine_growth_penalty = 0 }
+
+		set_variable = { BRG_famine_equipment_penalty = 0 }
+
+		set_variable = { BRG_famine_research_penalty = 0 }
+
+		set_variable = { BRG_famine_growth_penalty = 0 }
+		hidden_effect = {
+			TNO_worsen_agriculture_high = yes
+			TNO_worsen_agriculture_high = yes
+			add_dynamic_modifier = { modifier = BRG_famine_tree_modifier } 
+		}
+		
+	}
+}
+shared_focus = {
+	id = BRG_food_for_factories
+	icon = GFX_focus_BRG_food_for_the_factories
+	cost = 4.00
+	prerequisite = { focus = BRG_das_landwirtschaftsamt }
+	available = {
+		OR = {
+			NOT = { has_country_flag = BRG_cop_priority_flag }
+			custom_trigger_tooltip = {
+				tooltip = BRG_Enough_Food_Reserves_TT
+				check_variable = { BRG_National_Food_Reserve > 24999 }
+			}
+		}
+	}
+	x = -3
+	y = 1
+	relative_position_id = BRG_das_landwirtschaftsamt
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_food_for_factories"
+		if = {
+			limit = { has_country_flag = BRG_cop_priority_flag }
+			custom_effect_tooltip = BRG_prioritize_both
+			clr_country_flag = BRG_cop_priority_flag
+			subtract_from_variable = { BRG_National_Food_Reserve = 25000 }
+		}
+		else = {
+			custom_effect_tooltip = BRG_prioritize_workers
+			set_country_flag = BRG_worker_priority_flag
+		}
+		country_event = { id = BRG_agri.3 }
+		add_stability = 0.03
+	}
+}
+shared_focus = {
+	id = BRG_a_simple_ration
+	icon = GFX_focus_BRG_a_simple_ration
+	cost = 4.00
+	prerequisite = { focus = BRG_food_for_factories }
+	x = -1
+	y = 1
+	relative_position_id = BRG_food_for_factories
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_a_simple_ration"
+		custom_effect_tooltip = BRG_reduce_food_consumption
+		custom_effect_tooltip = BRG_reduce_growth
+		subtract_from_variable = { BRG_food_rationing = 0.05 }
+		subtract_from_variable = { BRG_famine_growth_penalty = 0.03 }
+		TNO_improve_max_workhours_policy_effectiveness_low = yes
+		TNO_improve_regulations_policy_effectiveness_low = yes
+		every_owned_state = {
+			BRG_Decrease_himmler_support_large = yes
+			random_list = {
+				34 = {
+					BRG_Increase_langemarck_support_medium = yes
+				}
+				33 = {
+					BRG_Increase_walloon_support_medium = yes
+				}
+				33 = {
+					BRG_Increase_charlemagne_support_medium = yes
+				}
+			}
+		}
+	}
+}
+shared_focus = {
+	id = BRG_industrial_aids
+	icon = GFX_focus_BRG_automated_agricultural_practices
+	cost = 4.00
+	prerequisite = { focus = BRG_a_simple_ration }
+	x = -1
+	y = 1
+	relative_position_id = BRG_a_simple_ration
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_industrial_aids"
+		set_variable = { BRG_famine_agriculture_gain = 0 }
+		set_variable = { BRG_famine_equipment_penalty = 0 }
+		TNO_improve_agriculture_low = yes
+		custom_effect_tooltip = BRG_unlock_industrial_farm_aid
+		random_owned_state = {
+			BRG_Increase_himmler_support_small = yes
+		}
+		random_owned_state = {
+			BRG_Increase_himmler_support_small = yes
+		}
+	}
+}
+shared_focus = {
+	id = BRG_expand_rodomo_sillos
+	icon = GFX_focus_BRG_expand_rodomo_silos
+	cost = 4.00
+	prerequisite = { focus = BRG_a_simple_ration }
+	x = 1
+	y = 1
+	relative_position_id = BRG_a_simple_ration
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_expand_rodomo_sillos"
+		15 = {
+			BRG_Increase_himmler_support_small = yes
+			add_building_construction = {
+				type = offices
+				level = 2
+				instant_build = yes
+			}
+			add_building_construction = {
+				type = fuel_silo
+				level = 1
+				instant_build = yes
+			}
+		}
+		custom_effect_tooltip = BRG_unlock_reserves_expansion
+	}
+}
+shared_focus = {
+	id = BRG_fields_of_grain
+	icon = GFX_focus_BRG_a_simpler_life
+	cost = 4.00
+	prerequisite = { focus = BRG_industrial_aids }
+	prerequisite = { focus = BRG_expand_rodomo_sillos }
+	x = 0
+	y = 2
+	relative_position_id = BRG_a_simple_ration
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_fields_of_grain"
+		custom_effect_tooltip = BRG_unlock_factory_farms
+		TNO_worsen_industrial_equipment_low = yes
+		TNO_worsen_industrial_expertise_low = yes
+		TNO_improve_agriculture_med = yes
+		tno_regulations_improve = yes
+		tno_pollution_improve = yes
+	}
+}
+shared_focus = {
+	id = BRG_food_for_those_who_matter
+	icon = GFX_focus_BRG_food_for_the_elite
+	cost = 4.00
+	prerequisite = { focus = BRG_das_landwirtschaftsamt }
+	available = {
+		OR = {
+			NOT = { has_country_flag = BRG_worker_priority_flag }
+			custom_trigger_tooltip = {
+				tooltip = BRG_Enough_Food_Reserves_TT
+				check_variable = { BRG_National_Food_Reserve > 24999 }
+			}
+		}
+	}
+	x = 3
+	y = 1
+	relative_position_id = BRG_das_landwirtschaftsamt
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_food_for_those_who_matter"
+		if = {
+			limit = { has_country_flag = BRG_worker_priority_flag }
+			custom_effect_tooltip = BRG_prioritize_both
+			clr_country_flag = BRG_worker_priority_flag
+			subtract_from_variable = { BRG_National_Food_Reserve = 25000 }
+		}
+		else = {
+			custom_effect_tooltip = BRG_prioritize_cops
+			set_country_flag = BRG_cop_priority_flag
+		}
+		country_event = { id = BRG_agri.4 }
+		add_war_support = 0.03
+		TNO_improve_agriculture_low = yes
+	}
+}
+shared_focus = {
+	id = BRG_establish_priority_lists
+	icon = GFX_focus_BRG_write_down_priority_lists
+	cost = 4.00
+	prerequisite = { focus = BRG_food_for_those_who_matter }
+	x = 1
+	y = 1
+	relative_position_id = BRG_food_for_those_who_matter
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_establish_priority_lists"
+		country_event = { id = BRG_agri.2 }
+		TNO_improve_regulations_policy_effectiveness_low = yes
+		TNO_improve_military_supervision_policy_effectiveness_low = yes
+	}
+}
+shared_focus = {
+	id = BRG_forget_outer_circle
+	icon = GFX_focus_BRG_forget_the_outer_circle
+	cost = 4.00
+	prerequisite = { focus = BRG_establish_priority_lists }
+	x = -1
+	y = 1
+	relative_position_id = BRG_establish_priority_lists
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_forget_outer_circle"
+		custom_effect_tooltip = BRG_reduce_food_consumption
+		custom_effect_tooltip = BRG_famine_reduce_loyalty
+		TNO_improve_political_parties_policy_effectiveness_med = yes
+		TNO_worsen_military_supervision_policy_effectiveness_low = yes
+		TNO_worsen_army_professionalism_low = yes
+		hidden_effect = {
+			subtract_from_variable = { BRG_food_rationing = 0.05 }
+			every_owned_state = {
+				if = {
+					limit = { check_variable = { nationality = 140 } }
+					subtract_from_variable = { HimmlerSupport = 5 }
+				}
+				else = {
+					subtract_from_variable = { HimmlerSupport = 10 }
+				}
+			}
+		}
+	}
+}
+shared_focus = {
+	id = BRG_crack_the_whip
+	icon = GFX_focus_generic_crack_the_whip
+	cost = 4.00
+	prerequisite = { focus = BRG_establish_priority_lists }
+	x = 1
+	y = 1
+	relative_position_id = BRG_establish_priority_lists
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_crack_the_whip"
+		custom_effect_tooltip = BRG_unlock_forced_farm_labor
+		TNO_improve_max_workhours_policy_effectiveness_med = yes
+		TNO_improve_regulations_policy_effectiveness_med = yes
+		TNO_worsen_industrial_expertise_low = yes
+		every_owned_state = {
+			BRG_Decrease_himmler_support_small = yes
+			random_list = {
+				34 = {
+					BRG_Increase_langemarck_support_medium = yes
+				}
+				33 = {
+					BRG_Increase_walloon_support_medium = yes
+				}
+				33 = {
+					BRG_Increase_charlemagne_support_medium = yes
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = BRG_political.59
+				days = 21
+			}
+		}
+	}
+}
+shared_focus = {
+	id = BRG_waste_not_or_want_not
+	icon = GFX_focus_BRG_punish_food_waste
+	cost = 4.00
+	prerequisite = { focus = BRG_forget_outer_circle }
+	prerequisite = { focus = BRG_crack_the_whip }
+	x = 0
+	y = 2
+	relative_position_id = BRG_establish_priority_lists
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_waste_not_or_want_not"
+		custom_effect_tooltip = BRG_increase_food_production
+		add_to_variable = { BRG_national_food_boost = 0.05 }
+		TNO_improve_regulations_policy_effectiveness_low = yes
+		TNO_improve_agriculture_low = yes
+		every_owned_state = {
+			BRG_Increase_himmler_support_small = yes
+		}
+
+	}
+}
+shared_focus = {
+	id = BRG_emergency_stockpile_measures
+	icon = GFX_focus_BRG_the_burgundian_diet
+	cost = 4.00
+	prerequisite = { focus = BRG_das_landwirtschaftsamt }
+	x = 0
+	y = 2
+	relative_position_id = BRG_das_landwirtschaftsamt
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_emergency_stockpile_measures"
+		custom_effect_tooltip = BRG_unlock_stockpile
+		country_event = {
+			id = BRG_agri.13
+			days = 4
+		}
+	}
+}
+shared_focus = {
+	id = BRG_develop_new_fertilizers
+	icon = GFX_focus_BRG_develop_new_fertilizers
+	cost = 4.00
+	prerequisite = { focus = BRG_emergency_stockpile_measures }
+	x = -1
+	y = 1
+	relative_position_id = BRG_emergency_stockpile_measures
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_develop_new_fertilizers"
+		custom_effect_tooltip = BRG_increase_food_production
+		add_to_variable = { BRG_national_food_boost = 0.05 }
+		TNO_improve_research_facilities_med = yes
+		TNO_improve_agriculture_low = yes
+		TNO_improve_regulations_policy_effectiveness_low = yes
+	}
+}
+shared_focus = {
+	id = BRG_specialized_assistance
+	icon = GFX_focus_generic_specialized_assistance
+	cost = 4.00
+	prerequisite = { focus = BRG_emergency_stockpile_measures }
+	x = 1
+	y = 1
+	relative_position_id = BRG_emergency_stockpile_measures
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_specialized_assistance"
+		custom_effect_tooltip = BRG_unlock_socdev_conversions
+		TNO_improve_admin_efficiency_med = yes
+		set_variable = { BRG_famine_equipment_penalty = 0 }
+		set_variable = { BRG_famine_research_penalty = 0 }
+	}
+}
+shared_focus = {
+	id = BRG_industriebauernhof_projekte
+	icon = GFX_focus_BRG_make_some_space
+	cost = 4.00
+	prerequisite = { focus = BRG_specialized_assistance }
+	prerequisite = { focus = BRG_develop_new_fertilizers }
+	x = 0
+	y = 2
+	relative_position_id = BRG_emergency_stockpile_measures
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_industriebauernhof_projekte"
+		custom_effect_tooltip = BRG_unlock_city_destruction
+		TNO_worsen_poverty_med = yes
+		TNO_improve_agriculture_med = yes
+		every_owned_state = {
+			BRG_Decrease_himmler_support_large = yes
+			random_list = {
+				34 = {
+					BRG_Increase_langemarck_support_large = yes
+				}
+				33 = {
+					BRG_Increase_walloon_support_large = yes
+				}
+				33 = {
+					BRG_Increase_charlemagne_support_large = yes
+				}
+			}
+		}
+	}
+}
+shared_focus = {
+	id = BRG_the_final_measures
+	icon = GFX_focus_BRG_the_basic_crops
+	cost = 4.00
+	prerequisite = {
+		focus = BRG_fields_of_grain
+		focus = BRG_waste_not_or_want_not
+	}
+	prerequisite = { focus = BRG_industriebauernhof_projekte }
+	x = 0
+	y = 1
+	relative_position_id = BRG_industriebauernhof_projekte
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_the_final_measures"
+		custom_effect_tooltip = BRG_reserve_boost
+		country_event = { id = BRG_agri.5 }
+		hidden_effect = {
+			add_to_variable = { BRG_National_Food_Reserve = 30000 }
+			set_variable = { BRG_second_famine_counter = 0 }
+		}
+	}
+}
+shared_focus = {
+	id = BRG_a_second_try
+	icon = GFX_focus_BRG_a_second_try
+	cost = 4.00
+	prerequisite = { focus = BRG_the_final_measures }
+	allow_branch = { has_country_flag = BRG_agriculture_phase_2 }
+	x = 0
+	y = 1
+	relative_position_id = BRG_the_final_measures
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_a_second_try"
+		country_event = { id = BRG_agri.6 }
+		add_political_power = 40
+		custom_effect_tooltip = BRG_second_try_tt
+	}
+}
+shared_focus = {
+	id = BRG_raze_the_cities
+	icon = GFX_focus_BRG_raze_the_cities
+	cost = 4.00
+	prerequisite = { focus = BRG_a_second_try }
+	x = -1
+	y = 1
+	relative_position_id = BRG_a_second_try
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_raze_the_cities"
+		custom_effect_tooltip = BRG_unlock_farm_regions
+		custom_effect_tooltip = BRG_famine_reduce_loyalty
+		TNO_worsen_industrial_expertise_med = yes
+		TNO_worsen_industrial_equipment_med = yes
+		TNO_worsen_trade_laws_policy_effectiveness_high = yes
+		TNO_improve_agriculture_med = yes
+		hidden_effect = {
+			every_owned_state = {
+				if = {
+					limit = { check_variable = { nationality = 140 } }
+					subtract_from_variable = { HimmlerSupport = 5 }
+				}
+				else = {
+					subtract_from_variable = { HimmlerSupport = 10 }
+				}
+			}
+		}
+	}
+}
+shared_focus = {
+	id = BRG_survival_of_the_fittest
+	icon = GFX_focus_BRG_workers_are_resources
+	cost = 4.00
+	prerequisite = { focus = BRG_raze_the_cities }
+	x = -1
+	y = 1
+	relative_position_id = BRG_raze_the_cities
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_survival_of_the_fittest"
+		custom_effect_tooltip = BRG_increase_rodomo_output_tt
+		custom_effect_tooltip = BRG_reduce_growth
+		subtract_from_variable = { BRG_famine_growth_penalty = 0.02 }
+		add_to_variable = { BRG_Rodomo_Output = 0.05 }
+		hidden_effect = {
+			country_event = {
+				id = BRG_political.60
+				days = 7
+			}
+		}
+	}
+}
+shared_focus = {
+	id = BRG_tighten_the_belts
+	icon = GFX_focus_BRG_tighten_the_belts
+	cost = 4.00
+	prerequisite = { focus = BRG_a_second_try }
+	x = 1
+	y = 1
+	relative_position_id = BRG_a_second_try
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_tighten_the_belts"
+		custom_effect_tooltip = BRG_reduce_food_consumption
+		TNO_worsen_army_professionalism_low = yes
+		subtract_from_variable = { BRG_food_rationing = 0.05 }
+		random_owned_state = {
+			BRG_Increase_walloon_support_large = yes
+		}
+		random_owned_state = {
+			BRG_Increase_charlemagne_support_large = yes
+		}
+	}
+}
+shared_focus = {
+	id = BRG_grab_it_all
+	icon = GFX_focus_BRG_the_burgundian_diet
+	cost = 4.00
+	prerequisite = { focus = BRG_tighten_the_belts }
+	x = 1
+	y = 1
+	relative_position_id = BRG_tighten_the_belts
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_grab_it_all"
+		custom_effect_tooltip = BRG_increase_food_production
+		TNO_worsen_poverty_med = yes
+		add_to_variable = { BRG_increase_food_production = 0.03 }
+		every_owned_state = {
+			BRG_Decrease_himmler_support_medium = yes
+		}
+	}
+}
+shared_focus = {
+	id = BRG_burgundian_diet
+	icon = GFX_focus_BRG_single_meal_days
+	cost = 4.00
+	prerequisite = { focus = BRG_survival_of_the_fittest }
+	prerequisite = { focus = BRG_grab_it_all }
+	x = 0
+	y = 3
+	relative_position_id = BRG_a_second_try
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_burgundian_diet"
+		country_event = { id = BRG_agri.7 }
+		custom_effect_tooltip = BRG_increase_agriculture_modifier
+		add_to_variable = { BRG_famine_agriculture_gain = 1 }
+	}
+}
+shared_focus = {
+	id = BRG_nothing_shall_remain
+	icon = GFX_focus_BRG_nothing_shall_remain
+	cost = 4.00
+	prerequisite = { focus = BRG_burgundian_diet }
+	mutually_exclusive = { focus = BRG_some_can_stay }
+	x = -2
+	y = 1
+	relative_position_id = BRG_burgundian_diet
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_nothing_shall_remain"
+		custom_effect_tooltip = BRG_significantly_anger_charlemagne
+		custom_effect_tooltip = BRG_increase_food_production
+		add_to_variable = { BRG_increase_food_production = 0.06 }
+		TNO_improve_admin_efficiency_low = yes
+		TNO_improve_political_parties_policy_effectiveness_med = yes
+		hidden_effect = {
+			every_owned_state = {
+				limit = {
+					NOT = {
+						state = 16 #Nord Paris
+					}
+				}
+				if = {
+					limit = { is_core_of = FRA }
+					if = {
+						limit = { check_variable = { nationality = 140 } }
+						add_to_variable = { CharlemagneSupport = 10 }
+					}
+					else = {
+						add_to_variable = { CharlemagneSupport = 14 }
+					}
+				}
+			}
+		}
+	}
+}
+shared_focus = {
+	id = BRG_root_of_indulgence
+	icon = GFX_focus_BRG_ban_regional_food
+	cost = 4.00
+	prerequisite = { focus = BRG_nothing_shall_remain }
+	x = 0
+	y = 1
+	relative_position_id = BRG_nothing_shall_remain
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_root_of_indulgence"
+		custom_effect_tooltip = BRG_drastic_food_increase
+		custom_effect_tooltip = BRG_increase_food_production
+		add_to_variable = { BRG_increase_food_production = 0.05 }
+		add_political_power = 50
+	}
+}
+shared_focus = {
+	id = BRG_some_can_stay
+	icon = GFX_focus_BRG_some_can_stay
+	cost = 4.00
+	prerequisite = { focus = BRG_burgundian_diet }
+	mutually_exclusive = { focus = BRG_nothing_shall_remain }
+	x = 2
+	y = 1
+	relative_position_id = BRG_burgundian_diet
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_some_can_stay"
+		custom_effect_tooltip = BRG_please_charlemagne
+		custom_effect_tooltip = BRG_decrease_food_production
+		TNO_worsen_political_parties_policy_effectiveness_med = yes
+		TNO_worsen_admin_efficiency_low = yes
+		hidden_effect = {
+			subtract_from_variable = { BRG_national_food_boost = 0.05 }
+			every_owned_state = {
+				limit = {
+					NOT = {
+						state = 16 #Nord Paris
+					}
+				}
+				if = {
+					limit = { is_core_of = FRA }
+					if = {
+						limit = { check_variable = { nationality = 140 } }
+						subtract_from_variable = { CharlemagneSupport = 6 }
+						add_to_variable = { HimmlerSupport = 6 }
+					}
+					else = {
+						subtract_from_variable = { CharlemagneSupport = 4 }
+						add_to_variable = { HimmlerSupport = 4 }
+					}
+				}
+			}
+		}
+	}
+}
+shared_focus = {
+	id = BRG_needs_of_the_few_outwiegh_the_many
+	icon = GFX_focus_BRG_the_needs_of_few
+	cost = 4.00
+	prerequisite = { focus = BRG_some_can_stay }
+	x = 0
+	y = 1
+	relative_position_id = BRG_some_can_stay
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_needs_of_the_few_outwiegh_the_many"
+		custom_effect_tooltip = BRG_unlock_food_grants
+		TNO_worsen_agriculture_med = yes
+		add_political_power = -50
+		TNO_worsen_admin_efficiency_low = yes
+		every_owned_state = {
+			limit = { check_variable = { nationality = 123 } }
+			BRG_Decrease_charlemagne_support_large = yes
+			BRG_Increase_himmler_support_large = yes
+		}
+	}
+}
+shared_focus = {
+	id = BRG_a_solved_problem
+	icon = GFX_focus_BRG_the_burgundian_diet
+	cost = 4.00
+	prerequisite = {
+		focus = BRG_root_of_indulgence
+		focus = BRG_needs_of_the_few_outwiegh_the_many
+	}
+	x = 0
+	y = 3
+	relative_position_id = BRG_burgundian_diet
+	completion_reward = {
+		log = "[GetDateText]: [Root.GetName]: Focus BRG_a_solved_problem"
+		custom_effect_tooltip = BRG_reserve_boost
+		country_event = { id = BRG_agri.8 }
+		add_stability = 0.03
+		add_war_support = 0.03
+		add_to_variable = { BRG_National_Food_Reserve = 30000 }
+		every_owned_state = {
+			BRG_Increase_himmler_support_medium = yes
+		}
+	}
+}
+
+## I fucking hate burgundy -- Same

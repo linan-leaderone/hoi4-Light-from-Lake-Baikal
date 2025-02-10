@@ -1,0 +1,4856 @@
+# ██████╗ ██████╗ ██╗████████╗ █████╗ ██╗███╗   ██╗ #
+# ██╔══██╗██╔══██╗██║╚══██╔══╝██╔══██╗██║████╗  ██║ #
+# ██████╔╝██████╔╝██║   ██║   ███████║██║██╔██╗ ██║ #
+# ██╔══██╗██╔══██╗██║   ██║   ██╔══██║██║██║╚██╗██║ #
+# ██████╔╝██║  ██║██║   ██║   ██║  ██║██║██║ ╚████║ #
+# ╚═════╝ ╚═╝  ╚═╝╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ #
+# Scripted Effects
+
+#	1 GUIS & MECHANICS
+# 		1.1 WORKSHOP GUI
+#		1.2 PARTY MECHANIC
+#		1.3 MANN MECHANIC
+#		1.4 MIDNIGHT MECHANIC
+#
+#	2 OTHER
+#		2.1 THE SECOND GENERAL UPRISING
+#		2.2 ASSORTED LAWS
+
+##############################
+# |========================| #
+# |=[ 1 GUIS & MECHANICS ]=| #
+# |========================| #
+##############################
+
+############################
+# |=[ 1.1 WORKSHOP GUI ]=| #
+############################
+# Primary Designer: Maedhros
+# Primary Coder: Lamounier
+
+#	Base Effects
+#	Economic Effects
+#	Display Update Effects
+#	Modifier Effects
+#	Goals/Crisis Effects
+#	Specific Effects
+
+#########################
+# |=[ Base Effects ] =| #
+#########################
+
+## Activate economy mechanic
+BRI_Workshop_Activate = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Workshop_Activate; Executing."
+	custom_effect_tooltip = BRI_Workshop_Activate_tt
+
+	hidden_effect = {
+		set_country_flag = BRI_WorkshopMechanic_Active
+		set_country_flag = gui_alert_visible_2
+		set_country_flag = country_has_gui
+
+		## Setup vars
+		BRI_Workshop_Setup_DataHistory = yes
+		set_variable = { BRI_Workshop_Unemployment = BRI_Workshop_UnemploymentHistory^12 }
+		set_variable = { BRI_Workshop_Action2_Uses = 5 }
+		set_variable = { BRI_Workshop_Action5_PP_Cost = 0 }
+
+		set_variable = { BRI_Workshop_Action1_CostPP = -15 } #action costs
+		set_variable = { BRI_Workshop_Action2_CostPP = -30 }
+		set_variable = { BRI_Workshop_Action3_CostPP = -45 }
+		set_variable = { BRI_Workshop_Action6_CostPP = -60 }
+
+		set_variable = { BRI_Workshop_Action1_CostPP_tt = 15 } #action costs tooltips (if someone knows a better way to solve this, please share)
+		set_variable = { BRI_Workshop_Action2_CostPP_tt = 30 }
+		set_variable = { BRI_Workshop_Action3_CostPP_tt = 45 }
+		set_variable = { BRI_Workshop_Action6_CostPP_tt = 60 }
+
+		# Pre-emptively clearing arrays
+		clear_array = BRI_Workshop_SelectedTab
+
+		# GUI tabs array
+		add_to_array = { BRI_Workshop_SelectedTab = 0 }
+		add_to_array = { BRI_Workshop_SelectedTabFrame = 2 }
+		add_to_array = { BRI_Workshop_SelectedTabFrame = 0 }
+
+		## Set up regions
+		clear_array = BRI_Workshop_Regions
+		add_ideas = { # Yes, really. Dw tho, these get removed immediately.
+			ENG_Workshop_GUI_Map_Scotland
+			ENG_Workshop_GUI_Map_Northwest
+			ENG_Workshop_GUI_Map_Northeast
+			ENG_Workshop_GUI_Map_Yorkshire
+			ENG_Workshop_GUI_Map_Wales
+			ENG_Workshop_GUI_Map_WestMidlands
+			ENG_Workshop_GUI_Map_EastMidlands
+			ENG_Workshop_GUI_Map_Anglia
+			ENG_Workshop_GUI_Map_Southwest
+			ENG_Workshop_GUI_Map_Southeast
+			ENG_Workshop_GUI_Map_London
+		}
+		set_variable = { BRI_Workshop_SelectedRegion = token:ENG_Workshop_GUI_Map_London }
+		set_variable = { BRI_Workshop_SelectedCorpo  = 1 }
+
+		## Setup corporations array
+		clear_array = BRI_Workshop_Corporations
+		add_to_array = { BRI_Workshop_Corporations = 1 } # Deutsche Bank
+		add_to_array = { BRI_Workshop_Corporations = 2 } # Reichswerke
+		add_to_array = { BRI_Workshop_Corporations = 3 } # Blohm & Voss
+		add_to_array = { BRI_Workshop_Corporations = 4 } # AEG
+		add_to_array = { BRI_Workshop_Corporations = 5 } # Volkswagen
+		BRI_Workshop_FindDominant = yes
+
+		## Setup initial displays
+		BRI_Workshop_DisplayUpdate = yes
+
+		## Effect modifiers
+		add_dynamic_modifier = { modifier = BRI_Workshop_dynamic_modifier }
+		add_dynamic_modifier = { modifier = BRI_Workshop_pp_cost_dynamic_modifier }
+		add_dynamic_modifier = { modifier = BRI_Workshop_Goals_dynamic_modifier }
+		BRI_Workshop_UpdateModifier = yes
+
+		## Economic Goals
+		BRI_Workshop_SetEconomicGoals = yes
+
+		## Adding projects
+		add_ideas = {
+			ENG_Workshop_GUI_Goals_Blyth
+			ENG_Workshop_GUI_Goals_ThamesAirport
+			ENG_Workshop_GUI_Goals_SevernBarrage
+		}
+		set_variable = { BRI_Workshop_GoalPUInvestmentsTotal = 11 }
+		recalculate_PUs_on_demand = yes
+		for_each_loop = {
+			array = BRI_Workshop_Goals
+			BRI_Workshop_CheckObjectives = yes
+		}
+
+		## Swapping ideas for info display
+		swap_ideas = {
+			remove_idea = ENG_German_Corporate_Dominance_0
+			add_idea = ENG_German_Corporate_Dominance_1
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Workshop_Activate; Completed execution."
+}
+BRI_workshop_temp_close = {
+	log = "[GetDateText]: [Root.GetName]: BRI_workshop_temp_close; Executing."
+	clr_country_flag = BRI_WorkshopMechanic_Active
+	clr_country_flag = BRI_WorkshopMechanic_Block
+	clr_country_flag = country_has_gui
+
+	clear_array = BRI_Workshop_SelectedTab
+	clear_variable = BRI_Workshop_SelectedRegion
+	clear_variable = BRI_Workshop_SelectedCorpo
+
+	clear_variable = BRI_Workshop_TargetGDPGrowth
+	clear_variable = BRI_Workshop_TargetInflation
+	clear_variable = BRI_Workshop_TargetUnemployment
+
+	for_each_loop = {
+		array = BRI_Workshop_Goals
+		
+		clear_variable = BRI_Workshop_GoalDuration@var:v
+		clear_variable = BRI_Workshop_GoalPUInvestment@var:v
+	}
+	set_variable = { BRI_Workshop_GoalPUInvestmentsTotal = 0 }
+	log = "[GetDateText]: [Root.GetName]: BRI_workshop_temp_close; Done"
+}
+BRI_workshop_temp_restart = {
+	log = "[GetDateText]: [Root.GetName]: BRI_workshop_temp_restart ; Executing."
+	custom_effect_tooltip = BRI_Workshop_Activate_tt
+
+	hidden_effect = {
+		set_country_flag = BRI_WorkshopMechanic_Active
+		set_country_flag = gui_alert_visible_2
+		set_country_flag = country_has_gui
+		add_to_array = { BRI_Workshop_SelectedTab = 0 }
+		set_variable = { BRI_Workshop_SelectedRegion = token:ENG_Workshop_GUI_Map_London }
+		set_variable = { BRI_Workshop_SelectedCorpo  = 1 }
+		BRI_Workshop_DisplayUpdate = yes
+
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BRI_workshop_temp_restart ; Done"
+}
+## Disable the mechanic once it is done
+BRI_Workshop_Disable = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Workshop_Disable; Executing."
+	clr_country_flag = BRI_WorkshopMechanic_Active
+	clr_country_flag = BRI_WorkshopMechanic_Block
+	clr_country_flag = country_has_gui
+
+	clear_array = BRI_Workshop_SelectedTab
+	clear_variable = BRI_Workshop_SelectedRegion
+	clear_variable = BRI_Workshop_SelectedCorpo
+
+	clear_variable = BRI_Workshop_Unemployment
+
+	clear_array = BRI_Workshop_GDPGrowthHistory
+	clear_array = BRI_Workshop_InflationHistory
+	clear_array = BRI_Workshop_UnemploymentHistory
+
+	for_each_loop = {
+		array = BRI_Workshop_Regions
+		clear_variable = BRI_Workshop_RegionX@var:v
+		clear_variable = BRI_Workshop_RegionY@var:v
+		clear_variable = BRI_Workshop_RegionFrames@var:v
+		clear_variable = BRI_Workshop_OwnershipState@var:v
+		clear_variable = BRI_Workshop_OwnershipCorporate@var:v
+		clear_variable = BRI_Workshop_OwnershipPrivate@var:v
+		clear_variable = BRI_Workshop_DeutscheBankInfl@var:v
+		clear_variable = BRI_Workshop_ReichswerkeInfl@var:v
+		clear_variable = BRI_Workshop_BlohmVossInfl@var:v
+		clear_variable = BRI_Workshop_AEGInfl@var:v
+		clear_variable = BRI_Workshop_VolkswagenInfl@var:v
+		clear_variable = BRI_Workshop_Action1_Cooldown@var:v
+		clear_variable = BRI_Workshop_Action2_Cooldown@var:v
+		clear_variable = BRI_Workshop_Action3_Cooldown@var:v
+		clear_variable = BRI_Workshop_Action5_Cooldown@var:v
+		clear_variable = BRI_Workshop_InflMonthly_ID@var:v
+		clear_variable = BRI_Workshop_InflMonthly_Val@var:v
+	}
+	clear_variable = BRI_Workshop_Action2_Uses
+	clear_variable = BRI_Workshop_Action5_PP_Cost
+	clear_array = BRI_Workshop_Regions
+
+	clear_array = BRI_Workshop_OwnershipDisp
+	clear_array = BRI_Workshop_CorpoDisp
+
+	clear_array = BRI_Workshop_Corporations
+	clear_variable = BRI_Workshop_DominantCorpo
+
+	clear_variable = BRI_Workshop_GraphSelection
+	clear_array = BRI_Workshop_GraphButtonSelection
+	clear_array = BRI_Workshop_GraphValues
+	clear_array = BRI_Workshop_GraphOffsets
+	clear_array = BRI_Workshop_GraphDeltas
+	clear_array = BRI_Workshop_GraphVBars
+	clear_array = BRI_Workshop_GraphVBarOffsets
+
+	for_each_loop = {
+		array = BRI_Workshop_Goals
+		clear_variable = BRI_Workshop_GoalObjective_1@var:v
+		clear_variable = BRI_Workshop_GoalObjective_2@var:v
+		clear_variable = BRI_Workshop_GoalObjective_3@var:v
+		clear_variable = BRI_Workshop_GoalObjective_4@var:v
+		clear_variable = BRI_Workshop_GoalObjective_5@var:v
+		clear_variable = BRI_Workshop_GoalObjective_6@var:v
+		clear_variable = BRI_Workshop_GoalObjective_1_String@var:v
+		clear_variable = BRI_Workshop_GoalObjective_2_String@var:v
+		clear_variable = BRI_Workshop_GoalObjective_3_String@var:v
+		clear_variable = BRI_Workshop_GoalObjective_4_String@var:v
+		clear_variable = BRI_Workshop_GoalObjective_5_String@var:v
+		clear_variable = BRI_Workshop_GoalObjective_6_String@var:v
+		clear_variable = BRI_Workshop_GoalDuration@var:v
+	}
+	clear_array = BRI_Workshop_Goals
+
+	clear_variable = BRI_Workshop_TargetGDPGrowth
+	clear_variable = BRI_Workshop_TargetInflation
+	clear_variable = BRI_Workshop_TargetUnemployment
+
+	remove_dynamic_modifier = { modifier = BRI_Workshop_dynamic_modifier }
+	remove_dynamic_modifier = { modifier = BRI_Workshop_pp_cost_dynamic_modifier }
+	remove_dynamic_modifier = { modifier = BRI_Workshop_Goals_dynamic_modifier }
+
+	## Removing ideas
+	remove_ideas = {
+		ENG_A_Retrenched_Conviction
+		ENG_An_Altered_Line
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Workshop_Disable; Completed execution."
+}
+
+## Sets up initial history data for the graph values
+BRI_Workshop_Setup_DataHistory = {
+	## GDP Growth
+	clear_array = BRI_Workshop_GDPGrowthHistory
+	set_temp_variable = { current = 2.4 }
+	set_temp_variable = { diff = 0.004 }
+	multiply_temp_variable = { diff = 2.4 }
+	divide_temp_variable = { diff = 12 }
+
+	for_loop_effect = {
+		end = 13
+
+		add_to_array = { array = BRI_Workshop_GDPGrowthHistory value = current index = 0 }
+		set_temp_variable = { r = random }
+		subtract_from_temp_variable = { r = 0.5 }
+		multiply_temp_variable = { r = 1.2 }
+		add_to_temp_variable = { r = 1.0 }
+		multiply_temp_variable = { r = diff }
+		subtract_from_temp_variable = { current = r }
+	}
+
+	## Inflation
+	clear_array = BRI_Workshop_InflationHistory
+	add_to_array = { BRI_Workshop_InflationHistory = 5.2 } # Jan, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 4.8 } # Feb, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 4.6 } # Mar, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 3.2 } # Apr, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 2.5 } # May, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 2.6 } # Jun, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 2.5 } # Jul, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 2.5 } # Aug, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 2.4 } # Sep, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 3.1 } # Oct, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 3.4 } # Nov, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 4.1 } # Dec, 61
+	add_to_array = { BRI_Workshop_InflationHistory = 4.5 } # Jan, 62
+
+	for_loop_effect = {
+		start = 4
+		end = 16
+		value = temp 
+
+		set_temp_variable = { inflhistemp = temp }
+		subtract_from_temp_variable = { inflhistemp = 4 }
+
+		set_variable = { ENG.inflation_numbers^temp = BRI_Workshop_InflationHistory^inflhistemp }
+	}
+	update_economy_tab = yes
+	econ_rerender_inflation_graph = yes
+	#clear_array = BRI_Workshop_InflationHistory
+	#set_temp_variable = { current = 4.047 }
+	#set_temp_variable = { diff = 0.015 }
+	#multiply_temp_variable = { diff = 3.12 }
+	#divide_temp_variable = { diff = 12 }
+
+
+	## Unemployment
+	clear_array = BRI_Workshop_UnemploymentHistory
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 11.2 } # Jan, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 10.8 } # Feb, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 11.1 } # Mar, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 10.6 } # Apr, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 10.3 } # May, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 9.9 } # Jun, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 9.4 } # Jul, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 9.7 } # Aug, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 10.1 } # Sep, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 10.6 } # Oct, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 10.0 } # Nov, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 10.5 } # Dec, 61
+	add_to_array = { BRI_Workshop_UnemploymentHistory = 10.3 } # Jan, 62
+}
+
+# Updates the dynmod to account for the new econ values
+BRI_Workshop_UpdateModifier = {
+	clear_array = BRI_WorkshopEffects
+	add_to_array = { BRI_WorkshopEffects = 0 }
+	resize_array = { BRI_WorkshopEffects = 14 }
+
+	## Collect all values
+	for_each_loop = {
+		array = BRI_Workshop_Regions
+		add_to_temp_variable = { StateOwnership     = BRI_Workshop_OwnershipState@var:v }
+		add_to_temp_variable = { PrivateOwnership   = BRI_Workshop_OwnershipPrivate@var:v }
+		add_to_temp_variable = { CorporateOwnership = BRI_Workshop_OwnershipCorporate@var:v }
+
+		add_to_temp_variable = { DeutscheBankInfluence = BRI_Workshop_DeutscheBankInfl@var:v }
+		add_to_temp_variable = { ReichswerkeInfluence  = BRI_Workshop_ReichswerkeInfl@var:v }
+		add_to_temp_variable = { BlohmVossInfluence    = BRI_Workshop_BlohmVossInfl@var:v }
+		add_to_temp_variable = { AEGInfluence 		   = BRI_Workshop_AEGInfl@var:v }
+		add_to_temp_variable = { VolkswagenInfluence   = BRI_Workshop_VolkswagenInfl@var:v }
+	}
+
+	divide_temp_variable = { StateOwnership     = BRI_Workshop_Regions^num }
+	divide_temp_variable = { PrivateOwnership   = BRI_Workshop_Regions^num }
+	divide_temp_variable = { CorporateOwnership = BRI_Workshop_Regions^num }
+
+	divide_temp_variable = { DeutscheBankInfluence = BRI_Workshop_Regions^num }
+	divide_temp_variable = { ReichswerkeInfluence  = BRI_Workshop_Regions^num }
+	divide_temp_variable = { BlohmVossInfluence    = BRI_Workshop_Regions^num }
+	divide_temp_variable = { AEGInfluence          = BRI_Workshop_Regions^num }
+	divide_temp_variable = { VolkswagenInfluence   = BRI_Workshop_Regions^num }
+
+	### DYNMOD INDEXES ###
+	# 0: Misc Income
+	# 1: Local Resources Factor
+	# 2: Starting Efficiency
+	# 3: Grid Power
+	# 4: Consumer Good Production
+	# 5: Political Power Gain
+	# 6: Social Policies Monthly Efficiency
+	# 7: Monthly Unemployment
+	# 8: Annual GDP Growth
+	# 9: Consumer Goods Use
+	# 10: Production Efficiency Gain
+	# 11: GDP Growth
+	# 12: Prod. Units to GDP Ratio
+	# 13: Inflation Rate Modifier
+	# 14: Political Power Cost
+
+	### DYNMOD VALUES ###
+
+	### Corporations
+	## Deutsche Bank
+		# Misc Income
+		set_variable = { BRI_WorkshopEffects^0 = DeutscheBankInfluence }
+		divide_variable = { BRI_WorkshopEffects^0 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^0 = 0.75 }
+	##
+
+	## Reichswerke
+		# Local Resources Factor
+		set_variable = { BRI_WorkshopEffects^1 = ReichswerkeInfluence }
+		divide_variable = { BRI_WorkshopEffects^1 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^1 = 0.15 }
+	##
+
+	## Blöhm & Voss
+		# Starting Efficiency
+		set_variable = { BRI_WorkshopEffects^2 = BlohmVossInfluence }
+		divide_variable = { BRI_WorkshopEffects^2 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^2 = 0.1 }
+	##
+
+	## AEG
+		# Grid Power
+		set_variable = { BRI_WorkshopEffects^3 = AEGInfluence }
+		divide_variable = { BRI_WorkshopEffects^3 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^3 = 3 }
+		round_variable = BRI_WorkshopEffects^3
+		hidden_effect = { every_owned_state = { add_to_temp_variable = { total_power_plants = building_level@thermoelectric_plant } } }
+		multiply_variable = { BRI_WorkshopEffects^3 = total_power_plants }
+	##
+
+	## Volkswagen
+		# Consumer Goods Production
+		set_variable = { BRI_WorkshopEffects^4 = VolkswagenInfluence }
+		divide_variable = { BRI_WorkshopEffects^4 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^4 = 0.1 }
+	##
+
+	### Ownership
+	## State
+		# Political Power Gain
+		set_variable = { BRI_WorkshopEffects^5 = StateOwnership }
+		divide_variable = { BRI_WorkshopEffects^5 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^5 = 0.3 }
+
+		# Social Policies Monthly Efficiency
+		set_variable = { BRI_WorkshopEffects^6 = StateOwnership }
+		divide_variable = { BRI_WorkshopEffects^6 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^6 = 2.5 }
+
+		# Monthly Unemployment
+		set_variable = { BRI_WorkshopEffects^7 = StateOwnership }
+		divide_variable = { BRI_WorkshopEffects^7 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^7 = -0.8 }
+	##
+
+	## Private
+		# Annual GDP Growth
+		set_variable = { BRI_WorkshopEffects^8 = PrivateOwnership }
+		divide_variable = { BRI_WorkshopEffects^8 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^8 = 0.125 }
+
+		# Consumer Goods Use
+		set_variable = { BRI_WorkshopEffects^9 = PrivateOwnership }
+		divide_variable = { BRI_WorkshopEffects^9 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^9 = -0.15 }
+
+		# Production Efficiency Gain
+		set_variable = { BRI_WorkshopEffects^10 = PrivateOwnership }
+		divide_variable = { BRI_WorkshopEffects^10 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^10 = 0.15 }
+	##
+
+	## Corporate
+		# GDP Growth
+		set_variable = { BRI_WorkshopEffects^11 = PrivateOwnership }
+		divide_variable = { BRI_WorkshopEffects^11 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^11 = 4 }
+
+		# Prod. Units to GDP Ratio
+		set_variable = { BRI_WorkshopEffects^12 = PrivateOwnership }
+		divide_variable = { BRI_WorkshopEffects^12 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^12 = -0.25 }
+
+		# Inflation Rate Modifier
+		set_variable = { BRI_WorkshopEffects^13 = PrivateOwnership }
+		divide_variable = { BRI_WorkshopEffects^13 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^13 = 3 }
+
+		# Political Power Cost
+		set_variable = { BRI_WorkshopEffects^14 = PrivateOwnership }
+		divide_variable = { BRI_WorkshopEffects^14 = 100 }
+		multiply_variable = { BRI_WorkshopEffects^14 = 0.4 }
+	##
+
+	force_update_dynamic_modifier = yes
+}
+
+# Finds dominant (largest influence) corporation for display
+BRI_Workshop_FindDominant = {
+	add_to_array = { corpo_infl = 0 }
+	resize_array = { corpo_infl = BRI_Workshop_Corporations^num }
+
+	# Sum all influence values
+	for_each_loop = {
+		array = BRI_Workshop_Regions
+		add_to_variable = { corpo_infl^0 = BRI_Workshop_DeutscheBankInfl@var:v }
+		add_to_variable = { corpo_infl^1 = BRI_Workshop_ReichswerkeInfl@var:v }
+		add_to_variable = { corpo_infl^2 = BRI_Workshop_BlohmVossInfl@var:v }
+		add_to_variable = { corpo_infl^3 = BRI_Workshop_AEGInfl@var:v }
+		add_to_variable = { corpo_infl^4 = BRI_Workshop_VolkswagenInfl@var:v }
+	}
+
+	# Find highest through array
+	find_highest_in_array = { array = corpo_infl index = high_i }
+	set_variable = { BRI_Workshop_DominantCorpo = high_i }
+	add_to_variable = { BRI_Workshop_DominantCorpo = 1 } # Due to how corpo IDs currently work (they start at one)
+	clear_array = corpo_infl
+}
+
+############################
+# |=[ Economic Effects ]=| #
+############################
+
+BRI_Workshop_SetEconomicGoals = {
+	#for those looking here in the future, dont be like me and do tokenize, elsewise have fun adding budget checks to the scripted loc/effects
+	#a more based solution is to have all those generic checks for the graph as just a generic buget active and then enable both flags
+	if = {
+		limit = { check_variable = { global.year = 1962 } }
+		set_variable = { BRI_Workshop_TargetGDPGrowth = 4.4 }
+		set_variable = { BRI_Workshop_TargetInflation = 3 }
+		set_variable = { BRI_Workshop_TargetUnemployment = 7.8 }
+	}
+	else_if = {
+		limit = { check_variable = { global.year = 1963 } }
+		set_variable = { BRI_Workshop_TargetGDPGrowth = 5.2 }
+		set_variable = { BRI_Workshop_TargetInflation = 2.7 }
+		set_variable = { BRI_Workshop_TargetUnemployment = 7 }
+	}
+	else_if = {
+		limit = { check_variable = { global.year = 1965 } }
+		set_variable = { BRI_Workshop_TargetGDPGrowth = variant_gdpgrowth }
+		set_variable = { BRI_Workshop_TargetInflation = variant_inflation }
+		set_variable = { BRI_Workshop_TargetUnemployment = variant_unemployment }
+	}
+
+	if = { # Integration with difficulty system, might be a better spot for this though - RemyRat
+		limit = { has_country_flag = BRI_Enabled_Higher_Budgets }
+		add_to_variable = { BRI_Workshop_TargetGDPGrowth = 0.8 }
+		add_to_variable = { BRI_Workshop_TargetInflation = -0.5 }
+		add_to_variable = { BRI_Workshop_TargetUnemployment = -1 }
+	}
+	else_if = {
+		limit = { has_country_flag = BRI_Enabled_Lower_Budgets }
+		add_to_variable = { BRI_Workshop_TargetGDPGrowth = -0.8 }
+		add_to_variable = { BRI_Workshop_TargetInflation = 0.5 }
+		add_to_variable = { BRI_Workshop_TargetUnemployment = 1 }
+	}
+}
+##################################
+# |=[ Display Update Effects ]=| #
+##################################
+
+## Fully updates the display for all graphs, map frames & progressbars
+BRI_Workshop_DisplayUpdate = {
+	BRI_Workshop_GenerateFrames = yes
+	BRI_Workshop_GenerateBars = yes
+	BRI_Workshop_GenerateGraph = yes
+}
+
+## Temporary effect that generates random values for Ownership and Corporate vars
+BRI_Workshop_GenerateValues = {
+	for_each_loop = {
+		array = BRI_Workshop_Regions
+
+		## Ownership
+		set_temp_variable = { pct_left = 100 }
+		set_variable_to_random = { var = BRI_Workshop_OwnershipState@var:v     min = 0 max = 100          integer = yes } subtract_from_temp_variable = { pct_left = BRI_Workshop_OwnershipState@var:v }
+		set_variable_to_random = { var = BRI_Workshop_OwnershipCorporate@var:v min = 0 max = var:pct_left integer = yes } subtract_from_temp_variable = { pct_left = BRI_Workshop_OwnershipCorporate@var:v }
+		set_variable = { BRI_Workshop_OwnershipPrivate@var:v = pct_left }
+
+		## Corporations
+		set_temp_variable = { pct_left = 100 }
+		set_variable_to_random = { var = BRI_Workshop_DeutscheBankInfl@var:v min = 0 max = 100          integer = yes } subtract_from_temp_variable = { pct_left = BRI_Workshop_DeutscheBankInfl@var:v }
+		set_variable_to_random = { var = BRI_Workshop_ReichswerkeInfl@var:v  min = 0 max = var:pct_left integer = yes } subtract_from_temp_variable = { pct_left = BRI_Workshop_ReichswerkeInfl@var:v }
+		set_variable_to_random = { var = BRI_Workshop_BlohmVossInfl@var:v    min = 0 max = var:pct_left integer = yes } subtract_from_temp_variable = { pct_left = BRI_Workshop_BlohmVossInfl@var:v }
+		set_variable_to_random = { var = BRI_Workshop_AEGInfl@var:v          min = 0 max = var:pct_left integer = yes } subtract_from_temp_variable = { pct_left = BRI_Workshop_AEGInfl@var:v }
+		set_variable = { BRI_Workshop_VolkswagenInfl@var:v = pct_left }
+	}
+}
+
+## Updates the frame display for map regions
+BRI_Workshop_GenerateFrames = {
+	for_each_loop = {
+		array = BRI_Workshop_Regions
+		value = region
+
+		## Get leading (highest influence) group
+		# Temp array to run find_highest
+		if = { # Corporations
+			limit = { check_variable = { BRI_Workshop_Mapmode = 0 } }
+			add_to_array = { infl = BRI_Workshop_DeutscheBankInfl@var:region }
+			add_to_array = { infl = BRI_Workshop_ReichswerkeInfl@var:region }
+			add_to_array = { infl = BRI_Workshop_BlohmVossInfl@var:region }
+			add_to_array = { infl = BRI_Workshop_AEGInfl@var:region }
+			add_to_array = { infl = BRI_Workshop_VolkswagenInfl@var:region }
+		}
+		else = { # Ownership
+			add_to_array = { infl = BRI_Workshop_OwnershipState@var:region }
+			add_to_array = { infl = BRI_Workshop_OwnershipCorporate@var:region }
+			add_to_array = { infl = BRI_Workshop_OwnershipPrivate@var:region }
+		}
+
+		# Grab highest index
+		find_highest_in_array = { array = infl index = high_i }
+		add_to_temp_variable = { high_i = 1 } # Needs to be corrected because of the way indexes in the frame asset work
+		clear_array = infl
+
+		## Setup display frame var from leading index
+		set_variable = { BRI_Workshop_RegionFrames@var:region = high_i }
+		multiply_variable = { BRI_Workshop_RegionFrames@var:region = 1000 }
+	}
+	add_to_variable = { BRI_Workshop_Dirty = 1 }
+}
+
+## Updates the display for the Ownership and Corporate bars
+BRI_Workshop_GenerateBars = {
+	clear_array = BRI_Workshop_OwnershipDisp
+	clear_array = BRI_Workshop_CorpoDisp
+
+	## Generate Ownership bar frame values
+	set_temp_variable = { pct_left = 100 }
+	add_to_array = { BRI_Workshop_OwnershipDisp = pct_left } round_variable = BRI_Workshop_OwnershipDisp^0 subtract_from_temp_variable = { pct_left = BRI_Workshop_OwnershipState@var:BRI_Workshop_SelectedRegion }
+	add_to_array = { BRI_Workshop_OwnershipDisp = pct_left } round_variable = BRI_Workshop_OwnershipDisp^1 subtract_from_temp_variable = { pct_left = BRI_Workshop_OwnershipCorporate@var:BRI_Workshop_SelectedRegion }
+	add_to_array = { BRI_Workshop_OwnershipDisp = pct_left } round_variable = BRI_Workshop_OwnershipDisp^2 subtract_from_temp_variable = { pct_left = BRI_Workshop_OwnershipPrivate@var:BRI_Workshop_SelectedRegion }
+
+	## Generate Corporate bar frame values
+	set_temp_variable = { pct_left = 100 }
+	add_to_array = { BRI_Workshop_CorpoDisp = pct_left } round_variable = BRI_Workshop_CorpoDisp^0 subtract_from_temp_variable = { pct_left = BRI_Workshop_DeutscheBankInfl@var:BRI_Workshop_SelectedRegion }
+	add_to_array = { BRI_Workshop_CorpoDisp = pct_left } round_variable = BRI_Workshop_CorpoDisp^1 subtract_from_temp_variable = { pct_left = BRI_Workshop_ReichswerkeInfl@var:BRI_Workshop_SelectedRegion }
+	add_to_array = { BRI_Workshop_CorpoDisp = pct_left } round_variable = BRI_Workshop_CorpoDisp^2 subtract_from_temp_variable = { pct_left = BRI_Workshop_BlohmVossInfl@var:BRI_Workshop_SelectedRegion }
+	add_to_array = { BRI_Workshop_CorpoDisp = pct_left } round_variable = BRI_Workshop_CorpoDisp^3 subtract_from_temp_variable = { pct_left = BRI_Workshop_AEGInfl@var:BRI_Workshop_SelectedRegion }
+	add_to_array = { BRI_Workshop_CorpoDisp = pct_left } round_variable = BRI_Workshop_CorpoDisp^4 subtract_from_temp_variable = { pct_left = BRI_Workshop_VolkswagenInfl@var:BRI_Workshop_SelectedRegion }
+
+	add_to_variable = { BRI_Workshop_Dirty = 1 }
+}
+
+## Updates the display for the line graph
+# Credits to flaxbeard for the code
+BRI_Workshop_GenerateGraph = {
+	# Update frames of buttons
+	clear_array = BRI_Workshop_GraphButtonSelection
+	resize_array = { array = BRI_Workshop_GraphButtonSelection value = 1 size = 3 }
+	set_variable = { BRI_Workshop_GraphButtonSelection^BRI_Workshop_GraphSelection = 2 }
+
+	# Fill graph values with appropriate values, based on selected stat
+	clear_array = BRI_Workshop_GraphValues
+	clear_array = BRI_Workshop_Target_GraphValues
+	if = { # GDP Growth
+		limit = { check_variable = { BRI_Workshop_GraphSelection = 0 } }
+		for_loop_effect = {
+			start = 0
+			end = 13
+			value = i
+
+			add_to_array = { BRI_Workshop_GraphValues = BRI_Workshop_GDPGrowthHistory^i }
+			add_to_array = { BRI_Workshop_Target_GraphValues = BRI_Workshop_TargetGDPGrowth }
+		}
+	}
+	else_if = { # Inflation
+		limit = { check_variable = { BRI_Workshop_GraphSelection = 1 } }
+		for_loop_effect = {
+			start = 0
+			end = 13
+			value = i
+
+			add_to_array = { BRI_Workshop_GraphValues = BRI_Workshop_InflationHistory^i }
+			add_to_array = { BRI_Workshop_Target_GraphValues = BRI_Workshop_TargetInflation }
+		}
+	}
+	else = { # Unemployment
+		for_loop_effect = {
+			start = 0
+			end = 13
+			value = i
+
+			add_to_array = { BRI_Workshop_GraphValues = BRI_Workshop_UnemploymentHistory^i }
+			add_to_array = { BRI_Workshop_Target_GraphValues = BRI_Workshop_TargetUnemployment }
+		}
+	}
+
+	clear_array = BRI_Workshop_GraphOffsets
+	clear_array = BRI_Workshop_Target_GraphOffsets
+	clear_array = BRI_Workshop_GraphDeltas
+	clear_array = BRI_Workshop_Target_GraphDeltas
+	clear_array = BRI_Workshop_GraphVBars
+	clear_array = BRI_Workshop_GraphVBarOffsets
+
+	# Find minimum and maximum values visible on graph
+	set_temp_variable = { min = BRI_Workshop_GraphValues^0 }
+	set_temp_variable = { max = BRI_Workshop_GraphValues^0 }
+	set_temp_variable = { target_min = BRI_Workshop_Target_GraphValues^0 }
+	set_temp_variable = { target_max = BRI_Workshop_Target_GraphValues^0 }
+	for_loop_effect = {
+		end = 13
+		value = i
+
+		if = {
+			limit = { check_variable = { BRI_Workshop_GraphValues^i > max } }
+			set_temp_variable = { max = BRI_Workshop_GraphValues^i }
+		}
+		if = {
+			limit = { check_variable = { BRI_Workshop_GraphValues^i < min } }
+			set_temp_variable = { min = BRI_Workshop_GraphValues^i }
+		}
+		if = {
+			limit = { check_variable = { BRI_Workshop_Target_GraphValues^i > target_max } }
+			set_temp_variable = { target_max = BRI_Workshop_Target_GraphValues^i }
+		}
+		if = {
+			limit = { check_variable = { BRI_Workshop_Target_GraphValues^i < target_min } }
+			set_temp_variable = { target_min = BRI_Workshop_Target_GraphValues^i }
+		}
+	}
+	set_temp_variable = { range = targetmax }
+	subtract_from_temp_variable = { range = min }
+	set_temp_variable = { targetrange = target_max }
+	subtract_from_temp_variable = { targetrange = target_min }
+
+	# Determine rounding factor based on range
+	set_temp_variable = { unit = 10000 }
+	if = {
+		limit = {
+			check_variable = { range < 3 }
+		}
+		set_temp_variable = { unit = 1 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 6 }
+		}
+		set_temp_variable = { unit = 1 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 12 }
+		}
+		set_temp_variable = { unit = 2 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 30 }
+		}
+		set_temp_variable = { unit = 5 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 60 }
+		}
+		set_temp_variable = { unit = 10 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 120 }
+		}
+		set_temp_variable = { unit = 20 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 300 }
+		}
+		set_temp_variable = { unit = 50 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 600 }
+		}
+		set_temp_variable = { unit = 100 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 1200 }
+		}
+		set_temp_variable = { unit = 200 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 3000 }
+		}
+		set_temp_variable = { unit = 500 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 6000 }
+		}
+		set_temp_variable = { unit = 1000 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 12000 }
+		}
+		set_temp_variable = { unit = 2000 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { range < 30000 }
+		}
+		set_temp_variable = { unit = 5000 }
+	}
+
+	divide_temp_variable = { min = unit }
+	divide_temp_variable = { max = unit }
+	divide_temp_variable = { target_min = unit }
+	divide_temp_variable = { target_max = unit }
+	set_temp_variable = { swagapocolaypse = BRI_Workshop_Target_GraphValues^num }
+	subtract_from_temp_variable = { swagapocolaypse = 1 }
+	set_temp_variable = { alalala = BRI_Workshop_Target_GraphValues^swagapocolaypse }
+	if = {
+		limit = {
+			check_variable = { alalala > BRI_Workshop_GraphValues^swagapocolaypse }
+		}
+		subtract_from_temp_variable = { min = 1 }
+		add_to_temp_variable = { max = 4 }
+		subtract_from_temp_variable = { target_min = 1 }
+		add_to_temp_variable = { target_max = 4 }
+	}
+	else = {
+		subtract_from_temp_variable = { min = 6 }
+		add_to_temp_variable = { max = 0.8 }
+		subtract_from_temp_variable = { target_min = 6 }
+		add_to_temp_variable = { target_max = 0.8 }
+	}
+	log = "min [?min]"
+
+	round_temp_variable = min
+	round_temp_variable = max
+	round_temp_variable = target_min
+	round_temp_variable = target_max
+	clamp_temp_variable = {
+		var = min
+		min = 0
+	}
+
+	multiply_temp_variable = { min = unit }
+	multiply_temp_variable = { max = unit }
+	multiply_temp_variable = { target_min = unit }
+	multiply_temp_variable = { target_min = unit }
+
+	set_temp_variable = { range = max }
+	set_temp_variable = { targetrange = target_max }
+	subtract_from_temp_variable = { range = min }
+	subtract_from_temp_variable = { targetrange = target_min }
+
+	set_temp_variable = { divisor = 1000 }
+	while_loop_effect = {
+		limit = { check_variable = { divisor < min } }
+		multiply_temp_variable = { divisor = 1000 }
+	}
+	divide_temp_variable = { divisor = 1000 }
+
+	# Generate the y axis ticks for our graph
+	divide_temp_variable = { range = 100 }
+	divide_temp_variable = { targetrange = 100 }
+	log = "[?targetrange] [?range]"
+
+	set_temp_variable = { m2 = max }
+	add_to_temp_variable = { m2 = 0.25 }
+	set_temp_variable = { k = min }
+	while_loop_effect = {
+		limit = { check_variable = { k < m2 } }
+		set_temp_variable = { label = k }
+		divide_temp_variable = { label = divisor }
+		add_to_array = { BRI_Workshop_GraphVBars = label }
+
+		set_temp_variable = { offset = k }
+		subtract_from_temp_variable = { offset = min }
+		divide_temp_variable = { offset = range }
+		multiply_temp_variable = { offset = -1.5 }
+		add_to_array = { BRI_Workshop_GraphVBarOffsets = offset }
+
+		add_to_temp_variable = { k = unit }
+
+
+	}
+
+	# Actually generate the graph line segments
+	for_loop_effect = {
+		start = 0
+		end = 12
+		value = i
+
+		set_temp_variable = { j = i }
+		add_to_temp_variable = { j = 1 }
+
+		set_temp_variable = { vj = BRI_Workshop_GraphValues^j }
+		set_temp_variable = { vi = BRI_Workshop_GraphValues^i }
+		subtract_from_temp_variable = { vj = min }
+		subtract_from_temp_variable = { vi = min }
+		divide_temp_variable = { vj = range }
+		divide_temp_variable = { vi = range }
+
+		divide_temp_variable = { vj = 2 }
+		divide_temp_variable = { vi = 2 }
+		round_temp_variable = vi
+		round_temp_variable = vj
+		multiply_temp_variable = { vj = 2 }
+		multiply_temp_variable = { vi = 2 }
+
+		set_temp_variable = { delta = vj }
+		subtract_from_temp_variable = { delta = vi }
+		divide_temp_variable = { delta = 2 }
+		round_temp_variable = delta
+		add_to_temp_variable = { delta = 50 }
+
+		set_temp_variable = { offset = vi }
+		multiply_temp_variable = { offset = -1.5 }
+
+		add_to_array = { BRI_Workshop_GraphOffsets = offset }
+		add_to_array = { BRI_Workshop_GraphDeltas = delta }
+
+		set_temp_variable = { ti = BRI_Workshop_Target_GraphValues^i }
+		subtract_from_temp_variable = { ti = min }
+		divide_temp_variable = { ti = range }
+		#divide_temp_variable = { ti = 3 }
+
+		divide_temp_variable = { ti = 2 }
+		round_temp_variable = ti
+		multiply_temp_variable = { ti = 2 }
+
+		set_temp_variable = { target_offset = ti }
+		multiply_temp_variable = { target_offset = -1.41 }
+
+		add_to_array = { BRI_Workshop_Target_GraphOffsets = target_offset }
+		add_to_array = { BRI_Workshop_Target_GraphDeltas = 50 }
+
+	}
+
+	add_to_variable = { BRI_Workshop_Dirty = 1 }
+	set_temp_variable = { tes2 = BRI_Workshop_GraphOffsets^num }
+	subtract_from_temp_variable = { tes2 = 1 }
+	set_variable = { BRI_texticon_graph_actual_y = BRI_Workshop_GraphOffsets^tes2 }
+	add_to_variable = { BRI_texticon_graph_actual_y = 135 }
+	#multiply_variable = { BRI_texticon_graph_actual_y = -1 }
+	if = {
+		limit = {
+			check_variable = { BRI_Workshop_GraphDeltas^tes2 < 50 }
+		}
+		set_temp_variable = { ermm = 50 }
+		subtract_from_temp_variable = { ermm = BRI_Workshop_GraphDeltas^tes2 }
+		#add_to_temp_variable = { ermm = 40 }
+		add_to_variable = { BRI_texticon_graph_actual_y = ermm }
+	}
+	else_if ={
+		limit = {
+			check_variable = { BRI_Workshop_GraphDeltas^tes2 = 50 }
+		}
+	}
+	else = {
+		set_temp_variable = { ermm = BRI_Workshop_GraphDeltas^tes2 }
+		subtract_from_temp_variable = { ermm = 50 }
+		add_to_temp_variable = { ermm = 12 }
+		subtract_from_variable = { BRI_texticon_graph_actual_y = ermm }
+	}
+
+
+	set_temp_variable = { tes = BRI_Workshop_Target_GraphOffsets^num }
+	subtract_from_temp_variable = { tes = 1 }
+	set_variable = { BRI_target_texticon_graph_actual_y = BRI_Workshop_Target_GraphOffsets^tes }
+	add_to_variable = { BRI_target_texticon_graph_actual_y = 135 }
+
+
+}
+
+############################
+# |=[ Modifier Effects ]=| #
+############################
+
+## Modify a corporation's influence value in a region
+# Arguments: Region_v, CorpoID, Influence (Default value: 5)
+BRI_Workshop_AddInfluence = {
+	log = "[GetDateText]: [THIS.GetName]: BRI_Workshop_AddInfluence; Executing"
+
+	if = {
+		limit = { NOT = { has_variable = Region_v } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: BRI_Workshop_AddInfluence; Handed unset region. Breaking."
+	}
+	else_if = {
+		limit = { NOT = { has_variable = CorpoID } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: BRI_Workshop_AddInfluence; Handed unset corpo index. Breaking."
+	}
+	else = {
+		log = "[GetDateText]: [THIS.GetName]: BRI_Workshop_AddInfluence; Given Region_v: [?Region_v.GetTokenLocalizedKey] CorpoID: [?CorpoID] Influence: [?Influence?5]"
+
+		## Tooltip
+		custom_effect_tooltip = BRI_Workshop_AddInfluence_tt
+
+		## Da Math
+		# Values are stored in separate variables tied to region token, so we grab and put them into a single temp array for ease of use
+		add_to_array = { infl = BRI_Workshop_DeutscheBankInfl@var:Region_v }
+		add_to_array = { infl = BRI_Workshop_ReichswerkeInfl@var:Region_v }
+		add_to_array = { infl = BRI_Workshop_BlohmVossInfl@var:Region_v }
+		add_to_array = { infl = BRI_Workshop_AEGInfl@var:Region_v }
+		add_to_array = { infl = BRI_Workshop_VolkswagenInfl@var:Region_v }
+		subtract_from_temp_variable = { CorpoID = 1 } # Due to the way scripted loc is currently setup
+
+		# This balances the values so their sum is always equal to 100%
+		set_temp_variable = { BalanceSum = 100 }
+		subtract_from_temp_variable = { BalanceSum = infl^CorpoID }
+
+		set_temp_variable = { BalanceFactor = infl^CorpoID }
+		add_to_temp_variable = { BalanceFactor = Influence?5 }
+		if = {
+			limit = { check_variable = { BalanceFactor > 100 } }
+			subtract_from_temp_variable = { BalanceFactor = 100 }
+			subtract_from_temp_variable = { Influence?5 = BalanceFactor }
+		}
+		else_if = {
+			limit = { check_variable = { BalanceFactor < 0 } }
+			subtract_from_temp_variable = { Influence?5 = BalanceFactor }
+		}
+
+		add_to_variable = { infl^CorpoID = Influence?5 }
+		for_each_loop = {
+			array = infl
+			if = {
+				limit = { NOT = { check_variable = { CorpoID = i } } }
+				set_temp_variable = { BalanceVar = infl^i }
+				divide_temp_variable = { BalanceVar = BalanceSum }
+				multiply_temp_variable = { BalanceVar = Influence?5 }
+				subtract_from_variable = { infl^i = BalanceVar }
+			}
+			clamp_variable = { var = infl^i min = 0 max = 100 }
+		}
+
+		# Now we give the array's values back to the vars and then clear our temp array
+		set_variable = { BRI_Workshop_DeutscheBankInfl@var:Region_v = infl^0 }
+		set_variable = { BRI_Workshop_ReichswerkeInfl@var:Region_v  = infl^1 }
+		set_variable = { BRI_Workshop_BlohmVossInfl@var:Region_v 	= infl^2 }
+		set_variable = { BRI_Workshop_AEGInfl@var:Region_v 		    = infl^3 }
+		set_variable = { BRI_Workshop_VolkswagenInfl@var:Region_v   = infl^4 }
+		clear_array = infl
+
+		## Update Display
+		BRI_Workshop_DisplayUpdate = yes
+
+		## Update modifier
+		BRI_Workshop_UpdateModifier = yes
+
+		for_each_loop = {
+			array = BRI_Workshop_Goals
+			BRI_Workshop_CheckObjectives = yes
+		}
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: BRI_Workshop_AddInfluence; Completed execution."
+}
+
+## Modify a group's ownership value in a region
+# Arguments: Region_v, GroupID, Ownership (Default value: 5)
+BRI_Workshop_AddOwnership = {
+	log = "[GetDateText]: [THIS.GetName]: BRI_Workshop_AddOwnership; Executing"
+
+	if = {
+		limit = { NOT = { has_variable = Region_v } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: BRI_Workshop_AddOwnership; Handed unset region. Breaking."
+	}
+	else_if = {
+		limit = { NOT = { has_variable = GroupID } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: BRI_Workshop_AddOwnership; Handed unset corpo index. Breaking."
+	}
+	else = {
+		log = "[GetDateText]: [THIS.GetName]: BRI_Workshop_AddOwnership; Given Region_v: [?Region_v.GetTokenLocalizedKey] GroupID: [?GroupID] Ownership: [?Ownership?5]"
+
+		## Tooltip
+		custom_effect_tooltip = BRI_Workshop_AddOwnership_tt
+
+		## Da Math
+		# Values are stored in separate variables tied to region token, so we grab and put them into a single temp array for ease of use
+		add_to_array = { own = BRI_Workshop_OwnershipState@var:Region_v }
+		add_to_array = { own = BRI_Workshop_OwnershipCorporate@var:Region_v }
+		add_to_array = { own = BRI_Workshop_OwnershipPrivate@var:Region_v }
+		subtract_from_temp_variable = { GroupID = 1 } # Due to the way scripted loc is currently setup
+
+		# This balances the values so their sum is always equal to 100%
+		set_temp_variable = { BalanceSum = 100 }
+		subtract_from_temp_variable = { BalanceSum = own^GroupID }
+
+		set_temp_variable = { BalanceFactor = own^GroupID }
+		add_to_temp_variable = { BalanceFactor = Ownership?5 }
+		if = {
+			limit = { check_variable = { BalanceFactor > 100 } }
+			subtract_from_temp_variable = { BalanceFactor = 100 }
+			subtract_from_temp_variable = { Ownership?5 = BalanceFactor }
+		}
+		else_if = {
+			limit = { check_variable = { BalanceFactor < 0 } }
+			subtract_from_temp_variable = { Ownership?5 = BalanceFactor }
+		}
+
+		add_to_variable = { own^GroupID = Ownership?5 }
+		for_each_loop = {
+			array = own
+			if = {
+				limit = { NOT = { check_variable = { GroupID = i } } }
+				set_temp_variable = { BalanceVar = own^i }
+				divide_temp_variable = { BalanceVar = BalanceSum }
+				multiply_temp_variable = { BalanceVar = Ownership?5 }
+				subtract_from_variable = { own^i = BalanceVar }
+			}
+			clamp_variable = { var = own^i min = 0 max = 100 }
+		}
+
+		# Now we give the array's values back to the vars and then clear our temp array
+		set_variable = { BRI_Workshop_OwnershipState@var:Region_v     = own^0 }
+		set_variable = { BRI_Workshop_OwnershipCorporate@var:Region_v = own^1 }
+		set_variable = { BRI_Workshop_OwnershipPrivate@var:Region_v   = own^2 }
+		clear_array = own
+
+		## Update Display
+		BRI_Workshop_DisplayUpdate = yes
+
+		## Update modifier
+		BRI_Workshop_UpdateModifier = yes
+
+		for_each_loop = {
+			array = BRI_Workshop_Goals
+			BRI_Workshop_CheckObjectives = yes
+		}
+	}
+
+	log = "[GetDateText]: [THIS.GetName]: BRI_Workshop_AddOwnership; Completed execution."
+}
+
+## Modifies the Unemployment value
+# Arguments: Unemployment (Default value: 0.25)
+BRI_Workshop_AddUnemployment = {
+	log = "[GetDateText]: [THIS.GetName]: BRI_Workshop_AddUnemployment; Executing"
+
+	# Defining the tooltip
+	if = {
+		limit = { check_variable = { Unemployment?0.25 > 0 } }
+		custom_effect_tooltip = BRI_Workshop_AddUnemployment_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BRI_Workshop_AddUnemployment_sub_tt
+	}
+
+	# The actual math
+	add_to_variable = { BRI_Workshop_Unemployment = Unemployment?0.25 }
+	clamp_variable = { var = BRI_Workshop_Unemployment max = 100 min = 0 }
+	
+	BRI_Workshop_DisplayUpdate = yes
+	log = "[GetDateText]: [THIS.GetName]: BRI_Workshop_AddUnemployment; Completed execution."
+}
+
+## Updates graph values every month
+BRI_Workshop_GraphMonthlyUpdate = {
+	remove_from_array = { array = BRI_Workshop_GDPGrowthHistory    index = 0 }
+	remove_from_array = { array = BRI_Workshop_InflationHistory    index = 0 }
+	remove_from_array = { array = BRI_Workshop_UnemploymentHistory index = 0 }
+
+	# GDP
+	add_to_array = { BRI_Workshop_GDPGrowthHistory = ENG.GDP_growth_real }
+
+	# Inflation
+	add_to_array = { BRI_Workshop_InflationHistory = ENG.clamped_inflation_rate }
+
+	# Unemployment
+	add_to_array = { BRI_Workshop_UnemploymentHistory = BRI_Workshop_Unemployment }
+}
+
+################################
+# |=[ Goals/Crisis Effects ]=| #
+################################
+
+BRI_Workshop_ConcludeProject = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Workshop_ConcludeProject; Executing."
+
+	if = {
+		limit = { NOT = { has_variable = v } }
+		log = "(ERROR): [GetDateText]: [THIS.GetName]: BRI_Workshop_ConcludeProject; Handed unset ID. Breaking."
+	}
+	else = {
+		log = "[GetDateText]: [THIS.GetName]: BRI_Workshop_ConcludeProject; Given project: [?v] ([?v.GetTokenLocalizedKey])"
+		custom_effect_tooltip = BRI_Workshop_ConcludeProject_tt
+
+		set_temp_variable = { count = 0 }
+		set_temp_variable = { count2 = 0 }
+		if = {
+			limit = { check_variable = { BRI_Workshop_GoalObjective_1@var:v > 0 } }
+			add_to_temp_variable = { count = 2 }
+			add_to_temp_variable = { count2 = BRI_Workshop_GoalObjective_1@var:v }
+		}
+		if = {
+			limit = { check_variable = { BRI_Workshop_GoalObjective_2@var:v > 0 } }
+			add_to_temp_variable = { count = 2 }
+			add_to_temp_variable = { count2 = BRI_Workshop_GoalObjective_2@var:v }
+		}
+		if = {
+			limit = { check_variable = { BRI_Workshop_GoalObjective_3@var:v > 0 } }
+			add_to_temp_variable = { count = 2 }
+			add_to_temp_variable = { count2 = BRI_Workshop_GoalObjective_3@var:v }
+		}
+		if = {
+			limit = { check_variable = { BRI_Workshop_GoalObjective_4@var:v > 0 } }
+			add_to_temp_variable = { count = 2 }
+			add_to_temp_variable = { count2 = BRI_Workshop_GoalObjective_4@var:v }
+		}
+
+		if = {
+			limit = { check_variable = { count2 = count } }
+			BRI_Workshop_GoalSuccess = yes
+		}
+		else = {
+			BRI_Workshop_GoalFailure = yes
+		}
+
+		clear_variable = BRI_Workshop_GoalObjective_1@var:v
+		clear_variable = BRI_Workshop_GoalObjective_2@var:v
+		clear_variable = BRI_Workshop_GoalObjective_3@var:v
+		clear_variable = BRI_Workshop_GoalObjective_4@var:v
+		clear_variable = BRI_Workshop_GoalObjective_1_String@var:v
+		clear_variable = BRI_Workshop_GoalObjective_2_String@var:v
+		clear_variable = BRI_Workshop_GoalObjective_3_String@var:v
+		clear_variable = BRI_Workshop_GoalObjective_4_String@var:v
+		clear_variable = BRI_Workshop_GoalDuration@var:v
+		clear_variable = BRI_Workshop_GoalPUInvestment@var:v
+		remove_from_array = { array = BRI_Workshop_Goals value = v }
+		add_to_variable = { BRI_Workshop_Dirty = 1 }
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Workshop_ConcludeProject; Completed execution."
+}
+
+BRI_Workshop_CheckObjectives = {
+	if = { # Budget of 1962
+		limit = { check_variable = { v = token:ENG_Workshop_GUI_Goals_Budget62 } }
+		if = {
+			limit = { check_variable = { ENG.GDP_growth_real > 4.3 } }
+			set_variable = { BRI_Workshop_GoalObjective_1@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_1@var:v = 1 }
+		}
+
+		if = {
+			limit = { check_variable = { ENG.clamped_inflation_rate < 3 } }
+			set_variable = { BRI_Workshop_GoalObjective_2@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_2@var:v = 1 }
+		}
+
+		if = {
+			limit = { check_variable = { BRI_Workshop_Unemployment < 17 } }
+			set_variable = { BRI_Workshop_GoalObjective_3@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_3@var:v = 1 }
+		}
+	}
+
+	else_if = { # Winter of 1962
+		limit = { check_variable = { v = token:ENG_Workshop_GUI_Goals_Winter62 } }
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_Scotland }
+				check_variable = { BRI_Workshop_AEGInfl@var:i > 17 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_1@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_1@var:v = 1 }
+		}
+
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_Northwest }
+				check_variable = { BRI_Workshop_AEGInfl@var:i > 25 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_2@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_2@var:v = 1 }
+		}
+
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_Scotland }
+				check_variable = { BRI_Workshop_OwnershipState@var:i > 30 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_3@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_3@var:v = 1 }
+		}
+
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_Northwest }
+				check_variable = { BRI_Workshop_OwnershipState@var:i > 30 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_4@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_4@var:v = 1 }
+		}
+	}
+	
+	else_if = { # Thames Estuary Airport
+		limit = { check_variable = { v = token:ENG_Workshop_GUI_Goals_ThamesAirport } }
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_Southeast }
+				check_variable = { BRI_Workshop_OwnershipState@var:i > 50 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_1@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_1@var:v = 1 }
+		}
+
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_London }
+				check_variable = { BRI_Workshop_OwnershipCorporate@var:i > 33 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_2@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_2@var:v = 1 }
+		}
+
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_London }
+				check_variable = { BRI_Workshop_DeutscheBankInfl@var:i > 33 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_3@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_3@var:v = 1 }
+		}
+	}
+	
+	else_if = { # Severn Barrage
+		limit = { check_variable = { v = token:ENG_Workshop_GUI_Goals_SevernBarrage } }
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_Southwest }
+				check_variable = { BRI_Workshop_OwnershipState@var:i > 25 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_1@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_1@var:v = 1 }
+		}
+
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_Southwest }
+				check_variable = { BRI_Workshop_AEGInfl@var:i > 25 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_2@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_2@var:v = 1 }
+		}
+
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_London }
+				check_variable = { BRI_Workshop_DeutscheBankInfl@var:i > 33 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_3@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_3@var:v = 1 }
+		}
+	}
+	
+	else_if = { # Blyth B Power Station
+		limit = { check_variable = { v = token:ENG_Workshop_GUI_Goals_Blyth } }
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_Northeast }
+				check_variable = { BRI_Workshop_OwnershipState@var:i > 33 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_1@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_1@var:v = 1 }
+		}
+
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_Northeast }
+				check_variable = { BRI_Workshop_ReichswerkeInfl@var:i > 25 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_2@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_2@var:v = 1 }
+		}
+		
+		if = {
+			limit = {
+				set_temp_variable = { i = token:ENG_Workshop_GUI_Map_Northeast }
+				check_variable = { BRI_Workshop_AEGInfl@var:i > 25 }
+			}
+			set_variable = { BRI_Workshop_GoalObjective_3@var:v = 2 }
+		}
+		else = {
+			set_variable = { BRI_Workshop_GoalObjective_3@var:v = 1 }
+		}
+	}
+	
+	add_to_variable = { BRI_Workshop_Dirty = 1 }
+}
+
+BRI_Workshop_GoalSuccess = {
+	if = {
+		limit = { check_variable = { v = token:ENG_Workshop_GUI_Goals_Winter62 } }
+		country_event = domvile.74
+	}
+	else_if = {
+		limit = { check_variable = { v = token:ENG_Workshop_GUI_Goals_Budget62 } }
+		country_event = britain_budget.2
+	}
+	else_if = {
+		limit = {  check_variable = { v = token:ENG_Workshop_GUI_Goals_ThamesAirport } }
+		# country_event = 
+	}
+	else_if = {
+		limit = {  check_variable = { v = token:ENG_Workshop_GUI_Goals_SevernBarrage } }
+		# country_event = 
+	}
+	else_if = {
+		limit = {  check_variable = { v = token:ENG_Workshop_GUI_Goals_Blyth } }
+		country_event = britain_projects.6
+	}
+}
+
+BRI_Workshop_GoalFailure = {
+	if = {
+		limit = { check_variable = { v = token:ENG_Workshop_GUI_Goals_Winter62 } }
+		country_event = domvile.76
+	}
+	else_if = {
+		limit = { check_variable = { v = token:ENG_Workshop_GUI_Goals_Budget62 } }
+		country_event = britain_budget.3
+	}
+	else_if = {
+		limit = {  check_variable = { v = token:ENG_Workshop_GUI_Goals_ThamesAirport } }
+		# country_event = 
+	}
+	else_if = {
+		limit = {  check_variable = { v = token:ENG_Workshop_GUI_Goals_SevernBarrage } }
+		# country_event = 
+	}
+	else_if = {
+		limit = {  check_variable = { v = token:ENG_Workshop_GUI_Goals_Blyth } }
+		country_event = britain_projects.9
+	}
+}
+
+BRI_Workshop_GoalCompletionGainCalc = {
+	set_variable = { BRI_Workshop_GoalCompletionGain@var:v = BRI_Workshop_GoalPUInvestment@var:v }
+	divide_variable = { BRI_Workshop_GoalCompletionGain@var:v = BRI_Workshop_GoalPUInvestmentModifier@var:v }
+
+	set_variable = { BRI_Workshop_GoalPUInvestmentsTotal = 0 }
+	for_each_loop = {
+		array = BRI_Workshop_Goals
+		value = val
+		add_to_variable = { BRI_Workshop_GoalPUInvestmentsTotal = BRI_Workshop_GoalPUInvestment@var:val }
+	}
+	multiply_variable = { BRI_Workshop_GoalPUInvestmentsTotal = -1 }
+	recalculate_PUs_on_demand = yes
+	add_to_variable = { BRI_Workshop_Dirty = 1 }
+}
+
+#############################
+# |= [ Specific Effects ]=| #
+#############################
+# These effects still expect to be given the effect value variables:
+#  - Influence for AI
+#  - Ownership for AO
+
+#|========[ ADD INFLUENCE ]=======|#
+#####  SCOTLAND  #####
+BRI_IND_AI_Scotland_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Scotland }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Scotland_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Scotland }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Scotland_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Scotland }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Scotland_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Scotland }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Scotland_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Scotland }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#####  NORTHWEST  #####
+BRI_IND_AI_Northwest_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northwest }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Northwest_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northwest }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Northwest_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northwest }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Northwest_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northwest }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Northwest_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northwest }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#####  NORTHEAST  #####
+BRI_IND_AI_Northeast_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northeast }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Northeast_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northeast }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Northeast_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northeast }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Northeast_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northeast }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Northeast_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northeast }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#####  YORKSHIRE  #####
+BRI_IND_AI_Yorkshire_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Yorkshire }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Yorkshire_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Yorkshire }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Yorkshire_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Yorkshire }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Yorkshire_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Yorkshire }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Yorkshire_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Yorkshire }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#####  WALES  #####
+BRI_IND_AI_Wales_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Wales }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Wales_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Wales }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Wales_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Wales }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Wales_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Wales }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Wales_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Wales }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#####  WEST MIDLANDS  #####
+BRI_IND_AI_WestMidlands_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_WestMidlands }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_WestMidlands_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_WestMidlands }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_WestMidlands_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_WestMidlands }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_WestMidlands_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_WestMidlands }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_WestMidlands_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_WestMidlands }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#####  EAST MIDLANDS  #####
+BRI_IND_AI_EastMidlands_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_EastMidlands }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_EastMidlands_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_EastMidlands }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_EastMidlands_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_EastMidlands }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_EastMidlands_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_EastMidlands }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_EastMidlands_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_EastMidlands }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#####  ANGLIA  #####
+BRI_IND_AI_Anglia_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Anglia }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Anglia_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Anglia }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Anglia_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Anglia }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Anglia_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Anglia }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Anglia_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Anglia }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#####  SOUTHWEST  #####
+BRI_IND_AI_Southwest_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southwest }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Southwest_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southwest }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Southwest_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southwest }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Southwest_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southwest }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Southwest_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southwest }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#####  SOUTHEAST  #####
+BRI_IND_AI_Southeast_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southeast }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Southeast_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southeast }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Southeast_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southeast }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Southeast_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southeast }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_Southeast_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southeast }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#####  LONDON  #####
+BRI_IND_AI_London_DeutscheBank = {
+	set_temp_variable = { CorpoID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_London }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_London_Reichswerke = {
+	set_temp_variable = { CorpoID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_London }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_London_BlohmVoss = {
+	set_temp_variable = { CorpoID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_London }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_London_AEG = {
+	set_temp_variable = { CorpoID = 4 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_London }
+	BRI_Workshop_AddInfluence = yes
+}
+BRI_IND_AI_London_Volkswagen = {
+	set_temp_variable = { CorpoID = 5 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_London }
+	BRI_Workshop_AddInfluence = yes
+}
+
+#|========[ ADD OWNERSHIP ]=======|#
+#####  SCOTLAND  #####
+BRI_IND_AO_Scotland_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Scotland }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Scotland_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Scotland }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Scotland_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Scotland }
+	BRI_Workshop_AddOwnership = yes
+}
+
+#####  NORTHWEST  #####
+BRI_IND_AO_Northwest_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northwest }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Northwest_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northwest }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Northwest_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northwest }
+	BRI_Workshop_AddOwnership = yes
+}
+
+#####  NORTHEAST  #####
+BRI_IND_AO_Northeast_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northeast }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Northeast_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northeast }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Northeast_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Northeast }
+	BRI_Workshop_AddOwnership = yes
+}
+
+#####  YORKSHIRE  #####
+BRI_IND_AO_Yorkshire_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Yorkshire }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Yorkshire_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Yorkshire }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Yorkshire_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Yorkshire }
+	BRI_Workshop_AddOwnership = yes
+}
+
+#####  WALES  #####
+BRI_IND_AO_Wales_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Wales }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Wales_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Wales }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Wales_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Wales }
+	BRI_Workshop_AddOwnership = yes
+}
+
+#####  WEST MIDLANDS  #####
+BRI_IND_AO_WestMidlands_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_WestMidlands }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_WestMidlands_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_WestMidlands }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_WestMidlands_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_WestMidlands }
+	BRI_Workshop_AddOwnership = yes
+}
+
+#####  EAST MIDLANDS  #####
+BRI_IND_AO_EastMidlands_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_EastMidlands }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_EastMidlands_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_EastMidlands }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_EastMidlands_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_EastMidlands }
+	BRI_Workshop_AddOwnership = yes
+}
+
+#####  ANGLIA  #####
+BRI_IND_AO_Anglia_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Anglia }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Anglia_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Anglia }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Anglia_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Anglia }
+	BRI_Workshop_AddOwnership = yes
+}
+
+#####  SOUTHWEST  #####
+BRI_IND_AO_Southwest_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southwest }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Southwest_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southwest }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Southwest_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southwest }
+	BRI_Workshop_AddOwnership = yes
+}
+
+#####  SOUTHEAST  #####
+BRI_IND_AO_Southeast_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southeast }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Southeast_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southeast }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_Southeast_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_Southeast }
+	BRI_Workshop_AddOwnership = yes
+}
+
+#####  LONDON  #####
+BRI_IND_AO_London_State = {
+	set_temp_variable = { GroupID = 1 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_London }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_London_Corporate = {
+	set_temp_variable = { GroupID = 2 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_London }
+	BRI_Workshop_AddOwnership = yes
+}
+BRI_IND_AO_London_Private = {
+	set_temp_variable = { GroupID = 3 }
+	set_temp_variable = { Region_v = token:ENG_Workshop_GUI_Map_London }
+	BRI_Workshop_AddOwnership = yes
+}
+
+##############################
+# |=[ 1.2 PARTY MECHANIC ]=| #
+##############################
+# Primary Designer: Maedhros
+# Primary Coders: Lamounier, leoj
+
+#	Base Effects
+#	Chaos Effects
+#	Group Effects
+#	Victory Effects
+
+########################
+# |=[ Base Effects ]=| #
+########################
+
+# Activate decision category & mechanic
+BRI_Party_Activate = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Activate; Executing."
+	set_country_flag = TNO_BRI_Party_GUI_Active
+	custom_effect_tooltip = TNO_BRI_Party_Activate_tt
+
+	## Setup arrays & variables
+	clear_array = BRI_Party_CategoryInfluence
+	add_to_array = { BRI_Party_CategoryInfluence = 35 } # Peers
+	add_to_array = { BRI_Party_CategoryInfluence = 45 } # German Garrison
+	add_to_array = { BRI_Party_CategoryInfluence = 55 } # German Corporations
+	add_to_array = { BRI_Party_CategoryInfluence = 65 } # Party
+	set_variable = { BRI_Party_Tick_Var = 0 } # Tick variable
+	# These values correspond to the percentage of Ideologue influence on a given group
+	# Pragmatist influence is stored in the BRI_Party_CategoryInfluenceAlt array, but is only used for tooltips
+
+	clear_array = BRI_ChaosEffects
+	add_to_array = { BRI_ChaosEffects = 0  }
+	resize_array = { BRI_ChaosEffects = 15 }
+
+	# Setup total influence
+	BRI_Party_CalculateTotalInfluence = yes
+
+	# Each two times player increases influence of a candidate an event fires.
+	add_to_array = { BRI_Party_Choice = 0 } # Ideologues
+	add_to_array = { BRI_Party_Choice = 0 } # Pragmatists
+
+	## Threshold positioning
+	# Set arrays for positioning
+	add_to_array = { BRI_ChaosThreshold = 10 }
+	add_to_array = { BRI_ChaosThreshold = 20 }
+	add_to_array = { BRI_ChaosThreshold = 40 }
+	add_to_array = { BRI_ChaosThreshold = 60 }
+	add_to_array = { BRI_ChaosThreshold = 80 }
+	add_to_array = { BRI_ChaosThreshold = 95 }
+	set_variable = { BRI_CurrentThreshold = -1 }
+
+	# X positioning is calculated by multiplying the progressbar horizontal size by the milestone's percentage value
+	clear_array = BRI_ChaosThreshold_X
+	for_loop_effect = {
+		start = 0
+		end = BRI_ChaosThreshold^num
+		value = threshold_idx
+
+		set_temp_variable = { x = BRI_ChaosThreshold^threshold_idx }
+		divide_temp_variable = { x = 100 }
+		multiply_temp_variable = { x = 400 } # Size of the progress bar
+		round_temp_variable = x
+		add_to_array = { BRI_ChaosThreshold_X = x }
+	}
+
+	## Chaos effects dynmod
+	hidden_effect = { add_dynamic_modifier = { modifier = BRI_Chaos_dynamic_modifier } }
+
+	## Chaos tick
+	add_to_variable = { BRI_ChaosWeekly = 0 }
+
+	set_variable = { BRI_ChaosCap = 60 }
+
+	## AI chaos cap
+	hidden_effect = {
+		random_list = {
+			50 = {
+				modifier = {
+					factor = 0
+					OR  = {
+						has_game_rule = {
+							rule = ENG_COLLAB_ROUTE
+							option = ENG_COLLAB_ROUTE_OLDGUARDS
+						}
+						has_game_rule = {
+							rule = ENG_COLLAB_ROUTE
+							option = ENG_COLLAB_ROUTE_COUP
+						}
+					}
+				}
+				set_variable = { ENG_collab_chaos_ai_cap = 55 }
+			}
+			25 = {
+				modifier = {
+					factor = 0
+					has_game_rule = {
+						rule = ENG_COLLAB_ROUTE
+						option = ENG_COLLAB_ROUTE_COUP
+					}
+				}
+				set_variable = { ENG_collab_chaos_ai_cap = 75 }
+			}
+			25 = {
+				set_variable = { ENG_collab_chaos_ai_cap = 100 }
+			}
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Activate; Completed execution."
+}
+
+# Hide the mechanic for the period of the SGU
+BRI_Party_Hide = {
+	clr_country_flag = TNO_BRI_Party_GUI_Active
+	set_variable = { BRI_ChaosWeeklySaved = BRI_ChaosWeekly }
+	set_variable = { BRI_ChaosWeekly = 0 }
+	add_to_array = { BRI_Party_CategoryInfluence_Saved = var:BRI_Party_CategoryInfluence^0 } # Peers
+	add_to_array = { BRI_Party_CategoryInfluence_Saved = var:BRI_Party_CategoryInfluence^1 } # German Garrison
+	add_to_array = { BRI_Party_CategoryInfluence_Saved = var:BRI_Party_CategoryInfluence^2 } # German Corporations
+	add_to_array = { BRI_Party_CategoryInfluence_Saved = var:BRI_Party_CategoryInfluence^3 } # Party
+	clear_array = BRI_Party_CategoryInfluence
+	set_variable = { BRI_Party_Tick_Var = 0 } # Tick variable
+}
+
+# Show the mechanic after the SGU
+BRI_Party_Show = {
+	set_country_flag = TNO_BRI_Party_GUI_Active
+	set_variable = { BRI_ChaosWeekly = BRI_ChaosWeeklySaved }
+	clear_variable = BRI_ChaosWeekly
+	clear_array = BRI_Party_CategoryInfluence
+	add_to_array = { BRI_Party_CategoryInfluence = var:BRI_Party_CategoryInfluence_Saved^0 } # Peers
+	add_to_array = { BRI_Party_CategoryInfluence = var:BRI_Party_CategoryInfluence_Saved^1 } # German Garrison
+	add_to_array = { BRI_Party_CategoryInfluence = var:BRI_Party_CategoryInfluence_Saved^2 } # German Corporations
+	add_to_array = { BRI_Party_CategoryInfluence = var:BRI_Party_CategoryInfluence_Saved^3 } # Party
+	clear_array = BRI_Party_CategoryInfluence_Saved
+	BRI_Party_CalculateTotalInfluence = yes
+}
+
+# Disable the mechanic once it is done
+BRI_Party_Disable = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Disable; Executing."
+
+	clr_country_flag = TNO_BRI_Party_GUI_Active
+
+	clear_array = BRI_Party_CategoryInfluence
+	clear_array = BRI_Party_CategoryInfluenceAlt
+	clear_array = BRI_Party_CategoryInfluence_Saved
+	clear_array = BRI_Party_Choice
+	clear_variable = BRI_Party_CategorySelection
+	clear_variable = BRI_Party_InfluenceTotal
+	clear_variable = BRI_Party_Tick_Var
+
+	clear_array = BRI_ChaosThreshold
+	clear_array = BRI_ChaosThreshold_X
+	clear_array = BRI_ChaosEffects
+	clear_variable = BRI_Chaos
+	clear_variable = BRI_ChaosCap
+	clear_variable = BRI_ChaosWeekly
+	clear_variable = BRI_ChaosWeeklySaved
+	clear_variable = BRI_CurrentThreshold
+	remove_dynamic_modifier = { modifier = BRI_Chaos_dynamic_modifier }
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Disable; Completed execution."
+}
+
+# Calculates winner
+BRI_Party_Winner_Calc = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Winner_Calc; Executing."
+	BRI_Party_CalculateTotalInfluence = yes
+	if = { # If ideologue influence is less than 50, prags win
+		limit = {
+			check_variable = {
+				var = BRI_Party_InfluenceTotal
+				value = 50
+				compare = less_than
+			}
+		}
+		set_country_flag = BRI_Butler_Victory_flag
+	}
+	else_if = { # If old guard is active and its influence is higher than 50, old guard wins
+		limit = {
+			AND = {
+				has_country_flag = BRI_Wallop_Active_flag
+				check_variable = {
+					var = BRI_Party_InfluenceTotal
+					value = 50
+					compare = greater_than
+				}
+			}
+		}
+		set_country_flag = BRI_Wallop_Victory_flag
+	}
+	else_if = { # If ideologue influence is higher than 50, ideos win
+		limit = {
+			check_variable = {
+				var = BRI_Party_InfluenceTotal
+				value = 50
+				compare = greater_than
+			}
+		}
+		set_country_flag = BRI_Fountaine_Victory_flag
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Winner_Calc; Completed execution."
+}
+
+# Mechanic weekly pulse
+BRI_Party_OnWeekly = { # only affects chaos
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_OnWeekly; Executing."
+
+	# Weekly progress
+	BRI_Party_Calc_ChaosWeeklyChange = yes
+	add_to_variable = { BRI_Chaos = BRI_ChaosWeekly }
+	if = {
+		limit = {
+			ENG = {
+				is_ai = yes
+			}
+		}
+		clamp_variable  = { var = BRI_Chaos min = 0 max = ENG_collab_chaos_ai_cap }
+	}
+	else = {
+		clamp_variable  = { var = BRI_Chaos min = 0 max = BRI_ChaosCap }
+	}
+	# Check for threshold
+	BRI_Party_ThresholdCheck = yes
+	custom_effect_tooltip = BRI_Party_Chaos_tick_tt
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_OnWeekly; Completed execution."
+}
+
+# Recalculates total influence values for the factions
+BRI_Party_CalculateTotalInfluence = {
+	# Sum up all influence values
+	set_variable = { BRI_Party_InfluenceTotal = 0 }
+	add_to_variable = { BRI_Party_InfluenceTotal = BRI_Party_CategoryInfluence^0 } # Peers
+	add_to_variable = { BRI_Party_InfluenceTotal = BRI_Party_CategoryInfluence^1 } # German Garrison
+	add_to_variable = { BRI_Party_InfluenceTotal = BRI_Party_CategoryInfluence^2 } # German Corporations
+	add_to_variable = { BRI_Party_InfluenceTotal = BRI_Party_CategoryInfluence^3 } # Party
+
+	# Divide by num of groups
+	divide_variable = { BRI_Party_InfluenceTotal = BRI_Party_CategoryInfluence^num }
+
+	#Gamerule effect
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = ENG_COLLAB_ROUTE
+				option = ENG_COLLAB_ROUTE_PRAGMATISTS
+			}
+			NOT = {
+				check_variable = {
+					var = BRI_Party_InfluenceTotal
+					value = 50
+					compare = less_than
+				}
+			}
+		}
+		set_variable = {
+			BRI_Party_InfluenceTotal = 49
+		}
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_game_rule = {
+					rule = ENG_COLLAB_ROUTE
+					option = ENG_COLLAB_ROUTE_OLDGUARDS
+				}
+				has_game_rule = {
+					rule = ENG_COLLAB_ROUTE
+					option = ENG_COLLAB_ROUTE_IDEOLOGUES
+				}
+			}
+			NOT = {
+				check_variable = {
+					var = BRI_Party_InfluenceTotal
+					value = 50
+					compare = greater_than
+				}
+			}
+		}
+		set_variable = {
+			BRI_Party_InfluenceTotal = 51
+		}
+	}
+
+	# Update Pragmatic influence
+	clear_array = BRI_Party_CategoryInfluenceAlt
+	add_to_array = { BRI_Party_CategoryInfluenceAlt = 100 }
+	resize_array = { array = BRI_Party_CategoryInfluenceAlt value = 100 size = 4 }
+	subtract_from_variable = { BRI_Party_CategoryInfluenceAlt^0 = BRI_Party_CategoryInfluence^0 } # Peers
+	subtract_from_variable = { BRI_Party_CategoryInfluenceAlt^1 = BRI_Party_CategoryInfluence^1 } # German Garrison
+	subtract_from_variable = { BRI_Party_CategoryInfluenceAlt^2 = BRI_Party_CategoryInfluence^2 } # German Corporations
+	subtract_from_variable = { BRI_Party_CategoryInfluenceAlt^3 = BRI_Party_CategoryInfluence^3 } # Party
+
+	set_variable = { BRI_Party_CategoryInfluence_peers = BRI_Party_CategoryInfluence^0 }
+	set_variable = { BRI_Party_CategoryInfluence_garrison = BRI_Party_CategoryInfluence^1 }
+	set_variable = { BRI_Party_CategoryInfluence_corpos = BRI_Party_CategoryInfluence^2 }
+	set_variable = { BRI_Party_CategoryInfluence_party = BRI_Party_CategoryInfluence^3 }
+
+	BRI_Party_Evaluate_Var = yes # calculates ticking variable
+	BRI_Party_Calc_ChaosWeeklyChange = yes # calculates chaos change
+	add_to_variable = { BRI_Party_Dirty = 1.001 }
+}
+
+# Applies Chaos threshold effects
+BRI_Party_ThresholdCheck = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_ThresholdCheck; Executing."
+
+	set_temp_variable = { NextThreshold = BRI_CurrentThreshold }
+	add_to_temp_variable = { NextThreshold = 1 }
+	if = {
+		limit = {
+			OR = {
+				check_variable = { var = BRI_Chaos value = BRI_ChaosThreshold^NextThreshold compare = greater_than_or_equals }
+				OR = {
+					has_game_rule = {
+						rule = ENG_COLLAB_ROUTE
+						option = ENG_COLLAB_ROUTE_OLDGUARDS
+					}
+					has_game_rule = {
+						rule = ENG_COLLAB_ROUTE
+						option = ENG_COLLAB_ROUTE_COUP
+					}
+				}
+			}
+		}
+		set_temp_variable = { ThresholdID = NextThreshold }
+		if = {
+			limit = {
+				has_game_rule = {
+					rule = ENG_COLLAB_ROUTE
+					option = ENG_COLLAB_ROUTE_IDEOLOGUES
+				}
+				check_variable = {
+					var = ThresholdID
+					value = 3
+					compare = greater_than_or_equals
+				}
+			}
+			set_temp_variable = { ThresholdID = 2 }
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_game_rule = {
+						rule = ENG_COLLAB_ROUTE
+						option = ENG_COLLAB_ROUTE_OLDGUARDS
+					}
+					has_game_rule = {
+						rule = ENG_COLLAB_ROUTE
+						option = ENG_COLLAB_ROUTE_PRAGMATISTS
+					}
+				}
+				check_variable = {
+					var = ThresholdID
+					value = 5
+					compare = greater_than_or_equals
+				}
+			}
+			set_temp_variable = { ThresholdID = 4 }
+		}
+		BRI_Party_ThresholdEffect = yes
+
+		# Fire alert
+		set_variable = { BRI_CurrentThreshold = ThresholdID }
+		set_temp_variable = { alert_id = token:Alert_BRI_ChaosThreshold }
+		set_temp_variable = { alert_data = BRI_CurrentThreshold }
+		add_TNO_alert = yes
+	}
+	force_update_dynamic_modifier = yes
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_ThresholdCheck; Completed execution."
+}
+
+BRI_check_if_budget_met = {
+	if = {
+		limit = {
+			AND = {
+				check_variable = {
+					var = ENG.GDP_growth_real
+					value = BRI_Workshop_TargetGDPGrowth
+					compare = greater_than_or_equals
+				}
+				check_variable = {
+					var = ENG.clamped_inflation_rate
+					value = BRI_Workshop_TargetInflation
+					compare = less_than_or_equals
+				}
+				check_variable = {
+					var = BRI_Workshop_Unemployment
+					value = BRI_Workshop_TargetUnemployment
+					compare = less_than_or_equals
+				}
+			}
+		}
+		if = {
+			limit = { has_country_flag = ENG_62_budget_visible }
+			country_event = britain_budget.2
+		}
+		else_if = {
+			limit = { has_country_flag = ENG_63_budget_visible }
+			country_event = britain_budget.5
+		}
+	}
+	else = {
+		if = {
+			limit = { has_country_flag = ENG_62_budget_visible }
+			country_event = britain_budget.3
+		}
+		else_if = {
+			limit = { has_country_flag = ENG_63_budget_visible }
+			country_event = britain_budget.6
+		}
+	}
+	#clear_array = BRI_Workshop_Target_GraphValues
+	clr_country_flag = ENG_budget_visible
+	clr_country_flag = ENG_62_budget_visible
+	clr_country_flag = ENG_63_budget_visible
+}
+
+BRI_Party_ThresholdEffect = {
+	## Chaos Threshold effects
+	if = {
+		limit = { check_variable = { ThresholdID = 0 } }
+		log = "[GetDateText]: [Root.GetName]: BRI_Party_ThresholdEffect; Chaos Threshold 1 reached."
+		country_event = collab_party_threshold.1
+	}
+	else_if = {
+		limit = { check_variable = { ThresholdID = 1 } }
+		log = "[GetDateText]: [Root.GetName]: BRI_Party_ThresholdEffect; Chaos Threshold 2 reached."
+		country_event = collab_party_threshold.2
+	}
+	else_if = {
+		limit = { check_variable = { ThresholdID = 2 } }
+		log = "[GetDateText]: [Root.GetName]: BRI_Party_ThresholdEffect; Chaos Threshold 3 reached."
+		country_event = collab_party_threshold.3
+	}
+	else_if = {
+		limit = { check_variable = { ThresholdID = 3 } }
+		log = "[GetDateText]: [Root.GetName]: BRI_Party_ThresholdEffect; Chaos Threshold 4 reached."
+		if = {
+			limit = {
+				check_variable = { BRI_ChaosCap = 60 }
+			}
+			custom_effect_tooltip = BRI_ChaosCap_60_tt
+		}
+		country_event = collab_party_threshold.4
+	}
+	else_if = {
+		limit = { check_variable = { ThresholdID = 4 } }
+		log = "[GetDateText]: [Root.GetName]: BRI_Party_ThresholdEffect; Chaos Threshold 5 reached."
+		country_event = collab_party_threshold.5
+	}
+	else_if = {
+		limit = { check_variable = { ThresholdID = 5 } }
+		log = "[GetDateText]: [Root.GetName]: BRI_Party_ThresholdEffect; Chaos Threshold 6 reached."
+		country_event = collab_party_threshold.6
+	}
+}
+
+BRI_Party_Choice_Update = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Choice_Update; Executing."
+	log = "[GetDateText]: [THIS.GetName]: BRI_Party_Choice_Update; Given CandidateChange: [?CandidateChange]"
+
+	add_to_variable = { BRI_Party_Choice^CandidateChange = 1 }
+	if = {
+		limit = { check_variable = { BRI_Party_Choice^CandidateChange = 2 } }
+		set_variable = { BRI_Party_Choice^CandidateChange = 0 }
+		if = {
+			limit = { check_variable = { CandidateChange = 0 } }
+			country_event = collab_party_choice.1
+		}
+		else = {
+			country_event = collab_party_choice.2
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Choice_Update; Completed execution."
+}
+
+#########################
+# |=[ Chaos Effects ]=| #
+#########################
+
+## Modify the Chaos variable by a direct value
+# Arguments: ChaosChange (Default value: 1)
+BRI_Party_Modify_Chaos = { # adds 1 chaos
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Modify_Chaos; Executing."
+	log = "[GetDateText]: [THIS.GetName]: BRI_Party_Modify_Chaos; Given ChaosChange: [?ChaosChange?1]"
+
+	custom_effect_tooltip = BRI_Party_Modify_Chaos_tt
+
+	add_to_variable = { BRI_Chaos = ChaosChange?1 }
+	if = {
+		limit = { check_variable = { BRI_CurrentThreshold = -1 } }
+		clamp_variable = { var = BRI_Chaos min = 0 max = BRI_ChaosCap }
+	}
+	else = {
+		clamp_variable = { var = BRI_Chaos min = BRI_ChaosThreshold^BRI_CurrentThreshold max = BRI_ChaosCap }
+	}
+
+	add_to_variable = { BRI_Party_Dirty = 1.01 }
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Modify_Chaos; Completed execution."
+}
+
+BRI_Party_Modify_Chaos_Med = { # adds 2 chaos
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Modify_Chaos; Executing."
+	log = "[GetDateText]: [THIS.GetName]: BRI_Party_Modify_Chaos; Given ChaosChange: [?ChaosChange?2]"
+
+	custom_effect_tooltip = BRI_Party_Modify_Chaos_Med_tt
+
+	add_to_variable = { BRI_Chaos = ChaosChange?2 }
+	if = {
+		limit = { check_variable = { BRI_CurrentThreshold = -1 } }
+		clamp_variable = { var = BRI_Chaos min = 0 max = BRI_ChaosCap }
+	}
+	else = {
+		clamp_variable = { var = BRI_Chaos min = BRI_ChaosThreshold^BRI_CurrentThreshold max = BRI_ChaosCap }
+	}
+
+
+	add_to_variable = { BRI_Party_Dirty = 1.01 }
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Modify_Chaos; Completed execution."
+}
+
+BRI_Party_Modify_Chaos_Large = { # adds 3 chaos
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Modify_Chaos; Executing."
+	log = "[GetDateText]: [THIS.GetName]: BRI_Party_Modify_Chaos; Given ChaosChange: [?ChaosChange?3]"
+
+	custom_effect_tooltip = BRI_Party_Modify_Chaos_Large_tt
+
+	add_to_variable = { BRI_Chaos = ChaosChange?3 }
+	if = {
+		limit = { check_variable = { BRI_CurrentThreshold = -1 } }
+		clamp_variable = { var = BRI_Chaos min = 0 max = BRI_ChaosCap }
+	}
+	else = {
+		clamp_variable = { var = BRI_Chaos min = BRI_ChaosThreshold^BRI_CurrentThreshold max = BRI_ChaosCap }
+	}
+
+	add_to_variable = { BRI_Party_Dirty = 1.01 }
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Modify_Chaos; Completed execution."
+}
+
+## Modify the Weekly Chaos gain variable
+# Arguments: ChaosWeeklyChange
+BRI_Party_Modify_ChaosWeekly = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Modify_ChaosWeekly; Executing."
+	log = "[GetDateText]: [THIS.GetName]: BRI_Party_Modify_ChaosWeekly; Given ChaosWeeklyChange: [?ChaosWeeklyChange]"
+
+	custom_effect_tooltip = BRI_Party_Modify_ChaosWeekly_tt
+
+	add_to_variable = { BRI_ChaosWeekly = ChaosWeeklyChange }
+	clamp_variable = { var = BRI_ChaosWeekly min = 0 }
+	add_to_variable = { BRI_Party_Dirty = 1.01 }
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Modify_ChaosWeekly; Completed execution."
+}
+
+# Calculates weekly chaos change
+BRI_Party_Calc_ChaosWeeklyChange = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Calc_ChaosWeeklyChange; Executing."
+	
+	if = { # If ideologue influence is higher than prag influence
+		limit = {
+			check_variable = {
+				var = BRI_Party_InfluenceTotal
+				value = 50
+				compare = greater_than
+			}
+		}
+		
+		set_temp_variable = { ChaosWCTemp = BRI_Party_InfluenceTotal }
+		multiply_temp_variable = { ChaosWCTemp = -0.02 }
+		add_to_temp_variable = { ChaosWCTemp = 2.8 }
+		set_variable = { ChaosWeeklyChange = ChaosWCTemp }
+	}
+	
+	else_if = { # If prag influence is higher than ideologue influence
+		limit = {
+			check_variable = {
+				var = BRI_Party_InfluenceTotal
+				value = 50
+				compare = less_than
+			}
+		}
+		
+		set_temp_variable = { InfluencePrag = 100 }
+		subtract_from_temp_variable = { InfluencePrag = BRI_Party_InfluenceTotal }
+		set_temp_variable = { ChaosWCTemp = InfluencePrag }
+		multiply_temp_variable = { ChaosWCTemp = -0.02 }
+		add_to_temp_variable = { ChaosWCTemp = 2.8 }
+		set_variable = { ChaosWeeklyChange = ChaosWCTemp }
+	}
+	
+	else = { # If the split is 50/50
+		set_variable = { ChaosWeeklyChange = 1.7 }
+	}
+	set_variable = { BRI_ChaosWeekly = ChaosWeeklyChange }
+	log = "[GetDateText]: [Root.GetName]: BRI_Party_Calc_ChaosWeeklyChange; Completed execution."
+}
+
+BRI_Party_ChaosCap_Move = {
+	custom_effect_tooltip = BRI_Party_ChaosCap_Move_tt
+	set_variable = { BRI_ChaosCap = 100 }
+	add_to_variable = { BRI_Party_Dirty = 1.01 }
+}
+
+#########################
+# |=[ Group Effects ]=| #
+#########################
+
+## Ideologue effects
+# add 2.5 / regular
+
+BRI_Party_Peers_IncreaseIdeologues = { # Peers
+	custom_effect_tooltip = BRI_Party_PeersEffect_Ideologues_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^0 = Influence?2.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^0 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Garrison_IncreaseIdeologues = { # German Garrison
+	custom_effect_tooltip = BRI_Party_GarrisonEffect_Ideologues_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^1 = Influence?2.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^1 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Corporations_IncreaseIdeologues = { # German Corporations
+	custom_effect_tooltip = BRI_Party_CorporationsEffect_Ideologues_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^2 = Influence?2.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^2 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Party_IncreaseIdeologues = { # Party
+	custom_effect_tooltip = BRI_Party_PartyEffect_Ideologues_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^3 = Influence?2.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^3 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+
+# add 5 / med
+
+BRI_Party_Peers_IncreaseIdeologues_Med = { # Peers
+	custom_effect_tooltip = BRI_Party_PeersEffect_Ideologues_Med_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^0 = Influence?5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^0 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Garrison_IncreaseIdeologues_Med = { # German Garrison
+	custom_effect_tooltip = BRI_Party_GarrisonEffect_Ideologues_Med_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^1 = Influence?5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^1 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Corporations_IncreaseIdeologues_Med = { # German Corporations
+	custom_effect_tooltip = BRI_Party_CorporationsEffect_Ideologues_Med_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^2 = Influence?5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^2 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Party_IncreaseIdeologues_Med = { # Party
+	custom_effect_tooltip = BRI_Party_PartyEffect_Ideologues_Med_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^3 = Influence?5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^3 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+
+# add 7.5 / large
+
+BRI_Party_Peers_IncreaseIdeologues_Large = { # Peers
+	custom_effect_tooltip = BRI_Party_PeersEffect_Ideologues_Large_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^0 = Influence?7.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^0 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Garrison_IncreaseIdeologues_Large  = { # German Garrison
+	custom_effect_tooltip = BRI_Party_GarrisonEffect_Ideologues_Large_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^1 = Influence?7.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^1 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Corporations_IncreaseIdeologues_Large  = { # German Corporations
+	custom_effect_tooltip = BRI_Party_CorporationsEffect_Ideologues_Large_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^2 = Influence?7.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^2 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Party_IncreaseIdeologues_Large  = { # Party
+	custom_effect_tooltip = BRI_Party_PartyEffect_Ideologues_Large_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^3 = Influence?7.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^3 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+
+BRI_Party_Party_IncreaseIdeologues_tick = { # Party Tick
+	custom_effect_tooltip = BRI_Party_PartyEffect_Ideologues_tick_tt
+	add_to_variable = { BRI_Party_Party_CategoryInfluence_tick^3 = Influence?0.1 }
+}
+BRI_Party_Corporations_IncreaseIdeologues_tick = { # German Corporations Tick
+	custom_effect_tooltip = BRI_Party_CorporationsEffect_Ideologues_tick_tt
+	add_to_variable = { BRI_Party_Party_CategoryInfluence_tick^2 = Influence?0.1 }
+}
+
+## Pragmatist effects
+# add 2.5 / regular
+BRI_Party_Peers_IncreasePragmatists = { # Peers
+	custom_effect_tooltip = BRI_Party_PeersEffect_Pragmatists_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^0 = Influence?2.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^0 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Garrison_IncreasePragmatists = { # German Garrison
+	custom_effect_tooltip = BRI_Party_GarrisonEffect_Pragmatists_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^1 = Influence?2.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^1 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Corporations_IncreasePragmatists = { # German Corporations
+	custom_effect_tooltip = BRI_Party_CorporationsEffect_Pragmatists_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^2 = Influence?2.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^2 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Party_IncreasePragmatists = { # Party
+	custom_effect_tooltip = BRI_Party_PartyEffect_Pragmatists_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^3 = Influence?2.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^3 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+
+#add 5 / med
+
+BRI_Party_Peers_IncreasePragmatists_Med = { # Peers
+	custom_effect_tooltip = BRI_Party_PeersEffect_Pragmatists_Med_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^0 = Influence?5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^0 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Garrison_IncreasePragmatists_Med = { # German Garrison
+	custom_effect_tooltip = BRI_Party_GarrisonEffect_Pragmatists_Med_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^1 = Influence?5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^1 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Corporations_IncreasePragmatists_Med = { # German Corporations
+	custom_effect_tooltip = BRI_Party_CorporationsEffect_Pragmatists_Med_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^2 = Influence?5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^2 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Party_IncreasePragmatists_Med = { # Party
+	custom_effect_tooltip = BRI_Party_PartyEffect_Pragmatists_Med_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^3 = Influence?5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^3 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+
+#add 7.5 / large
+
+BRI_Party_Peers_IncreasePragmatists_Large = { # Peers
+	custom_effect_tooltip = BRI_Party_PeersEffect_Pragmatists_Large_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^0 = Influence?7.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^0 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Garrison_IncreasePragmatists_Large = { # German Garrison
+	custom_effect_tooltip = BRI_Party_GarrisonEffect_Pragmatists_Large_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^1 = Influence?7.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^1 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Corporations_IncreasePragmatists_Large = { # German Corporations
+	custom_effect_tooltip = BRI_Party_CorporationsEffect_Pragmatists_Large_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^2 = Influence?7.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^2 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+BRI_Party_Party_IncreasePragmatists_Large = { # Party
+	custom_effect_tooltip = BRI_Party_PartyEffect_Pragmatists_Large_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^3 = Influence?7.5 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^3 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+	BRI_Party_Evaluate_Var = yes
+}
+
+BRI_Party_Party_IncreasePragmatists_tick = { # Party Tick
+	custom_effect_tooltip = BRI_Party_PartyEffect_Pragmatists_tick_tt
+	subtract_from_variable = { BRI_Party_Party_CategoryInfluence_tick^3 = Influence?0.1 }
+}
+
+BRI_Party_Corporations_IncreasePragmatists_tick = { # German Corporations Tick
+	custom_effect_tooltip = BRI_Party_CorporationsEffect_Pragmatists_tick_tt
+	subtract_from_variable = { BRI_Party_Party_CategoryInfluence_tick^2 = Influence?0.1 }
+}
+
+## weekly ticks
+
+BRI_Party_Evaluate_Var = {
+	if = { # If prags are dominant
+		limit = {
+			check_variable = {
+				var = BRI_Party_InfluenceTotal
+				value = 45
+				compare = less_than
+			}
+		}
+		set_temp_variable = { BRI_Party_Tick_Calc = BRI_Party_InfluenceTotal }
+		multiply_temp_variable = { BRI_Party_Tick_Calc = -1 }
+		add_to_temp_variable = { BRI_Party_Tick_Calc = 100 }
+		if = {
+			limit = { has_country_flag = BRI_Enabled_Harder_Party_of_Contrasts }
+			divide_temp_variable = { BRI_Party_Tick_Calc = 85 }
+		}
+		else = {
+			divide_temp_variable = { BRI_Party_Tick_Calc = 130 }
+		}
+		set_variable = { BRI_Party_Tick_Var = BRI_Party_Tick_Calc }
+	}
+	else_if = { # If ideos are dominant
+		limit = {
+			check_variable = {
+				var = BRI_Party_InfluenceTotal
+				value = 55
+				compare = greater_than
+			}
+		}
+		set_temp_variable = { BRI_Party_Tick_Calc = BRI_Party_InfluenceTotal }
+		if = {
+			limit = { has_country_flag = BRI_Enabled_Harder_Party_of_Contrasts }
+			divide_temp_variable = { BRI_Party_Tick_Calc = 85 }
+		}
+		else = {
+			divide_temp_variable = { BRI_Party_Tick_Calc = 130 }
+		}
+		set_variable = { BRI_Party_Tick_Var = BRI_Party_Tick_Calc }
+	}
+	else = {
+		set_variable = { BRI_Party_Tick_Var = 0 }
+	}
+
+}
+
+BRI_Party_Influence_add = {
+	#custom_effect_tooltip = BRI_Party_Influence_add_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^0 = Influence?BRI_Party_Tick_Var }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^0 min = 0 max = 100 }
+	add_to_variable = { BRI_Party_CategoryInfluence^1 = Influence?BRI_Party_Tick_Var }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^1 min = 0 max = 100 }
+	add_to_variable = { BRI_Party_CategoryInfluence^2 = Influence?BRI_Party_Tick_Var }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^2 min = 0 max = 100 }
+	add_to_variable = { BRI_Party_CategoryInfluence^3 = Influence?BRI_Party_Tick_Var }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^3 min = 0 max = 100 }
+	BRI_Party_CalculateTotalInfluence = yes
+}
+
+BRI_Party_Influence_remove = {
+	#custom_effect_tooltip = BRI_Party_Influence_remove_tt
+	subtract_from_variable = { BRI_Party_CategoryInfluence^0 = Influence?BRI_Party_Tick_Var }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^0 min = 0 max = 100 }
+	subtract_from_variable = { BRI_Party_CategoryInfluence^1 = Influence?BRI_Party_Tick_Var }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^1 min = 0 max = 100 }
+	subtract_from_variable = { BRI_Party_CategoryInfluence^2 = Influence?BRI_Party_Tick_Var }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^2 min = 0 max = 100 }
+	subtract_from_variable = { BRI_Party_CategoryInfluence^3 = Influence?BRI_Party_Tick_Var }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^3 min = 0 max = 100 }
+	BRI_Party_CalculateTotalInfluence = yes
+}
+
+BRI_Party_Influence_tick = {
+	if = { # If ideologue influence is less than or equal to 45, this will add influence
+		limit = {
+			check_variable = {
+				var = BRI_Party_InfluenceTotal
+				value = 45
+				compare = less_than
+			}
+		}
+		BRI_Party_Evaluate_Var = yes
+		BRI_Party_Influence_add = yes
+	}
+	else_if = { # If ideologue influence is higher than or equal to 55, this will remove influence
+		limit = {
+			check_variable = {
+				var = BRI_Party_InfluenceTotal
+				value = 55
+				compare = greater_than
+			}
+		}
+		BRI_Party_Evaluate_Var = yes
+		BRI_Party_Influence_remove = yes
+	}
+
+	BRI_Party_CalculateTotalInfluence = yes
+	custom_effect_tooltip = BRI_Party_Influence_tick_tt
+}
+
+BRI_Party_Party_tick = {
+	custom_effect_tooltip = BRI_Party_Party_tick_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^3 = Influence?BRI_Party_CategoryInfluence_tick^3 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^3 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+}
+
+BRI_Corporations_tick = {
+	custom_effect_tooltip = BRI_Corporations_tick_tt
+	add_to_variable = { BRI_Party_CategoryInfluence^2 = Influence?BRI_Party_CategoryInfluence_tick^2 }
+	clamp_variable = { var = BRI_Party_CategoryInfluence^2 min = 0 max = 100 }
+
+	BRI_Party_CalculateTotalInfluence = yes
+}
+
+###########################
+# |=[ Victory Effects ]=| #
+###########################
+
+BRI_Party_Fountaine_Victory = {
+	ENG = {
+		load_focus_tree = ENG_Fountaine_100_days
+		#remove_country_leader_role = {
+		#	ideology = fascism_3_subtype
+		#}
+		#remove_country_leader_role = {
+		#	ideology = fascism_2_subtype
+		#}
+		#remove_country_leader_role = {
+		#	ideology = fascism_1_subtype
+		#}
+		ENG_Andrew_Fountaine = {
+			promote_character = { ideology = fascism_british_fascism_2_subtype }
+		}
+		BRI_workshop_temp_restart = yes
+		remove_ideas = { #Cain ministers
+			ENG_Andrew_Fountaine_hog
+			ENG_Gerard_Wallop_civil_war_for
+			ENG_Rab_Butler_eco
+			ENG_Rudolf_Wulf_civil_war_sec
+		}
+		add_ideas = {
+			#ministers#
+			ENG_Wed_Allen_hog
+			ENG_John_Bean_eco
+			ENG_James_Lonsdale_Bryans_for
+		}
+		ENG_Kim_Philby = {
+			remove_advisor_role = { slot = security_minister }
+			add_advisor_role = {
+				advisor = {
+					slot = security_minister
+					idea_token = ENG_Kim_Philby_Fountaine_sec
+					traits = {
+						security_minister
+						sec_spymaster
+					}
+					ledger = civilian
+					cost = -1
+					can_be_fired = no
+					ai_will_do = { factor = 0 }
+				}
+				activate = yes
+			}
+		}
+
+		ENG_Gerard_Wallop = {
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					ideology = fascism_3_subtype
+					expire = "1994.1.1.1"
+				}
+			}
+		}
+		set_party_name = {
+			ideology = fascism_3
+			name = ENG_fascism_3_party_fountaine
+			long_name = ENG_fascism_3_party_fountaine_long
+		}
+
+		ENG_john_bean = {
+			promote_character = fascism_2_subtype
+		}
+		set_party_name = {
+			ideology = fascism_2
+			name = ENG_fascism_2_party_fountaine
+			long_name = ENG_fascism_2_party_fountaine_long
+		}
+		add_popularity = {
+			ideology = fascism_2
+			popularity = -1
+		}
+		add_popularity = {
+			ideology = fascism_2
+			popularity = 0.05
+		}
+
+		ENG_Jeffrey_Hamm = {
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					ideology = fascism_1_subtype
+					expire = "1994.1.1.1"
+				}
+			}
+		}
+		set_party_name = {
+			ideology = fascism_1
+			name = ENG_fascism_1_party_fountaine
+			long_name = ENG_fascism_1_party_fountaine_long
+		}
+		add_popularity = {
+			ideology = fascism_1
+			popularity = -1
+		}
+		add_popularity = {
+			ideology = fascism_1
+			popularity = 0.05
+		}
+		set_variable = { fascism_1_var = token:ENG_fascism_1_fountaine }
+		set_variable = { fascism_2_var = token:ENG_fascism_2_fountaine }
+		set_variable = { fascism_3_var = token:ENG_fascism_3_fountaine }
+	}
+	every_country = {
+		limit = {
+			is_ai = no
+		}
+		news_event = {
+			id = WORLD_ENG.5
+		}
+	}
+}
+
+BRI_Party_Wallop_Victory = {
+	ENG = {
+		load_focus_tree = ENG_Wallop_100_days
+		ENG_Gerard_Wallop = {
+			promote_character = { ideology = fascism_british_fascism_1_subtype }
+		}
+		BRI_workshop_temp_restart = yes
+		remove_ideas = { #Cain ministers
+			ENG_Andrew_Fountaine_hog
+			ENG_Gerard_Wallop_civil_war_for
+			ENG_Rab_Butler_eco
+			ENG_Rudolf_Wulf_civil_war_sec
+		}
+		add_ideas = {
+			ENG_Generic_Vacant_hog
+			ENG_Generic_Vacant_eco
+			ENG_Generic_Vacant_for
+		}
+		ENG_Kim_Philby = {
+			remove_advisor_role = { slot = security_minister }
+			add_advisor_role = {
+				advisor = {
+					slot = security_minister
+					idea_token = ENG_Kim_Philby_Wallop_sec
+					traits = {
+						security_minister
+						sec_spymaster
+					}
+					ledger = civilian
+					cost = -1
+					can_be_fired = no
+					ai_will_do = { factor = 0 }
+				}
+				activate = yes
+			}
+		}
+	}
+	every_country = {
+		limit = {
+			is_ai = no
+		}
+		news_event = {
+			id = WORLD_ENG.6
+		}
+	}
+}
+
+BRI_Party_Rab_Victory = {
+	ENG = {
+		load_focus_tree = ENG_Butler_100_days
+		BRI_workshop_temp_restart = yes
+		remove_ideas = { #Cain ministers
+			ENG_Andrew_Fountaine_hog
+			ENG_Gerard_Wallop_civil_war_for
+			ENG_Rab_Butler_eco
+			ENG_Rudolf_Wulf_civil_war_sec
+		}
+		add_ideas = {
+			ENG_Reginald_Manningham_Buller_hog
+			ENG_Reginald_Maudling_for
+			ENG_Angus_Maude_eco
+			ENG_The_Three_Musketeers
+			ENG_Yesterdays_Man
+		}
+		ENG_Kim_Philby = {
+			remove_advisor_role = { slot = security_minister }
+			add_advisor_role = {
+				advisor = {
+					slot = security_minister
+					idea_token = ENG_Kim_Philby_Butler_sec
+					traits = {
+						security_minister
+						sec_spymaster
+					}
+					ledger = civilian
+					cost = -1
+					can_be_fired = no
+					ai_will_do = { factor = 0 }
+				}
+				activate = yes
+			}
+		}
+		set_politics = {
+			ruling_party = paternalism
+		}
+		promote_character = ENG_Rab_Butler
+	}
+	every_country = {
+		limit = {
+			is_ai = no
+		}
+		news_event = {
+			id = WORLD_ENG.4
+		}
+	}
+}
+
+BRI_Party_Jordan_Victory = {
+	ENG = {
+		set_country_flag = BRI_Jordan_Victory_flag
+		promote_character = ENG_Colin_Jordan
+		set_politics = {
+			ruling_party = national_socialism
+		}
+		hidden_effect = {
+			load_focus_tree = ZZZ_blank_focus
+			remove_ideas = { # Cain Ministers
+				ENG_Andrew_Fountaine_hog
+				ENG_Gerard_Wallop_civil_war_for
+				ENG_Rab_Butler_eco
+				ENG_Rudolf_Wulf_civil_war_sec
+			}
+			add_ideas = { # Colin Ministers
+				ENG_John_Tyndall_hog
+				ENG_Roland_Ian_Kerr_Ritchie_for
+				ENG_Denis_Pirie_eco
+				ENG_Thomas_Haller_Cooper_sec
+			}
+			add_popularity = {
+				ideology = national_socialism
+				popularity = 0.2
+			}
+			add_popularity = {
+				ideology = national_socialism_2
+				popularity = 0.1
+			}
+			BRI_Workshop_Disable = yes
+			TNO_Country_Closing_Screen_Show = yes
+		}
+	}
+}
+
+#############################
+# |=[ 1.3 MANN MECHANIC ]=| #
+#############################
+# Primary Designer: Anna
+# Primary Coder: Anna
+
+#	Base Effects
+#	Intel Effects
+#	Weaponry Effects
+#	Defeseviness Effects
+#	Invasion Effects
+#	Conclusion Effects
+#	Misc Effects
+
+########################
+# |=[ Base Effects ]=| #
+########################
+
+BRI_Mann_Activate = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Activate; Executing."
+
+	set_country_flag = TNO_BRI_Mann_GUI_Active
+	custom_effect_tooltip = BRI_Mann_Activate_tt
+
+	## Variables & Arrays
+
+	# Overall
+	set_variable = { BRI_Mann_Intel = 34.4 }
+	set_variable = { BRI_Mann_Intel_BiWeekly = -1.5 }
+	set_variable = { FEN.BRI_Mann_Intel = 12.5 } # Making it this way so it's a *bit* easier to integrate this mechanic for HMMLR when their content comes along. It'll have to be transported to their notifying event, but the structure of the code shall act this way.
+	set_variable = { FEN.BRI_Mann_Intel_BiWeekly = 3.1 } # Same applies here.
+	set_variable = { BRI_Mann_Weaponry = 84.3 }
+	set_variable = { BRI_Mann_Weaponry_BiWeekly = -2.4 }
+	set_variable = { BRI_Mann_EnduredAttacks = 0 }
+	set_variable = { BRI_Mann_NumOfLostStates = 0 }
+
+	# States
+	set_variable = { BRI_Mann_StateDefensivenessLoss = 15 }
+	set_variable = { BRI_Mann_StateSelected = token:BRI_Mann_StatePortErin }
+
+	# Difficulty System Integration
+	if = {		#50% harder
+		limit = { has_country_flag = BRI_Enabled_Harder_Mann }
+		add_to_variable = { BRI_Mann_Intel_BiWeekly = -0.75 }
+		add_to_variable = { FEN.BRI_Mann_Intel = 6.25 }
+		add_to_variable = { FEN.BRI_Mann_Intel_BiWeekly = 1.55 }
+		add_to_variable = { BRI_Mann_Weaponry_BiWeekly = -1.2 }
+		add_to_variable = { BRI_Mann_StateDefensivenessLoss = 7.5 }
+	}
+	else_if = {	#50% easier
+		limit = { has_country_flag = BRI_Enabled_Easier_Mann }
+		add_to_variable = { BRI_Mann_Intel_BiWeekly = 0.75 }
+		add_to_variable = { FEN.BRI_Mann_Intel = -6.25 }
+		add_to_variable = { FEN.BRI_Mann_Intel_BiWeekly = -1.55 }
+		add_to_variable = { BRI_Mann_Weaponry_BiWeekly = 1.2 }
+		add_to_variable = { BRI_Mann_StateDefensivenessLoss = -7.5 }
+	}
+
+	## Missions, Dummy Ideas & DynMods
+	hidden_effect = {
+		activate_mission = BRI_Mann_BiWeeklyTick
+		activate_mission = BRI_Mann_Invasion_Start
+		add_ideas = {
+			BRI_Mann_StatePortErin
+			BRI_Mann_StateDouglasAndOnchan
+			BRI_Mann_StateRamsey
+			BRI_Mann_StateKirkMichael
+			BRI_Mann_StatePointOfAyre
+		}
+		add_dynamic_modifier = { modifier = BRI_Mann_Intel_dynamic_modifier }
+		BRI_Mann_SetDynmod_Intel = yes
+		add_dynamic_modifier = { modifier = BRI_Mann_Weaponry_dynamic_modifier }
+		BRI_Mann_SetDynmod_Weaponry = yes
+	}
+
+	## Misc effects
+	1566 = { # Isle of Man
+		set_demilitarized_zone = yes
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Activate; Completed execution."
+}
+
+BRI_Mann_Disable = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Disable; Executing."
+
+	clr_country_flag = TNO_BRI_Mann_GUI_Active
+	clr_country_flag = BRI_Mann_WeaponryShown
+	clr_country_flag = BRI_Mann_IntelShown
+
+	for_each_loop = {
+		array = BRI_Mann_State
+		clear_variable = BRI_Mann_StateStatus@var:v
+		clear_variable = BRI_Mann_StateDefensiveness@var:v
+	}
+	clear_array = BRI_Mann_State
+	clear_array = BRI_Mann_Intel_DynModModifiers
+	clear_array = BRI_Mann_Weaponry_DynModModifiers
+	clear_variable = BRI_Mann_Intel
+	clear_variable = BRI_Mann_Intel_BiWeekly
+	clear_variable = FEN.BRI_Mann_Intel
+	clear_variable = FEN.BRI_Mann_Intel_BiWeekly
+	clear_variable = BRI_Mann_Weaponry
+	clear_variable = BRI_Mann_Weaponry_BiWeekly
+	clear_variable = BRI_Mann_StateDefensivenessLoss
+	clear_variable = BRI_Mann_StateSelected
+	clear_variable = BRI_Mann_EnduredAttacks
+	clear_variable = BRI_Mann_NumOfLostStates
+
+	hidden_effect = {
+		remove_mission = BRI_Mann_BiWeeklyTick
+		remove_mission = BRI_Mann_Invasion_Start
+		remove_mission = BRI_Mann_Invasion_End
+		if = {
+			limit = { has_dynamic_modifier = { modifier = BRI_Mann_Intel_dynamic_modifier } }
+			remove_dynamic_modifier = { modifier = BRI_Mann_Intel_dynamic_modifier }
+		}
+		if = {
+			limit = { has_dynamic_modifier = { modifier = BRI_Mann_Weaponry_dynamic_modifier } }
+			remove_dynamic_modifier = { modifier = BRI_Mann_Weaponry_dynamic_modifier }
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Disable; Completed execution."
+}
+
+#########################
+# |=[ Intel Effects ]=| #
+#########################
+
+BRI_Mann_Modify_Intel_ENG = {
+	if = {
+		limit = { check_variable = { IntelChange > 0 } }
+		custom_effect_tooltip = BRI_Mann_Modify_Intel_ENG_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BRI_Mann_Modify_Intel_ENG_sub_tt
+	}
+	add_to_variable = { BRI_Mann_Intel = IntelChange }
+	clamp_variable = { var = BRI_Mann_Intel min = 0 max = 100 }
+	BRI_Mann_SetDynmod_Intel = yes
+}
+
+BRI_Mann_Modify_Intel_ENG_BiWeekly = {
+	if = {
+		limit = { check_variable = { IntelBiWeeklyChange > 0 } }
+		custom_effect_tooltip = BRI_Mann_Modify_Intel_ENG_BiWeekly_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BRI_Mann_Modify_Intel_ENG_BiWeekly_sub_tt
+	}
+	add_to_variable = { BRI_Mann_Intel_BiWeekly = IntelBiWeeklyChange }
+	clamp_variable = { var = BRI_Mann_Intel_BiWeekly min = -100 max = 100 }
+
+	add_to_variable = { BRI_Mann_Dirty = 1 }
+}
+
+BRI_Mann_Modify_Intel_FEN = { # Will have to be handled differently once we give content to HMMLR but works for now
+	if = {
+		limit = { check_variable = { IntelChange > 0 } }
+		custom_effect_tooltip = BRI_Mann_Modify_Intel_FEN_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BRI_Mann_Modify_Intel_FEN_sub_tt
+	}
+	add_to_variable = { FEN.BRI_Mann_Intel = IntelChange }
+	clamp_variable = { var = FEN.BRI_Mann_Intel min = 0 max = 100 }
+	BRI_Mann_SetDynmod_Intel = yes
+
+	add_to_variable = { BRI_Mann_Dirty = 1 }
+}
+
+BRI_Mann_Modify_Intel_FEN_BiWeekly = {
+	if = {
+		limit = { check_variable = { IntelBiWeeklyChange > 0 } }
+		custom_effect_tooltip = BRI_Mann_Modify_Intel_FEN_BiWeekly_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BRI_Mann_Modify_Intel_FEN_BiWeekly_sub_tt
+	}
+	add_to_variable = { FEN.BRI_Mann_Intel_BiWeekly = IntelBiWeeklyChange }
+	clamp_variable = { var = FEN.BRI_Mann_Intel_BiWeekly min = -100 max = 100 }
+
+	add_to_variable = { BRI_Mann_Dirty = 1 }
+}
+
+BRI_Mann_SetDynmod_Intel = {
+	ENG = { # Will have to feature blocks for ENG and FEN in the future, for now only ENG.
+		clear_array = BRI_Mann_Intel_DynModModifiers
+		add_to_array = { BRI_Mann_Intel_DynModModifiers = 0 }
+		resize_array = { BRI_Mann_Intel_DynModModifiers = 3 }
+
+		## ^0 - max_command_power, ^1 - army_intel_factor, ^2 - political_power_gain
+		if = { # Very Bad
+			limit = {
+				check_variable = { BRI_Mann_Intel < 20 }
+			}
+			set_variable = { BRI_Mann_Intel_DynModModifiers^0 = -100 }
+			set_variable = { BRI_Mann_Intel_DynModModifiers^1 = -0.8 }
+			set_variable = { BRI_Mann_Intel_DynModModifiers^2 = -0.3 }
+		}
+		else_if = { # Bad
+			limit = {
+				check_variable = { BRI_Mann_Intel > 19 }
+				check_variable = { BRI_Mann_Intel < 40 }
+			}
+			set_variable = { BRI_Mann_Intel_DynModModifiers^0 = -50 }
+			set_variable = { BRI_Mann_Intel_DynModModifiers^1 = -0.4 }
+			set_variable = { BRI_Mann_Intel_DynModModifiers^2 = -0.2 }
+		}
+		else_if = { # Normal
+			limit = {
+				check_variable = { BRI_Mann_Intel > 39 }
+				check_variable = { BRI_Mann_Intel < 61 }
+			}
+			set_variable = { BRI_Mann_Intel_DynModModifiers^0 = 25 }
+			set_variable = { BRI_Mann_Intel_DynModModifiers^1 = 0 }
+			set_variable = { BRI_Mann_Intel_DynModModifiers^2 = 0.2 }
+		}
+		else_if = { # Good
+			limit = {
+				check_variable = { BRI_Mann_Intel > 59 }
+				check_variable = { BRI_Mann_Intel < 80 }
+			}
+			set_variable = { BRI_Mann_Intel_DynModModifiers^0 = 50 }
+			set_variable = { BRI_Mann_Intel_DynModModifiers^1 = 0.3 }
+			set_variable = { BRI_Mann_Intel_DynModModifiers^2 = 0.4 }
+		}
+		else_if = { # Very Good
+			limit = {
+				check_variable = { BRI_Mann_Intel > 79 }
+			}
+			set_variable = { BRI_Mann_Intel_DynModModifiers^0 = 75 }
+			set_variable = { BRI_Mann_Intel_DynModModifiers^1 = 0.6 }
+			set_variable = { BRI_Mann_Intel_DynModModifiers^2 = 0.5 }
+		}
+
+		force_update_dynamic_modifier = yes
+	}
+	add_to_variable = { BRI_Mann_Dirty = 1 }
+}
+
+############################
+# |=[ Weaponry Effects ]=| #
+############################
+
+BRI_Mann_Modify_Weaponry = {
+	if = {
+		limit = { check_variable = { WeaponryChange > 0 } }
+		custom_effect_tooltip = BRI_Mann_Modify_Weaponry_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BRI_Mann_Modify_Weaponry_sub_tt
+	}
+	add_to_variable = { BRI_Mann_Weaponry = WeaponryChange }
+	clamp_variable = { var = BRI_Mann_Weaponry min = 0 max = 100 }
+	BRI_Mann_SetDynmod_Weaponry = yes
+}
+
+BRI_Mann_Modify_Weaponry_BiWeekly = {
+	if = {
+		limit = { check_variable = { WeaponrBiWeeklyChange > 0 } }
+		custom_effect_tooltip = BRI_Mann_Modify_Weaponry_BiWeekly_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BRI_Mann_Modify_Weaponry_BiWeekly_sub_tt
+	}
+	add_to_variable = { BRI_Mann_Weaponry_BiWeekly = WeaponrBiWeeklyChange }
+	clamp_variable = { var = BRI_Mann_Weaponry_BiWeekly min = -100 max = 100 }
+	BRI_Mann_SetDynmod_Weaponry = yes
+}
+
+BRI_Mann_SetDynmod_Weaponry = {
+	clear_array = BRI_Mann_Weaponry_DynModModifiers
+	add_to_array = { BRI_Mann_Weaponry_DynModModifiers = 0 }
+	resize_array = { BRI_Mann_Weaponry_DynModModifiers = 3 }
+
+	## ^0 - military_costs_misc, ^1 - command_power_gain, ^2 - Added manually to FEN.BRI_Mann_Intel_BiWeekly each iteration.
+	if = { # Very Good
+		limit = {
+			check_variable = { BRI_Mann_Weaponry < 20 }
+		}
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^0 = 0 }
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^1 = 0.4 }
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^2 = -2 }
+	}
+	else_if = { # Good
+		limit = {
+			check_variable = { BRI_Mann_Weaponry > 19 }
+			check_variable = { BRI_Mann_Weaponry < 40 }
+		}
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^0 = 0.5 }
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^1 = 0.2 }
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^2 = -1 }
+	}
+	else_if = { # Normal
+		limit = {
+			check_variable = { BRI_Mann_Weaponry > 39 }
+			check_variable = { BRI_Mann_Weaponry < 61 }
+		}
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^0 = 0.1 }
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^1 = -0.1 }
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^2 = 0 }
+	}
+	else_if = { # Bad
+		limit = {
+			check_variable = { BRI_Mann_Weaponry > 59 }
+			check_variable = { BRI_Mann_Weaponry < 80 }
+		}
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^0 = 0.2 }
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^1 = -0.3 }
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^2 = 1 }
+	}
+	else_if = { # Very Bad
+		limit = {
+			check_variable = { BRI_Mann_Weaponry > 79 }
+		}
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^0 = 0.4 }
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^1 = -0.4 }
+		set_variable = { BRI_Mann_Weaponry_DynModModifiers^2 = 2 }
+	}
+
+	force_update_dynamic_modifier = yes
+
+	add_to_variable = { BRI_Mann_Dirty = 1 }
+}
+
+################################
+# |=[ Defensiveness Effects ( Defenseviness lol nice spelling Anna - frost )  ]=| #
+################################
+
+BRI_Mann_Modify_Defenseviness = {
+	custom_effect_tooltip = BRI_Mann_Modify_Defenseviness_tt
+	add_to_variable = { BRI_Mann_StateDefensiveness@var:TargetState = D_Change }
+	clamp_variable = { var = BRI_Mann_StateDefensiveness@var:TargetState min = 0 max = 100 }
+
+	add_to_variable = { BRI_Mann_Dirty = 1 }
+}
+
+BRI_Mann_Modify_DefensevinessLoss = { # Will have to depend on variables from HMMLR's side of things in the future.
+	if = {
+		limit = { check_variable = { DLoss_Change > 0 } }
+		custom_effect_tooltip = BRI_Mann_Modify_DefensevinessLoss_add_tt
+	}
+	else = {
+		custom_effect_tooltip = BRI_Mann_Modify_DefensevinessLoss_sub_tt
+	}
+	add_to_variable = { BRI_Mann_StateDefensivenessLoss = DLoss_Change }
+	clamp_variable = { var = BRI_Mann_StateDefensivenessLoss min = 5 }
+
+	add_to_variable = { BRI_Mann_Dirty = 1 }
+}
+
+############################
+# |=[ Invasion Effects ]=| #
+############################
+
+BRI_Mann_Invasion_Start = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Invasion_Start; Executing."
+
+	if = {
+		limit = { check_variable = { BRI_Mann_NumOfLostStates > 2 } }
+		if = {
+			limit = { check_variable = { BRI_Mann_EnduredAttacks < 4 } }
+			BRI_Mann_Conclusion_ShamefulEvacuation = yes
+		}
+		else = {
+			BRI_Mann_Conclusion_NormalEvacuation = yes
+		}
+	}
+	else = {
+		if = {
+			limit = { check_variable = { BRI_Mann_EnduredAttacks = 7 } }
+			BRI_Mann_Conclusion_ProudEvacuation = yes
+		}
+		else = {
+			custom_effect_tooltip = BRI_Mann_Invasion_Start_tt
+			for_each_loop = {
+				array = BRI_Mann_State
+				add_to_temp_array = { defence = BRI_Mann_StateDefensiveness@var:v }
+			}
+			if = {
+				limit = { check_variable = { ENG.BRI_Mann_Intel > FEN.BRI_Mann_Intel } }
+				find_highest_in_array = { array = defence index = target_i }
+			}
+			else = {
+				for_each_loop = {
+					array = BRI_Mann_State
+					if = {
+						limit = { NOT = { check_variable = { BRI_Mann_StateStatus@var:v = token:BRI_Mann_StateNormal } } }
+						set_variable = { defence^i = 101 }
+					}
+				}
+				find_lowest_in_array = { array = defence index = target_i }
+			}
+			hidden_effect = {
+				set_temp_variable = { TargetState = BRI_Mann_State^target_i }
+				set_temp_variable = { TargetStatus = token:BRI_Mann_StateTargeted }
+				BRI_Mann_Change_StateStatus = yes
+			}
+		}
+	}
+
+	add_to_variable = { BRI_Mann_Dirty = 1 }
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Invasion_Start; Completed execution."
+}
+
+BRI_Mann_Invasion_End = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Invasion_End; Executing."
+
+	if = {
+		limit = { check_variable = { BRI_Mann_EnduredAttacks < 2 } }
+		set_temp_variable = { strength = 15 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Mann_EnduredAttacks > 1 } check_variable = { BRI_Mann_EnduredAttacks < 4 } }
+		set_temp_variable = { strength = 25 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Mann_EnduredAttacks = 4 } }
+		set_temp_variable = { strength = 35 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Mann_EnduredAttacks = 5 } }
+		set_temp_variable = { strength = 45 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Mann_EnduredAttacks = 6 } }
+		set_temp_variable = { strength = 55 }
+	}
+
+	if = {
+		limit = { check_variable = { BRI_Mann_NumOfLostStates > 0 } }
+		for_loop_effect = {
+			end = BRI_Mann_NumOfLostStates
+			add_to_temp_variable = { strength = 5 }
+		}
+	}
+
+	if = {
+		limit = { check_variable = { ENG.BRI_Mann_Intel > FEN.BRI_Mann_Intel } }
+		add_to_temp_variable = { strength = 10 }
+	}
+
+	add_to_variable = { BRI_Mann_EnduredAttacks = 1 }
+
+	for_each_loop = {
+		array = BRI_Mann_State
+		if = {
+			limit = { check_variable = { BRI_Mann_StateStatus@var:v = token:BRI_Mann_StateTargeted } }
+			if = {
+				limit = { check_variable = { strength > BRI_Mann_StateDefensiveness@var:v } }
+				BRI_Mann_Invasion_Lost = yes
+			}
+			else = {
+				BRI_Mann_Invasion_Won = yes
+			}
+		}
+	}
+
+	hidden_effect = { activate_mission = BRI_Mann_Invasion_Start }
+
+	add_to_variable = { BRI_Mann_Dirty = 1 }
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Invasion_End; Completed execution."
+}
+
+BRI_Mann_Invasion_Lost = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Invasion_Lost; Executing."
+
+	custom_effect_tooltip = BRI_Mann_Invasion_Lost_tt
+
+	set_variable = { BRI_Mann_StateDefensiveness@var:v = 0 }
+
+	set_temp_variable = { TargetState = v }
+	set_temp_variable = { TargetStatus = token:BRI_Mann_StateOccupied }
+	BRI_Mann_Change_StateStatus = yes
+
+	if = {
+		limit = { check_variable = { BRI_Mann_Weaponry > 59 } }
+		set_temp_variable = { WeaponryChange = -40 }
+		BRI_Mann_Modify_Weaponry = yes
+	}
+
+	add_to_variable = { BRI_Mann_NumOfLostStates = 1 }
+
+	set_temp_variable = { IntelChange = 15 }
+	BRI_Mann_Modify_Intel_ENG = yes
+	set_temp_variable = { IntelBiWeeklyChange = 1 }
+	BRI_Mann_Modify_Intel_ENG_BiWeekly = yes
+	set_temp_variable = { DLoss_Change = 10 }
+	BRI_Mann_Modify_DefensevinessLoss = yes
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Invasion_Lost; Completed execution."
+}
+
+BRI_Mann_Invasion_Won = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Invasion_Won; Executing."
+
+	custom_effect_tooltip = BRI_Mann_Invasion_Won_tt
+
+	set_temp_variable = { TargetState = v }
+	set_temp_variable = { D_Change = BRI_Mann_StateDefensivenessLoss }
+	multiply_temp_variable = { D_Change = -1 }
+	BRI_Mann_Modify_Defenseviness = yes
+
+	set_temp_variable = { TargetState = v }
+	set_temp_variable = { TargetStatus = token:BRI_Mann_StateNormal }
+	BRI_Mann_Change_StateStatus = yes
+
+	if = {
+		limit = { check_variable = { BRI_Mann_EnduredAttacks = 1 } }
+		country_event = mann.5
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Mann_EnduredAttacks = 3 } }
+		country_event = mann.6
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Mann_EnduredAttacks = 5 } }
+		country_event = mann.7
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Mann_EnduredAttacks = 7 } }
+		country_event = mann.8
+	}
+
+	set_temp_variable = { IntelChange = -15 }
+	BRI_Mann_Modify_Intel_ENG = yes
+	set_temp_variable = { IntelBiWeeklyChange = -1 }
+	BRI_Mann_Modify_Intel_ENG_BiWeekly = yes
+	set_temp_variable = { IntelBiWeeklyChange = 1.5 }
+	BRI_Mann_Modify_Intel_FEN_BiWeekly = yes
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Invasion_Won; Completed execution."
+}
+
+##############################
+# |=[ Conclusion Effects ]=| #
+##############################
+
+BRI_Mann_Conclusion_ShamefulEvacuation = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Conclusion_ShamefulEvacuation; Executing."
+
+	custom_effect_tooltip = BRI_Mann_Conclusion_ShamefulEvacuation_tt
+	country_event = mann.2
+	hidden_effect = {
+		FEN = {
+			swap_ideas = {
+				remove_idea = ENG_Union_Supply_Line_Blockaded
+				add_idea = ENG_Union_Supply_Line_Open
+			}
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 8000
+			}
+			add_equipment_to_stockpile = {
+				type = support_equipment
+				amount = 1200
+			}
+			add_equipment_to_stockpile = {
+				type = artillery_equipment_3
+				amount = 800
+			}
+			transfer_state = 1566
+		}
+	}
+	BRI_Mann_Disable = yes
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Conclusion_ShamefulEvacuation; Completed execution."
+}
+
+BRI_Mann_Conclusion_NormalEvacuation = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Conclusion_NormalEvacuation; Executing."
+
+	custom_effect_tooltip = BRI_Mann_Conclusion_NormalEvacuation_tt
+	country_event = mann.3
+	hidden_effect = {
+		FEN = {
+			swap_ideas = {
+				remove_idea = ENG_Union_Supply_Line_Blockaded
+				add_idea = ENG_Union_Supply_Line_Open
+			}
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 4000
+			}
+			add_equipment_to_stockpile = {
+				type = support_equipment
+				amount = 600
+			}
+			add_equipment_to_stockpile = {
+				type = artillery_equipment_3
+				amount = 400
+			}
+			transfer_state = 1566
+		}
+	}
+	BRI_Mann_Disable = yes
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Conclusion_NormalEvacuation; Completed execution."
+}
+
+BRI_Mann_Conclusion_ProudEvacuation = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Conclusion_ProudEvacuation; Executing."
+
+	custom_effect_tooltip = BRI_Mann_Conclusion_ProudEvacuation_tt
+	country_event = mann.4
+	hidden_effect = {
+		FEN = {
+			swap_ideas = {
+				remove_idea = ENG_Union_Supply_Line_Blockaded
+				add_idea = ENG_Union_Supply_Line_Open
+			}
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 2000
+			}
+			add_equipment_to_stockpile = {
+				type = support_equipment
+				amount = 300
+			}
+			add_equipment_to_stockpile = {
+				type = artillery_equipment_3
+				amount = 200
+			}
+			transfer_state = 1566
+		}
+	}
+	BRI_Mann_Disable = yes
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Mann_Conclusion_ProudEvacuation; Completed execution."
+}
+
+########################
+# |=[ Misc Effects ]=| #
+########################
+
+BRI_Mann_Change_StateStatus = {
+	custom_effect_tooltip = BRI_Mann_Change_StateStatus_tt
+	set_variable = { BRI_Mann_StateStatus@var:TargetState = TargetStatus }
+	add_to_variable = { BRI_Mann_Dirty = 1 }
+}
+
+#################################
+# |=[ 1.4 MIDNIGHT MECHANIC ]=| #
+#################################
+# Primary Designer: Anna
+# Primary Coder: Anna
+
+#	Base Effects
+#	Confidence Effects
+#	Acclimation Effects
+#	Exhaustion Effects
+#	Mission Effects
+
+########################
+# |=[ Base Effects ]=| #
+########################
+
+#	BRI_Midnight_CollectData
+#	BRI_Midnight_Activate
+#	BRI_Midnight_Disable
+
+# Collect data from pre-SGU mechanics to set up values in this mechanic
+BRI_Midnight_CollectData = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_CollectData; Executing."
+
+	custom_effect_tooltip = BRI_Midnight_CollectData_tt
+
+	if = {
+		limit = { tag = ENG }
+		if = {
+			limit = { is_ai = no }
+			## Confidence
+			set_variable = { BRI_Midnight_ConfidenceScore = 3 }
+
+			# AEG / Volkswagen Dominant
+			if = {
+				limit = {
+					OR = {
+						check_variable = { BRI_Workshop_DominantCorpo = 4 }
+						check_variable = { BRI_Workshop_DominantCorpo = 5 }
+					}
+				}
+				add_to_variable = { BRI_Midnight_AcclimationGainScore = 1 }
+			}
+
+			## Exhaustion
+			set_variable = { BRI_Midnight_ExhaustionScore = 0 }
+
+			# Home Secretary Effectiveness
+			if = {
+				limit = {
+					check_variable = { BRI_Cabinet_MinisterEffectiveness@var:BRI_Cabinet_MinisterAndrewFountaine > 0.19 }
+					check_variable = { BRI_Cabinet_MinisterEffectiveness@var:BRI_Cabinet_MinisterAndrewFountaine < 0.60 }
+				}
+				add_to_variable = { BRI_Midnight_ExhaustionScore = 1 }
+			}
+			else_if = {
+				limit = { check_variable = { BRI_Cabinet_MinisterEffectiveness@var:BRI_Cabinet_MinisterAndrewFountaine > 0.59 } }
+				add_to_variable = { BRI_Midnight_ExhaustionScore = 2 }
+			}
+
+			# Chaos
+			if = {
+				limit = {
+					check_variable = { BRI_Chaos > 19 }
+					check_variable = { BRI_Chaos < 60 }
+				}
+				add_to_variable = { BRI_Midnight_ExhaustionScore = 1 }
+			}
+			else_if = {
+				limit = { check_variable = { BRI_Chaos > 60 } }
+				add_to_variable = { BRI_Midnight_ExhaustionScore = 2 }
+			}
+
+			# Deutsche Bank / Reichswerke Dominant
+			if = {
+				limit = {
+					OR = {
+						check_variable = { BRI_Workshop_DominantCorpo = 1 }
+						check_variable = { BRI_Workshop_DominantCorpo = 2 }
+					}
+				}
+				add_to_variable = { BRI_Midnight_ExhaustionScore = 1 }
+			}
+
+			# Projects
+			# FIXME: Temp.
+
+			### Exhaustion Gain
+			set_variable = { BRI_Midnight_ExhaustionGainScore = 0 }
+
+			# Foreign Secretary Effectiveness
+			if = {
+				limit = {
+					check_variable = { BRI_Cabinet_MinisterEffectiveness@var:BRI_Cabinet_MinisterRonaldNallCain > 0.19 }
+					check_variable = { BRI_Cabinet_MinisterEffectiveness@var:BRI_Cabinet_MinisterRonaldNallCain < 0.60 }
+				}
+				add_to_variable = { BRI_Midnight_ExhaustionGainScore = 1 }
+			}
+			else_if = {
+				limit = { check_variable = { BRI_Cabinet_MinisterEffectiveness@var:BRI_Cabinet_MinisterRonaldNallCain > 0.59 } }
+				add_to_variable = { BRI_Midnight_ExhaustionGainScore = 2 }
+			}
+
+			# Overall Loyalty of All Ministers
+			set_temp_variable = { overall_loyalty = 0 }
+			for_each_loop = {
+				array = BRI_Cabinet_Minister
+				add_to_temp_variable = { overall_loyalty = BRI_Cabinet_MinisterLoyalty@var:v }
+			}
+			divide_temp_variable = { overall_loyalty = BRI_Cabinet_Minister^num }
+			if = {
+				limit = {
+					check_variable = { overall_loyalty > 0.19 }
+					check_variable = { overall_loyalty < 0.60 }
+				}
+				add_to_variable = { BRI_Midnight_ExhaustionGainScore = 1 }
+			}
+			else_if = {
+				limit = { check_variable = { overall_loyalty > 0.59 } }
+				add_to_variable = { BRI_Midnight_ExhaustionGainScore = 2 }
+			}
+		}
+		else = {
+			set_variable = { BRI_Midnight_ConfidenceScore = 2 }
+			set_variable = { BRI_Midnight_AcclimationScore = 3 }
+			set_variable = { BRI_Midnight_AcclimationGainScore = 1 }
+			set_variable = { BRI_Midnight_ExhaustionScore = 2 }
+			set_variable = { BRI_Midnight_ExhaustionGainScore = 2 }
+		}
+	}
+	else = {
+		if = {
+			limit = { is_ai = no }
+			# FIXME: Post-Demo content.
+		}
+		else = {
+			set_variable = { BRI_Midnight_ConfidenceScore = 0 }
+			set_variable = { BRI_Midnight_AcclimationScore = 0 }
+			set_variable = { BRI_Midnight_AcclimationGainScore = 0 }
+			set_variable = { BRI_Midnight_ExhaustionScore = 0 }
+			set_variable = { BRI_Midnight_ExhaustionGainScore = 0 }
+		}
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_CollectData; BRI_Midnight_ConfidenceScore = [?BRI_Midnight_ConfidenceScore]."
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_CollectData; BRI_Midnight_AcclimationScore = [?BRI_Midnight_AcclimationScore]."
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_CollectData; BRI_Midnight_AcclimationGainScore = [?BRI_Midnight_AcclimationGainScore]."
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_CollectData; BRI_Midnight_ExhaustionScore = [?BRI_Midnight_ExhaustionScore]."
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_CollectData; BRI_Midnight_ExhaustionGainScore = [?BRI_Midnight_ExhaustionGainScore]."
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_CollectData; Completed execution."
+}
+
+# Activating the mechanic
+BRI_Midnight_Activate = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_Activate; Executing."
+
+	custom_effect_tooltip = BRI_Midnight_Activate_tt
+	set_country_flag = BRI_Midnight_Active
+
+	### Setting up overall variables based on values from the BRI_Midnight_CollectData effect.
+	## Confidence Setup
+	if = { # For ENG, varies
+		limit = { tag = ENG }
+		if = { # Very Bad Result
+			limit = { check_variable = { BRI_Midnight_ConfidenceScore?0 = 0 } }
+			set_variable = { BRI_Midnight_Confidence = 10 }
+		}
+		else_if = { # Bad Result
+			limit = { check_variable = { BRI_Midnight_ConfidenceScore?0 = 1 } }
+			set_variable = { BRI_Midnight_Confidence = 20 }
+		}
+		else_if = { # Normal Result
+			limit = { check_variable = { BRI_Midnight_ConfidenceScore?0 = 2 } }
+			set_variable = { BRI_Midnight_Confidence = 35 }
+		}
+		else_if = { # Good Result
+			limit = { check_variable = { BRI_Midnight_ConfidenceScore?0 = 3 } }
+			set_variable = { BRI_Midnight_Confidence = 50 }
+		}
+		else_if = { # Very Good Result
+			limit = { check_variable = { BRI_Midnight_ConfidenceScore?0 > 3 } }
+			set_variable = { BRI_Midnight_Confidence = 60 }
+		}
+	}
+	else = { # For FEN, set amount
+		set_variable = { BRI_Midnight_Confidence = 75 }
+	}
+
+	## Acclimation Setup
+	if = { # For ENG, varies
+		limit = { tag = ENG }
+		if = { # Very Bad Result
+			limit = { check_variable = { BRI_Midnight_AcclimationScore?0 < 2 } }
+			set_variable = { BRI_Midnight_Acclimation = 20 }
+		}
+		else_if = { # Bad Result
+			limit = { check_variable = { BRI_Midnight_AcclimationScore?0 > 1 } check_variable = { BRI_Midnight_AcclimationScore?0 < 3 } }
+			set_variable = { BRI_Midnight_Acclimation = 30 }
+		}
+		else_if = { # Normal Result
+			limit = { check_variable = { BRI_Midnight_AcclimationScore?0 = 3 } }
+			set_variable = { BRI_Midnight_Acclimation = 40 }
+		}
+		else_if = { # Good Result
+			limit = { check_variable = { BRI_Midnight_AcclimationScore?0 > 3 } check_variable = { BRI_Midnight_AcclimationScore?0 < 5 } }
+			set_variable = { BRI_Midnight_Acclimation = 60 }
+		}
+		else_if = { # Very Good Result
+			limit = { check_variable = { BRI_Midnight_AcclimationScore?0 > 4 } }
+			set_variable = { BRI_Midnight_Acclimation = 80 }
+		}
+	}
+	else = { # For FEN, set amount
+		set_variable = { BRI_Midnight_Acclimation = 70 }
+	}
+
+	## Acclimation Gain Setup
+	if = { # For ENG, varies
+		limit = { tag = ENG }
+		if = { # Bad Result
+			limit = { check_variable = { BRI_Midnight_AcclimationGainScore?0 = 0 } }
+			set_variable = { BRI_Midnight_AcclimationGain = 2 }
+		}
+		else_if = { # Normal Result
+			limit = { check_variable = { BRI_Midnight_AcclimationGainScore?0 = 1 } }
+			set_variable = { BRI_Midnight_AcclimationGain = 4 }
+		}
+		else_if = { # Good Result
+			limit = { check_variable = { BRI_Midnight_AcclimationGainScore?0 > 1 } }
+			set_variable = { BRI_Midnight_AcclimationGain = 6 }
+		}
+	}
+	else = { # For FEN, set amount
+		set_variable = { BRI_Midnight_AcclimationGain = 6 }
+	}
+
+	## Exhaustion Setup
+	if = { # For ENG, varies
+		limit = { tag = ENG }
+		if = { # Very Bad Result
+			limit = { check_variable = { BRI_Midnight_ExhaustionScore?0 = 0 } }
+			set_variable = { BRI_Midnight_Exhaustion = 60 }
+		}
+		else_if = { # Bad Result
+			limit = { check_variable = { BRI_Midnight_ExhaustionScore?0 = 1 } }
+			set_variable = { BRI_Midnight_Exhaustion = 50 }
+		}
+		else_if = { # Bad Result
+			limit = { check_variable = { BRI_Midnight_ExhaustionScore?0 = 2 } }
+			set_variable = { BRI_Midnight_Exhaustion = 40 }
+		}
+		else_if = { # Good Result
+			limit = { check_variable = { BRI_Midnight_ExhaustionScore?0 > 2 } check_variable = { BRI_Midnight_ExhaustionScore?0 < 5 } }
+			set_variable = { BRI_Midnight_Exhaustion = 20 }
+		}
+		else_if = { # Very Good Result
+			limit = { check_variable = { BRI_Midnight_ExhaustionScore?0 = 5 } }
+			set_variable = { BRI_Midnight_Exhaustion = 10 }
+		}
+	}
+	else = { # For FEN, set amount
+		set_variable = { BRI_Midnight_Exhaustion = 10 }
+	}
+
+	## Exhaustion Gain Setup
+	if = { # For ENG, varies
+		limit = { tag = ENG }
+		if = { # Very Bad Result
+			limit = { check_variable = { BRI_Midnight_ExhaustionGainScore?0 = 0 } }
+			set_variable = { BRI_Midnight_ExhaustionGain = 4 }
+		}
+		else_if = { # Bad Result
+			limit = { check_variable = { BRI_Midnight_ExhaustionGainScore?0 = 1 } }
+			set_variable = { BRI_Midnight_ExhaustionGain = 2 }
+		}
+		else_if = { # Normal Result
+			limit = { check_variable = { BRI_Midnight_ExhaustionGainScore?0 = 2 } }
+			set_variable = { BRI_Midnight_ExhaustionGain = 1 }
+		}
+		else_if = { # Good Result
+			limit = { check_variable = { BRI_Midnight_ExhaustionGainScore?0 = 3 } }
+			set_variable = { BRI_Midnight_ExhaustionGain = 0.5 }
+		}
+		else_if = { # Very Good Result
+			limit = { check_variable = { BRI_Midnight_ExhaustionGainScore?0 = 4 } }
+			set_variable = { BRI_Midnight_ExhaustionGain = 0.25 }
+		}
+	}
+	else = { # For FEN, set amount
+		set_variable = { BRI_Midnight_ExhaustionGain = 0.25 }
+	}
+
+	clear_variable = BRI_Midnight_ConfidenceScore
+	clear_variable = BRI_Midnight_AcclimationScore
+	clear_variable = BRI_Midnight_AcclimationGainScore
+	clear_variable = BRI_Midnight_ExhaustionScore
+	clear_variable = BRI_Midnight_ExhaustionGainScore
+
+	## Setting up mission
+	activate_mission = BRI_Midnight_MissionBiWeeklyTick
+	## Start holding missions for starting cities
+	if = {
+		limit = { tag = ENG }
+		activate_mission = BRI_Midnight_Mission_Hold_Edinburgh
+		activate_mission = BRI_Midnight_Mission_Hold_Leeds
+		activate_mission = BRI_Midnight_Mission_Hold_London
+	}
+	else = {
+		activate_mission = BRI_Midnight_Mission_Hold_Norwich
+		activate_mission = BRI_Midnight_Mission_Hold_Birmingham
+		activate_mission = BRI_Midnight_Mission_Hold_Cardiff
+		activate_mission = BRI_Midnight_Mission_Hold_Liverpool
+		activate_mission = BRI_Midnight_Mission_Hold_York
+		activate_mission = BRI_Midnight_Mission_Hold_Glasgow
+	}
+
+	hidden_effect = {
+		add_dynamic_modifier = { modifier = BRI_Midnight_Base_dynamic_modifier }
+
+		add_to_array = { BRI_Midnight_ConfidenceEffects = 0 }
+		resize_array = { BRI_Midnight_ConfidenceEffects = 5 }
+		add_dynamic_modifier = { modifier = BRI_Midnight_Confidence_dynamic_modifier }
+		BRI_Midnight_ConfidenceEffects = yes
+
+		add_to_array = { BRI_Midnight_AcclimationEffects = 0 }
+		resize_array = { BRI_Midnight_AcclimationEffects = 5 }
+		add_dynamic_modifier = { modifier = BRI_Midnight_Acclimation_dynamic_modifier }
+		BRI_Midnight_AcclimationEffects = yes
+
+		add_to_array = { BRI_Midnight_ExhaustionEffects = 0 }
+		resize_array = { BRI_Midnight_ExhaustionEffects = 5 }
+		add_dynamic_modifier = { modifier = BRI_Midnight_Exhaustion_dynamic_modifier }
+		BRI_Midnight_ExhaustionEffects = yes
+	}
+
+	set_country_flag = BRI_Midnight_GenericShown
+
+	set_variable = { BRI_Midnight_DevastatedStatesNum = 0 }
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_Activate; Completed execution."
+}
+
+# Disabling the mechanic
+BRI_Midnight_Disable = {
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_Disable; Executing."
+
+	custom_effect_tooltip = BRI_Midnight_Disable_tt
+	clr_country_flag = BRI_Midnight_Active
+
+	clear_array = BRI_Midnight_ConfidenceEffects
+	clear_array = BRI_Midnight_AcclimationEffects
+	clear_array = BRI_Midnight_ExhaustionEffects
+	clear_variable = BRI_Midnight_Confidence
+	clear_variable = BRI_Midnight_Acclimation
+	clear_variable = BRI_Midnight_AcclimationGain
+	clear_variable = BRI_Midnight_Exhaustion
+	clear_variable = BRI_Midnight_ExhaustionGain
+	clear_variable = BRI_Midnight_SurrenderProgressPast
+
+	remove_dynamic_modifier = { modifier = BRI_Midnight_Base_dynamic_modifier }
+	remove_dynamic_modifier = { modifier = BRI_Midnight_Confidence_dynamic_modifier }
+	remove_dynamic_modifier = { modifier = BRI_Midnight_Acclimation_dynamic_modifier }
+	remove_dynamic_modifier = { modifier = BRI_Midnight_Exhaustion_dynamic_modifier }
+
+	clr_country_flag = BRI_Midnight_GenericShown
+	clr_country_flag = BRI_Midnight_Fortifications_Shown
+
+	log = "[GetDateText]: [Root.GetName]: BRI_Midnight_Disable; Completed execution."
+}
+
+##############################
+# |=[ Confidence Effects ]=| #
+##############################
+
+#	BRI_Midnight_ConfidenceEffects
+#	BRI_Midnight_ConfidenceAdd
+
+BRI_Midnight_ConfidenceEffects = {
+	# ^0 - army_attack_factor, ^1 - army_morale_factor, ^2 - org_loss_when_moving, ^3 - supply_consumption_factor, ^4 - BRI_Midnight_ExhaustionGain
+
+	if = {
+		limit = { check_variable = { BRI_Midnight_Confidence < 20 } }
+		set_variable = { BRI_Midnight_ConfidenceEffects^0 = -0.3 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^1 = -0.3 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^2 = 0.15 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^3 = -0.15 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^4 = -2 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Midnight_Confidence > 19 } check_variable = { BRI_Midnight_Confidence < 40 } }
+		set_variable = { BRI_Midnight_ConfidenceEffects^0 = -0.15 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^1 = -0.15 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^2 = 0.10 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^3 = -0.10 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^4 = -1 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Midnight_Confidence > 39 } check_variable = { BRI_Midnight_Confidence < 60 } }
+		set_variable = { BRI_Midnight_ConfidenceEffects^0 = 0.10 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^1 = 0.10 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^2 = -0.10 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^3 = 0.10 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^4 = 1 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Midnight_Confidence > 59 } check_variable = { BRI_Midnight_Confidence < 80 } }
+		set_variable = { BRI_Midnight_ConfidenceEffects^0 = 0.20 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^1 = 0.20 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^2 = -0.20 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^3 = 0.20 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^4 = 1 }
+	}
+	else = {
+		set_variable = { BRI_Midnight_ConfidenceEffects^0 = 0.30 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^1 = 0.30 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^2 = -0.30 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^3 = 0.30 }
+		set_variable = { BRI_Midnight_ConfidenceEffects^4 = 2 }
+	}
+
+	force_update_dynamic_modifier = yes
+	add_to_variable = { BRI_Midnight_Dirty = 1 }
+}
+
+BRI_Midnight_ConfidenceAdd = {
+	custom_effect_tooltip = BRI_Midnight_ConfidenceAdd_tt
+	add_to_variable = { BRI_Midnight_Confidence = Confidence }
+	clamp_variable = { var = BRI_Midnight_Confidence min = 0 max = 100 }
+
+	BRI_Midnight_ConfidenceEffects = yes
+}
+
+###############################
+# |=[ Acclimation Effects ]=| #
+###############################
+
+#	BRI_Midnight_AcclimationEffects
+#	BRI_Midnight_AcclimationAdd
+#	BRI_Midnight_AcclimationGainAdd
+
+BRI_Midnight_AcclimationEffects = {
+	# ^0 - army_defence_factor, ^1 - planning_speed, ^2 - max_planning_factor
+
+	if = {
+		limit = { check_variable = { BRI_Midnight_Acclimation < 20 } }
+		set_variable = { BRI_Midnight_AcclimationEffects^0 = -0.3 }
+		set_variable = { BRI_Midnight_AcclimationEffects^1 = 0.3 }
+		set_variable = { BRI_Midnight_AcclimationEffects^2 = -0.3 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Midnight_Acclimation > 19 } check_variable = { BRI_Midnight_Acclimation < 40 } }
+		set_variable = { BRI_Midnight_AcclimationEffects^0 = -0.15 }
+		set_variable = { BRI_Midnight_AcclimationEffects^1 = 0.15 }
+		set_variable = { BRI_Midnight_AcclimationEffects^2 = -0.15 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Midnight_Acclimation > 39 } check_variable = { BRI_Midnight_Acclimation < 60 } }
+		set_variable = { BRI_Midnight_AcclimationEffects^0 = 0.15 }
+		set_variable = { BRI_Midnight_AcclimationEffects^1 = -0.1 }
+		set_variable = { BRI_Midnight_AcclimationEffects^2 = 0.1 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Midnight_Acclimation > 59 } check_variable = { BRI_Midnight_Acclimation < 80 } }
+		set_variable = { BRI_Midnight_AcclimationEffects^0 = 0.3 }
+		set_variable = { BRI_Midnight_AcclimationEffects^1 = -0.2 }
+		set_variable = { BRI_Midnight_AcclimationEffects^2 = 0.2 }
+	}
+	else = {
+		set_variable = { BRI_Midnight_AcclimationEffects^0 = 0.6 }
+		set_variable = { BRI_Midnight_AcclimationEffects^1 = -0.3 }
+		set_variable = { BRI_Midnight_AcclimationEffects^2 = 0.3 }
+	}
+
+	force_update_dynamic_modifier = yes
+	add_to_variable = { BRI_Midnight_Dirty = 1 }
+}
+
+BRI_Midnight_AcclimationAdd = {
+	custom_effect_tooltip = BRI_Midnight_AcclimationAdd_tt
+	add_to_variable = { BRI_Midnight_Acclimation = Acclimation }
+	clamp_variable = { var = BRI_Midnight_Acclimation min = 0 max = 100 }
+
+	BRI_Midnight_AcclimationEffects = yes
+}
+
+BRI_Midnight_AcclimationGainAdd = {
+	custom_effect_tooltip = BRI_Midnight_AcclimationGainAdd_tt
+	add_to_variable = { BRI_Midnight_AcclimationGain = AcclimationGain }
+
+	force_update_dynamic_modifier = yes
+	add_to_variable = { BRI_Midnight_Dirty = 1 }
+}
+
+BRI_Midnight_AcclimationSubtract = {
+	custom_effect_tooltip = BRI_Midnight_AcclimationAdd_tt
+	subtract_from_variable = { BRI_Midnight_Acclimation = Acclimation }
+	clamp_variable = { var = BRI_Midnight_Acclimation min = 0 max = 100 }
+
+	BRI_Midnight_AcclimationEffects = yes
+}
+
+##############################
+# |=[ Exhaustion Effects ]=| #
+##############################
+
+#	BRI_Midnight_ExhaustionEffects
+#	BRI_Midnight_ExhaustionAdd
+#	BRI_Midnight_ExhaustionGainAdd
+
+BRI_Midnight_ExhaustionEffects = {
+	# ^0 - command_power_gain, ^1 - army_org_regain, ^2 - BRI_Midnight_AcclimationGain, ^3 - no_supply_grace
+
+	if = {
+		limit = { check_variable = { BRI_Midnight_Exhaustion > 79 } }
+		set_variable = { BRI_Midnight_ExhaustionEffects^0 = -1 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^1 = -0.5 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^2 = -5 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^3 = -0.4 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Midnight_Exhaustion < 80 } check_variable = { BRI_Midnight_Exhaustion > 59 } }
+		set_variable = { BRI_Midnight_ExhaustionEffects^0 = -0.5 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^1 = -0.25 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^2 = -2.5 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^3 = -0.2 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Midnight_Exhaustion < 60 } check_variable = { BRI_Midnight_Exhaustion > 39 } }
+		set_variable = { BRI_Midnight_ExhaustionEffects^0 = -0.1 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^1 = -0.1 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^2 = -1.5 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^3 = 0.1 }
+	}
+	else_if = {
+		limit = { check_variable = { BRI_Midnight_Exhaustion < 40 } check_variable = { BRI_Midnight_Exhaustion > 19 } }
+		set_variable = { BRI_Midnight_ExhaustionEffects^0 = 0.2 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^1 = 0.2 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^2 = 2.5 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^3 = 0.4 }
+	}
+	else = {
+		set_variable = { BRI_Midnight_ExhaustionEffects^0 = 0.4 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^1 = 0.4 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^2 = 4 }
+		set_variable = { BRI_Midnight_ExhaustionEffects^3 = 0.4 }
+	}
+
+	force_update_dynamic_modifier = yes
+	add_to_variable = { BRI_Midnight_Dirty = 1 }
+}
+
+BRI_Midnight_ExhaustionAdd = {
+	custom_effect_tooltip = BRI_Midnight_ExhaustionAdd_tt
+	add_to_variable = { BRI_Midnight_Exhaustion = Exhaustion }
+	clamp_variable = { var = BRI_Midnight_Exhaustion min = 0 max = 100 }
+
+	BRI_Midnight_ExhaustionEffects = yes
+}
+
+BRI_Midnight_ExhaustionSubtract = {
+	custom_effect_tooltip = BRI_Midnight_ExhaustionSubtract_tt
+	subtract_from_variable = { BRI_Midnight_Exhaustion = Exhaustion }
+	clamp_variable = { var = BRI_Midnight_Exhaustion min = 0 max = 100 }
+
+	BRI_Midnight_ExhaustionEffects = yes
+}
+
+BRI_Midnight_ExhaustionGainAdd = {
+	custom_effect_tooltip = BRI_Midnight_ExhaustionGainAdd_tt
+	add_to_variable = { BRI_Midnight_ExhaustionGain = ExhaustionGain }
+
+	force_update_dynamic_modifier = yes
+	add_to_variable = { BRI_Midnight_Dirty = 1 }
+}
+
+###########################
+# |=[ Mission Effects ]=| #
+###########################
+
+#	BRI_Midnight_MissionBiWeeklyTick
+
+# BRI_Midnight_MissionBiWeeklyTick_Effect = {
+# 	set_variable = { BRI_Midnight_SurrenderProgressPast = THIS.surrender_progress }
+# 	# hidden_effect = { activate_mission = BRI_Midnight_MissionBiWeeklyTick } # FIXME: Temp.
+# }
+
+BRI_Midnight_MissionBiWeeklyTick_Effect = {
+	set_variable = { BRI_Midnight_SurrenderProgressPast = THIS.surrender_progress }
+	add_to_variable = { BRI_Midnight_SurrenderProgressPast = 5 }
+	if = {
+		limit = {
+			NOT = { check_variable = { BRI_Midnight_SurrenderProgressPast > THIS.surrender_progress } }
+		}
+		set_temp_variable = { Acclimation = 5 }
+		BRI_Midnight_AcclimationAdd = yes
+		set_variable = { BRI_Midnight_SurrenderProgressPast = THIS.surrender_progress }
+	}
+	else = {
+		set_variable = { BRI_Midnight_SurrenderProgressPast = THIS.surrender_progress }
+	}
+}
+
+###################
+# |=============| #
+# |=[ 2 OTHER ]=| #
+# |=============| #
+###################
+
+###########################################
+# |=[ 2.1 THE SECOND GENERAL UPRISING ]=| #
+###########################################
+
+TFL_ECW_State_transfer = {
+	FEN = {
+		every_owned_state = {
+			ENG = { transfer_state = PREV }
+		}
+	}
+	ENG = {
+		every_owned_state = {
+			add_core_of = FEN
+		}
+		every_owned_state = {
+			limit = {
+				NOT = {
+					state = 127
+					state = 2015
+					state = 1300
+					state = 2014
+					state = 2011
+					state = 126
+					state = 338
+					state = 2012
+					state = 2009
+					state = 2010
+					state = 128
+					state = 129
+					state = 2008
+					state = 2007
+					state = 130
+					state = 131
+					state = 1998
+					state = 121
+					state = 1995
+					state = 777
+					state = 1566
+				}
+			}
+			FEN = { transfer_state = PREV }
+			FEN = {
+				set_province_controller = 7239
+				set_province_controller = 6378
+				set_province_controller = 6351
+				set_province_controller = 11471
+				set_province_controller = 219
+				set_province_controller = 16373
+				set_province_controller = 11382
+			}
+			ENG = {
+				set_province_controller = 6320
+				set_province_controller = 16378
+				set_province_controller = 11218
+				set_province_controller = 9350
+				set_province_controller = 16351
+				set_province_controller = 9237
+				set_province_controller = 9350
+				set_province_controller = 6350
+			}
+		}
+	}
+	ENG_demil_mann = yes
+	every_state = {
+		limit = {
+			OR = {
+				is_owned_by = ENG
+				is_owned_by = FEN
+			}
+		}
+		add_province_modifier = {
+			static_modifiers = { ENG_uprising_combat_malus }
+			province = { all_provinces = yes }
+		}
+	}
+}
+
+ENG_demil_mann = {
+	1566 = {
+		set_demilitarized_zone = yes
+	}
+}
+
+ENG_HMMLR_ECW_VictoryPreAnnex_NEW = {
+	log = "[GetDateText]: [Root.GetName]: ENG_HMMLR_ECW_VictoryPreAnnex_NEW; Executing"
+	#This SE contains effects that are to be done before FEN is annexed into ENG
+	hidden_effect = {
+		#Fix debtplosion
+		ENG = {
+			set_variable = { national_debt = FEN.national_debt }
+			fiscal_crisis_check = yes
+		}
+
+		#Switch player tag
+		ENG = { change_tag_from = FEN }
+
+		#Shift FEN politics to ENG
+		ENG = {
+			retire_country_leader = yes
+
+			#Removes Collab Military Leaders
+			every_unit_leader = {
+				retire = yes
+			}
+
+			#FEN = { #Moving all characters to ENG
+			#	every_character = {
+			#		limit = {
+			#			NOT = {
+			#				is_character = FEN_Jack_Jones
+			#				is_character = FEN_Fitzroy_Maclean
+			#				is_character = FEN_Generic_Vacant
+			#				is_character = FEN_Heinrich_HMMLR
+			#				is_character = FEN_Harold_Wilson #Old Content
+			#				is_character = FEN_Jeffrey_Hamm #Old Content
+			#			}
+			#		}
+			#		set_nationality = ENG
+			#	}
+			#}
+			ENG_Maxwell_Knight = {
+				promote_character = yes
+			}
+			add_ideas = {
+				ENG_Britains_Economic_Ruin
+				ENG_Fractured_Food_Supply
+			}
+			remove_ideas = {
+				#policies
+				tno_trade_unions_illegal
+				tno_racial_integration_none
+				tno_minorities_oppression
+				tno_admin_efficiency_deficient_administrative_systems
+				tno_penal_system_harsh_penal_code
+				#ideas
+				ENG_Big_Bad_Buff
+				ENG_Oil_Reserves
+				ENG_A_Mere_Puppet
+				ENG_British_Free_Corp_Influence_Low
+				ENG_British_Free_Corp_Influence_Medium
+				ENG_British_Free_Corp_Influence_High
+				ENG_Garrison_Support
+				ENG_Chaos_in_Production
+				ENG_Simplified_Designs_1
+				ENG_Simplified_Designs_2
+				ENG_British_Fighting_Spirit
+				ENG_An_Altered_Line
+				ENG_A_Retrenched_Conviction
+			}
+			set_party_name = {
+				ideology = liberalism
+				long_name = FEN_liberalism_party_long
+				name = FEN_liberalism_party
+			}
+			set_party_name = {
+				ideology = socialist
+				long_name = FEN_socialist_party_long
+				name = FEN_socialist_party
+			}
+			set_party_name = {
+				ideology = communist
+				long_name = FEN_communist_party_long
+				name = FEN_communist_party
+			}
+			set_party_name = {
+				ideology = despotism
+				long_name = FEN_despotism_party_long
+				name = FEN_despotism_party
+			}
+			set_popularities = {
+				communist = 5
+				socialist = 25
+				liberalism = 15
+				despotism = 55
+			}
+			set_politics = { ruling_party = despotism }
+			set_temp_variable = { TNO_economy_subtype_temp = token:Econ_Subtype_Military_Directed }
+			econ_subtype_change = yes
+			remove_all_ministers = yes
+			add_ideas = {
+				### MINISTERS ###
+				ENG_Jack_Jones_civil_war_hog
+				ENG_Fitzroy_Maclean_civil_war_sec
+				ENG_Jock_Haston_civil_war_for
+				ENG_Claude_Auchinleck_civil_war_eco
+
+				### POLITICAL ###
+				tno_political_parties_controlled_opposition
+				tno_religious_rights_pluralism
+				tno_trade_unions_all_allowed
+				tno_immigration_open_immigration
+				tno_slavery_outlawed
+				tno_public_meetings_regulated
+				tno_press_rights_censored_press
+				tno_vote_franchise_registered_voting
+
+				### MILITARY ###
+				tno_conscription_broadened_conscription
+				tno_military_supervision_no_supervision
+				tno_training_basic_training
+				tno_draft_exemptions_civil_service_deferment
+
+				### ECONOMIC ###
+				tno_trade_laws_limited_exports
+				tno_income_taxation_low_income_weighted
+				tno_minimum_wage_trinket_minimum_wage
+				tno_max_workhours_14_hour_work_day
+				tno_pensions_low_pensions
+				tno_unemployment_trinket_subsidies
+
+				### SOCIAL ###
+				tno_health_care_low_income_protections
+				tno_education_public_education
+				tno_penal_system_incarceration
+				tno_gender_rights_women_in_the_workplace
+				tno_security_regulated_police
+				tno_regulations_token_regulations
+
+				### MISC ###
+				tno_refugees_banned
+				tno_women_banned
+				tno_racial_integration_integrated_military
+				tno_child_labor_illegal
+				tno_safety_limited_regulations
+				tno_pollution_no_controls
+				tno_lgbt_rights_lgbt_outlawed
+				tno_minorities_equal_rights
+
+				### SOCIETAL DEVELOPMENT ###
+				tno_academic_base_secondary_schooling
+				tno_research_facilities_modern
+				tno_agriculture_mass_mechanized
+				tno_healthcare_developed
+				tno_industrial_equipment_manufacturing_lines
+				tno_industrial_expertise_experienced
+				tno_admin_efficiency_functional_administrative_systems
+				tno_army_professionalism_political_interference
+			}
+
+			### Set Policy Effectiveness
+
+			### Political
+			set_variable = { tno_political_parties_effectiveness = 60 }
+			set_variable = { tno_religious_rights_effectiveness = 80 }
+			set_variable = { tno_trade_unions_effectiveness = 85 }
+			set_variable = { tno_immigration_effectiveness = 90 }
+			set_variable = { tno_slavery_effectiveness = 100 }
+			set_variable = { tno_public_meetings_effectiveness = 60 }
+			set_variable = { tno_press_rights_effectiveness = 65 }
+			set_variable = { tno_vote_franchise_effectiveness = 70 }
+
+			### Military
+			set_variable = { tno_conscription_effectiveness = 100 }
+			set_variable = { tno_military_supervision_effectiveness = 100 }
+			set_variable = { tno_training_effectiveness = 80 }
+			set_variable = { tno_draft_exemptions_effectiveness = 85 }
+
+			### Economic
+			set_variable = { tno_trade_laws_effectiveness = 85 }
+			set_variable = { tno_income_taxation_effectiveness = 70 }
+			set_variable = { tno_minimum_wage_effectiveness = 65 }
+			set_variable = { tno_max_workhours_effectiveness = 85 }
+			set_variable = { tno_pensions_effectiveness = 75 }
+			set_variable = { tno_unemployment_effectiveness = 100 }
+
+
+			### Social
+			set_variable = { tno_health_care_effectiveness = 75 }
+			set_variable = { tno_education_effectiveness = 65 }
+			set_variable = { tno_penal_system_effectiveness = 75 }
+			set_variable = { tno_gender_rights_effectiveness = 85 }
+			set_variable = { tno_security_effectiveness = 55 }
+			set_variable = { tno_regulations_effectiveness = 90 }
+
+			#Remove ENG divisions
+			ENG = {
+				division_template = {
+					name = "Garrison Division"
+					division_names_group = FEN_GarrisonDivision
+
+					regiments = {
+						cavalry = { x = 0 y = 0 }
+						cavalry = { x = 0 y = 1 }
+						cavalry = { x = 1 y = 0 }
+						cavalry = { x = 1 y = 1 }
+					}
+					support = {
+						military_police = { x = 0 y = 0 }
+					}
+				}
+				set_division_template_lock = {
+					division_template = "Marine-Abteilung Unit"
+					is_locked = no
+				}
+				set_division_template_lock = {
+					division_template = "Panzer-Division"
+					is_locked = no
+				}
+				set_division_template_lock = {
+					division_template = "Infanterie-Division"
+					is_locked = no
+				}
+				set_division_template_lock = {
+					division_template = "Infantry Division"
+					is_locked = no
+				}
+				delete_unit_template_and_units = {
+					division_template = "Marine-Abteilung Unit"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Panzer-Division"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Infanterie-Division"
+				}
+				delete_units = {
+					division_template = "Infantry Division"
+					disband = yes
+				}
+				delete_units = {
+					division_template = "National Militia"
+					disband = yes
+				}
+				inherit_technology = FEN
+			}
+		}
+		#Remove anti-OFN opinion modifiers
+		USA = { ENG = { clear_embargo_PREV = yes } }
+		CAN = { ENG = { clear_embargo_PREV = yes } }
+		AST = { ENG = { clear_embargo_PREV = yes } }
+		GUY = { ENG = { clear_embargo_PREV = yes } }
+		NZL = { ENG = { clear_embargo_PREV = yes } }
+		ICE = { ENG = { clear_embargo_PREV = yes } }
+		BLZ = { ENG = { clear_embargo_PREV = yes } }
+
+		ENG = {
+			remove_opinion_modifier = { target = CAN modifier = CAN_usurping_liberals }
+			remove_opinion_modifier = { target = AST modifier = CAN_usurping_liberals }
+			remove_opinion_modifier = { target = NZL modifier = CAN_usurping_liberals }
+			remove_opinion_modifier = { target = BLZ modifier = CAN_usurping_liberals }
+		}
+
+		CAN = { remove_opinion_modifier = { target = ENG modifier = ENG_illegitimate_government } }
+		AST = { remove_opinion_modifier = { target = ENG modifier = ENG_illegitimate_government } }
+		NZL = { remove_opinion_modifier = { target = ENG modifier = ENG_illegitimate_government } }
+		BLZ = { remove_opinion_modifier = { target = ENG modifier = ENG_illegitimate_government } }
+
+		#Add anti-Pakt opinion modifiers
+		GER = { ENG = { set_embargo_PREV = yes } }
+		GGR = { ENG = { set_embargo_PREV = yes } }
+		BGR = { ENG = { set_embargo_PREV = yes } }
+		GGR = { ENG = { set_embargo_PREV = yes } }
+		SGR = { ENG = { set_embargo_PREV = yes } }
+		CZE = { ENG = { set_embargo_PREV = yes } }
+		GGN = { ENG = { set_embargo_PREV = yes } }
+		SLO = { ENG = { set_embargo_PREV = yes } }
+		UKR = { ENG = { set_embargo_PREV = yes } }
+		MCW = { ENG = { set_embargo_PREV = yes } }
+		OST = { ENG = { set_embargo_PREV = yes } }
+		COG = { ENG = { set_embargo_PREV = yes } }
+		CAU = { ENG = { set_embargo_PREV = yes } }
+		SER = { ENG = { set_embargo_PREV = yes } }
+		DEN = { ENG = { set_embargo_PREV = yes } }
+		HOL = { ENG = { set_embargo_PREV = yes } }
+		NOR = { ENG = { set_embargo_PREV = yes } }
+		MAD = { ENG = { set_embargo_PREV = yes } }
+		GRO = { ENG = { set_embargo_PREV = yes } }
+		ANG = { ENG = { set_embargo_PREV = yes } }
+		BRG = { ENG = { set_embargo_PREV = yes } }
+		BUL = { ENG = { set_embargo_PREV = yes } }
+		FRA = { ENG = { set_embargo_PREV = yes } }
+		IRE = { ENG = { set_embargo_PREV = yes } }
+	}
+	log = "[GetDateText]: [Root.GetName]: ENG_HMMLR_ECW_VictoryPreAnnex_NEW; Completed execution"
+}
+
+ENG_Extra_Units_Difficulty_System = {	# Gives more units to ENG if not using harder civil war decision
+	log = "[GetDateText]: [Root.GetName]: ENG_Extra_Units_Difficulty_System; Executing"
+	if = {
+		limit = { NOT = { has_country_flag = BRI_Enabled_Harder_Civil_War } }
+		121 = {		# Lothian
+			create_unit = {
+				division = "division_template = \"Infanterie-Division\" start_experience_factor = 0.6 start_equipment_factor = 1.0"
+				owner = ENG
+			}
+		}
+		1300 = {	# London
+			create_unit = {
+				division = "division_template = \"Infanterie-Division\" start_experience_factor = 0.6 start_equipment_factor = 1.0"
+				owner = ENG
+			}
+		}
+		random_owned_state = {
+			create_unit = {
+				division = "division_template = \"National Militia\" start_experience_factor = 0.3 start_equipment_factor = 0.6"
+				owner = ENG
+				count = 3
+			}
+		}
+		random_owned_state = {	# Picks a second state for the next 3
+			create_unit = {
+				division = "division_template = \"National Militia\" start_experience_factor = 0.3 start_equipment_factor = 0.6"
+				owner = ENG
+				count = 3
+			}
+		}
+	}
+	if = {	# These should both be if
+		limit = { has_country_flag = BRI_Enabled_Easier_Civil_War }
+		random_owned_state = {
+			create_unit = {
+				division = "division_template = \"National Militia\" start_experience_factor = 0.3 start_equipment_factor = 0.6"
+				owner = ENG
+				count = 4
+			}
+		}
+		random_owned_state = {	# Picks a second state for the next 3
+			create_unit = {
+				division = "division_template = \"National Militia\" start_experience_factor = 0.3 start_equipment_factor = 0.6"
+				owner = ENG
+				count = 3
+			}
+		}
+	}
+}

@@ -1,0 +1,2162 @@
+# ██████╗ ██╗      ██████╗ ██████╗  █████╗ ██╗          ██████╗ ██████╗ ███╗   ██╗███████╗██╗     ██╗ ██████╗████████╗███████╗#
+#██╔════╝ ██║     ██╔═══██╗██╔══██╗██╔══██╗██║         ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║     ██║██╔════╝╚══██╔══╝██╔════╝#
+#██║  ███╗██║     ██║   ██║██████╔╝███████║██║         ██║     ██║   ██║██╔██╗ ██║█████╗  ██║     ██║██║        ██║   ███████╗#
+#██║   ██║██║     ██║   ██║██╔══██╗██╔══██║██║         ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║     ██║██║        ██║   ╚════██║#
+#╚██████╔╝███████╗╚██████╔╝██████╔╝██║  ██║███████╗    ╚██████╗╚██████╔╝██║ ╚████║██║     ███████╗██║╚██████╗   ██║   ███████║#
+# ╚═════╝ ╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝     ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚══════╝╚═╝ ╚═════╝   ╚═╝   ╚══════╝#
+#Scripted GUIs
+
+#Index; Search for these names using ctrl+f and you'll find the section they entitle.
+#	Base Global Conflicts GUI
+#		No Conflicts GUI
+#		Generic Conflicts GUI
+#		Generic Conflict Topbar GUI
+#
+#	Conflict-Specific GUIs
+#		Indonesian Civil War GUI
+#		Jamaican Referendum GUI
+#		Jamaican Crisis GUI
+#		Trinidad BPR GUI
+#		Turkes Kenes GUI
+#		Philippines War GUI
+#		Philippines Reconstruction GUI
+#		South Africa US Reconstruction GUI
+#		South Africa Withdrawal GUI
+#		West Africa Reconstruction GUI
+#		Puerto Plata Invasion GUI
+#		French Reclamation GUI
+#		Iceland Elections GUI
+#		Haitian Civil War GUI
+#		Madagaskar War GUI
+#		Channel Crisis GUI
+
+scripted_gui = {
+	#################################################
+	##=|        Base Global Conflicts GUI        |=##
+	##======================| |====================##
+	#################################################
+	TNO_fopo_container = {
+		window_name = "TNO_fopo_container"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = { check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts } }
+		ai_enabled = { always = no }
+
+		dynamic_lists = {
+			conflict_tabs = {
+				array = TNO_active_conflicts
+				index = conflict_idx
+				value = conflict_id
+				entry_container = TNO_fopo_conflict_tab
+			}
+			# conflict_guis = {
+			# 	array = world_conflict_guis
+			# 	index = conflict_idx
+			# 	value = conflict_id
+			# 	entry_container = [Get_TNO_fopo_conflict_guis]
+			# }
+		}
+
+		effects = {
+			conflict_icon_click = {
+				set_variable = { selected_conflict_id = conflict_id }
+				clear_array = world_conflict_guis
+				add_to_array = { world_conflict_guis = conflict_id }
+			}
+			tab_click = {
+				set_variable = { selected_conflict_id = conflict_id }
+				clear_array = world_conflict_guis
+				add_to_array = { world_conflict_guis = conflict_id }
+			}
+
+			frontlines_btn_click = {
+				set_variable = { TNO_fopo_selected_front = 1 }
+			}
+			homefront_btn_click = {
+				set_variable = { TNO_fopo_selected_front = 2 }
+			}
+		}
+
+		triggers = {
+			conflict_icon_visible = {
+				if = {
+					limit = {
+						check_variable = { selected_conflict_id = conflict_id }
+					}
+					set_temp_variable = { fopo_button_tab_frame = 2 }
+				}
+				else = {
+					set_temp_variable = { fopo_button_tab_frame = 1 }
+				}
+			}
+
+			frontlines_btn_visible = {
+				TNO_fopo_should_display_homefront = yes
+			}
+			homefront_btn_visible = {
+				TNO_fopo_should_display_homefront = yes
+			}
+			conflict_status_visible = {
+				TNO_fopo_should_display_homefront = no
+			}
+			conflict_title_visible = {
+				TNO_fopo_should_display_homefront = no
+			}
+			info_tab_visible = {
+				TNO_fopo_show_info_tab = yes
+			}
+
+			frontlines_btn_click_enabled = {
+				check_variable = { TNO_fopo_selected_front = 2 }
+			}
+			homefront_btn_click_enabled = {
+				check_variable = { TNO_fopo_selected_front = 1 }
+			}
+		}
+
+		properties = {
+			tab_bg = {
+				frame = fopo_button_tab_frame
+			}
+			tab = {
+				frame = fopo_button_tab_frame
+			}
+			conflict_icon = {
+				image = "[Get_fopo_icon]"
+			}
+		}
+	}
+
+	#################################################
+	#               No Conflicts GUI                #
+	#################################################
+	TNO_fopo_no_conflict = {
+		window_name = "TNO_fopo_no_conflict"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { TNO_active_conflicts^num = 0 }
+		}
+	}
+
+	#################################################
+	#             Generic Conflicts GUI             #
+	#################################################
+	TNO_fopo_generic_conflict = {
+		window_name = "TNO_fopo_generic_conflict"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = { # pain
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			NOT = {
+				AND = {
+					OR = {
+						check_variable = { selected_conflict_id = token:GC_WAC }
+						check_variable = { selected_conflict_id = token:GC_SAW }
+					}
+					tag = USA
+				}
+				check_variable = { selected_conflict_id = token:GC_IndonesiaCW }
+				check_variable = { selected_conflict_id = token:GC_JamaicanReferendum }
+				check_variable = { selected_conflict_id = token:GC_JamaicanCrisis }
+				check_variable = { selected_conflict_id = token:GC_TrinidadRev }
+				check_variable = { selected_conflict_id = token:GC_Turkestan }
+				AND = { check_variable = { selected_conflict_id = token:GC_PhilippinesWar } tag = JAP }
+				AND = { check_variable = { selected_conflict_id = token:GC_SAWReconstruction } tag = USA }
+				check_variable = { selected_conflict_id = token:GC_PhilippinesReconstruction }
+				check_variable = { selected_conflict_id = token:GC_SAWWithdrawal }
+				check_variable = { selected_conflict_id = token:GC_WACReconstruction }
+				AND = { check_variable = { selected_conflict_id = token:GC_PuertoPlata } tag = USA }
+				AND = { check_variable = { selected_conflict_id = token:GC_PuertoPlata } tag = IBR }
+				AND = { check_variable = { selected_conflict_id = token:GC_PuertoPlata } tag = GER }
+				AND = { check_variable = { selected_conflict_id = token:GC_PuertoPlata } tag = MEX }
+				check_variable = { selected_conflict_id = token:GC_FranceCW }
+				check_variable = { selected_conflict_id = token:GC_IcelandElections }
+				AND = { check_variable = { selected_conflict_id = token:GC_Haitian_Civil_War } tag = USA }
+				check_variable = { selected_conflict_id = token:GC_MalagasyCW }
+				check_variable = { selected_conflict_id = token:GC_ChannelCrisis }
+				check_variable = { TNO_active_conflicts^num = 0 }
+			}
+		}
+
+		properties = {
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#          Generic Conflict Topbar GUI          #
+	#################################################
+	TNO_fopo_generic_conflict_topbar = {
+		window_name = "TNO_fopo_generic_conflict_topbar"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			OR = {
+				check_variable = { selected_conflict_id = token:GC_WAC }
+				check_variable = { selected_conflict_id = token:GC_SAW }
+			}
+			tag = USA
+		}
+
+		triggers = {
+			info_tab_visible = {
+				TNO_fopo_show_info_tab = yes
+			}
+		}
+
+		properties = {
+			topbar = {
+				image = "[Get_fopo_topbar]"
+				frame = TNO_fopo_selected_front
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	##=|          Conflict-Specific GUIs         |=##
+	##======================| |====================##
+	#################################################
+
+	#################################################
+	#           Indonesian Civil War GUI            #
+	#################################################
+	TNO_Indonesian_Civil_War_GUI = {
+		window_name = "TNO_Indonesian_Civil_War_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_IndonesiaCW }
+		}
+
+		effects = {
+			discontent_effect_box_click = {
+				effect_tooltip = {
+					INS_ICW_discontent_effect = yes
+				}
+			}
+		}
+
+		properties = {
+			escalation_bar = {
+				frame = global.ICW_escalation
+			}
+			discontent_bar = {
+				frame = ICW_discontent
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#            Jamaican Referendum GUI            #
+	#################################################
+	TNO_Jamaican_Referendum_GUI = {
+		window_name = "TNO_Jamaican_Referendum_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_JamaicanReferendum }
+		}
+
+		triggers = {
+			left_icon_1_visible = {
+				check_variable = { WIN.WIN_jamaica_daily_favor < 0 }
+				NOT = { check_variable = { WIN.WIN_jamaica_daily_favor < -0.5 } }
+			}
+			left_icon_2_visible = {
+				check_variable = { WIN.WIN_jamaica_daily_favor < -0.5 }
+				NOT = { check_variable = { WIN.WIN_jamaica_daily_favor < -1 } }
+			}
+			left_icon_3_visible = {
+				check_variable = { WIN.WIN_jamaica_daily_favor < -1 }
+			}
+			right_icon_1_visible = {
+				check_variable = { WIN.WIN_jamaica_daily_favor > 0 }
+				NOT = { check_variable = { WIN.WIN_jamaica_daily_favor > 0.5 } }
+			}
+			right_icon_2_visible = {
+				check_variable = { WIN.WIN_jamaica_daily_favor > 0.5 }
+				NOT = { check_variable = { WIN.WIN_jamaica_daily_favor > 1 } }
+			}
+			right_icon_3_visible = {
+				check_variable = { WIN.WIN_jamaica_daily_favor > 1 }
+			}
+		}
+
+		effects = {
+			add_jam_btn_click = {
+				TNO_increase_jamaica_indep_chance_low = yes
+			}
+
+			add_wif_btn_click = {
+				TNO_decrease_jamaica_indep_chance_low = yes
+				log = "[?WIN.WIN_jamaica_favor]"
+			}
+		}
+
+		properties = {
+			arrow = {
+				frame = WIN.WIN_jamaica_favor
+			}
+			timer_fill = {
+				frame = WIN.WIN_referendum_fill
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#              Jamaican Crisis GUI              #
+	#################################################
+	TNO_Jamaican_Crisis_GUI = {
+		window_name = "TNO_Jamaican_Crisis_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_JamaicanCrisis }
+		}
+
+		triggers = {
+			japan_map_visible = {
+				original_tag = JAP
+			}
+			add_violence_btn_visible = {
+				always = no
+			}
+			add_fervor_btn_visible = {
+				always = no
+			}
+			lower_violence_btn_visible = {
+				always = no
+			}
+			lower_fervor_btn_visible = {
+				always = no
+			}
+		}
+
+		effects = {
+			add_violence_btn_click = {
+				TNO_increase_crisis_violence_med = yes
+			}
+
+			lower_violence_btn_click = {
+				TNO_decrease_crisis_violence_med = yes
+			}
+			add_fervor_btn_click = {
+				TNO_increase_fervor_med = yes
+			}
+
+			lower_fervor_btn_click = {
+				TNO_decrease_fervor_med = yes
+			}
+		}
+
+		properties = {
+			violence_bar = {
+				frame = WIN.WIN_violence
+			}
+			japan_map = {
+				frame = WIN.WIN_japan_map_frame
+			}
+			fervor_bar = {
+				frame = WIN.WIN_fervor
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#                Trinidad BPR GUI               #
+	#################################################
+	TNO_Trinidad_BPR_GUI = {
+		window_name = "TNO_Trinidad_BPR_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_TrinidadRev }
+		}
+
+		properties = {
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#                Turkes Kenes GUI               #
+	#################################################
+	TNO_CA_Conference_Unification_1_GUI = {
+		window_name = "TNO_CA_Conference_Unification_1_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_Turkestan }
+		}
+
+		dynamic_lists = {
+			conference_seats = {
+				array = TRK.CA_Conference_seat_x
+				change_scope = no
+				entry_container = TNO_CA_Conference_dot
+				index = seat_idx
+			}
+		}
+
+		properties = {
+			seat_dot = {
+				x = TRK.CA_Conference_seat_x^seat_idx
+				y = TRK.CA_Conference_seat_y^seat_idx
+				frame = TRK.CA_Conference_alignment^TRK.CA_Conference_indices^seat_idx
+			}
+			ofn_bar = {
+				frame = TRK.TK_delegates^1
+			}
+			pakt_bar = {
+				frame = TRK.TK_delegates^2
+			}
+			tension_bar = {
+				frame = TRK.CA_Conference_tension
+			}
+			suspicion_bar = {
+				frame = TRK.CA_Conference_suspicion
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#              Philippines War GUI              #
+	#################################################
+	TNO_Philippines_Prep_GUI = {
+		window_name = "TNO_Philippines_Prep_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_PhilippinesWar } tag = JAP
+		}
+
+		triggers = {
+			supply_bar_visible = {
+				check_variable = {
+					var = JAP.JP_PHI_supply
+					value = JAP.JP_PHI_supply_perc
+					compare = greater_than_or_equals
+				}
+			}
+			out_of_supply_bar_visible = {
+				check_variable = { JAP.JP_PHI_supply_perc > JAP.JP_PHI_supply }
+			}
+		}
+
+		properties = {
+			supply_bar = {
+				frame = JAP.JP_PHI_supply
+			}
+			out_of_supply_bar = {
+				frame = JAP.JP_PHI_supply
+			}
+			supply_arrow = {
+				x = JAP.JP_PHI_target_pos
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	TNO_Philippines_Prep_GUI_USA = {
+		window_name = "TNO_Philippines_Prep_GUI_USA"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_BalintawakBlitz }
+		}
+
+		### Fake Missions
+		triggers = {
+			fake_mission_1_background_visible = { ZZZ = { has_active_mission = ZZZ_USA_Philippines_Dummy } }
+			fake_mission_1_title_visible = { ZZZ = { has_active_mission = ZZZ_USA_Philippines_Dummy } }
+			fake_mission_1_duration_visible = { ZZZ = { has_active_mission = ZZZ_USA_Philippines_Dummy } }
+		}
+	}
+
+	#################################################
+	#         Philippines Reconstruction GUI        #
+	#################################################
+	TNO_Philippines_Reconstruction_GUI = {
+		window_name = "TNO_Philippines_Reconstruction_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_PhilippinesReconstruction }
+		}
+
+		triggers = {
+			sidebar_JAP_visible = {
+				original_tag = JAP
+			}
+			sidebar_USA_visible = {
+				original_tag = USA
+			}
+			reconstruction_complete_button_click_enabled = {
+				check_variable = { PHI_reconstruction_var = 100 }
+				if = {
+					limit = {
+						original_tag = USA
+						NOT = { country_exists = SPH }
+					}
+					has_country_flag = USA_PHI_delegitimized_leyte
+				}
+			}
+			phili_reconstruction_arrow_visible = {
+				check_variable = { PHI_reconstruction_var = 100 }
+				if = {
+					limit = {
+						original_tag = USA
+						NOT = { country_exists = SPH }
+					}
+					has_country_flag = USA_PHI_delegitimized_leyte
+				}
+			}
+		}
+
+		effects = {
+			reconstruction_complete_button_click = {
+				PHI_reconstruction_complete = yes
+			}
+		}
+
+		properties = {
+			reconstruction_bar = { frame = PHI_reconstruction_var }
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#      South Africa US Reconstruction GUI       #
+	#################################################
+	TNO_SAF_US_Reconstruction_GUI = {
+		window_name = "TNO_SAF_US_Reconstruction_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_SAWReconstruction } tag = USA
+		}
+
+		triggers = {
+			#Angola Section
+			Angola_status_progbar_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			Angola_status_frame_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			AngolaFlag_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			AngolaFlag_overlay_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			AngolaMidpoint_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+
+			#Congo Section
+			Congo_status_progbar_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			Congo_status_frame_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+
+				}
+			}
+			CongoFlag_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			CongoFlag_overlay_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			CongoMidpoint_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+
+			#East Africa Section
+			EastAfrica_status_progbar_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			EastAfrica_status_frame_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			EastAfricaFlag_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			EastAfricaFlag_overlay_visible = {
+				NOT = {
+					has_global_flag = CAR_FORMED
+				}
+			}
+			#USC Section
+			CentralAfrica_status_progbar_visible = {
+				has_global_flag = CAR_FORMED
+			}
+			CentralAfrica_frame_visible = {
+				has_global_flag = CAR_FORMED
+			}
+			CentralAfricaFlag_visible = {
+				has_global_flag = CAR_FORMED
+			}
+			CentralAfricaFlag_overlay_visible = {
+				has_global_flag = CAR_FORMED
+			}
+		}
+
+		properties = {
+			Angola_status_progbar = {
+				frame = ANG.OFN_MANDATE_rebel_stability_display
+			}
+			Congo_status_progbar = {
+				frame = COG.OFN_MANDATE_rebel_stability_display
+			}
+			EastAfrica_status_progbar = {
+				frame = MZB.OFN_MANDATE_rebel_stability_display
+			}
+			CentralAfrica_status_progbar = {
+				frame = USC.OFN_MANDATE_rebel_stability_display
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#          South Africa Withdrawal GUI          #
+	#################################################
+	TNO_SAW_Withdrawal_GUI = {
+		window_name = "TNO_SAW_Withdrawal_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_SAWWithdrawal }
+		}
+
+		triggers = {
+			withdrawal_complete_button_click_enabled = {
+				check_variable = { GER_withdrawal_var = 100 }
+			}
+		}
+
+		effects = {
+			withdrawal_complete_button_click = {
+				if = {
+					limit = {
+						has_global_flag = german_civil_war_speervic
+					}
+					SGR_conclude_SAW = yes
+				}
+				if = {
+					limit = {
+						has_global_flag = german_civil_war_bormannvic
+					}
+					GER_Bormann_SAF_conclude_SAW = yes
+				}
+				remove_mission = GER_withdrawal_deadline
+			}
+		}
+
+		properties = {
+			withdrawal_bar = { frame = GER_withdrawal_var }
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#         West Africa Reconstruction GUI        #
+	#################################################
+	TNO_Free_France_Reconstruction_GUI = {
+		window_name = "TNO_Free_France_Reconstruction_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_WACReconstruction }
+		}
+
+		triggers = {
+			sidebar_USA_visible = {
+				original_tag = USA
+			}
+			FF_reconstruction_complete_button_click_enabled = {
+				check_variable = { WAF_mil_reconstruct_prog = 100 }
+				check_variable = { WAF_eco_reconstruct_prog = 100 }
+			}
+			FF_reconstruction_arrow_visible = {
+				check_variable = { WAF_mil_reconstruct_prog = 100 }
+				check_variable = { WAF_eco_reconstruct_prog = 100 }
+			}
+		}
+
+		effects = {
+			FF_reconstruction_complete_button_click = {
+				WAF_reconstruction_complete = yes
+				remove_mission = USA_WAFR_reconstruction_timeout
+			}
+		}
+
+		properties = {
+			FF_reconstruction_bar_mil = { frame = WAF_mil_reconstruct_prog }
+			FF_reconstruction_bar_eco = { frame = WAF_eco_reconstruct_prog }
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#        Puerto Plata Invasion GUI (USA)        #
+	#################################################
+	TNO_Puerto_Plata_Invasion_GUI_USA = {
+		window_name = "TNO_Puerto_Plata_Invasion_GUI_USA"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_PuertoPlata } tag = USA
+		}
+
+		triggers = {
+			pp_strength_bar_visible = {
+				check_variable = {
+					var = USA.US_PP_supply
+					value = USA.US_PP_supply_perc
+					compare = greater_than_or_equals
+				}
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			pp_strength_bar_overlay_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			pp_out_of_strength_bar_visible = {
+				check_variable = { USA.US_PP_supply_perc > USA.US_PP_supply }
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			pp_preparation_bar_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			pp_preparation_bar_overlay_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			preparation_indicator_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+
+			assemble_text_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			pp_strength_arrow_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			strength_indicator_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			spy_indicator_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			ceasefire_spy_indicator_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			ceasefire_pp_spy_meter_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			pp_spy_meter_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			mexican_american_cooperation_visible = {
+				OR = {
+					has_global_flag = PPI_proxy_war_preparation
+					has_global_flag = PPI_landing_ongoing
+				}
+			}
+		}
+
+		properties = {
+			pp_strength_bar_overlay = {
+				frame = USA.US_PP_supply
+			}
+			pp_preparation_bar_overlay = {
+				frame = CAL.PPI_ceasefire_military_preparation
+			}
+			mexican_american_cooperation = {
+				frame = MEX.PP_mexican_american_cooperation_frame
+			}
+			pp_strength_arrow = {
+				x = USA.US_PP_target_pos
+			}
+			pp_spy_meter = {
+				frame = global.PP_spy_strength_CAL
+			}
+			ceasefire_pp_spy_meter = {
+				frame = global.PP_spy_strength_CAL
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	TNO_Puerto_Plata_GUI_USA = {
+		window_name = "TNO_Puerto_Plata_GUI_USA"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_PuertoPlata }
+			OR = {
+				tag = USA
+				tag = MEX
+			}
+		}
+
+		### Fake Missions
+		triggers = {
+			fake_mission_1_background_visible = {
+				ZZZ = {
+					OR = {
+						has_active_mission = ZZZ_PPI_Invasion_Begins
+						has_active_mission = ZZZ_PPI_CAL_training
+						has_active_mission = ZZZ_PPI_Invasion_Ends
+						has_active_mission = ZZZ_PPI_DOM_CAL_Negotiations
+					}
+				}
+			}
+			fake_mission_1_title_visible = {
+				ZZZ = {
+					OR = {
+						has_active_mission = ZZZ_PPI_Invasion_Begins
+						has_active_mission = ZZZ_PPI_CAL_training
+						has_active_mission = ZZZ_PPI_Invasion_Ends
+						has_active_mission = ZZZ_PPI_DOM_CAL_Negotiations
+					}
+				}
+			}
+			fake_mission_1_duration_visible = {
+				ZZZ = {
+					OR = {
+						has_active_mission = ZZZ_PPI_Invasion_Begins
+						has_active_mission = ZZZ_PPI_CAL_training
+						has_active_mission = ZZZ_PPI_Invasion_Ends
+						has_active_mission = ZZZ_PPI_DOM_CAL_Negotiations
+					}
+				}
+			}
+		}
+	}
+	#################################################
+	#        Puerto Plata Invasion GUI (MEX)        #
+	#################################################
+	TNO_Puerto_Plata_Invasion_GUI_MEX = {
+		window_name = "TNO_Puerto_Plata_Invasion_GUI_MEX"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_PuertoPlata } tag = MEX
+		}
+
+		triggers = {
+			pp_strength_bar_visible = {
+				check_variable = {
+					var = USA.US_PP_supply
+					value = USA.US_PP_supply_perc
+					compare = greater_than_or_equals
+				}
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			pp_strength_bar_overlay_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			pp_out_of_strength_bar_visible = {
+				check_variable = { USA.US_PP_supply_perc > USA.US_PP_supply }
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			pp_preparation_bar_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			pp_preparation_bar_overlay_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			preparation_indicator_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+
+			assemble_text_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			pp_strength_arrow_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			strength_indicator_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			spy_indicator_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			ceasefire_spy_indicator_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			ceasefire_pp_spy_meter_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			pp_spy_meter_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			mexican_american_cooperation_visible = {
+				OR = {
+					has_global_flag = PPI_proxy_war_preparation
+					has_global_flag = PPI_landing_ongoing
+				}
+			}
+		}
+
+		properties = {
+			pp_strength_bar_overlay = {
+				frame = USA.US_PP_supply
+			}
+			pp_preparation_bar_overlay = {
+				frame = CAL.PPI_ceasefire_military_preparation
+			}
+			mexican_american_cooperation = {
+				frame = MEX.PP_mexican_american_cooperation_frame
+			}
+			pp_strength_arrow = {
+				x = USA.US_PP_target_pos
+			}
+			pp_spy_meter = {
+				frame = global.PP_spy_strength_CAL
+			}
+			ceasefire_pp_spy_meter = {
+				frame = global.PP_spy_strength_CAL
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#        Puerto Plata Invasion GUI (IBR)        #
+	#################################################
+	TNO_Puerto_Plata_Invasion_GUI_IBR = {
+		window_name = "TNO_Puerto_Plata_Invasion_GUI_IBR"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_PuertoPlata } tag = IBR
+		}
+
+		triggers = {
+			spy_indicator_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			ceasefire_spy_indicator_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			ceasefire_pp_spy_meter_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			pp_spy_meter_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			ibr_preparation_indicator_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			pp_dom_preparation_bar_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			pp_dom_preparation_bar_overlay_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			preparation_outline_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+		}
+
+		properties = {
+			pp_spy_meter = {
+				frame = global.PP_spy_strength_CAL
+			}
+			ceasefire_pp_spy_meter = {
+				frame = global.PP_spy_strength_CAL
+			}
+			pp_dom_preparation_bar_overlay = {
+				frame = DOM.PPI_ceasefire_military_preparation
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#        Puerto Plata Invasion GUI (GER)        #
+	#################################################
+	TNO_Puerto_Plata_Invasion_GUI_GER = {
+		window_name = "TNO_Puerto_Plata_Invasion_GUI_GER"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_PuertoPlata } tag = GER
+		}
+
+		triggers = {
+			GER_PP_Prep_spy_indicator_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+			GER_PP_prep_spy_meter_visible = {
+				NOT = {
+					OR = {
+						has_global_flag = PPI_ceasefire_happening
+						has_global_flag = PPI_civil_war_ongoing
+					}
+				}
+			}
+
+			ceasefire_brandenburger_indicator_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			ceasefire_pp_brandenburger_meter_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			ger_preparation_indicator_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			pp_dom_preparation_bar_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			pp_dom_preparation_bar_overlay_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+			preparation_outline_visible = {
+				OR = {
+					has_global_flag = PPI_ceasefire_happening
+					has_global_flag = PPI_civil_war_ongoing
+				}
+			}
+		}
+
+		properties = {
+			GER_PP_prep_spy_meter = {
+				frame = global.PP_spy_strength_CAL
+			}
+			pp_dom_preparation_bar_overlay = {
+				frame = DOM.PPI_ceasefire_military_preparation
+			}
+			ceasefire_pp_brandenburger_meter = {
+				frame = global.PP_brandenburger_manpower
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#             French Reclamation GUI            #
+	#################################################
+	TNO_FrenchReclamation_DecisionGUI = {
+		window_name = "TNO_FrenchReclamation_DecisionGUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_FranceCW }
+		}
+
+		dynamic_lists = {
+			TNO_FrenchReclamation_Focus_Gridbox = {
+				array = FFR.FrenchReclamation_Focus
+				change_scope = no
+				entry_container= TNO_FrenchReclamation_Focus_Gridbox_EntryContainer
+				index = i
+			}
+		}
+
+		triggers = {
+			TNO_FrenchReclamation_Focus_Stored_Bar_Empty_visible = {
+				check_variable = { FFR.FrenchReclamation_Focus_Stored = 0 }
+			}
+			TNO_FrenchReclamation_Focus_Bar_Empty_visible = {
+				check_variable = { FFR.FrenchReclamation_Focus^i = 0 }
+			}
+			TNO_FrenchReclamation_Focus_Stored_Button_USA_visible = {
+				OR = {
+					tag = USA
+					AND = {
+						has_global_flag = IBR_FFR_negotiations_successful
+						tag = IBR
+					}
+				}
+			}
+			TNO_FrenchReclamation_Focus_Stored_Button_USA_click_enabled = {
+				check_variable = { FFR.FrenchReclamation_Focus_Stored < 5 }
+				has_political_power > 29.99
+			}
+			TNO_FrenchReclamation_Focus_Stored_Button_GER_visible = {
+				tag = GER
+			}
+			TNO_FrenchReclamation_Button_Usual_USA_visible = {
+				OR = {
+					tag = USA
+					AND = {
+						has_global_flag = IBR_FFR_negotiations_successful
+						tag = IBR
+					}
+				}
+			}
+			TNO_FrenchReclamation_Button_Usual_USA_click_enabled = {
+				check_variable = { FFR.FrenchReclamation_Focus_Stored > 0 }
+				check_variable = { FFR.FrenchReclamation_Focus^i < 5 }
+			}
+			TNO_FrenchReclamation_Button_Usual_GER_visible = {
+				tag = GER
+			}
+		}
+
+		effects = {
+			TNO_FrenchReclamation_Focus_Stored_Button_USA_click = {
+				add_to_variable = { FFR.FrenchReclamation_Focus_Stored = 1 }
+				add_political_power = -30
+			}
+			TNO_FrenchReclamation_Button_Usual_USA_click = {
+				add_to_variable = { FFR.FrenchReclamation_Focus_Stored = -1 }
+				add_to_variable = { FFR.FrenchReclamation_Focus^i = 1 }
+				FFR_reclamation_dynamic_modifier_calculate = yes
+			}
+		}
+
+		properties = {
+			TNO_FrenchReclamation_Focus_Stored_Bar = { frame = FFR.FrenchReclamation_Focus_Stored }
+			TNO_FrenchReclamation_Focus_Bar = { frame = FFR.FrenchReclamation_Focus^i }
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+	}
+
+	#################################################
+	#             Iceland Elections GUI             #
+	#################################################
+	TNO_Iceland_Congress_Mechanic = {
+		window_name = "TNO_Iceland_Congress_Mechanic"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_IcelandElections }
+		}
+
+		properties = {
+			proofn_bg_bar = {
+				frame = ICE.ICE_OFNSUPPORT_BG
+			}
+			proofn_bar = {
+				frame = ICE.ICE_OFNSUPPORT
+			}
+			ind_bg_bar = {
+				frame = ICE.ICE_INDSUPPORT_BG
+			}
+			ind_bar = {
+				frame = ICE.ICE_INDSUPPORT
+			}
+			antiofn_bg_bar = {
+				frame = ICE.ICE_ANTIOFNSUPPORT_BG
+			}
+			antiofn_bar = {
+				frame = ICE.ICE_ANTIOFNSUPPORT
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+
+		triggers = {
+			fake_mission_1_background_visible = {
+				ZZZ = { has_active_mission = ZZZ_media_cycle_countdown }
+			}
+			fake_mission_1_title_visible = {
+				ZZZ = { has_active_mission = ZZZ_media_cycle_countdown }
+			}
+			fake_mission_1_duration_visible = {
+				ZZZ = { has_active_mission = ZZZ_media_cycle_countdown }
+			}
+		}
+	}
+
+	#################################################
+	#             Haitian Civil War GUI             #
+	#################################################
+	TNO_Haitian_War_GUI_USA = {
+		window_name = "TNO_Haitian_War_GUI_USA"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_Haitian_Civil_War }
+			tag = USA
+			is_ai = no
+		}
+
+		dynamic_lists = {
+			haiti_map_grid = {
+				array = HAI_map_array
+				entry_container = TNO_Haitian_War_GUI_Map_Entry
+				value = hai_v
+				index = hai_i
+			}
+		}
+
+		triggers = {
+			scenario_control_visible = {
+				if = {
+					limit = {
+						has_global_flag = HIS_trujillo_blitz_ongoing
+					}
+					set_temp_variable = { haiti_active_tab = 1 }
+				}
+				else = {
+					set_temp_variable = { haiti_active_tab = 0 }
+				}
+			}
+
+			haiti_involvement_bar_visible = {
+				NOT = { has_country_flag = TNO_HCW_disengagement_phase }
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_involvement_bar_red_visible = {
+				has_country_flag = TNO_HCW_disengagement_phase
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_involvement_bar_overlay_visible = {
+				NOT = { has_country_flag = TNO_HCW_disengagement_phase }
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_involvement_bar_overlay_inverted_visible = {
+				has_country_flag = TNO_HCW_disengagement_phase
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_signal_lost_pie_visible = {
+				has_country_flag = HCW_signal_lost
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_signal_lost_visible = {
+				has_country_flag = HCW_signal_lost
+				check_variable = { haiti_active_tab = 0 }
+			}
+			state_trujillo_tension_visible = {
+				check_variable = { HAI_blitz_tension > 0 }
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_tension_text_visible = {
+				check_variable = { HAI_blitz_tension > 0 }
+				check_variable = { haiti_active_tab = 0 }
+			}
+			state_trujillo_warning_visible = {
+				check_variable = { HAI_blitz_tension > 49.999 }
+				check_variable = { haiti_active_tab = 0 }
+			}
+			state_trujillo_normal_visible = {
+				check_variable = { HAI_blitz_tension = 0 }
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_map_button_visible = {
+				set_temp_variable = { haiti_map_button_y = HAI_map_y^hai_i }
+				add_to_temp_variable = { haiti_map_button_y = 1 }
+
+				if = {
+					limit = {
+						check_variable = { HAI_selected_state = hai_v }
+					}
+					set_temp_variable = { haiti_map_button_frame = 2 }
+				}
+				else = {
+					set_temp_variable = { haiti_map_button_frame = 1 }
+				}
+
+				NOT = { has_country_flag = HCW_signal_lost }
+				check_variable = { haiti_active_tab = 0 }
+			}
+			desc_haiti_civilwar_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_government_pie_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_divided_pie_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_communism_pie_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_pie_overlay_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_legitimacy_bar_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_legitimacy_frame_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_legitimacy_text_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_violence_bar_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_violence_frame_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_violence_text_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_weariness_bar_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_weariness_frame_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_weariness_text_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_fake_background_frame_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_involvement_text_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			haiti_map_icon_visible = {
+				check_variable = { haiti_active_tab = 0 }
+			}
+			desc_haiti_blitz_visible = {
+				check_variable = { haiti_active_tab = 1 }
+			}
+		}
+
+		effects = {
+			haiti_map_button_click = {
+				set_variable = { HAI_selected_state = hai_v }
+				TNO_HCW_Draw_Pie_Chart = yes
+			}
+		}
+
+		properties = {
+			haiti_map_icon = {
+				frame = hai_v:gui_display_frame
+				image = "GFX_haitianwar_state_[?hai_v]"
+				x = HAI_map_x^hai_i
+				y = HAI_map_y^hai_i
+			}
+			haiti_map_button = {
+				frame = haiti_map_button_frame
+				image = "GFX_haitianwar_state_selected_[?hai_v]"
+				x = HAI_map_x^hai_i
+				y = haiti_map_button_y
+			}
+			haiti_communism_pie = {
+				frame = HAI_selected_state:HCW_Communist_Control
+			}
+			haiti_divided_pie = {
+				frame = haiti_divided_pie_frame
+			}
+			haiti_government_pie = {
+				frame = haiti_government_pie_frame
+			}
+			haiti_legitimacy_bar = {
+				frame = HAI_legitimacy
+			}
+			haiti_violence_bar = {
+				frame = HAI_radicalism
+			}
+			haiti_weariness_bar = {
+				frame = HAI_weariness
+			}
+			state_trujillo_tension = {
+				frame = HAI_blitz_tension
+			}
+			state_trujillo_normal = {
+				frame = HCW_Hinche_frame
+			}
+			haiti_involvement_bar_overlay = {
+				frame = HAI_involvement
+			}
+			haiti_involvement_bar_overlay_inverted = {
+				frame = HAI_involvement
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+
+		### Fake Missions
+		triggers = {
+			fake_mission_1_background_visible = { ZZZ = { has_active_mission = ZZZ_USA_Haiti_Updates } }
+			fake_mission_1_title_visible = { ZZZ = { has_active_mission = ZZZ_USA_Haiti_Updates } }
+			fake_mission_1_duration_visible = { ZZZ = { has_active_mission = ZZZ_USA_Haiti_Updates } }
+
+			fake_mission_2_background_visible = { ZZZ = { has_active_mission = ZZZ_USA_HAI_Blitz_Combat_Stagnates } }
+			fake_mission_2_title_visible = { ZZZ = { has_active_mission = ZZZ_USA_HAI_Blitz_Combat_Stagnates } }
+			fake_mission_2_duration_visible = { ZZZ = { has_active_mission = ZZZ_USA_HAI_Blitz_Combat_Stagnates } }
+		}
+	}
+
+	#################################################
+	#               Madagaskar War GUI              #
+	#################################################
+	TNO_Madagascar_GUI = {
+		window_name = "TNO_Madagascar_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_MalagasyCW }
+			OR = {
+				tag = USA
+				tag = JAP
+				tag = GER
+			}
+			is_ai = no
+		}
+
+		triggers = {
+			madagascar_line_visible = {
+				check_variable = { Madagascar_active_tab = 1 }
+			}
+
+			selection_1857_visible = {
+				check_variable = { Madagascar_selected_city = 1857 }
+			}
+			selection_1969_visible = {
+				check_variable = { Madagascar_selected_city = 1969 }
+			}
+			selection_944_visible = {
+				check_variable = { Madagascar_selected_city = 944 }
+			}
+			selection_945_visible = {
+				check_variable = { Madagascar_selected_city = 945 }
+			}
+			selection_1970_visible = {
+				check_variable = { Madagascar_selected_city = 1970 }
+			}
+			selection_1974_visible = {
+				check_variable = { Madagascar_selected_city = 1974 }
+			}
+			selection_1975_visible = {
+				check_variable = { Madagascar_selected_city = 1975 }
+			}
+			selection_1860_visible = {
+				check_variable = { Madagascar_selected_city = 1860 }
+			}
+			selection_946_visible = {
+				check_variable = { Madagascar_selected_city = 946 }
+			}
+
+			madagascar_button_1_visible = {
+				if = {
+					limit = {
+						check_variable = { Madagascar_active_tab = 0 }
+					}
+					set_temp_variable = { madagascar_button_1_frame = 1 }
+					set_temp_variable = { madagascar_button_2_frame = 2 }
+				}
+				else = {
+					set_temp_variable = { madagascar_button_1_frame = 2 }
+					set_temp_variable = { madagascar_button_2_frame = 1 }
+				}
+			}
+
+			madagascar_strength_icon_visible = {
+				check_variable = { Madagascar_active_tab = 1 }
+				if = {
+					limit = {
+						check_variable = { Madagascar_selected_city:Madagascar_strength_var_@ROOT > 74.999 }
+					}
+					set_temp_variable = { Madagascar_strength_icon_frame = 4 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { Madagascar_selected_city:Madagascar_strength_var_@ROOT > 49.999 }
+					}
+					set_temp_variable = { Madagascar_strength_icon_frame = 3 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { Madagascar_selected_city:Madagascar_strength_var_@ROOT > 24.999 }
+					}
+					set_temp_variable = { Madagascar_strength_icon_frame = 2 }
+				}
+				else = {
+					set_temp_variable = { Madagascar_strength_icon_frame = 1 }
+				}
+			}
+
+			madagascar_pie_usa_visible = {
+				OR = {
+					original_tag = USA
+					original_tag = JAP
+				}
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_pie_japan_visible = {
+				OR = {
+					original_tag = USA
+					original_tag = JAP
+				}
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_flag_USA_visible = {
+				OR = {
+					original_tag = USA
+					original_tag = JAP
+				}
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_flag_JAP_visible = {
+				OR = {
+					original_tag = USA
+					original_tag = JAP
+				}
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+
+			madagascar_pie_germany_visible = {
+				original_tag = GER
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_pie_france_visible = {
+				original_tag = GER
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_flag_GER_visible = {
+				original_tag = GER
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_flag_FRA_visible = {
+				original_tag = GER
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_flag_1_overlay_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_flag_2_overlay_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_pie_overlay_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_investment_bar_frame_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_investment_bar_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			investment_text_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_investment_icon_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_contributions_bar_frame_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_contributions_bar_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			contribution_text_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_contributions_icon_visible = {
+				check_variable = { Madagascar_active_tab = 0 }
+			}
+			##########################
+			madagascar_state_name_visible = {
+				check_variable = { Madagascar_active_tab = 1 }
+			}
+			madagascar_state_desc_visible = {
+				check_variable = { Madagascar_active_tab = 1 }
+			}
+			madagascar_strength_bar_frame_visible = {
+				check_variable = { Madagascar_active_tab = 1 }
+			}
+			madagascar_strength_bar_visible = {
+				check_variable = { Madagascar_active_tab = 1 }
+			}
+			contribution_text_1_visible = {
+				check_variable = { Madagascar_active_tab = 1 }
+			}
+		}
+
+		effects = {
+			selected_node_1857_click = {
+				set_variable = { Madagascar_selected_city = 1857 }
+			}
+			selected_node_1969_click = {
+				set_variable = { Madagascar_selected_city = 1969 }
+			}
+			selected_node_944_click = {
+				set_variable = { Madagascar_selected_city = 944 }
+			}
+			selected_node_945_click = {
+				set_variable = { Madagascar_selected_city = 945 }
+			}
+			selected_node_1970_click = {
+				set_variable = { Madagascar_selected_city = 1970 }
+			}
+			selected_node_1974_click = {
+				set_variable = { Madagascar_selected_city = 1974 }
+			}
+			selected_node_1975_click = {
+				set_variable = { Madagascar_selected_city = 1975 }
+			}
+			selected_node_1860_click = {
+				set_variable = { Madagascar_selected_city = 1860 }
+			}
+			selected_node_946_click = {
+				set_variable = { Madagascar_selected_city = 946 }
+			}
+
+			madagascar_button_1_click = {
+				set_variable = { Madagascar_active_tab = 0 }
+			}
+			madagascar_button_2_click = {
+				set_variable = { Madagascar_active_tab = 1 }
+			}
+		}
+
+		properties = {
+
+			madagascar_involvement_bar_overlay = {
+				frame = global.MAD_war_prog
+			}
+
+			madagascar_line = {
+				image = "GFX_madagascar_line_[?Madagascar_selected_city]"
+			}
+
+			selected_node_1857_overlay = {
+				image = "[MAD_proxy_color_1857]"
+			}
+			selected_node_1969_overlay = {
+				image = "[MAD_proxy_color_1969]"
+			}
+			selected_node_944_overlay = {
+				image = "[MAD_proxy_color_944]"
+			}
+			selected_node_945_overlay = {
+				image = "[MAD_proxy_color_945]"
+			}
+			selected_node_1970_overlay = {
+				image = "[MAD_proxy_color_1970]"
+			}
+			selected_node_1974_overlay = {
+				image = "[MAD_proxy_color_1974]"
+			}
+			selected_node_1975_overlay = {
+				image = "[MAD_proxy_color_1975]"
+			}
+			selected_node_1860_overlay = {
+				image = "[MAD_proxy_color_1860]"
+			}
+			selected_node_946_overlay = {
+				image = "[MAD_proxy_color_946]"
+			}
+
+
+			selected_node_1864 = {
+				image = "[MAD_proxy_color_1864]"
+			}
+			selected_node_1859 = {
+				image = "[MAD_proxy_color_1859]"
+			}
+			selected_node_1971 = {
+				image = "[MAD_proxy_color_1971]"
+			}
+			selected_node_1972 = {
+				image = "[MAD_proxy_color_1972]"
+			}
+			selected_node_1861 = {
+				image = "[MAD_proxy_color_1861]"
+			}
+
+			madagascar_button_1 = {
+				frame = madagascar_button_1_frame
+			}
+			madagascar_button_2 = {
+				frame = madagascar_button_2_frame
+			}
+
+			madagascar_strength_bar = {
+				frame = Madagascar_selected_city:Madagascar_strength_var_@ROOT
+			}
+			madagascar_strength_icon = {
+				frame = Madagascar_strength_icon_frame
+			}
+
+			madagascar_pie_usa = {
+				frame = madagascar_pie_usa_frame
+			}
+			madagascar_pie_japan = {
+				frame = global.Madagascar_JAP_influence
+			}
+			madagascar_pie_germany = {
+				frame = madagascar_pie_germany_frame
+			}
+			madagascar_pie_france = {
+				frame = global.Madagascar_FRA_influence
+			}
+			madagascar_investment_bar = {
+				frame = Madagascar_investment
+			}
+			madagascar_contributions_bar = {
+				frame = Madagascar_contributions
+			}
+
+			madagascar_flag_JAP = {
+				image = "[?JAP.GetFlag]"
+			}
+			madagascar_flag_USA = {
+				image = "[?USA.GetFlag]"
+			}
+			madagascar_flag_GER = {
+				image = "[?GER.GetFlag]"
+			}
+			madagascar_flag_FRA = {
+				image = "[?FRA.GetFlag]"
+			}
+			sidebar = {
+				image = "[Get_fopo_sidebar]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+		}
+
+		### Fake Missions
+		triggers = {
+			fake_mission_1_background_visible = { ZZZ = { has_active_mission = ZZZ_USA_MADCW_Action_Counter } tag = USA }
+			fake_mission_1_title_visible = { ZZZ = { has_active_mission = ZZZ_USA_MADCW_Action_Counter } tag = USA }
+			fake_mission_1_duration_visible = { ZZZ = { has_active_mission = ZZZ_USA_MADCW_Action_Counter } tag = USA }
+		}
+	}
+
+	#################################################
+	#               Channel Crisis GUI              #
+	#################################################
+	TNO_Channel_Crisis_GUI = {
+		window_name = "TNO_Channel_Crisis_GUI"
+		context_type = player_context
+		parent_window_name = powerbalanceview
+
+		visible = {
+			check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_GlobalConflicts }
+			check_variable = { selected_conflict_id = token:GC_ChannelCrisis }
+			is_ai = no #might try making the ai directly interact later, moving ai buttons to decisions for now
+		}
+
+		dynamic_lists = {
+			cc_negotiations_grid = {
+				array = ENG.cc_negotiations_concessions_array
+				index = ENG.cc_negotiations_concessions_array_idx
+				value = ENG.cc_negotiations_concessions_array_val
+				entry_container = TNO_cc_negotiations_entry
+			}
+		}
+
+		properties = {
+			#sidebar = {
+			#	image = "[Get_fopo_sidebar]"
+			#}
+			header_image = {
+				image = "[Get_cc_display_image]"
+			}
+			seal = {
+				image = "[Get_fopo_seal]"
+			}
+			American_flag = {
+				image = "[USA.GetFlag]"
+				x = THIS.channelgui_x_usa
+			}
+			British_flag = {
+				image = "[ENG.GetFlag]"
+				x = THIS.channelgui_x_eng
+			}
+			German_flag = {
+				image = "[GER.GetFlag]"
+				x = THIS.channelgui_x_ger
+			}
+			American_flag_overlay = { x = THIS.channelgui_overlay_x_usa }
+			British_flag_overlay = { x = THIS.channelgui_overlay_x_eng }
+			German_flag_overlay = { x = THIS.channelgui_overlay_x_ger }
+			readiness_bar_player = {
+				frame = THIS.CC_player_readiness_display
+			}
+			readiness_bar_opposing = {
+				frame = THIS.CC_opposing_readiness_display
+			}
+			cc_involvement_bar_overlay = {
+				frame = ENG.CC_buildup_progression
+			}
+			cc_concessions_entry = {
+				image = "GFX_cc_negotiations_[?ENG.cc_negotiations_concessions_array_val.GetTokenKey]"
+			}
+			cc_negotiations_reject_button = {
+				frame = THIS.cc_negotiations_reject_button_frame
+			}
+		}
+
+		effects = {
+			cc_negotiations_accept_button_click = {
+				CC_accept_button_effect = yes
+			}
+			cc_negotiations_reject_button_click = {
+				CC_reject_demand_button_effect = yes
+			}
+		}
+
+		triggers = {
+			cc_negotiations_accept_button_click_enabled = {
+				OR = {
+					has_country_flag = CC_negotiations_accept_or_reject
+					has_country_flag = CC_negotiations_accept_or_demand
+				}
+			}
+			cc_negotiations_reject_button_click_enabled = {
+				OR = {
+					has_country_flag = CC_negotiations_accept_or_reject
+					has_country_flag = CC_negotiations_accept_or_demand
+				}
+			}
+			cc_concessions_frame_confirmed_visible = {
+				CC_is_concession_confirmed = yes
+			}
+			cc_concessions_frame_unconfirmed_visible = {
+				CC_is_concession_confirmed = no
+			}
+			cc_involvement_bar_static_visible = {
+				NOT = { has_global_flag = channel_crisis_ongoing_buildup }
+			}
+			cc_involvement_bar_visible = {
+				has_global_flag = channel_crisis_ongoing_buildup
+			}
+			cc_involvement_bar_overlay_visible = {
+				has_global_flag = channel_crisis_ongoing_buildup
+			}
+			negotiations_desc_text_visible = {
+				NOT = { has_global_flag = channel_crisis_negotiations_ongoing }
+			}
+			cc_concessions_entry_visible = {
+				has_global_flag = channel_crisis_negotiations_ongoing
+			}
+			cc_concessions_frame_unconfirmed_visible = {
+				has_global_flag = channel_crisis_negotiations_ongoing
+			}
+			cc_concessions_frame_confirmed_visible = {
+				has_global_flag = channel_crisis_negotiations_ongoing
+			}
+		}
+
+	}
+
+}

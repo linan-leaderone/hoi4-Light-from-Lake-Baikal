@@ -1,0 +1,404 @@
+# ██████╗ ██████╗ ██╗████████╗ █████╗ ██╗███╗   ██╗ #
+# ██╔══██╗██╔══██╗██║╚══██╔══╝██╔══██╗██║████╗  ██║ #
+# ██████╔╝██████╔╝██║   ██║   ███████║██║██╔██╗ ██║ #
+# ██╔══██╗██╔══██╗██║   ██║   ██╔══██║██║██║╚██╗██║ #
+# ██████╔╝██║  ██║██║   ██║   ██║  ██║██║██║ ╚████║ #
+# ╚═════╝ ╚═╝  ╚═╝╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ #
+#Scripted Localization
+
+#Index; Search for these names using ctrl+f and you'll find the section they entitle.
+#	Party Mechanic Scripted Loc
+#		BRI_Party_GetCurrentStruggle
+#		BRI_Party_GetCurrentSelection
+#		BRI_Party_GetPragmatistInfluence
+#		BRI_Party_GetChaosThresholdTitle
+#		BRI_Party_GetChaosThresholdStatus
+#		BRI_Party_GetFascistName
+#
+#	Mann Mechanic Scripted Loc
+#		BRI_Mann_GetStateName
+#		BRI_Mann_GetStateNameSelected
+#		BRI_Mann_GetStateNameEffect
+#		BRI_Mann_GetStateStatus
+#		BRI_Mann_GetStateStatusEffect
+#		BRI_Mann_GetStateFrame
+#
+#	Midnight Mechanic Scripted Loc
+#		BRI_Midnight_GetConfidenceDesc_text
+#		BRI_Midnight_GetConfidenceDesc_tt_delayed
+#		BRI_Midnight_GetAcclimationDesc_text
+#		BRI_Midnight_GetAcclimationDesc_tt_delayed
+#		BRI_Midnight_GetExhaustionDesc_text
+#		BRI_Midnight_GetExhaustionDesc_tt_delayed
+
+#################################################
+##=|       Party Mechanic Scripted Loc       |=##
+##======================| |====================##
+#################################################
+
+# Returns current status of the Party dispute (who's more influential)
+defined_text = {
+	name = BRI_Party_GetCurrentStruggle
+	text = { # Ideologues
+		trigger = { check_variable = { BRI_Party_InfluenceTotal > 55 } }
+		localization_key = [BRI_Party_GetFascistStatus]
+	}
+	text = { # Pragmatists
+		trigger = { check_variable = { BRI_Party_InfluenceTotal < 45 } }
+		localization_key = "BRI_Party_Status_Pragmatists_tt"
+	}
+	text = { # No one
+		localization_key = "BRI_Party_Status_None_tt"
+	}
+}
+
+# Returns currently selected group
+defined_text = {
+	name = BRI_Party_GetCurrentSelection
+	text = { # Peers
+		trigger = { check_variable = { BRI_Party_CategorySelection = 0 } }
+		localization_key = "TNO_BRI_Party_Peers_name_tt"
+	}
+	text = { # German Garrison
+		trigger = { check_variable = { BRI_Party_CategorySelection = 1 } }
+		localization_key = "TNO_BRI_Party_Garrison_name_tt"
+	}
+	text = { # German Corporations
+		trigger = { check_variable = { BRI_Party_CategorySelection = 2 } }
+		localization_key = "TNO_BRI_Party_Corporations_name_tt"
+	}
+	text = { # Party
+		trigger = { check_variable = { BRI_Party_CategorySelection = 3 } }
+		localization_key = "TNO_BRI_Party_Party_name_tt"
+	}
+}
+
+# Returns total Pragmatist influence
+defined_text = {
+	name = BRI_Party_GetPragmatistInfluence
+	text = {
+		trigger = {
+			set_temp_variable = { InfluenceTemp = 100 }
+			subtract_from_temp_variable = { InfluenceTemp = BRI_Party_InfluenceTotal }
+		}
+		localization_key = "BRI_Party_InfluenceTempDisp_tt"
+	}
+}
+
+#defines party tick
+defined_text = {
+	name = getdominantbripartyparty
+	text = {
+		trigger = {
+			OR = {
+				has_country_flag = party_indoctrinated
+				has_country_flag = contracts_cut
+			}
+		}
+		localization_key = BRI_Ideologues
+	}
+	text = {
+		trigger = {
+			OR = {
+				has_country_flag = party_educated
+				has_country_flag = pipeline_opened
+			}
+		}
+		localization_key = BRI_Pragmatists
+	}
+}
+
+#party tick v2
+defined_text = {
+	name = BRI_Party_Get_Tick_Party
+	text = { # Ideologues
+		trigger = { check_variable = { BRI_Party_InfluenceTotal > 55 } }
+		localization_key = "BRI_Ideo_Tick"
+	}
+	text = { # Pragmatists
+		trigger = { check_variable = { BRI_Party_InfluenceTotal < 45 } }
+		localization_key = "BRI_Prag_Tick"
+	}
+	text = { # No one
+		localization_key = "BRI_No_One_Tick"
+	}
+}
+
+# Returns the title for a Chaos bar threshold
+defined_text = {
+	name = BRI_Party_GetChaosThresholdTitle
+	text = { # 
+		trigger = { check_variable = { threshold_idx = 0 } }
+		localization_key = "BRI_ChaosThreshold_0"
+	}
+	text = { # 
+		trigger = { check_variable = { threshold_idx = 1 } }
+		localization_key = "BRI_ChaosThreshold_1"
+	}
+	text = { # 
+		trigger = { check_variable = { threshold_idx = 2 } }
+		localization_key = "BRI_ChaosThreshold_2"
+	}
+	text = { # 
+		trigger = { check_variable = { threshold_idx = 3 } }
+		localization_key = "BRI_ChaosThreshold_3"
+	}
+	text = { # 
+		trigger = { check_variable = { threshold_idx = 4 } }
+		localization_key = "BRI_ChaosThreshold_4"
+	}
+	text = { # 
+		trigger = { check_variable = { threshold_idx = 5 } }
+		localization_key = "BRI_ChaosThreshold_5"
+	}
+}
+
+# Returns effect status for a Chaos bar threshold
+defined_text = {
+	name = BRI_Party_GetChaosThresholdStatus
+	text = { # Active
+		trigger = { check_variable = { var = BRI_Chaos value = BRI_ChaosThreshold^threshold_idx compare = greater_than_or_equals } }
+		localization_key = "BRI_ChaosModifierActive_tt"
+	}
+	text = { # Inactive
+		localization_key = "BRI_ChaosModifierInactive_tt"
+	}
+}
+
+# Returns proper fascist party name
+defined_text = {
+	name = BRI_Party_GetFascistName
+	text = { # Ideologues
+		trigger = { NOT = { has_country_flag = BRI_Wallop_Active_flag } }
+		localization_key = "BRI_Ideologues"
+	}
+	text = { # Old Guard
+		localization_key = "BRI_Old_Guard"
+	}
+}
+
+# Returns proper fascist party name w/o icon
+defined_text = {
+	name = BRI_Party_GetFascistName_Iconless
+	text = { # Ideologues
+		trigger = { NOT = { has_country_flag = BRI_Wallop_Active_flag } }
+		localization_key = "BRI_Ideologues_Iconless"
+	}
+	text = { # Old Guard
+		localization_key = "BRI_Old_Guard_Iconless"
+	}
+}
+
+# Returns proper fascist party name PLURAL
+defined_text = {
+	name = BRI_Party_GetFascistName_PL
+	text = { # Ideologues
+		trigger = { NOT = { has_country_flag = BRI_Wallop_Active_flag } }
+		localization_key = "BRI_Ideologues"
+	}
+	text = { # Old Guard
+		localization_key = "BRI_Old_Guard"
+	}
+}
+
+# Returns proper fascist party name w/o icon PLURAL
+defined_text = {
+	name = BRI_Party_GetFascistName_Iconless_PL
+	text = { # Ideologues
+		trigger = { NOT = { has_country_flag = BRI_Wallop_Active_flag } }
+		localization_key = "BRI_Ideologues_Iconless"
+	}
+	text = { # Old Guard
+		localization_key = "BRI_Old_Guard_Iconless"
+	}
+}
+
+# Returns status with proper fascist party name i'm gonna explode in 0.03 seconds
+defined_text = {
+	name = BRI_Party_GetFascistStatus
+	text = { # Ideologues
+		trigger = { NOT = { has_country_flag = BRI_Wallop_Active_flag } }
+		localization_key = "BRI_Party_Status_Ideologues_tt"
+	}
+	text = { # Old Guard
+		localization_key = "BRI_Party_Status_Old_Guard_tt"
+	}
+}
+
+############################################
+##=|     Mann Mechanic Scripted Loc     |=##
+##========================================##
+############################################
+
+defined_text = {
+	name = BRI_Mann_GetStateName
+	text = { localization_key = "[?State_v.GetTokenLocalizedKey]" }
+}
+
+defined_text = {
+	name = BRI_Mann_GetStateNameSelected
+	text = { localization_key = "[?BRI_Mann_StateSelected.GetTokenLocalizedKey]" }
+}
+
+defined_text = {
+	name = BRI_Mann_GetStateNameEffect
+	text = { localization_key = "[?TargetState.GetTokenLocalizedKey]" }
+}
+
+defined_text = {
+	name = BRI_Mann_GetStateStatus
+	text = { localization_key = "[?BRI_Mann_StateStatus@var:State_v.GetTokenLocalizedKey]" }
+}
+
+defined_text = {
+	name = BRI_Mann_GetStateStatusEffect
+	text = { localization_key = "[?TargetStatus.GetTokenLocalizedKey]" }
+}
+
+defined_text = {
+	name = BRI_Mann_GetStateFrame
+	text = { localization_key = "GFX_[?BRI_Mann_StateStatus@var:State_v.GetTokenKey]" }
+}
+
+################################################
+##=|     Midnight Mechanic Scripted Loc     |=##
+##============================================##
+################################################
+
+defined_text = {
+	name = BRI_Midnight_GetConfidenceDesc_text
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Confidence < 20 } }
+		localization_key = "BRI_Midnight_ConfidenceDesc_text_VeryBad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Confidence > 19 } check_variable = { BRI_Midnight_Confidence < 40 } }
+		localization_key = "BRI_Midnight_ConfidenceDesc_text_Bad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Confidence > 39 } check_variable = { BRI_Midnight_Confidence < 60 } }
+		localization_key = "BRI_Midnight_ConfidenceDesc_text_Normal"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Confidence > 59 } check_variable = { BRI_Midnight_Confidence < 80 } }
+		localization_key = "BRI_Midnight_ConfidenceDesc_text_Good"
+	}
+	text = {
+		localization_key = "BRI_Midnight_ConfidenceDesc_text_VeryGood"
+	}
+}
+
+defined_text = {
+	name = BRI_Midnight_GetConfidenceDesc_tt_delayed
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Confidence < 20 } }
+		localization_key = "BRI_Midnight_ConfidenceDesc_tt_delayed_VeryBad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Confidence > 19 } check_variable = { BRI_Midnight_Confidence < 40 } }
+		localization_key = "BRI_Midnight_ConfidenceDesc_tt_delayed_Bad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Confidence > 39 } check_variable = { BRI_Midnight_Confidence < 60 } }
+		localization_key = "BRI_Midnight_ConfidenceDesc_tt_delayed_Normal"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Confidence > 59 } check_variable = { BRI_Midnight_Confidence < 80 } }
+		localization_key = "BRI_Midnight_ConfidenceDesc_tt_delayed_Good"
+	}
+	text = {
+		localization_key = "BRI_Midnight_ConfidenceDesc_tt_delayed_VeryGood"
+	}
+}
+
+defined_text = {
+	name = BRI_Midnight_GetAcclimationDesc_text
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Acclimation < 20 } }
+		localization_key = "BRI_Midnight_AcclimationDesc_text_VeryBad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Acclimation > 19 } check_variable = { BRI_Midnight_Acclimation < 40 } }
+		localization_key = "BRI_Midnight_AcclimationDesc_text_Bad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Acclimation > 39 } check_variable = { BRI_Midnight_Acclimation < 60 } }
+		localization_key = "BRI_Midnight_AcclimationDesc_text_Normal"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Acclimation > 59 } check_variable = { BRI_Midnight_Acclimation < 80 } }
+		localization_key = "BRI_Midnight_AcclimationDesc_text_Good"
+	}
+	text = {
+		localization_key = "BRI_Midnight_AcclimationDesc_text_VeryGood"
+	}
+}
+
+defined_text = {
+	name = BRI_Midnight_GetAcclimationDesc_tt_delayed
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Acclimation < 20 } }
+		localization_key = "BRI_Midnight_AcclimationDesc_tt_delayed_VeryBad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Acclimation > 19 } check_variable = { BRI_Midnight_Acclimation < 40 } }
+		localization_key = "BRI_Midnight_AcclimationDesc_tt_delayed_Bad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Acclimation > 39 } check_variable = { BRI_Midnight_Acclimation < 60 } }
+		localization_key = "BRI_Midnight_AcclimationDesc_tt_delayed_Normal"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Acclimation > 59 } check_variable = { BRI_Midnight_Acclimation < 80 } }
+		localization_key = "BRI_Midnight_AcclimationDesc_tt_delayed_Good"
+	}
+	text = {
+		localization_key = "BRI_Midnight_AcclimationDesc_tt_delayed_VeryGood"
+	}
+}
+
+defined_text = {
+	name = BRI_Midnight_GetExhaustionDesc_text
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Exhaustion > 79 } }
+		localization_key = "BRI_Midnight_ExhaustionDesc_text_VeryBad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Exhaustion < 80 } check_variable = { BRI_Midnight_Exhaustion > 59 } }
+		localization_key = "BRI_Midnight_ExhaustionDesc_text_Bad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Exhaustion < 60 } check_variable = { BRI_Midnight_Exhaustion > 39 } }
+		localization_key = "BRI_Midnight_ExhaustionDesc_text_Normal"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Exhaustion < 40 } check_variable = { BRI_Midnight_Exhaustion > 19 } }
+		localization_key = "BRI_Midnight_ExhaustionDesc_text_Good"
+	}
+	text = {
+		localization_key = "BRI_Midnight_ExhaustionDesc_text_VeryGood"
+	}
+}
+
+defined_text = {
+	name = BRI_Midnight_GetExhaustionDesc_tt_delayed
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Exhaustion > 79 } }
+		localization_key = "BRI_Midnight_ExhaustionDesc_tt_delayed_VeryBad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Exhaustion < 80 } check_variable = { BRI_Midnight_Exhaustion > 59 } }
+		localization_key = "BRI_Midnight_ExhaustionDesc_tt_delayed_Bad"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Exhaustion < 60 } check_variable = { BRI_Midnight_Exhaustion > 39 } }
+		localization_key = "BRI_Midnight_ExhaustionDesc_tt_delayed_Normal"
+	}
+	text = {
+		trigger = { check_variable = { BRI_Midnight_Exhaustion < 40 } check_variable = { BRI_Midnight_Exhaustion > 19 } }
+		localization_key = "BRI_Midnight_ExhaustionDesc_tt_delayed_Good"
+	}
+	text = {
+		localization_key = "BRI_Midnight_ExhaustionDesc_tt_delayed_VeryGood"
+	}
+}

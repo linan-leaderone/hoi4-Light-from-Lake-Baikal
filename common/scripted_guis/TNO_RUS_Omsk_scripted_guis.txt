@@ -1,0 +1,168 @@
+##########################################
+##  ██████╗ ███╗   ███╗ ██████╗██╗  ██╗ ##
+## ██╔═══██╗████╗ ████║██╔════╝██║ ██╔╝ ##
+## ██║   ██║██╔████╔██║██║     █████╔╝  ##
+## ██║   ██║██║╚██╔╝██║██║     ██╔═██╗  ##
+## ╚██████╔╝██║ ╚═╝ ██║╚██████╗██║  ██╗ ##
+##  ╚═════╝ ╚═╝     ╚═╝ ╚═════╝╚═╝  ╚═╝ ##
+##########################################
+
+scripted_gui = {
+
+	# // INDEX // #
+	# /// Gauntlet /// #
+	# /// Batov's Insurgency /// #
+
+	# /// Gauntlet /// #
+	TNO_OMS_Gauntlet_GUI = {
+		context_type = decision_category
+		window_name = "TNO_OMS_Gauntlet_GUI"
+		visible = { always = yes }
+		dirty = OMS_Gauntlet_Dirty
+		dynamic_lists = {
+			OMS_Gauntlet_CityList = {
+				array = OMS_Gauntlet_City_Status
+				index = city_idx
+				value = city_val
+				entry_container = "TNO_OMS_Gauntlet_CityList_Entry"
+			}
+			OMS_Gauntlet_NewGuardList = {
+				array = OMS_Gauntlet_NewGuard_ID
+				index = guard_idx
+				value = guard_val
+				entry_container = "TNO_OMS_Gauntlet_NewGuardList_Entry"
+			}
+		}
+		triggers = {
+			OMS_Gauntlet_NewGuardLocked_visible = {
+				check_variable = { guard_val = 0 }
+			}
+			OMS_Gauntlet_NewGuardButtonRecruit_visible = {
+				check_variable = { guard_val = 0 }
+			}
+			OMS_Gauntlet_NewGuardButtonSupport_visible = {
+				check_variable = { guard_val > 0 }
+			}
+			OMS_Gauntlet_CityHealth_BarCap_visible = {
+				check_variable = { city_val < 1 }
+			}
+			OMS_Gauntlet_CityControl_BarCap_visible = {
+				check_variable = { city_val < 1 }
+			}
+			OMS_Gauntlet_CityFramePacified_visible = {
+				check_variable = { city_val = 1 }
+			}
+			OMS_Gauntlet_NewGuardButtonSupport_click_enabled = {
+				check_variable = { OMS_Gauntlet_NewGuard_Entrenchment^guard_idx < 100 }
+			}
+		}
+		effects = {
+			OMS_Gauntlet_NewGuardButtonRecruit_click = {
+				OMS_Gauntlet_NewGuardButtonRecruit = yes
+			}
+			OMS_Gauntlet_NewGuardButtonSupport_click = {
+				OMS_Gauntlet_NewGuardButtonSupport = yes
+			}
+		}
+		properties = {
+			OMS_Gauntlet_CityImage = { frame = OMS_Gauntlet_City_Frame^city_idx }
+			OMS_Gauntlet_CityHealth_Bar = { frame = OMS_Gauntlet_City_Health^city_idx }
+			OMS_Gauntlet_CityHealth_BarCap = { y = OMS_Gauntlet_City_HealthCap_Y^city_idx }
+			OMS_Gauntlet_CityControl_Bar = { frame = OMS_Gauntlet_City_Control^city_idx }
+			OMS_Gauntlet_CityControl_BarCap = { y = OMS_Gauntlet_City_ControlCap_Y^city_idx }
+			OMS_Gauntlet_NewGuardImage = { frame = guard_val }
+			OMS_Gauntlet_NewGuardEntrenchment_Bar = { frame = OMS_Gauntlet_NewGuard_Entrenchment^guard_idx }
+		}
+	}
+
+	# /// Batov's Insurgency /// #
+	OMS_GUI_insurgency = {
+		context_type = decision_category
+		window_name = "OMS_GUI_insurgency"
+		visible = { always = yes }
+		dirty = insurgency_controller
+		dynamic_lists = {
+			map_gridbox = {
+				array = OMS_map_grid_array
+				index = idx
+				value = OMS_map_value
+				entry_container = "OMS_map_entry"
+			}
+		}
+		properties = {
+			map_state = {
+				image = "GFX_OMS_insurgency_map_state_[?OMS_map_grid_array^idx]"
+				frame = OMS_map_value:base_status
+				x = OMS_map_x^idx
+				y = OMS_map_y^idx
+			}
+			top_bar_strength_bar = { frame = insurgency_strength }
+		}
+		triggers = {
+			map_state_754_selected_visible = { check_variable = { insurgency_state_selected = 754 } }
+			map_state_653_selected_visible = { check_variable = { insurgency_state_selected = 653 } }
+			map_state_573_selected_visible = { check_variable = { insurgency_state_selected = 573 } }
+			map_state_572_selected_visible = { check_variable = { insurgency_state_selected = 572 } }
+			map_state_580_selected_visible = { check_variable = { insurgency_state_selected = 580 } }
+			map_state_403_selected_visible = { check_variable = { insurgency_state_selected = 403 } }
+			map_state_571_selected_visible = { check_variable = { insurgency_state_selected = 571 } }
+			map_state_871_selected_visible = { check_variable = { insurgency_state_selected = 871 } }
+			map_state_863_selected_visible = { check_variable = { insurgency_state_selected = 863 } }
+			map_state_756_selected_visible = { check_variable = { insurgency_state_selected = 756 } }
+			map_state_844_selected_visible = { check_variable = { insurgency_state_selected = 844 } }
+			map_state_579_selected_visible = { check_variable = { insurgency_state_selected = 579 } }
+			map_state_845_selected_visible = { check_variable = { insurgency_state_selected = 845 } }
+			OMS_ISD_button_visible = { has_completed_focus = OMS_isd_field_commissars }
+			OMS_ISD_button_click_enabled = {
+				command_power > 14.99
+				has_political_power > 19.99
+				var:insurgency_state_selected = {
+					NOT = { has_state_flag = OMS_deployed_commissar }
+				}
+			}
+			OMS_army_button_visible = {
+				has_completed_focus = OMS_marching_for_vengeance
+				check_variable = { OMS_army_deployed = 0 }
+			}
+			OMS_army_button_click_enabled = {
+				check_variable = { OMS.insurgency_strength > 84 }
+				check_variable = { OMS_army_deployed = 0 }
+			}
+		}
+		effects = {
+			map_state_click = {
+				set_variable = { insurgency_state_selected = OMS_map_grid_array^idx }
+				set_variable = { insurgency_state_selected_i = idx }
+				add_to_variable = { insurgency_controller = 1 }
+			}
+			OMS_ISD_button_click = {
+				var:insurgency_state_selected = {
+					set_state_flag = {
+						flag = OMS_deployed_commissar
+						days = 150
+						value = 1
+					}
+					add_to_variable = { insurgency_strength = -0.05 }
+				}
+				add_to_variable = { insurgency_controller = 1 }
+				OMS_SE_insurgency_calc_insurgency_strength = yes
+				hidden_effect = { add_command_power = -15 }
+				hidden_effect = { add_political_power = -20 }
+			}
+			OMS_army_button_click = {
+				if = {
+					limit = {
+						check_variable = { OMS_army_click = 0 }
+					}
+					activate_mission = OMS_confirm_total_destruction_batov
+					add_days_mission_timeout = {
+						mission = OMS_put_down_batovs_bandits
+						days = 15
+					}
+				}
+				set_variable = { OMS_army_click = 1 }
+			}
+		}
+	}
+
+}

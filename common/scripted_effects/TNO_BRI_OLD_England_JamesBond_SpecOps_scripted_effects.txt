@@ -1,0 +1,144 @@
+ENG_JamesBond_SpecOps_Progress = {
+	if = { #When picking up the focus.
+		limit = {
+			check_variable = { ENG_ARR_JamesBond_SpecOps_Status^JamesBond_SpecOps_Status_Index = 0 }
+		}
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Invested = 0 }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Invested = 0 }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Invested = 0 }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Invested = 0 }
+		if = {
+			limit = {
+				check_variable = { JamesBond_SpecOps_Status_Index = 0 }
+			}
+			set_variable = { AddNeededTF = 100 }
+			set_variable = { AddNeededIntelXP = 30 }
+			set_variable = { AddNeededGuns = 1000 }
+			set_variable = { AddNeededPP = 50 }
+		}
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Needed = AddNeededTF }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Needed = AddNeededIntelXP }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Needed = AddNeededGuns }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Needed = AddNeededPP }
+		clear_variable = AddNeededTF
+		clear_variable = AddNeededIntelXP
+		clear_variable = AddNeededGuns
+		clear_variable = AddNeededPP
+		randomize_temp_variable = {
+			var = AddToSpecOpsDays
+			min = 15
+			max = 30
+		}
+		set_variable = { ENG_JamesBond_SpecOps_Days = AddToSpecOpsDays }
+		round_variable = ENG_JamesBond_SpecOps_Days
+		set_variable = { ENG_ARR_JamesBond_SpecOps_Status^JamesBond_SpecOps_Status_Index = 1 }
+		hidden_effect = {
+			country_event = { id = ENG_jamesbond_specops.2 }
+		}
+	}
+	else_if = { #After the preparation stage.
+		limit = {
+			check_variable = { ENG_ARR_JamesBond_SpecOps_Status^JamesBond_SpecOps_Status_Index = 1 }
+		}
+		clear_array = ENG_ARR_JamesBond_SpecOps_Resources_Needed
+		if = {
+			limit = {
+				check_variable = { JamesBond_SpecOps_Status_Index = 0 }
+			}
+			add_political_power = 50
+			set_variable = { AddNeededTF = 500 }
+			set_variable = { AddNeededIntelXP = 100 }
+			set_variable = { AddNeededGuns = 0 }
+			set_variable = { AddNeededPP = 0 }
+		}
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Needed = AddNeededTF }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Needed = AddNeededIntelXP }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Needed = AddNeededGuns }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Needed = AddNeededPP }
+		clear_array = ENG_ARR_JamesBond_SpecOps_Resources_Invested
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Invested = 0 }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Invested = 0 }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Invested = 0 }
+		add_to_array = { ENG_ARR_JamesBond_SpecOps_Resources_Invested = 0 }
+		clear_variable = AddNeededTF
+		clear_variable = AddNeededIntelXP
+		clear_variable = AddNeededGuns
+		clear_variable = AddNeededPP
+		randomize_temp_variable = {
+			var = AddToSpecOpsDays
+			min = 15
+			max = 30
+		}
+		set_variable = { ENG_JamesBond_SpecOps_Days = AddToSpecOpsDays }
+		round_variable = ENG_JamesBond_SpecOps_Days
+		set_variable = { ENG_ARR_JamesBond_SpecOps_Status^JamesBond_SpecOps_Status_Index = 2 }
+		hidden_effect = {
+			country_event = { id = ENG_jamesbond_specops.2 }
+		}
+	}
+	else_if = { #After an execution stage.
+		limit = {
+			check_variable = { ENG_ARR_JamesBond_SpecOps_Status^JamesBond_SpecOps_Status_Index = 2 }
+		}
+		if = {
+			limit = {
+				check_variable = { JamesBond_SpecOps_Status_Index = 0 }
+			}
+			add_political_power = 300
+		}
+		clear_array = ENG_ARR_JamesBond_SpecOps_Resources_Invested
+		clear_array = ENG_ARR_JamesBond_SpecOps_Resources_Needed
+		clr_country_flag = ENG_CF_JamesBond_SpecOps_Open
+	}
+}
+
+ENG_JamesBond_SpecOps_Investing = {
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { ENG_ARR_JamesBond_SpecOps_Resources_Invested^ENG_JamesBond_SpecOps_InvestMode = ENG_ARR_JamesBond_SpecOps_Resources_Needed^ENG_JamesBond_SpecOps_InvestMode }
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					check_variable = { ENG_JamesBond_SpecOps_InvestMode = 0 }
+					check_variable = { ENG_JamesBond_SpecOps_InvestMode = 1 }
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { ENG_ARR_JamesBond_SpecOps_Resources_Has^ENG_JamesBond_SpecOps_InvestMode > 10 }
+				}
+				add_to_variable = { ENG_ARR_JamesBond_SpecOps_Resources_Invested^ENG_JamesBond_SpecOps_InvestMode = 10 }
+				add_to_variable = { ENG_ARR_JamesBond_SpecOps_Resources_Has^ENG_JamesBond_SpecOps_InvestMode = -10 }
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = { ENG_JamesBond_SpecOps_InvestMode = 2 }
+			}
+			if = {
+				limit = {
+					check_variable = { ENG_ARR_JamesBond_SpecOps_Resources_Has^ENG_JamesBond_SpecOps_InvestMode > 249 }
+				}
+				add_to_variable = { ENG_ARR_JamesBond_SpecOps_Resources_Invested^ENG_JamesBond_SpecOps_InvestMode = 250 }
+				add_to_variable = { ENG_ARR_JamesBond_SpecOps_Resources_Has^ENG_JamesBond_SpecOps_InvestMode = -250 }
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = { ENG_JamesBond_SpecOps_InvestMode = 3 }
+			}
+			if = {
+				limit = {
+					ENG = {
+						has_political_power > 9.99
+					}
+				}
+				add_to_variable = { ENG_ARR_JamesBond_SpecOps_Resources_Invested^ENG_JamesBond_SpecOps_InvestMode = 10 }
+				ENG = { add_political_power = -10 }
+			}
+		}
+	}
+}

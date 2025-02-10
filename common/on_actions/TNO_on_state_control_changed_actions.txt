@@ -1,0 +1,1502 @@
+on_actions = {
+	on_state_control_changed = {
+		effect = {
+			FROM.FROM = {
+				if = {
+					limit = { 
+						OR = {
+							###also fires when the endonym button is clicked
+							has_state_flag = universal_renamings 
+							### non-universal renamings - separate effects in other file as well for code efficiency
+							has_state_flag = state_renamings 
+							###does not fire when the button is clicked, only with on actions, meant mostly for non-renaming purposes
+							has_state_flag = state_control_change_effects 
+						}
+					}
+					meta_effect = {
+						text = {
+							state_control_effect_[STATEID] = yes
+						}
+						STATEID = "[?This.GetID]"
+					}
+				}
+				if = {
+					limit = { 
+						AND = {
+							###when effects need to be differentiated
+							OR = {
+								has_state_flag = universal_renamings 
+								has_state_flag = state_renamings 
+							}
+							has_state_flag = state_control_change_effects 
+						}
+					}
+					meta_effect = {
+						text = {
+							non_endo_state_control_effect_[STATEID] = yes
+						}
+						STATEID = "[?This.GetID]"
+					}
+				}
+			}
+
+			################################
+			###   Indonesian Civil War   ###
+			################################
+
+			if = {
+				limit = {
+					FROM = {
+						original_tag = MKS
+					}
+					ROOT = {
+						is_in_faction_with = FRI
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = {
+							state = 1557
+						}
+						ROOT = {
+							controls_province = 10263
+						}
+					}
+					FROM = {
+						set_politics = {
+							ruling_party = despotism
+						}
+						set_popularities = {
+							despotism = 90
+							ultranationalism = 10
+						}
+					}
+				}
+			}
+
+			if = {#Name changers
+				limit = {
+					FROM = {
+						original_tag = INS
+					}
+					ROOT = {
+						original_tag = FRI
+					}
+					FROM.FROM = {
+						state = 669
+					}
+				}
+						
+				set_province_name = {
+					id = 12371
+					name = VICTORY_POINTS_12371_fri
+				}
+			}
+
+			###################
+			### MALAYAN WAR ###
+			###################
+
+			if = {#Hold the Line Mission
+				limit = {
+					FROM = {
+						original_tag = SHO
+					}
+					ROOT = {
+						original_tag = MLY
+					}
+					FROM.FROM = {
+						state = 751
+					}
+				}
+				USA = {
+					activate_mission = USA_hold_the_line
+				}
+			}
+
+			if = {#Hold the Line Mission
+				limit = {
+					FROM = {
+						original_tag = MLY
+					}
+					ROOT = {
+						original_tag = SHO
+					}
+					FROM.FROM = {
+						state = 751
+					}
+				}
+				USA = {
+					remove_mission = USA_hold_the_line
+				}
+			}
+
+
+			#############################
+			###   ANTI-HEYDRICH PACT  ###
+			#############################
+			
+			if = {
+				limit = {
+					has_global_flag = german_civil_war
+					NOT = { has_global_flag = anti_heydrich_pact_chain_begins }
+				}
+				if = {
+					limit = {
+						ROOT = { original_tag = HGR }
+						OR = {
+							AND = {
+								# num_of_controlled_states > 6
+								num_of_controlled_states > 11
+								NOT = { 5 = { is_controlled_by = HGR } }
+								NOT = { 85 = { is_controlled_by = HGR } }
+								NOT = { 97 = { is_controlled_by = HGR } }
+								NOT = { 98 = { is_controlled_by = HGR } }
+							}
+							AND = {
+								# num_of_controlled_states > 7
+								num_of_controlled_states > 12
+								count_triggers = {
+									amount = 4
+									NOT = { 5 = { is_controlled_by = HGR } }
+									NOT = { 85 = { is_controlled_by = HGR } }
+									NOT = { 97 = { is_controlled_by = HGR } }
+									NOT = { 98 = { is_controlled_by = HGR } }
+								}
+							}
+							AND = {
+								# num_of_controlled_states > 8
+								num_of_controlled_states > 13
+								count_triggers = {
+									amount = 3
+									NOT = { 5 = { is_controlled_by = HGR } }
+									NOT = { 85 = { is_controlled_by = HGR } }
+									NOT = { 97 = { is_controlled_by = HGR } }
+									NOT = { 98 = { is_controlled_by = HGR } }
+								}
+							}
+							AND = {
+								# num_of_controlled_states > 9
+								num_of_controlled_states > 14
+								count_triggers = {
+									amount = 2
+									NOT = { 5 = { is_controlled_by = HGR } }
+									NOT = { 85 = { is_controlled_by = HGR } }
+									NOT = { 97 = { is_controlled_by = HGR } }
+									NOT = { 98 = { is_controlled_by = HGR } }
+								}
+							}
+							AND = {
+								# num_of_controlled_states > 10
+								num_of_controlled_states > 15
+								count_triggers = {
+									amount = 1
+									NOT = { 5 = { is_controlled_by = HGR } }
+									NOT = { 85 = { is_controlled_by = HGR } }
+									NOT = { 97 = { is_controlled_by = HGR } }
+									NOT = { 98 = { is_controlled_by = HGR } }
+								}
+							}
+							AND = {
+								# num_of_controlled_states > 11
+								num_of_controlled_states > 16
+								5 = { is_controlled_by = HGR }
+								85 = { is_controlled_by = HGR }
+								97 = { is_controlled_by = HGR }
+								98 = { is_controlled_by = HGR }
+							}
+						}
+						count_triggers = {
+							amount > 1
+							country_exists = BGR
+							country_exists = GGR
+							country_exists = SGR
+						}
+					}
+					if = {
+						limit = { country_exists = SGR }
+						SGR = { country_event = speer.16 }
+					}
+					else_if = {
+						limit = { country_exists = BGR }
+						BGR = { country_event = bormann.9 }
+					}
+					set_global_flag = anti_heydrich_pact_chain_begins
+				}
+			}
+
+			###############################
+			###   Mongolian Civil War   ###
+			###############################
+
+
+			################################################
+			### Mengjiang Reconquest of Western Mongolia ###
+			################################################
+
+			###########################
+			###   Great Asian War   ###
+			###########################
+
+			if = {#Prevent Countries running rampant in Korea
+				limit = {
+					FROM.FROM = {
+						OR = {
+							is_core_of = KOR
+							is_core_of = JAP
+						}
+						NOT = { state = 100 }
+					}
+					FROM = {
+						original_tag = JAP
+					}
+				}
+				if = { # WI
+					limit = {
+						ROOT = {
+							is_in_faction_with = YUN
+						}
+						OR = {
+							has_global_flag = YUN_NPA_GAW_Crisis
+							has_global_flag = CHI_Western_Insurrection_Crisis
+						}
+					}
+					YUN = {
+						country_event = { id = yun_wi.45 hours = 3 }
+					}
+				}
+			}
+
+			if = {#Western Insurrection - Yunnan
+				limit = {
+					NOT = { has_global_flag = YUN_WI_thx_paradox }
+					OR = {
+						has_global_flag = YUN_NPA_GAW_Crisis
+						has_global_flag = CHI_Western_Insurrection_Crisis
+					}
+					FROM = {
+						OR = {
+							original_tag = CHI
+							original_tag = XIK
+							original_tag = QIN
+							original_tag = XIN
+							original_tag = TIB
+							is_in_faction_with = JAP
+							is_in_faction_with = CHI
+						}
+					}
+
+					ROOT = {
+						original_tag = YUN
+					}
+
+				}
+
+				FROM.FROM = {
+					if = {
+						limit = { has_state_flag = WI_core_state }
+						YUN_reconquered_core_state_calc = yes
+					}
+					else = {
+						YUN_conquered_state_calc = yes
+					}
+				}
+				ROOT = {
+					add_to_variable = { YUN_WI_warbuff = 1 }
+					clamp_variable = {
+						var = YUN_WI_warbuff
+						min = 0
+						max = 100
+					}
+					add_to_variable = { YUN_NPA_Crusade_dirty = 1 }
+					WI_calc_state_officer_needed = yes
+					greater_china_states_control_change = yes
+					if = {
+						limit = {
+							NOT = { has_variable = YUN_introduce_admin }
+						}
+						country_event = { id = yun_wi.26 }
+						set_variable = { YUN_introduce_admin = 1 }
+					}
+					#country_event = { id = yun.2022 }
+				}
+
+				if = {#NCPC
+					limit = {
+						FROM.FROM = {
+							OR = {
+								state = 597 
+								state = 598 
+								state = 606 
+								state = 607 
+								state = 608 
+								state = 609 
+								state = 613
+								state = 614
+								state = 620
+								state = 959
+								state = 1014
+								state = 1015
+								state = 1020
+								state = 1021
+								state = 1022
+								state = 1023
+								state = 1016
+							}
+						}
+						NOT = { has_global_flag = YUN_NCPC_revived }
+					}
+					JAP = {
+						country_event = japchiinteraction.10
+					}
+				}
+
+				if = {
+					limit = {
+						FROM.FROM = {
+							state = 1016 #Wuhan
+						}
+					}
+					YUN = { 
+						country_event = { id = yun_wi.66 } 
+					}
+				}
+
+				if = {
+					limit = {
+						FROM.FROM = {
+							state = 607 #Henan
+						}
+					}
+					YUN = {
+						country_event = { id = yun_wi.62 days = 3 }
+					}
+				}
+				
+				if = {
+					limit = {
+						FROM.FROM = {
+							state = 613 #Nanjing
+						}
+					}	
+					CHI = {
+						remove_ideas = CHI_Western_Insurrection
+						add_ideas = CHI_nanjing_falls
+					}
+					YUN = {
+						country_event = { id = yun_wi.29 }
+					}
+				}
+
+				if = {
+					limit = {
+						has_global_flag = YUN_NPA_GAW_Crisis
+						FROM.FROM = {
+							state = 608 #Beijing
+						}
+					}
+					YUN = { 
+						country_event = { id = yun_wi.67 } 
+					}
+				}
+			}
+
+			if = {#Western Insurrection - Not Yunnan
+				limit = {
+					NOT = { has_global_flag = YUN_WI_thx_paradox }
+					OR = {
+						has_global_flag = YUN_NPA_GAW_Crisis
+						has_global_flag = CHI_Western_Insurrection_Crisis
+					}
+					FROM = {
+						original_tag = YUN
+					}
+
+					ROOT = {
+						OR = {
+							original_tag = CHI
+							original_tag = XIK
+							original_tag = QIN
+							original_tag = XIN
+							original_tag = TIB
+							is_in_faction_with = JAP
+							is_in_faction_with = CHI
+						}
+					}
+				}
+
+				FROM.FROM = {
+					YUN_conquered_state_calc_reverse = yes
+				}
+				FROM = {
+					add_to_variable = { YUN_WI_warbuff = -2 }
+					clamp_variable = {
+						var = YUN_WI_warbuff
+						min = 0
+						max = 100
+					}
+					add_to_variable = { YUN_NPA_Crusade_dirty = 1 }
+					WI_calc_state_officer_needed = yes
+					greater_china_states_control_change = yes
+					if = {
+						limit = { 
+							num_of_controlled_states < 2
+							NOT = { has_country_flag = YUN_NPA_despair_branch }
+						}
+						country_event = { id = yun_wi.51 }
+					}
+				}
+			}
+
+			#if = {#Chinese states rename
+			#	limit = {
+			#		FROM = {
+			#			OR = {
+			#				is_russian_nation = yes
+			#				is_in_faction_with = JAP
+			#			}
+			#		}
+			#		ROOT = {
+			#			OR = {
+			#				is_in_faction_with = YUN
+			#				is_in_faction_with = CHI
+			#			}
+			#			NOT = { is_in_faction_with = JAP }
+			#		}
+			#	}
+			#	FROM.FROM = {
+			#		if = {
+			#			limit = {
+			#				is_in_array = { YUN.greater_china_states = THIS } 
+			#			}
+			#		}
+			#	}
+			#}
+
+			#if = {#Japanese states rename
+			#	limit = {
+			#		FROM = {
+			#			OR = {
+			#				is_in_faction_with = YUN
+			#				is_in_faction_with = CHI
+			#			}
+			#			NOT = { is_in_faction_with = JAP }
+			#		}
+			#		ROOT = {
+			#			is_in_faction_with = JAP
+			#		}
+			#	}
+			#	FROM.FROM = {
+			#		if = {
+			#			limit = {
+			#				is_in_array = { YUN.greater_china_states = THIS } 
+			#			}
+			#		}
+			#	}
+			#}
+
+			###########################
+			###   Warsaw Uprising   ###
+			###########################
+
+			#Germany/GGN takes Polish states (in Poland)
+
+			#Poland takes Germany/GGN states (in Poland)
+			
+			#######################################################
+			### RUSSIAN WARLORD VP NAME CHANGES GOD HELP US ALL ###
+			#######################################################
+
+			if = { 
+				limit = { NOT = { has_global_flag = TNO_exonym_mode } } #temp until it's switched over to the new system 
+				FROM.FROM = {
+					### Outer Manchuria
+					VP_change_outman = yes
+					
+					### Central Russia ###
+						
+					### Fuck Finland ###
+					VP_change_fin = yes
+				}
+			}
+			
+			### RETURN TO SANITY ###
+			
+			############
+			#Madagascar#
+			############
+		
+			#Natives take states
+			
+			#For German factions if Malagasy VPs are ever Germanized to be more easily integrated into this system
+
+			###CROATIAN SPRING###
+			if = {
+				limit = {
+					FROM = {
+						OR = {
+							original_tag = ITA
+							original_tag = GER
+						}
+					}
+					ROOT = {
+						original_tag = CRO
+						NOT = { has_global_flag = TNO_exonym_mode } #temp until it's switched over to the new system
+					}
+				}
+
+				if = {
+					limit = {
+						FROM.FROM = { state = 102 }
+					}
+					102 = { set_state_name = STATE_102_cro }
+					set_province_name = {
+						id = 9627
+						name = VICTORY_POINTS_9627_cro
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 103 }
+					}
+					103 = { set_state_name = STATE_103_cro }
+					set_province_name = {
+						id = 14660
+						name = VICTORY_POINTS_14660_cro
+					}
+					set_province_name = {
+						id = 14661
+						name = VICTORY_POINTS_14661_cro
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 736 }
+					}
+					736 = { set_state_name = STATE_736_cro }
+					set_province_name = {
+						id = 14649
+						name = VICTORY_POINTS_14649_cro
+					}
+					set_province_name = {
+						id = 599
+						name = VICTORY_POINTS_599_cro
+					}
+					set_province_name = {
+						id = 6626
+						name = VICTORY_POINTS_6626_cro
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 116 }
+					}
+					116 = { set_state_name = STATE_116_cro }
+					set_province_name = {
+						id = 11595
+						name = VICTORY_POINTS_11595_cro
+					}
+					set_province_name = {
+						id = 628
+						name = VICTORY_POINTS_628_cro
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					FROM = {
+						original_tag = CRO
+						original_tag = GER
+					}
+					ROOT = {
+						original_tag = ITA
+						NOT = { has_global_flag = TNO_exonym_mode } #temp until it's switched over to the new system
+					}
+				}
+
+				if = {
+					limit = {
+						FROM.FROM = { state = 102 }
+					}
+					102 = { reset_state_name = yes }
+					reset_province_name = 9627
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 103 }
+					}
+					103 = { reset_state_name = yes }
+					reset_province_name = 14660
+					reset_province_name = 14661
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 736 }
+					}
+					736 = { reset_state_name = yes }
+					reset_province_name = 14649
+					reset_province_name = 599
+					reset_province_name = 6626
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 116 }
+					}
+					116 = { reset_state_name = yes }
+					reset_province_name = 11595
+					reset_province_name = 628
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 39 }
+					}
+					39 = { reset_state_name = yes }
+					reset_province_name = 9630
+				}
+			}
+			else_if = {
+				limit = {
+					FROM = {
+						OR = {
+							original_tag = ITA
+							original_tag = CRO
+						}
+					}
+					ROOT = {
+						original_tag = GER
+						NOT = { has_global_flag = TNO_exonym_mode } #temp until it's switched over to the new system
+					}
+				}
+
+				if = {
+					limit = {
+						FROM.FROM = { state = 102 }
+					}
+					102 = { set_state_name = STATE_102_ger }
+					set_province_name = {
+						id = 9627
+						name = VICTORY_POINTS_9627_ger
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 103 }
+					}
+					set_province_name = {
+						id = 14660
+						name = VICTORY_POINTS_14660_ger
+					}
+					set_province_name = {
+						id = 14661
+						name = VICTORY_POINTS_14661_ger
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 736 }
+					}
+					736 = { set_state_name = STATE_736_ger }
+					set_province_name = {
+						id = 14649
+						name = VICTORY_POINTS_14649_ger
+					}
+					set_province_name = {
+						id = 599
+						name = VICTORY_POINTS_599_ger
+					}
+					set_province_name = {
+						id = 6626
+						name = VICTORY_POINTS_6626_cro
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 116 }
+					}
+					116 = { set_state_name = STATE_116_ger }
+					set_province_name = {
+						id = 11595
+						name = VICTORY_POINTS_11595_ger
+					}
+					set_province_name = {
+						id = 628
+						name = VICTORY_POINTS_628_ger
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 39 }
+					}
+					39 = { set_state_name = STATE_39_ger }
+					set_province_name = {
+						id = 9630
+						name = VICTORY_POINTS_9630_ger
+					}
+				}
+			}
+
+			#######################
+			###   West Africa   ###
+			#######################
+			if = {
+				limit = { FROM = { is_in_array = { global.west_african_nations = THIS } } }
+
+				## West African Crisis ##
+				if = {
+					limit = { has_global_flag = west_african_war_ongoing }
+
+					if = { # Emergency Divisions for CAO
+						limit = {
+							OR = {
+								NOT = { country_exists = YOR }
+								YOR = { has_capitulated = yes }
+								AND = {
+									YOR = { has_capitulated = no }
+									FROM.FROM = { state = 1187 }
+								}
+							}
+							FROM.FROM = {
+								OR = {
+									state = 825
+									state = 1188
+									state = 1187
+								}
+							}
+							NOT = {
+								CAO = {
+									OR = {
+										has_template = "Igbo Conscripts"
+										has_template = "Milice de Douala"
+									}
+								}
+							}
+						}
+						CAO = {
+							load_oob = "CAO_emergency"
+						}
+						WAC_escalate_large = yes
+					}
+
+					if = { # Douala Falls
+						limit = {
+							FROM.FROM = { state = 793 }
+							ROOT = { NOT = { is_in_faction_with = CAO } }
+							NOT = { has_global_flag = WAC_over }
+						}
+
+						log = "[GetDateText]: FROM: [From.GetName] ROOT: [Root.GetName] effect Douala Falls state_control_change"
+
+						if = { # Scenario 1
+							limit = { has_global_flag = WAC_scenario_1 }
+
+							if = { # Immediate surrender
+								limit = {
+									CAO = { surrender_progress > 0.6 }
+									NOT = { CAO = { has_capitulated = yes } }
+								}
+
+								clr_global_flag = west_african_war_ongoing
+
+								ZZZ = {
+									country_event = {
+										id = west_africa_peace_deal.1
+										hours = 1
+									}
+								}
+							}
+
+							else = { # Timed surrender
+								USA = { activate_mission = USA_WAC_cameroon_capitulates }
+							}
+						}
+						if = { # Scenario 2
+							limit = { has_global_flag = WAC_scenario_2 }
+
+							if = { # Immediate surrender
+								limit = { 
+									CAO = { surrender_progress > 0.6 }
+									NOT = { CAO = { has_capitulated = yes } }
+									NOT = { has_global_flag = WAC_scen2_PALF_fell }
+								}
+
+								ZZZ = {
+									country_event = {
+										id = west_africa_peace_deal.6
+										hours = 1
+									}
+									if = {
+										limit = {
+											has_global_flag = WAC_scen2_WAA_fell
+										}
+										clr_global_flag = west_african_war_ongoing
+										country_event = {
+											id = west_africa_peace_deal.4
+											hours = 1
+										}
+									}
+									else_if = {
+										limit = {
+											has_global_flag = WAC_scen2_FMA_fell
+										}
+										clr_global_flag = west_african_war_ongoing
+										country_event = {
+											id = west_africa_peace_deal.3
+											hours = 1
+										}
+									}
+								}
+							}
+
+							else_if = { # Timed surrender
+								limit = { NOT = { has_global_flag = WAC_scen2_FMA_fell } }
+								USA = { activate_mission = USA_WAC_cameroon_capitulates }
+							}
+						}
+						if = { # Scenario 3
+							limit = { has_global_flag = WAC_scenario_3 }
+
+							if = { # Immediate surrender
+								limit = {
+									CAO = { surrender_progress > 0.6 }
+									NOT = { CAO = { has_capitulated = yes } }
+								}
+
+								clr_global_flag = west_african_war_ongoing
+
+								ZZZ = {
+									country_event = {
+										id = west_africa_peace_deal.7
+										hours = 1
+									}
+								}
+							}
+
+							else = { # Timed surrender
+								USA = { activate_mission = USA_WAC_cameroon_capitulates }
+							}
+						}
+					}
+
+					# Checks for Japan sending a task force if Ekos is taken by Cameroon here
+				}
+
+
+				## Mano Campaign ##
+				if = {
+					limit = {
+						has_global_flag = mano_campaign_ongoing
+						NOT = { has_global_flag = mano_campaign_MRP_victory }
+					}
+
+					if = { # Immediate peace trigger
+						limit = {
+							OR = {
+								FROM.FROM = { state = 827 }
+								FROM.FROM = { state = 274 }
+								FROM.FROM = { state = 833 }
+								FROM.FROM = { state = 1217 }
+								FROM.FROM = { state = 1226 }
+								FROM.FROM = { state = 1220 }
+								FROM.FROM = { state = 830 }
+								FROM.FROM = { state = 1604 }
+							}
+						}
+						ZZZ = { MANO_MRP_VICTORY = yes }
+					}
+				}
+			}
+			#################
+			### Macedonia ###
+			#################
+
+			#############################
+			### Burgundy Nuke Chances ###
+			#############################
+			if = {
+				limit = {
+					FROM = {
+						original_tag = BRG
+					}
+					BRG = {
+						surrender_progress > 0.8
+						has_country_flag = BRG_will_nuke
+					}
+				}
+				BRG = {
+					country_event = { id = BRG_collapse.15 days = 1 }
+				}
+			}
+
+			##################
+			### Hispaniola ###
+			##################
+			# Centre et Nord-Est
+
+			# Santo Domingo
+			if = { # Caribbean Legion/Haiti takes it
+				limit = {
+					has_global_flag = PPI_landing_ongoing
+					ROOT = {
+						OR = {
+							original_tag = CAL
+						}
+					}
+					FROM.FROM = {
+						state = 319
+					}
+				}
+				DOM = { save_global_event_target_as = losing_country }
+				CAL = { save_global_event_target_as = winning_country }
+				set_global_flag = show_peace_popup_alert
+				add_to_variable = { global.peace_popup_dirty = 1 }
+				log = "war_won - on_state_control PP"
+				set_global_flag = war_won
+				TNO_PPI_DOM_ceasefire = yes
+				# update state lore
+			}
+
+			#######################
+			### Chile-Argentina ###
+			#######################
+
+			###############################
+			###         Ukraine         ###
+			###############################
+				
+			### Partisans capture German-aligned states
+			
+			### Germans capture partisan lands
+
+			### UA-SSR captures competitor land
+			if = {
+				limit = {
+					country_exists = UKS
+					FROM = {
+						tag = UKR
+						has_war_with = UKS
+					}
+					ROOT = {
+						tag = UKS
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 226 } #Reichenstaudt
+					}
+					UKS = {
+						country_event = { id = UKR_u_ssr_cw.17 days = 3 } #Workers rise up
+						country_event = { id = UKR_u_ssr_pavlichenko.9 days = 10 }
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = UKS
+					FROM = {
+						tag = UKR
+						has_war_with = UKS
+					}
+					ROOT = {
+						tag = UKS
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 1428 } #Kiev
+					}
+					UKS = {
+						country_event = { id = UKR_u_ssr_cw.18 days = 3 }
+						country_event = { id =  UKR_u_ssr_pavlichenko.10 days = 10 }
+					}
+				}
+			}
+
+			###############################
+			###         Britain         ###
+			###############################
+
+			if = {
+				limit = {
+					country_exists = FEN
+					FROM = {
+						tag = FEN
+						has_war_with = ENG 
+					}
+					ROOT = {
+						tag = ENG
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 125 } #Norfolk
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Hold_Norwich
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Retake_Norwich
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = ENG
+					FROM = {
+						tag = ENG
+						has_war_with = FEN
+					}
+					ROOT = {
+						tag = FEN
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 125 } #Norfolk
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Hold_Norwich
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Retake_Norwich
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = FEN
+					FROM = {
+						tag = FEN
+						has_war_with = ENG
+					}
+					ROOT = {
+						tag = ENG
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 2002 } #Birmingham
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Hold_Birmingham
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Retake_Birmingham
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = ENG
+					FROM = {
+						tag = ENG
+						has_war_with = FEN
+					}
+					ROOT = {
+						tag = FEN
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 2002 } #Birmingham
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Hold_Birmingham
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Retake_Birmingham
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = FEN
+					FROM = {
+						tag = FEN
+						has_war_with = ENG
+					}
+					ROOT = {
+						tag = ENG
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 122 } #Cardiff
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Hold_Cardiff
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Retake_Cardiff
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = ENG
+					FROM = {
+						tag = ENG
+						has_war_with = FEN
+					}
+					ROOT = {
+						tag = FEN
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 122 } #Cardiff
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Hold_Cardiff
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Retake_Cardiff
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = FEN
+					FROM = {
+						tag = FEN
+						has_war_with = ENG
+					}
+					ROOT = {
+						tag = ENG
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 2000 } #Liverpool
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Hold_Liverpool
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Retake_Liverpool
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = ENG
+					FROM = {
+						tag = ENG
+						has_war_with = FEN
+					}
+					ROOT = {
+						tag = FEN
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 2000 } #Liverpool
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Hold_Liverpool
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Retake_Liverpool
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = FEN
+					FROM = {
+						tag = FEN
+						has_war_with = ENG
+					}
+					ROOT = {
+						tag = ENG
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 2006 } #York
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Hold_York
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Retake_York
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = ENG
+					FROM = {
+						tag = ENG
+						has_war_with = FEN
+					}
+					ROOT = {
+						tag = FEN
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 2006 } #York
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Hold_York
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Retake_York
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = FEN
+					FROM = {
+						tag = FEN
+						has_war_with = ENG
+					}
+					ROOT = {
+						tag = ENG
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 130 } #Leeds
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Hold_Leeds
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Retake_Leeds
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = ENG
+					FROM = {
+						tag = ENG
+						has_war_with = FEN
+					}
+					ROOT = {
+						tag = FEN
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 130 } #Leeds
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Hold_Leeds
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Retake_Leeds
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = FEN
+					FROM = {
+						tag = FEN
+						has_war_with = ENG
+					}
+					ROOT = {
+						tag = ENG
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 133 } #Glasgow
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Hold_Glasgow
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Retake_Glasgow
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = ENG
+					FROM = {
+						tag = ENG
+						has_war_with = FEN
+					}
+					ROOT = {
+						tag = FEN
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 133 } #Glasgow
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Hold_Glasgow
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Retake_Glasgow
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = FEN
+					FROM = {
+						tag = FEN
+						has_war_with = ENG
+					}
+					ROOT = {
+						tag = ENG
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 121 } #Edinburgh
+					}
+					ENG = {
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Retake_Edinburgh
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = ENG
+					FROM = {
+						tag = ENG
+						has_war_with = FEN
+					}
+					ROOT = {
+						tag = FEN
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 121 } #Edinburgh
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Retake_Edinburgh
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					country_exists = FEN
+					FROM = {
+						tag = FEN
+						has_war_with = ENG
+					}
+					ROOT = {
+						tag = ENG
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 1300 } #London
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Hold_London
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Retake_London
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = ENG
+					FROM = {
+						tag = ENG
+						has_war_with = FEN
+					}
+					ROOT = {
+						tag = FEN
+					}
+				}
+				if = {
+					limit = {
+						FROM.FROM = { state = 1300 } #London
+					}
+					FEN = {
+						activate_mission = BRI_Midnight_Mission_Hold_London
+					}
+					ENG = {
+						activate_mission = BRI_Midnight_Mission_Retake_London
+					}
+				}
+			}
+
+
+			##############################
+			###   FRENCH RECLAMATION   ###
+			##############################
+			if = {
+				limit = {
+					has_global_flag = FFR_reclamation_happening
+					FROM.FROM = {
+						OR = {
+							state = 19
+							state = 21
+						}
+					}
+					FROM = {
+						NOT = {
+							controls_state = 19
+							controls_state = 21
+						}
+						OR = {
+							original_tag = FRD
+							original_tag = FFR
+						}
+					}
+					ROOT = {
+						controls_state = 19
+						controls_state = 21
+						NOT = {
+							original_tag = FRD
+							original_tag = FFR
+						}
+					}
+				}
+				FROM = { save_global_event_target_as = losing_country }
+				ROOT = {
+					save_global_event_target_as = winning_country
+					white_peace = FROM
+				}
+
+				ROOT = { # Take Kerguelen
+					add_state_core = 713
+					transfer_state = 713
+					transfer_state = 19
+					transfer_state = 21
+				}
+				FROM = {
+					remove_state_core = 19
+					remove_state_core = 21
+					FFR = { remove_state_core = 713 }
+				}
+				every_state = { # Transfer whatever states FFR gobbled up
+					limit = {
+						is_owned_by = FFR
+						is_core_of = FROM
+					}
+
+					FROM = { transfer_state = PREV }
+				}
+				FFR_reclamation_defeat = yes
+
+				log = "war_won"
+				set_global_flag = war_won
+				set_global_flag = show_peace_popup_alert
+				add_to_variable = { global.peace_popup_dirty = 1 }				
+			}
+		}
+	}
+}

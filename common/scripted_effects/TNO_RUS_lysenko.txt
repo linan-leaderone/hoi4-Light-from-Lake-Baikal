@@ -1,0 +1,212 @@
+lysenko_army_readiness_check = {
+	if = {
+		limit = {
+			has_country_leader = { character = MGN_Trofim_Lysenko ruling_only = yes }
+		}
+		lysenko_influence_assign = yes
+	}
+
+	clamp_variable = {
+		var = army_preperation
+		max = 100
+		min = 0
+	}
+	clamp_variable = {
+		var = army_drill
+		max = 100
+		min = 0
+	}
+	clamp_variable = {
+		var = lysenko_nkvd_disloyalty
+		max = 100
+		min = 0
+	}
+	clamp_variable = {
+		var = lysenko_nkvd_influence
+		max = 100
+		min = 0
+	}
+}
+
+lysenko_influence_assign = {
+	hidden_effect = {
+		remove_ideas = {
+			MGN_Lysenko_Influence_Very_Low
+			MGN_Lysenko_Influence_Low
+			MGN_Lysenko_Influence_Medium
+			MGN_Lysenko_Influence_High
+			MGN_Lysenko_Influence_Very_High
+		}
+		if = {
+			limit = {
+				check_variable = { lysenko_nkvd_influence < 20 }
+			}
+			add_ideas = MGN_Lysenko_Influence_Very_Low
+		}
+		else_if = {
+			limit = {
+				check_variable = { lysenko_nkvd_influence < 40 }
+			}
+			add_ideas = MGN_Lysenko_Influence_Low
+		}
+		else_if = {
+			limit = {
+				check_variable = { lysenko_nkvd_influence < 60 }
+			}
+			add_ideas = MGN_Lysenko_Influence_Medium
+		}
+		else_if = {
+			limit = {
+				check_variable = { lysenko_nkvd_influence < 80 }
+			}
+			add_ideas = MGN_Lysenko_Influence_High
+		}
+		else = {
+			add_ideas = MGN_Lysenko_Influence_Very_High
+		}
+	}
+}
+
+lysenko_army_preperation_idea_assignment = {
+	if = {
+		limit = {
+			check_variable = { army_preperation > 49 }
+		}
+		add_timed_idea = {
+			idea = MGN_well_prepared_army
+			days = 45
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { army_preperation > 24 }
+		}
+		add_timed_idea = {
+			idea = MGN_average_prepared_army
+			days = 45
+		}
+	}
+	else = {
+		add_timed_idea = {
+			idea = MGN_bad_prepared_army
+			days = 45
+		}
+	}
+}
+
+lysenko_army_drill_idea_assignment = {
+	if = {
+		limit = {
+			check_variable = { army_drill > 49 }
+		}
+		add_timed_idea = {
+			idea = MGN_well_trained_army
+			days = 45
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { army_drill > 24 }
+		}
+		add_timed_idea = {
+			idea = MGN_average_trained_army
+			days = 45
+		}
+	}
+	else = {
+		add_timed_idea = {
+			idea = MGN_bad_trained_army
+			days = 45
+		}
+	}
+}
+
+lysenko_update_sanity = {
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = MGN_leader_route
+				option = MGN_LEADER_ROUTE_LYSENKO
+			}
+		}
+		clamp_variable = {
+			var = lysenko_sanity
+			max = 100
+			min = 1
+		}
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_game_rule = {
+					rule = MGN_leader_route
+					option = MGN_LEADER_ROUTE_GOOD_NKVD
+				}
+				has_game_rule = {
+					rule = MGN_leader_route
+					option = MGN_LEADER_ROUTE_BAD_NKVD
+				}
+			}
+		}
+		set_variable = { lysenko_sanity = 0 }
+	}
+	else = {
+		clamp_variable = {
+			var = lysenko_sanity
+			max = 100
+			min = 0
+		}
+	}
+	if = {
+		limit = {
+			has_country_leader = { character = MGN_Trofim_Lysenko ruling_only = yes }
+			check_variable = { lysenko_sanity = 0 }
+		}
+		country_event = { id = MGN.258	days = 1 }
+	}
+	else_if = {
+		limit = {
+			has_country_leader = { character = MGN_Trofim_Lysenko ruling_only = yes }
+			check_variable = { lysenko_sanity < 25 }
+			NOT = {
+				has_idea = MGN_SANITY_LOW
+			}
+		}
+		country_event = { id = MGN.255	days = 1 }
+		remove_ideas = {
+			MGN_SANITY_NEUTRAL
+			MGN_SANITY_HIGH
+		}
+		add_ideas = MGN_SANITY_LOW
+	}
+	else_if = {
+		limit = {
+			has_country_leader = { character = MGN_Trofim_Lysenko ruling_only = yes }
+			check_variable = { lysenko_sanity < 75 }
+			NOT = {
+				has_idea = MGN_SANITY_NEUTRAL
+			}
+		}
+		remove_ideas = {
+			MGN_SANITY_LOW
+			MGN_SANITY_HIGH
+		}
+		country_event = { id = MGN.256	days = 1 }
+		add_ideas = MGN_SANITY_NEUTRAL
+	}
+	else_if = {
+		limit = {
+			has_country_leader = { character = MGN_Trofim_Lysenko ruling_only = yes }
+			check_variable = { lysenko_sanity > 74 }
+			NOT = {
+				has_idea = MGN_SANITY_HIGH
+			}
+		}
+		country_event = { id = MGN.257	days = 1 }
+		remove_ideas = {
+			MGN_SANITY_LOW
+			MGN_SANITY_NEUTRAL
+		}
+		add_ideas = MGN_SANITY_HIGH
+	}
+}

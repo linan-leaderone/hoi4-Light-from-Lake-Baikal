@@ -1,0 +1,2207 @@
+### Megacorps ###
+
+#needs of NOV_clicked_state argument
+NOV_Open_State_UI = {
+	log = "[GetDateText]: [Root.GetName]: NOV_Open_State_UI Executing; [?NOV_clicked_state.GetName]"
+	if = {
+		limit = {
+			check_variable = { NOV_target_country = NOV_clicked_state }
+		}
+		clear_variable = NOV_target_country
+	}
+	else = {
+		set_variable = { NOV_target_country = NOV_clicked_state }
+		NOV_calculate_costs = yes
+		log = "[GetDateText]: [Root.GetName]: NOV_target_country is [?NOV_target_country.GetName]"
+	}
+	clear_variable = NOV_clicked_state
+}
+
+NOV_Increase_Takeover_Progress = {
+	var:NOV_target_country = {
+		add_to_variable = { NOV_Takeover_Progress = NOV.NOV_Takeover_Power }
+		# < 153 Unitary X
+		# > 153 Federal X
+		# > 123 Collectivist Y
+		# < 123 Corporatist Y
+
+		add_to_variable = { NOV_Takeover_Progress = NOV.NOV_Ideological_Similarity }
+
+		log = "[GetDateText]: [This.GetName]: NOV_Takeover_Progress is [?NOV_Takeover_Progress]"
+
+		#########MEGA CORPS EFFECTS##############
+
+		#####FENIKS - GOOD WITH AUTHDEMS AND DESPOTS
+
+		if = {
+			limit = {
+				OR = {
+					has_government = despotism
+					has_government = paternalism
+					#less governments but i mean cmon like everyone is these two ideologies
+				}
+				check_variable = { NOV.NOV_megacorp1_loyalty > 49.9 }
+			}
+			add_to_variable = { NOV_Takeover_Progress = NOV.NOV_dummy_megacorp_boost }
+		}
+
+		if = {
+			limit = {
+				OR = {
+					has_government = despotism
+					has_government = paternalism
+				}
+				check_variable = { NOV.NOV_megacorp1_loyalty < 50 }
+			}
+			subtract_from_variable = { NOV_Takeover_Progress = NOV.NOV_dummy_megacorp_boost }
+		}
+
+		###SIBIR - FEDERALISTS - GOOD WITH LIBTARDS
+
+		if = {
+			limit = {
+				OR = {
+					has_government = conservatism
+					has_government = liberal_conservatism
+					has_government = liberalism
+					has_government = progressivism #yes its used twice so what?
+				}
+				check_variable = { NOV.NOV_megacorp2_loyalty > 49.9 }
+			}
+			add_to_variable = { NOV_Takeover_Progress = NOV.NOV_dummy_megacorp_boost }
+		}
+
+		if = {
+			limit = {
+				OR = {
+					has_government = conservatism
+					has_government = liberal_conservatism
+					has_government = liberalism
+					has_government = progressivism #yes its used twice so what?
+				}
+
+				check_variable = { NOV.NOV_megacorp2_loyalty < 50 }
+			}
+			subtract_from_variable = { NOV_Takeover_Progress = NOV.NOV_dummy_megacorp_boost }
+		}
+
+		#########TITAN - FASCIST SUPPORT
+		if = {
+			limit = {
+				OR = {
+					has_government = fascism
+					has_government = national_socialism
+					has_government = ultranationalism
+				}
+				check_variable = { NOV.NOV_megacorp3_loyalty > 49.9 }
+			}
+			add_to_variable = { NOV_Takeover_Progress = NOV.NOV_dummy_megacorp_boost }
+		}
+
+		if = {
+			limit = {
+				OR = {
+					has_government = fascism
+					has_government = national_socialism
+					has_government = ultranationalism
+				}
+
+				check_variable = { NOV.NOV_megacorp3_loyalty < 50 }
+			}
+			subtract_from_variable = { NOV_Takeover_Progress = NOV.NOV_dummy_megacorp_boost }
+		}
+		####THE PEOPLE - COLLECTIVIST HELP YOU TALK TO COMMUNISTS
+		if = {
+			limit = {
+				OR = {
+					has_government = communist
+					has_government = socialist
+				}
+				check_variable = { NOV.NOV_megacorp4_loyalty > 49.9 }
+			}
+			add_to_variable = { NOV_Takeover_Progress = NOV.NOV_dummy_megacorp_boost }
+		}
+
+		if = {
+			limit = {
+				OR = {
+					has_government = communist
+					has_government = socialist
+				}
+				check_variable = { NOV.NOV_megacorp4_loyalty < 50 }
+			}
+			subtract_from_variable = { NOV_Takeover_Progress = NOV.NOV_dummy_megacorp_boost }
+		}
+
+		clamp_variable = { var = NOV_Takeover_Progress min = 0 max = 100 }
+	}
+}
+
+NOV_calculate_costs = {
+	var:NOV_target_country = {
+		# < 153 Unitary X
+		# > 153 Federal X
+		# > 123 Collectivist Y
+		# < 123 Corporatist Y
+		NOV = { set_variable = { NOV_dummy_megacorp_boost = 0 } }
+		#NOV.NOV_corp_collect_y
+		#NOV.NOV_unitary_federal_x
+		if = {
+			limit = { has_government = communist }
+
+			set_variable = { NOV.NOV_ideal_ideological_Y = 220 }
+			set_variable = { NOV.NOV_ideal_ideological_X = 100 }
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y < 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_X = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y > 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+			}
+
+			add_to_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_ideal_ideological_X }
+			set_variable = { NOV.NOV_Ideological_Similarity = NOV.NOV_ideal_ideological_Y }
+			NOV = {
+				set_variable = { NOV_dummy_megacorp_boost = NOV_megacorp4_power }
+
+				if = { limit = { check_variable = { NOV_megacorp4_loyalty < 50 } }
+					multiply_variable = { NOV_dummy_megacorp_boost = -1 }
+				}
+			}
+		}
+
+		if = {
+			limit = { has_government = socialist }
+
+			set_variable = { NOV.NOV_ideal_ideological_Y = 220 }
+			set_variable = { NOV.NOV_ideal_ideological_X = 230 }
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y < 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_X = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y > 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+			}
+
+			add_to_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_ideal_ideological_X }
+			set_variable = { NOV.NOV_Ideological_Similarity = NOV.NOV_ideal_ideological_Y }
+			NOV = {
+				set_variable = { NOV_dummy_megacorp_boost = NOV_megacorp4_power }
+				if = { limit = { check_variable = { NOV_megacorp4_loyalty < 50 } }
+					multiply_variable = { NOV_dummy_megacorp_boost = -1 }
+				}
+			}
+
+		}
+
+		if = {
+			limit = { has_government = progressivism }
+
+			set_variable = { NOV.NOV_ideal_ideological_Y = 150 }
+			set_variable = { NOV.NOV_ideal_ideological_X = 180 }
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y < 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_X = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y > 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+			}
+
+			add_to_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_ideal_ideological_X }
+			set_variable = { NOV.NOV_Ideological_Similarity = NOV.NOV_ideal_ideological_Y }
+			NOV = {
+				set_variable = { NOV_dummy_megacorp_boost = NOV_megacorp2_power }
+				if = { limit = { check_variable = { NOV_megacorp2_loyalty < 50 } }
+					multiply_variable = { NOV_dummy_megacorp_boost = -1 }
+				}
+			}
+		}
+
+		if = {
+			limit = { has_government = liberalism }
+
+			set_variable = { NOV.NOV_ideal_ideological_Y = 105 }
+			set_variable = { NOV.NOV_ideal_ideological_X = 170 }
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y > 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_X = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y < 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+			}
+			NOV = {
+				set_variable = { NOV_dummy_megacorp_boost = NOV_megacorp2_power }
+				if = { limit = { check_variable = { NOV_megacorp2_loyalty < 50 } }
+					multiply_variable = { NOV_dummy_megacorp_boost = -1 }
+				}
+			}
+			add_to_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_ideal_ideological_X }
+			set_variable = { NOV.NOV_Ideological_Similarity = NOV.NOV_ideal_ideological_Y }
+
+		}
+
+		if = {
+			limit = {
+				OR = {
+					has_government = liberal_conservatism
+					has_government = conservatism
+				}
+			}
+
+			set_variable = { NOV.NOV_ideal_ideological_Y = 90 }
+			set_variable = { NOV.NOV_ideal_ideological_X = 190 }
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y < 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y > 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_X = -1 }
+			}
+			NOV = {
+				set_variable = { NOV_dummy_megacorp_boost = NOV_megacorp2_power }
+				if = { limit = { check_variable = { NOV_megacorp2_loyalty < 50 } }
+					multiply_variable = { NOV_dummy_megacorp_boost = -1 }
+				}
+			}
+			add_to_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_ideal_ideological_X }
+			set_variable = { NOV.NOV_Ideological_Similarity = NOV.NOV_ideal_ideological_Y }
+		}
+
+		if = {
+			limit = { has_government = paternalism }
+
+			set_variable = { NOV.NOV_ideal_ideological_Y = 123 }
+			set_variable = { NOV.NOV_ideal_ideological_X = 110 }
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y > 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_X = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y < 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+			}
+			NOV = {
+				set_variable = { NOV_dummy_megacorp_boost = NOV_megacorp1_power }
+				if = { limit = { check_variable = { NOV_megacorp1_loyalty < 50 } }
+					multiply_variable = { NOV_dummy_megacorp_boost = -1 }
+				}
+			}
+			add_to_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_ideal_ideological_X }
+			set_variable = { NOV.NOV_Ideological_Similarity = NOV.NOV_ideal_ideological_Y }
+		}
+
+		if = {
+			limit = { has_government = despotism }
+			set_variable = { NOV.NOV_ideal_ideological_Y = 122 }
+			set_variable = { NOV.NOV_ideal_ideological_X = 40 }
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y > 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_X = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y < 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+			}
+			NOV = {
+				set_variable = { NOV_dummy_megacorp_boost = NOV_megacorp1_power }
+				if = { limit = { check_variable = { NOV_megacorp1_loyalty < 50 } }
+					multiply_variable = { NOV_dummy_megacorp_boost = -1 }
+				}
+			}
+			add_to_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_ideal_ideological_X }
+			set_variable = { NOV.NOV_Ideological_Similarity = NOV.NOV_ideal_ideological_Y }
+		}
+
+		if = {
+			limit = {  #Lol I forgot to put in natsoc just gonna merge them with fascist
+				OR = {
+					has_government = fascism
+					has_government = national_socialism
+				}
+			}
+			set_variable = { NOV.NOV_ideal_ideological_Y = 40 }
+			set_variable = { NOV.NOV_ideal_ideological_X = 30 }
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y > 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y < 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_X = -1 }
+			}
+			NOV = {
+				set_variable = { NOV_dummy_megacorp_boost = NOV_megacorp3_power }
+				if = { limit = { check_variable = { NOV_megacorp3_loyalty < 50 } }
+					multiply_variable = { NOV_dummy_megacorp_boost = -1 }
+				}
+			}
+			add_to_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_ideal_ideological_X }
+			set_variable = { NOV.NOV_Ideological_Similarity = NOV.NOV_ideal_ideological_Y }
+		}
+
+		if = {
+			limit = { has_government = ultranationalism }
+			set_variable = { NOV.NOV_ideal_ideological_Y = 140 }
+			set_variable = { NOV.NOV_ideal_ideological_X = 30 }
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y < 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_X = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y > 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+			}
+			NOV = {
+				set_variable = { NOV_dummy_megacorp_boost = NOV_megacorp3_power }
+				if = { limit = { check_variable = { NOV_megacorp3_loyalty < 50 } }
+					multiply_variable = { NOV_dummy_megacorp_boost = -1 }
+				}
+			}
+			add_to_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_ideal_ideological_X }
+			set_variable = { NOV.NOV_Ideological_Similarity = NOV.NOV_ideal_ideological_Y }
+		}
+
+		if = {
+			set_variable = { NOV.NOV_ideal_ideological_Y = 90 }
+			set_variable = { NOV.NOV_ideal_ideological_X = 30 }
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y > 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+				multiply_variable = { NOV.NOV_ideal_ideological_X = -1 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_corp_collect_y < 123 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_corp_collect_y }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_Y = 0.05 }
+			}
+
+			if = {
+				limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+
+				subtract_from_variable = { NOV.NOV_ideal_ideological_X = NOV.NOV_unitary_federal_x }
+
+				multiply_variable = { NOV.NOV_ideal_ideological_X = 0.05 }
+			}
+			NOV = {
+				set_variable = { NOV_dummy_megacorp_boost = NOV_megacorp3_power }
+				if = { limit = { check_variable = { NOV_megacorp3_loyalty < 50 } }
+					multiply_variable = { NOV_dummy_megacorp_boost = -1 }
+				}
+			}
+			add_to_variable = { NOV.NOV_ideal_ideological_Y = NOV.NOV_ideal_ideological_X }
+			set_variable = { NOV.NOV_Ideological_Similarity = NOV.NOV_ideal_ideological_Y }
+		}
+
+		if = {
+			limit = {
+				OR = {
+					check_variable = { NOV.NOV_unitary_federal_x = 153 }
+					check_variable = { NOV.NOV_corp_collect_y = 123 }
+				}
+			}
+			set_variable = { NOV.NOV_Ideological_Similarity = 0 }
+		}
+		NOV = { divide_variable = { NOV_dummy_megacorp_boost = 10 } }
+		clamp_variable = { var = NOV_Takeover_Progress min = 0 max = 100 }
+
+
+		#########MEGA CORPS EFFECTS##############
+
+		#####FENIKS - GOOD WITH AUTHDEMS AND DESPOTS
+
+		#########TITAN - FASCIST SUPPORT
+
+		####THE PEOPLE - COLLECTIVIST HELP YOU TALK TO COMMUNISTS
+
+		log = "[GetDateText]: [This.GetName]: Updated NOV_Takeover_Progress is [?NOV_Takeover_Progress]"
+		set_variable = { NOV.NOV_Dummy_Id_Sim = NOV.NOV_Ideological_Similarity }
+
+	}
+}
+
+NOV_monthly_pulse = {
+	NOV = { set_variable = { NOV_Takeover_Decay = 2 } }
+
+	every_country = {
+		limit = { check_variable = { NOV_Takeover_Progress > 0 } }
+		subtract_from_variable = { NOV_Takeover_Progress = NOV.NOV_Takeover_Decay }
+		clamp_variable = { var = NOV_Takeover_Progress min = 0 max = 100 }
+	}
+	subtract_from_variable = { NOV_megacorp1_loyalty = 0.5 }
+	subtract_from_variable = { NOV_megacorp1_power = 0.5 }
+
+	subtract_from_variable = { NOV_megacorp2_loyalty = 0.5 }
+	subtract_from_variable = { NOV_megacorp2_power = 0.5 }
+
+	subtract_from_variable = { NOV_megacorp3_loyalty = 0.5 }
+	subtract_from_variable = { NOV_megacorp3_power = 0.5 }
+
+	subtract_from_variable = { NOV_megacorp4_loyalty = 0.5 }
+	subtract_from_variable = { NOV_megacorp4_power = 0.5 }
+
+	NOV_poli_drift = yes
+	NOV_clamp_pol_compass = yes
+}
+
+NOV_poli_drift = {
+	set_variable = { NOV_federal_drift = NOV.NOV_megacorp2_power }
+	set_variable = { NOV_unit_drift = NOV.NOV_megacorp1_power }
+	set_variable = { NOV_corp_drift = NOV.NOV_megacorp3_power }
+	set_variable = { NOV_coll_drift = NOV.NOV_megacorp4_power }
+
+	divide_variable = { NOV_unit_drift = 5 }
+	divide_variable = { NOV_corp_drift = 5 }
+	divide_variable = { NOV_federal_drift = 5 }
+	divide_variable = { NOV_coll_drift = 5 }
+
+	#military
+	subtract_from_variable = { NOV.NOV_unitary_federal_x = NOV_unit_drift }
+	#agri
+	add_to_variable = { NOV.NOV_unitary_federal_x = NOV_federal_drift }
+	#tech
+	subtract_from_variable = { NOV.NOV_corp_collect_y = NOV_corp_drift }
+	#people
+	add_to_variable = { NOV.NOV_corp_collect_y = NOV_coll_drift }
+}
+
+NOV_clamp_pol_compass = {
+	clamp_variable = { var = NOV.NOV_unitary_federal_x min = 8 max = 296 }
+	clamp_variable = { var = NOV.NOV_corp_collect_y min = 8 max = 247 }
+
+	clamp_variable = { var = NOV_megacorp1_loyalty min = 0 max = 100 }
+	clamp_variable = { var = NOV_megacorp2_loyalty min = 0 max = 100 }
+	clamp_variable = { var = NOV_megacorp3_loyalty min = 0 max = 100 }
+	clamp_variable = { var = NOV_megacorp4_loyalty min = 0 max = 100 }
+
+	clamp_variable = { var = NOV.NOV_megacorp1_power min = 0 max = 100 }
+	clamp_variable = { var = NOV.NOV_megacorp2_power min = 0 max = 100 }
+	clamp_variable = { var = NOV.NOV_megacorp3_power min = 0 max = 100 }
+	clamp_variable = { var = NOV.NOV_megacorp4_power min = 0 max = 100 }
+
+	NOV_update_megacorp_modifiers = yes
+}
+
+NOV_update_megacorp_modifiers = {
+	### Feniks Modifiers
+
+	set_variable = { NOV_MC1_army_org_factor = NOV_megacorp1_power }
+	set_variable = { NOV_MC1_army_attack_factor = NOV_megacorp1_power }
+	set_variable = { NOV_MC1_army_professionalism_monthly_rate = NOV_megacorp1_power }
+
+	set_temp_variable = { NOV_Feniks_Bonus = NOV_megacorp1_loyalty }
+	add_to_temp_variable = { NOV_Feniks_Bonus = -50 }
+	divide_temp_variable = { NOV_Feniks_Bonus = 100 }
+
+	multiply_variable = { NOV_MC1_army_org_factor = NOV_Feniks_Bonus }
+	multiply_variable = { NOV_MC1_army_attack_factor = NOV_Feniks_Bonus }
+	multiply_variable = { NOV_MC1_army_professionalism_monthly_rate = NOV_Feniks_Bonus }
+
+	divide_variable = { NOV_MC1_army_org_factor = 200 }
+	divide_variable = { NOV_MC1_army_attack_factor = 200 }
+	divide_variable = { NOV_MC1_army_professionalism_monthly_rate = 50 }
+
+	### Sibir Modifier
+
+	set_variable = { NOV_MC2_consumer_goods_factor = NOV_megacorp2_power }
+	set_variable = { NOV_MC2_production_speed_buildings_factor = NOV_megacorp2_power }
+	set_variable = { NOV_MC2_production_factory_max_efficiency_factor = NOV_megacorp2_power }
+
+	set_temp_variable = { NOV_Sibir_Bonus = NOV_megacorp2_loyalty }
+	add_to_temp_variable = { NOV_Sibir_Bonus = -50 }
+	divide_temp_variable = { NOV_Sibir_Bonus = 100 }
+
+	multiply_variable = { NOV_MC2_consumer_goods_factor = NOV_Sibir_Bonus }
+	multiply_variable = { NOV_MC2_production_speed_buildings_factor = NOV_Sibir_Bonus }
+	multiply_variable = { NOV_MC2_production_factory_max_efficiency_factor = NOV_Sibir_Bonus }
+
+	divide_variable = { NOV_MC2_production_speed_buildings_factor = 200 }
+	divide_variable = { NOV_MC2_production_factory_max_efficiency_factor = 200 }
+	divide_variable = { NOV_MC2_consumer_goods_factor = -200 }
+
+	### Titan Modifiers
+
+	set_variable = { NOV_MC3_research_speed_factor = NOV_megacorp3_power }
+	set_variable = { NOV_MC3_academic_base_monthly_rate = NOV_megacorp3_power }
+	set_variable = { NOV_MC3_research_facilities_monthly_rate = NOV_megacorp3_power }
+
+	set_temp_variable = { NOV_Titan_Bonus = NOV_megacorp3_loyalty }
+	add_to_temp_variable = { NOV_Titan_Bonus = -50 }
+	divide_temp_variable = { NOV_Titan_Bonus = 100 }
+
+	multiply_variable = { NOV_MC3_research_speed_factor = NOV_Titan_Bonus }
+	multiply_variable = { NOV_MC3_academic_base_monthly_rate = NOV_Titan_Bonus }
+	multiply_variable = { NOV_MC3_research_facilities_monthly_rate = NOV_Titan_Bonus }
+
+	divide_variable = { NOV_MC3_research_speed_factor = 200 }
+	divide_variable = { NOV_MC3_academic_base_monthly_rate = 50 }
+	divide_variable = { NOV_MC3_research_facilities_monthly_rate = 50 }
+
+	### People Modifiers
+
+	set_variable = { NOV_MC4_political_power_gain = NOV_megacorp4_power }
+	set_variable = { NOV_MC4_poverty_monthly_rate = NOV_megacorp4_power }
+
+	set_temp_variable = { NOV_People_Bonus = NOV_megacorp4_loyalty }
+	add_to_temp_variable = { NOV_People_Bonus = -50 }
+	divide_temp_variable = { NOV_People_Bonus = 100 }
+
+	multiply_variable = { NOV_MC4_political_power_gain = NOV_People_Bonus }
+	multiply_variable = { NOV_MC4_poverty_monthly_rate = NOV_People_Bonus }
+
+	divide_variable = { NOV_MC4_political_power_gain = 200 }
+	divide_variable = { NOV_MC4_poverty_monthly_rate = 1250 }
+
+	force_update_dynamic_modifier = yes
+}
+### Narodnik Investigation ###
+NOV_increase_investigation_progress = {
+	custom_effect_tooltip = NOV_narodnik_investigation_progress_tt
+	add_to_variable = { NOV_investigation_progress = 25 }
+	clamp_variable = { var = NOV_investigation_progress min = 0 max = 100 }
+}
+
+NOV_reduce_narodnik_strength = {
+	if = {
+		limit = {
+			has_idea = NOV_Socialist_Agitators
+		}
+		swap_ideas = {
+			remove_idea = NOV_Socialist_Agitators
+			add_idea = NOV_Socialist_Agitators_2
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = NOV_Socialist_Agitators_2
+		}
+		swap_ideas = {
+			remove_idea = NOV_Socialist_Agitators_2
+			add_idea = NOV_Socialist_Agitators_3
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = NOV_Socialist_Agitators_3
+		}
+		swap_ideas = {
+			remove_idea = NOV_Socialist_Agitators_3
+			add_idea = NOV_Socialist_Agitators_4
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = NOV_Socialist_Agitators_4
+		}
+		swap_ideas = {
+			remove_idea = NOV_Socialist_Agitators_4
+			add_idea = NOV_Socialist_Agitators_5
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = NOV_Socialist_Agitators_5
+		}
+		remove_ideas = NOV_Socialist_Agitators_5
+	}
+}
+
+NOV_remove_narodnik_natspirit = {
+	if = {
+		limit = {
+			has_idea = NOV_Socialist_Agitators
+		}
+		remove_ideas = NOV_Socialist_Agitators
+	}
+	else_if = {
+		limit = {
+			has_idea = NOV_Socialist_Agitators_2
+		}
+		remove_ideas = NOV_Socialist_Agitators_2
+	}
+	else_if = {
+		limit = {
+			has_idea = NOV_Socialist_Agitators_3
+		}
+		remove_ideas = NOV_Socialist_Agitators_3
+	}
+	else_if = {
+		limit = {
+			has_idea = NOV_Socialist_Agitators_4
+		}
+		remove_ideas = NOV_Socialist_Agitators_4
+	}
+	else_if = {
+		limit = {
+			has_idea = NOV_Socialist_Agitators_5
+		}
+		remove_ideas = NOV_Socialist_Agitators_5
+	}
+}
+
+
+###THUNDER THESE SCRIPTED EFFECTS HERE### https://www.youtube.com/watch?v=wFNr9FnpZBk
+
+#Some notes for posterity
+#
+#NOV.NOV_Takeover_Power changing this variable anywhere will change the BASE takeover power, no scripted effect but you might wanna do this as a bonus in a tree or something
+#
+#idk lol
+
+###Poli Compass Changes###
+
+#Corporatism#
+
+NOV_Add_Corporatism_Low = {
+	custom_effect_tooltip = NOV_Add_Corporatism_Low_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = -5 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Add_Corporatism_Mid = {
+	custom_effect_tooltip = NOV_Add_Corporatism_Mid_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = -10 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Add_Corporatism_High = {
+	custom_effect_tooltip = NOV_Add_Corporatism_High_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = -15 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Lower_Corporatism_Low = {
+	custom_effect_tooltip = NOV_Lower_Corporatism_Low_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = 5 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Lower_Corporatism_Mid = {
+	custom_effect_tooltip = NOV_Lower_Corporatism_Mid_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = 10 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Lower_Corporatism_High = {
+	custom_effect_tooltip = NOV_Lower_Corporatism_High_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = 15 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+#Collectivism#
+NOV_Add_Collectivism_Low = {
+	custom_effect_tooltip = NOV_Add_Collectivism_Low_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = 5 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Add_Collectivism_Mid = {
+	custom_effect_tooltip = NOV_Add_Collectivism_Mid_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = 10 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Add_Collectivism_High = {
+	custom_effect_tooltip = NOV_Add_Collectivism_High_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = 15 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Lower_Collectivism_Low = {
+	custom_effect_tooltip = NOV_Lower_Collectivism_Low_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = -5 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Lower_Collectivism_Mid = {
+	custom_effect_tooltip = NOV_Lower_Collectivism_Mid_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = -10 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Lower_Collectivism_High = {
+	custom_effect_tooltip = NOV_Lower_Collectivism_High_tt
+	NOV = { add_to_variable = { NOV.NOV_corp_collect_y = -15 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+#Federalism#
+NOV_Add_Federalism_Low = {
+	custom_effect_tooltip = NOV_Add_Federalism_Low_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = 5 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Add_Federalism_Mid = {
+	custom_effect_tooltip = NOV_Add_Federalism_Mid_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = 10 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Add_Federalism_High = {
+	custom_effect_tooltip = NOV_Add_Federalism_High_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = 15 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Lower_Federalism_Low = {
+	custom_effect_tooltip = NOV_Lower_Federalism_Low_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = -5 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Lower_Federalism_Mid = {
+	custom_effect_tooltip = NOV_Lower_Federalism_Mid_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = -10 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Lower_Federalism_High = {
+	custom_effect_tooltip = NOV_Lower_Federalism_High_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = -15 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+#Unitarianism#
+NOV_Add_Unitarianism_Low = {
+	custom_effect_tooltip = NOV_Add_Unitarianism_Low_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = -5 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Add_Unitarianism_Mid = {
+	custom_effect_tooltip = NOV_Add_Unitarianism_Mid_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = -10 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Add_Unitarianism_High = {
+	custom_effect_tooltip = NOV_Add_Unitarianism_High_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = -15 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Lower_Unitarianism_Low = {
+	custom_effect_tooltip = NOV_Lower_Unitarianism_Low_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = 5 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Lower_Unitarianism_Mid = {
+	custom_effect_tooltip = NOV_Lower_Unitarianism_Mid_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = 10 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Lower_Unitarianism_High = {
+	custom_effect_tooltip = NOV_Lower_Unitarianism_High_tt
+	NOV = { add_to_variable = { NOV.NOV_unitary_federal_x = 15 } }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+### Power Changes ###
+
+#Feniks
+NOV_Feniks_ADD_Feniks_Power_Low = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Feniks_Power_Low_tt
+	add_to_variable = { NOV.NOV_megacorp1_power = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Feniks_Power_Med = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Feniks_Power_Med_tt
+	add_to_variable = { NOV.NOV_megacorp1_power = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Feniks_Power_High = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Feniks_Power_High_tt
+	add_to_variable = { NOV.NOV_megacorp1_power = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Feniks_SUBTRACT_Feniks_Power_Low = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Feniks_Power_Low_tt
+	subtract_from_variable = { NOV.NOV_megacorp1_power = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Feniks_Power_Med = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Feniks_Power_Med_tt
+	subtract_from_variable = { NOV.NOV_megacorp1_power = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Feniks_Power_High = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Feniks_Power_High_tt
+	subtract_from_variable = { NOV.NOV_megacorp1_power = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+#Sibir
+NOV_Feniks_ADD_Sibir_Power_Low = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Sibir_Power_Low_tt
+	add_to_variable = { NOV.NOV_megacorp2_power = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Sibir_Power_Med = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Sibir_Power_Med_tt
+	add_to_variable = { NOV.NOV_megacorp2_power = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Sibir_Power_High = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Sibir_Power_High_tt
+	add_to_variable = { NOV.NOV_megacorp2_power = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Feniks_SUBTRACT_Sibir_Power_Low = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Sibir_Power_Low_tt
+	subtract_from_variable = { NOV.NOV_megacorp2_power = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Sibir_Power_Med = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Sibir_Power_Med_tt
+	subtract_from_variable = { NOV.NOV_megacorp2_power = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Sibir_Power_High = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Sibir_Power_High_tt
+	subtract_from_variable = { NOV.NOV_megacorp2_power = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+#Titan
+NOV_Feniks_ADD_Titan_Power_Low = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Titan_Power_Low_tt
+	add_to_variable = { NOV.NOV_megacorp3_power = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Titan_Power_Med = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Titan_Power_Med_tt
+	add_to_variable = { NOV.NOV_megacorp3_power = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Titan_Power_High = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Titan_Power_High_tt
+	add_to_variable = { NOV.NOV_megacorp3_power = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Feniks_SUBTRACT_Titan_Power_Low = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Titan_Power_Low_tt
+	subtract_from_variable = { NOV.NOV_megacorp3_power = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Titan_Power_Med = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Titan_Power_Med_tt
+	subtract_from_variable = { NOV.NOV_megacorp3_power = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Titan_Power_High = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Titan_Power_High_tt
+	subtract_from_variable = { NOV.NOV_megacorp3_power = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+#The People
+NOV_Feniks_ADD_People_Power_Low = {
+	custom_effect_tooltip = NOV_Feniks_ADD_People_Power_Low_tt
+	add_to_variable = { NOV.NOV_megacorp4_power = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_People_Power_Med = {
+	custom_effect_tooltip = NOV_Feniks_ADD_People_Power_Med_tt
+	add_to_variable = { NOV.NOV_megacorp4_power = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_People_Power_High = {
+	custom_effect_tooltip = NOV_Feniks_ADD_People_Power_High_tt
+	add_to_variable = { NOV.NOV_megacorp4_power = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Feniks_SUBTRACT_People_Power_Low = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_People_Power_Low_tt
+	subtract_from_variable = { NOV.NOV_megacorp4_power = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_People_Power_Med = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_People_Power_Med_tt
+	subtract_from_variable = { NOV.NOV_megacorp4_power = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_People_Power_High = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_People_Power_High_tt
+	subtract_from_variable = { NOV.NOV_megacorp4_power = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+###################
+# Loyalty Changes #
+###################
+
+#Feniks
+NOV_Feniks_ADD_Feniks_Loyalty_Low = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Feniks_Loyalty_Low_tt
+	add_to_variable = { NOV.NOV_megacorp1_loyalty = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Feniks_Loyalty_Med = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Feniks_Loyalty_Med_tt
+	add_to_variable = { NOV.NOV_megacorp1_loyalty = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Feniks_Loyalty_High = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Feniks_Loyalty_High_tt
+	add_to_variable = { NOV.NOV_megacorp1_loyalty = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Feniks_SUBTRACT_Feniks_Loyalty_Low = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Feniks_Loyalty_Low_tt
+	subtract_from_variable = { NOV.NOV_megacorp1_loyalty = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Feniks_Loyalty_Med = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Feniks_Loyalty_Med_tt
+	subtract_from_variable = { NOV.NOV_megacorp1_loyalty = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Feniks_Loyalty_High = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Feniks_Loyalty_High_tt
+	subtract_from_variable = { NOV.NOV_megacorp1_loyalty = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+#Sibir
+NOV_Feniks_ADD_Sibir_Loyalty_Low = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Sibir_Loyalty_Low_tt
+	add_to_variable = { NOV.NOV_megacorp2_loyalty = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Sibir_Loyalty_Med = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Sibir_Loyalty_Med_tt
+	add_to_variable = { NOV.NOV_megacorp2_loyalty = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Sibir_Loyalty_High = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Sibir_Loyalty_High_tt
+	add_to_variable = { NOV.NOV_megacorp2_loyalty = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Feniks_SUBTRACT_Sibir_Loyalty_Low = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Sibir_Loyalty_Low_tt
+	subtract_from_variable = { NOV.NOV_megacorp2_loyalty = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Sibir_Loyalty_Med = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Sibir_Loyalty_Med_tt
+	subtract_from_variable = { NOV.NOV_megacorp2_loyalty = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Sibir_Loyalty_High = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Sibir_Loyalty_High_tt
+	subtract_from_variable = { NOV.NOV_megacorp2_loyalty = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+#Titan
+NOV_Feniks_ADD_Titan_Loyalty_Low = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Titan_Loyalty_Low_tt
+	add_to_variable = { NOV.NOV_megacorp3_loyalty = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Titan_Loyalty_Med = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Titan_Loyalty_Med_tt
+	add_to_variable = { NOV.NOV_megacorp3_loyalty = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_Titan_Loyalty_High = {
+	custom_effect_tooltip = NOV_Feniks_ADD_Titan_Loyalty_High_tt
+	add_to_variable = { NOV.NOV_megacorp3_loyalty = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Feniks_SUBTRACT_Titan_Loyalty_Low = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Titan_Loyalty_Low_tt
+	subtract_from_variable = { NOV.NOV_megacorp3_loyalty = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Titan_Loyalty_Med = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Titan_Loyalty_Med_tt
+	subtract_from_variable = { NOV.NOV_megacorp3_loyalty = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_Titan_Loyalty_High = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_Titan_Loyalty_High_tt
+	subtract_from_variable = { NOV.NOV_megacorp3_loyalty = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+#The People
+NOV_Feniks_ADD_People_Loyalty_Low = {
+	custom_effect_tooltip = NOV_Feniks_ADD_People_Loyalty_Low_tt
+	add_to_variable = { NOV.NOV_megacorp4_loyalty = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_People_Loyalty_Med = {
+	custom_effect_tooltip = NOV_Feniks_ADD_People_Loyalty_Med_tt
+	add_to_variable = { NOV.NOV_megacorp4_loyalty = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_ADD_People_Loyalty_High = {
+	custom_effect_tooltip = NOV_Feniks_ADD_People_Loyalty_High_tt
+	add_to_variable = { NOV.NOV_megacorp4_loyalty = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+#
+NOV_Feniks_SUBTRACT_People_Loyalty_Low = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_People_Loyalty_Low_tt
+	subtract_from_variable = { NOV.NOV_megacorp4_loyalty = 5 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_People_Loyalty_Med = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_People_Loyalty_Med_tt
+	subtract_from_variable = { NOV.NOV_megacorp4_loyalty = 10 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_Feniks_SUBTRACT_People_Loyalty_High = {
+	custom_effect_tooltip = NOV_Feniks_SUBTRACT_People_Loyalty_High_tt
+	subtract_from_variable = { NOV.NOV_megacorp4_loyalty = 15 }
+	NOV = { NOV_clamp_pol_compass = yes }
+}
+
+NOV_FP_scripted_effect = {
+	if = {
+		limit = { check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence } }
+		add_to_variable = { NOV_Sphere_Influence = NOV_equalizer_effect }
+		if = {
+			limit = { check_variable = { NOV_Sphere_Influence > NOV_OFN_Influence } }
+			set_temp_variable = { NOV_Sphere_Influence_temp = NOV_Sphere_Influence }
+			set_temp_variable = { NOV_OFN_Influence_temp = NOV_OFN_Influence }
+			subtract_from_temp_variable = { NOV_Sphere_Influence_temp = NOV_OFN_Influence_temp }
+			subtract_from_variable = { NOV_OFN_Influence = NOV_Sphere_Influence_temp }
+		}
+	}
+	if = {
+		limit = { check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence } }
+		add_to_variable = { NOV_OFN_Influence = NOV_equalizer_effect }
+		if = {
+			limit = { check_variable = { NOV_Sphere_Influence < NOV_OFN_Influence } }
+			set_temp_variable = { NOV_Sphere_Influence_temp = NOV_Sphere_Influence }
+			set_temp_variable = { NOV_OFN_Influence_temp = NOV_OFN_Influence }
+			subtract_from_temp_variable = { NOV_OFN_Influence_temp = NOV_Sphere_Influence_temp }
+			subtract_from_variable = { NOV_Sphere_Influence = NOV_OFN_Influence_temp }
+		}
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+		subtract_from_variable = {
+			NOV_OFN_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+		subtract_from_variable = {
+			NOV_Sphere_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		random_list = {
+			50 = {
+				set_variable = {
+					NOV_OFN_Influence = NOV_Sphere_Influence
+				}
+			}
+			50 = {
+				set_variable = {
+					NOV_Sphere_Influence = NOV_OFN_Influence
+				}
+			}
+		}
+	}
+}
+
+### Diplomacy Tree ###
+#Japan/Sphere
+NOV_JAP_gain_low_influence = {
+	custom_effect_tooltip = NOV_JAP_gain_low_influence_tt
+	add_to_variable = { NOV_Sphere_Influence = 5 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+		}
+		clamp_variable = { var = NOV_Sphere_Influence min = 0 max = 95 }
+	}
+	else = {
+		clamp_variable = { var = NOV_Sphere_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+		add_to_variable = {
+			NOV_OFN_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+	}
+}
+
+NOV_JAP_gain_mid_influence = {
+	custom_effect_tooltip = NOV_JAP_gain_mid_influence_tt
+	add_to_variable = { NOV_Sphere_Influence = 10 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+		}
+		clamp_variable = { var = NOV_Sphere_Influence min = 0 max = 95 }
+	}
+	else = {
+		clamp_variable = { var = NOV_Sphere_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+		add_to_variable = {
+			NOV_OFN_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+	}
+}
+
+NOV_JAP_gain_high_influence = {
+	custom_effect_tooltip = NOV_JAP_gain_high_influence_tt
+	add_to_variable = { NOV_Sphere_Influence = 15 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+		}
+		clamp_variable = { var = NOV_Sphere_Influence min = 0 max = 95 }
+	}
+	else = {
+		clamp_variable = { var = NOV_Sphere_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+		add_to_variable = {
+			NOV_OFN_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+	}
+}
+#
+NOV_JAP_lose_low_influence = {
+	custom_effect_tooltip = NOV_JAP_lose_low_influence_tt
+	subtract_from_variable = { NOV_Sphere_Influence = 5 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+		}
+		clamp_variable = { var = NOV_Sphere_Influence min = 5 max = 100 }
+	}
+	else = {
+		clamp_variable = { var = NOV_Sphere_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+		subtract_from_variable = {
+			NOV_OFN_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+	}
+}
+
+NOV_JAP_lose_mid_influence = {
+	custom_effect_tooltip = NOV_JAP_lose_mid_influence_tt
+	subtract_from_variable = { NOV_Sphere_Influence = 10 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+		}
+		clamp_variable = { var = NOV_Sphere_Influence min = 5 max = 100 }
+	}
+	else = {
+		clamp_variable = { var = NOV_Sphere_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+		subtract_from_variable = {
+			NOV_OFN_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+	}
+}
+
+NOV_JAP_lose_high_influence = {
+	custom_effect_tooltip = NOV_JAP_lose_high_influence_tt
+	subtract_from_variable = { NOV_Sphere_Influence = 15 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+		}
+		clamp_variable = { var = NOV_Sphere_Influence min = 5 max = 100 }
+	}
+	else = {
+		clamp_variable = { var = NOV_Sphere_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+		subtract_from_variable = {
+			NOV_OFN_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_OFN_Influence = NOV_Sphere_Influence
+		}
+	}
+}
+
+#OFN
+NOV_USA_gain_low_influence = {
+	custom_effect_tooltip = NOV_USA_gain_low_influence_tt
+	add_to_variable = { NOV_OFN_Influence = 5 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+		}
+		clamp_variable = { var = NOV_OFN_Influence min = 0 max = 95 }
+	}
+	else = {
+		clamp_variable = { var = NOV_OFN_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+		add_to_variable = {
+			NOV_Sphere_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+	}
+}
+
+NOV_USA_gain_mid_influence = {
+	custom_effect_tooltip = NOV_USA_gain_mid_influence_tt
+	add_to_variable = { NOV_OFN_Influence = 10 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+		}
+		clamp_variable = { var = NOV_OFN_Influence min = 0 max = 95 }
+	}
+	else = {
+		clamp_variable = { var = NOV_OFN_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+		add_to_variable = {
+			NOV_Sphere_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+	}
+}
+
+NOV_USA_gain_high_influence = {
+	custom_effect_tooltip = NOV_USA_gain_high_influence_tt
+	add_to_variable = { NOV_OFN_Influence = 15 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+		}
+		clamp_variable = { var = NOV_OFN_Influence min = 0 max = 95 }
+	}
+	else = {
+		clamp_variable = { var = NOV_OFN_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_SPHERE
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+		add_to_variable = {
+			NOV_Sphere_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+	}
+}
+#
+NOV_USA_lose_low_influence = {
+	custom_effect_tooltip = NOV_USA_lose_low_influence_tt
+	subtract_from_variable = { NOV_OFN_Influence = 5 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+		}
+		clamp_variable = { var = NOV_OFN_Influence min = 5 max = 100 }
+	}
+	else = {
+		clamp_variable = { var = NOV_OFN_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+		subtract_from_variable = {
+			NOV_Sphere_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+	}
+}
+
+NOV_USA_lose_mid_influence = {
+	custom_effect_tooltip = NOV_USA_lose_mid_influence_tt
+	subtract_from_variable = { NOV_OFN_Influence = 10 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+		}
+		clamp_variable = { var = NOV_OFN_Influence min = 5 max = 100 }
+	}
+	else = {
+		clamp_variable = { var = NOV_OFN_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+		subtract_from_variable = {
+			NOV_Sphere_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+	}
+}
+
+NOV_USA_lose_high_influence = {
+	custom_effect_tooltip = NOV_USA_lose_high_influence_tt
+	subtract_from_variable = { NOV_OFN_Influence = 15 }
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+		}
+		clamp_variable = { var = NOV_OFN_Influence min = 5 max = 100 }
+	}
+	else = {
+		clamp_variable = { var = NOV_OFN_Influence min = 0 max = 100 }
+	}
+	if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_OFN
+			}
+			NOT = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+		subtract_from_variable = {
+			NOV_Sphere_Influence = 5
+		}
+	}
+	else_if = {
+		limit = {
+			has_game_rule = {
+				rule = NOV_DIPLO_TREE
+				option = NOV_DIPLO_TREE_NEUTRAL
+			}
+			OR = {
+				check_variable = { NOV_OFN_Influence > NOV_Sphere_Influence }
+				check_variable = { NOV_OFN_Influence < NOV_Sphere_Influence }
+			}
+		}
+		set_variable = {
+			NOV_Sphere_Influence = NOV_OFN_Influence
+		}
+	}
+}
+
+### Election Season ###
+
+NOV_elections_setup = {
+	set_country_flag = NOV_elections_season
+	if = {
+		limit = { check_variable = { NOV.NOV_unitary_federal_x > 153 } }
+		set_variable = { NOV_pokryshkin_support = 40 }
+	}
+	else_if = {
+		limit = { check_variable = { NOV.NOV_unitary_federal_x < 153 } }
+		set_variable = { NOV_pokryshkin_support = 60 }
+	}
+	else = {
+		set_variable = { NOV_pokryshkin_support = 50 }
+	}
+	NOV_clamp_elections_var = yes
+}
+
+NOV_shukshin_wins = {
+	set_politics = {
+		ruling_party = conservatism
+	}
+	add_popularity = { ideology = conservatism popularity = 0.1 }
+	remove_all_ministers = yes
+	add_ideas = {
+		NOV_Alexander_Pokryshkin_hog
+		NOV_Vladimir_Sobolev_for
+		NOV_Mikhail_Kerchenko_eco
+		NOV_Amet_khan_Sultan_sec
+	}
+	set_country_flag = NOV_shukshin_in_charge
+	set_country_flag = NOV_elections_sorted_flag
+	hidden_effect = {
+		load_focus_tree = { tree = NOV_novosibirsk_superregional_shukshin keep_completed = yes }
+	}
+	clr_country_flag = NOV_elections_season
+	clr_country_flag = NOV_shukshin_campaigning
+}
+
+NOV_pokryshkin_wins = {
+	add_popularity = { ideology = paternalism popularity = 0.1 }
+	hidden_effect = {
+		remove_ideas = {
+			NOV_Vasily_Shukshin_hog
+		}
+	}
+	add_ideas = NOV_Mikhail_Devyatayev_hog
+	set_country_flag = NOV_pokryshkin_in_charge
+	set_country_flag = NOV_elections_sorted_flag
+	hidden_effect = {
+		load_focus_tree = { tree = NOV_novosibirsk_superregional_pokryshkin keep_completed = yes }
+	}
+	clr_country_flag = NOV_elections_season
+	clr_country_flag = NOV_pokryshkin_campaigning
+}
+
+#Pokryshkin
+NOV_raise_pokryshkin_support_low = {
+	custom_effect_tooltip = NOV_raise_pokryshkin_support_low_tt
+	add_to_variable = { NOV_pokryshkin_support = 5 }
+	NOV_clamp_elections_var = yes
+}
+
+NOV_raise_pokryshkin_support_mid = {
+	custom_effect_tooltip = NOV_raise_pokryshkin_support_mid_tt
+	add_to_variable = { NOV_pokryshkin_support = 10 }
+	NOV_clamp_elections_var = yes
+}
+
+NOV_raise_pokryshkin_support_high = {
+	custom_effect_tooltip = NOV_raise_pokryshkin_support_high_tt
+	add_to_variable = { NOV_pokryshkin_support = 15 }
+	NOV_clamp_elections_var = yes
+}
+#
+NOV_lower_pokryshkin_support_low = {
+	custom_effect_tooltip = NOV_lower_pokryshkin_support_low_tt
+	subtract_from_variable = { NOV_pokryshkin_support = 5 }
+	NOV_clamp_elections_var = yes
+}
+
+NOV_lower_pokryshkin_support_mid = {
+	custom_effect_tooltip = NOV_lower_pokryshkin_support_mid_tt
+	subtract_from_variable = { NOV_pokryshkin_support = 10 }
+	NOV_clamp_elections_var = yes
+}
+
+NOV_lower_pokryshkin_support_high = {
+	custom_effect_tooltip = NOV_lower_pokryshkin_support_high_tt
+	subtract_from_variable = { NOV_pokryshkin_support = 15 }
+	NOV_clamp_elections_var = yes
+}
+
+#Shukshin
+NOV_raise_shukshin_support_low = {
+	custom_effect_tooltip = NOV_raise_shukshin_support_low_tt
+	subtract_from_variable = { NOV_pokryshkin_support = 5 }
+	NOV_clamp_elections_var = yes
+}
+
+NOV_raise_shukshin_support_mid = {
+	custom_effect_tooltip = NOV_raise_shukshin_support_mid_tt
+	subtract_from_variable = { NOV_pokryshkin_support = 10 }
+	NOV_clamp_elections_var = yes
+}
+
+NOV_raise_shukshin_support_high = {
+	custom_effect_tooltip = NOV_raise_shukshin_support_high_tt
+	subtract_from_variable = { NOV_pokryshkin_support = 15 }
+	NOV_clamp_elections_var = yes
+}
+#
+NOV_lower_shukshin_support_low = {
+	custom_effect_tooltip = NOV_lower_shukshin_support_low_tt
+	add_to_variable = { NOV_pokryshkin_support = 5 }
+	NOV_clamp_elections_var = yes
+}
+
+NOV_lower_shukshin_support_mid = {
+	custom_effect_tooltip = NOV_lower_shukshin_support_mid_tt
+	add_to_variable = { NOV_pokryshkin_support = 10 }
+	NOV_clamp_elections_var = yes
+}
+
+NOV_lower_shukshin_support_high = {
+	custom_effect_tooltip = NOV_lower_shukshin_support_high_tt
+	add_to_variable = { NOV_pokryshkin_support = 15 }
+	NOV_clamp_elections_var = yes
+}
+
+NOV_clamp_elections_var = {
+	round_variable = NOV_pokryshkin_support
+	clamp_variable = { var = NOV_pokryshkin_support min = 0 max = 100 }
+
+	set_variable = { NOV_shukshin_support = 100 } #only for display
+	subtract_from_variable = { NOV_shukshin_support = NOV_pokryshkin_support }
+
+	set_variable = { NOV_pokryshkin_x_axis = 4.44 } #(481-37)/100
+	multiply_variable = { NOV_pokryshkin_x_axis = NOV_pokryshkin_support }
+	round_variable = NOV_pokryshkin_x_axis
+	add_to_variable = { NOV_pokryshkin_x_axis = 37 }
+}
+
+#########################################
+
+### Debug ###
+NOV_russia_debug = {
+	for_each_scope_loop = {
+		array = global.russian_warlords
+		random_list = {
+			10 = {
+				set_variable = { NOV_Takeover_Progress = 20 }
+			}
+			10 = {
+				set_variable = { NOV_Takeover_Progress = 30 }
+			}
+			10 = {
+				set_variable = { NOV_Takeover_Progress = 40 }
+			}
+			10 = {
+				set_variable = { NOV_Takeover_Progress = 50 }
+			}
+			10 = {
+				set_variable = { NOV_Takeover_Progress = 60 }
+			}
+			10 = {
+				set_variable = { NOV_Takeover_Progress = 70 }
+			}
+			10 = {
+				set_variable = { NOV_Takeover_Progress = 80 }
+			}
+		}
+		log = "[GetDateText]: [This.GetName]: NOV_Takeover_Progress is [?This.NOV_Takeover_Progress]"
+	}
+}

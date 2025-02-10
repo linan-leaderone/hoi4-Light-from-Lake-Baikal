@@ -1,0 +1,1974 @@
+scripted_gui = {
+	TNO_CSS_BRA_map_openbutton = {
+		context_type = player_context
+		window_name = "TNO_CSS_BRA_map_openbutton"
+		parent_window_token = politics_tab
+		visible = { tag = BRA }
+
+		triggers = {
+			gui_alert_visible = {
+				has_country_flag = gui_alert_visible
+			}
+		}
+
+		effects = {
+			open_button1_click = {
+				clr_country_flag = gui_alert_visible
+				if = {
+					limit = { has_country_flag = BRA_map_window_open }
+					clr_country_flag = BRA_map_window_open
+				}
+				else = {
+					set_country_flag = BRA_map_window_open
+					BRA_senate_select_state = yes
+				}
+				clear_array = BRA_senate_campaigning_party
+			}
+		}
+	}
+	TNO_CSS_BRA_map = {
+		context_type = player_context
+		window_name = "TNO_CSS_BRA_map_GUI"
+		parent_window_token = TNO_CSS_BRA_map_GUI
+
+		visible = { has_country_flag = BRA_map_window_open }
+
+		effects = {
+			map_close_button_click = {
+				clr_country_flag = BRA_map_window_open
+			}
+			tab_0_click = {
+				clear_array = BRA_map_selected_tab
+				add_to_array = { BRA_map_selected_tab = 0 }
+				clear_array = BRA_map_tab_frames
+				add_to_array = { BRA_map_tab_frames = 2 }
+				add_to_array = { BRA_map_tab_frames = 1 }
+				add_to_array = { BRA_map_tab_frames = 1 }
+			}
+			tab_1_click = {
+				clear_array = BRA_map_selected_tab
+				if = {
+					limit = { check_variable = { BRA_map_election_type_frames^0 = 2 } }
+					add_to_array = { BRA_map_selected_tab = 3 }
+				}
+				else = {
+					add_to_array = { BRA_map_selected_tab = 1 }
+				}
+				clear_array = BRA_map_tab_frames
+				add_to_array = { BRA_map_tab_frames = 1 }
+				add_to_array = { BRA_map_tab_frames = 2 }
+				add_to_array = { BRA_map_tab_frames = 1 }
+			}
+			#tab_2_click = {
+			#	clear_array = BRA_map_selected_tab
+			#	add_to_array = { BRA_map_selected_tab = 2 }
+			#	clear_array = BRA_map_tab_frames
+			#	add_to_array = { BRA_map_tab_frames = 1 }
+			#	add_to_array = { BRA_map_tab_frames = 1 }
+			#	add_to_array = { BRA_map_tab_frames = 2 }
+			#}
+		}
+		properties = {
+			tab_0 = {
+				frame = BRA_map_tab_frames^0
+			}
+			tab_1 = {
+				frame = BRA_map_tab_frames^1
+			}
+			tab_2 = {
+				frame = BRA_map_tab_frames^2
+			}
+		}
+
+		dynamic_lists = {
+			current_tab = {
+				array = BRA_map_selected_tab
+				change_scope = no
+				entry_container = "[TNO_CSS_BRA_map_selected_tab_GUI]"
+			}
+		}
+
+		###############################################################
+		########             Development Mechanic              ########
+		###############################################################
+
+		effects = {
+			mega_project_add_button_click = {
+				add_political_power = -10
+				add_to_variable = { BRA_megaprojects_level^BRA_develop_selected_project = 2 }
+				BRA_develop_update_projects = yes
+			}
+			mega_project_sub_button_click = {
+				add_political_power = -10
+				subtract_from_variable = { BRA_megaprojects_level^BRA_develop_selected_project = 2 }
+				BRA_develop_update_projects = yes
+			}
+			encourage_migration_click = {
+				add_political_power = -10
+				add_to_variable = { BRA_develop_region_urban_pop_trend^BRA_develop_selected_region = 0.25 }
+
+				set_country_flag = BRA_development_cooldown
+				set_temp_variable = { alert_id = token:Alert_BRA_Development }
+				remove_TNO_alert = yes
+				country_event = {
+					id = brazil.16
+					days = 60
+				}
+			}
+			sponsor_projects_click = {
+				add_political_power = -10
+				set_temp_variable = { temp_econ_GDP_boost_flat = 0.2 }
+				econ_GDP_boost_once_flat = yes
+				add_to_variable = { BRA_develop_region_industry_trend^BRA_develop_selected_region = 0.25 }
+
+				set_country_flag = BRA_development_cooldown
+				set_temp_variable = { alert_id = token:Alert_BRA_Development }
+				remove_TNO_alert = yes
+				country_event = {
+					id = brazil.16
+					days = 60
+				}
+			}
+			subsidize_mech_click = {
+				add_political_power = -10
+				set_temp_variable = { temp_econ_GDP_boost_flat = 0.2 }
+				econ_GDP_boost_once_flat = yes
+				BRA_development_subsidize_mech_state_GDP_growth = yes
+				add_to_variable = { BRA_develop_region_mech_rate_trend^BRA_develop_selected_region = 0.25 }
+
+				set_country_flag = BRA_development_cooldown
+				set_temp_variable = { alert_id = token:Alert_BRA_Development }
+				remove_TNO_alert = yes
+				country_event = {
+					id = brazil.16
+					days = 60
+				}
+			}
+			requisition_assets_click = {
+				add_political_power = -10
+				set_temp_variable = { temp_econ_GDP_boost_flat = -0.05 }
+				econ_GDP_boost_once_flat = yes
+				set_temp_variable = { money_reserves_temp = 0.100 }
+				econ_money_reserves_change_raw_money = yes
+				subtract_from_variable = { BRA_develop_region_industry_trend^BRA_develop_selected_region = 0.25 }
+
+				set_country_flag = BRA_development_cooldown
+				set_temp_variable = { alert_id = token:Alert_BRA_Development }
+				remove_TNO_alert = yes
+				country_event = {
+					id = brazil.16
+					days = 60
+				}
+			}
+		}
+		properties = {
+			mega_project_meter = {
+				frame = BRA_megaprojects_progress^BRA_develop_selected_project
+			}
+			map_highway = {
+				frame = BRA_develop_highway_frame
+			}
+			development_icon = {
+				frame = BRA_develop_frame
+			}
+		}
+		triggers = {
+			mega_project_add_button_click_enabled = {
+				check_variable = { BRA_megaprojects_level^BRA_develop_selected_project < BRA_megaprojects_max_level^BRA_develop_selected_project }
+				has_political_power > 9.9
+			}
+			mega_project_sub_button_click_enabled = {
+				check_variable = { BRA_megaprojects_level^BRA_develop_selected_project > 2 }
+				has_political_power > 9.9
+			}
+			not_developed_enough_visible = {
+				check_variable = { BRA_develop_selected_region = 0 }
+			}
+			encourage_migration_visible = {
+				NOT = { check_variable = { BRA_develop_selected_region = 0 } }
+			}
+			sponsor_projects_visible = {
+				NOT = { check_variable = { BRA_develop_selected_region = 0 } }
+			}
+			subsidize_mech_visible = {
+				NOT = { check_variable = { BRA_develop_selected_region = 0 } }
+			}
+			requisition_assets_visible = {
+				NOT = { check_variable = { BRA_develop_selected_region = 0 } }
+			}
+			encourage_migration_title_visible = {
+				NOT = { check_variable = { BRA_develop_selected_region = 0 } }
+			}
+			sponsor_projects_title_visible = {
+				NOT = { check_variable = { BRA_develop_selected_region = 0 } }
+			}
+			subsidize_mech_title_visible = {
+				NOT = { check_variable = { BRA_develop_selected_region = 0 } }
+			}
+			requisition_assets_title_visible = {
+				NOT = { check_variable = { BRA_develop_selected_region = 0 } }
+			}
+			encourage_migration_click_enabled = {
+				NOT = { has_country_flag = BRA_development_cooldown }
+				has_political_power > 9.9
+			}
+			sponsor_projects_click_enabled = {
+				NOT = { has_country_flag = BRA_development_cooldown }
+				has_political_power > 9.9
+			}
+			subsidize_mech_click_enabled = {
+				NOT = { has_country_flag = BRA_development_cooldown }
+				has_political_power > 9.9
+			}
+			requisition_assets_click_enabled = {
+				NOT = { has_country_flag = BRA_development_cooldown }
+				has_political_power > 9.9
+			}
+		}
+
+		effects = {
+			debug_add_progress_button_click = {
+				add_to_variable = { BRA_develop_highway_progress = 1 }
+				#BRA_develop_update_highway_progress = yes
+			}
+			debug_sub_progress_button_click = {
+				subtract_from_variable = { BRA_develop_highway_progress = 1 }
+				#BRA_develop_update_highway_progress = yes
+			}
+			debug_add_progress_button_right_click = {
+				add_to_variable = { BRA_develop_highway_progress = 5 }
+				#BRA_develop_update_highway_progress = yes
+			}
+			debug_sub_progress_button_right_click = {
+				subtract_from_variable = { BRA_develop_highway_progress = 5 }
+				#BRA_develop_update_highway_progress = yes
+			}
+			debug_add_urb_button_click = {
+				add_to_variable = { BRA_develop_region_urban_pop^BRA_develop_selected_region = 1 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_add_urb_button_right_click = {
+				add_to_variable = { BRA_develop_region_urban_pop^BRA_develop_selected_region = 5 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_sub_urb_button_click = {
+				subtract_from_variable = { BRA_develop_region_urban_pop^BRA_develop_selected_region = 1 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_sub_urb_button_right_click = {
+				subtract_from_variable = { BRA_develop_region_urban_pop^BRA_develop_selected_region = 5 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_add_mech_button_click = {
+				add_to_variable = { BRA_develop_region_mech_rate^BRA_develop_selected_region = 1 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_add_mech_button_right_click = {
+				add_to_variable = { BRA_develop_region_mech_rate^BRA_develop_selected_region = 5 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_sub_mech_button_click = {
+				subtract_from_variable = { BRA_develop_region_mech_rate^BRA_develop_selected_region = 1 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_sub_mech_button_right_click = {
+				subtract_from_variable = { BRA_develop_region_mech_rate^BRA_develop_selected_region = 5 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_add_ind_button_click = {
+				add_to_variable = { BRA_develop_region_industry^BRA_develop_selected_region = 1 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_add_ind_button_right_click = {
+				add_to_variable = { BRA_develop_region_industry^BRA_develop_selected_region = 5 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_sub_ind_button_click = {
+				subtract_from_variable = { BRA_develop_region_industry^BRA_develop_selected_region = 1 }
+				BRA_develop_update_regional_progress = yes
+			}
+			debug_sub_ind_button_right_click = {
+				subtract_from_variable = { BRA_develop_region_industry^BRA_develop_selected_region = 5 }
+				BRA_develop_update_regional_progress = yes
+			}
+		}
+		triggers = {
+			debug_add_progress_button_visible = {
+				has_country_flag = BRA_debug_tools
+			}
+			debug_sub_progress_button_visible = {
+				has_country_flag = BRA_debug_tools
+			}
+			debug_add_urb_button_visible = {
+				has_country_flag = BRA_debug_tools
+			}
+			debug_sub_urb_button_visible = {
+				has_country_flag = BRA_debug_tools
+			}
+			debug_add_mech_button_visible = {
+				has_country_flag = BRA_debug_tools
+			}
+			debug_sub_mech_button_visible = {
+				has_country_flag = BRA_debug_tools
+			}
+			debug_add_ind_button_visible = {
+				has_country_flag = BRA_debug_tools
+			}
+			debug_sub_ind_button_visible = {
+				has_country_flag = BRA_debug_tools
+			}
+		}
+
+		effects = {
+			map_button_amazonia_click = {
+				set_variable = { BRA_develop_selected_region = 0 }
+				BRA_develop_select_region = yes
+			}
+			map_button_north_east_click = {
+				set_variable = { BRA_develop_selected_region = 1 }
+				BRA_develop_select_region = yes
+			}
+			map_button_central_west_click = {
+				set_variable = { BRA_develop_selected_region = 2 }
+				BRA_develop_select_region = yes
+			}
+			map_button_south_east_click = {
+				set_variable = { BRA_develop_selected_region = 3 }
+				BRA_develop_select_region = yes
+			}
+			map_button_south_click = {
+				set_variable = { BRA_develop_selected_region = 4 }
+				BRA_develop_select_region = yes
+			}
+
+			total_gdp_select_click = {
+				set_variable = { BRA_develop_graph_selected_stat = 0 }
+				BRA_develop_ready_graph = yes
+			}
+			total_pop_select_click = {
+				set_variable = { BRA_develop_graph_selected_stat = 1 }
+				BRA_develop_ready_graph = yes
+			}
+			total_inflation_select_click = {
+				set_variable = { BRA_develop_graph_selected_stat = 2 }
+				BRA_develop_ready_graph = yes
+			}
+			total_industry_select_click = {
+				set_variable = { BRA_develop_graph_selected_stat = 3 }
+				BRA_develop_ready_graph = yes
+			}
+
+			region_pop_select_click = {
+				set_variable = { BRA_develop_graph_selected_stat = 4 }
+				BRA_develop_ready_graph = yes
+			}
+			region_urb_select_click = {
+				set_variable = { BRA_develop_graph_selected_stat = 5 }
+				BRA_develop_ready_graph = yes
+			}
+			region_mech_rate_select_click = {
+				set_variable = { BRA_develop_graph_selected_stat = 6 }
+				BRA_develop_ready_graph = yes
+			}
+			region_industry_select_click = {
+				set_variable = { BRA_develop_graph_selected_stat = 7 }
+				BRA_develop_ready_graph = yes
+			}
+		}
+
+		dynamic_lists = {
+			development_active_projects = {
+				array = BRA_active_display
+				change_scope = no
+				entry_container = TNO_CSS_BRA_map_development_project_button
+				value = project_id
+			}
+		}
+		properties = {
+			open_megaproject_button = {
+				image = "[BRA_open_project_button_img]"
+			}
+		}
+
+		effects = {
+			map_highway_click = {
+				set_variable = { BRA_develop_selected_region = 0 }
+				set_variable = { BRA_develop_selected_project = TRANS_AMAZONIAN_HIGHWAY_MEGAPROJECT }
+				BRA_develop_select_region = yes
+				set_country_flag = BRA_viewing_megaproject
+				set_variable = { BRA_is_region_selected^BRA_develop_selected_region = 1 }
+			}
+			open_megaproject_button_click = {
+				set_variable = { BRA_develop_selected_region = 0 }
+				set_variable = { BRA_develop_selected_project = TRANS_AMAZONIAN_HIGHWAY_MEGAPROJECT }
+				BRA_develop_select_region = yes
+				set_country_flag = BRA_viewing_megaproject
+				set_variable = { BRA_is_region_selected^BRA_develop_selected_region = 1 }
+			}
+		}
+
+		dynamic_lists = {
+			line_segments = {
+				array = BRA_develop_graph_offsets
+				change_scope = no
+				entry_container = line_graph_line_segment
+				index = segment_idx
+			}
+			vbars = {
+				array = BRA_develop_graph_vbars
+				change_scope = no
+				entry_container = line_graph_vbar
+				index = vbar_idx
+			}
+			development_side_panel = {
+				array = BRA_develop_selected_region_arr
+				change_scope = no
+				entry_container = "[BRA_develop_sidebar_type]"
+			}
+		}
+
+		properties = {
+			total_gdp_select = {
+				frame = BRA_develop_is_stat_selected^0
+			}
+			total_pop_select = {
+				frame = BRA_develop_is_stat_selected^1
+			}
+			total_inflation_select = {
+				frame = BRA_develop_is_stat_selected^2
+			}
+			total_industry_select = {
+				frame = BRA_develop_is_stat_selected^3
+			}
+			region_pop_select = {
+				frame = BRA_develop_is_stat_selected^4
+			}
+			region_urb_select = {
+				frame = BRA_develop_is_stat_selected^5
+			}
+			region_mech_rate_select = {
+				frame = BRA_develop_is_stat_selected^6
+			}
+			region_industry_select = {
+				frame = BRA_develop_is_stat_selected^7
+			}
+		}
+
+		properties = {
+			segment = {
+				frame = BRA_develop_graph_deltas^segment_idx
+				y = BRA_develop_graph_offsets^segment_idx
+			}
+			horizontal_bar = {
+				y = BRA_develop_graph_vbar_offsets^vbar_idx
+			}
+			horizontal_bar_label = {
+				y = BRA_develop_graph_vbar_offsets^vbar_idx
+			}
+		}
+
+		#### Map Outlines ####
+		properties = {
+			map_outline_amazonia = {
+				frame = BRA_is_region_selected^0
+			}
+			map_outline_north_east = {
+				frame = BRA_is_region_selected^1
+			}
+			map_outline_central_west = {
+				frame = BRA_is_region_selected^2
+			}
+			map_outline_south_east = {
+				frame = BRA_is_region_selected^3
+			}
+			map_outline_south = {
+				frame = BRA_is_region_selected^4
+			}
+		}
+
+		#### Map Fills ####
+		properties = {
+			map_fill_amazonia = {
+				frame = BRA_develop_regional_progress^0
+			}
+			map_fill_north_east = {
+				frame = BRA_develop_regional_progress^1
+			}
+			map_fill_central_west = {
+				frame = BRA_develop_regional_progress^2
+			}
+			map_fill_south_east = {
+				frame = BRA_develop_regional_progress^3
+			}
+			map_fill_south = {
+				frame = BRA_develop_regional_progress^4
+			}
+		}
+
+
+		###############################################################
+		########           Presidential Race Mechanic          ########
+		###############################################################
+
+		effects = {
+			senado_toggle_click = {
+				set_variable = { BRA_map_selected_tab^0 = 1 }
+				set_variable = { BRA_map_election_type_frames^0 = 1 }
+				set_variable = { BRA_map_election_type_frames^1 = 2 }
+			}
+			president_toggle_click = {
+				set_variable = { BRA_map_selected_tab^0 = 3 }
+				set_variable = { BRA_map_election_type_frames^0 = 2 }
+				set_variable = { BRA_map_election_type_frames^1 = 1 }
+			}
+		}
+
+		effects = {
+			map_button_pres_amazonia_click = {
+				set_variable = { BRA_pres_selected_region = 0 }
+				BRA_pres_select_region = yes
+			}
+			map_button_pres_BAH_click = {
+				set_variable = { BRA_pres_selected_region = 1 }
+				BRA_pres_select_region = yes
+			}
+			map_button_pres_central_west_click = {
+				set_variable = { BRA_pres_selected_region = 2 }
+				BRA_pres_select_region = yes
+			}
+			map_button_pres_MG_click = {
+				set_variable = { BRA_pres_selected_region = 3 }
+				BRA_pres_select_region = yes
+			}
+			map_button_pres_south_click = {
+				set_variable = { BRA_pres_selected_region = 4 }
+				BRA_pres_select_region = yes
+			}
+			map_button_pres_MAR_PI_click = {
+				set_variable = { BRA_pres_selected_region = 5 }
+				BRA_pres_select_region = yes
+			}
+			map_button_pres_NE_click = {
+				set_variable = { BRA_pres_selected_region = 6 }
+				BRA_pres_select_region = yes
+			}
+			map_button_pres_RJ_ES_click = {
+				set_variable = { BRA_pres_selected_region = 7 }
+				BRA_pres_select_region = yes
+			}
+			map_button_pres_SP_click = {
+				set_variable = { BRA_pres_selected_region = 8 }
+				BRA_pres_select_region = yes
+			}
+		}
+
+		#### Map Outlines ####
+		properties = {
+			map_outline_pres_amazonia = {
+				frame = BRA_is_region_selected_pres^0
+			}
+			map_outline_pres_BAH = {
+				frame = BRA_is_region_selected_pres^1
+			}
+			map_outline_pres_central_west = {
+				frame = BRA_is_region_selected_pres^2
+			}
+			map_outline_pres_MG = {
+				frame = BRA_is_region_selected_pres^3
+			}
+			map_outline_pres_south = {
+				frame = BRA_is_region_selected_pres^4
+			}
+			map_outline_pres_MAR_PI = {
+				frame = BRA_is_region_selected_pres^5
+			}
+			map_outline_pres_NE = {
+				frame = BRA_is_region_selected_pres^6
+			}
+			map_outline_pres_RJ_ES = {
+				frame = BRA_is_region_selected_pres^7
+			}
+			map_outline_pres_SP = {
+				frame = BRA_is_region_selected_pres^8
+			}
+			senado_toggle = {
+				frame = BRA_map_election_type_frames^1
+			}
+			president_toggle = {
+				frame = BRA_map_election_type_frames^0
+			}
+		}
+
+		#### Map Fills ####
+		properties = {
+			map_fill_pres_amazonia = {
+				frame = BRA_pres_leading_party^0
+			}
+			map_fill_pres_BAH = {
+				frame = BRA_pres_leading_party^1
+			}
+			map_fill_pres_central_west = {
+				frame = BRA_pres_leading_party^2
+			}
+			map_fill_pres_MG = {
+				frame = BRA_pres_leading_party^3
+			}
+			map_fill_pres_south = {
+				frame = BRA_pres_leading_party^4
+			}
+			map_fill_pres_MAR_PI = {
+				frame = BRA_pres_leading_party^5
+			}
+			map_fill_pres_NE = {
+				frame = BRA_pres_leading_party^6
+			}
+			map_fill_pres_RJ_ES = {
+				frame = BRA_pres_leading_party^7
+			}
+			map_fill_pres_SP = {
+				frame = BRA_pres_leading_party^8
+			}
+		}
+
+		dynamic_lists = {
+			presidential_candidates = {
+				array = BRA_pres_candidates
+				change_scope = no
+				entry_container = TNO_CSS_BRA_map_pres_candidate_entry
+				value = pres_candidate_id
+				index = pres_candidate_idx
+			}
+			presidential_candidate_bars = {
+				array = BRA_pres_candidates
+				change_scope = no
+				entry_container = TNO_CSS_BRA_map_pres_candidate_bar
+				value = pres_candidate_id
+				index = pres_candidate_idx
+			}
+			bar_graph_numbers = {
+				array = BRA_numbers_to_hundred
+				change_scope = no
+				entry_container = BRA_bar_graph_label
+				value = number
+			}
+			pres_candidate_portraits = {
+				array = BRA_pres_candidates
+				change_scope = no
+				entry_container = TNO_CSS_BRA_map_pres_candidate_portrait
+				value = pres_candidate_id
+				index = pres_candidate_idx
+			}
+		}
+
+		properties = {
+			pres_party_indicator = {
+				frame = BRA_pres_candidate_parties^pres_candidate_idx
+			}
+			pres_party_indicator_bar = {
+				frame = BRA_pres_candidate_parties^pres_candidate_idx
+				y = BRA_pres_candidate_bar_offsets^pres_candidate_idx
+			}
+			pres_candidate_pop_bar = {
+				frame = BRA_pres_selected_pops^pres_candidate_idx
+			}
+			pres_prog_bar = {
+				y = BRA_pres_candidate_bar_offsets^pres_candidate_idx
+				image = "[BRA_pres_prog_bar]"
+				frame = BRA_pres_nationwide_pops^pres_candidate_idx
+			}
+			pres_candidate_portrait = {
+				image = "[BRA_pres_candidate_portrait]"
+				x = BRA_pres_candidate_portrait_offset
+			}
+			pres_candidate_name_portrait = {
+				x = BRA_pres_candidate_portrait_offset
+			}
+			pres_candidate_pop_portrait = {
+				x = BRA_pres_candidate_portrait_offset
+			}
+			pres_candidate_momentum = {
+				image = "[BRA_pres_selected_momentum]"
+			}
+		}
+
+		effects = {
+			pres_rally_click = {
+				set_temp_variable = { idx = BRA_pres_selected_region }
+				multiply_temp_variable = { idx = BRA_pres_candidates^num }
+				add_to_temp_variable = { idx = pres_candidate_idx }
+
+				set_temp_variable = { amount = 600000 }
+				divide_temp_variable = { amount = BRA_pres_region_pop^BRA_pres_selected_region }
+				multiply_temp_variable = { amount = BRA_pres_infra^idx }
+				multiply_temp_variable = { amount = BRA_pres_fatigue^BRA_pres_selected_region }
+
+				add_to_variable = { BRA_pres_support^idx = amount }
+				subtract_from_variable = { BRA_pres_fatigue^BRA_pres_selected_region = 0.15 }
+				clamp_variable = { var = BRA_pres_fatigue^BRA_pres_selected_region min = 0 max = 1 }
+				BRA_redraw_pres_info = yes
+				BRA_pres_select_region = yes
+
+				if = {
+					limit = {
+						check_variable = { BRA_pres_campaigning_party^BRA_pres_selected_region = 0 }
+					}
+					set_variable = { BRA_pres_campaigning_party^BRA_pres_selected_region = BRA_pres_candidate_parties^pres_candidate_idx }
+				}
+				else = {
+					set_variable = { BRA_pres_campaigning_party_2^BRA_pres_selected_region = BRA_pres_candidate_parties^pres_candidate_idx }
+				}
+				set_country_flag = BRA_pres_campaign_cooldown
+				set_temp_variable = { alert_id = token:Alert_BRA_PresVoting }
+				remove_TNO_alert = yes
+			}
+			pres_campaign_click = {
+				set_temp_variable = { idx = BRA_pres_selected_region }
+				multiply_temp_variable = { idx = BRA_pres_candidates^num }
+				add_to_temp_variable = { idx = pres_candidate_idx }
+
+				set_temp_variable = { amount = 27 }
+				multiply_temp_variable = { amount = BRA_pres_infra^idx }
+				multiply_temp_variable = { amount = BRA_pres_fatigue^BRA_pres_selected_region }
+
+				add_to_variable = { BRA_pres_momentum^idx = amount }
+				subtract_from_variable = { BRA_pres_fatigue^BRA_pres_selected_region = 0.15 }
+				clamp_variable = { var = BRA_pres_fatigue^BRA_pres_selected_region min = 0 max = 1 }
+				BRA_redraw_pres_info = yes
+				BRA_pres_select_region = yes
+
+				if = {
+					limit = {
+						check_variable = { BRA_pres_campaigning_party^BRA_pres_selected_region = 0 }
+					}
+					set_variable = { BRA_pres_campaigning_party^BRA_pres_selected_region = BRA_pres_candidate_parties^pres_candidate_idx }
+				}
+				else = {
+					set_variable = { BRA_pres_campaigning_party_2^BRA_pres_selected_region = BRA_pres_candidate_parties^pres_candidate_idx }
+				}
+				set_country_flag = BRA_pres_campaign_cooldown
+				set_temp_variable = { alert_id = token:Alert_BRA_PresVoting }
+				remove_TNO_alert = yes
+			}
+			pres_infra_click = {
+				set_temp_variable = { idx = BRA_pres_selected_region }
+				multiply_temp_variable = { idx = BRA_pres_candidates^num }
+				add_to_temp_variable = { idx = pres_candidate_idx }
+
+				multiply_variable = { BRA_pres_infra^idx = 1.1 }
+				subtract_from_variable = { BRA_pres_fatigue^BRA_pres_selected_region = 0.15 }
+				clamp_variable = { var = BRA_pres_fatigue^BRA_pres_selected_region min = 0 max = 1 }
+
+				BRA_redraw_pres_info = yes
+				BRA_pres_select_region = yes
+
+				if = {
+					limit = {
+						check_variable = { BRA_pres_campaigning_party^BRA_pres_selected_region = 0 }
+					}
+					set_variable = { BRA_pres_campaigning_party^BRA_pres_selected_region = BRA_pres_candidate_parties^pres_candidate_idx }
+				}
+				else = {
+					set_variable = { BRA_pres_campaigning_party_2^BRA_pres_selected_region = BRA_pres_candidate_parties^pres_candidate_idx }
+				}
+				set_country_flag = BRA_pres_campaign_cooldown
+				set_temp_variable = { alert_id = token:Alert_BRA_PresVoting }
+				remove_TNO_alert = yes
+			}
+
+			pres_supporters_click = {
+				set_temp_variable = { idx = BRA_pres_selected_region }
+				multiply_temp_variable = { idx = BRA_pres_candidates^num }
+				add_to_temp_variable = { idx = pres_candidate_idx }
+
+				set_temp_variable = { amount = -600000 }
+				divide_temp_variable = { amount = BRA_pres_region_pop^BRA_pres_selected_region }
+				multiply_temp_variable = { amount = BRA_pres_infra^idx }
+				multiply_temp_variable = { amount = BRA_pres_fatigue^BRA_pres_selected_region }
+
+				add_to_variable = { BRA_pres_support^idx = amount }
+				subtract_from_variable = { BRA_pres_fatigue^BRA_pres_selected_region = 0.15 }
+				clamp_variable = { var = BRA_pres_fatigue^BRA_pres_selected_region min = 0 max = 1 }
+				BRA_redraw_pres_info = yes
+				BRA_pres_select_region = yes
+
+				if = {
+					limit = {
+						check_variable = { BRA_pres_campaigning_party^BRA_pres_selected_region = 0 }
+					}
+					set_variable = { BRA_pres_campaigning_party^BRA_pres_selected_region = BRA_pres_candidate_parties^pres_candidate_idx }
+				}
+				else = {
+					set_variable = { BRA_pres_campaigning_party_2^BRA_pres_selected_region = BRA_pres_candidate_parties^pres_candidate_idx }
+				}
+				set_country_flag = BRA_pres_campaign_cooldown
+				set_temp_variable = { alert_id = token:Alert_BRA_PresVoting }
+				remove_TNO_alert = yes
+			}
+			pres_negative_click = {
+				set_temp_variable = { idx = BRA_pres_selected_region }
+				multiply_temp_variable = { idx = BRA_pres_candidates^num }
+				add_to_temp_variable = { idx = pres_candidate_idx }
+
+				set_temp_variable = { amount = -15 }
+				multiply_temp_variable = { amount = BRA_pres_infra^idx }
+				multiply_temp_variable = { amount = BRA_pres_fatigue^BRA_pres_selected_region }
+
+				add_to_variable = { BRA_pres_momentum^idx = amount }
+				subtract_from_variable = { BRA_pres_fatigue^BRA_pres_selected_region = 0.15 }
+				clamp_variable = { var = BRA_pres_fatigue^BRA_pres_selected_region min = 0 max = 1 }
+
+				BRA_redraw_pres_info = yes
+				BRA_pres_select_region = yes
+
+				if = {
+					limit = {
+						check_variable = { BRA_pres_campaigning_party^BRA_pres_selected_region = 0 }
+					}
+					set_variable = { BRA_pres_campaigning_party^BRA_pres_selected_region = BRA_pres_candidate_parties^pres_candidate_idx }
+				}
+				else = {
+					set_variable = { BRA_pres_campaigning_party_2^BRA_pres_selected_region = BRA_pres_candidate_parties^pres_candidate_idx }
+				}
+				set_country_flag = BRA_pres_campaign_cooldown
+				set_temp_variable = { alert_id = token:Alert_BRA_PresVoting }
+				remove_TNO_alert = yes
+			}
+		}
+
+		triggers = {
+			pres_campaign_visible = {
+				check_variable = { BRA_pres_chosen_candidate = pres_candidate_id }
+			}
+			pres_rally_visible = {
+				check_variable = { BRA_pres_chosen_candidate = pres_candidate_id }
+			}
+			pres_infra_visible = {
+				check_variable = { BRA_pres_chosen_candidate = pres_candidate_id }
+			}
+			pres_supporters_visible = {
+				NOT = { check_variable = { BRA_pres_chosen_candidate = pres_candidate_id } }
+			}
+			pres_negative_visible = {
+				NOT = { check_variable = { BRA_pres_chosen_candidate = pres_candidate_id } }
+			}
+			pres_campaign_click_enabled = {
+				NOT = { has_country_flag = BRA_pres_campaign_cooldown }
+				has_country_flag = BRA_pres_election_active
+			}
+			pres_rally_click_enabled = {
+				NOT = { has_country_flag = BRA_pres_campaign_cooldown }
+				has_country_flag = BRA_pres_election_active
+			}
+			pres_infra_click_enabled = {
+				NOT = { has_country_flag = BRA_pres_campaign_cooldown }
+				has_country_flag = BRA_pres_election_active
+			}
+			pres_supporters_click_enabled = {
+				NOT = { has_country_flag = BRA_pres_campaign_cooldown }
+				has_country_flag = BRA_pres_election_active
+			}
+			pres_negative_click_enabled = {
+				NOT = { has_country_flag = BRA_pres_campaign_cooldown }
+				has_country_flag = BRA_pres_election_active
+			}
+
+
+			no_pres_active_election_visible = {
+				NOT = { has_country_flag = BRA_pres_election_active }
+			}
+			president_toggle_click_enabled = {
+				has_country_flag = BRA_pres_election_active
+			}
+		}
+
+		#### Campaign Outlines ####
+		properties = {
+			map_campaign_pres_amazonia = {
+				frame = BRA_pres_campaigning_party^0
+			}
+			map_campaign_pres_BAH = {
+				frame = BRA_pres_campaigning_party^1
+			}
+			map_campaign_pres_central_west = {
+				frame = BRA_pres_campaigning_party^2
+			}
+			map_campaign_pres_MG = {
+				frame = BRA_pres_campaigning_party^3
+			}
+			map_campaign_pres_south = {
+				frame = BRA_pres_campaigning_party^4
+			}
+			map_campaign_pres_MAR_PI = {
+				frame = BRA_pres_campaigning_party^5
+			}
+			map_campaign_pres_NE = {
+				frame = BRA_pres_campaigning_party^6
+			}
+			map_campaign_pres_RJ_ES = {
+				frame = BRA_pres_campaigning_party^7
+			}
+			map_campaign_pres_SP = {
+				frame = BRA_pres_campaigning_party^8
+			}
+
+			map_campaign_2_pres_amazonia = {
+				frame = BRA_pres_campaigning_party_2^0
+			}
+			map_campaign_2_pres_BAH = {
+				frame = BRA_pres_campaigning_party_2^1
+			}
+			map_campaign_2_pres_central_west = {
+				frame = BRA_pres_campaigning_party_2^2
+			}
+			map_campaign_2_pres_MG = {
+				frame = BRA_pres_campaigning_party_2^3
+			}
+			map_campaign_2_pres_south = {
+				frame = BRA_pres_campaigning_party_2^4
+			}
+			map_campaign_2_pres_MAR_PI = {
+				frame = BRA_pres_campaigning_party_2^5
+			}
+			map_campaign_2_pres_NE = {
+				frame = BRA_pres_campaigning_party_2^6
+			}
+			map_campaign_2_pres_RJ_ES = {
+				frame = BRA_pres_campaigning_party_2^7
+			}
+			map_campaign_2_pres_SP = {
+				frame = BRA_pres_campaigning_party_2^8
+			}
+		}
+		triggers = {
+			map_campaign_pres_amazonia_visible = {
+				check_variable = { BRA_pres_campaigning_party^0 > 0 }
+			}
+			map_campaign_pres_BAH_visible = {
+				check_variable = { BRA_pres_campaigning_party^1 > 0 }
+			}
+			map_campaign_pres_central_west_visible = {
+				check_variable = { BRA_pres_campaigning_party^2 > 0 }
+			}
+			map_campaign_pres_MG_visible = {
+				check_variable = { BRA_pres_campaigning_party^3 > 0 }
+			}
+			map_campaign_pres_south_visible = {
+				check_variable = { BRA_pres_campaigning_party^4 > 0 }
+			}
+			map_campaign_pres_MAR_PI_visible = {
+				check_variable = { BRA_pres_campaigning_party^5 > 0 }
+			}
+			map_campaign_pres_NE_visible = {
+				check_variable = { BRA_pres_campaigning_party^6 > 0 }
+			}
+			map_campaign_pres_RJ_ES_visible = {
+				check_variable = { BRA_pres_campaigning_party^7 > 0 }
+			}
+			map_campaign_pres_SP_visible = {
+				check_variable = { BRA_pres_campaigning_party^8 > 0 }
+			}
+
+			map_campaign_2_pres_amazonia_visible = {
+				check_variable = { BRA_pres_campaigning_party_2^0 > 0 }
+			}
+			map_campaign_2_pres_BAH_visible = {
+				check_variable = { BRA_pres_campaigning_party_2^1 > 0 }
+			}
+			map_campaign_2_pres_central_west_visible = {
+				check_variable = { BRA_pres_campaigning_party_2^2 > 0 }
+			}
+			map_campaign_2_pres_MG_visible = {
+				check_variable = { BRA_pres_campaigning_party_2^3 > 0 }
+			}
+			map_campaign_2_pres_south_visible = {
+				check_variable = { BRA_pres_campaigning_party_2^4 > 0 }
+			}
+			map_campaign_2_pres_MAR_PI_visible = {
+				check_variable = { BRA_pres_campaigning_party_2^5 > 0 }
+			}
+			map_campaign_2_pres_NE_visible = {
+				check_variable = { BRA_pres_campaigning_party_2^6 > 0 }
+			}
+			map_campaign_2_pres_RJ_ES_visible = {
+				check_variable = { BRA_pres_campaigning_party_2^7 > 0 }
+			}
+			map_campaign_2_pres_SP_visible = {
+				check_variable = { BRA_pres_campaigning_party_2^8 > 0 }
+			}
+		}
+
+
+
+		###############################################################
+		########            Senado Federal Mechanic            ########
+		###############################################################
+		dynamic_lists = {
+			parli_diagram_gridbox = {
+				array = BRA_senate_x
+				change_scope = no
+				entry_container= TNO_CSS_BRA_map_diagram_seat
+				index = seat_idx
+			}
+			map_s1_gridbox = {
+				array = BRA_senator_identities_1
+				change_scope = no
+				entry_container= TNO_CSS_BRA_map_seat1
+				index = seat_idx
+			}
+			map_s2_gridbox = {
+				array = BRA_senator_identities_2
+				change_scope = no
+				entry_container= TNO_CSS_BRA_map_seat2
+				index = seat_idx
+			}
+			map_s3_gridbox = {
+				array = BRA_senator_identities_3
+				change_scope = no
+				entry_container= TNO_CSS_BRA_map_seat3
+				index = seat_idx
+			}
+		}
+
+
+		triggers = {
+			diagram_senate_seat_major_visible = {
+				NOT = { check_variable = { BRA_senate_major_party_align^BRA_diagram_senator_parties^seat_idx = BRA_diagram_senator_parties^seat_idx } }
+			}
+
+			diagram_senate_seat_major_s1_visible = {
+				NOT = { check_variable = { BRA_senate_major_party_align^BRA_senator_parties_1^seat_idx = BRA_senator_parties_1^seat_idx } }
+			}
+			diagram_senate_seat_major_s2_visible = {
+				NOT = { check_variable = { BRA_senate_major_party_align^BRA_senator_parties_2^seat_idx = BRA_senator_parties_2^seat_idx } }
+			}
+			diagram_senate_seat_major_s3_visible = {
+				NOT = { check_variable = { BRA_senate_major_party_align^BRA_senator_parties_3^seat_idx = BRA_senator_parties_3^seat_idx } }
+			}
+		}
+
+		properties = {
+			diagram_senate_seat = {
+				x = BRA_senate_x^seat_idx
+				y = BRA_senate_y^seat_idx
+				frame = BRA_diagram_senator_parties^seat_idx
+			}
+			diagram_senate_seat_major = {
+				x = BRA_senate_x^seat_idx
+				y = BRA_senate_y^seat_idx
+				frame = BRA_senate_major_party_align^BRA_diagram_senator_parties^seat_idx
+			}
+			diagram_senate_seat_outline = {
+				x = BRA_senate_x^seat_idx
+				y = BRA_senate_y^seat_idx
+				frame = BRA_diagram_senator_up_for_election^seat_idx
+			}
+
+			diagram_senate_seat_s1 = {
+				x = BRA_senate_s1_x^seat_idx
+				y = BRA_senate_s1_y^seat_idx
+				frame = BRA_senator_parties_1^seat_idx
+			}
+			diagram_senate_seat_major_s1 = {
+				x = BRA_senate_s1_x^seat_idx
+				y = BRA_senate_s1_y^seat_idx
+				frame = BRA_senate_major_party_align^BRA_senator_parties_1^seat_idx
+			}
+			diagram_senate_seat_outline_s1 = {
+				x = BRA_senate_s1_x^seat_idx
+				y = BRA_senate_s1_y^seat_idx
+				frame = BRA_seat_1_up_for_election
+			}
+
+			diagram_senate_seat_s2 = {
+				x = BRA_senate_s2_x^seat_idx
+				y = BRA_senate_s2_y^seat_idx
+				frame = BRA_senator_parties_2^seat_idx
+			}
+			diagram_senate_seat_major_s2 = {
+				x = BRA_senate_s2_x^seat_idx
+				y = BRA_senate_s2_y^seat_idx
+				frame = BRA_senate_major_party_align^BRA_senator_parties_2^seat_idx
+			}
+			diagram_senate_seat_outline_s2 = {
+				x = BRA_senate_s2_x^seat_idx
+				y = BRA_senate_s2_y^seat_idx
+				frame = BRA_seat_2_up_for_election
+			}
+
+			diagram_senate_seat_s3 = {
+				x = BRA_senate_s3_x^seat_idx
+				y = BRA_senate_s3_y^seat_idx
+				frame = BRA_senator_parties_3^seat_idx
+			}
+			diagram_senate_seat_major_s3 = {
+				x = BRA_senate_s3_x^seat_idx
+				y = BRA_senate_s3_y^seat_idx
+				frame = BRA_senate_major_party_align^BRA_senator_parties_3^seat_idx
+			}
+			diagram_senate_seat_outline_s3 = {
+				x = BRA_senate_s3_x^seat_idx
+				y = BRA_senate_s3_y^seat_idx
+				frame = BRA_seat_3_up_for_election
+			}
+		}
+
+		effects = {
+			diagram_senate_seat_outline_click = {
+				set_variable = { BRA_senate_selected_state = BRA_diagram_senator_state_id^seat_idx }
+				BRA_senate_select_state = yes
+			}
+			diagram_senate_seat_outline_s1_click = {
+				set_variable = { BRA_senate_selected_state = seat_idx }
+				BRA_senate_select_state = yes
+			}
+			diagram_senate_seat_outline_s2_click = {
+				set_variable = { BRA_senate_selected_state = seat_idx }
+				BRA_senate_select_state = yes
+			}
+			diagram_senate_seat_outline_s3_click = {
+				set_variable = { BRA_senate_selected_state = seat_idx }
+				BRA_senate_select_state = yes
+			}
+		}
+
+		effects = {
+			details_button_click = {
+				if = {
+					limit = { has_country_flag = BRA_voting_bloc_open }
+					clr_country_flag = BRA_voting_bloc_open
+				} else = {
+					set_country_flag = BRA_voting_bloc_open
+				}
+			}
+		}
+
+
+		dynamic_lists = {
+			party_seat_counts = {
+				array = BRA_senate_major_parties
+				change_scope = no
+				entry_container = TNO_CSS_BRA_party_seat_count
+				value = party_id
+			}
+		}
+		properties = {
+			party_indicator_sc = {
+				frame = party_id
+			}
+		}
+
+		dynamic_lists = {
+			selected_candidates = {
+				array = BRA_selected_candidate_identities
+				change_scope = no
+				entry_container = TNO_CSS_BRA_map_candidate_entry
+				index = candidate_idx
+			}
+		}
+
+		properties = {
+			party_indicator = {
+				frame = BRA_selected_candidate_parties^candidate_idx
+			}
+			party_indicator_major = {
+				frame = BRA_senate_major_party_align^BRA_selected_candidate_parties^candidate_idx
+			}
+			candidate_pop_bar = {
+				frame = BRA_selected_candidate_popularities_pct^candidate_idx
+			}
+			incumbent1_party_indicator = {
+				frame = BRA_incumbent_party_1
+			}
+			incumbent2_party_indicator = {
+				frame = BRA_incumbent_party_2
+			}
+			incumbent1_party_indicator_major = {
+				frame = BRA_senate_major_party_align^BRA_incumbent_party_1
+			}
+			incumbent2_party_indicator_major = {
+				frame = BRA_senate_major_party_align^BRA_incumbent_party_2
+			}
+			campaign = {
+				frame = BRA_senate_campaign_cooldown
+			}
+			slander = {
+				frame = BRA_senate_campaign_cooldown
+			}
+		}
+
+		triggers = {
+			party_indicator_major_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+				NOT = { check_variable = { BRA_senate_major_party_align^BRA_selected_candidate_parties^candidate_idx = BRA_selected_candidate_parties^candidate_idx } }
+			}
+
+			map_coup_screen_visible = {
+				has_country_flag = BRA_senate_dissolved
+			}
+			incumbent1_box_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			incumbent1_name_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			incumbent1_party_indicator_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			incumbent1_party_indicator_major_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+				NOT = { check_variable = { BRA_senate_major_party_align^BRA_incumbent_party_1 = BRA_incumbent_party_1 } }
+			}
+
+			incumbent2_box_visible = {
+				check_variable = { BRA_num_incumbents = 2 }
+			}
+			incumbent2_name_visible = {
+				check_variable = { BRA_num_incumbents = 2 }
+			}
+			incumbent2_party_indicator_visible = {
+				check_variable = { BRA_num_incumbents = 2 }
+			}
+			incumbent2_party_indicator_major_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+				NOT = { check_variable = { BRA_senate_major_party_align^BRA_incumbent_party_2 = BRA_incumbent_party_2 } }
+			}
+
+			campaign_visible = {
+				set_temp_variable = { party = BRA_selected_candidate_parties^candidate_idx }
+				check_variable = { BRA_senate_major_party_align^party = BRA_senate_selected_party }
+			}
+			slander_visible = {
+				set_temp_variable = { party = BRA_selected_candidate_parties^candidate_idx }
+				NOT = { check_variable = { BRA_senate_major_party_align^party = BRA_senate_selected_party } }
+			}
+			campaign_click_enabled = {
+				check_variable = { BRA_senate_campaign_cooldown = 0 }
+			}
+			slander_click_enabled = {
+				check_variable = { BRA_senate_campaign_cooldown = 0 }
+			}
+			no_active_election_visible = {
+				check_variable = { BRA_num_incumbents = 0 }
+			}
+		}
+		effects = {
+			campaign_click = {
+				# Modify relevant popularity entry
+				set_temp_variable = { idx = BRA_selected_candidate_indices^candidate_idx }
+				
+				set_temp_variable = { senator_id = BRA_candidate_identities^idx }
+				log = "[BRA_senator_name_dynamic]"
+
+				if = {
+					limit = {
+						check_variable = { BRA_senate_campaigning_party^BRA_senate_selected_state = 0 }
+					}
+					set_variable = { BRA_senate_campaigning_party^BRA_senate_selected_state = BRA_senate_selected_party }
+				}
+				else = {
+					set_variable = { BRA_senate_campaigning_party_2^BRA_senate_selected_state = BRA_senate_selected_party }
+				}
+
+				add_to_variable = { BRA_candidate_popularities^idx = 55 }
+				BRA_update_leading_parties = yes
+				BRA_senate_update_selected_state = yes
+
+				#add_political_power = -10
+
+				# Set up cooldown, event enables campaigning again
+				set_variable = { BRA_senate_campaign_cooldown = 2 }
+				set_temp_variable = { alert_id = token:Alert_BRA_SenadoVoting }
+				remove_TNO_alert = yes
+			}
+			slander_click = {
+				# Modify relevant popularity entry
+				set_temp_variable = { idx = BRA_selected_candidate_indices^candidate_idx }
+
+				set_temp_variable = { senator_id = BRA_candidate_identities^idx }
+				log = "[BRA_senator_name_dynamic]"
+
+				if = {
+					limit = {
+						check_variable = { BRA_senate_campaigning_party^BRA_senate_selected_state = 0 }
+					}
+					set_variable = { BRA_senate_campaigning_party^BRA_senate_selected_state = BRA_senate_selected_party }
+				}
+				else = {
+					set_variable = { BRA_senate_campaigning_party_2^BRA_senate_selected_state = BRA_senate_selected_party }
+				}
+
+				subtract_from_variable = { BRA_candidate_popularities^idx = 55 }
+				BRA_update_leading_parties = yes
+				BRA_senate_update_selected_state = yes
+
+				#add_political_power = -10
+
+				# Set up cooldown, event enables campaigning again
+				set_variable = { BRA_senate_campaign_cooldown = 2 }
+				set_temp_variable = { alert_id = token:Alert_BRA_SenadoVoting }
+				remove_TNO_alert = yes
+			}
+		}
+
+
+
+		#### Campaign Outlines ####
+		triggers = {
+			map_campaign_acre_visible = {
+				check_variable = { BRA_senate_campaigning_party^0 > 0 }
+			}
+			map_campaign_alagoas_visible = {
+				check_variable = { BRA_senate_campaigning_party^1 > 0 }
+			}
+			map_campaign_amazonas_visible = {
+				check_variable = { BRA_senate_campaigning_party^2 > 0 }
+			}
+			map_campaign_bahia_visible = {
+				check_variable = { BRA_senate_campaigning_party^3 > 0 }
+			}
+			map_campaign_ceara_visible = {
+				check_variable = { BRA_senate_campaigning_party^4 > 0 }
+			}
+			map_campaign_espirito_santo_visible = {
+				check_variable = { BRA_senate_campaigning_party^5 > 0 }
+			}
+			map_campaign_goias_visible = {
+				check_variable = { BRA_senate_campaigning_party^6 > 0 }
+			}
+			map_campaign_guanabara_visible = {
+				check_variable = { BRA_senate_campaigning_party^7 > 0 }
+			}
+			map_campaign_guanabara_2_visible = {
+				check_variable = { BRA_senate_campaigning_party^7 > 0 }
+			}
+			map_campaign_maranho_visible = {
+				check_variable = { BRA_senate_campaigning_party^8 > 0 }
+			}
+			map_campaign_mato_grosso_visible = {
+				check_variable = { BRA_senate_campaigning_party^9 > 0 }
+			}
+			map_campaign_minas_gerais_visible = {
+				check_variable = { BRA_senate_campaigning_party^10 > 0 }
+			}
+			map_campaign_para_visible = {
+				check_variable = { BRA_senate_campaigning_party^11 > 0 }
+			}
+			map_campaign_paraiba_visible = {
+				check_variable = { BRA_senate_campaigning_party^12 > 0 }
+			}
+			map_campaign_parana_visible = {
+				check_variable = { BRA_senate_campaigning_party^13 > 0 }
+			}
+			map_campaign_pernambuco_visible = {
+				check_variable = { BRA_senate_campaigning_party^14 > 0 }
+			}
+			map_campaign_piaui_visible = {
+				check_variable = { BRA_senate_campaigning_party^15 > 0 }
+			}
+			map_campaign_rio_de_janeiro_visible = {
+				check_variable = { BRA_senate_campaigning_party^16 > 0 }
+			}
+			map_campaign_rio_de_janeiro_2_visible = {
+				check_variable = { BRA_senate_campaigning_party^16 > 0 }
+			}
+			map_campaign_rio_grande_do_norte_visible = {
+				check_variable = { BRA_senate_campaigning_party^17 > 0 }
+			}
+			map_campaign_rio_grande_do_sul_visible = {
+				check_variable = { BRA_senate_campaigning_party^18 > 0 }
+			}
+			map_campaign_sao_paulo_visible = {
+				check_variable = { BRA_senate_campaigning_party^20 > 0 }
+			}
+			map_campaign_santa_catarina_visible = {
+				check_variable = { BRA_senate_campaigning_party^19 > 0 }
+			}
+			map_campaign_sergipe_visible = {
+				check_variable = { BRA_senate_campaigning_party^21 > 0 }
+			}
+
+
+			map_campaign_2_acre_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^0 > 0 }
+			}
+			map_campaign_2_alagoas_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^1 > 0 }
+			}
+			map_campaign_2_amazonas_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^2 > 0 }
+			}
+			map_campaign_2_bahia_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^3 > 0 }
+			}
+			map_campaign_2_ceara_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^4 > 0 }
+			}
+			map_campaign_2_espirito_santo_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^5 > 0 }
+			}
+			map_campaign_2_goias_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^6 > 0 }
+			}
+			map_campaign_2_guanabara_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^7 > 0 }
+			}
+			map_campaign_2_guanabara_2_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^7 > 0 }
+			}
+			map_campaign_2_maranho_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^8 > 0 }
+			}
+			map_campaign_2_mato_grosso_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^9 > 0 }
+			}
+			map_campaign_2_minas_gerais_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^10 > 0 }
+			}
+			map_campaign_2_para_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^11 > 0 }
+			}
+			map_campaign_2_paraiba_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^12 > 0 }
+			}
+			map_campaign_2_parana_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^13 > 0 }
+			}
+			map_campaign_2_pernambuco_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^14 > 0 }
+			}
+			map_campaign_2_piaui_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^15 > 0 }
+			}
+			map_campaign_2_rio_de_janeiro_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^16 > 0 }
+			}
+			map_campaign_2_rio_de_janeiro_2_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^16 > 0 }
+			}
+			map_campaign_2_rio_grande_do_norte_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^17 > 0 }
+			}
+			map_campaign_2_rio_grande_do_sul_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^18 > 0 }
+			}
+			map_campaign_2_sao_paulo_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^20 > 0 }
+			}
+			map_campaign_2_santa_catarina_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^19 > 0 }
+			}
+			map_campaign_2_sergipe_visible = {
+				check_variable = { BRA_senate_campaigning_party_2^21 > 0 }
+			}
+		}
+		properties = {
+			map_campaign_acre = {
+				frame = BRA_senate_campaigning_party^0
+			}
+			map_campaign_alagoas = {
+				frame = BRA_senate_campaigning_party^1
+			}
+			map_campaign_amazonas = {
+				frame = BRA_senate_campaigning_party^2
+			}
+			map_campaign_bahia = {
+				frame = BRA_senate_campaigning_party^3
+			}
+			map_campaign_ceara = {
+				frame = BRA_senate_campaigning_party^4
+			}
+			map_campaign_espirito_santo = {
+				frame = BRA_senate_campaigning_party^5
+			}
+			map_campaign_goias = {
+				frame = BRA_senate_campaigning_party^6
+			}
+			map_campaign_guanabara = {
+				frame = BRA_senate_campaigning_party^7
+			}
+			map_campaign_guanabara_2 = {
+				frame = BRA_senate_campaigning_party^7
+			}
+			map_campaign_maranho = {
+				frame = BRA_senate_campaigning_party^8
+			}
+			map_campaign_mato_grosso = {
+				frame = BRA_senate_campaigning_party^9
+			}
+			map_campaign_minas_gerais = {
+				frame = BRA_senate_campaigning_party^10
+			}
+			map_campaign_para = {
+				frame = BRA_senate_campaigning_party^11
+			}
+			map_campaign_paraiba = {
+				frame = BRA_senate_campaigning_party^12
+			}
+			map_campaign_parana = {
+				frame = BRA_senate_campaigning_party^13
+			}
+			map_campaign_pernambuco = {
+				frame = BRA_senate_campaigning_party^14
+			}
+			map_campaign_piaui = {
+				frame = BRA_senate_campaigning_party^15
+			}
+			map_campaign_rio_de_janeiro = {
+				frame = BRA_senate_campaigning_party^16
+			}
+			map_campaign_rio_de_janeiro_2 = {
+				frame = BRA_senate_campaigning_party^16
+			}
+			map_campaign_rio_grande_do_norte = {
+				frame = BRA_senate_campaigning_party^17
+			}
+			map_campaign_rio_grande_do_sul = {
+				frame = BRA_senate_campaigning_party^18
+			}
+			map_campaign_sao_paulo = {
+				frame = BRA_senate_campaigning_party^20
+			}
+			map_campaign_santa_catarina = {
+				frame = BRA_senate_campaigning_party^19
+			}
+			map_campaign_sergipe = {
+				frame = BRA_senate_campaigning_party^21
+			}
+
+			map_campaign_2_acre = {
+				frame = BRA_senate_campaigning_party_2^0
+			}
+			map_campaign_2_alagoas = {
+				frame = BRA_senate_campaigning_party_2^1
+			}
+			map_campaign_2_amazonas = {
+				frame = BRA_senate_campaigning_party_2^2
+			}
+			map_campaign_2_bahia = {
+				frame = BRA_senate_campaigning_party_2^3
+			}
+			map_campaign_2_ceara = {
+				frame = BRA_senate_campaigning_party_2^4
+			}
+			map_campaign_2_espirito_santo = {
+				frame = BRA_senate_campaigning_party_2^5
+			}
+			map_campaign_2_goias = {
+				frame = BRA_senate_campaigning_party_2^6
+			}
+			map_campaign_2_guanabara = {
+				frame = BRA_senate_campaigning_party_2^7
+			}
+			map_campaign_2_guanabara_2 = {
+				frame = BRA_senate_campaigning_party_2^7
+			}
+			map_campaign_2_maranho = {
+				frame = BRA_senate_campaigning_party_2^8
+			}
+			map_campaign_2_mato_grosso = {
+				frame = BRA_senate_campaigning_party_2^9
+			}
+			map_campaign_2_minas_gerais = {
+				frame = BRA_senate_campaigning_party_2^10
+			}
+			map_campaign_2_para = {
+				frame = BRA_senate_campaigning_party_2^11
+			}
+			map_campaign_2_paraiba = {
+				frame = BRA_senate_campaigning_party_2^12
+			}
+			map_campaign_2_parana = {
+				frame = BRA_senate_campaigning_party_2^13
+			}
+			map_campaign_2_pernambuco = {
+				frame = BRA_senate_campaigning_party_2^14
+			}
+			map_campaign_2_piaui = {
+				frame = BRA_senate_campaigning_party_2^15
+			}
+			map_campaign_2_rio_de_janeiro = {
+				frame = BRA_senate_campaigning_party_2^16
+			}
+			map_campaign_2_rio_de_janeiro_2 = {
+				frame = BRA_senate_campaigning_party_2^16
+			}
+			map_campaign_2_rio_grande_do_norte = {
+				frame = BRA_senate_campaigning_party_2^17
+			}
+			map_campaign_2_rio_grande_do_sul = {
+				frame = BRA_senate_campaigning_party_2^18
+			}
+			map_campaign_2_sao_paulo = {
+				frame = BRA_senate_campaigning_party_2^20
+			}
+			map_campaign_2_santa_catarina = {
+				frame = BRA_senate_campaigning_party_2^19
+			}
+			map_campaign_2_sergipe = {
+				frame = BRA_senate_campaigning_party_2^21
+			}
+		}
+
+		#### Map Fills ####
+		triggers = {
+			map_fill_acre_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_alagoas_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_amazonas_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_bahia_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_ceara_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_espirito_santo_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_goias_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_guanabara_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_guanabara_2_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_maranho_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_mato_grosso_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_minas_gerais_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_para_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_paraiba_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_parana_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_pernambuco_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_piaui_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_rio_de_janeiro_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_rio_de_janeiro_2_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_rio_grande_do_norte_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_rio_grande_do_sul_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_sao_paulo_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_santa_catarina_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			map_fill_sergipe_visible = {
+				check_variable = { BRA_num_incumbents > 0 }
+			}
+			date_header_visible = {
+				NOT = { check_variable = { BRA_num_incumbents = 0 } }
+			}
+			date_text_visible = {
+				NOT = { check_variable = { BRA_num_incumbents = 0 } }
+			}
+		}
+		properties = {
+			map_fill_acre = {
+				frame = BRA_senate_leading_party_frame^0
+			}
+			map_fill_alagoas = {
+				frame = BRA_senate_leading_party_frame^1
+			}
+			map_fill_amazonas = {
+				frame = BRA_senate_leading_party_frame^2
+			}
+			map_fill_bahia = {
+				frame = BRA_senate_leading_party_frame^3
+			}
+			map_fill_ceara = {
+				frame = BRA_senate_leading_party_frame^4
+			}
+			map_fill_espirito_santo = {
+				frame = BRA_senate_leading_party_frame^5
+			}
+			map_fill_goias = {
+				frame = BRA_senate_leading_party_frame^6
+			}
+			map_fill_guanabara = {
+				frame = BRA_senate_leading_party_frame^7
+			}
+			map_fill_guanabara_2 = {
+				frame = BRA_senate_leading_party_frame^7
+			}
+			map_fill_maranho = {
+				frame = BRA_senate_leading_party_frame^8
+			}
+			map_fill_mato_grosso = {
+				frame = BRA_senate_leading_party_frame^9
+			}
+			map_fill_minas_gerais = {
+				frame = BRA_senate_leading_party_frame^10
+			}
+			map_fill_para = {
+				frame = BRA_senate_leading_party_frame^11
+			}
+			map_fill_paraiba = {
+				frame = BRA_senate_leading_party_frame^12
+			}
+			map_fill_parana = {
+				frame = BRA_senate_leading_party_frame^13
+			}
+			map_fill_pernambuco = {
+				frame = BRA_senate_leading_party_frame^14
+			}
+			map_fill_piaui = {
+				frame = BRA_senate_leading_party_frame^15
+			}
+			map_fill_rio_de_janeiro = {
+				frame = BRA_senate_leading_party_frame^16
+			}
+			map_fill_rio_de_janeiro_2 = {
+				frame = BRA_senate_leading_party_frame^16
+			}
+			map_fill_rio_grande_do_norte = {
+				frame = BRA_senate_leading_party_frame^17
+			}
+			map_fill_rio_grande_do_sul = {
+				frame = BRA_senate_leading_party_frame^18
+			}
+			map_fill_sao_paulo = {
+				frame = BRA_senate_leading_party_frame^20
+			}
+			map_fill_santa_catarina = {
+				frame = BRA_senate_leading_party_frame^19
+			}
+			map_fill_sergipe = {
+				frame = BRA_senate_leading_party_frame^21
+			}
+		}
+		#### Map Outlines ####
+		properties = {
+			map_outline_acre = {
+				frame = BRA_is_state_selected^0
+			}
+			map_outline_alagoas = {
+				frame = BRA_is_state_selected^1
+			}
+			map_outline_amazonas = {
+				frame = BRA_is_state_selected^2
+			}
+			map_outline_bahia = {
+				frame = BRA_is_state_selected^3
+			}
+			map_outline_ceara = {
+				frame = BRA_is_state_selected^4
+			}
+			map_outline_espirito_santo = {
+				frame = BRA_is_state_selected^5
+			}
+			map_outline_goias = {
+				frame = BRA_is_state_selected^6
+			}
+			map_outline_guanabara = {
+				frame = BRA_is_state_selected^7
+			}
+			map_outline_guanabara_2 = {
+				frame = BRA_is_state_selected^7
+			}
+			map_outline_maranho = {
+				frame = BRA_is_state_selected^8
+			}
+			map_outline_mato_grosso = {
+				frame = BRA_is_state_selected^9
+			}
+			map_outline_minas_gerais = {
+				frame = BRA_is_state_selected^10
+			}
+			map_outline_para = {
+				frame = BRA_is_state_selected^11
+			}
+			map_outline_paraiba = {
+				frame = BRA_is_state_selected^12
+			}
+			map_outline_parana = {
+				frame = BRA_is_state_selected^13
+			}
+			map_outline_pernambuco = {
+				frame = BRA_is_state_selected^14
+			}
+			map_outline_piaui = {
+				frame = BRA_is_state_selected^15
+			}
+			map_outline_rio_de_janeiro = {
+				frame = BRA_is_state_selected^16
+			}
+			map_outline_rio_de_janeiro_2 = {
+				frame = BRA_is_state_selected^16
+			}
+			map_outline_rio_grande_do_norte = {
+				frame = BRA_is_state_selected^17
+			}
+			map_outline_rio_grande_do_sul = {
+				frame = BRA_is_state_selected^18
+			}
+			map_outline_sao_paulo = {
+				frame = BRA_is_state_selected^20
+			}
+			map_outline_santa_catarina = {
+				frame = BRA_is_state_selected^19
+			}
+			map_outline_sergipe = {
+				frame = BRA_is_state_selected^21
+			}
+		}
+		effects = {
+			map_button_acre_click = {
+				set_variable = { BRA_senate_selected_state = 0 }
+				BRA_senate_select_state = yes
+			}
+			map_button_alagoas_click = {
+				set_variable = { BRA_senate_selected_state = 1 }
+				BRA_senate_select_state = yes
+			}
+			map_button_amazonas_click = {
+				set_variable = { BRA_senate_selected_state = 2 }
+				BRA_senate_select_state = yes
+			}
+			map_button_bahia_click = {
+				set_variable = { BRA_senate_selected_state = 3 }
+				BRA_senate_select_state = yes
+			}
+			map_button_ceara_click = {
+				set_variable = { BRA_senate_selected_state = 4 }
+				BRA_senate_select_state = yes
+			}
+			map_button_espirito_santo_click = {
+				set_variable = { BRA_senate_selected_state = 5 }
+				BRA_senate_select_state = yes
+			}
+			map_button_goias_click = {
+				set_variable = { BRA_senate_selected_state = 6 }
+				BRA_senate_select_state = yes
+			}
+			map_button_guanabara_click = {
+				set_variable = { BRA_senate_selected_state = 7 }
+				BRA_senate_select_state = yes
+			}
+			map_button_guanabara_2_click = {
+				set_variable = { BRA_senate_selected_state = 7 }
+				BRA_senate_select_state = yes
+			}
+			map_button_maranho_click = {
+				set_variable = { BRA_senate_selected_state = 8 }
+				BRA_senate_select_state = yes
+			}
+			map_button_mato_grosso_click = {
+				set_variable = { BRA_senate_selected_state = 9 }
+				BRA_senate_select_state = yes
+			}
+			map_button_minas_gerais_click = {
+				set_variable = { BRA_senate_selected_state = 10 }
+				BRA_senate_select_state = yes
+			}
+			map_button_para_click = {
+				set_variable = { BRA_senate_selected_state = 11 }
+				BRA_senate_select_state = yes
+			}
+			map_button_paraiba_click = {
+				set_variable = { BRA_senate_selected_state = 12 }
+				BRA_senate_select_state = yes
+			}
+			map_button_parana_click = {
+				set_variable = { BRA_senate_selected_state = 13 }
+				BRA_senate_select_state = yes
+			}
+			map_button_pernambuco_click = {
+				set_variable = { BRA_senate_selected_state = 14 }
+				BRA_senate_select_state = yes
+			}
+			map_button_piaui_click = {
+				set_variable = { BRA_senate_selected_state = 15 }
+				BRA_senate_select_state = yes
+			}
+			map_button_rio_de_janeiro_click = {
+				set_variable = { BRA_senate_selected_state = 16 }
+				BRA_senate_select_state = yes
+			}
+			map_button_rio_de_janeiro_2_click = {
+				set_variable = { BRA_senate_selected_state = 16 }
+				BRA_senate_select_state = yes
+			}
+			map_button_rio_grande_do_norte_click = {
+				set_variable = { BRA_senate_selected_state = 17 }
+				BRA_senate_select_state = yes
+			}
+			map_button_rio_grande_do_sul_click = {
+				set_variable = { BRA_senate_selected_state = 18 }
+				BRA_senate_select_state = yes
+			}
+			map_button_sao_paulo_click = {
+				set_variable = { BRA_senate_selected_state = 20 }
+				BRA_senate_select_state = yes
+			}
+			map_button_santa_catarina_click = {
+				set_variable = { BRA_senate_selected_state = 19 }
+				BRA_senate_select_state = yes
+			}
+			map_button_sergipe_click = {
+				set_variable = { BRA_senate_selected_state = 21 }
+				BRA_senate_select_state = yes
+			}
+		}
+	}
+
+	TNO_CSS_BRA_party_info = {
+		window_name = "TNO_CSS_BRA_party_info"
+		context_type = player_context
+		parent_window_token = TNO_CSS_BRA_map_GUI
+
+		visible = {
+			has_country_flag = BRA_map_window_open 
+			check_variable = { BRA_map_selected_tab^num > 0 }
+			check_variable = { BRA_map_selected_tab^0 = 1 }
+			has_country_flag = BRA_voting_bloc_open
+		}
+
+		dynamic_lists = {
+			coalition_breakdown = {
+				array = BRA_menu_senate_parties
+				change_scope = no
+				entry_container = "[BRA_party_breakdown_container]"
+				value = party_id
+				index = breakdown_idx
+			}
+		}
+		properties = {
+			party_indicator_sc = {
+				frame = party_id
+			}
+		}
+		effects = {
+			party_info_close_button_click = {
+				clr_country_flag = BRA_voting_bloc_open
+			}
+		}
+	}
+}

@@ -1,0 +1,267 @@
+scripted_gui = {
+	TNO_GNG_LegCo_OpenButtonContainer = {
+		window_name = "TNO_GNG_LegCo_AccessButton"
+		context_type = player_context
+		parent_window_token = politics_tab
+
+		visible = {
+			tag = GNG
+			NOT = {
+				has_country_flag = GNG_IJA_Disable_LegCo
+			}
+		}
+
+		effects = {
+			TNO_GNG_LegCo_OpenButton_click = {
+				if = {
+					limit = { NOT = { has_country_flag = TNO_GNG_LegCo_GUI_Open } }
+					set_country_flag = TNO_GNG_LegCo_GUI_Open
+				}
+				else_if = {
+					limit = { has_country_flag = TNO_GNG_LegCo_GUI_Open }
+					clr_country_flag = TNO_GNG_LegCo_GUI_Open
+				}
+				clr_country_flag = gui_alert_visible
+			}
+			TNO_GNG_LegCo_OpenButton_right_click = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = TNO_GNG_LegCo_GUI_Debug }
+						is_debug = yes
+					}
+					set_country_flag = TNO_GNG_LegCo_GUI_Debug
+				}
+				else_if = {
+					limit = {
+						has_country_flag = TNO_GNG_LegCo_GUI_Debug
+						is_debug = yes
+					}
+					clr_country_flag = TNO_GNG_LegCo_GUI_Debug
+				}
+			}
+		}
+
+		triggers = {
+			gui_alert_visible = {
+				has_country_flag = gui_alert_visible
+			}
+		}
+	}
+
+
+	TNO_GNG_LegCo_GUI = {
+		context_type = player_context
+		window_name = "TNO_GNG_LegCo_Display"
+
+		visible = {
+			has_country_flag = TNO_GNG_LegCo_GUI_Open
+		}
+
+		triggers = {
+			legco_sonybar_visible = {
+				NOT = { check_variable = { GNG_sony_left < 0 } }
+			}
+			legco_matsushitabar_visible = {
+				NOT = { check_variable = { GNG_matsushita_left < 0 } }
+			}
+			legco_fujitsubar_visible = {
+				NOT = { check_variable = { GNG_fujitsu_left < 0 } }
+			}
+			legco_yasudabar_visible = {
+				NOT = { check_variable = { GNG_yasuda_left < 0 } }
+			}
+			legco_cheungkongbar_visible = {
+				has_country_flag = GNG_legco_stage_2
+			}
+			legco_hitachibar_visible = {
+				check_variable = { GNG_hitachi_left > -1 }
+			}
+			letterhead_visible = {
+				check_variable = { GNG_legco_current_ordinance_id > 0 }
+			}
+			Fujitsu_Future_Overlay_visible = {
+				has_country_flag = GNG_Future_Act_passed
+			}
+			Fujitsu_Future_Overlay_Glow_visible = {
+				has_country_flag = GNG_Future_Act_passed
+			}
+			IJA_LegCo_Cover_visible = {
+				has_country_flag = GNG_disable_all_mechanics_IJA
+			}
+		}
+
+		properties = {
+			legco_cheungkongbar = {
+				frame = GNG_cheungkong_right
+			}
+			legco_sonybar = {
+				frame = GNG_sony_display
+			}
+			legco_matsushitabar = {
+				frame = GNG_matsushita_display
+			}
+			legco_fujitsubar = {
+				frame = GNG_fujitsu_display
+			}
+			legco_yasudabar = {
+				frame = GNG_yasuda_display
+			}
+			legco_hitachibar = {
+				frame = GNG_hitachi_display
+			}
+			letterhead = {
+				frame = GNG_legco_sponsor_faction^GNG_legco_ordinance_id
+			}
+			symbol = {
+				frame = GNG_legco_sponsor_faction^GNG_legco_ordinance_id
+			}
+		}
+
+		dynamic_lists = {
+			parliament_diagram = {
+				array = GNG_legco_x
+				change_scope = no
+				entry_container = GNG_legco_seat
+				index = seat_idx
+			}
+		}
+
+		dynamic_lists = {
+			parliament_seat_counts = {
+				array = GNG_legco_factions
+				change_scope = no
+				index = GNG_legco_faction_idx
+				value = GNG_legco_faction
+				entry_container = GNG_legco_group
+			}
+		}
+
+		dynamic_lists = {
+			past_ordinance_list = {
+				array = GNG_legco_history
+				index = GNG_legco_history_i
+				entry_container = GNG_legco_ord
+				value = GNG_legco_ordinance_id
+			}
+		}
+
+		properties = {
+			parliament_dot_icon = {
+				x = GNG_legco_x^seat_idx
+				y = GNG_legco_y^seat_idx
+				frame = GNG_legco_faction^seat_idx
+			}
+			legco_box = {
+				frame = GNG_legco_faction
+			}
+			legco_faction_icon = {
+				image = "[GNG_legco_current_faction_icon_dynamic]"
+			}
+			history_letterhead = {
+				frame = GNG_legco_sponsor_faction^GNG_legco_ordinance_id
+			}
+			history_symbol = {
+				frame = GNG_legco_sponsor_faction^GNG_legco_ordinance_id
+			}
+		}
+
+
+
+		triggers = {
+			debug_change_view_visible = {
+				has_country_flag = TNO_GNG_LegCo_GUI_Debug
+			}
+			add_seat_visible = {
+				has_country_flag = TNO_GNG_LegCo_GUI_Debug
+			}
+			sub_seat_visible = {
+				has_country_flag = TNO_GNG_LegCo_GUI_Debug
+			}
+			history_letterhead = {
+				check_variable = { GNG_legco_current_ordinance_id > 0 }
+			}
+			background_visible = {
+				check_variable = { GNG_legco_current_ordinance_id > 0 }
+			}
+			symbol_visible = {
+				check_variable = { GNG_legco_current_ordinance_id > 0 }
+			}
+			amendments_title_visible = {
+				check_variable = { GNG_legco_current_ordinance_id > 0 }
+			}
+			effects_title_visible = {
+				check_variable = { GNG_legco_current_ordinance_id > 0 }
+			}
+			amendments_info_visible = {
+				check_variable = { GNG_legco_current_ordinance_id > 0 }
+			}
+			effects_info_visible = {
+				check_variable = { GNG_legco_current_ordinance_id > 0 }
+			}
+			current_ordinance_name_visible = {
+				check_variable = { GNG_legco_current_ordinance_id > 0 }
+			}
+			legco_ordinance_effect_visible = {
+				check_variable = { GNG_legco_current_ordinance_id > 0 }
+				has_country_flag = GNG_show_effects_for_ordinance
+			}
+			no_ordinance_display_visible = {
+				NOT = {
+					check_variable = { GNG_legco_current_ordinance_id > 0 }
+				}
+			}
+		}
+
+
+		effects = {
+			debug_change_view_click = {
+				if = {
+					limit = { has_country_flag = GNG_legco_stage_2 }
+					clr_country_flag = GNG_legco_stage_2
+					set_variable = { GNG_legco_yasuda_seats = GNG_legco_cheungkong_seats }
+					set_variable = { GNG_legco_suzuki_seats = GNG_legco_hitachi_seats }
+				}
+				else = {
+					set_country_flag = GNG_legco_stage_2
+					set_variable = { GNG_legco_cheungkong_seats = GNG_legco_yasuda_seats }
+					set_variable = { GNG_legco_hitachi_seats = GNG_legco_suzuki_seats }
+				}
+				GNG_rerender_legco = yes
+			}
+			add_seat_click = {
+				set_temp_variable = { amount = 1 }
+				GNG_modify_legco_seats = yes
+			}
+			sub_seat_click = {
+				set_temp_variable = { amount = -1 }
+				GNG_modify_legco_seats = yes
+			}
+			add_seat_right_click = {
+				set_temp_variable = { amount = 5 }
+				GNG_modify_legco_seats = yes
+			}
+			sub_seat_right_click = {
+				set_temp_variable = { amount = -5 }
+				GNG_modify_legco_seats = yes
+			}
+			background_click = {
+				set_country_flag = GNG_show_effects_for_ordinance
+			}
+			legco_ordinance_effect_click = {
+				GNG_show_effects_for_ordinance = yes
+				custom_effect_tooltip = GNG_clear_show_effects_for_ordinances_tt
+				clr_country_flag = GNG_show_effects_for_ordinance
+			}
+			TNO_GNG_legco_close_button_click = {
+				if = {
+					limit = { NOT = { has_country_flag = TNO_GNG_LegCo_GUI_Open } }
+					set_country_flag = TNO_GNG_LegCo_GUI_Open
+				}
+				else_if = {
+					limit = { has_country_flag = TNO_GNG_LegCo_GUI_Open }
+					clr_country_flag = TNO_GNG_LegCo_GUI_Open
+				}
+			}
+		}
+	}
+}

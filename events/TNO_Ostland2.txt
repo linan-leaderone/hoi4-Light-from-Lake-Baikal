@@ -1,0 +1,1187 @@
+add_namespace = OSTL
+
+##########################
+# Your Usual Programming #
+##########################
+
+#########################
+###  Ostland Opening  ###
+#########################
+
+#The Model Colony, Intro Event
+country_event = {
+	id = OSTL.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.1" }
+	title = OSTL.1.t
+	desc = OSTL.1.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = OSTL.1.a
+
+	}
+}
+
+#The Reichskommissar Fades / The Loose Hand
+country_event = {
+	id = OSTL.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.2" }
+	title = OSTL.2.t
+	desc = OSTL.2.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = OSTL.2.a
+	}
+}
+
+#Send Litzmann off to Germania
+country_event = {
+	id = OSTL.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.3" }
+	title = OSTL.3.t
+	desc = OSTL.3.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = OSTL.3.a
+	}
+}
+
+#The Reichskommissar is dead!
+country_event = {
+	id = OSTL.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.4" }
+	title = OSTL.4.t
+	desc = OSTL.4.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = OSTL.4.a
+		retire_character = OST_Hinrich_Lohse
+		promote_character = OST_Karl_Siegmund_Litzmann
+		add_stability = -0.20
+		hidden_effect = {
+			add_ideas = OST_Karl_Siegmund_Litzmann_hog
+			country_event = { id = OSTL.5 days = 7 }
+		}
+	}
+}
+
+#Death in the Skies!
+country_event = {
+	id = OSTL.5
+	title = OSTL.5.t
+	desc = OSTL.5.desc
+	picture = GFX_report_event_OST_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event OSTL.5"
+		hidden_effect = {
+			11 = { set_demilitarized_zone = yes }
+			96 = { set_demilitarized_zone = yes }
+			189 = { set_demilitarized_zone = yes }
+			190 = { set_demilitarized_zone = yes }
+			1399 = { set_demilitarized_zone = yes }
+			1398 = { set_demilitarized_zone = yes }
+			1400 = { set_demilitarized_zone = yes }
+			1401 = { set_demilitarized_zone = yes }
+			1440 = { set_demilitarized_zone = yes }
+
+			random_list = {
+				1 = { 1397 = { set_demilitarized_zone = yes } }
+				1 = {  }
+			}
+		}
+	}
+
+	#Stahlecker!
+	option = {
+		name = OSTL.5.a
+		retire_character = OST_Karl_Siegmund_Litzmann
+		promote_character = OST_Franz_Walter_Stahlecker
+		add_stability = -0.10
+		hidden_effect = {
+			add_ideas = OST_Franz_Walter_Stahlecker_hog
+		}
+		country_event = { id = OSTL.6 days = 7 }
+	}
+
+	#Drechsler!
+	option = {
+		name = OSTL.5.b
+		retire_character = OST_Karl_Siegmund_Litzmann
+		promote_character = DST_Otto_Heinrich_Drechsler
+		add_stability = -0.10
+		hidden_effect = {
+			add_ideas = DST_Otto_Heinrich_Drechsler_hog
+		}
+		set_country_flag = OST_Drechsler_chosen
+		country_event = { id = OSTL.6 days = 7 }
+	}
+}
+
+#Crisis in Ostland (over succession)
+country_event = {
+	id = OSTL.6
+	title = OSTL.6.t
+	desc = {
+		text = OSTL.6.S.desc
+		trigger = {
+			has_country_leader = {
+				character = OST_Franz_Walter_Stahlecker
+				ruling_only = yes
+			}
+		}
+	}
+	desc = {
+		text = OSTL.6.D.desc
+		trigger = {
+			has_country_flag = OST_Drechsler_chosen
+		}
+	}
+	picture = GFX_report_event_OST_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event OSTL.6"
+		hidden_effect = {
+			GER = {
+				set_autonomy = {
+					target = OST
+					autonomy_state = autonomy_free
+				}
+			}
+			leave_faction = yes
+
+			#Set up OST_contenders
+			add_to_array = { global.OST_contenders = OST } #Stahlecker
+			add_to_array = { global.OST_contenders = DST } #Drechsler
+
+			#add_ideas = OST_OCW
+			load_oob = OST_war
+			set_global_flag = OST_OCW_Ongoing
+
+			every_owned_state = { add_core_of = DST }
+
+			every_owned_state = {
+				limit = { is_demilitarized_zone = yes }
+				DST = { transfer_state = PREV }
+				set_demilitarized_zone = no
+			}
+
+			DST = {
+				#set_cosmetic_tag = DST_OCW
+				inherit_technology = PREV
+				load_oob = DST
+				load_oob = DST_air
+				country_event = { id = OSTL.7 days = 10 }
+				drechsler_economy = yes 
+			}
+			every_character = {
+				limit = {
+					has_character_flag = is_DST_character
+				}
+				set_nationality = DST
+			}
+			DST = {
+				promote_character = DST_Otto_Heinrich_Drechsler
+				add_ideas = { 
+					DST_Gunther_Prohl_hog
+					DST_Friedrich_Wilhelm_Mueller_sec
+					DST_Hans_Gewecke_for
+					DST_Adrian_von_Renteln_eco
+				}
+			}
+
+			country_event = { id = OSTL.7 days = 10 }
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = {
+					id = WORLD_REICH.1200
+					days = 1
+				}
+			}
+
+			1402 = { set_demilitarized_zone = yes }
+			943 = {
+				set_demilitarized_zone = yes
+				owner = {
+					country_event = { id = OSTL.14 days = 2 } #Polesen Putsch, Jeckeln
+				}
+			}
+			1399 = { set_demilitarized_zone = yes }
+			1403 = { set_demilitarized_zone = yes }
+			1404 = {
+				random_list = {
+					1 = { set_demilitarized_zone = yes }
+					1 = {  }
+				}
+			}
+			96 = {
+				set_demilitarized_zone = yes
+				owner = {
+					country_event = { id = OSTL.8 days = 7 } #Wilna Revolt, Meyer-Landrut
+				}
+			}
+			1405 = { set_demilitarized_zone = yes }
+			1406 = { set_demilitarized_zone = yes }
+			1407 = { set_demilitarized_zone = yes }
+			207 = {
+				set_demilitarized_zone = yes
+				owner = {
+					country_event = { id = OSTL.12 days = 9 } #Belarussian Mutiny, Vituska
+				}
+			}
+			1398 = { set_demilitarized_zone = yes }
+			1400 = {
+				set_demilitarized_zone = yes
+				owner = {
+					country_event = { id = OSTL.10 days = 4 } #Siege of Dunaburg, Kovner
+				}
+			}
+		}
+	}
+
+	option = {
+		name = OSTL.6.a
+		
+		hidden_effect = {
+			set_country_flag = OST_end_power_struggle
+			clear_variable = OST_weak_drechsler
+			load_focus_tree = OST_civil_war
+			remove_ideas = {
+				OST_model_colony
+				OST_model_colony2
+				OST_unusual_quiet
+			}
+			if = {
+				limit = {
+					has_country_flag = OST_Drechsler_chosen
+				}
+				promote_character = OST_Franz_Walter_Stahlecker
+				add_ideas = OST_Franz_Walter_Stahlecker_hog
+				if = {
+					limit = { is_ai = no }
+					DST = { change_tag_from = ROOT }
+				}
+			}
+			if = {
+				limit = { check_variable = { OST_weak_drechsler = 3 } }
+				DST = { add_manpower = -7500 }
+				DST = {
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = -750
+						producer = DST
+					}
+				}
+			}
+			else_if = {
+				limit = { check_variable = { OST_weak_drechsler = 2 } }
+				DST = { add_manpower = -5000 }
+				DST = {
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = -500
+						producer = DST
+					}
+				}
+			}
+			else_if = {
+				limit = { check_variable = { OST_weak_drechsler = 1 } }
+				DST = { add_manpower = -2500 }
+				DST = {
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = -250
+						producer = DST
+					}
+				}
+			}
+			else = {
+			}
+		}
+	}
+}
+
+#Siege of Riga
+country_event = {
+	id = OSTL.7
+	title = OSTL.7.t
+	desc = { text = OSTL.7.desc_ost trigger = { tag = OST } }
+	desc = { text = OSTL.7.desc_dst trigger = { tag = DST } }
+	picture = GFX_report_event_OST_tank
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event OSTL.7"
+		hidden_effect = {
+			if = {
+				limit = {
+					NOT = { DST = { has_war_with = OST } }
+				}
+				DST = { declare_war_on = { target = OST type = civil_war } }
+			}
+		}
+	}
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+	option = {
+		name = OSTL.7.a
+		hidden_effect = {
+			if = {
+				limit = { tag = OST	}
+				for_each_scope_loop = {
+					array = global.OST_contenders
+
+					add_ideas = OCW_surrender_buff
+					if = {
+						limit = {
+							NOT = { tag = MST }
+						}
+						country_event = { id = OSTL.9 days = 6 }
+					}
+					if = {
+						limit = {
+							NOT = { tag = UPO }
+						}
+						country_event = { id = OSTL.11 days = 3 }
+					}
+					if = {
+						limit = {
+							NOT = { tag = BLR }
+						}
+						country_event = { id = OSTL.13 days = 8 }
+					}
+					if = {
+						limit = {
+							NOT = { tag = JST }
+						}
+						country_event = { id = OSTL.15 days = 1 }
+					}
+				}
+			}
+		}
+	}
+}
+
+#Wilna Riots
+country_event = {
+	id = OSTL.8
+	title = OSTL.8.t
+	desc = OSTL.8.desc
+	picture = GFX_report_event_OST_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event OSTL.8"
+		hidden_effect = {
+			OST = {
+				remove_ideas_with_trait = economy_minister
+				remove_ideas_with_trait = security_minister
+				add_ideas = OST_Friedrich_Karl_Vialon_eco
+				add_ideas = OST_Franz_Baeke_sec
+				every_character = {
+					limit = {
+						has_character_flag = is_MST_character
+					}
+					set_nationality = MST
+				}
+			}
+			MST = {
+				MST_Andreas_Meyer_Landrut = {
+					promote_character = { ideology = paternalism_oligarchy_subtype }
+				}
+				MST_Andreas_Meyer_Landrut = {
+					promote_character = { ideology = despotism_subtype }
+				}
+				MST_Andreas_Meyer_Landrut = {
+					promote_character = { ideology = liberalism_subtype }
+				}
+				MST_Andreas_Meyer_Landrut = {
+					promote_character = { ideology = conservatism_subtype }
+				}
+				add_ideas = {
+					MST_Ulrich_Sahm_hog
+					MST_Bernhard_Plettner_eco
+					MST_Hans_von_Herwath_for
+					MST_Karl_Plagge_sec
+				}
+				add_state_core = 1399
+				transfer_state = 96
+				transfer_state = 1399
+				transfer_state = 1403
+				1404 = {
+					if = {
+						limit = { is_demilitarized_zone = yes }
+						PREV = { transfer_state = PREV }
+						set_demilitarized_zone = no
+					}
+					else = { set_demilitarized_zone = yes }
+				}
+
+				inherit_technology = PREV
+				load_oob = MST
+				add_to_array = { global.OST_contenders = THIS }
+				meyer_landrut_economy = yes 
+			}
+
+			96 = { set_demilitarized_zone = no }
+			1399 = { set_demilitarized_zone = no }
+			1403 = { set_demilitarized_zone = no }
+		}
+	}
+
+	option = {
+		name = OSTL.8.a
+	}
+	option = {
+		name = OSTL.8.b
+		trigger = { NOT = { is_ai = yes } }
+		custom_effect_tooltip = OST_play_meyer_landrut_tt
+		#Become Meyer-Landrut
+		MST  = {
+			change_tag_from = ROOT
+		}
+	}
+}
+
+#Wilna Riots War Decl
+country_event = {
+	id = OSTL.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.9" }
+	title = OSTL.9.t
+	desc = OSTL.9.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+
+	immediate = { 
+		set_variable = { OST_OCWspawn_eventid = 9 }
+		for_each_scope_loop = {
+			array = global.OST_contenders
+			if = {
+				limit = { 
+					NOT = {
+						OR = {
+							tag = MST 
+							has_war_with = MST
+						}
+					} 
+				}
+				declare_war_on = { target = MST type = civil_war }
+			}
+		}
+	}
+
+	option = {
+		name = OSTL.9.rk
+		trigger = { 
+			OR = {
+				tag = OST 
+				tag = DST 
+				tag = JST 
+			}
+		}
+	}
+	option = {
+		name = OSTL.9.rb
+		trigger = { 
+			OR = {
+				tag = UPO
+				tag = BLR 
+			}  
+		}
+	}
+}
+
+#Siege of Dunaburg
+country_event = {
+	id = OSTL.10
+	title = OSTL.10.t
+	desc = OSTL.10.desc
+	picture = GFX_report_event_OST_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event OSTL.10"
+		hidden_effect = {
+			UPO = {
+				add_state_core = 1398
+				transfer_state = 1398
+				add_state_core = 1400
+				transfer_state = 1400
+
+				inherit_technology = PREV
+				load_oob = UPO
+				add_to_array = { global.OST_contenders = THIS }
+				kovner_economy = yes
+			}
+
+			1398 = { set_demilitarized_zone = no }
+			1400 = { set_demilitarized_zone = no }
+		}
+	}
+
+	option = {
+		name = OSTL.10.a
+	}
+	option = {
+		name = OSTL.10.b
+		trigger = { NOT = { is_ai = yes } }
+		custom_effect_tooltip = OST_play_kovner_tt
+		#Become Kovner
+		UPO = {
+			change_tag_from = ROOT
+		}
+	}
+}
+
+#Siege of Dunaburg War Decl.
+country_event = {
+	id = OSTL.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.11" }
+	title = OSTL.11.t
+	desc = OSTL.11.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+
+	immediate = { 
+		set_variable = { OST_OCWspawn_eventid = 11 }
+		for_each_scope_loop = {
+			array = global.OST_contenders
+			if = {
+				limit = { 
+					NOT = {
+						OR = {
+							tag = UPO 
+							has_war_with = UPO
+						}
+					} 
+				}
+				declare_war_on = { target = UPO type = civil_war }
+			}
+		} 
+	}
+
+	option = {
+		name = OSTL.11.ost
+		trigger = { tag = OST }
+	}
+	option = {
+		name = OSTL.11.dst
+		trigger = { tag = DST }
+	}
+	option = {
+		name = OSTL.11.mst
+		trigger = { tag = MST }
+	}
+	option = {
+		name = OSTL.11.jst
+		trigger = { tag = JST }
+	}
+	option = {
+		name = OSTL.11.blr
+		trigger = { tag = BLR }
+	}
+}
+
+#Belarussian Mutiny
+country_event = {
+	id = OSTL.12
+	title = OSTL.12.t
+	desc = OSTL.12.desc
+	picture = GFX_report_event_OST_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event OSTL.12"
+		hidden_effect = {
+			BLR = {
+				every_state = {
+					limit = { Pakt_OST_Is_Belarus_State = yes }
+					add_core_of = BLR
+				}
+				transfer_state = 207
+				transfer_state = 1405
+				transfer_state = 1406
+				transfer_state = 1407
+				1404 = {
+					if = {
+						limit = { is_demilitarized_zone = yes }
+						PREV = { transfer_state = PREV }
+						set_demilitarized_zone = no
+					}
+				}
+
+				inherit_technology = PREV
+				load_oob = BLR
+				add_to_array = { global.OST_contenders = THIS }
+				vituska_economy = yes
+			}
+
+			207 = { set_demilitarized_zone = no }
+			1405 = { set_demilitarized_zone = no }
+			1406 = { set_demilitarized_zone = no }
+			1407 = { set_demilitarized_zone = no }
+		}
+	}
+
+	option = {
+		name = OSTL.12.a
+	}
+	option = {
+		name = OSTL.12.b
+		trigger = { NOT = { is_ai = yes } }
+		custom_effect_tooltip = OST_play_vituska_tt
+		#Become Vituska
+		BLR = {
+			change_tag_from = ROOT
+		}
+	}
+}
+
+#Belarussian Mutiny War Decl
+country_event = {
+	id = OSTL.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.13" }
+	title = OSTL.13.t
+	desc = OSTL.13.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+
+	immediate = { 
+		set_variable = { OST_OCWspawn_eventid = 13 }
+		for_each_scope_loop = {
+			array = global.OST_contenders
+			if = {
+				limit = { 
+					NOT = {
+						OR = {
+							tag = BLR
+							has_war_with = BLR
+							tag = UPO 
+						}
+					} 
+				}
+				declare_war_on = { target = BLR type = civil_war }
+			}
+		} 
+	}
+
+	option = {
+		name = OSTL.13.rk
+		trigger = { 
+			OR = {
+				tag = OST
+				tag = JST 
+				tag = DST 
+				tag = MST 
+			}
+		}
+	}
+	option = {
+		name = OSTL.13.upo
+		trigger = { tag = UPO }
+	}
+}
+
+#Polesen Putsch
+country_event = {
+	id = OSTL.14
+	title = OSTL.14.t
+	desc = OSTL.14.desc
+	picture = GFX_report_event_OST_tank
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event OSTL.14"
+		hidden_effect = {
+			JST = {
+				add_state_core = 943
+				transfer_state = 943
+				add_state_core = 1402
+				transfer_state = 1402
+
+				inherit_technology = PREV
+				load_oob = JST
+				add_to_array = { global.OST_contenders = THIS }
+				jeckeln_economy = yes
+			}
+			OST = {
+				every_character = {
+					limit = {
+						has_character_flag = is_JST_character
+					}
+					set_nationality = JST
+				}
+			}
+			JST = {
+				JST_Friedrich_Jeckeln = {
+					promote_character = {
+						ideology = national_socialism_spartanism_subtype
+					}
+				}
+				add_ideas = {
+					JST_Curt_von_Gottberg_sec
+					JST_Walther_Schroder_hog
+					JST_Martin_Matthiessen_eco
+					JST_Walter_Neum_for
+				}
+			}
+
+			943 = { set_demilitarized_zone = no }
+			1402 = { set_demilitarized_zone = no }
+		}
+	}
+
+	option = {
+		name = OSTL.14.a
+	}
+	option = {
+		name = OSTL.14.b
+		trigger = { NOT = { is_ai = yes } }
+		custom_effect_tooltip = OST_play_jeckeln_tt
+		#Become Jeckeln
+		JST = {
+			change_tag_from = ROOT
+		}
+	}
+}
+
+#Polesen Putsch War Decl
+country_event = {
+	id = OSTL.15
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.15" }
+	title = OSTL.15.t
+	desc = OSTL.15.desc
+	picture = GFX_report_event_OST_tank
+	is_triggered_only = yes
+
+	immediate = { 
+		set_variable = { OST_OCWspawn_eventid = 15 }
+		for_each_scope_loop = {
+			array = global.OST_contenders
+			if = {
+				limit = { 
+					NOT = {
+						OR = {
+							tag = JST 
+							has_war_with = JST
+						}
+					} 
+				}
+				declare_war_on = { target = JST type = civil_war }
+			}
+		} 
+	}
+
+	option = {
+		name = OSTL.15.ost
+		trigger = { tag = OST }
+	}
+	option = {
+		name = OSTL.15.dst
+		trigger = { tag = DST }
+	}
+	option = {
+		name = OSTL.15.mst
+		trigger = { tag = MST } 
+	}
+	option = {
+		name = OSTL.15.upo
+		trigger = { tag = UPO }
+	}
+	option = {
+		name = OSTL.15.blr
+		trigger = { tag = BLR }
+	}
+}
+
+country_event = { # Keep the peace, status report about partisans in Ostland
+	id = OSTL.16
+	title = OSTL.16.t
+	desc = OSTL.16.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.16" }
+
+	option = {
+		name = OSTL.16.a
+	}
+}
+
+country_event = { # Meeting with the Belarussian council, who to sent?
+	id = OSTL.17
+	title = OSTL.17.t
+	desc = OSTL.17.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.17" }
+
+	option = { # Send a militarist
+		name = OSTL.17.a
+		custom_effect_tooltip = OST_BLR_militarist_sent_tt
+		set_country_flag = OST_BLR_militarist_send
+	}
+	option = { # Send a conservative
+		name = OSTL.17.b
+		custom_effect_tooltip = OST_BLR_conservative_sent_tt
+	}
+}
+
+country_event = { # Selecting a path for the AI to fuck up
+	id = OSTL.18
+	title = OSTL.18.t
+	desc = OSTL.18.desc
+	picture = GFX_report_event_OST_tank
+
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.18" }
+
+	option = {
+		name = OSTL.18.a
+		trigger = {
+			NOT = {
+				has_completed_focus = OST_estonian_harbors
+			}
+		}
+		country_event = { id = OSTL.19 days = 7 }
+	}
+	option = {
+		name = OSTL.18.b
+		trigger = {
+			NOT = {
+				has_completed_focus = OST_latvian_partisans
+			}
+		}
+		country_event = { id = OSTL.20 days = 7 }
+	}
+	option = {
+		name = OSTL.18.c
+		trigger = {
+			NOT = {
+				has_completed_focus = OST_lithuanian_integration
+			}
+		}
+		country_event = { id = OSTL.21 days = 7 }
+	}
+	option = {
+		name = OSTL.18.d
+		trigger = {
+			NOT = {
+				has_completed_focus = OST_belarussian_doubts
+			}
+		}
+		country_event = { id = OSTL.22 days = 7 }
+	}
+}
+
+country_event = { # Estonian investments failed
+	id = OSTL.19
+	title = OSTL.19.t
+	desc = OSTL.19.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.19" }
+
+	option = {
+		name = OSTL.19.a
+		OST_EST_increase_militarist = yes
+		unlock_national_focus = OST_estonian_harbors
+		unlock_national_focus = OST_attract_siemens
+		unlock_national_focus = OST_educate_the_workers
+	}
+}
+
+country_event = { # Fighting partisans failed
+	id = OSTL.20
+	title = OSTL.20.t
+	desc = OSTL.20.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.20" }
+
+	option = {
+		name = OSTL.20.a
+		OST_LAT_increase_militarist = yes
+		12 = {
+			damage_building = {
+				type = infastructure
+				damage = 2
+			}
+		}
+		unlock_national_focus = OST_latvian_partisans
+		unlock_national_focus = OST_alter_the_deal
+		unlock_national_focus = OST_strengthen_local_militias
+	}
+}
+
+country_event = { # Requesting military support failed
+	id = OSTL.21
+	title = OSTL.21.t
+	desc = OSTL.21.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.21" }
+
+	option = {
+		name = OSTL.21.a
+		OST_LIT_increase_conservative = yes
+		unlock_national_focus = OST_lithuanian_integration
+		unlock_national_focus = OST_request_further_military_integration
+		unlock_national_focus = OST_promote_povilas
+	}
+}
+
+country_event = { # Meeting with Vituska failed
+	id = OSTL.22
+	title = OSTL.22.t
+	desc = OSTL.22.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.22" }
+
+	option = {
+		name = OSTL.22.a
+		custom_effect_tooltip = OST_BLR_1_resist_tooltip
+		set_country_flag = OST_BLR_1_resist
+		unlock_national_focus = OST_belarussian_doubts
+		unlock_national_focus = OST_meet_with_vituska
+		unlock_national_focus = OST_subvert_the_council
+	}
+}
+
+country_event = { # Hitler tours the nation
+	id = OSTL.23
+	title = { text = OSTL.23.D.t trigger = { has_completed_focus = OST_prepare_the_military_parade } }
+	title = { text = OSTL.23.S.t trigger = { has_completed_focus = OST_plan_the_tour } }
+	desc = { text = OSTL.23.D.desc trigger = { has_completed_focus = OST_prepare_the_military_parade } }
+	desc = { text = OSTL.23.S.desc trigger = { has_completed_focus = OST_plan_the_tour } }
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.23" }
+
+	option = {
+		name = OSTL.23.a
+		if = {
+			limit = {
+				has_completed_focus = OST_prepare_the_military_parade
+			}
+			OST_LIT_increase_militarist = yes
+			OST_BLR_increase_militarist = yes
+		}
+		else = {
+			OST_LIT_increase_conservative = yes
+			OST_BLR_increase_conservative = yes
+		}
+	}
+}
+
+country_event = { # Hitler does not tour the nation
+	id = OSTL.24
+	title = OSTL.24.t
+	desc = { text = OSTL.24.G.desc trigger = { GER = { has_country_flag = goring_for_germany } } }
+	desc = { text = OSTL.24.S.desc trigger = { GER = { has_country_flag = speer_for_germany } } }
+	desc = { text = OSTL.24.H.desc trigger = { GER = { has_country_flag = heydrich_for_germany } } }
+	desc = { text = OSTL.24.B.desc trigger = { GER = { has_country_flag = bormann_for_germany } } }
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.24" }
+
+	option = {
+		name = OSTL.24.a
+		if = {
+			limit = {
+				has_completed_focus = OST_prepare_the_military_parade
+			}
+			OST_EST_increase_conservative = yes
+			OST_LAT_increase_conservative = yes
+			OST_LIT_increase_conservative = yes
+			OST_BLR_increase_conservative = yes
+		}
+		else = {
+			OST_EST_increase_militarist = yes
+			OST_LAT_increase_militarist = yes
+			OST_LIT_increase_militarist = yes
+			OST_BLR_increase_militarist = yes
+		}
+	}
+}
+
+country_event = { # Drechsler is replaced by order of Germania, very sketchy stuff
+	id = OSTL.25
+	title = OSTL.25.t
+	desc = OSTL.25.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.25" }
+
+	option = {
+		name = OSTL.25.a
+		complete_national_focus = OST_replace_drechsler
+	}
+}
+
+country_event = { # Wehrmacht orders investagition of southern camps to fuck over the SS
+	id = OSTL.26
+	title = OSTL.26.t
+	desc = OSTL.26.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.26" }
+
+	option = {
+		name = OSTL.26.a
+		complete_national_focus = OST_investigate_the_southern_camps
+	}
+}
+
+country_event = { # The protesters are shot after the protests escalate
+	id = OSTL.27
+	title = OSTL.27.t
+	desc = OSTL.27.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.27" }
+
+	option = {
+		name = OSTL.27.a
+		complete_national_focus = OST_the_talinn_university_massacre
+	}
+}
+
+country_event = { # Without your permission a block of politicians pass a reform
+	id = OSTL.28
+	title = OSTL.28.t
+	desc = OSTL.28.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.28" }
+
+	option = {
+		name = OSTL.28.a
+		complete_national_focus = OST_sit_down_with_their_leaders
+	}
+}
+
+country_event = { # Introduction to Jeckeln
+	id = OSTL.29
+	title = OSTL.29.t
+	desc = OSTL.29.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.29" }
+
+	option = { # Support Vituska
+		name = OSTL.29.a
+		OST_BLR_increase_militarist = yes
+	}
+
+	option = { # Support the Lithuanians
+		name = OSTL.29.b
+		OST_LIT_increase_militarist = yes
+	}
+}
+
+country_event = { # Introduction to Landrut
+	id = OSTL.30
+	title = OSTL.30.t
+	desc = OSTL.30.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.30" }
+
+	option = { # Counter estonian protests
+		name = OSTL.30.a
+		OST_EST_increase_conservative = yes
+	}
+	option = { # Counter latvian partisans
+		name = OSTL.30.b
+		OST_LAT_increase_conservative = yes
+	}
+}
+
+country_event = { # Civil War Introduction Event
+	id = OSTL.31
+	title = OSTL.31.t
+	desc = OSTL.31.desc
+	picture = GFX_report_event_OST_tank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = { log = "[GetDateText]: [Root.GetName]: event OSTL.31" }
+
+	option = { # Beginning the Focus tree
+		name = OSTL.31.a
+
+	}
+}

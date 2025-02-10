@@ -1,0 +1,1103 @@
+SVR_Not_So_Red_Army = {
+	SVR_crack_down_on_black_league = {
+		icon = GFX_decision_generic_revolt
+		fire_only_once = no
+		cost = 5
+		custom_cost_trigger = {
+			has_political_power > 49.99
+			has_manpower > 499
+		}
+		custom_cost_text = decision_cost_50_pp_500_men
+		available = {
+			country_exists = OMS
+			#always = yes
+		}
+
+		visible = {
+			NOT = { has_country_flag = SVR_omsk_curbed }
+			NOT = { has_country_flag = SVR_yazov_dead }
+			has_country_flag = SVR_NOT_SO_RED_ARMY
+			country_exists = OMS
+			NOT = { is_ai = yes }
+			#always = yes
+		}
+		ai_will_do = {
+			factor = 0
+			modifier = {
+				add = 1000
+				AND = {
+					has_country_flag = SVR_tyumen_curbed
+					OR = {
+						has_idea = SVR_black_league_influence_tier_3
+						has_idea = SVR_black_league_influence_tier_4
+					}
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_crack_down_on_black_league"
+			add_manpower = -500
+			add_political_power = -50
+			set_country_flag = SVR_cl_cd
+		}
+		days_re_enable = 2
+		days_remove = 14
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_crack_down_on_black_league"
+			clr_country_flag = SVR_cl_cd
+			add_manpower = 400
+			black_league_influence_decrease = yes
+		}
+	}
+
+	SVR_crack_down_on_revisionists = {
+		icon = GFX_decision_generic_revolt
+		fire_only_once = no
+		cost = 5
+		custom_cost_trigger = {
+			has_political_power > 49.99
+			has_manpower > 499
+		}
+		custom_cost_text = decision_cost_50_pp_500_men
+		available = {
+			country_exists = TYM
+			#always = yes
+		}
+
+		visible = {
+			NOT = { has_country_flag = SVR_tyumen_curbed }
+			has_country_flag = SVR_NOT_SO_RED_ARMY
+			country_exists = TYM
+			NOT = { is_ai = yes }
+			#always = yes
+		}
+		ai_will_do = {
+			factor = 100
+			modifier = {
+				factor = 10
+				OR = {
+					has_idea = SVR_revisionist_influence_tier_3
+					has_idea = SVR_revisionist_influence_tier_4
+				}
+			}
+		}
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_crack_down_on_revisionists"
+			add_manpower = -500
+			add_political_power = -50
+			set_country_flag = SVR_rev_cd
+		}
+		days_re_enable = 2
+		days_remove = 14
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove OB_crack_down_on_revisionists"
+			clr_country_flag = SVR_rev_cd
+			add_manpower = 400
+			revisionist_influence_decrease = yes
+		}
+	}
+
+
+	SVR_rev_influence_ticker = {
+		icon = GFX_decision_generic_propaganda
+		priority = 11
+		allowed = { tag = SVR }
+		available = {
+			OR = {
+				has_country_flag = SVR_tyumen_curbed
+				communist < 0.05
+				NOT = { country_exists = TYM }
+			}
+		}
+		visible = {
+			has_country_flag = SVR_NOT_SO_RED_ARMY
+		}
+		activation = {
+			has_country_flag = SVR_NOT_SO_RED_ARMY
+			NOT = { has_country_flag = SVR_tyumen_curbed }
+			communist > 0.1
+			NOT = { is_ai = yes }
+			country_exists = TYM
+		}
+		#days_remove = 5
+		days_mission_timeout = 100
+		fire_only_once = no
+		is_good = no
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout SVR_rev_influence_ticker"
+			add_popularity = {
+				ideology = communist
+				popularity = 0.01
+			}
+			revisionist_influence_increase = yes
+		}
+	}
+
+	SVR_cl_influence_ticker = {
+		icon = GFX_decision_generic_propaganda
+		priority = 11
+		allowed = { tag = SVR }
+		available = {
+			OR = {
+				has_country_flag = SVR_omsk_curbed
+				ultranationalism < 0.05
+				NOT = { country_exists = OMS }
+			}
+		}
+
+		activation = {
+			has_country_flag = SVR_NOT_SO_RED_ARMY
+			NOT = { has_country_flag = SVR_omsk_curbed }
+			ultranationalism > 0.1
+			country_exists = OMS
+			NOT = { is_ai = yes }
+		}
+
+		#days_remove = 5
+		days_mission_timeout = 100
+		fire_only_once = no
+		is_good = no
+		timeout_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision timeout SVR_cl_influence_ticker"
+			add_popularity = {
+				ideology = ultranationalism
+				popularity = 0.01
+			}
+			black_league_influence_increase = yes
+		}
+	}
+}
+
+SVR_sverdlovsk_regional_category = {
+	SVR_hunt_down_bandit_holdouts = {
+		icon = GFX_decision_generic_prepare_civil_war
+
+		allowed = {
+			original_tag = SVR
+		}
+
+		available = {
+			NOT = {
+				has_decision = SVR_deal_with_the_remaining_kaganovich_loyalists
+				has_decision = SVR_deal_with_black_league_remnants
+			}
+		}
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 845
+			}
+		}
+
+		#on_map_mode = map_only
+
+		ai_will_do = {
+			factor = 10
+		}
+
+		fire_only_once = yes
+
+		modifier = {
+			political_power_gain = -0.25
+		}
+
+		days_remove = 21
+
+		cost = 25
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_hunt_down_bandit_holdouts"
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_hunt_down_bandit_holdouts"
+			RUS_decrease_administrative_strain = yes
+			TNO_improve_security_policy_effectiveness_low = yes
+			hidden_effect = {
+				country_event = { id = sverdreg.29 }
+			}
+		}
+	}
+
+	SVR_deal_with_the_remaining_kaganovich_loyalists = {
+		icon = GFX_decision_generic_prepare_civil_war
+
+		allowed = {
+			original_tag = SVR
+		}
+
+		available = {
+			NOT = {
+				has_decision = SVR_hunt_down_bandit_holdouts
+				has_decision = SVR_deal_with_black_league_remnants
+			}
+		}
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 403
+			}
+		}
+
+		#on_map_mode = map_only
+
+		ai_will_do = {
+			factor = 10
+		}
+
+		fire_only_once = yes
+
+		modifier = {
+			political_power_gain = -0.1
+		}
+
+		days_remove = 21
+
+		cost = 25
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_deal_with_the_remaining_kaganovich_loyalists"
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_deal_with_the_remaining_kaganovich_loyalists"
+			RUS_decrease_administrative_strain = yes
+			TNO_improve_security_policy_effectiveness_med = yes
+			hidden_effect = {
+				set_country_flag = SVR_kaganovich_loyalists_dealt_with
+			}
+		}
+	}
+
+	SVR_deal_with_black_league_remnants = {
+		icon = GFX_decision_generic_prepare_civil_war
+
+		allowed = {
+			original_tag = SVR
+		}
+
+		available = {
+			NOT = {
+				has_decision = SVR_hunt_down_bandit_holdouts
+				has_decision = SVR_deal_with_the_remaining_kaganovich_loyalists
+			}
+		}
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 571
+			}
+		}
+
+		#on_map_mode = map_only
+
+		ai_will_do = {
+			factor = 10
+		}
+
+		fire_only_once = yes
+
+		modifier = {
+			political_power_gain = -0.1
+		}
+
+		days_remove = 21
+
+		cost = 25
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_deal_with_black_league_remnants"
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_deal_with_black_league_remnants"
+			RUS_decrease_administrative_strain = yes
+			TNO_improve_security_policy_effectiveness_med = yes
+			hidden_effect = {
+				set_country_flag = SVR_black_league_remnants_dealt_with
+			}
+		}
+	}
+
+	SVR_trial_of_lazar_kaganovich = {
+		icon = GFX_decision_generic_decision
+
+		allowed = {
+			original_tag = SVR
+		}
+
+		visible = {
+			has_country_flag = SVR_kaganovich_loyalists_dealt_with
+		}
+
+		available = {
+			NOT = {
+				has_decision = SVR_trial_of_dmitry_yazov
+			}
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+
+		fire_only_once = yes
+
+		modifier = {
+			political_power_gain = -0.1
+		}
+
+		days_remove = 21
+
+		cost = 10
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_trial_of_lazar_kaganovich"
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_trial_of_lazar_kaganovich"
+			country_event = { id = sverdreg.3 }
+		}
+	}
+
+	SVR_trial_of_dmitry_yazov = {
+		icon = GFX_decision_generic_decision
+
+		allowed = {
+			original_tag = SVR
+		}
+
+		visible = {
+			has_country_flag = SVR_black_league_remnants_dealt_with
+			NOT = {
+				has_country_flag = SVR_yazov_dead
+			}
+		}
+
+		available = {
+			NOT = {
+				has_decision = SVR_trial_of_lazar_kaganovich
+			}
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+
+		fire_only_once = yes
+
+		modifier = {
+			political_power_gain = -0.1
+		}
+
+		days_remove = 21
+
+		cost = 10
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_trial_of_dmitry_yazov"
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_trial_of_dmitry_yazov"
+			country_event = { id = sverdreg.4 }
+		}
+	}
+
+	SVR_improve_training_methods = {
+		icon = GFX_decision_generic_prepare_civil_war
+
+		allowed = {
+			original_tag = SVR
+		}
+
+		custom_cost_trigger = {
+			has_army_experience > 24.99
+		}
+		custom_cost_text = decision_cost_25_army_xp
+
+		visible = {
+			has_completed_focus = SVR_the_cream_of_the_crop
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+
+		fire_only_once = yes
+
+		days_remove = 30
+
+		
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_improve_training_methods"
+			army_experience = -25
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_improve_training_methods"
+			tno_training_improve = yes
+		}
+	}
+
+	SVR_promote_new_officers = {
+		icon = GFX_decision_generic_prepare_civil_war
+
+		allowed = {
+			original_tag = SVR
+		}
+
+		visible = {
+			has_completed_focus = SVR_establish_the_rokossovsky_military_academy
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+
+		fire_only_once = yes
+
+		days_remove = 7
+
+		cost = 50
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_promote_new_officers"
+			army_experience = 15
+			TNO_worsen_army_professionalism_low = yes
+			custom_effect_tooltip = SVR_promote_new_officers_tt
+			OMS_Viktor_Grigoriev = {
+				add_corps_commander_role = {
+					traits = { war_hero infantry_leader winter_specialist }
+					skill = 3
+					attack_skill = 2
+					defense_skill = 4
+					planning_skill = 3
+					logistics_skill = 1
+					legacy_id = 15002
+				}
+			}
+			OMS_Andrey_Matvienko = {
+				add_corps_commander_role = {
+					traits = { trait_cautious trait_engineer }
+					skill = 2
+					attack_skill = 2
+					defense_skill = 2
+					planning_skill = 2
+					logistics_skill = 1
+					legacy_id = 15003
+				}
+			}
+		}
+	}
+
+	SVR_improve_ground_support_efficiency = {
+		icon = GFX_decision_market_helicopter
+
+		allowed = {
+			original_tag = SVR
+		}
+
+		visible = {
+			has_completed_focus = SVR_the_airfields_of_surgut
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+
+		fire_only_once = yes
+
+		days_remove = 7
+
+		cost = 50
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_improve_ground_support_efficiency"
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_improve_ground_support_efficiency"
+			air_experience = 20
+			add_ideas = SVR_airland_battles
+		}
+	}
+}
+
+SVR_democratic_politics_category = {
+
+	SVR_Limit_LPR_Campaigning = {
+
+		visible = {
+			has_country_flag = RUS_campaigning_for_authdem
+		}
+
+		days_remove = 40
+
+		cost = 70
+
+		ai_will_do = {
+			factor = 40
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_Limit_LPR_Campaigning"
+			TNO_improve_press_rights_policy_effectiveness_monthly_low = yes
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_Limit_LPR_Campaigning"
+			remove_decision = SVR_conservative_campaign_ai
+		}
+	}
+
+	SVR_Suppress_Opposition_Voting = {
+
+		visible = {
+			has_country_flag = RUS_campaigning_for_authdem
+		}
+
+		days_remove = 40
+
+		cost = 70
+
+		ai_will_do = {
+			factor = 40
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_Suppress_Opposition_Voting"
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_Suppress_Opposition_Voting"
+			TNO_improve_vote_franchise_policy_effectiveness_low = yes
+			custom_effect_tooltip = SVR_Suppress_Opposition_Voting_tt
+			hidden_effect = {
+				every_owned_state = {
+					add_to_variable = { RUS_auth_state_turnout = 0.03 }
+					add_to_variable = { RUS_socdem_state_turnout = -0.01 }
+					add_to_variable = { RUS_liberal_state_turnout = -0.01 }
+					add_to_variable = { RUS_conservative_state_turnout = -0.01 }
+				}
+			}
+		}
+	}
+
+	SVR_Encourage_Minorities_Voting = {
+
+		visible = {
+			has_country_flag = RUS_campaigning_for_conservative
+		}
+
+		days_remove = 40
+
+		cost = 70
+
+		ai_will_do = {
+			factor = 40
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision SVR_Encourage_Minorities_Voting"
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_Encourage_Minorities_Voting"
+			RUS_encourage_minority_voting = yes
+		}
+	}
+
+	SVR_campaign_arctic_russia = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 150 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_arctic_russia"
+			clr_country_flag = SVR_is_campaigning
+			RUS_arctic_russia_campaign = yes
+		}
+	}
+
+	SVR_campaign_central_russia = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 133 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_central_russia"
+			clr_country_flag = SVR_is_campaigning
+			RUS_central_russia_campaign = yes
+		}
+	}
+
+	SVR_campaign_ural_region = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 138 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_ural_region"
+			clr_country_flag = SVR_is_campaigning
+			RUS_ural_region_campaign = yes
+		}
+	}
+
+	SVR_campaign_transvolga = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 40 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_transvolga"
+			clr_country_flag = SVR_is_campaigning
+			RUS_transvolga_campaign = yes
+		}
+	}
+
+	SVR_campaign_southern_urals = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 209 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_southern_urals"
+			clr_country_flag = SVR_is_campaigning
+			RUS_southern_urals_campaign = yes
+		}
+	}
+
+	SVR_campaign_trans_urals = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 14 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_trans_urals"
+			clr_country_flag = SVR_is_campaigning
+			RUS_trans_urals_campaign = yes
+		}
+	}
+
+	SVR_campaign_western_siberia = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 151 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_western_siberia"
+			clr_country_flag = SVR_is_campaigning
+			RUS_western_siberia_campaign = yes
+		}
+	}
+
+	SVR_campaign_northern_siberia = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 147 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_northern_siberia"
+			clr_country_flag = SVR_is_campaigning
+			RUS_northern_siberia_campaign = yes
+		}
+	}
+
+	SVR_campaign_central_siberia = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 207 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_central_siberia"
+			clr_country_flag = SVR_is_campaigning
+			RUS_central_siberia_campaign = yes
+		}
+	}
+
+	SVR_campaign_eastern_siberia = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 149 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_eastern_siberia"
+			clr_country_flag = SVR_is_campaigning
+			RUS_eastern_siberia_campaign = yes
+		}
+	}
+
+	SVR_campaign_trans_baikal = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 211 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_trans_baikal"
+			clr_country_flag = SVR_is_campaigning
+			RUS_trans_baikal_campaign = yes
+		}
+	}
+
+	SVR_campaign_far_east = {
+
+		available = {
+			NOT = {
+				has_country_flag = SVR_is_campaigning
+			}
+		}
+
+		visible = {
+			any_owned_state = { region = 148 }
+		}
+
+		days_remove = 25
+
+		cost = 30
+
+		ai_will_do = {
+			factor = 30
+		}
+
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = SVR_is_campaigning
+		}
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove SVR_campaign_far_east"
+			clr_country_flag = SVR_is_campaigning
+			RUS_far_east_campaign = yes
+		}
+	}
+
+	SVR_authdem_campaign_ai = {
+		allowed = {
+			tag = SVR
+		}
+
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		activation = {
+			has_country_flag = RUS_POLLS_ENABLE
+			has_country_flag = RUS_AUTHDEM_AI_ENABLE
+			NOT = {
+				has_country_flag = RUS_campaigning_for_authdem
+			}
+		}
+
+		visible = {
+			has_country_flag = RUS_POLLS_ENABLE
+		}
+		fixed_random_seed = no
+		cancel_if_not_visible = yes
+		is_good = yes
+		days_mission_timeout = 25
+		days_re_enable = 5
+
+		timeout_effect = {
+			hidden_effect = {
+				ZZZ = {
+					country_event = {
+						id = russian_democracy_helpers.9
+						days = 1
+					}
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+
+	SVR_conservative_campaign_ai = {
+		allowed = {
+			tag = SVR
+		}
+
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		activation = {
+			has_country_flag = RUS_POLLS_ENABLE
+			has_country_flag = RUS_CONSERVATIVE_AI_ENABLE
+			NOT = {
+				has_country_flag = RUS_campaigning_for_conservative
+			}
+		}
+
+		visible = {
+			has_country_flag = RUS_POLLS_ENABLE
+		}
+		fixed_random_seed = no
+		cancel_if_not_visible = yes
+		is_good = yes
+		days_mission_timeout = 25
+		days_re_enable = 5
+
+		timeout_effect = {
+			hidden_effect = {
+				ZZZ = {
+					country_event = {
+						id = russian_democracy_helpers.10
+						days = 1
+					}
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+}

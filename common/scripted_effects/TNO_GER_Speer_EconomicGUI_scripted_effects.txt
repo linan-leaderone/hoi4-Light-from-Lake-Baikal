@@ -1,0 +1,6714 @@
+
+#Made by Moyme - thanks to Calph, Sino, CPR and everyone else who helped make this GUI reality
+
+############
+# Commands #
+############
+
+#One timers don't use#
+
+initiate_wirtschaftswunder = {
+	set_variable = { skilled_labour_Growth = 0.05 }
+	custom_effect_tooltip = SGR_erhard_plan_tt
+	hidden_effect = {
+		add_dynamic_modifier = { modifier = GER_SGR_the_wirtschaftswunder_dynamic_modifier }
+		add_dynamic_modifier = { modifier = GER_SGR_zollverein_dynamic_modifier }
+		add_ideas = {
+			SGR_zollverein_germany
+			GER_SGR_WWS_Dummy
+		}
+	}
+}
+
+initiate_repatriation = {
+	set_variable = { repatriation_effectiveness = 70 }
+	set_global_flag = SGR_repatriation_started
+	custom_effect_tooltip = SGR_repatriation_started_tt
+	hidden_effect = {
+		add_dynamic_modifier = { modifier = GER_SGR_repatriation_dynamic_modifier }
+	}
+}
+
+SGR_halt_repatriation = {	#For the Oil Crisis
+	set_variable = { repatriation_effectiveness = 0 }
+	custom_effect_tooltip = SGR_halt_repatriation_tt
+}
+
+#Stuff
+
+SGR_recompile_ZV_array = {
+
+	GER = {
+		add_to_array = { ZV_members = THIS }
+	}
+
+	every_country = {
+		limit = {
+			has_idea = SGR_zollverein_basic
+		}
+		GER = {
+			add_to_array = { ZV_members = PREV }
+		}
+	}
+
+	quicksort_ZVMembers = yes
+}
+
+#Used every 14 days
+Zollverein_two_weeks_pulse = {
+	for_each_loop = {
+		array = SGR_WWS_Regions
+		index = i
+		value = val
+
+		if = {
+			limit = {
+				check_variable = { i < 27 }
+			}
+			clamp_variable = {
+				var = SGR_WWS_Regions^i
+				min = 0
+			}
+		}
+	}
+
+	check_megacorp_powerdecline = yes
+	check_diplomatic_standing = yes
+}
+
+
+reset_state_decision_flags = {
+
+
+	#Events
+	if = {
+		limit = {
+			has_country_flag = SGR_phase2
+			NOT = { has_country_flag = SGR_slave_siege_fired } 
+			check_variable = { Reich_SlavesNum_m < 30 }
+		}
+		set_country_flag = SGR_slave_siege_fired
+		country_event = {
+			id = speerflavor.1
+			days = 8
+		}
+		country_event = {
+			id = speerflavor.25
+			days = 82
+		}
+	}
+}
+
+#For closing the state windows
+clearSGRStateInfoWindowFlags = {
+	clr_country_flag = SGR_Germany1_state_info_window_open
+	clr_country_flag = SGR_Germany2_state_info_window_open
+	clr_country_flag = SGR_Germany3_state_info_window_open
+	clr_country_flag = SGR_Germany4_state_info_window_open
+	clr_country_flag = SGR_Germany5_state_info_window_open
+	clr_country_flag = SGR_Germany6_state_info_window_open
+	clr_country_flag = SGR_Germany7_state_info_window_open
+	clr_country_flag = SGR_Bohemia_state_info_window_open
+	clr_country_flag = SGR_GGN_state_info_window_open
+	clr_country_flag = SGR_Crimea_state_info_window_open
+	clr_country_flag = SGR_Ostland1_state_info_window_open
+	clr_country_flag = SGR_Ostland2_state_info_window_open
+	clr_country_flag = SGR_Ostland3_state_info_window_open
+	clr_country_flag = SGR_Ukraine1_state_info_window_open
+	clr_country_flag = SGR_Ukraine2_state_info_window_open
+	clr_country_flag = SGR_Ukraine3_state_info_window_open
+	clr_country_flag = SGR_Denmark_state_info_window_open
+	clr_country_flag = SGR_Holland_state_info_window_open
+	clr_country_flag = SGR_Holland_state_info_window_open
+	clr_country_flag = SGR_Norway1_state_info_window_open
+	clr_country_flag = SGR_Norway2_state_info_window_open
+	clr_country_flag = SGR_Leningrad_state_info_window_open
+	clr_country_flag = SGR_Wolga1_state_info_window_open
+	clr_country_flag = SGR_Wolga2_state_info_window_open
+	clr_country_flag = SGR_Cau1_state_info_window_open
+	clr_country_flag = SGR_Cau2_state_info_window_open
+	clr_country_flag = SGR_Cau3_state_info_window_open
+	clr_country_flag = SGR_Romania_state_info_window_open
+}
+
+#For closing the megacorp info boxes
+clearSGRCorporationInfoWindowFlags = {
+	clr_country_flag = SGR_Farben_info_window_open
+	clr_country_flag = SGR_Reichswerke_info_window_open
+	clr_country_flag = SGR_Benz_info_window_open
+	clr_country_flag = SGR_Siemens_info_window_open
+}
+
+Speerconomics_monthly_pulse = {
+	run_germany_repatriations = yes
+	run_skilled_labour_calculation = yes
+	calculate_Reich_GDP = yes
+	calculate_wws_power = yes
+	determine_top_economies = yes
+	reset_state_decision_flags = yes
+	check_Wirtschaftswunder_effects = yes
+	offset_deficit_pp_debuff = yes
+	SGR_monthly_project_progress_update = yes
+}
+
+# monthly check to offset dumb deficit pp gain
+
+offset_deficit_pp_debuff = {
+	set_variable = {
+		SGR_pp_deficit_offset = TNO_deficit_PP_cost
+	}
+}
+
+#Join Zollverein scripted effect
+
+join_zollverein = {
+	custom_effect_tooltip = SGR_join_zollverein_tt
+	hidden_effect = {
+		if = {
+			limit = {
+				NOT = {
+					tag = GER
+				}
+			}
+			add_ideas = SGR_zollverein_basic
+		}
+		set_variable = { ZV_pp_gain = -0.1 }
+		set_variable = { ZV_production_gain = 0.2 }
+		set_variable = { ZV_consumer_goods = -0.05 }
+		GER = { add_to_array = { ZV_members = PREV } }
+		set_variable = { ZollvereinPayments = 0.05 }
+		add_dynamic_modifier = { modifier = GER_SGR_ZV_member_dynamic_modifier }
+	}
+	if = {
+		limit = {
+			NOT = {
+				check_variable = {
+					ECON_SPHERE_LEADER = GER
+				}
+				check_variable = {
+					ECON_SPHERE_LEADER = IBR
+				}
+			}
+		}
+		econ_join_sphere_GER = yes
+	}
+	hidden_effect = {
+		GER = { check_zollverein_boni = yes }
+	}
+}
+
+#Skilled Labour Growth increases
+
+increase_wwgrowth_small = {
+	add_to_variable = { skilled_labour_Growth = 0.025 }
+	add_to_variable = { SGR_total_cost = 0.002 }
+	clamp_variable = {
+		var = skilled_labour_Growth
+		min = -1
+		max = 1.2
+	}
+	custom_effect_tooltip = SGR_skilled_labour_increase_small_tt
+}
+
+increase_wwgrowth_mid = {
+	add_to_variable = { skilled_labour_Growth = 0.05 }
+	add_to_variable = { SGR_total_cost = 0.003 }
+	clamp_variable = {
+		var = skilled_labour_Growth
+		min = -1
+		max = 1.2
+	}
+	custom_effect_tooltip = SGR_skilled_labour_increase_mid_tt
+}
+
+increase_wwgrowth_big = { #Use very sparringly.
+	add_to_variable = { skilled_labour_Growth = 0.1 }
+	add_to_variable = { SGR_total_cost = 0.004 }
+	clamp_variable = {
+		var = skilled_labour_Growth
+		min = -1
+		max = 1.2
+	}
+	custom_effect_tooltip = SGR_skilled_labour_increase_big_tt
+}
+
+OilCrisis_reverse_wwgrowth = {	#Uniquely for the Oil Crisis
+	set_variable = { skilled_labour_Growth_preOC = skilled_labour_Growth }
+	set_variable = { skilled_labour_Growth_OG = skilled_labour_Growth_preOC }
+	set_temp_variable = { tempVal = -0.1 }
+	multiply_temp_variable = { tempVal = skilled_labour_Growth_preOC }
+	set_variable = { skilled_labour_Growth = tempVal }
+}
+
+#Repatriation rate increases
+
+increase_repatriation_small = {
+	add_to_variable = { repatriation_effectiveness = 5 }
+	add_to_variable = { SGR_total_cost = 0.005 }
+	clamp_variable = {
+		var = repatriation_effectiveness
+		min = 0
+		max = 115
+	}
+	custom_effect_tooltip = SGR_repatriation_increase_small
+}
+
+increase_repatriation_mid = {
+	add_to_variable = { repatriation_effectiveness = 10 }
+	add_to_variable = { SGR_total_cost = 0.010 }
+	clamp_variable = {
+		var = repatriation_effectiveness
+		min = 0
+		max = 115
+	}
+	custom_effect_tooltip = SGR_repatriation_increase_mid
+}
+
+#USE SPARINGLY
+increase_repatriation_big = {
+	add_to_variable = { repatriation_effectiveness = 20 }
+	add_to_variable = { SGR_total_cost = 0.020 }
+	clamp_variable = {
+		var = repatriation_effectiveness
+		min = 0
+		max = 115
+	}
+	custom_effect_tooltip = SGR_repatriation_increase_big
+}
+
+#FOR THE SPEER ECON TREE ONLY: Attack factors against the megacorps
+
+attack_igfarben = {
+	add_to_variable = { antiIGFarben = 2 }
+	custom_effect_tooltip = SGR_igfarben_attack_tt
+}
+
+defend_igfarben = {
+	add_to_variable = { antiIGFarben = -2 }
+	custom_effect_tooltip = SGR_igfarben_defend_tt
+}
+
+attack_reichswerke = {
+	add_to_variable = { antiReichswerke = 2.6 }
+	custom_effect_tooltip = SGR_reichswerke_attack_tt
+}
+
+attack_daimler = {
+	add_to_variable = { antiDaimler = 2.4 }
+	custom_effect_tooltip = SGR_daimler_attack_tt
+}
+
+attack_siemens = {
+	add_to_variable = { antiSiemens = 3 }
+	custom_effect_tooltip = SGR_siemens_attack_tt
+}
+
+##################
+# Diplo-AI Stuff #
+##################
+
+# The script here roughly determines Germany's international standing, calculated by checking how large the Zollverein's GDP is in combination with how much slavery has been reduced
+# and how large the civilian workforce has become. There are five GLOBAL FLAGS for this:
+
+# 1.	SGR_diplomatic_standing_bad 					 BAD DIPLOMATIC STANDING
+
+# 2.	SGR_diplomatic_standing_okay					 OKAY DIPLOMATIC STANDING
+
+# 3.	SGR_diplomatic_standing_good					 GOOD DIPLOMATIC STANDING
+
+# 4.	SGR_diplomatic_standing_very_good				 VERY GOOD DIPLOMATIC STANDING
+
+# 5.	SGR_diplomatic_standing_slavery_abolished		 SLAVERY ABOLISHED
+
+# An example for diplo weighing for a generic Speer diplomatic event:
+
+# ai_will_do = {
+	# 	base = 1
+	# 	modifier = {
+		# 	   add = 1
+		# 	   has_global_flag = SGR_diplomatic_standing_bad
+		# 	}
+	# 	modifier = {
+		# 		add = 10
+		# 		has_global_flag = SGR_diplomatic_standing_okay
+		# 	}
+	# 	modifier = {
+		# 		add = 25
+		# 		has_global_flag = SGR_diplomatic_standing_good
+		# 	}
+	# 	modifier = {
+		# 		add = 50
+		# 		has_global_flag = SGR_diplomatic_standing_very_good
+		# 	}
+	# 	modifier = {
+		# 		add = 100
+		# 		has_global_flag = SGR_diplomatic_standing_slavery_abolished
+		# 	}
+	# }
+
+# 'Base' may NEVER be 0, and do not set the 'add' to anything ludicrously high. The AI should still have a chance of declining.
+
+check_diplomatic_standing = {
+
+	#Calculating the original and current amount of slaves
+
+	set_temp_variable = { origSlavesDiplo = 0 }
+
+	set_temp_variable = { currentSlavesDiplo = 0 }
+
+	for_each_loop = {
+		array = SGR_WWS_Regions_Reciprocal
+		index = i
+		value = val
+
+		if = {
+			limit = {
+				check_variable = { i < 27 }
+			}
+			add_to_temp_variable = { origSlavesDiplo = SGR_WWS_Regions_Reciprocal^i }
+		}
+	}
+
+	for_each_loop = {
+		array = SGR_WWS_Regions
+		index = i
+		value = val
+
+		if = {
+			limit = {
+				check_variable = { i < 27 }
+			}
+			add_to_temp_variable = { currentSlavesDiplo = SGR_WWS_Regions^i }
+		}
+	}
+
+	#Calculating the ratio of current slaves to the original amount of slaves
+
+	divide_temp_variable = { currentSlavesDiplo = origSlavesDiplo }
+
+	set_variable = { DiploSlavesRatio = currentSlavesDiplo }
+
+	log = "[GetDateText]: [Root.GetName]: Current Slaves Ratio [?DiploSlavesRatio]"
+
+	#Big ol' flag setter
+
+	if = {
+		limit = {
+			check_variable = { DiploSlavesRatio > 0.74 }
+			check_variable = { displayCivPercentage < 0.26 }
+			check_variable = { reich_GDP > 0.199 } #already converted to billion
+			check_variable = { reich_GDP < 0.301 } #already converted to billion
+		}
+		set_global_flag = SGR_diplomatic_standing_bad
+
+		clr_global_flag = SGR_diplomatic_standing_okay
+		clr_global_flag = SGR_diplomatic_standing_good
+		clr_global_flag = SGR_diplomatic_standing_very_good
+		clr_global_flag = SGR_diplomatic_standing_slavery_abolished
+	}
+	else_if = {
+		limit = {
+			check_variable = { DiploSlavesRatio > 0.49 }
+			check_variable = { DiploSlavesRatio < 0.75 }
+			check_variable = { displayCivPercentage < 0.51 }
+			check_variable = { displayCivPercentage > 0.25 }
+			check_variable = { reich_GDP > 0.299 } #already converted to billion
+			check_variable = { reich_GDP < 0.401 } #already converted to billion
+		}
+		set_global_flag = SGR_diplomatic_standing_okay
+
+		clr_global_flag = SGR_diplomatic_standing_bad
+		clr_global_flag = SGR_diplomatic_standing_good
+		clr_global_flag = SGR_diplomatic_standing_very_good
+		clr_global_flag = SGR_diplomatic_standing_slavery_abolished
+	}
+	else_if = {
+		limit = {
+			check_variable = { DiploSlavesRatio > 0.24 }
+			check_variable = { DiploSlavesRatio < 0.5 }
+			check_variable = { displayCivPercentage < 0.76 }
+			check_variable = { displayCivPercentage > 0.5 }
+			check_variable = { reich_GDP > 0.399 } #already converted to billion
+			check_variable = { reich_GDP < 0.501 } #already converted to billion
+		}
+		set_global_flag = SGR_diplomatic_standing_good
+
+		clr_global_flag = SGR_diplomatic_standing_okay
+		clr_global_flag = SGR_diplomatic_standing_bad
+		clr_global_flag = SGR_diplomatic_standing_very_good
+		clr_global_flag = SGR_diplomatic_standing_slavery_abolished
+	}
+	else_if = {
+		limit = {
+			NOT = { check_variable = { DiploSlavesRatio = 0 } }
+			check_variable = { DiploSlavesRatio < 0.25 }
+			check_variable = { displayCivPercentage > 0.75 }
+			OR = {
+				check_variable = { reich_GDP > USA.GDP }
+				check_variable = { reich_GDP > JAP.GDP }
+			}
+		}
+		set_global_flag = SGR_diplomatic_standing_very_good
+
+		clr_global_flag = SGR_diplomatic_standing_okay
+		clr_global_flag = SGR_diplomatic_standing_good
+		clr_global_flag = SGR_diplomatic_standing_bad
+		clr_global_flag = SGR_diplomatic_standing_slavery_abolished
+	}
+	else_if = {
+		limit = {
+			check_variable = { DiploSlavesRatio = 0 }
+			check_variable = { displayCivPercentage = 1 }
+			OR = {
+				check_variable = { reich_GDP > USA.GDP }
+				check_variable = { reich_GDP > JAP.GDP }
+			}
+		}
+		set_global_flag = SGR_diplomatic_standing_slavery_abolished
+
+		clr_global_flag = SGR_diplomatic_standing_okay
+		clr_global_flag = SGR_diplomatic_standing_good
+		clr_global_flag = SGR_diplomatic_standing_very_good
+		clr_global_flag = SGR_diplomatic_standing_bad
+	}
+}
+
+###################
+# Econ Tree Stuff #
+###################
+
+check_zollverein_boni = {
+
+	if = {
+		limit = {
+			check_variable = { ZV_members^num > 1 }
+		}
+
+		#Total Zollverein budget
+		set_variable = { ZollvereinBudget = 0 }
+
+		for_each_scope_loop = {
+			array = ZV_members
+
+			set_temp_variable = { tempRevenue = THIS.total_income }
+			
+			if = {
+				limit = {
+					check_variable = { THIS.tempRevenue < 0 }
+				}
+				multiply_variable = { THIS.tempRevenue = -1 }
+			}
+			
+			multiply_temp_variable = { tempRevenue = THIS.ZollvereinPayments }
+			subtract_from_variable = { THIS.total_income = tempRevenue }
+			add_to_variable = { GER.ZollvereinBudget = tempRevenue }
+			log = "[THIS.GetTag] total payment is [?tempRevenue]"
+			log = "GER total budget is [?GER.ZollvereinBudget]"
+		}
+		set_variable = { calcZVBudget = ZollvereinBudget }
+
+		#Germany's budget
+		set_temp_variable = { tempZVBudget = calcZVBudget }
+		multiply_temp_variable = { tempZVBudget = SGRZVfactor }
+		subtract_from_variable = { calcZVBudget = tempZVBudget }
+		set_variable = { MemberZVBudget = tempZVBudget }
+		set_variable = { MemberSpentBudget = MemberZVBudget }
+
+
+		#Other ZV Members budget
+		set_temp_variable = { tempMembers = ZV_members^num }
+		subtract_from_temp_variable = { tempMembers = 1 }
+		divide_variable = { calcZVBudget = tempMembers }
+
+		for_each_scope_loop = {
+			array = ZV_members
+
+			if = {
+				limit = {
+					check_variable = { tag = FRA }
+					GER = { has_country_flag = SGR_FRA_Bichelonne_demand_ZV }
+				}
+				set_temp_variable = { tempMisc = GER.misc_income }
+				multiply_temp_variable = { tempMisc = 0.025 }
+				subtract_from_variable = { GER.misc_income = tempMisc }
+
+				set_variable = { MemberZVBudget = GER.calcZVBudget }
+				add_to_variable = { MemberZVBudget = tempMisc }
+				set_variable = { MemberSpentBudget = MemberZVBudget }
+			}
+			else_if = {
+				limit = {
+					NOT = { tag = GER }
+				}
+				set_variable = { MemberZVBudget = GER.calcZVBudget }
+				set_variable = { MemberSpentBudget = MemberZVBudget }
+			}
+		}
+	}
+
+
+	if = {
+		limit = {
+			GER = { has_idea = SGR_made_in_germany_reformist }
+		}
+		every_country = {
+			limit = {
+				is_in_faction_with = GER
+				NOT = { tag = GER }
+			}
+			set_temp_variable = { tempGDP = THIS.total_budget }
+			multiply_temp_variable = { tempGDP = 0.05 } #already converted to billion
+			add_to_variable = { GER.total_budget = tempGDP }
+			subtract_from_variable = { THIS.total_budget = tempGDP }
+		}
+	}
+	else_if = {
+		limit = {
+			GER = { has_idea = SGR_made_in_germany_conservative }
+		}
+		every_country = {
+			limit = {
+				is_in_faction_with = GER
+				NOT = { tag = GER }
+			}
+			set_temp_variable = { tempGDP = THIS.total_budget }
+			multiply_temp_variable = { tempGDP = 0.08 } #already converted to billion
+			add_to_variable = { GER.total_budget = tempGDP }
+			subtract_from_variable = { THIS.total_budget = tempGDP }
+		}
+	}
+	check_brand_growth = yes
+}
+
+check_brand_growth = {
+	add_to_variable = { MadeInGermanyTicker = 1 }
+	#OFN-leaning Speer, reformist
+	if = {
+		limit = {
+			GER = {
+				has_country_flag = SGR_USA_Embargo_Lifted_Major
+				has_idea = SGR_made_in_germany_reformist
+			}
+			check_variable = { MadeInGermanyTicker = 3 }
+		}
+		every_country = {
+			limit = {
+				OR = {
+					is_in_faction_with = GER
+					OR = {
+						tag = USA
+						is_in_faction_with = USA
+					}
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_reformist_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				has_country_flag = SGR_USA_Embargo_Lifted_Major
+				has_idea = SGR_made_in_germany_reformist
+			}
+			check_variable = { MadeInGermanyTicker = 9 }
+		}
+		every_country = {
+			limit = {
+				OR = {
+					is_in_faction_with = JAP
+					tag = JAP
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_reformist_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				has_country_flag = SGR_USA_Embargo_Lifted_Major
+				has_idea = SGR_made_in_germany_reformist
+			}
+			check_variable = { MadeInGermanyTicker = 12 }
+		}
+		every_country = {
+			limit = {
+				original_tag = IBR
+			}
+			add_ideas = {
+				SGR_made_in_germany_reformist_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				has_country_flag = SGR_USA_Embargo_Lifted_Major
+				has_idea = SGR_made_in_germany_reformist
+			}
+			check_variable = { MadeInGermanyTicker = 24 }
+		}
+		every_country = {
+			limit = {
+				NOT = {
+					AND = {
+						is_in_faction_with = USA
+						is_in_faction_with = JAP
+						is_in_faction_with = GER
+						original_tag = IBR
+						has_government = communist
+					}
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_reformist_hidden
+			}
+		}
+	}
+	#OFN-leaning Speer, conservative
+	if = {
+		limit = {
+			GER = {
+				has_country_flag = SGR_USA_Embargo_Lifted_Major
+				has_idea = SGR_made_in_germany_conservative
+			}
+			check_variable = { MadeInGermanyTicker = 3 }
+		}
+		every_country = {
+			limit = {
+				OR = {
+					is_in_faction_with = GER
+					OR = {
+						tag = USA
+						is_in_faction_with = USA
+					}
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_conservative_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				has_country_flag = SGR_USA_Embargo_Lifted_Major
+				has_idea = SGR_made_in_germany_conservative
+			}
+			check_variable = { MadeInGermanyTicker = 9 }
+		}
+		every_country = {
+			limit = {
+				OR = {
+					is_in_faction_with = JAP
+					tag = JAP
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_conservative_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				has_country_flag = SGR_USA_Embargo_Lifted_Major
+				has_idea = SGR_made_in_germany_conservative
+			}
+			check_variable = { MadeInGermanyTicker = 12 }
+		}
+		every_country = {
+			limit = {
+				original_tag = IBR
+			}
+			add_ideas = {
+				SGR_made_in_germany_conservative_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				has_country_flag = SGR_USA_Embargo_Lifted_Major
+				has_idea = SGR_made_in_germany_conservative
+			}
+			check_variable = { MadeInGermanyTicker = 24 }
+		}
+		every_country = {
+			limit = {
+				NOT = {
+					AND = {
+						is_in_faction_with = USA
+						is_in_faction_with = JAP
+						is_in_faction_with = GER
+						original_tag = IBR
+						has_government = communist
+					}
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_conservative_hidden
+			}
+		}
+	}
+	#Japan-leaning, reformist
+	if = {
+		limit = {
+			GER = {
+				OR = {
+					has_country_flag = speer_japan_tariffs_large
+					has_country_flag = speer_japan_tariffs_medium
+					has_country_flag = speer_japan_tariffs_small
+				}
+				has_idea = SGR_made_in_germany_reformist
+			}
+			check_variable = { MadeInGermanyTicker = 3 }
+		}
+		every_country = {
+			limit = {
+				OR = {
+					is_in_faction_with = GER
+					OR = {
+						tag = JAP
+						is_in_faction_with = JAP
+					}
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_reformist_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				OR = {
+					has_country_flag = speer_japan_tariffs_large
+					has_country_flag = speer_japan_tariffs_medium
+					has_country_flag = speer_japan_tariffs_small
+				}
+				has_idea = SGR_made_in_germany_reformist
+			}
+			check_variable = { MadeInGermanyTicker = 9 }
+		}
+		every_country = {
+			limit = {
+				OR = {
+					is_in_faction_with = USA
+					tag = USA
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_reformist_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				OR = {
+					has_country_flag = speer_japan_tariffs_large
+					has_country_flag = speer_japan_tariffs_medium
+					has_country_flag = speer_japan_tariffs_small
+				}
+				has_idea = SGR_made_in_germany_reformist
+			}
+			check_variable = { MadeInGermanyTicker = 12 }
+		}
+		every_country = {
+			limit = {
+				original_tag = IBR
+			}
+			add_ideas = {
+				SGR_made_in_germany_reformist_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				OR = {
+					has_country_flag = speer_japan_tariffs_large
+					has_country_flag = speer_japan_tariffs_medium
+					has_country_flag = speer_japan_tariffs_small
+				}
+				has_idea = SGR_made_in_germany_reformist
+			}
+			check_variable = { MadeInGermanyTicker = 24 }
+		}
+		every_country = {
+			limit = {
+				NOT = {
+					AND = {
+						is_in_faction_with = USA
+						is_in_faction_with = JAP
+						is_in_faction_with = GER
+						original_tag = IBR
+						has_government = communist
+					}
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_reformist_hidden
+			}
+		}
+	}
+	#Japan-leaning, conservative
+	if = {
+		limit = {
+			GER = {
+				OR = {
+					has_country_flag = speer_japan_tariffs_large
+					has_country_flag = speer_japan_tariffs_medium
+					has_country_flag = speer_japan_tariffs_small
+				}
+				has_idea = SGR_made_in_germany_conservative
+			}
+			check_variable = { MadeInGermanyTicker = 3 }
+		}
+		every_country = {
+			limit = {
+				OR = {
+					is_in_faction_with = GER
+					OR = {
+						tag = JAP
+						is_in_faction_with = JAP
+					}
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_conservative_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				OR = {
+					has_country_flag = speer_japan_tariffs_large
+					has_country_flag = speer_japan_tariffs_medium
+					has_country_flag = speer_japan_tariffs_small
+				}
+				has_idea = SGR_made_in_germany_conservative
+			}
+			check_variable = { MadeInGermanyTicker = 9 }
+		}
+		every_country = {
+			limit = {
+				OR = {
+					is_in_faction_with = USA
+					tag = USA
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_conservative_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				OR = {
+					has_country_flag = speer_japan_tariffs_large
+					has_country_flag = speer_japan_tariffs_medium
+					has_country_flag = speer_japan_tariffs_small
+				}
+				has_idea = SGR_made_in_germany_conservative
+			}
+			check_variable = { MadeInGermanyTicker = 12 }
+		}
+		every_country = {
+			limit = {
+				original_tag = IBR
+			}
+			add_ideas = {
+				SGR_made_in_germany_conservative_hidden
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			GER = {
+				OR = {
+					has_country_flag = speer_japan_tariffs_large
+					has_country_flag = speer_japan_tariffs_medium
+					has_country_flag = speer_japan_tariffs_small
+				}
+				has_idea = SGR_made_in_germany_conservative
+			}
+			check_variable = { MadeInGermanyTicker = 24 }
+		}
+		every_country = {
+			limit = {
+				NOT = {
+					AND = {
+						is_in_faction_with = USA
+						is_in_faction_with = JAP
+						is_in_faction_with = GER
+						original_tag = IBR
+						has_government = communist
+					}
+				}
+			}
+			add_ideas = {
+				SGR_made_in_germany_conservative_hidden
+			}
+		}
+	}
+}
+
+##############################
+# Decisions Scripted Effects #
+##############################
+perform_erhard_plan_2 = {
+	if = {
+		limit = {
+			has_country_flag = SGR_konjunkturpaket2_active
+		}
+		add_stability = 0.004
+		set_temp_variable = { temp_econ_spending_amount = 0.75 }
+		econ_spend_money_once_effect_raw_money = yes
+		set_temp_variable = { inflation_temp = 0.25 }
+		econ_inflation_change = yes
+		random_list = {
+			50 = {
+				random_owned_state = {
+					set_temp_variable = { temp_state_value_addition = 0.25 }
+					econ_state_value_change_addition = yes
+					add_extra_state_shared_building_slots = 1
+				}
+				random_owned_state = {
+					set_temp_variable = { temp_state_value_addition = 0.25 }
+					econ_state_value_change_addition = yes
+					add_extra_state_shared_building_slots = 1
+				}
+			}
+			50 = {
+				random_owned_state = {
+					add_state_modifier = {
+						modifier = {
+							state_GDP_growth_factor_modifier = 0.05
+						}
+					}
+					add_extra_state_shared_building_slots = 1
+				}
+				random_owned_state = {
+					add_state_modifier = {
+						modifier = {
+							state_GDP_growth_factor_modifier = 0.05
+						}
+					}
+					add_extra_state_shared_building_slots = 1
+				}
+			}
+		}
+	}
+}
+perform_erhard_plan = {
+	#Germany
+	if = {
+		limit = {
+			has_country_flag = SGR_konjunkturpaket_active
+		}
+		add_popularity = {
+			ideology = liberalism
+			popularity = 0.003
+		}
+		add_popularity = {
+			ideology = progressivism
+			popularity = 0.002
+		}
+		add_popularity = {
+			ideology = socialist
+			popularity = 0.001
+		}
+		add_popularity = {
+			ideology = paternalism
+			popularity = 0.003
+		}
+		add_stability = 0.004
+		add_to_variable = { GER.national_debt = 0.2 } #already converted to billion
+		add_to_variable = { SGR_total_cost = 0.050 }
+		random_list = {
+			50 = {
+				set_temp_variable = { pus_temp = 1 }
+				econ_pus_change = yes
+			}
+			50 = {
+				random_owned_state = {
+					add_extra_state_shared_building_slots = 2
+				}
+				random_owned_state = {
+					add_extra_state_shared_building_slots = 2
+				}
+			}
+			10 = {
+				set_temp_variable = { gdp_growth_temp = 0.65 }
+				econ_gdp_growth_change = yes
+			}
+		}
+	}
+	#Poland
+	if = {
+		limit = {
+			has_country_flag = SGR_poland_active
+		}
+		add_to_variable = { GER.national_debt = 0.1 } #already converted to billion
+		add_to_variable = { SGR_total_cost = 0.025 }
+		POL = {
+			multiply_variable = { THIS.gdp_growth = 1.05 }
+			add_popularity = {
+				ideology = liberalism
+				popularity = 0.003
+			}
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.002
+			}
+			add_popularity = {
+				ideology = socialist
+				popularity = 0.001
+			}
+			random_list = {
+				50 = {
+					random_owned_state = {
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+					}
+				}
+				50 = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+				}
+				10 = {
+					set_temp_variable = { gdp_growth_temp = 0.65 }
+					econ_gdp_growth_change = yes
+				}
+			}
+		}
+	}
+	#Ukraine
+	if = {
+		limit = {
+			has_country_flag = SGR_ukraine_active
+		}
+		add_to_variable = { GER.national_debt = 0.05 } #already converted to billion
+		add_to_variable = { SGR_total_cost = 0.025 }
+		UKR = {
+			multiply_variable = { THIS.gdp_growth = 1.05 }
+			add_popularity = {
+				ideology = liberalism
+				popularity = 0.002
+			}
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.002
+			}
+			add_popularity = {
+				ideology = socialist
+				popularity = 0.001
+			}
+			random_list = {
+				50 = {
+					random_owned_state = {
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+					}
+				}
+				50 = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+				}
+				10 = {
+					set_temp_variable = { gdp_growth_temp = 0.65 }
+					econ_gdp_growth_change = yes
+				}
+			}
+		}
+	}
+	#Former Ostland
+	if = {
+		limit = {
+			has_country_flag = SGR_ostland_active
+		}
+		add_to_variable = { GER.national_debt = 0.05 } #already converted to billion
+		add_to_variable = { SGR_total_cost = 0.025 }
+		OST = {
+			multiply_variable = { THIS.gdp_growth = 1.05 }
+			add_popularity = {
+				ideology = liberalism
+				popularity = 0.003
+			}
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.002
+			}
+			add_popularity = {
+				ideology = socialist
+				popularity = 0.001
+			}
+			random_list = {
+				50 = {
+					random_owned_state = {
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+					}
+				}
+				50 = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+				}
+				10 = {
+					set_temp_variable = { gdp_growth_temp = 0.65 }
+					econ_gdp_growth_change = yes
+				}
+			}
+		}
+		BLR = {
+			multiply_variable = { THIS.gdp_growth = 1.05 }
+			add_popularity = {
+				ideology = liberalism
+				popularity = 0.003
+			}
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.002
+			}
+			add_popularity = {
+				ideology = socialist
+				popularity = 0.001
+			}
+			random_list = {
+				50 = {
+					random_owned_state = {
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+					}
+				}
+				50 = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+				}
+				10 = {
+					set_temp_variable = { gdp_growth_temp = 0.65 }
+					econ_gdp_growth_change = yes
+				}
+			}
+		}
+	}
+	#Kaukasien
+	if = {
+		limit = {
+			has_country_flag = SGR_kaukasien_active
+		}
+		add_to_variable = { GER.national_debt = 0.05 } #already converted to billion
+		add_to_variable = { SGR_total_cost = 0.025 }
+		CAU = {
+			multiply_variable = { THIS.gdp_growth = 1.05 }
+			add_popularity = {
+				ideology = liberalism
+				popularity = 0.003
+			}
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.002
+			}
+			add_popularity = {
+				ideology = socialist
+				popularity = 0.001
+			}
+			random_list = {
+				50 = {
+					random_owned_state = {
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+					}
+				}
+				50 = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+				}
+				10 = {
+					set_temp_variable = { gdp_growth_temp = 0.65 }
+					econ_gdp_growth_change = yes
+				}
+			}
+		}
+	}
+	#Volga
+	if = {
+		limit = {
+			has_country_flag = SGR_volga_active
+		}
+		add_to_variable = { GER.national_debt = 0.05 } #already converted to billion
+		add_to_variable = { SGR_total_cost = 0.025 }
+		MCW = {
+			multiply_variable = { THIS.gdp_growth = 1.05 }
+			add_popularity = {
+				ideology = liberalism
+				popularity = 0.003
+			}
+			add_popularity = {
+				ideology = progressivism
+				popularity = 0.002
+			}
+			add_popularity = {
+				ideology = socialist
+				popularity = 0.001
+			}
+			random_list = {
+				50 = {
+					random_owned_state = {
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+					}
+				}
+				50 = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+					}
+				}
+				10 = {
+					set_temp_variable = { gdp_growth_temp = 0.65 }
+					econ_gdp_growth_change = yes
+				}
+			}
+		}
+	}
+}
+
+#############################
+# Big Ol' Econ GUI Commands #
+#############################
+
+calculate_wws_power = {
+
+	set_variable = { IGFarben_current = 0 }
+
+	set_variable = { Reichswerke_current = 0 }
+
+	set_variable = { Daimler_current = 0 }
+
+	set_variable = { Siemens_current = 0 }
+
+	for_each_loop = {
+		array = SGR_WWS_Megacorps
+		index = i
+		value = val
+
+		#IG Farben
+		if = {
+			limit = {
+				check_variable = { SGR_WWS_Megacorps^i = 1 }
+			}
+			add_to_variable = { IGFarben_current = 1 }
+		}
+
+		#Reichswerke
+		else_if = {
+			limit = {
+				check_variable = { SGR_WWS_Megacorps^i = 2 }
+			}
+			add_to_variable = { Reichswerke_current = 1 }
+		}
+
+		#Daimler-Benz
+		else_if = {
+			limit = {
+				check_variable = { SGR_WWS_Megacorps^i = 3 }
+			}
+			add_to_variable = { Daimler_current = 1 }
+		}
+
+		#Siemens
+		else_if = {
+			limit = {
+				check_variable = { SGR_WWS_Megacorps^i = 4 }
+			}
+			add_to_variable = { Siemens_current = 1 }
+		}
+	}
+	##Power Percentage calculator
+
+	#IG Farben
+
+	if = {
+		limit = {
+			check_variable = { IGFarben_current > 0 }
+		}
+		divide_variable = { IGFarben_current = IGFarben_orig }
+
+		set_variable = { IGFarbenPower = IGFarben_current }
+
+		set_variable = { IGFarbenBarDisplay = IGFarbenPower }
+
+		multiply_variable = { IGFarbenBarDisplay = 100 }
+
+		else = {
+			set_variable = { IGFarbenPower = 0 }
+		}
+	}
+
+	#Reichswerke
+
+	if = {
+		limit = {
+			check_variable = { Reichswerke_current > 0 }
+		}
+		divide_variable = { Reichswerke_current = Reichswerke_orig }
+
+		set_variable = { ReichswerkePower = Reichswerke_current }
+
+		set_variable = { ReichswerkeBarDisplay = ReichswerkePower }
+
+		multiply_variable = { ReichswerkeBarDisplay = 100 }
+
+		else = {
+			set_variable = { ReichswerkePower = 0 }
+		}
+	}
+
+
+	#Daimler-Benz
+
+	if = {
+		limit = {
+			check_variable = { Daimler_current > 0 }
+		}
+		divide_variable = { Daimler_current = Daimler_orig }
+
+		set_variable = { DaimlerPower = Daimler_current }
+
+		set_variable = { DaimlerBarDisplay = DaimlerPower }
+
+		multiply_variable = { DaimlerBarDisplay = 100 }
+
+		else = {
+			set_variable = { DaimlerPower = 0 }
+		}
+	}
+
+
+	#Siemens
+
+	if = {
+		limit = {
+			check_variable = { Siemens_current > 0 }
+		}
+		divide_variable = { Siemens_current = Siemens_orig }
+
+		set_variable = { SiemensPower = Siemens_current }
+
+		set_variable = { SiemensBarDisplay = SiemensPower }
+
+		multiply_variable = { SiemensBarDisplay = 100 }
+
+		else = {
+			set_variable = { SiemensPower = 0 }
+		}
+	}
+
+}
+
+increase_middleclass_power = {
+	add_to_variable = { SGR_total_cost = 0.025 }
+	if = {
+		limit = {
+			has_country_flag = SGR_Germany2_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^0 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^0 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+
+
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^0 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Rhineland_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany1_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^1 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^1 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiDaimler?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^1 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Northgermany_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany6_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^2 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^2 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		log = "power decrease [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^2 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Centralgermany_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany3_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^3 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^3 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^3 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Sachsenanhalt_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany7_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^4 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^4 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^4 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Prussia_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Bohemia_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^5 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^5 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiSiemens?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^5 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Bohemia_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany4_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^6 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^6 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiDaimler?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^6 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Southgermany_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany5_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^7 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^7 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^7 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Austria_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_GGN_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^8 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^8 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^8 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Poland_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ostland2_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^9 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^9 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^9 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Belarus_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ostland3_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^10 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^10 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiDaimler?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^10 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Lithuania_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ostland1_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^11 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^11 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			#Sanity check so that it doesn't try to divide 0
+
+			if = {
+				limit = {
+					check_variable = { tempCurrentSlaves > 0 }
+				}
+				divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+				else = {
+					set_temp_variable = { tempCurrentSlaves = 0.01 }
+				}
+			}
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiSiemens?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^11 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Estonia_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ukraine1_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^12 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^12 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^12 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Kyiv_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ukraine3_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^13 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^13 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiDaimler?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^13 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Southukraine_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ukraine2_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^14 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^14 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^14 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Northukraine_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Cau3_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^15 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^15 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^15 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Azerbaijan_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Cau2_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^16 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^16 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^16 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Georgia_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Cau1_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^17 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^17 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^17 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Katharinastadt_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Leningrad_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^18 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^18 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiSiemens?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^18 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Leningrad_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Holland_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^19 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^19 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiSiemens?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^19 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Holland_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Denmark_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^20 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^20 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^20 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Denmark_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Norway2_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^21 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^21 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^21 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Oslo_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Norway1_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^22 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^22 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^22 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Westnorway_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Crimea_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^23 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^23 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^23 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Crimea_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Wolga2_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^24 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^24 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiSiemens?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^24 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Uppervolga_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Wolga1_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^25 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^25 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		multiply_temp_variable = { powerDecreaser = antiDaimler?1 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^25 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Lowervolga_middleclass_taken value = 1 days = 14 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Romania_state_info_window_open
+		}
+		#Money cost 25 million
+		set_temp_variable = { temp_econ_spending_amount = 0.01 }
+		econ_spend_money_once_effect_raw_money = yes
+		#PP cost 25
+		add_political_power = -5
+		#Actual variables decreaser
+		set_temp_variable = { tempRandom = 1 }
+
+		randomize_temp_variable = {
+			var = tempRandom
+			distribution = binomial
+			min = 0.5
+			max = 1.5
+		}
+
+		#Current Slaves to Original Slaves Ratio
+		set_temp_variable = { tempSlavesReciprocal = 1 }
+		set_temp_variable = { tempCurrentSlaves = SGR_WWS_Regions^26 }
+		set_temp_variable = { tempOriginalSlaves = SGR_WWS_Regions_Reciprocal^26 }
+
+		#Sanity check so that it doesn't try to divide 0
+
+		if = {
+			limit = {
+				check_variable = { tempCurrentSlaves > 0 }
+			}
+			divide_temp_variable = { tempCurrentSlaves = tempOriginalSlaves }
+
+			else = {
+				set_temp_variable = { tempCurrentSlaves = 0.01 }
+			}
+		}
+
+		log = "Current Slave Ratio[?tempCurrentSlaves]"
+
+		#Reciprocalizer ding dong thingy
+
+		divide_temp_variable = { tempSlavesReciprocal = tempCurrentSlaves }
+
+		log = "Reciprocal [?tempSlavesReciprocal]"
+
+		multiply_temp_variable = { tempSlavesReciprocal = tempRandom }
+
+		set_temp_variable = { powerDecreaser = tempSlavesReciprocal }
+		divide_temp_variable = { powerDecreaser = 100 }
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^26 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Romania_middleclass_taken value = 1 days = 14 }
+	}
+	for_each_loop = {
+		array = SGR_WWS_Megacorps_Power
+		index = i
+		value = val
+
+		if = {
+			limit = {
+				NOT = { check_variable = { i > 27 } }
+			}
+			clamp_variable = {
+				var = SGR_WWS_Megacorps_Power^i
+				min = 0
+				max = 100
+			}
+		}
+	}
+}
+
+decrease_megacorp_power = {
+	if = {
+		limit = {
+			has_country_flag = SGR_Germany2_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+
+		#Actual effect
+
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^0 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Rhineland_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany1_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiDaimler?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^1 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Northgermany_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany6_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^2 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Centralgermany_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany3_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^3 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Sachsenanhalt_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany7_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^4 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Prussia_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Bohemia_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiSiemens?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^5 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Bohemia_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany4_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiDaimler?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^6 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Southgermany_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany5_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^7 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Austria_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_GGN_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^8 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Poland_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ostland2_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^9 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Belarus_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ostland3_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiDaimler?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^10 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Lithuania_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ostland1_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiSiemens?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^11 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Estonia_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ukraine1_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^12 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Kyiv_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ukraine3_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiDaimler?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^13 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Southukraine_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ukraine2_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^14 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Northukraine_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Cau3_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^15 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Azerbaijan_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Cau2_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^16 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Georgia_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Cau1_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^17 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Katharinastadt_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Leningrad_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiSiemens?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^18 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Leningrad_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Holland_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiSiemens?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^19 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Holland_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Denmark_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^20 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Denmark_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Norway2_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiIGFarben?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^21 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Oslo_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Norway1_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^22 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Westnorway_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Crimea_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiReichswerke?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^23 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Crimea_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Wolga2_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiSiemens?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^24 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Uppervolga_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Wolga1_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		multiply_temp_variable = { powerDecreaser = antiDaimler?1 }
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^25 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Lowervolga_decrease_taken value = 1 days = 30 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Romania_state_info_window_open
+		}
+		add_command_power = -30
+		#PP Cost 10
+		add_political_power = -10
+		set_temp_variable = { powerDecreaser = 0.1 }
+
+		randomize_temp_variable = {
+			var = powerDecreaser
+			distribution = binomial
+			min = 0.05
+			max = 0.15
+		}
+
+
+		log = "powerDecreaser/100 [?powerDecreaser]"
+
+		subtract_from_variable = { SGR_WWS_Megacorps_Power^26 = powerDecreaser }
+
+		set_country_flag = { flag = SGR_Romania_decrease_taken value = 1 days = 30 }
+	}
+	for_each_loop = {
+		array = SGR_WWS_Megacorps_Power
+		index = i
+		value = val
+
+		if = {
+			limit = {
+				NOT = { check_variable = { i > 27 } }
+			}
+			clamp_variable = {
+				var = SGR_WWS_Megacorps_Power^i
+				min = 0
+				max = 100
+			}
+		}
+	}
+	clamp_variable = {
+		var = RND_surveillance^1
+		min = 0
+		max = 100
+	}
+}
+
+abolish_local_megacorp = {
+	add_to_variable = { SGR_total_cost = 0.025 }
+	#Rhineland
+	if = {
+		limit = {
+			has_country_flag = SGR_Germany2_state_info_window_open
+			check_variable = { SGR_WWS_Megacorps_Power^0 = 0 }
+		}
+		add_political_power = -25
+
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^0 = 0 }
+
+		#Rewards
+		subtract_from_variable = { SGR_consumer_goods = 0.02 }
+		add_regime_stab_small = yes
+	}
+	#North Germany
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany1_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^1 = 0 }
+		add_regime_stab_small = yes
+	}
+	#Central Germany
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany6_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^2 = 0 }
+		#Rewards
+		subtract_from_variable = { SGR_consumer_goods = 0.02 }
+		add_regime_stab_small = yes
+	}
+	#Sachsen-Anhalt
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany3_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^3 = 0 }
+		#Rewards
+		subtract_from_variable = { SGR_consumer_goods = 0.02 }
+		add_regime_stab_small = yes
+	}
+	#Prussia
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany7_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^4 = 0 }
+		#Rewards
+		subtract_from_variable = { SGR_consumer_goods = 0.02 }
+		add_regime_stab_small = yes
+	}
+	#Bohemia
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Bohemia_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^5 = 0 }
+		#Rewards
+		subtract_from_variable = { SGR_consumer_goods = 0.02 }
+		add_regime_stab_small = yes
+	}
+	#South Germany
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany4_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^6 = 0 }
+		#Rewards
+		subtract_from_variable = { SGR_consumer_goods = 0.02 }
+		add_regime_stab_small = yes
+	}
+	#Austria
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Germany5_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^7 = 0 }
+		#Rewards
+		subtract_from_variable = { SGR_consumer_goods = 0.02 }
+		add_regime_stab_small = yes
+	}
+	#Poland
+	else_if = {
+		limit = {
+			has_country_flag = SGR_GGN_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^8 = 0 }
+		#Rewards
+		POL = {
+			random_list = {
+				66 = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+				}
+				33 = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 4
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+					random_owned_state = {
+						add_state_modifier = {
+							modifier = {
+								state_GDP_growth_factor_modifier = 0.05
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	#Belarus
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ostland2_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^9 = 0 }
+		#Rewards
+		BLR = {
+			random_list = {
+				66 = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+				33 = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 4
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+		}
+	}
+	#Lithuania
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ostland3_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^10 = 0 }
+		#Rewards
+		OST = {
+			random_list = {
+				66 = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+				33 = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 4
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 4
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 4
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+		}
+	}
+	#Estonia
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ostland1_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^11 = 0 }
+		#Rewards
+		OST = {
+			random_list = {
+				66 = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+				33 = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 2
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+		}
+	}
+	#Kyiv
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ukraine1_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^12 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				UKR = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_list = {
+						1 = {
+							202 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							201 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							93 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							199 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							1428 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+					}
+				}
+			}
+			33 = {
+				random_list = {
+					1 = {
+						202 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						201 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						93 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						199 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						1428 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+				}
+			}
+		}
+	}
+	#South Ukraine
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ukraine3_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^13 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				UKR = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_list = {
+						1 = {
+							226 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							197 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							200 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							196 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+					}
+				}
+			}
+			33 = {
+				random_list = {
+					1 = {
+						226 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						197 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						200 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						196 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+				}
+			}
+		}
+	}
+	#North Ukraine
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Ukraine2_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^14 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				UKR = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_list = {
+						1 = {
+							225 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							221 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							201 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							93 = {
+								add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+					}
+				}
+			}
+			33 = {
+				random_list = {
+					1 = {
+						225 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						221 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						201 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						93 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+				}
+			}
+		}
+	}
+	#Azerbaijan
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Cau3_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^15 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				CAU = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_list = {
+						1 = {
+							229 = {
+										add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							1552 = {
+										add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+					}
+				}
+			}
+			33 = {
+				random_list = {
+					1 = {
+						1552 = {
+							add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						229 = {
+							add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+				}
+			}
+		}
+	}
+	#Georgia
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Cau2_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^16 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				CAU = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					231 = {
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+			33 = {
+				231 = {
+					add_extra_state_shared_building_slots = 4
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+				}
+			}
+		}
+	}
+	#Katharinastadt
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Cau1_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^17 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				CAU = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_list = {
+						1 = {
+							234 = {
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+						1 = {
+							235 = {
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+							}
+						}
+					}
+				}
+			}
+			33 = {
+				random_list = {
+					1 = {
+						234 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						235 = {
+							add_extra_state_shared_building_slots = 4
+							add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+				}
+			}
+		}
+	}
+	#Leningrad
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Leningrad_state_info_window_open
+		}
+		#Money cost 25 million
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^18 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				set_temp_variable = { pus_temp = 2 }
+				econ_pus_change = yes
+				195 = {
+					set_temp_variable = { state_GDP_growth_factor_temp = 2.00 }
+					add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+				}
+			}
+			33 = {
+				195 = {
+					add_extra_state_shared_building_slots = 4
+					set_temp_variable = { state_GDP_growth_factor_temp = 2.00 }
+					add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+				}
+			}
+		}
+	}
+	#Holland
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Holland_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^19 = 0 }
+		random_list = {
+			66 = {
+				HOL = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+			33 = {
+				HOL = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 4
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+		}
+	}
+	#Denmark
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Denmark_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^20 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				DEN = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+			33 = {
+				DEN = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 4
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+		}
+	}
+	#Oslo
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Norway2_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^21 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				NOR = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+			33 = {
+				NOR = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 4
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+		}
+	}
+	#West Norway
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Norway1_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^22 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				NOR = {
+					set_temp_variable = { pus_temp = 2 }
+					econ_pus_change = yes
+					random_owned_state = {
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+			33 = {
+				NOR = {
+					random_owned_state = {
+						add_extra_state_shared_building_slots = 4
+						add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+					}
+				}
+			}
+		}
+	}
+	#Crimea
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Crimea_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^23 = 0 }
+		#Rewards
+		random_list = {
+			66 = {
+				set_temp_variable = { pus_temp = 2 }
+				econ_pus_change = yes
+				137 = {
+					set_temp_variable = { state_GDP_growth_factor_temp = 2.00 }
+					add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+				}
+			}
+			33 = {
+				137 = {
+					add_extra_state_shared_building_slots = 4
+					set_temp_variable = { state_GDP_growth_factor_temp = 2.00 }
+					add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+				}
+			}
+		}
+	}
+	#Upper Volga
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Wolga2_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^24 = 0 }
+		#Rewards
+		random_list = {
+			1 = {
+				random_list = {
+					1 = {
+						260 = {
+							add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+					1 = {
+						239 = {
+							add_extra_state_shared_building_slots = 4
+								add_state_modifier = { modifier = { state_GDP_growth_factor_modifier = 0.05 } }
+						}
+					}
+				}
+			}
+		}
+	}
+	#Lower Volga
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Wolga1_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^25 = 0 }
+		#Rewards
+		random_list = {
+			1 = {
+				random_list = {
+					1 = {
+						243 = {
+							add_extra_state_shared_building_slots = 4
+							}		
+					}
+					1 = {
+						217 = {
+							add_extra_state_shared_building_slots = 4
+							}
+					}
+				}
+			}
+		}
+	}
+	#Transnistria
+	else_if = {
+		limit = {
+			has_country_flag = SGR_Romania_state_info_window_open
+		}
+		add_political_power = -25
+		#Stuff
+		set_variable = { SGR_WWS_Megacorps^26 = 0 }
+	}
+	calculate_wws_power = yes
+}
+
+abolish_slavery = {
+
+	for_each_loop = {
+		array = SGR_WWS_Regions
+		index = i
+		value = val
+
+		if = {
+			limit = {
+				check_variable = { val > 0 }
+			}
+			set_variable = { SGR_WWS_Regions^i = 0 }
+		}
+	}
+	clr_country_flag = IGFarben_dismantled
+	clr_country_flag = Reichswerke_dismantled
+	clr_country_flag = Daimler_dismantled
+	clr_country_flag = Siemens_dismantled
+	###All Megacorps Dismantle
+	set_variable = { IGFarbenPower = 0 }
+	set_variable = { ReichswerkePower = 0 }
+	set_variable = { DaimlerPower = 0 }
+	set_variable = { SiemensPower = 0 }
+	set_variable = { tno_slavery_effectiveness = 100 }
+	set_country_flag = IGFarben_dismantled
+	set_country_flag = Reichswerke_dismantled
+	set_country_flag = Daimler_dismantled
+	set_country_flag = Siemens_dismantled
+	
+	calculate_Reich_Slaves = yes
+}
+
+
+##########
+# Arrays #
+##########
+
+initialize_speer_arrays = {
+	set_variable = { SGR_infowindow_page_count = 1 }
+	##Slaves Array. The values given here reflect the slave population within the respective nation.
+	#Germany 19,784,000
+	add_to_array = { SGR_WWS_Regions = 5861 } 	#West Germany 0
+	add_to_array = { SGR_WWS_Regions = 2147 } 	#North Germany 1
+	add_to_array = { SGR_WWS_Regions = 5826 } 	#Central Germany 2
+	add_to_array = { SGR_WWS_Regions = 577 }  	#Sachsen-Anhalt 3
+	add_to_array = { SGR_WWS_Regions = 3491 } 	#Prussia 4
+	add_to_array = { SGR_WWS_Regions = 282 } 	#Czechia 5
+	add_to_array = { SGR_WWS_Regions = 900 } 	#Bavaria 6
+	add_to_array = { SGR_WWS_Regions = 700 } 	#Austria 7
+
+	#Poland 3,577,000
+	add_to_array = { SGR_WWS_Regions = 3577 } 	#Poland 8
+
+	#Ostland 5,231,000
+	add_to_array = { SGR_WWS_Regions = 2616 } 	#Belarus 9
+	add_to_array = { SGR_WWS_Regions = 1308 } 	#Lithuania 10
+	add_to_array = { SGR_WWS_Regions = 1307 } 	#Estonia 11
+
+	#Ukraine 3,070,000
+	add_to_array = { SGR_WWS_Regions = 2535 } 	#Kyiv 12
+	add_to_array = { SGR_WWS_Regions = 878 }  	#Southern Ukraine 13
+	add_to_array = { SGR_WWS_Regions = 767 }  	#Northeastern Ukraine 14
+
+	#Kaukasia 3,245,000
+	add_to_array = { SGR_WWS_Regions = 2430 } 	#Azerbaijan 15
+	add_to_array = { SGR_WWS_Regions = 1326 } 	#Georgia 16
+	add_to_array = { SGR_WWS_Regions = 1489 } 	#Yekaterinburg 17
+
+	#Leningrad/Moskowien 56,000
+	add_to_array = { SGR_WWS_Regions = 56 } 	#Brauchitschstadt 18
+
+	#Holland 112,000
+	add_to_array = { SGR_WWS_Regions = 112 } 	#Holland 19
+
+	#Denmark 41,000
+	add_to_array = { SGR_WWS_Regions = 41 } 	#Denmark 20
+
+	#Norway 30,000
+	add_to_array = { SGR_WWS_Regions = 20 } 	#Oslo 21
+	add_to_array = { SGR_WWS_Regions = 10 } 	#Western Norway 22
+
+	#Crimea 63,000
+	add_to_array = { SGR_WWS_Regions = 63 }		#Crimea 23
+
+	#Volga 78,000
+	add_to_array = { SGR_WWS_Regions = 24 }		#Upper Volga 24
+	add_to_array = { SGR_WWS_Regions = 54 }		#Lower Volga 25
+
+	#Bessarabia 0
+	add_to_array = { SGR_WWS_Regions = 0 }		#Bessarabia 26
+
+
+
+	#For Display; Slave Pop in millions
+	#resize_array = { SGR_WWS_Mil_Regions = SGR_WWS_Regions^n }
+
+	##Megacorps array. 1 - IG Farben, 2 - Reichswerke, 3 - Daimler-Benz, 4 - Siemens
+	#Germany
+	add_to_array = { SGR_WWS_Megacorps = 1 }		#Rheinland IG Farben			0
+	add_to_array = { SGR_WWS_Megacorps = 3 }		#Norddeutschland Daimler-Benz	1
+	add_to_array = { SGR_WWS_Megacorps = 2 }		#Mitteldeutschland Reichswerke	2
+	add_to_array = { SGR_WWS_Megacorps = 1 }		#Sachsen-Anhalt IG Farben		3
+	add_to_array = { SGR_WWS_Megacorps = 1 }		#Prussia IG Farben				4
+	add_to_array = { SGR_WWS_Megacorps = 4 }		#Bohemia Siemens				5
+	add_to_array = { SGR_WWS_Megacorps = 3 }		#Süddeutschland Daimler-Benz	6
+	add_to_array = { SGR_WWS_Megacorps = 2 }		#Austria Reichswerke			7
+
+	#Poland
+	add_to_array = { SGR_WWS_Megacorps = 1 }		#Poland IG Farben				8
+
+	#Ostland
+	add_to_array = { SGR_WWS_Megacorps = 1 }		#Belarus IG Farben				9
+	add_to_array = { SGR_WWS_Megacorps = 3 }		#Lithuania Daimler-Benz			10
+	add_to_array = { SGR_WWS_Megacorps = 4 }		#Estonia Siemens				11
+
+	#Ukraine
+	add_to_array = { SGR_WWS_Megacorps = 2 }		#Wolhynien-Podolien Reichswerke	12
+	add_to_array = { SGR_WWS_Megacorps = 3 }		#Zaporizhia Daimler-Benz		13
+	add_to_array = { SGR_WWS_Megacorps = 1 }		#Northeastern Ukraine IG Farben	14
+
+	#Kaukasia
+	add_to_array = { SGR_WWS_Megacorps = 1 }		#Azerbaijan IG Farben			15
+	add_to_array = { SGR_WWS_Megacorps = 2 }		#Georgia Reichswerke			16
+	add_to_array = { SGR_WWS_Megacorps = 2 }		#Katherinastadt Reichswerke		17
+
+	#Leningrad
+	add_to_array = { SGR_WWS_Megacorps = 4 }		#Brauchitschstadt Siemens		18
+
+	#Holland
+	add_to_array = { SGR_WWS_Megacorps = 4 }		#Holland Siemens				19
+
+	#Denmark
+	add_to_array = { SGR_WWS_Megacorps = 2 }		#Denmark Reichswerke			20
+
+	#Norway
+	add_to_array = { SGR_WWS_Megacorps = 1 }		#Ostlandet IG Farben			21
+	add_to_array = { SGR_WWS_Megacorps = 2 }		#Vestlandet Reichswerke			22
+
+	#Crimea
+	add_to_array = { SGR_WWS_Megacorps = 2 }		#Crimea Daimler-Reichswerke		23
+
+	#Volga
+	add_to_array = { SGR_WWS_Megacorps = 4 }		#Upper Volga Siemens			24
+	add_to_array = { SGR_WWS_Megacorps = 3 }		#Lower Volga Daimler-Benz		25
+
+	#Bessarabia
+	add_to_array = { SGR_WWS_Megacorps = 0 }		#Bessarabia No Cartel			26
+
+	##Megacorp control array. 1 = 100%
+	#Germany
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Rheinland IG Farben			0
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Norddeutschland Daimler-Benz	1
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Mitteldeutschland Reichswerke	2
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Sachsen-Anhalt IG Farben		3
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Prussia IG Farben				4
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Bohemia Siemens				5
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Süddeutschland Daimler-Benz	6
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Austria Reichswerke			7
+
+	#Poland
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Poland IG Farben				8
+
+	#Ostland
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Belarus IG Farben				9
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Lithuania Daimler-Benz			10
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Estonia Siemens				11
+
+	#Ukraine
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Wolhynien-Podolien Reichswerke	12
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Zaporizhia Daimler-Benz		13
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Northeastern Ukraine IG Farben	14
+
+	#Kaukasia
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Azerbaijan IG Farben			15
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Georgia Reichswerke			16
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Katherinastadt Reichswerke		17
+
+	#Leningrad
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Brauchitschstadt Siemens		18
+
+	#Holland
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Holland Siemens				19
+
+	#Denmark
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Denmark Reichswerke			20
+
+	#Norway
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Ostlandet IG Farben			21
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Vestlandet Reichswerke			22
+
+	#Crimea
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Crimea Reichswerke				23
+
+	#Volga
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Upper Volga Siemens			24
+	add_to_array = { SGR_WWS_Megacorps_Power = 1 }		#Lower Volga Daimler-Benz		25
+
+	#Bessarabia
+	add_to_array = { SGR_WWS_Megacorps_Power = 0 }		#Bessarabia No Cartel			26
+
+
+	#Wirtschaftswunder stuff
+
+	set_variable = {
+		var = SGR_deficit_offset
+		value = 0
+	}
+	set_variable = {
+		var = SGR_youth_productivity
+		value = -0.15
+	}
+	set_variable = {
+		var = SGR_youth_industry
+		value = -0.15
+	}
+	set_variable = {
+		var = SGR_youth_efficiency
+		value = -0.15
+	}
+	set_variable = {
+		var = SGR_youth_political_power
+		value = 0.1
+	}
+	set_variable = {
+		var = SGR_youth_conscription
+		value = 0.1
+	}
+	set_variable = {
+		var = SGR_consumer_goods
+		value = 0.1
+	}
+	set_variable = {
+		var = SGR_total_cost
+		value = 0
+	}
+	set_variable = {
+		var = SGR_reich_leaning
+		value = 0
+	}
+	set_variable = {
+		var = SGR_zollverein_leaning
+		value = 0
+	}
+
+	set_variable = { skilled_labour_Factor = 0.175 }
+
+	set_variable = { skilled_labour_Growth = 0 }
+
+	set_variable = { IGFarben_orig = 0 }
+	set_variable = { Reichswerke_orig = 0 }
+	set_variable = { Daimler_orig = 0 }
+	set_variable = { Siemens_orig = 0 }
+
+	#Registers the number of original corporate holdings for every megacorp at the beginning
+
+	for_each_loop = {
+		array = SGR_WWS_Megacorps
+		index = i
+		value = val
+
+		#IG Farben
+		if = {
+			limit = {
+				check_variable = { SGR_WWS_Megacorps^i = 1 }
+			}
+			add_to_variable = { IGFarben_orig = 1 }
+		}
+
+		#Reichswerke
+		else_if = {
+			limit = {
+				check_variable = { SGR_WWS_Megacorps^i = 2 }
+			}
+			add_to_variable = { Reichswerke_orig = 1 }
+		}
+
+		#Daimler-Benz
+		else_if = {
+			limit = {
+				check_variable = { SGR_WWS_Megacorps^i = 3 }
+			}
+			add_to_variable = { Daimler_orig = 1 }
+		}
+
+		#Siemens
+		else_if = {
+			limit = {
+				check_variable = { SGR_WWS_Megacorps^i = 4 }
+			}
+			add_to_variable = { Siemens_orig = 1 }
+		}
+	}
+
+	#Generates an array to be used in calculating reciprocal stuff later on
+
+	for_each_loop = {
+		array = SGR_WWS_Regions
+		index = i
+		value = val
+
+		if = {
+			limit = {
+				check_variable = { i < 27 }
+			}
+			add_to_array = { SGR_WWS_Regions_Reciprocal = SGR_WWS_Regions^i }
+		}
+	}
+
+	#Initial Zollverein Growth 
+	set_variable = { ZollvereinGDPGrowth = 1.015 }
+
+	set_variable = { SGRZVfactor = 0.25 }
+
+	set_variable = { ZollvereinPayments = 0.05 }
+
+	#Constants
+
+	@SGR_THEORETICAL_WORKFORCE_CONS = 0.7
+
+	calculate_Reich_GDP = yes
+	calculate_wws_power = yes
+
+}
+
+#Creates a list of possible top economies
+
+determine_top_economies = {
+
+	clear_array = arr_econ
+	clear_array = econRankingGDP
+
+	log = "[GetDateText]: [Root.GetName]: determine_top_economies; Executing"
+
+	#Saving Germany's actual GDP
+
+	#Setting Germany's GDP as the Zollverein's GDP 
+
+	set_temp_variable = { tempZollvereinGDP = reich_GDP }
+	multiply_temp_variable = { tempZollvereinGDP = 1.0 } #already converted to billion
+	set_variable = { PKT.GDP = tempZollvereinGDP }
+
+	log = "[GetDateText]: [Root.GetName]: determine_top_economies; Setting [PKT.GetName]'s GDP to reich_GDP: [?tempZollvereinGDP]."
+
+	every_country = {
+		limit = {
+			THIS = {
+				NOT = {
+					tag = GER
+					tag = UKR
+					tag = HOL
+					tag = DEN
+					tag = NOR
+					tag = BLR
+					tag = CAU
+					tag = MCW
+					tag = POL
+					tag = PKT
+					AND = {
+						tag = FRA
+						FRA = { is_in_faction_with = GER }
+						NOT = { has_country_flag = SGR_FRA_Sidos_demand_ZV }
+					}
+				}
+			}
+		}
+		GER = {
+			add_to_array = { arr_econ = PREV }
+		}
+	}
+
+	GER = {
+		add_to_array = { arr_econ = PKT }
+	}
+
+
+	set_variable = { low = 0 }
+	set_temp_variable = { tempHigh = arr_econ^num }
+	subtract_from_temp_variable = { tempHigh = 1 }
+	set_variable = { high = tempHigh }
+
+	log = "[GetDateText]: [Root.GetName]: determine_top_economies; Setting Quicksort variables low: [?low] and high: [?high]."
+	log = "[GetDateText]: [Root.GetName]: determine_top_economies; Quicksort excecuting."
+
+
+	quicksort_econ = yes
+
+	resize_array = { arr_econ = 5 }
+
+	var:arr_econ^0 = {
+		GER = {
+			set_temp_variable = { tempGDP = PREV.GDP }
+			divide_temp_variable = { tempGDP = 1.0 } #already converted to billion
+			add_to_array = { econRankingGDP = tempGDP }
+		}
+	}
+
+	var:arr_econ^1 = {
+		GER = {
+			set_temp_variable = { tempGDP = PREV.GDP }
+			divide_temp_variable = { tempGDP = 1.0 } #already converted to billion
+			add_to_array = { econRankingGDP = tempGDP }
+		}
+	}
+
+	var:arr_econ^2 = {
+		GER = {
+			set_temp_variable = { tempGDP = PREV.GDP }
+			divide_temp_variable = { tempGDP = 1.0 } #already converted to billion
+			add_to_array = { econRankingGDP = tempGDP }
+		}
+	}
+
+	var:arr_econ^3 = {
+		GER = {
+			set_temp_variable = { tempGDP = PREV.GDP }
+			divide_temp_variable = { tempGDP = 1.0 } #already converted to billion
+			add_to_array = { econRankingGDP = tempGDP }
+		}
+	}
+
+	var:arr_econ^4 = {
+		GER = {
+			set_temp_variable = { tempGDP = PREV.GDP }
+			divide_temp_variable = { tempGDP = 1.0 } #already converted to billion
+			add_to_array = { econRankingGDP = tempGDP }
+		}
+	}
+
+	#Implicit chaining of Array scopes and variable calls doesn't work, thanks Johan
+	log = "[GetDateText]: [Root.GetName]: determine_top_economies; [?var:arr_econ^0.GetTag] [?econRankingGDP^0]"
+	log = "[GetDateText]: [Root.GetName]: determine_top_economies; [?var:arr_econ^1.GetTag] [?econRankingGDP^1]"
+	log = "[GetDateText]: [Root.GetName]: determine_top_economies; [?var:arr_econ^2.GetTag] [?econRankingGDP^2]"
+	log = "[GetDateText]: [Root.GetName]: determine_top_economies; [?var:arr_econ^3.GetTag] [?econRankingGDP^3]"
+	log = "[GetDateText]: [Root.GetName]: determine_top_economies; [?var:arr_econ^4.GetTag] [?econRankingGDP^4]"
+
+	#Use additional variables to manually "call" GDP values by switching to array scope first, then recoding GDP value using variable in GER scope
+
+	log = "[GetDateText]: [Root.GetName]: determine_top_economies; Completed execution."
+}
+
+
+################
+# Calculations #
+################
+
+####################
+
+# Randomized Iterative Quicksort by Yard1
+# ALL CREDIT GOES TO YARD1
+# Changes to accomodate this GUI's needs by Sino
+
+# Main function
+# Arguments (set in a non-temporary variable before calling):
+#     array = array to sort
+#     low = starting index (you probably want 0)
+#     high = ending index (you probably want array^num - 1)
+# modifies array in place
+
+quicksort_econ = {
+	# set up the auxilary stack
+	set_temp_variable = { stack_size = high }
+	subtract_from_temp_variable = { stack_size = low }
+	add_to_temp_variable = { stack_size = 1 }
+	resize_temp_array = {
+		array = stack
+		value = 0
+		size = stack_size
+	}
+
+	set_temp_variable = { top = 0 }
+	set_temp_variable = { stack^top = low }
+	add_to_temp_variable = { top = 1 }
+	set_temp_variable = { stack^top = high }
+
+	while_loop_effect = {
+		limit = {
+			check_variable = {
+				var = top
+				value = 0
+				compare = greater_than_or_equals
+			}
+		}
+		set_variable = { high = stack^top }
+		subtract_from_temp_variable = { top = 1 }
+		set_variable = { low = stack^top }
+		subtract_from_temp_variable = { top = 1 }
+
+		quicksort_partition = yes # returns qs_partition_return
+
+		set_temp_variable = { qs_partition_return_plus_1 = qs_partition_return }
+		set_temp_variable = { qs_partition_return_minus_1 = qs_partition_return }
+		add_to_temp_variable = { qs_partition_return_plus_1 = 1 }
+		subtract_from_temp_variable = { qs_partition_return_minus_1 = 1 }
+
+		if = {
+			limit = { check_variable = { qs_partition_return_minus_1 > low } }
+			add_to_temp_variable = { top = 1 }
+			set_temp_variable = { stack^top = low }
+			add_to_temp_variable = { top = 1 }
+			set_temp_variable = { stack^top = qs_partition_return_minus_1 }
+		}
+
+		if = {
+			limit = { check_variable = { qs_partition_return_plus_1 < high } }
+			add_to_temp_variable = { top = 1 }
+			set_temp_variable = { stack^top = qs_partition_return_plus_1 }
+			add_to_temp_variable = { top = 1 }
+			set_temp_variable = { stack^top = high }
+		}
+	}
+
+	# clear "temporary" variables
+	clear_variable = qs_partition_return
+	clear_variable = random_pivot
+}
+
+# Partition function (using a random pivot)
+quicksort_partition = {
+	# Get random pivot
+	set_variable = { random_pivot = random }
+	multiply_variable = { random_pivot = high }
+	round_variable = random_pivot
+	add_to_variable = { random_pivot = low }
+	clamp_variable = {
+		var = random_pivot
+		min = low
+		max = high
+	}
+	set_temp_variable = { swap = arr_econ^high }
+	set_variable = { arr_econ^high = arr_econ^random_pivot }
+	set_variable = { arr_econ^random_pivot = swap }
+
+	set_temp_variable = { idx = low }
+	subtract_from_temp_variable = { idx = 1 }
+
+	set_temp_variable = { min = arr_econ^high }
+
+	var:arr_econ^high = {
+		set_temp_variable = { PREV.min = GDP }
+	}
+
+	for_loop_effect = {
+		start = low
+		end = high
+		if = {
+			limit = {
+				var:arr_econ^v = {
+					set_temp_variable = { PREV.tempTransferGDP = GDP }
+				}
+				check_variable = {
+					var = tempTransferGDP
+					value = min
+					compare = greater_than_or_equals # can be changed to greater_than_or_equals to give reverse order
+				}
+			}
+			add_to_temp_variable = { idx = 1 }
+			set_temp_variable = { swap = arr_econ^idx }
+			set_variable = { arr_econ^idx = arr_econ^v }
+			set_variable = { arr_econ^v = swap }
+		}
+	}
+
+	add_to_temp_variable = { idx = 1 }
+	set_temp_variable = { swap = arr_econ^idx }
+	set_variable = { arr_econ^idx = arr_econ^high }
+	set_variable = { arr_econ^high = swap }
+
+	# we return the index
+	set_variable = { qs_partition_return = idx }
+}
+
+quicksort_ZVMembers = {
+
+	set_variable = { low = 0 }
+	set_variable = { high = ZV_members^num }
+	subtract_from_variable = { high = 1 }
+	# set up the auxilary stack
+	set_temp_variable = { stack_size = high }
+	subtract_from_temp_variable = { stack_size = low }
+	add_to_temp_variable = { stack_size = 1 }
+	resize_temp_array = {
+		array = stack
+		value = 0
+		size = stack_size
+	}
+
+	set_temp_variable = { top = 0 }
+	set_temp_variable = { stack^top = low }
+	add_to_temp_variable = { top = 1 }
+	set_temp_variable = { stack^top = high }
+
+	while_loop_effect = {
+		limit = {
+			check_variable = {
+				var = top
+				value = 0
+				compare = greater_than_or_equals
+			}
+		}
+		set_variable = { high = stack^top }
+		subtract_from_temp_variable = { top = 1 }
+		set_variable = { low = stack^top }
+		subtract_from_temp_variable = { top = 1 }
+
+		quicksort_partition_ZVMembers = yes # returns qs_partition_return
+
+		set_temp_variable = { qs_partition_return_plus_1 = qs_partition_return }
+		set_temp_variable = { qs_partition_return_minus_1 = qs_partition_return }
+		add_to_temp_variable = { qs_partition_return_plus_1 = 1 }
+		subtract_from_temp_variable = { qs_partition_return_minus_1 = 1 }
+
+		if = {
+			limit = { check_variable = { qs_partition_return_minus_1 > low } }
+			add_to_temp_variable = { top = 1 }
+			set_temp_variable = { stack^top = low }
+			add_to_temp_variable = { top = 1 }
+			set_temp_variable = { stack^top = qs_partition_return_minus_1 }
+		}
+
+		if = {
+			limit = { check_variable = { qs_partition_return_plus_1 < high } }
+			add_to_temp_variable = { top = 1 }
+			set_temp_variable = { stack^top = qs_partition_return_plus_1 }
+			add_to_temp_variable = { top = 1 }
+			set_temp_variable = { stack^top = high }
+		}
+	}
+
+	# clear "temporary" variables
+	clear_variable = qs_partition_return
+	clear_variable = random_pivot
+}
+
+# Partition function (using a random pivot)
+quicksort_partition_ZVMembers = {
+	# Get random pivot
+	set_variable = { random_pivot = random }
+	multiply_variable = { random_pivot = high }
+	round_variable = random_pivot
+	add_to_variable = { random_pivot = low }
+	clamp_variable = {
+		var = random_pivot
+		min = low
+		max = high
+	}
+	set_temp_variable = { swap = ZV_members^high }
+	set_variable = { ZV_members^high = ZV_members^random_pivot }
+	set_variable = { ZV_members^random_pivot = swap }
+
+	set_temp_variable = { idx = low }
+	subtract_from_temp_variable = { idx = 1 }
+
+	set_temp_variable = { min = ZV_members^high }
+
+	var:ZV_members^high = {
+		set_temp_variable = { PREV.min = GDP }
+	}
+
+	for_loop_effect = {
+		start = low
+		end = high
+		if = {
+			limit = {
+				var:ZV_members^v = {
+					set_temp_variable = { PREV.tempTransferGDP = GDP }
+				}
+				check_variable = {
+					var = tempTransferGDP
+					value = min
+					compare = greater_than_or_equals # can be changed to greater_than_or_equals to give reverse order
+				}
+			}
+			add_to_temp_variable = { idx = 1 }
+			set_temp_variable = { swap = ZV_members^idx }
+			set_variable = { ZV_members^idx = ZV_members^v }
+			set_variable = { ZV_members^v = swap }
+		}
+	}
+
+	add_to_temp_variable = { idx = 1 }
+	set_temp_variable = { swap = ZV_members^idx }
+	set_variable = { ZV_members^idx = ZV_members^high }
+	set_variable = { ZV_members^high = swap }
+
+	# we return the index
+	set_variable = { qs_partition_return = idx }
+}
+
+#####################
+
+calculate_Reich_GDP = {
+	log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; Executing"
+
+	set_variable = { reich_GDP = 0.0 } #already converted to billion
+
+	every_country = {
+		limit = {
+			OR = {
+				has_idea = SGR_zollverein_basic
+				has_idea = SGR_zollverein_germany
+			}
+		}
+
+		log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; This: [THIS.GetTag], GDP: [?THIS.GDP]"
+
+		set_temp_variable = { temp_GDP = THIS.GDP }
+		add_to_variable = { GER.reich_GDP = temp_GDP }
+
+		log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; Zollverein GDP: [?GER.reich_GDP]"
+	}
+
+	set_variable = { displayGermanyGDP = GER.GDP }
+	log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; Completed execution."
+
+	calculate_Reich_Slaves = yes
+}
+
+#Total Slave Count (Fuck you, Speer)
+
+calculate_Reich_Slaves = {
+	log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; Executing"
+
+	set_variable = { Reich_SlaveNum = 0 }
+	set_variable = { GER_SlaveNum = 0 }
+
+	for_each_loop = {
+		array = SGR_WWS_Regions
+		index = i
+		value = val
+
+		log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; (i: [?i], val: i: [?val]):"
+		if = {
+			limit = {
+				OR = {
+					#Germany
+					check_variable = { i < 8 } #1, 2, 3, 4, 5, 6, 7
+
+					#Poland
+					AND = {
+						check_variable = { i = 8 } #8
+						OR = {
+							POL = { is_in_faction_with = GER }
+							GGN = { is_in_faction_with = GGN }
+						}
+					}
+
+					#Belarus
+					AND = {
+						check_variable = { i = 9 } #9
+						OR = {
+							BLR = { is_in_faction_with = GER }
+							AND = {
+								NOT = { country_exists = BLR }
+								OST = { is_in_faction_with = GER }
+							}
+						}
+					}
+
+					#Ostland
+					AND = {
+						check_variable = { i < 12 } #10, 11
+						OR = {
+							OST = { is_in_faction_with = GER }
+							AND = {
+								EST = { is_in_faction_with = GER }
+								LAT = { is_in_faction_with = GER }
+								LIT = { is_in_faction_with = GER }
+							}
+						}
+					}
+
+					#Ukraine
+					AND = {
+						check_variable = { i < 15 } #12, 13, 14
+						UKR = { is_in_faction_with = GER }
+					}
+
+					#Kaukasien
+					AND = {
+						check_variable = { i < 18 } #15, 16, 17
+						CAU = { is_in_faction_with = GER }
+					}
+
+					#Brauchitschstadt
+					AND = {
+						check_variable = { i = 18 } #18
+						OR = {
+							GER = { owns_state = 195 }
+							MCW = {
+								owns_state = 195
+								is_in_faction_with = GER
+							}
+							OKB = { is_in_faction_with = GER }
+						}
+					}
+
+					#Netherlands
+					AND = {
+						check_variable = { i = 19 } #19
+						OR = {
+							HOL = { is_in_faction_with = GER }
+							GER = { owns_state = 7 }
+						}
+					}
+
+					#Denmark
+					AND = {
+						check_variable = { i = 20 } #20
+						DEN = { is_in_faction_with = GER }
+					}
+
+					#Norway
+					AND = {
+						check_variable = { i < 23 } #21, 22
+						NOR = { is_in_faction_with = GER }
+					}
+
+					#Crimea
+					AND = {
+						check_variable = { i = 23 } #23
+						OR = {
+							CRI = { is_in_faction_with = GER }
+							CRI = { is_in_faction_with = GER }
+							GER = { owns_state = 137 }
+						}
+					}
+
+					#Wolga
+					AND = {
+						check_variable = { i < 26 } #24, 25
+						OR = {
+							MCW = { is_in_faction_with = GER }
+						}
+					}
+
+					#Bessarabia
+					AND = {
+						check_variable = { i = 26 } #26
+						UKR = {
+							owns_state = 198
+							owns_state = 192
+							is_in_faction_with = GER
+						}
+					}
+				}
+			}
+
+			if = {
+				limit = { check_variable = { i < 8 } } #Germany; 1, 2, 3, 4, 5, 6, 7
+
+				add_to_variable = { GER_SlaveNum = val }
+
+				log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; GER_SlaveNum Now: [?GER_SlaveNum]"
+			}
+
+			add_to_variable = { Reich_SlaveNum = val }
+			set_variable = { SGR_WWS_Mil_Regions^i = val?0 }
+			multiply_variable = { SGR_WWS_Mil_Regions^i = 0.001 }
+
+			log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; Reich_SlaveNum Now: [?Reich_SlaveNum]"
+		}
+		else = {
+			log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; (i: [?i], val: i: [?val]), Is not in the Reich!"
+		}
+	}
+
+	#For Display
+	set_variable = { Reich_SlavesNum_m = Reich_SlaveNum }
+	multiply_variable = { Reich_SlavesNum_m = 0.001 }
+
+	log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; Reich_SlavesNum_m: [?Reich_SlavesNum_m]"
+
+	log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; Completed execution."
+
+	calculate_Civilian_Work_Ratio = yes
+}
+
+#Work Force Participation Ratio
+
+calculate_Civilian_Work_Ratio = {
+
+
+	#Calculating total population of Germany
+
+	set_temp_variable = { tempPop = GER.max_manpower_k }
+	set_temp_variable = { tempSlavesGermany = GER_SlaveNum }
+	set_temp_variable = { tempSlavesPakt = Reich_SlaveNum }
+
+	log = "[GetDateText]: [Root.GetName]: Sum Population [?tempPop] German Slaves [?GER_SlaveNum] Zollverein Slaves [?Reich_SlaveNum]"
+
+	subtract_from_temp_variable = { tempPop = tempSlavesGermany }
+
+	multiply_temp_variable = { tempPop = @SGR_THEORETICAL_WORKFORCE_CONS }
+
+	set_temp_variable = { calcTheoreticalWorkforce = tempPop }
+
+	set_variable = { TheoreticalWorkforce = tempPop }
+
+	subtract_from_temp_variable = { calcTheoreticalWorkforce = tempSlavesPakt }
+
+	clamp_variable = {
+		var = skilled_labour_Factor
+		min = 0
+		max = 1
+	}
+
+	multiply_temp_variable = { calcTheoreticalWorkforce = skilled_labour_Factor }
+
+	multiply_temp_variable = { calcTheoreticalWorkforce = 0.001 }
+
+	multiply_variable = { TheoreticalWorkforce = 0.001 }
+
+	set_variable = { displayCurrentWorkforce = calcTheoreticalWorkforce }
+
+	set_variable = { displayTheoreticalWorkforce = TheoreticalWorkforce }
+
+	divide_temp_variable = { calcTheoreticalWorkforce = TheoreticalWorkforce }
+
+	set_variable = { displayCivPercentage = calcTheoreticalWorkforce }
+
+	calculate_ZollvereinGDP_growth = yes
+}
+
+calculate_ZollvereinGDP_growth = {
+	log = "[GetDateText]: [Root.GetName]: calculate_ZollvereinGDP_growth; Executing"
+
+	set_variable = { zollvereinGDP_growth = 0 }
+	set_variable = { zollvereinMembers_num = 0 }
+
+	every_country = {
+		limit = {
+			is_in_faction_with = GER
+			OR = {
+				tag = GER
+				tag = AZR
+				tag = BLR
+				tag = CAU
+				tag = DEN
+				tag = GGN
+				tag = HOL
+				tag = MCW
+				tag = NOR
+				tag = OST
+				tag = POL
+				tag = UKR
+				tag = PAU
+			}
+		}
+
+		log = "[GetDateText]: [Root.GetName]: calculate_ZollvereinGDP_growth; This: [THIS.GetTag], GDP: [?THIS.gdp_growth]"
+
+		add_to_variable = { GER.zollvereinGDP_growth = THIS.gdp_growth }
+
+		add_to_variable = { GER.zollvereinMembers_num = 1 }
+	}
+	log = "[GetDateText]: [Root.GetName]: calculate_ZollvereinGDP_growth; Zollverein GDP: [?zollvereinGDP_growth], Zollverein total members: [?zollvereinMembers_num]"
+
+	divide_variable = { zollvereinGDP_growth = 100 }
+	divide_variable = { zollvereinGDP_growth = zollvereinMembers_num }
+
+	log = "[GetDateText]: [Root.GetName]: calculate_ZollvereinGDP_growth; Zollverein GDP growth arithmetic mean: [?zollvereinGDP_growth]"
+
+	log = "[GetDateText]: [Root.GetName]: calculate_ZollvereinGDP_growth; Completed execution."
+
+}
+
+run_skilled_labour_calculation = {
+
+	log = "[GetDateText]: [Root.GetName]: run_skilled_labour_calculation; Executing"
+
+
+	#Adds workforce growth from RSFSTP
+	add_to_variable = { skilled_labour_Growth = SGR_RSFSTP_workforce_growth }
+	clamp_variable = {
+		var = skilled_labour_Growth
+		min = -1
+		max = 1.2
+	}
+	add_to_variable = { skilled_labour_Factor = skilled_labour_Growth }
+
+
+	log = "[GetDateText]: [Root.GetName]: Skilled labour factor [?skilled_labour_Factor]"
+}
+
+run_germany_repatriations = { #For the slaves in Germany; moved to the RKs.
+
+	set_variable = { germany_repatriations = 0 }
+
+	set_temp_variable = { randomness_factor = random }
+
+	set_temp_variable = { repatriations_per_month = repatriation_effectiveness }
+
+	multiply_temp_variable = { repatriations_per_month = randomness_factor }
+
+	for_each_loop = {
+		array = SGR_WWS_Regions
+		index = i
+		value = val
+
+
+		if = {
+			limit = {
+				#Germany
+				AND = {
+					check_variable = { i < 8 } #1, 2, 3, 4, 5, 6, 7
+					NOT = { check_variable = { SGR_WWS_Regions^i = 0 } }
+				}
+			}
+			subtract_from_variable = { SGR_WWS_Regions^i = repatriations_per_month }
+
+			add_to_variable = { germany_repatriations = repatriations_per_month }
+
+			clamp_variable = {
+				var = SGR_WWS_Regions^i
+				min = 0
+				max = 10000
+			}
+
+			set_temp_variable = { repatriationsCalc = repatriations_per_month }
+
+			multiply_temp_variable = { repatriationsCalc = -1000 }
+
+			random_list = {
+				#Rhineland region
+				4 = {
+					random_list = {
+						1 = { 1810 = { add_manpower = var:repatriationsCalc } }
+						1 = { 1809 = { add_manpower = var:repatriationsCalc } }
+						1 = { 51 = { add_manpower = var:repatriationsCalc } }
+						1 = { 42 = { add_manpower = var:repatriationsCalc } }
+						1 = { 8 = { add_manpower = var:repatriationsCalc } }
+						1 = { 55 = { add_manpower = var:repatriationsCalc } }
+						1 = { 1811 = { add_manpower = var:repatriationsCalc } }
+						1 = { 1812 = { add_manpower = var:repatriationsCalc } }
+						1 = { 28 = { add_manpower = var:repatriationsCalc } }
+					}
+
+					modifier = {
+						factor = 0
+						NOT = { check_variable = { i = 0 } }
+					}
+				}
+
+				#North Germany region
+				2 = {
+					random_list = {
+						1 = { 1815 = { add_manpower = var:repatriationsCalc } }
+						1 = { 1373 = { add_manpower = var:repatriationsCalc } }
+						1 = { 57 = { add_manpower = var:repatriationsCalc } }
+						1 = { 56 = { add_manpower = var:repatriationsCalc } }
+						1 = { 59 = { add_manpower = var:repatriationsCalc } }
+						1 = { 188 = { add_manpower = var:repatriationsCalc } }
+						1 = { 775 = { add_manpower = var:repatriationsCalc } }
+						1 = { 58 = { add_manpower = var:repatriationsCalc } }
+						1 = { 774 = { add_manpower = var:repatriationsCalc } }
+					}
+
+					modifier = {
+						factor = 0
+						NOT = { check_variable = { i = 1 } }
+					}
+				}
+
+				#Sachsen-Anhalt region
+				1 = {
+					random_list = {
+						1 = { 1813 = { add_manpower = var:repatriationsCalc } }
+						1 = { 1814 = { add_manpower = var:repatriationsCalc } }
+						1 = { 60 = { add_manpower = var:repatriationsCalc } }
+					}
+
+					modifier = {
+						factor = 0
+						NOT = { check_variable = { i = 3 } }
+					}
+				}
+				#Southern Germany region
+				4 = {
+					random_list = {
+						1 = { 72 = { add_manpower = var:repatriationsCalc } }
+						1 = { 50 = { add_manpower = var:repatriationsCalc } }
+						1 = { 54 = { add_manpower = var:repatriationsCalc } }
+						1 = { 1026 = { add_manpower = var:repatriationsCalc } }
+						1 = { 53 = { add_manpower = var:repatriationsCalc } }
+						1 = { 52 = { add_manpower = var:repatriationsCalc } }
+						1 = { 68 = { add_manpower = var:repatriationsCalc } }
+					}
+					modifier = {
+						factor = 0
+						NOT = { check_variable = { i = 6 } }
+					}
+				}
+				#Ostmark region
+				3 = {
+					random_list = {
+						1 = { 153 = { add_manpower = var:repatriationsCalc } }
+						1 = { 86 = { add_manpower = var:repatriationsCalc } }
+						1 = { 62 = { add_manpower = var:repatriationsCalc } }
+						1 = { 98 = { add_manpower = var:repatriationsCalc } }
+						1 = { 770 = { add_manpower = var:repatriationsCalc } }
+						1 = { 1772 = { add_manpower = var:repatriationsCalc } }
+						1 = { 152 = { add_manpower = var:repatriationsCalc } }
+						1 = { 4 = { add_manpower = var:repatriationsCalc } }
+						1 = { 1025 = { add_manpower = var:repatriationsCalc } }
+					}
+					modifier = {
+						factor = 0
+						NOT = { check_variable = { i = 7 } }
+					}
+				}
+				#Bohemia
+				2 = {
+					random_list = {
+						1 = { 9 = { add_manpower = var:repatriationsCalc } }
+						1 = { 75 = { add_manpower = var:repatriationsCalc } }
+					}
+					modifier = {
+						factor = 0
+						NOT = { check_variable = { i = 5 } }
+					}
+				}
+				#Central Germany region
+				5 = {
+					random_list = {
+						1 = { 61 = { add_manpower = var:repatriationsCalc } }
+						1 = { 776 = { add_manpower = var:repatriationsCalc } }
+						1 = { 64 = { add_manpower = var:repatriationsCalc } }
+						1 = { 63 = { add_manpower = var:repatriationsCalc } }
+						1 = { 65 = { add_manpower = var:repatriationsCalc } }
+						1 = { 69 = { add_manpower = var:repatriationsCalc } }
+						1 = { 66 = { add_manpower = var:repatriationsCalc } }
+						1 = { 67 = { add_manpower = var:repatriationsCalc } }
+					}
+					modifier = {
+						factor = 0
+						NOT = { check_variable = { i = 2 } }
+					}
+				}
+				#Prussia region
+				6 = {
+					random_list = {
+						1 = { 5 = { add_manpower = var:repatriationsCalc } }
+						1 = { 87 = { add_manpower = var:repatriationsCalc } }
+						1 = { 85 = { add_manpower = var:repatriationsCalc } }
+						1 = { 97 = { add_manpower = var:repatriationsCalc } }
+					}
+					modifier = {
+						factor = 0
+						NOT = { check_variable = { i = 4 } }
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				#Netherlands
+				AND = {
+					check_variable = { i = 19 } #19
+					NOT = { check_variable = { SGR_WWS_Regions^i = 0 } }
+					HOL = { is_in_faction_with = GER }
+				}
+			}
+			subtract_from_variable = { SGR_WWS_Regions^i = repatriations_per_month }
+
+			add_to_variable = { germany_repatriations = repatriations_per_month }
+
+			clamp_variable = {
+				var = SGR_WWS_Regions^i
+				min = 0
+				max = 10000
+			}
+			set_temp_variable = { repatriationsCalc = repatriations_per_month }
+
+			multiply_temp_variable = { repatriationsCalc = -1000 }
+
+			HOL = {
+				random_owned_state = {
+					add_manpower = var:repatriationsCalc
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				#Denmark
+				AND = {
+					check_variable = { i = 20 } #20
+					NOT = { check_variable = { SGR_WWS_Regions^i = 0 } }
+					DEN = { is_in_faction_with = GER }
+				}
+			}
+			subtract_from_variable = { SGR_WWS_Regions^i = repatriations_per_month }
+
+			add_to_variable = { germany_repatriations = repatriations_per_month }
+
+			clamp_variable = {
+				var = SGR_WWS_Regions^i
+				min = 0
+				max = 10000
+			}
+
+			set_temp_variable = { repatriationsCalc = repatriations_per_month }
+
+			multiply_temp_variable = { repatriationsCalc = -1000 }
+
+			DEN = {
+				random_owned_state = {
+					add_manpower = var:repatriationsCalc
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				#Norway
+				AND = {
+					check_variable = { i < 23 } #21,22
+					NOT = { check_variable = { SGR_WWS_Regions^i = 0 } }
+					NOR = { is_in_faction_with = GER }
+				}
+			}
+			subtract_from_variable = { SGR_WWS_Regions^i = repatriations_per_month }
+
+			add_to_variable = { germany_repatriations = repatriations_per_month }
+
+			clamp_variable = {
+				var = SGR_WWS_Regions^i
+				min = 0
+				max = 10000
+			}
+
+			set_temp_variable = { repatriationsCalc = repatriations_per_month }
+
+			multiply_temp_variable = { repatriationsCalc = -1000 }
+
+			NOR = { #Not random owned state or else it breaks Norway with very low pop states
+				add_manpower = var:repatriationsCalc
+			}
+		}
+	}
+	run_repatriation_calculation = yes
+}
+
+run_repatriation_calculation = { #For the slaves outside Germany.
+
+	set_temp_variable = { tempGermanyRepatriations = germany_repatriations }
+
+
+	for_each_loop = {
+		array = SGR_WWS_Regions
+		index = i
+		value = val
+
+		log = "[GetDateText]: [Root.GetName]: calculate_Reich_Slaves; (i: [?i], val: i: [?val]):"
+		if = {
+			limit = {
+				#Poland
+				AND = {
+					check_variable = { i = 8 } #8
+					OR = {
+						POL = { is_in_faction_with = GER }
+						GGN = { is_in_faction_with = GGN }
+					}
+				}
+			}
+
+			multiply_temp_variable = { tempGermanyRepatriations = 0.25 }
+
+			add_to_variable = { SGR_WWS_Regions^i = tempGermanyRepatriations }
+
+			subtract_from_variable = { SGR_WWS_Regions^i = repatriations_per_month }
+
+
+			clamp_variable = {
+				var = SGR_WWS_Regions^i
+				min = 0
+				max = 10000
+			}
+
+			set_temp_variable = { PolishRepatriations = tempGermanyRepatriations }
+
+			multiply_temp_variable = { PolishRepatriations = 1000 }
+
+			POL = {
+				random_owned_state = {
+					add_manpower = var:PolishRepatriations
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						#Germany
+						NOT = { check_variable = { i < 8 } }
+						#Belarus
+						AND = {
+							check_variable = { i = 9 } #9
+							OR = {
+								BLR = { is_in_faction_with = GER }
+								AND = {
+									NOT = { country_exists = BLR }
+									OST = { is_in_faction_with = GER }
+								}
+							}
+						}
+
+						#Ostland
+						AND = {
+							check_variable = { i < 12 } #10, 11
+							OST = { is_in_faction_with = GER }
+						}
+					}
+				}
+			}
+			multiply_temp_variable = { tempGermanyRepatriations = 0.15 }
+
+			add_to_variable = { SGR_WWS_Regions^i = tempGermanyRepatriations }
+
+			subtract_from_variable = { SGR_WWS_Regions^i = repatriations_per_month }
+
+			clamp_variable = {
+				var = SGR_WWS_Regions^i
+				min = 0
+				max = 10000
+			}
+
+			set_temp_variable = { OstlandRepatriates = tempGermanyRepatriations }
+
+			divide_temp_variable = { OstlandRepatriates = 2 }
+
+			multiply_temp_variable = { OstlandRepatriates = 1000 }
+
+			OST = {
+				random_owned_state = {
+					add_manpower = var:OstlandRepatriates
+				}
+			}
+			BLR = {
+				random_owned_state = {
+					add_manpower = var:OstlandRepatriates
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						#Germany
+						NOT = { check_variable = { i < 8 } }
+						#Ukraine; counts 25%
+						AND = {
+							check_variable = { i < 15 } #12, 13, 14
+							UKR = { is_in_faction_with = GER }
+						}
+					}
+				}
+			}
+			multiply_temp_variable = { tempGermanyRepatriations = 0.15 }
+
+			add_to_variable = { SGR_WWS_Regions^i = tempGermanyRepatriations }
+
+			subtract_from_variable = { SGR_WWS_Regions^i = repatriations_per_month }
+
+			clamp_variable = {
+				var = SGR_WWS_Regions^i
+				min = 0
+				max = 10000
+			}
+			set_temp_variable = { UkrainianRepatriations = tempGermanyRepatriations }
+
+			multiply_temp_variable = { UkrainianRepatriations = 1000 }
+
+			UKR = {
+				random_owned_state = {
+					add_manpower = var:UkrainianRepatriations
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				AND = {
+					#Germany
+					NOT = { check_variable = { i < 8 } }
+					#Kaukasien
+					AND = {
+						check_variable = { i < 18 } #15, 16, 17
+						CAU = { is_in_faction_with = GER }
+					}
+				}
+			}
+			multiply_temp_variable = { tempGermanyRepatriations = 0.25 }
+
+			add_to_variable = { SGR_WWS_Regions^i = tempGermanyRepatriations }
+
+			subtract_from_variable = { SGR_WWS_Regions^i = repatriations_per_month }
+
+			clamp_variable = {
+				var = SGR_WWS_Regions^i
+				min = 0
+				max = 10000
+			}
+
+			set_temp_variable = { CaucasianRepatriations = tempGermanyRepatriations }
+
+			multiply_temp_variable = { CaucasianRepatriations = 1000 }
+
+			every_country = {
+				limit = {
+					original_tag = CAU
+				}
+				random_owned_state = {
+					add_manpower = var:CaucasianRepatriations
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						#Germany
+						NOT = { check_variable = { i < 8 } }
+						OR = {
+							#Brauchitschstadt
+							AND = {
+								check_variable = { i = 18 } #18
+								OR = {
+									GER = { owns_state = 195 }
+									MCW = {
+										owns_state = 195
+										is_in_faction_with = GER
+									}
+								}
+							}
+							#Crimea
+							AND = {
+								check_variable = { i = 23 } #23
+								OR = {
+									UKR = { is_in_faction_with = GER }
+									GER = { owns_state = 137 }
+								}
+							}
+
+							#Wolga
+							AND = {
+								check_variable = { i < 26 } #24, 25
+								OR = {
+									PAU = { is_in_faction_with = GER }
+									MCW = { is_in_faction_with = GER }
+								}
+							}
+						}
+					}
+				}
+			}
+			multiply_temp_variable = { tempGermanyRepatriations = 0.2 }
+
+			add_to_variable = { SGR_WWS_Regions^i = tempGermanyRepatriations }
+
+			subtract_from_variable = { SGR_WWS_Regions^i = repatriations_per_month }
+
+			clamp_variable = {
+				var = SGR_WWS_Regions^i
+				min = 0
+				max = 10000
+			}
+
+			set_temp_variable = { OtherRepatriations = tempGermanyRepatriations }
+
+			multiply_temp_variable = { OtherRepatriations = 1000 }
+
+			random_list = {
+				25 = {
+					CAU = {
+						random_owned_state = {
+							add_manpower = var:OtherRepatriations
+						}
+					}
+				}
+				25 = {
+					every_country = {
+						limit = {
+							original_tag = MCW
+						}
+						random_owned_state = {
+							add_manpower = var:OtherRepatriations
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+#Kicks in if a region's slave number reaches 0
+check_megacorp_powerdecline = {
+	for_each_loop = {
+		array = SGR_WWS_Regions
+		index = i
+		value = val
+
+		if = {
+			limit = {
+				check_variable = { SGR_WWS_Regions^i = 0 }
+			}
+			set_temp_variable = { tempRandom = 0.075 }
+
+			randomize_temp_variable = {
+				var = tempRandom
+				distribution = binomial
+				min = 0.05
+				max = 0.12
+			}
+
+			subtract_from_variable = { SGR_WWS_Megacorps_Power^i = tempRandom }
+
+			clamp_variable = {
+				var = SGR_WWS_Megacorps_Power^i
+				min = 0
+				max = 100
+			}
+		}
+	}
+}
+
+
+#####################################
+# Wirtschaftswunder related fuckery #
+#####################################
+
+
+check_Wirtschaftswunder_effects = {
+
+	if = { #Tier 1
+		limit = {
+			check_variable = { displayCivPercentage < 0.11 }
+			NOT = { has_country_flag = SGR_wws_tier1 }
+		}
+		set_variable = {
+			var = SGR_youth_productivity
+			value = -0.25
+		}
+		set_variable = {
+			var = SGR_youth_industry
+			value = -0.25
+		}
+		set_variable = {
+			var = SGR_youth_efficiency
+			value = -0.25
+		}
+		set_variable = {
+			var = SGR_youth_political_power
+			value = 0.15
+		}
+		set_variable = {
+			var = SGR_youth_conscription
+			value = 0.15
+		}
+		force_update_dynamic_modifier = yes
+
+
+		set_country_flag = SGR_wws_tier1
+		clr_country_flag = SGR_wws_tier2
+		clr_country_flag = SGR_wws_tier3
+		clr_country_flag = SGR_wws_tier4
+		clr_country_flag = SGR_wws_tier5
+		clr_country_flag = SGR_wws_tier6
+		clr_country_flag = SGR_wws_tier7
+		clr_country_flag = SGR_wws_tier8
+		clr_country_flag = SGR_wws_tier9
+		clr_country_flag = SGR_wws_tier10
+	}
+	else_if = { #Tier 2
+		limit = {
+			check_variable = { displayCivPercentage < 0.21 }
+			check_variable = { displayCivPercentage > 0.1 }
+			NOT = { has_country_flag = SGR_wws_tier2 }
+		}
+		set_variable = {
+			var = SGR_youth_productivity
+			value = -0.15
+		}
+		set_variable = {
+			var = SGR_youth_industry
+			value = -0.15
+		}
+		set_variable = {
+			var = SGR_youth_efficiency
+			value = -0.15
+		}
+		set_variable = {
+			var = SGR_youth_political_power
+			value = 0.1
+		}
+		set_variable = {
+			var = SGR_youth_conscription
+			value = 0.1
+		}
+		force_update_dynamic_modifier = yes
+
+
+		clr_country_flag = SGR_wws_tier1
+		set_country_flag = SGR_wws_tier2
+		clr_country_flag = SGR_wws_tier3
+		clr_country_flag = SGR_wws_tier4
+		clr_country_flag = SGR_wws_tier5
+		clr_country_flag = SGR_wws_tier6
+		clr_country_flag = SGR_wws_tier7
+		clr_country_flag = SGR_wws_tier8
+		clr_country_flag = SGR_wws_tier9
+		clr_country_flag = SGR_wws_tier10
+	}
+	else_if = {
+		limit = { #Tier 3
+			check_variable = { displayCivPercentage < 0.31 }
+			check_variable = { displayCivPercentage > 0.2 }
+			NOT = { has_country_flag = SGR_wws_tier3 }
+		}
+		set_variable = {
+			var = SGR_youth_productivity
+			value = -0.1
+		}
+		set_variable = {
+			var = SGR_youth_industry
+			value = -0.1
+		}
+		set_variable = {
+			var = SGR_youth_efficiency
+			value = -0.1
+		}
+		set_variable = {
+			var = SGR_youth_political_power
+			value = 0.05
+		}
+		set_variable = {
+			var = SGR_youth_conscription
+			value = 0.05
+		}
+		force_update_dynamic_modifier = yes
+
+		clr_country_flag = SGR_wws_tier1
+		clr_country_flag = SGR_wws_tier2
+		set_country_flag = SGR_wws_tier3
+		clr_country_flag = SGR_wws_tier4
+		clr_country_flag = SGR_wws_tier5
+		clr_country_flag = SGR_wws_tier6
+		clr_country_flag = SGR_wws_tier7
+		clr_country_flag = SGR_wws_tier8
+		clr_country_flag = SGR_wws_tier9
+		clr_country_flag = SGR_wws_tier10
+
+		set_temp_variable = { gdp_growth_temp = 1.0 }
+		econ_gdp_growth_change = yes
+	}
+	else_if = {
+		limit = { #Tier 4
+			check_variable = { displayCivPercentage < 0.41 }
+			check_variable = { displayCivPercentage > 0.3 }
+			NOT = { has_country_flag = SGR_wws_tier4 }
+		}
+		set_variable = {
+			var = SGR_youth_productivity
+			value = -0.05
+		}
+		set_variable = {
+			var = SGR_youth_industry
+			value = -0.05
+		}
+		set_variable = {
+			var = SGR_youth_efficiency
+			value = -0.05
+		}
+		set_variable = {
+			var = SGR_youth_political_power
+			value = 0.025
+		}
+		set_variable = {
+			var = SGR_youth_conscription
+			value = 0.025
+		}
+		force_update_dynamic_modifier = yes
+
+		clr_country_flag = SGR_wws_tier1
+		clr_country_flag = SGR_wws_tier2
+		clr_country_flag = SGR_wws_tier3
+		set_country_flag = SGR_wws_tier4
+		clr_country_flag = SGR_wws_tier5
+		clr_country_flag = SGR_wws_tier6
+		clr_country_flag = SGR_wws_tier7
+		clr_country_flag = SGR_wws_tier8
+		clr_country_flag = SGR_wws_tier9
+		clr_country_flag = SGR_wws_tier10
+
+		set_temp_variable = { gdp_growth_temp = 1.0 }
+		econ_gdp_growth_change = yes
+	}
+	else_if = {
+		limit = { #Tier 5
+			check_variable = { displayCivPercentage < 0.51 }
+			check_variable = { displayCivPercentage > 0.4 }
+			NOT = { has_country_flag = SGR_wws_tier5 }
+		}
+		set_variable = {
+			var = SGR_youth_productivity
+			value = 0.025
+		}
+		set_variable = {
+			var = SGR_youth_industry
+			value = 0.025
+		}
+		set_variable = {
+			var = SGR_youth_efficiency
+			value = 0.025
+		}
+		set_variable = {
+			var = SGR_youth_political_power
+			value = -0.025
+		}
+		set_variable = {
+			var = SGR_youth_conscription
+			value = -0.025
+		}
+		force_update_dynamic_modifier = yes
+
+		clr_country_flag = SGR_wws_tier1
+		clr_country_flag = SGR_wws_tier2
+		clr_country_flag = SGR_wws_tier3
+		clr_country_flag = SGR_wws_tier4
+		set_country_flag = SGR_wws_tier5
+		clr_country_flag = SGR_wws_tier6
+		clr_country_flag = SGR_wws_tier7
+		clr_country_flag = SGR_wws_tier8
+		clr_country_flag = SGR_wws_tier9
+		clr_country_flag = SGR_wws_tier10
+
+		set_temp_variable = { gdp_growth_temp = 1.0 }
+		econ_gdp_growth_change = yes	
+	}
+	else_if = {
+		limit = { #Tier 6
+			check_variable = { displayCivPercentage < 0.61 }
+			check_variable = { displayCivPercentage > 0.5 }
+			NOT = { has_country_flag = SGR_wws_tier6 }
+		}
+		set_variable = {
+			var = SGR_youth_productivity
+			value = 0.05
+		}
+		set_variable = {
+			var = SGR_youth_industry
+			value = 0.05
+		}
+		set_variable = {
+			var = SGR_youth_efficiency
+			value = 0.05
+		}
+		set_variable = {
+			var = SGR_youth_political_power
+			value = -0.05
+		}
+		set_variable = {
+			var = SGR_youth_conscription
+			value = -0.05
+		}
+		force_update_dynamic_modifier = yes
+
+
+		clr_country_flag = SGR_wws_tier1
+		clr_country_flag = SGR_wws_tier2
+		clr_country_flag = SGR_wws_tier3
+		clr_country_flag = SGR_wws_tier4
+		clr_country_flag = SGR_wws_tier5
+		set_country_flag = SGR_wws_tier6
+		clr_country_flag = SGR_wws_tier7
+		clr_country_flag = SGR_wws_tier8
+		clr_country_flag = SGR_wws_tier9
+		clr_country_flag = SGR_wws_tier10
+
+
+		set_temp_variable = { gdp_growth_temp = 1.0 }
+		econ_gdp_growth_change = yes
+	}
+	else_if = { #Tier 7
+		limit = {
+			check_variable = { displayCivPercentage < 0.71 }
+			check_variable = { displayCivPercentage > 0.6 }
+			NOT = { has_country_flag = SGR_wws_tier7 }
+		}
+		set_variable = {
+			var = SGR_youth_productivity
+			value = 0.1
+		}
+		set_variable = {
+			var = SGR_youth_industry
+			value = 0.1
+		}
+		set_variable = {
+			var = SGR_youth_efficiency
+			value = 0.1
+		}
+		set_variable = {
+			var = SGR_youth_political_power
+			value = -0.1
+		}
+		set_variable = {
+			var = SGR_youth_conscription
+			value = -0.1
+		}
+		force_update_dynamic_modifier = yes
+
+
+		clr_country_flag = SGR_wws_tier1
+		clr_country_flag = SGR_wws_tier2
+		clr_country_flag = SGR_wws_tier3
+		clr_country_flag = SGR_wws_tier4
+		clr_country_flag = SGR_wws_tier5
+		clr_country_flag = SGR_wws_tier6
+		set_country_flag = SGR_wws_tier7
+		clr_country_flag = SGR_wws_tier8
+		clr_country_flag = SGR_wws_tier9
+		clr_country_flag = SGR_wws_tier10
+
+		set_temp_variable = { gdp_growth_temp = 1.0 }
+		econ_gdp_growth_change = yes
+	}
+	else_if = { #Tier 8
+		limit = {
+			check_variable = { displayCivPercentage < 0.81 }
+			check_variable = { displayCivPercentage > 0.7 }
+			NOT = { has_country_flag = SGR_wws_tier8 }
+		}
+		set_variable = {
+			var = SGR_youth_productivity
+			value = 0.15
+		}
+		set_variable = {
+			var = SGR_youth_industry
+			value = 0.15
+		}
+		set_variable = {
+			var = SGR_youth_efficiency
+			value = 0.15
+		}
+		set_variable = {
+			var = SGR_youth_political_power
+			value = -0.15
+		}
+		set_variable = {
+			var = SGR_youth_conscription
+			value = -0.15
+		}
+		force_update_dynamic_modifier = yes
+
+
+		clr_country_flag = SGR_wws_tier1
+		clr_country_flag = SGR_wws_tier2
+		clr_country_flag = SGR_wws_tier3
+		clr_country_flag = SGR_wws_tier4
+		clr_country_flag = SGR_wws_tier5
+		clr_country_flag = SGR_wws_tier6
+		clr_country_flag = SGR_wws_tier7
+		set_country_flag = SGR_wws_tier8
+		clr_country_flag = SGR_wws_tier9
+		clr_country_flag = SGR_wws_tier10
+
+		set_temp_variable = { gdp_growth_temp = 1.0 }
+		econ_gdp_growth_change = yes
+	}
+	else_if = { #Tier 9
+		limit = {
+			check_variable = { displayCivPercentage < 0.91 }
+			check_variable = { displayCivPercentage > 0.8 }
+			NOT = { has_country_flag = SGR_wws_tier9 }
+		}
+		set_variable = {
+			var = SGR_youth_productivity
+			value = 0.2
+		}
+		set_variable = {
+			var = SGR_youth_industry
+			value = 0.2
+		}
+		set_variable = {
+			var = SGR_youth_efficiency
+			value = 0.2
+		}
+		set_variable = {
+			var = SGR_youth_political_power
+			value = -0.2
+		}
+		set_variable = {
+			var = SGR_youth_conscription
+			value = -0.2
+		}
+		force_update_dynamic_modifier = yes
+
+
+		clr_country_flag = SGR_wws_tier1
+		clr_country_flag = SGR_wws_tier2
+		clr_country_flag = SGR_wws_tier3
+		clr_country_flag = SGR_wws_tier4
+		clr_country_flag = SGR_wws_tier5
+		clr_country_flag = SGR_wws_tier6
+		clr_country_flag = SGR_wws_tier7
+		clr_country_flag = SGR_wws_tier8
+		set_country_flag = SGR_wws_tier9
+		clr_country_flag = SGR_wws_tier10
+
+		set_temp_variable = { gdp_growth_temp = 1.0 }
+		econ_gdp_growth_change = yes
+	}
+	else_if = { #Tier 10
+		limit = {
+			check_variable = { displayCivPercentage > 0.9 }
+			NOT = { has_country_flag = SGR_wws_tier10 }
+		}
+		set_variable = {
+			var = SGR_youth_productivity
+			value = 0.25
+		}
+		set_variable = {
+			var = SGR_youth_industry
+			value = 0.25
+		}
+		set_variable = {
+			var = SGR_youth_efficiency
+			value = 0.25
+		}
+		set_variable = {
+			var = SGR_youth_political_power
+			value = -0.25
+		}
+		set_variable = {
+			var = SGR_youth_conscription
+			value = -0.25
+		}
+		force_update_dynamic_modifier = yes
+
+
+		clr_country_flag = SGR_wws_tier1
+		clr_country_flag = SGR_wws_tier2
+		clr_country_flag = SGR_wws_tier3
+		clr_country_flag = SGR_wws_tier4
+		clr_country_flag = SGR_wws_tier5
+		clr_country_flag = SGR_wws_tier6
+		clr_country_flag = SGR_wws_tier7
+		clr_country_flag = SGR_wws_tier8
+		clr_country_flag = SGR_wws_tier9
+		set_country_flag = SGR_wws_tier10
+
+		set_temp_variable = { gdp_growth_temp = 1.0 }
+		econ_gdp_growth_change = yes
+	}
+
+}
+
+SGR_match_var_with_flag = {
+	if = {
+		limit = { check_variable = { i = 0 } }
+		set_country_flag = SGR_Germany2_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 1 } }
+		set_country_flag = SGR_Germany1_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 2 } }
+		set_country_flag = SGR_Germany6_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 3 } }
+		set_country_flag = SGR_Germany3_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 4 } }
+		set_country_flag = SGR_Germany7_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 5 } }
+		set_country_flag = SGR_Bohemia_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 6 } }
+		set_country_flag = SGR_Germany4_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 7 } }
+		set_country_flag = SGR_Germany5_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 8 } }
+		set_country_flag = SGR_GGN_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 9 } }
+		set_country_flag = SGR_Ostland2_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 10 } }
+		set_country_flag = SGR_Ostland3_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 11 } }
+		set_country_flag = SGR_Ostland1_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 12 } }
+		set_country_flag = SGR_Ukraine1_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 13 } }
+		set_country_flag = SGR_Ukraine3_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 14 } }
+		set_country_flag = SGR_Ukraine2_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 15 } }
+		set_country_flag = SGR_Cau3_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 16 } }
+		set_country_flag = SGR_Cau2_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 17 } }
+		set_country_flag = SGR_Cau1_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 18 } }
+		set_country_flag = SGR_Leningrad_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 19 } }
+		set_country_flag = SGR_Holland_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 20 } }
+		set_country_flag = SGR_Denmark_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 21 } }
+		set_country_flag = SGR_Norway2_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 22 } }
+		set_country_flag = SGR_Norway1_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 23 } }
+		set_country_flag = SGR_Crimea_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 24 } }
+		set_country_flag = SGR_Wolga2_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 25 } }
+		set_country_flag = SGR_Wolga1_state_info_window_open
+	}
+	if = {
+		limit = { check_variable = { i = 26 } }
+		set_country_flag = SGR_Romania_state_info_window_open
+	}
+}

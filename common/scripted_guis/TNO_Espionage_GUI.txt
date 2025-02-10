@@ -1,0 +1,330 @@
+scripted_gui = {
+	#|=|========[ Main GUI ]========|=|#
+	TNO_Espionage_DecisionGui = {
+		context_type = player_context
+		parent_window_name = powerbalanceview
+		window_name = "TNO_Espionage_GUI"
+		visible = { has_country_flag = TNO_Espionage_Mech_Active }
+
+		visible = { check_variable = { TNO_BoP_SelectedTab = token:BoP_Tab_Espionage } }
+
+		triggers = {
+			# Budget Control Buttons
+			Espionage_GUI_Budget_DecreaseBtn_click_enabled = {
+				NOT = { check_variable = { TNO_Espionage_Investment = 0 } }
+			}
+			Espionage_GUI_Budget_IncreaseBtn_click_enabled = {
+				NOT = { check_variable = { TNO_Espionage_Investment = 0.06 } }
+			}
+
+			# Investment & Recruitment Buttons
+			Espionage_GUI_Capability_InvestBtn_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = TNO_Espionage_ExpertiseNotAtMax_tt
+					check_variable = { TNO_Espionage_Expertise < 100 }
+				}
+				command_power > 9.99
+				has_manpower > 10
+			}
+			Espionage_GUI_Training_RecruitBtn_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = TNO_Espionage_RecruitmentInactive_tt
+					NOT = { has_country_flag = TNO_Espionage_IsRecruiting }
+				}
+				custom_trigger_tooltip = {
+					tooltip = TNO_Espionage_NotAtAgentCap_tt
+					check_variable = { TNO_Espionage_AgentsTotal < 10 }
+				}
+
+				set_temp_variable = { N = 15 } # Funding Cost
+				set_temp_variable = { M = 50 } # Expertise Cost
+				custom_trigger_tooltip = { tooltip = TNO_Espionage_FundingCost_tt divide_temp_variable = { N = 1000 } NOT = { check_variable = { TNO_Espionage_Budget < N } } }
+				custom_trigger_tooltip = { tooltip = TNO_Espionage_ExpertiseCost_tt NOT = { check_variable = { TNO_Espionage_Expertise < M } } }
+			}
+
+			# World Region selection outline
+			Espionage_GUI_World_Map_Regions_Entry_Outline_visible = {
+				check_variable = { Espionage_SelectedRegion = Region_v }
+			}
+		}
+
+		effects = {
+			# Info Button
+			Espionage_GUI_InfoBtn_click = {
+				if = {
+					limit = { has_country_flag = TNO_Espionage_LeaderInfoGUI_Open }
+					clr_country_flag = TNO_Espionage_LeaderInfoGUI_Open
+				}
+				else = {
+					set_country_flag = TNO_Espionage_LeaderInfoGUI_Open
+				}
+			}
+
+			# Budget Control Buttons
+			Espionage_GUI_Budget_IncreaseBtn_click = {
+				add_to_variable = { TNO_Espionage_Investment = 0.005 }
+				add_to_variable = { TNO_Espionage_max_command_power = -5 }
+				force_update_dynamic_modifier = yes
+			}
+			Espionage_GUI_Budget_DecreaseBtn_click = {
+				add_to_variable = { TNO_Espionage_Investment = -0.005 }
+				add_to_variable = { TNO_Espionage_max_command_power = 5 }
+				force_update_dynamic_modifier = yes
+			}
+
+			# Research GUI Button
+			Espionage_GUI_ResearchBtn_click = {
+				if = {
+					limit = { has_country_flag = TNO_Espionage_ResearchGUI_Open }
+					clr_country_flag = TNO_Espionage_ResearchGUI_Open
+				}
+				else = {
+					set_country_flag = TNO_Espionage_ResearchGUI_Open
+				}
+			}
+
+			# Recruitment Button
+			Espionage_GUI_Capability_InvestBtn_click = {
+				hidden_effect = {
+					add_command_power = -10
+					add_manpower = -10
+				}
+				add_to_variable = { TNO_Espionage_Expertise = 10 tooltip = TNO_Espionage_AddExpertise_tt }
+				clamp_variable = { var = TNO_Espionage_Expertise min = 0 max = 100 }
+			}
+			Espionage_GUI_Training_RecruitBtn_click = {
+				subtract_from_variable = { TNO_Espionage_Budget = 0.015 }
+				subtract_from_variable = { TNO_Espionage_Expertise = 50 }
+				custom_effect_tooltip = TNO_Espionage_RecruitmentWillBegin_tt
+				hidden_effect = {
+					country_event = TNO_Espionage.2
+					country_event = { id = TNO_Espionage.4 days = 10 }
+					country_event = { id = TNO_Espionage.3 days = 100 }
+					set_country_flag = TNO_Espionage_IsRecruiting
+				}
+			}
+
+			# Region Buttons
+			Espionage_GUI_World_Map_Regions_Entry_click = {
+				set_variable = { Espionage_SelectedRegion = Region_v }
+				if = { # Because the US is a special snowflake, it gets swapping agencies here
+					limit = { tag = USA }
+					if = {
+						limit = {
+							OR = {
+								check_variable = { Region_v = token:Espionage_Map_NA }
+								check_variable = { Region_v = token:Espionage_Map_CA }
+								check_variable = { Region_v = token:Espionage_Map_SA }
+							}
+						}
+						set_variable = { TNO_Espionage_Agency = token:Espionage_FBI }
+						set_variable = { TNO_Espionage_AgencyLeader = USA_FBI_Lead }
+					}
+					else = {
+						set_variable = { TNO_Espionage_Agency = token:Espionage_CIA }
+						set_variable = { TNO_Espionage_AgencyLeader = USA_CIA_Lead }
+					}
+				}
+			}
+		}
+
+		dynamic_lists = {
+			Espionage_GUI_World_Map_Regions = {
+				array = global.TNO_Espionage_Region
+				index = Region_i
+				value = Region_v
+				entry_container = TNO_Espionage_GUI_World_Map_Regions_Container
+			}
+		}
+
+		properties = {
+			# Logo
+			Espionage_GUI_Logo = {
+				image = "GFX_[?TNO_Espionage_Agency.GetTokenKey]_Logo"
+			}
+
+			# Training, Expertise & Research Bars
+			Espionage_GUI_Training_TrainingBar = {
+				frame = TNO_Espionage_Training
+			}
+			Espionage_GUI_Capability_ExpertiseBar = {
+				frame = TNO_Espionage_Expertise
+			}
+			Espionage_GUI_Research_Bar = {
+				frame = TNO_Espionage_ResearchProgress
+			}
+
+			# World Map Regions
+			Espionage_GUI_World_Map_Regions_Entry = {
+				image = "GFX_[?Region_v.GetTokenKey]"
+				x = global.TNO_Espionage_RegionX^Region_i
+				y = global.TNO_Espionage_RegionY^Region_i
+			}
+			Espionage_GUI_World_Map_Regions_Entry_Outline = {
+				image = "GFX_[?Region_v.GetTokenKey]_outline"
+				x = global.TNO_Espionage_RegionX^Region_i
+				y = global.TNO_Espionage_RegionY^Region_i
+			}
+		}
+
+		#|=|========[ AI CODE ]========|=|#
+		ai_enabled = { TNO_Espionage_AllowedTags = yes }
+		ai_check = { has_country_flag = TNO_Espionage_Mech_Active }
+
+		ai_test_interval = 720
+		ai_max_weight_taken_per_test = 6
+
+		ai_weights = {
+			Espionage_GUI_Budget_IncreaseBtn_click = {
+				ai_will_do = { base = 5 }
+				weight = 1
+			}
+		}
+	}
+
+	#|=|========[ Research GUI ]========|=|#
+	TNO_Espionage_ResearchGui = {
+		context_type = player_context
+		parent_window_token = TNO_Espionage_GUI
+		window_name = "TNO_Espionage_GUI_ResearchWindow"
+
+		visible = {
+			OR = {
+				AND = {
+					is_ai = yes
+					has_country_flag = TNO_Espionage_Mech_Active												# For people using observe - doesn't appear for non-espionage countries
+					check_variable = { TNO_Espionage_CurrentResearch = -1 }										# For people using observe - doesn't appear when active research
+					find_lowest_in_array = { array = TNO_Espionage_TechArray value = low_v }					# For people using observe - doesn't appear if tech tree is complete is done
+					check_variable = { low_v = 0 }
+				}
+				has_country_flag = TNO_Espionage_ResearchGUI_Open
+			}
+		}
+
+		triggers = {
+			# Tech Button Availability
+			TNO_Espionage_GUI_Research_TechUpgrade_Button_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = TNO_Espionage_ResearchNotActive_tt
+					check_variable = { TNO_Espionage_CurrentResearch = -1 }
+				}
+				custom_trigger_tooltip = {
+					tooltip = TNO_Espionage_ResearchNotComplete_tt
+					check_variable = { TNO_Espionage_TechArray^Tech_i = 0 }
+				}
+				TNO_Espionage_ResearchCosts = yes
+			}
+
+			# Button Overlay Visiblity
+			TNO_Espionage_GUI_Research_TechUpgrade_Complete_visible = {
+				check_variable = { TNO_Espionage_TechArray^Tech_i = 1 }
+			}
+			TNO_Espionage_GUI_Research_TechUpgrade_Inactive_visible = {
+				OR = {
+					NOT = { check_variable = { TNO_Espionage_CurrentResearch = -1 } }
+					TNO_Espionage_ResearchCosts = no
+				}
+			}
+		}
+
+		effects = {
+			# Close Button
+			TNO_Espionage_GUI_Research_CloseBtn_click = {
+				clr_country_flag = TNO_Espionage_ResearchGUI_Open
+			}
+
+			# Tech Button
+			TNO_Espionage_GUI_Research_TechUpgrade_Button_click = {
+				set_variable = { TNO_Espionage_CurrentResearch = Tech_i }
+				hidden_effect = { country_event = { id = TNO_Espionage.1 days = 7 } }
+
+				Espionage_Tech_ApplyCost = yes
+				effect_tooltip = { Espionage_Tech_ApplyEffect = yes }
+			}
+		}
+
+		dynamic_lists = {
+			TNO_Espionage_GUI_Research_TechUpgrades_Gridbox = {
+				array = TNO_Espionage_TechArray
+				index = Tech_i
+				entry_container = TNO_Espionage_GUI_Research_TechUpgrades_Container
+			}
+		}
+
+		triggers = { # Setup proper frame for the icon
+			TNO_Espionage_GUI_Research_TechUpgrade_Picture_visible = {
+				set_temp_variable = { techupgrade_frame = Tech_i }
+				add_to_temp_variable = { techupgrade_frame = 1 }
+			}
+		}
+		properties = {
+			TNO_Espionage_GUI_Research_TechUpgrade_Picture = {
+				image = "GFX_Espionage_Tech_[THIS.GetTag]"
+				frame = techupgrade_frame
+			}
+		}
+
+		#|=|========[ AI CODE ]========|=|#
+		ai_enabled = { TNO_Espionage_AllowedTags = yes }
+		ai_check = { has_country_flag = TNO_Espionage_Mech_Active }
+
+		ai_test_interval = 168
+		ai_max_weight_taken_per_test = 1
+
+		ai_weights = {
+			TNO_Espionage_GUI_Research_TechUpgrade_Button_click = {
+				ai_will_do = { base = 1 }
+				weight = 1
+			}
+		}
+	}
+
+	#|=|========[ Research Notification GUI ]========|=|#
+	TNO_Espionage_TechCompletionGui = {
+		context_type = player_context
+		parent_window_token = top_bar
+		window_name = "TNO_Espionage_GUI_TechCompletionWindow"
+
+		visible = { has_country_flag = TNO_Espionage_TechCompletionGUI_Open }
+
+		effects = {
+			TNO_Espionage_GUI_TechCompletion_ConfirmBtn_click = {
+				clr_country_flag = TNO_Espionage_TechCompletionGUI_Open
+			}
+		}
+
+		triggers = { # Setup proper frame for the icon
+			TNO_Espionage_GUI_TechCompletion_Icon_visible = {
+				set_temp_variable = { techcomplete_frame = TNO_Espionage_PastResearch }
+				add_to_temp_variable = { techcomplete_frame = 1 }
+			}
+		}
+		properties = {
+			TNO_Espionage_GUI_TechCompletion_Icon = {
+				image = "GFX_Espionage_Tech_[THIS.GetTag]"
+				frame = techcomplete_frame
+			}
+		}
+	}
+
+	#|=|========[ Leader Info GUI ]========|=|#
+	TNO_Espionage_LeaderInfoGui = {
+		context_type = player_context
+		parent_window_token = TNO_Espionage_GUI
+		window_name = "TNO_Espionage_GUI_LeaderInfoWindow"
+
+		visible = { has_country_flag = TNO_Espionage_LeaderInfoGUI_Open }
+
+		effects = {
+			TNO_Espionage_GUI_LeaderInfo_CloseBtn_click = {
+				clr_country_flag = TNO_Espionage_LeaderInfoGUI_Open
+			}
+		}
+
+		properties = {
+			TNO_Espionage_GUI_LeaderInfo_Portrait = {
+				image = "GFX_[THIS.GetTag]_[?TNO_Espionage_AgencyLeader.GetTokenKey]"
+			}
+		}
+	}
+}

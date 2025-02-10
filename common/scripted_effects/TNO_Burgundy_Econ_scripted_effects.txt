@@ -1,0 +1,140 @@
+##################################
+####
+#### TESTING STATION
+####
+##################################
+
+
+BRG_Monthly_Econ_Update = {
+
+	##########################
+	#### EQUATION:
+	####
+	#### (TW / FP ) = N, N /40 = P, P + -0.125 = F
+	####
+	##########################
+	BRG = {
+
+		set_temp_variable = { BRG_Total_Worker_Pop_For_Econ_Buffs = 0 }
+
+		set_temp_variable = { BRG_Factory_Population = 65000 } #FP, Factory Population 
+
+		set_temp_variable = { BRG_Standarized_Number_Of_Used_Factories = 0 } #N
+
+		set_temp_variable = { BRG_Used_Factory_Output = 0 } #P, Production
+		
+		set_temp_variable = { BRG_Final_Added_Buff = 0 } #F, Final Buff
+
+		set_temp_variable = { BRG_Number_Of_Free_PU = 0 } #For the PU stuff. It's equal to a rounded N
+
+		every_owned_state = {
+			add_to_temp_variable = { BRG_Total_Worker_Pop_For_Econ_Buffs = THIS.BRG_Skilled_Worker_Pop } ### Sum of all skilled workers
+		}
+
+		divide_temp_variable = { BRG_Total_Worker_Pop_For_Econ_Buffs = BRG_Factory_Population } # This gets N 
+
+		set_temp_variable = { BRG_Standarized_Number_Of_Used_Factories = BRG_Total_Worker_Pop_For_Econ_Buffs } # Sets N to N 
+
+		set_temp_variable = { BRG_Number_Of_Free_PU = BRG_Standarized_Number_Of_Used_Factories } # Sets This to N
+
+		set_variable = { BRG_Progress_Bar_Variable = BRG_Standarized_Number_Of_Used_Factories } # Sets the progress bar variable to the final P
+
+		divide_temp_variable = { BRG_Standarized_Number_Of_Used_Factories = 40 } # Gets P
+
+		set_temp_variable = { BRG_Used_Factory_Output = BRG_Standarized_Number_Of_Used_Factories } # Sets P to P
+
+		add_to_temp_variable = { BRG_Used_Factory_Output = -0.125 }
+
+		clamp_temp_variable = {
+			var = BRG_Used_Factory_Output #### Clamps the variable from -0.125 to 0.125
+			min = -0.125
+			max = 0.125
+		}
+
+		set_variable = { BRG_Econ_Dynamic_Mod_Construction_Speed = BRG_Used_Factory_Output } # Sets all the different economic variables
+		set_variable = { BRG_Econ_Dynamic_Mod_Factory_Output = BRG_Used_Factory_Output }
+		set_variable = { BRG_Econ_Dynamic_Mod_Factory_Retention = BRG_Used_Factory_Output }
+
+		round_temp_variable = BRG_Number_Of_Free_PU ## Rounds this to the nearest integer 
+
+		set_variable = { BRG_Econ_Dynamic_Mod_Free_PUS = BRG_Number_Of_Free_PU }
+
+		clamp_variable = {
+			var = BRG_Econ_Dynamic_Mod_Free_PUS
+			min = 0
+			max = 12
+		}
+		add_to_variable = { BRG_Econ_Dynamic_Mod_Free_PUS = BRG_Hidden_Econ_Dynamic_Mod_PUS }
+
+		set_temp_variable = { BRG_Econ_Dynamic_Mod_Stability_And_PP_Calcs = 12 }
+
+		subtract_from_temp_variable = { BRG_Econ_Dynamic_Mod_Stability_And_PP_Calcs = BRG_Number_Of_Free_PU }
+
+		divide_temp_variable = { BRG_Econ_Dynamic_Mod_Stability_And_PP_Calcs = -100 }
+
+		set_variable = { BRG_Econ_Dynamic_Mod_Stability = BRG_Econ_Dynamic_Mod_Stability_And_PP_Calcs }
+
+		multiply_temp_variable = { BRG_Econ_Dynamic_Mod_Stability_And_PP_Calcs = 2 }
+
+		set_variable = { BRG_Econ_Dynamic_Mod_PP = BRG_Econ_Dynamic_Mod_Stability_And_PP_Calcs }
+
+		multiply_variable = { BRG_Progress_Bar_Variable = 10 } # Gets it to between 0-100
+
+		if = { #Fix for stuff that breaks with no econ, hopefully the bare minimum needed
+			limit = { has_country_flag = can_not_use_econ_system }
+			societal_development_monthly_check = yes
+			recalculate_PUs_on_demand = yes
+			calculate_building_variables = yes
+			monthly_nuclear_production = yes
+		}
+	}
+}
+
+BRG_Monthly_Economy_Constant = {
+	BRG = {
+		set_variable = { GDP = 4.56 } #in billions
+		set_variable = { GDP_growth = 0.2 }
+		set_variable = { base_inflation_rate = 7.1 }
+		set_variable = { income_tax_rate = 0.05 }
+		set_variable = { business_tax_rate = 0.05 }
+		set_variable = { poverty_rate = 72 }
+		set_variable = { poverty_monthly_change = 0.20 }
+		set_variable = { money_reserves = 0.0 } #in billions
+		set_variable = { national_debt = 3.7 } #in billions
+		set_variable = { misc_income = 0.0 }
+		set_variable = { misc_costs = 0 }
+	}
+}
+
+
+BRG_Collapse_Economy = {
+	custom_effect_tooltip = BRG_economy_returns
+	BRG = {
+		hidden_effect = {
+			add_dynamic_modifier = { modifier = TNO_consumer_goods_production_dynamic_modifier }
+			add_dynamic_modifier = { modifier = TNO_economy_type_capitalism_dynamic_modifier }
+			add_dynamic_modifier = { modifier = Central_Bank_Dynamic_Modifier }
+			add_dynamic_modifier = { modifier = TNO_inflation_dynamic_modifier }
+			add_dynamic_modifier = { modifier = TNO_vol_troops_modifier }
+			add_dynamic_modifier = { modifier = TNO_deficit_effects_modifier }
+			add_dynamic_modifier = { modifier = TNO_factory_multiplier }
+			add_dynamic_modifier = { modifier = TNO_base_econ_shit_dynamic_modifier }
+			add_dynamic_modifier = { modifier = TNO_deficit_effects_modifier }
+
+			every_owned_state = { # Fixes Econ recalulating after collapse
+				set_temp_variable = { state_value_multiplier_temp = 0.1 }
+				econ_state_value_change_multiply = yes
+			}
+			calculate_total_state_gdp = yes
+			generate_country_gdp = yes
+		}
+
+		set_variable = { GDP_growth = -15.9 }
+		set_variable = { base_inflation_rate = 15.9 }
+		set_variable = { poverty_rate = 90 }
+		set_variable = { poverty_monthly_change = 0.20 }
+		set_variable = { money_reserves = 0.0 } #in billions
+		set_variable = { national_debt = 5.1 } #in billions
+		set_variable = { economic_centralization = 90 }
+	}
+}

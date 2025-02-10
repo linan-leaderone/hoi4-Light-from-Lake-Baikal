@@ -1,0 +1,335 @@
+########################################################################
+##  ██████╗  ██████╗ ██████╗ ███╗   ███╗ █████╗ ███╗   ██╗███╗   ██╗  ##
+##  ██╔══██╗██╔═══██╗██╔══██╗████╗ ████║██╔══██╗████╗  ██║████╗  ██║  ##
+##  ██████╔╝██║   ██║██████╔╝██╔████╔██║███████║██╔██╗ ██║██╔██╗ ██║  ##
+##  ██╔══██╗██║   ██║██╔══██╗██║╚██╔╝██║██╔══██║██║╚██╗██║██║╚██╗██║  ##
+##  ██████╔╝╚██████╔╝██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║██║ ╚████║  ##
+##  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝  ##
+########################################################################
+
+###################################
+#   BORMANN SIG AI WWEKLY CHECK   #
+###################################
+# Very dumb, very simple AI for the Reformists and Militarists in the Kartenhaus
+# Doesn't properly check for the status of the SIG or the faction, has no strategy at all
+# But it works and adds a bit of challenge, so hey, it ain't so bad
+
+# Biweekly SIG check
+BOR_SIG_AI_BiweeklyCheck = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_BiweeklyCheck; Executing."
+
+	# Reformist AI
+	if = {
+		limit = { NOT = { has_country_flag = BOR_reformists_dismantled } }
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_BiweeklyCheck; Reformists NOT Dismantled, Executing their AI."
+
+		# Run command
+		set_variable = { BOR_SIG_AI_fi = 0 }
+		BOR_SIG_AI_Run = yes
+
+		# Logging the Actor
+		set_variable = { BOR_SIG_Log_Actor^0 = 0 }
+	}
+
+	# Militarist AI
+	if = {
+		limit = { NOT = { has_country_flag = BOR_militarists_dismantled } }
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_BiweeklyCheck; Militarists NOT Dismantled, Executing their AI."
+
+		# Run command
+		set_variable = { BOR_SIG_AI_fi = 2 }
+		BOR_SIG_AI_Run = yes
+
+		# Logging the Actor
+		set_variable = { BOR_SIG_Log_Actor^0 = 2 }
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_BiweeklyCheck; Completed execution."
+}
+
+# The actual command that runs
+BOR_SIG_AI_Run = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_Run; Executing."
+	
+	# Pick a random non-Dismantled SIG
+	BOR_SIG_AI_DT = yes
+
+	# Logs
+	set_country_flag = BOR_SIG_non_specific_effect
+	add_to_array = { BOR_SIG_Log_Actor = 0 }
+
+	# Now that a random SIG is picked, check if its Allied or not
+	# 	If it's Allied OR Supportive, pick between Loyalty and Power
+	#		If Loyalty, decrease SIG Conservative Loyalty
+	#		If Power, decrease SIG Power
+	#	 If it's NOT Allied OR Supportive, increase target Faction SIG Loyalty
+	if = {
+		limit = {
+			check_variable = { BOR_SIGType^BOR_SIG_AI_RT > 1 }
+			NOT = {
+				#If Reformists aren't Supportive
+				AND = {
+					check_variable = { BOR_ReformistSupport < 50 }
+					check_variable = {
+						var = BOR_SIGLoyalty_Ref^Kartenhaus_SIGGridBox_i
+						value = BOR_SIGLoyalty_State^Kartenhaus_SIGGridBox_i
+						compare = greater_than_or_equals
+					}
+					check_variable = {
+						var = BOR_SIGLoyalty_Ref^Kartenhaus_SIGGridBox_i
+						value = BOR_SIGLoyalty_Mil^Kartenhaus_SIGGridBox_i
+						compare = greater_than_or_equals
+					}
+				}
+				
+				#If Militarists aren't Supportive
+				AND = {
+					check_variable = { BOR_MilitaristSupport < 50 }
+					check_variable = {
+						var = BOR_SIGLoyalty_Mil^Kartenhaus_SIGGridBox_i
+						value = BOR_SIGLoyalty_Ref^Kartenhaus_SIGGridBox_i
+						compare = greater_than_or_equals
+					}
+					check_variable = {
+						var = BOR_SIGLoyalty_Mil^Kartenhaus_SIGGridBox_i
+						value = BOR_SIGLoyalty_State^Kartenhaus_SIGGridBox_i
+						compare = greater_than_or_equals
+					}
+				}
+			}
+		}
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_Run; SIG is Allied OR Supportive."
+		random_list = {
+			# Loyalty
+			50 = {
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_Run; Loyalty action picked, running command."
+
+				## Effect
+				set_variable = { BOR_SIG_AL_fi = 1 }
+				set_variable = { BOR_SIG_AL_i = BOR_SIG_AI_RT }
+				set_variable = { BOR_SIG_AL_v = -3 }
+
+				BOR_SIG_AddLoyalty = yes
+			}
+			# Power
+			50 = {
+				log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_Run; Power action picked, running command."
+
+				## Effect
+				set_variable = { BOR_SIG_AP_i = BOR_SIG_AI_RT }
+				set_variable = { BOR_SIG_AP_v = -5 }
+
+				BOR_SIG_AddPower = yes
+			}
+		}
+	}
+	else = {
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_Run; SIG is NOT Allied OR Supportive."
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_Run; Loyalty action picked, running command."
+
+		## Effect
+		set_variable = { BOR_SIG_AL_fi = BOR_SIG_AI_fi }
+		set_variable = { BOR_SIG_AL_i = BOR_SIG_AI_RT }
+		set_variable = { BOR_SIG_AL_v = 3 }
+
+		BOR_SIG_AddLoyalty = yes
+	}
+
+	# Logging the affected SIG
+	set_variable = { BOR_SIG_Log_AffectedSIG^0 = BOR_SIG_AI_RT }
+
+	# Cleanup
+	clear_variable = BOR_SIG_AI_fi
+	clear_variable = BOR_SIG_AI_RT
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_Run; Completed execution."
+}
+
+# Picks a random SIG ID which is not Dismantled
+# Returns: BOR_SIG_AI_RT
+BOR_SIG_AI_DT = {
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_DT; Executing."
+
+	# Set variable
+	clear_variable = BOR_SIG_AI_RT
+	set_temp_variable = { BOR_SIG_AI_RT_temp = 0 }
+
+	# Set random value between 0 and 11
+	randomize_temp_variable = {
+		var = BOR_SIG_AI_RT_temp
+		distribution = uniform
+		min = 0
+		max = 11
+	}
+	set_variable = { BOR_SIG_AI_RT = BOR_SIG_AI_RT_temp }
+	round_variable = BOR_SIG_AI_RT
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_DT; Random SIG ID Value: [?BOR_SIG_AI_RT]"
+	
+	# Checking if SIG is Dismantled. If yes, run the script again
+	if = {
+		limit = { check_variable = { BOR_SIGType^BOR_SIG_AI_RT = 0 } }
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_DT; Random SIG is Dismantled, Re-executing."
+		BOR_SIG_AI_DT = yes
+	}
+	else = {
+		log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_DT; Random SIG is valid."
+	}
+
+	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_DT; Completed execution."
+}
+
+###### Old stuff that was never finished ######
+
+###################################
+# BORMANN SIG AI DETERMINE TARGET #
+###################################
+
+# ##Cleaning Command; Used in BOR_SIG_AI_DetermineTarget to clear variables once unneeded
+# #Args: n/a
+# BOR_SIG_AI_DT_Clear = {
+# 	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_DT_Clear; Executing."
+
+# 	clear_variable = BOR_SIG_AIWeights_sum_rdm
+# 	clear_array = BOR_SIG_AIWeights
+
+# 	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_DT_Clear; Completed execution."
+
+# }
+
+# ##Basic Command; Determines Target for SIG AI action
+# #Args: BOR_SIG_AI_fi (faction index)
+# BOR_SIG_AI_DetermineTarget = {
+# 	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_DetermineTarget; Executing."
+# 	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_DetermineTarget; Given BOR_SIG_AI_fi: [?BOR_SIG_AI_fi]"
+	
+# 	##Err Checks
+# 	#Handed invalid index
+# 	if = {
+# 		limit = {
+# 			NOT = { check_variable = { BOR_SIG_AI_fi = 0 } }
+# 			NOT = { check_variable = { BOR_SIG_AI_fi = 2 } }
+# 		}
+# 		log = "[ERROR]: [GetDateText]: [Root.GetName]: BOR_SIG_AI_DetermineTarget; Handed invalid index. Breaking."
+# 		BOR_SIG_AI_DT_Clear = yes
+# 		#break = yes	
+# 	}
+
+# 	##Array Instantiation
+# 	resize_array = {
+# 		array = BOR_SIG_AIWeights
+# 		value = 10
+# 		size = BOR_SIGType^n
+# 	}
+
+# 	##Weight Calculation
+	
+
+# 	##Weight Summing
+# 	set_variable = { BOR_SIG_AIWeights_sum = 0 }
+	
+# 	for_each_loop = {
+# 		array = BOR_SIG_AIWeights
+# 		value = val
+
+# 		add_to_variable = { BOR_SIG_AIWeights_sum = val }
+# 	}
+	
+# 	set_variable = { BOR_SIG_AIWeights_sum_rdm = random }
+# 	multiply_variable = { BOR_SIG_AIWeights_sum_rdm = BOR_SIG_AIWeights_sum }
+
+# 	##Target Determination
+	
+# 	set_variable = { BOR_SIG_AI_target = 0 }
+		
+# 	for_each_loop = {
+# 		array = BOR_SIG_AIWeights
+# 		value = val
+# 		index = i
+# 		break = break
+
+# 		if = {
+# 			limit = { check_variable = { BOR_SIG_AIWeights_sum_rdm > val } }
+# 			set_temp_variable = { break = 1 }
+# 		}
+# 		else = {
+# 			set_variable = { BOR_SIG_AI_target = i }
+# 		}
+# 	}
+
+# 	## Action
+# 	set_variable = { BOR_SIG_AIAction = random }
+# 	multiply_variable = { BOR_SIG_AIAction = 3 }
+# 	round_variable = BOR_SIG_AIAction
+
+# 	# For Logging
+# 	set_variable = { BOR_SIG_Log_Actor^0 = BOR_SIG_AI_fi	 }
+
+# 	# Action: AddPower to Target
+# 	if = {
+# 		limit = { check_variable = { BOR_SIG_AIAction = 0 } }
+
+# 		set_variable = { BOR_SIG_AP_i = BOR_SIG_AI_target }
+# 		set_variable = { BOR_SIG_AP_v = 5 }
+# 		BOR_SIG_AP_AddToFactionPower = yes
+# 	}
+# 	# Action: SubPower from Target
+# 	else_if = {
+# 		limit = { check_variable = { BOR_SIG_AIAction = 1 } }
+
+# 		set_variable = { BOR_SIG_AP_i = BOR_SIG_AI_target }
+# 		set_variable = { BOR_SIG_AP_v = -5 }
+# 		BOR_SIG_AP_AddToFactionPower = yes
+# 	}
+# 	# Action: AddLoyalty to Target against Self
+# 	else_if = {
+# 		limit = { check_variable = { BOR_SIG_AIAction = 2 } }
+
+# 		set_variable = { BOR_SIG_AL_i = BOR_SIG_AI_target }
+# 		set_variable = { BOR_SIG_AL_v = 3 }
+# 		set_variable = { BOR_SIG_AL_fi = BOR_SIG_AI_target }
+# 		BOR_SIG_AddLoyalty = yes
+# 	}
+# 	# Action: SubLoyalty from Target against Enemy (Con or Other Faction)
+# 	else_if = {
+# 		limit = { check_variable = { BOR_SIG_AIAction = 3 } }
+
+# 		set_variable = { BOR_SIG_AL_i = BOR_SIG_AI_target }
+# 		set_variable = { BOR_SIG_AL_v = 3 }
+# 		if = {
+# 			limit = {
+# 				OR = {
+# 					AND = {
+# 						check_variable = { BOR_SIG_AI_target = 0 }
+# 						check_variable = { BOR_ReformistSupport > 50 }
+# 					}
+# 					AND = {
+# 						check_variable = { BOR_SIG_AI_target = 2 }
+# 						check_variable = { BOR_ReformistSupport > 50 }
+# 					}
+# 				}
+# 			}
+# 			set_variable = { BOR_SIG_AL_fi = BOR_SIG_AI_target }
+# 		}
+# 		else_if = {
+# 			limit = {
+# 				OR = {
+# 					AND = {
+# 						check_variable = { BOR_SIG_AI_target = 0 }
+# 						check_variable = { BOR_ReformistSupport < 50 }
+# 					}
+# 					AND = {
+# 						check_variable = { BOR_SIG_AI_target = 2 }
+# 						check_variable = { BOR_ReformistSupport < 50 }
+# 					}
+# 				}
+# 			}
+# 			set_variable = { BOR_SIG_AL_fi = 1 }
+# 		}
+# 		BOR_SIG_AddLoyalty = yes
+# 	}
+
+# 	##Cleaning
+# 	BOR_SIG_AI_DT_Clear = yes
+
+# 	log = "[GetDateText]: [Root.GetName]: BOR_SIG_AI_DetermineTarget; Completed execution."
+# }

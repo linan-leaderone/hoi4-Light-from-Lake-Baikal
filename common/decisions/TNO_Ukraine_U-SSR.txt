@@ -1,0 +1,231 @@
+###################
+# Debug Decisions #
+###################
+UKS_debug_category = {
+	UKS_activate_rev_will = {
+		allowed = { tag = UKS }
+		visible = { is_debug = yes }
+		complete_effect = { UKS_Revolutionary_Will_Activate = yes }
+	}
+}
+
+####################################
+# The Revolutionary Will Decisions #
+####################################
+
+UKS_revolution_category = {
+	UKS_rev_meet_with_dissenters = {
+		allowed = { tag = UKS }
+		icon = GFX_decision_generic_civil_support
+		visible = { has_variable = UKS_Trust }
+		cost = 25
+		days_re_enable = 60
+		days_remove = 7
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_rev_meet_with_dissenters"
+			add_stability = 0.03
+			set_temp_variable = { TrustChange = 5 }
+			UKS_Modify_Trust = yes
+			set_temp_variable = { AuthorityChange = -5 }
+			UKS_Modify_Authority = yes
+		}
+	}
+	UKS_rev_rally_komsomol = {
+		allowed = { tag = UKS }
+		icon = GFX_decision_generic_document_socialism
+		visible = { has_variable = UKS_Trust }
+		cost = 40
+		days_re_enable = 60
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_rev_rally_komsomol"
+			set_temp_variable = { AuthorityChange = 5 }
+			UKS_Modify_Authority = yes
+			add_timed_idea = {
+				idea = UKS_rally_the_komsomol
+				days = 28
+			}
+		}
+	}
+	UKS_rev_root_collabs = {
+		allowed = { tag = UKS }
+		icon = GFX_decision_generic_assassination
+		visible = { has_variable = UKS_Trust }
+		cost = 50
+		days_re_enable = 60
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_rev_root_collabs"
+			set_temp_variable = { TrustChange = 2 }
+			UKS_Modify_Trust = yes
+			set_temp_variable = { AuthorityChange = 3 }
+			UKS_Modify_Authority = yes
+			add_timed_idea = {
+				idea = UKS_root_out_collaborators
+				days = 15
+			}
+		}
+	}
+	UKS_rev_elect_local_radas = {
+		allowed = { tag = UKS }
+		icon = GFX_decision_generic_voting
+		visible = { has_variable = UKS_Trust }
+		available = {
+			check_variable = { var = UKS_Trust value = 40 compare = greater_than_or_equals }
+			check_variable = { var = UKS_authority value = 40 compare = greater_than_or_equals }
+		}
+		cost = 30
+		days_remove = 7
+		days_re_enable = 60
+
+		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_rev_elect_local_radas"
+			set_temp_variable = { TrustChange = 10 }
+			UKS_Modify_Trust = yes
+			set_temp_variable = { AuthorityChange = -7.5 }
+			UKS_Modify_Authority = yes
+			add_political_power = 50
+		}
+	}
+	UKS_rev_meet_workers = {
+		allowed = { tag = UKS }
+		icon = GFX_decision_generic_workers
+		visible = { has_variable = UKS_Trust }
+		available = {
+			check_variable = { var = UKS_Trust value = 45 compare = greater_than_or_equals }
+			check_variable = { var = UKS_authority value = 45 compare = greater_than_or_equals }
+		}
+		cost = 50
+		days_re_enable = 90
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_rev_meet_workers"
+			add_timed_idea = {
+				idea = UKS_convene_factory_councils
+				days = 28
+			}
+		}
+	}
+}
+
+################################
+# Ukrainian Red Army Decisions #
+################################
+
+UKS_military_category = {
+	UKS_mil_convert_xp = {
+		allowed = { tag = UKS }
+		#icon =
+		visible = { has_variable = UKS_military_points }
+		custom_cost_trigger = {
+			has_army_experience > 19.99
+		}
+		custom_cost_text = decision_cost_20_army_xp
+		days_re_enable = 7
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_mil"
+			army_experience = -20
+			add_to_variable = { UKS_military_points = 5 }
+		}
+	}
+	UKS_mil_improve_training = {
+		allowed = { tag = UKS }
+		#icon =
+		visible = { has_variable = UKS_military_points }
+		custom_cost_trigger = { check_variable = { UKS_military_points > 4.99 } }
+		custom_cost_text = decision_cost_5_milpoints
+		days_re_enable = 14
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_mil"
+			subtract_from_variable = { UKS_military_points = 5 }
+			custom_effect_tooltip = UKS_red_army_header_tt
+			set_temp_variable = { L = -0.025 }
+			UKS_red_army_change_training_L = yes
+			TNO_improve_training_policy_effectiveness_low = yes 
+		}
+	}
+	UKS_mil_develop_planning = {
+		allowed = { tag = UKS }
+		#icon =
+		visible = { has_variable = UKS_military_points }
+		custom_cost_trigger = { check_variable = { UKS_military_points > 4.99 } }
+		custom_cost_text = decision_cost_5_milpoints
+		days_re_enable = 14
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_mil"
+			subtract_from_variable = { UKS_military_points = 5 }
+			custom_effect_tooltip = UKS_red_army_header_tt
+			set_temp_variable = { L = 0.025 }
+			UKS_red_army_change_max_planning_L = yes
+		}
+	}
+	UKS_mil_improve_organization = {
+		allowed = { tag = UKS }
+		#icon =
+		visible = { has_variable = UKS_military_points }
+		custom_cost_trigger = { check_variable = { UKS_military_points > 9.99 } }
+		custom_cost_text = decision_cost_10_milpoints
+		days_re_enable = 14
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_mil"
+			subtract_from_variable = { UKS_military_points = 10 }
+			custom_effect_tooltip = UKS_red_army_header_tt
+			set_temp_variable = { L = 0.025 }
+			UKS_red_army_change_org_L = yes
+			TNO_improve_military_supervision_policy_effectiveness_low = yes 
+		}
+	}
+	UKS_mil_develop_supply_consumption = {
+		allowed = { tag = UKS }
+		#icon =
+		visible = { has_variable = UKS_military_points }
+		custom_cost_trigger = { check_variable = { UKS_military_points > 9.99 } }
+		custom_cost_text = decision_cost_10_milpoints
+		days_re_enable = 14
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_mil"
+			subtract_from_variable = { UKS_military_points = 10 }
+			custom_effect_tooltip = UKS_red_army_header_tt
+			set_temp_variable = { L = -0.025 }
+			UKS_red_army_change_supply_consumption_L = yes
+		}
+	}
+	UKS_mil_improve_defense = {
+		allowed = { tag = UKS }
+		#icon =
+		visible = { has_variable = UKS_military_points }
+		custom_cost_trigger = { check_variable = { UKS_military_points > 14.99 } }
+		custom_cost_text = decision_cost_15_milpoints
+		days_re_enable = 14
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_mil"
+			subtract_from_variable = { UKS_military_points = 15 }
+			custom_effect_tooltip = UKS_red_army_header_tt
+			set_temp_variable = { L = 0.025 }
+			UKS_red_army_change_defence_L = yes
+		}
+	}
+	UKS_mil_improve_attack = {
+		allowed = { tag = UKS }
+		#icon =
+		visible = { has_variable = UKS_military_points }
+		custom_cost_trigger = { check_variable = { UKS_military_points > 14.99 } }
+		custom_cost_text = decision_cost_15_milpoints
+		days_re_enable = 14
+
+		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision UKS_mil"
+			subtract_from_variable = { UKS_military_points = 15 }
+			custom_effect_tooltip = UKS_red_army_header_tt
+			set_temp_variable = { L = 0.025 }
+			UKS_red_army_change_attack_L = yes
+		}
+	}
+}

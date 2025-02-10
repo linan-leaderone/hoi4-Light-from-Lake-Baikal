@@ -1,0 +1,72 @@
+﻿
+add_namespace = economy
+
+
+# Sphere quicksort here because Johan
+
+country_event = {
+	id = economy.0
+	title = economy.0.t
+	desc = economy.0.d
+	is_triggered_only = yes
+	hidden = yes
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event economy.0"
+		ZZZ = {
+			econ_recompile_all_spheres = yes
+			econ_get_world_gdp = yes
+			generate_econ_rankings = yes
+
+			# Market Stuff
+			setup_market_ZZZ = yes
+		}
+	}
+	option = {
+		name = economy.0.a
+	}
+}
+
+# TT Market system trade event MOVE ME
+country_event = {
+	id = economy.1
+	is_triggered_only = yes
+	hidden = yes
+	immediate = {
+		set_temp_variable = { amount = pending_trade_deals^0 }
+		if = {
+			limit = { check_variable = { amount < 0 } }
+			multiply_temp_variable = { amount = -1 }
+
+			subtract_from_variable = { PU_imports = amount }
+			log = "[GetDateText]: [Root.GetName]: Bulk import for [?amount] PU over"
+			} else = {
+			subtract_from_variable = { PU_exports = amount }
+			log = "[GetDateText]: [Root.GetName]: Bulk export for [?amount] PU over"
+		}
+		remove_from_array = { array = pending_trade_deals index = 0 }
+
+		update_prod_units_trade = yes
+	}
+
+	option = {
+		name = economy.1.a
+	}
+}
+
+# rerun recalculate_world_trade_influence at day 1
+country_event = {
+	id = economy.2
+	title = economy.2.t
+	desc = economy.2.d
+	is_triggered_only = yes
+	hidden = yes
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event economy.2"
+		ZZZ = {
+			recalculate_world_trade_influence = yes
+		}		
+	}
+	option = {
+		name = economy.2.a
+	}
+}

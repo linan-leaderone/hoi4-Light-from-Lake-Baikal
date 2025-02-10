@@ -1,0 +1,337 @@
+#|========================================================================|#
+#|  _____ _           _   _             _____                             |#
+#| |  ___| |         | | (_)           /  ___|                            |#
+#| | |__ | | ___  ___| |_ _  ___  _ __ \ `--.  ___  __ _ ___  ___  _ __   |#
+#| |  __|| |/ _ \/ __| __| |/ _ \| '_ \ `--. \/ _ \/ _` / __|/ _ \| '_ \  |#
+#| | |___| |  __/ (__| |_| | (_) | | | /\__/ /  __/ (_| \__ \ (_) | | | | |#
+#| \____/|_|\___|\___|\__|_|\___/|_| |_\____/ \___|\__,_|___/\___/|_| |_| |#
+#|                                                                        |#
+#|=====================| ElectionSeason ScriptedGUI |=====================|#
+#|=====| ~/common/scripted_guis/TNO_ElectionSeason_scripted_gui.txt |=====|#
+#|------------------------------------------------------------------------|#
+#|====| Related;                                                          |#
+#|==| $/common/scripted_effects/TNO_ElectionSeason_scripted_effects.txt   |#
+#|==| $/common/scripted_triggers/TNO_ElectionSeason_scripted_triggers.txt |#
+#|========================================================================|#
+
+# ***HUGE*** Brains List:
+# Calph, 
+
+scripted_gui = {
+	TNO_ElectionSeason_DecisionUI_SCO = {
+		window_name = "TNO_ElectionSeason_Main_SCO"
+		context_type = decision_category
+
+		visible = {
+			tag = SCO
+			#has_country_flag = Itis_ElectionSeason
+		}
+
+		dynamic_lists = {
+			# Used to display 'StateElectionBox'es
+			# - ElectionSeason_ActiveStates defined in Scripted Effects file
+			TNO_ElectionSeason_StateElection_GridBox = {
+				array = ElectionSeason_ActiveStates
+				index = ElectionSeason_ActiveStates_i
+				change_scope = yes
+
+				entry_container = TNO_ElectionSeason_StateElectionBox
+			}
+		}
+
+		effects = {
+			# StateElectionBox Interactions
+			# - See $/common/scripted_effects/TNO_ElectionSeason_scripted_effects.txt
+			#ElectionSeason_SE_CampaignBtn_click = {
+			#	ElectionSeason_CampaignInState = yes
+			#}
+
+			#ElectionSeason_SE_FoulPlayBtn_click = {
+			#	ElectionSeason_FoulPlayInState = yes
+			#}
+		}
+
+		properties = {
+
+		}
+
+		triggers = {
+			# StateElection_Entry Obverse v. Reverse
+			# - See $/common/scripted_triggers/TNO_ElectionSeason_scripted_triggers.txt
+			# - Obverse if index is even
+			# - Reverse if index is odd
+			#TNO_ElectionSeason_StateElections_Entry_Obverse_visible = {
+			#	always = no
+			#	#ElectionSeason_ActiveStates_index_iseven = yes
+			#}
+
+			#TNO_ElectionSeason_StateElections_Entry_Reverse_visible = {
+			#	always = no
+			#	#NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			#}
+		}
+	}
+
+	TNO_ElectionSeason_DecisionUI = {
+		window_name = "TNO_ElectionSeason_Main_ENG"
+		context_type = decision_category
+
+		visible = {
+			tag = ENG
+			# has_country_flag = TNO_Britain_ElectionSeason_Active
+		}
+
+		dynamic_lists = {
+			# Used to display 'StateElectionBox'es
+			# - ElectionSeason_ActiveStates defined in Scripted Effects file
+			TNO_ElectionSeason_StateElection_GridBox = {
+				array = ElectionSeason_ActiveStates
+				index = ElectionSeason_ActiveStates_i
+				value = ElectionSeason_ActiveStates_v
+				change_scope = yes
+
+				entry_container = TNO_ElectionSeason_StateElections_Entry
+			}
+		}
+
+		effects = {
+			# StateElectionBox Interactions
+			# - See $/common/scripted_effects/TNO_ElectionSeason_scripted_effects.txt
+			TNO_ElectionSeason_StateElections_Entry_Obverse_CampaignBtn_click = {
+				ENG = {
+					set_temp_variable = { alert_id = token:Alert_ENG_Election }
+					remove_TNO_alert = yes
+				}
+				if = {
+					limit = { ENG = { NOT = { has_country_flag = TNO_Britain_ElectionSeason_Campaign_Debug } } }
+					ElectionSeason_CampaignMission_Setup = yes
+				}
+				else = { ElectionSeason_CampaignInState = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_CampaignBtn_click = {
+				ENG = {
+					set_temp_variable = { alert_id = token:Alert_ENG_Election }
+					remove_TNO_alert = yes
+				}
+				if = {
+					limit = { ENG = { NOT = { has_country_flag = TNO_Britain_ElectionSeason_Campaign_Debug } } }
+					ElectionSeason_CampaignMission_Setup = yes
+				}
+				else = { ElectionSeason_CampaignInState = yes }
+			}
+		}
+
+		properties = {
+			#### ElectoralMap ####
+				# Cornwall
+			TNO_Britain_ElectoralMap_123 = {  frame = TNO_Britain_ElectoralMap_Array^0 }
+			TNO_Britain_ElectoralMap_1296 = { frame = TNO_Britain_ElectoralMap_Array^1 }
+
+				# Wales
+			TNO_Britain_ElectoralMap_122 = {  frame = TNO_Britain_ElectoralMap_Array^2 }
+			TNO_Britain_ElectoralMap_1301 = { frame = TNO_Britain_ElectoralMap_Array^3 }
+
+				# England
+			TNO_Britain_ElectoralMap_125 = {  frame = TNO_Britain_ElectoralMap_Array^4 }
+			TNO_Britain_ElectoralMap_126 = {  frame = TNO_Britain_ElectoralMap_Array^5 }
+			TNO_Britain_ElectoralMap_127 = {  frame = TNO_Britain_ElectoralMap_Array^6 }
+			TNO_Britain_ElectoralMap_128 = {  frame = TNO_Britain_ElectoralMap_Array^7 }
+			TNO_Britain_ElectoralMap_129 = {  frame = TNO_Britain_ElectoralMap_Array^8 }
+			TNO_Britain_ElectoralMap_130 = {  frame = TNO_Britain_ElectoralMap_Array^9 }
+			TNO_Britain_ElectoralMap_131 = {  frame = TNO_Britain_ElectoralMap_Array^10 }
+			TNO_Britain_ElectoralMap_132 = {  frame = TNO_Britain_ElectoralMap_Array^11 }
+			TNO_Britain_ElectoralMap_338 = {  frame = TNO_Britain_ElectoralMap_Array^12 }
+			TNO_Britain_ElectoralMap_777 = {  frame = TNO_Britain_ElectoralMap_Array^13 }
+			TNO_Britain_ElectoralMap_885 = {  frame = TNO_Britain_ElectoralMap_Array^14 }
+			TNO_Britain_ElectoralMap_1300 = { frame = TNO_Britain_ElectoralMap_Array^15 }
+
+				# Scotland
+			TNO_Britain_ElectoralMap_120 = {  frame = TNO_Britain_ElectoralMap_Array^16 }
+			TNO_Britain_ElectoralMap_121 = {  frame = TNO_Britain_ElectoralMap_Array^17 }
+			TNO_Britain_ElectoralMap_133 = {  frame = TNO_Britain_ElectoralMap_Array^18 }
+			TNO_Britain_ElectoralMap_136 = {  frame = TNO_Britain_ElectoralMap_Array^19 }
+			TNO_Britain_ElectoralMap_1320 = { frame = TNO_Britain_ElectoralMap_Array^20 }
+			TNO_Britain_ElectoralMap_1321 = { frame = TNO_Britain_ElectoralMap_Array^21 }
+			#### ElectoralMap ####
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_PartyIcon = {
+				image = "[ElectionSeason_ActiveStates_v.ElectionMech_State_GetFirstPlaceIcon_Large]"
+				frame = 1
+			}
+			TNO_ElectionSeason_StateElections_Entry_Obverse_FirstPlaceIcon = {
+				image = "[ElectionSeason_ActiveStates_v.ElectionMech_State_GetFirstPlaceIcon]"
+			}
+			TNO_ElectionSeason_StateElections_Entry_Obverse_SecondPlaceIcon = {
+				image = "[ElectionSeason_ActiveStates_v.ElectionMech_State_GetSecondPlaceIcon]"
+			}
+			TNO_ElectionSeason_StateElections_Entry_Obverse_ThirdPlaceIcon = {
+				image = "[ElectionSeason_ActiveStates_v.ElectionMech_State_GetThirdPlaceIcon]"
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_PartyIcon = {
+				image = "[ElectionSeason_ActiveStates_v.ElectionMech_State_GetFirstPlaceIcon_Large]"
+				frame = 1
+			}
+			TNO_ElectionSeason_StateElections_Entry_Reverse_FirstPlaceIcon = {
+				image = "[ElectionSeason_ActiveStates_v.ElectionMech_State_GetFirstPlaceIcon]"
+			}
+			TNO_ElectionSeason_StateElections_Entry_Reverse_SecondPlaceIcon = {
+				image = "[ElectionSeason_ActiveStates_v.ElectionMech_State_GetSecondPlaceIcon]"
+			}
+			TNO_ElectionSeason_StateElections_Entry_Reverse_ThirdPlaceIcon = {
+				image = "[ElectionSeason_ActiveStates_v.ElectionMech_State_GetThirdPlaceIcon]"
+			}
+		}
+
+		triggers = {
+			#### StateElections Entries ####
+				### Obverse ###
+			TNO_ElectionSeason_StateElections_Entry_Obverse_Container_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_PartyIcon_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_StateName_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_TurnoutBG_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_TurnoutValue_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_PartyPercDivider_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_FirstPlaceIcon_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_FirstPlaceValue_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_SecondPlaceIcon_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_SecondPlaceValue_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_ThirdPlaceIcon_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_ThirdPlaceValue_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_CampaignBtn_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_FoulPlayBtn_visible = {
+				ElectionSeason_ActiveStates_index_iseven = yes
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Obverse_CampaignBtn_click_enabled = {
+				ENG = {
+					has_country_flag = TNO_Britain_ElectionSeason_Active
+					if = {
+						limit = { ENG = { NOT = { has_country_flag = TNO_Britain_ElectionSeason_Campaign_Debug } } }
+						NOT = { has_country_flag = TNO_Britain_ElectionSeason_Campaign_Active }
+					}
+				}
+			}
+				### Obverse ###
+
+				### Reverse ###
+			TNO_ElectionSeason_StateElections_Entry_Reverse_Container_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_PartyIcon_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_StateName_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_TurnoutBG_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_TurnoutValue_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_PartyPercDivider_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_FirstPlaceIcon_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_FirstPlaceValue_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_SecondPlaceIcon_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_SecondPlaceValue_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_ThirdPlaceIcon_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_ThirdPlaceValue_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_CampaignBtn_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_FoulPlayBtn_visible = {
+				NOT = { ElectionSeason_ActiveStates_index_iseven = yes }
+			}
+
+			TNO_ElectionSeason_StateElections_Entry_Reverse_CampaignBtn_click_enabled = {
+				ENG = {
+					has_country_flag = TNO_Britain_ElectionSeason_Active
+					if = {
+						limit = { ENG = { NOT = { has_country_flag = TNO_Britain_ElectionSeason_Campaign_Debug } } }
+						NOT = { has_country_flag = TNO_Britain_ElectionSeason_Campaign_Active }
+					}
+				}
+			}
+				### Reverse ###
+			#### StateElections Entries ####
+
+			## StateElection_Entry Obverse v. Reverse ##
+		}
+	}
+
+	#TNO_Britain_ElectoralMap_SmallDisp = {
+	#	context_type = player_context
+	#	parent_window_token = "TNO_ElectionSeason_DecisionUI"
+	#	window_name = "TNO_Britain_ElectoralMap_Small"
+	#
+	#	#visible = { always = yes }
+	#}
+}

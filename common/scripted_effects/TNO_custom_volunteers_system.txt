@@ -1,0 +1,273 @@
+# TNO CUSTOM VOLUNTEER SYSTEM
+# by Flaxbeard
+
+# Available methods:
+#  TNO_set_num_volunteers - pass `target` and `number`
+#  TNO_add_num_volunteers - pass `target` and `to_add`
+#  TNO_sub_num_volunteers - pass `target` and `to_sub`
+#  TNO_clear_and_recall_volunteers - pass `target`
+#  TNO_clear_num_volunteers - pass `target`
+#  TNO_get_num_volunteers - pass `target`, returned in `result`
+#
+#  TNO_increase_volunteer_cap_1 - pass `target`
+#  TNO_increase_volunteer_cap_2 - pass `target`
+#  TNO_increase_volunteer_cap_3 - pass `target`
+#  TNO_decrease_volunteer_cap_1 - pass `target`
+#  TNO_decrease_volunteer_cap_2 - pass `target`
+#  TNO_decrease_volunteer_cap_3 - pass `target`
+#
+# Available scripted triggers:
+#  TNO_volunteer_cap_equal - pass `target` and `number`
+#  TNO_volunteer_cap_greater - pass `target` and `number`
+#  TNO_volunteer_cap_less - pass `target` and `number`
+
+
+# Sets the number of sendable volunteers from this tag to `number`
+# to the tag specified by the `target` temp var
+TNO_set_num_volunteers = {
+	hidden_effect = {
+		meta_effect = { 
+			text = {
+				set_country_flag = may_send_volunteers_to_[TARGET]
+			}
+
+			TARGET = "[?target.GetTag]"
+		}
+		if = {
+			limit = { check_variable = { number = 0 } }
+
+			TNO_clear_num_volunteers = yes
+		}
+		else = {
+			if = {
+				limit = { NOT = { is_in_array = { array = TNO_volunteers_tags value = target } } }
+				add_to_array = { TNO_volunteers_tags = target }
+				add_to_array = { TNO_volunteers_amounts = number }
+			}
+			else = {
+				for_loop_effect = {
+					start = 0
+					end = TNO_volunteers_tags^num
+					value = i
+
+					if = {
+						limit = { check_variable = { TNO_volunteers_tags^i = target } }
+						set_variable = { TNO_volunteers_amounts^i = number }
+					}
+				}
+			}
+		}
+		TNO_get_num_volunteers = yes
+		set_variable = { TNO_test_additional_volunteers = result }
+		TNO_update_volunteers_idea = yes
+		TNO_ai_reload_volunteers_sent = yes
+	}
+}
+
+# Adds `to_add` to the number of sendable volunteers from this tag
+# to the tag specified by the `target` temp var
+TNO_add_num_volunteers = {
+	hidden_effect = {
+		set_temp_variable = { target_idx = -1 }
+
+		meta_effect = { 
+			text = { # Magic
+				set_country_flag = may_send_volunteers_to_[TARGET]
+			}
+
+			TARGET = "[?target.GetTag]"
+		}
+
+		if = {
+			limit = { NOT = { is_in_array = { array = TNO_volunteers_tags value = target } } }
+			add_to_array = { TNO_volunteers_tags = target }
+			add_to_array = { TNO_volunteers_amounts = to_add }
+			if = {
+				limit = { NOT = { is_in_array = { array = global.volunteer_nations value = THIS } } }
+				add_to_array = { global.volunteer_nations = THIS }
+			}
+		}
+		else = {
+			for_loop_effect = {
+				start = 0
+				end = TNO_volunteers_tags^num
+				value = i
+
+				if = {
+					limit = { check_variable = { TNO_volunteers_tags^i = target } }
+					add_to_variable = { TNO_volunteers_amounts^i = to_add }
+					clamp_variable = { var = TNO_volunteers_amounts^i min = 0 }
+
+					if = {
+						limit = { check_variable = { TNO_volunteers_amounts^i = 0 } }
+						set_temp_variable = { target_idx = i }
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = { check_variable = { target_idx > -1 } }
+			remove_from_array = { array = TNO_volunteers_tags index = target_idx }
+			remove_from_array = { array = TNO_volunteers_amounts index = target_idx }
+			if = {
+				limit = { check_variable = { TNO_volunteers_tags^num = 0 } }
+				remove_from_array = { array = global.volunteer_nations value = THIS }
+			}
+		}
+		TNO_get_num_volunteers = yes
+		set_variable = { TNO_test_additional_volunteers = result }
+		force_update_dynamic_modifier = yes
+		TNO_update_volunteers_idea = yes
+		TNO_ai_reload_volunteers_sent = yes
+	}
+	custom_effect_tooltip = TNO_add_num_volunteers_tt
+}
+
+# Subtracts `to_sub` from the number of sendable volunteers from this tag
+# to the tag specified by the `target` temp var
+TNO_sub_num_volunteers = {
+	set_temp_variable = { to_add = to_sub }
+	multiply_temp_variable = { to_add = -1 }
+	TNO_add_num_volunteers = yes
+}
+
+
+# Built-in volunteer cap stuff
+TNO_increase_volunteer_cap_1 = {
+	set_temp_variable = { to_add = 1 }
+	TNO_add_num_volunteers = yes
+}
+TNO_increase_volunteer_cap_2 = {
+	set_temp_variable = { to_add = 2 }
+	TNO_add_num_volunteers = yes
+}
+TNO_increase_volunteer_cap_3 = {
+	set_temp_variable = { to_add = 3 }
+	TNO_add_num_volunteers = yes
+}
+TNO_increase_volunteer_cap_4 = {
+	set_temp_variable = { to_add = 4 }
+	TNO_add_num_volunteers = yes
+}
+TNO_increase_volunteer_cap_5 = {
+	set_temp_variable = { to_add = 4 }
+	TNO_add_num_volunteers = yes
+}
+TNO_increase_volunteer_cap_10 = {
+	set_temp_variable = { to_add = 10 }
+	TNO_add_num_volunteers = yes
+}
+TNO_decrease_volunteer_cap_1 = {
+	set_temp_variable = { to_add = -1 }
+	TNO_add_num_volunteers = yes
+}
+TNO_decrease_volunteer_cap_2 = {
+	set_temp_variable = { to_add = -2 }
+	TNO_add_num_volunteers = yes
+}
+TNO_decrease_volunteer_cap_3 = {
+	set_temp_variable = { to_add = -3 }
+	TNO_add_num_volunteers = yes
+}
+TNO_decrease_volunteer_cap_4 = {
+	set_temp_variable = { to_add = -4 }
+	TNO_add_num_volunteers = yes
+}
+
+# Gets the number of sendable volunteers from this tag to the `target` tag, returns in the `result` temp var
+TNO_get_num_volunteers = {
+	if = {
+		limit = { NOT = { is_in_array = { array = TNO_volunteers_tags value = target } } }
+		set_temp_variable = { result = 0 }
+	}
+	else = {
+		for_loop_effect = {
+			start = 0
+			end = TNO_volunteers_tags^num
+			value = i
+
+			if = {
+				limit = { check_variable = { TNO_volunteers_tags^i = target } }
+				set_temp_variable = { result = TNO_volunteers_amounts^i }
+			}
+		}
+	}
+}
+
+TNO_log_num_volunteers = {
+	TNO_get_num_volunteers = yes
+	log = "[?result]"
+}
+
+# Sets the number of sendable volunteers from this tag to the `target` tag to 0
+# and recalls the volunteers
+TNO_clear_and_recall_volunteers = {
+	TNO_clear_num_volunteers = yes
+	recall_volunteers_from = target
+	meta_effect = { 
+		text = {
+			clr_country_flag = may_send_volunteers_to_[TARGET]
+		}
+
+		TARGET = "[?target.GetTag]"
+	}
+}
+
+# Sets the number of sendable volunteers from this tag to the `target` tag to 0
+TNO_clear_num_volunteers = {
+	hidden_effect = {
+		set_temp_variable = { target_idx = -1 }
+		for_loop_effect = {
+			start = 0
+			end = TNO_volunteers_tags^num
+			value = i
+
+			if = {
+				limit = { check_variable = { TNO_volunteers_tags^i = target } }
+				set_temp_variable = { target_idx = i }
+			}
+		}
+
+		if = {
+			limit = { check_variable = { target_idx > -1 } }
+			remove_from_array = { array = TNO_volunteers_tags index = target_idx }
+			remove_from_array = { array = TNO_volunteers_amounts index = target_idx }
+		}
+		TNO_update_volunteers_idea = yes
+		meta_effect = { 
+			text = {
+				clr_country_flag = may_send_volunteers_to_[TARGET]
+			}
+	
+			TARGET = "[?target.GetTag]"
+		}
+		TNO_get_num_volunteers = yes
+		set_variable = { TNO_test_additional_volunteers = result }
+	}
+}
+
+TNO_update_volunteers_idea = {
+	if = {
+		limit = { check_variable = { TNO_volunteers_tags^num > 0 } }
+		add_ideas = TNO_foreign_advisors
+	}
+	else = {
+		remove_ideas = TNO_foreign_advisors 
+	}
+	force_update_dynamic_modifier = yes
+}
+
+TNO_test = {
+	add_dynamic_modifier = { modifier = TNO_vol_troops_modifier }
+}
+
+# needs target scope
+TNO_ai_reload_volunteers_sent = {
+	if = {
+		limit = { is_ai = yes }
+		TNO_get_num_volunteers = yes
+		recall_volunteers_from = var:target
+		set_variable = { TNO_test_additional_volunteers = result }
+	}
+}

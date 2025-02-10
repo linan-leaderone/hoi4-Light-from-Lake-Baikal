@@ -1,0 +1,1409 @@
+add_namespace = socintern
+add_namespace = comecon
+
+#### SocIntern events ####
+
+# Enable SocIntern voting
+country_event = {
+	id = socintern.0
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.0" }
+	title = socintern.0.t
+	desc = socintern.0.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.0.a
+		set_global_flag = SOCINTERN_MOTIONS_UNLOCK
+	}
+}
+
+country_event = { #Russia offers SocIntern membership
+	id = socintern.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.1" }
+	title = socintern.1.t
+	desc = socintern.1.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.1.a
+		ai_chance = {
+			factor = 75
+			modifier = {
+				factor = -60
+				check_variable = { global.COMINTERNCOUNT > 20 }
+			}
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = COMECON_MEMBERS_OUTCOME
+					option = COMECON_MEMBERS_OUTCOME_NOBODY_JOINS
+				}
+			}
+		}  
+		add_ideas = KOM_socintern_member
+		if = {
+			limit = { has_idea = KOM_socintern_associate }
+			remove_ideas = KOM_socintern_associate
+		}
+		if = {
+			limit = { has_global_flag = COM_SOCINTERN_NAP }
+			hidden_effect = {
+				every_country = {
+					limit = {
+						has_idea = KOM_socintern_member
+					}
+					diplomatic_relation = {
+						country = ROOT
+						relation = non_aggression_pact
+						active = yes
+					}
+				}
+			}
+		}
+		if = {
+			limit = { has_global_flag = COMECON_FOUNDED }
+			set_variable = { COMECON_lending_cap_one_shot = GDP }
+			set_variable = { COMECON_lending_cap_yearly = GDP }
+			divide_variable = { COMECON_lending_cap_one_shot = 20 }
+			divide_variable = { COMECON_lending_cap_yearly = 100 }
+			set_variable = { COMECON_borrowing_cap_one_shot = GDP }
+			divide_variable = { COMECON_borrowing_cap_one_shot = 10 }
+		}
+		if = {
+			limit = { has_global_flag = COMECON_SCIENCE_FOUNDED }
+			add_to_tech_sharing_group = comecon_tech_group
+		}
+		if = {
+			limit = {
+				has_global_flag = COMECON_CENTRALIZED
+				NOT = {
+					has_variable = ECON_SPHERE_LEADER
+				}
+			}
+			econ_join_sphere_CME = yes
+		}
+		set_country_flag = SOCINTERN_MEMBER
+		SocIntern_Refresh_Arrays = yes
+		FROM = {
+			country_event = {
+				id = socintern.3
+				days = 5
+				random_hours = 2
+			}
+		}
+	}
+	option = {
+		name = socintern.1.b
+		trigger = {
+			NOT = { has_idea = KOM_socintern_associate }
+		}
+		ai_chance = {
+			factor = 50
+			modifier = {
+				factor = -45
+				check_variable = { global.COMINTERNCOUNT > 25 }
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					has_game_rule = {
+						rule = COMECON_MEMBERS_OUTCOME
+						option = COMECON_MEMBERS_OUTCOME_EVERYONE_JOINS
+					}
+					has_game_rule = {
+						rule = COMECON_MEMBERS_OUTCOME
+						option = COMECON_MEMBERS_OUTCOME_NOBODY_JOINS
+					}
+				}
+			}
+		}
+		add_ideas = KOM_socintern_associate
+		set_country_flag = SOCINTERN_MEMBER
+		SocIntern_Refresh_Arrays = yes
+		FROM = {
+			country_event = {
+				id = socintern.4
+				days = 5
+				random_hours = 2
+			}
+		}
+	}
+	option = {
+		name = socintern.1.c
+		ai_chance = {
+			factor = 20
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = COMECON_MEMBERS_OUTCOME
+					option = COMECON_MEMBERS_OUTCOME_EVERYONE_JOINS
+				}
+			}
+		}
+		FROM = {
+			country_event = {
+				id = socintern.5
+				days = 5
+				random_hours = 2
+			}
+		}
+	}
+}
+
+country_event = { #Russia offers SocIntern associate status
+	id = socintern.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.2" }
+	title = socintern.2.t
+	desc = socintern.2.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.2.a
+		ai_chance = {
+			factor = 50
+		}
+		add_ideas = KOM_socintern_associate
+		set_country_flag = SOCINTERN_MEMBER
+		SocIntern_Refresh_Arrays = yes
+		FROM = {
+			country_event = {
+				id = socintern.4
+				days = 5
+				random_hours = 2
+			}
+		}
+	}
+	option = {
+		name = socintern.2.b
+		ai_chance = {
+			factor = 3
+		}
+		FROM = {
+			country_event = {
+				id = socintern.5
+				days = 5
+				random_hours = 2
+			}
+		}
+	}
+}
+
+country_event = { #Nation accepts SocIntern membership
+	id = socintern.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.3" }
+	title = socintern.3.t
+	desc = socintern.3.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.3.a
+		add_political_power = 10
+		add_opinion_modifier = {
+			target = FROM
+			modifier = TNO_socintern_member
+		}
+		FROM = {
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = TNO_socintern_member
+			}
+		}
+		ROOT = {
+			FROM = { clear_embargo_PREV = yes }
+		}
+	}
+}
+
+country_event = { #Nation accepts SocIntern associateship
+	id = socintern.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.4" }
+	title = socintern.4.t
+	desc = socintern.4.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.4.a
+		add_political_power = 5
+		add_opinion_modifier = {
+			target = FROM
+			modifier = TNO_socintern_associate
+		}
+		FROM = {
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = TNO_socintern_associate
+			}
+		}
+		ROOT = {
+			FROM = { clear_embargo_PREV = yes }
+		}
+	}
+}
+
+country_event = { #Nation will not join SocIntern
+	id = socintern.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.5" }
+	title = socintern.5.t
+	desc = socintern.5.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.5.a
+		add_political_power = -5
+	}
+}
+
+country_event = { #The Rykov Conference - Invitation
+	id = socintern.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.6" }
+	title = socintern.6.t
+	desc = socintern.6.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.6.a
+		ai_chance = {
+			factor = 3
+			modifier = {
+				has_government = communist
+				factor = 4
+			}
+			modifier = {
+				has_government = socialist
+				factor = 2
+			}
+		}
+		country_event = {
+			id = socintern.7
+			days = 4
+		}
+		set_country_flag = ATTENDED_RYKOV_CONFERENCE
+		add_opinion_modifier = {
+			target = FROM
+			modifier = TNO_rykov_conference
+		}
+		FROM = {
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = TNO_rykov_conference
+			}
+		}
+	}
+	option = {
+		name = socintern.6.b
+		ai_chance = {
+			factor = 3
+		}
+	}
+}
+
+country_event = { #The Rykov Conference
+	id = socintern.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.7" }
+	title = socintern.7.t
+	desc = socintern.7.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.7.a
+		add_popularity = {
+			ideology = communist
+			popularity = 0.01
+		}
+	}
+}
+
+#Country seeks to join SocIntern
+country_event = {
+	id = socintern.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.8" }
+	title = socintern.8.t
+	desc = socintern.8.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.8.a
+		ai_chance = {
+			factor = 150
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = COMECON_MEMBERS_OUTCOME
+					option = COMECON_MEMBERS_OUTCOME_NOBODY_JOINS
+				}
+			}
+		}
+		FROM = {
+			country_event = {
+				id = socintern.9
+				days = 1
+			}
+		}
+	}
+	option = {
+		name = socintern.8.b
+		ai_chance = {
+			factor = 25
+			modifier = {
+				factor = 0
+				has_game_rule = {
+					rule = COMECON_MEMBERS_OUTCOME
+					option = COMECON_MEMBERS_OUTCOME_EVERYONE_JOINS
+				}
+			}
+		}
+		FROM = {
+			country_event = {
+				id = socintern.10
+				days = 1
+			}
+		}
+	}
+}
+
+
+#Y
+country_event = {
+	id = socintern.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.9" }
+	title = socintern.9.t
+	desc = socintern.9.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.9.a
+		add_ideas = KOM_socintern_member
+		if = {
+			limit = { has_idea = KOM_socintern_associate }
+			remove_ideas = KOM_socintern_associate
+		}
+		SocIntern_Refresh_Arrays = yes
+		ROOT = {
+			FROM = { clear_embargo_PREV = yes }
+		}
+	}
+}
+
+#N
+country_event = {
+	id = socintern.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.10" }
+	title = socintern.10.t
+	desc = socintern.10.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.10.a
+		add_political_power = -15
+	}
+}
+
+
+#Country seeks SocIntern observer status
+country_event = {
+	id = socintern.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.11" }
+	title = socintern.11.t
+	desc = socintern.11.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.11.a
+		ai_chance = {
+			factor = 150
+		}
+		FROM = {
+			country_event = {
+				id = socintern.12
+				days = 1
+			}
+		}
+	}
+	option = {
+		name = socintern.11.b
+		ai_chance = {
+			factor = 10
+		}
+		FROM = {
+			country_event = {
+				id = socintern.13
+				days = 1
+			}
+		}
+	}
+}
+
+#Y
+country_event = {
+	id = socintern.12
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.12" }
+	title = socintern.12.t
+	desc = socintern.12.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.12.a
+		add_ideas = KOM_socintern_associate
+		SocIntern_Refresh_Arrays = yes
+		ROOT = {
+			FROM = { clear_embargo_PREV = yes }
+		}
+	}
+}
+
+#N
+country_event = {
+	id = socintern.13
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.13" }
+	title = socintern.13.t
+	desc = socintern.13.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.13.a
+		add_political_power = -15
+	}
+}
+
+#COMECON Passes
+country_event = {
+	id = socintern.17
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.17" }
+	title = socintern.17.t
+	desc = socintern.17.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.17.a
+		custom_effect_tooltip =  COM_unlock_fund_tt
+		hidden_effect = {
+			set_variable = { global.COMECON_monetary_fund_value = 0.5 }
+			set_variable = { global.COMECON_collective_defense_value = 0.5 }
+			every_country = {
+				limit = {
+					has_idea = KOM_socintern_member
+				}
+				set_variable = { COMECON_lending_cap_one_shot = GDP }
+				set_variable = { COMECON_lending_cap_yearly = GDP }
+				divide_variable = { COMECON_lending_cap_one_shot = 20 }
+				divide_variable = { COMECON_lending_cap_yearly = 100 }
+				set_variable = { COMECON_borrowing_cap_one_shot = GDP }
+				divide_variable = { COMECON_borrowing_cap_one_shot = 10 }
+			}
+		}
+	}
+}
+
+#COMECON Fails
+country_event = {
+	id = socintern.18
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.18" }
+	title = socintern.18.t
+	desc = socintern.18.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.18.a
+	}
+}
+
+#NAP passes
+country_event = {
+	id = socintern.19
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.19" }
+	title = socintern.19.t
+	desc = socintern.19.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.19.a
+		every_country = {
+			limit = {
+				has_idea = KOM_socintern_member
+			}
+			diplomatic_relation = {
+				country = ROOT
+				relation = non_aggression_pact
+				active = yes
+			}
+		}
+	}
+}
+
+#NAP fails
+country_event = {
+	id = socintern.20
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.20" }
+	title = socintern.20.t
+	desc = socintern.20.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.20.a
+	}
+}
+
+#COMECONScience passes
+country_event = {
+	id = socintern.21
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.21" }
+	title = socintern.21.t
+	desc = socintern.21.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.21.a
+		add_to_tech_sharing_group = comecon_tech_group
+	}
+}
+
+#COMECONScience fails
+country_event = {
+	id = socintern.22
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.22" }
+	title = socintern.22.t
+	desc = socintern.22.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.22.a
+	}
+}
+
+#Invite passes
+country_event = {
+	id = socintern.23
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.23" }
+	title = socintern.23.t
+	desc = socintern.23.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.23.a
+	}
+}
+
+#Invite fails
+country_event = {
+	id = socintern.24
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.24" }
+	title = socintern.24.t
+	desc = socintern.24.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.24.a
+	}
+}
+
+#Associateship passes
+country_event = {
+	id = socintern.25
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.25" }
+	title = socintern.25.t
+	desc = socintern.25.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.25.a
+	}
+}
+
+#Associateship fails
+country_event = {
+	id = socintern.26
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.26" }
+	title = socintern.26.t
+	desc = socintern.26.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.26.a
+	}
+}
+
+#Spherification passes
+country_event = {
+	id = socintern.27
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.27" }
+	title = socintern.27.t
+	desc = socintern.27.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.27.a
+		econ_join_sphere_CME = yes
+	}
+}
+
+#Spherification fails
+country_event = {
+	id = socintern.28
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.28" }
+	title = socintern.28.t
+	desc = socintern.28.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.28.a
+	}
+}
+
+#International Brigades passes
+country_event = {
+	id = socintern.29
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.29" }
+	title = socintern.29.t
+	desc = socintern.29.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.29.a
+	}
+}
+
+#International Brigades fails
+country_event = {
+	id = socintern.30
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.30" }
+	title = socintern.30.t
+	desc = socintern.30.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.30.a
+	}
+}
+#Volunteers passes
+country_event = {
+	id = socintern.31
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event socintern.31"
+		hidden_effect = { #On immediate effect to prevent player from selecting another military assistance decision
+			set_temp_variable = { target = event_target:SOCINTERN_VOLUNTEERS_PREV }
+			TNO_increase_volunteer_cap_1 = yes
+		}
+	}
+	title = socintern.31.t
+	desc = socintern.31.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.31.a
+		set_temp_variable = { target = event_target:SOCINTERN_VOLUNTEERS_PREV }
+		TNO_increase_volunteer_cap_1 = no
+	}
+}
+
+#Volunteers fails
+country_event = {
+	id = socintern.32
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.32" }
+	title = socintern.32.t
+	desc = socintern.32.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.32.a
+	}
+}
+
+#COMECON invite passes
+country_event = {
+	id = socintern.33
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.33" }
+	title = socintern.33.t
+	desc = socintern.33.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.33.a
+	}
+}
+
+#COMECON invite fails
+country_event = {
+	id = socintern.34
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.34" }
+	title = socintern.34.t
+	desc = socintern.34.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.34.a
+	}
+}
+
+#Invite to join COMECON sphere
+country_event = {
+	id = socintern.35
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.35" }
+	title = socintern.35.t
+	desc = socintern.35.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.35.a
+		ai_chance = {
+			factor = 50
+		}
+		econ_join_sphere_CME = yes
+		FROM = {
+			country_event = {
+				id = socintern.36
+				days = 5
+				random_hours = 2
+			}
+		}
+	}
+	option = { #Ai will always join the sphere, wouldn't be fun if they didn't
+		name = socintern.35.b
+		ai_chance = {
+			factor = 0
+		}
+		FROM = {
+			country_event = {
+				id = socintern.37
+				days = 5
+				random_hours = 2
+			}
+		}
+	}
+}
+
+#Nation will join COMECON
+country_event = {
+	id = socintern.36
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.36" }
+	title = socintern.36.t
+	desc = socintern.36.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.36.a
+		add_political_power = 25
+	}
+}
+
+#Nation will not join COMECON
+country_event = {
+	id = socintern.37
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.37" }
+	title = socintern.37.t
+	desc = socintern.37.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = {
+		name = socintern.37.a
+		add_political_power = -5
+	}
+}
+
+#Generic vote for AI
+country_event = {
+	id = socintern.200
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.200" }
+	title = socintern.200.t
+	desc = socintern.200.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+
+	option = { #Y
+		name = socintern.200.a
+		ai_chance = {
+			factor = 100
+		}
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = SOCINTERN_LEADER
+				}
+			}
+			set_variable = { socintern_current_vote = 2 }
+			add_to_variable = { global.SocIntern_yes_votes = 1 }
+			add_to_variable = { global.SocIntern_total_votes = 1 }
+		}
+		else = {
+			set_variable = { socintern_current_vote = 2 }
+			add_to_variable = { global.SocIntern_yes_votes = 3 }
+			add_to_variable = { global.SocIntern_total_votes = 3 }
+		}
+	}
+	option = { #N 
+		name = socintern.200.b
+		ai_chance = {
+			factor = 50
+		}
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = SOCINTERN_LEADER
+				}
+			}
+			set_variable = { socintern_current_vote = 4 }
+			add_to_variable = { global.SocIntern_no_votes = 1 }
+			add_to_variable = { global.SocIntern_total_votes = 1 }
+		}
+		else = {
+			set_variable = { socintern_current_vote = 4 }
+			add_to_variable = { global.SocIntern_no_votes = 3 }
+			add_to_variable = { global.SocIntern_total_votes = 3 }
+		}
+	} 
+	option = { #A
+		name = socintern.200.c
+		ai_chance = {
+			factor = 50
+		}
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = SOCINTERN_LEADER
+				}
+			}
+			set_variable = { socintern_current_vote = 3 }
+			add_to_variable = { global.SocIntern_abs_votes = 1 }
+		}
+		else = {
+			set_variable = { socintern_current_vote = 3 }
+			add_to_variable = { global.SocIntern_abs_votes = 3 }
+		}
+	}
+}
+
+#This thing exists
+country_event = {
+	id = socintern.300
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.300" }
+	title = socintern.300.t
+	desc = socintern.300.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+	hidden = yes
+	immediate = {	
+	}
+	option = {
+		name = socintern.300.a
+		clr_global_flag = COM_cooldown
+	}
+}
+
+#ComIntern leader change
+country_event = {
+	id = socintern.400
+	immediate = { log = "[GetDateText]: [Root.GetName]: event socintern.400" }
+	title = socintern.400.t
+	desc = socintern.400.d
+	picture = GFX_report_event_KOM_government
+
+	is_triggered_only = yes
+	option = { #Dang
+		name = socintern.400.a
+		hidden_effect = {
+			every_country = {
+				limit = { has_idea = KOM_socintern_associate }
+				add_opinion_modifier = {
+					target = ROOT
+					modifier = TNO_socintern_associate
+				}
+				reverse_add_opinion_modifier = {
+					target = ROOT
+					modifier = TNO_socintern_associate
+				}
+			}
+			every_country = {
+				limit = { has_idea = KOM_socintern_member }
+				add_opinion_modifier = {
+					target = ROOT
+					modifier = TNO_socintern_member
+				}
+				reverse_add_opinion_modifier = {
+					target = ROOT
+					modifier = TNO_socintern_member
+				}
+			}
+		}
+	}
+}
+
+###### C O M E C O N ######
+
+country_event = { #Dispatching COMECON aid - sender
+	id = comecon.1
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.1" }
+	title = comecon.1.t
+	desc = comecon.1.d
+	picture = GFX_report_event_CME_comecon_aid
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.1.a
+		custom_effect_tooltip = pay_aid_to_comecon_country_tt
+		set_temp_variable = { debt_temp = 0.250 }
+		econ_national_debt_change = yes
+		FROM = {
+			country_event = {
+				id = comecon.2
+				hours = 1
+			}
+		}
+	}
+}
+
+country_event = { #Dispatching COMECON aid - receiver
+	id = comecon.2
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.2" }
+	title = comecon.2.t
+	desc = comecon.2.d
+	picture = GFX_report_event_CME_comecon_aid
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.2.a
+		ai_chance = {
+			factor = 60
+		}
+		set_temp_variable = { money_reserves_temp = 0.25 }
+		econ_money_reserves_change_raw_money = yes
+		add_political_power = 10
+	}
+	option = {
+		name = comecon.2.b
+		ai_chance = {
+			factor = 50
+		}
+		set_temp_variable = { gdp_growth_temp = 0.3 }
+		econ_gdp_growth_change = yes
+		add_political_power = 5
+	}
+	option = {
+		name = comecon.2.c
+		ai_chance = {
+			factor = 40
+		}
+		TNO_improve_poverty_low = yes
+		add_political_power = 3
+	}
+}
+
+country_event = { #Asking for COMECON aid - sender
+	id = comecon.3
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.3" }
+	title = comecon.3.t
+	desc = comecon.3.d
+	picture = GFX_report_event_CME_comecon_aid
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.3.a
+		ai_chance = {
+			factor = 75
+		}
+		custom_effect_tooltip = pay_aid_to_comecon_country_tt
+		set_temp_variable = { debt_temp = 0.250 }
+		econ_national_debt_change = yes
+		FROM = {
+			country_event = {
+				id = comecon.5
+			}
+		}
+	}
+	option = {
+		name = comecon.3.b
+		ai_chance = {
+			factor = 35
+		}
+		FROM = {
+			country_event = {
+				id = comecon.4
+			}
+		}
+	}
+}
+
+country_event = { #Sender cannot give COMECON aid - receiver
+	id = comecon.4
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.4" }
+	title = comecon.4.t
+	desc = comecon.4.d
+	picture = GFX_report_event_CME_comecon_aid
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.4.a
+		add_political_power = -5
+	}
+}
+
+country_event = { #Sender can give COMECON aid - receiver
+	id = comecon.5
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.5" }
+	title = comecon.5.t
+	desc = comecon.5.d
+	picture = GFX_report_event_CME_comecon_aid
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.5.a
+		ai_chance = {
+			factor = 60
+		}
+		set_temp_variable = { money_reserves_temp = 0.25 }
+		econ_money_reserves_change_raw_money = yes
+		add_political_power = 10
+	}
+	option = {
+		name = comecon.5.b
+		ai_chance = {
+			factor = 50
+		}
+		set_temp_variable = { gdp_growth_temp = 0.3 }
+		econ_gdp_growth_change = yes
+		add_political_power = 5
+	}
+	option = {
+		name = comecon.5.c
+		ai_chance = {
+			factor = 40
+		}
+		TNO_improve_poverty_med = yes
+		add_political_power = 3
+	}
+}
+
+country_event = { #Deposit to monetary fund
+	id = comecon.6
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.6" }
+	title = comecon.6.t
+	desc = comecon.6.d
+	picture = GFX_report_event_CME_comecon_money
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.6.a
+		custom_effect_tooltip = COMECON_deposit_monetary_1
+		set_temp_variable = { COMECON_money_to_transfer = 0.01 }
+		multiply_temp_variable = { COMECON_money_to_transfer = total_budget }
+		add_to_variable = { national_debt = COMECON_money_to_transfer }
+		add_to_variable = { global.COMECON_monetary_fund_value = COMECON_money_to_transfer }
+	}
+	option = {
+		name = comecon.6.b
+		custom_effect_tooltip = COMECON_deposit_monetary_2_5
+		set_temp_variable = { COMECON_money_to_transfer = 0.025 }
+		multiply_temp_variable = { COMECON_money_to_transfer = total_budget }
+		add_to_variable = { national_debt = COMECON_money_to_transfer }
+		add_to_variable = { global.COMECON_monetary_fund_value = COMECON_money_to_transfer }
+	}
+	option = {
+		name = comecon.6.c
+		custom_effect_tooltip = COMECON_deposit_monetary_5
+		set_temp_variable = { COMECON_money_to_transfer = 0.05 }
+		multiply_temp_variable = { COMECON_money_to_transfer = total_budget }
+		add_to_variable = { national_debt = COMECON_money_to_transfer }
+		add_to_variable = { global.COMECON_monetary_fund_value = COMECON_money_to_transfer }
+	}
+	option = {
+		name = comecon.6.e
+		custom_effect_tooltip = COMECON_deposit_monetary_7_5
+		set_temp_variable = { COMECON_money_to_transfer = 0.075 }
+		multiply_temp_variable = { COMECON_money_to_transfer = total_budget }
+		add_to_variable = { national_debt = COMECON_money_to_transfer }
+		add_to_variable = { global.COMECON_monetary_fund_value = COMECON_money_to_transfer }
+	}
+}
+
+country_event = { #Withdraw from monetary fund
+	id = comecon.7
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.7" }
+	title = comecon.7.t
+	desc = comecon.7.d
+	picture = GFX_report_event_CME_comecon_money
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.9.a
+		custom_effect_tooltip = COMECON_money_transfer_10_monetary_tt
+		set_temp_variable = { COMECON_money_to_transfer = 0.10 }
+		multiply_temp_variable = { COMECON_money_to_transfer = global.COMECON_monetary_fund_value }
+		add_to_variable = { money_reserves = COMECON_money_to_transfer }
+		subtract_from_variable = { global.COMECON_monetary_fund_value = COMECON_money_to_transfer }
+	}
+	option = {
+		name = comecon.9.b
+		custom_effect_tooltip = COMECON_money_transfer_25_monetary_tt
+		set_temp_variable = { COMECON_money_to_transfer = 0.25 }
+		multiply_temp_variable = { COMECON_money_to_transfer = global.COMECON_monetary_fund_value }
+		add_to_variable = { money_reserves = COMECON_money_to_transfer }
+		subtract_from_variable = { global.COMECON_monetary_fund_value = COMECON_money_to_transfer }
+	}
+	option = {
+		name = comecon.9.c
+		custom_effect_tooltip = COMECON_money_transfer_50_monetary_tt
+		set_temp_variable = { COMECON_money_to_transfer = 0.50 }
+		multiply_temp_variable = { COMECON_money_to_transfer = global.COMECON_monetary_fund_value }
+		add_to_variable = { money_reserves = COMECON_money_to_transfer }
+		subtract_from_variable = { global.COMECON_monetary_fund_value = COMECON_money_to_transfer }
+	}
+}
+
+country_event = { #Deposit to defense fund
+	id = comecon.8
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.8" }
+	title = comecon.8.t
+	desc = comecon.8.d
+	picture = GFX_report_event_CME_comecon_military
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.8.a
+		custom_effect_tooltip = COMECON_deposit_defense_1
+		set_temp_variable = { COMECON_money_to_transfer = 0.01 }
+		multiply_temp_variable = { COMECON_money_to_transfer = total_budget }
+		add_to_variable = { national_debt = COMECON_money_to_transfer }
+		add_to_variable = { global.COMECON_collective_defense_value = COMECON_money_to_transfer }
+	}
+	option = {
+		name = comecon.8.b
+		custom_effect_tooltip = COMECON_deposit_defense_2_5
+		set_temp_variable = { COMECON_money_to_transfer = 0.025 }
+		multiply_temp_variable = { COMECON_money_to_transfer = total_budget }
+		add_to_variable = { national_debt = COMECON_money_to_transfer }
+		add_to_variable = { global.COMECON_collective_defense_value = COMECON_money_to_transfer }
+	}
+	option = {
+		name = comecon.8.c
+		custom_effect_tooltip = COMECON_deposit_defense_5
+		set_temp_variable = { COMECON_money_to_transfer = 0.05 }
+		multiply_temp_variable = { COMECON_money_to_transfer = total_budget }
+		add_to_variable = { national_debt = COMECON_money_to_transfer }
+		add_to_variable = { global.COMECON_collective_defense_value = COMECON_money_to_transfer }
+	}
+	option = {
+		name = comecon.8.e
+		custom_effect_tooltip = COMECON_deposit_defense_7_5
+		set_temp_variable = { COMECON_money_to_transfer = 0.075 }
+		multiply_temp_variable = { COMECON_money_to_transfer = total_budget }
+		add_to_variable = { national_debt = COMECON_money_to_transfer }
+		add_to_variable = { global.COMECON_collective_defense_value = COMECON_money_to_transfer }
+	}
+}
+
+country_event = { #Withdraw from defense fund
+	id = comecon.9
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.9" }
+	title = comecon.9.t
+	desc = comecon.9.d
+	picture = GFX_report_event_CME_comecon_military
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.9.a
+		custom_effect_tooltip = COMECON_money_transfer_10_tt
+		set_temp_variable = { COMECON_money_to_transfer = 0.10 }
+		multiply_temp_variable = { COMECON_money_to_transfer = global.COMECON_collective_defense_value }
+		add_to_variable = { money_reserves = COMECON_money_to_transfer }
+		subtract_from_variable = { global.COMECON_collective_defense_value = COMECON_money_to_transfer }
+	}
+	option = {
+		name = comecon.9.b
+		custom_effect_tooltip = COMECON_money_transfer_25_tt
+		set_temp_variable = { COMECON_money_to_transfer = 0.25 }
+		multiply_temp_variable = { COMECON_money_to_transfer = global.COMECON_collective_defense_value }
+		add_to_variable = { money_reserves = COMECON_money_to_transfer }
+		subtract_from_variable = { global.COMECON_collective_defense_value = COMECON_money_to_transfer }
+	}
+	option = {
+		name = comecon.9.c
+		custom_effect_tooltip = COMECON_money_transfer_50_tt
+		set_temp_variable = { COMECON_money_to_transfer = 0.50 }
+		multiply_temp_variable = { COMECON_money_to_transfer = global.COMECON_collective_defense_value }
+		add_to_variable = { money_reserves = COMECON_money_to_transfer }
+		subtract_from_variable = { global.COMECON_collective_defense_value = COMECON_money_to_transfer }
+	}
+}
+
+country_event = { #Joining research org
+	id = comecon.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.10" }
+	title = comecon.10.t
+	desc = comecon.10.d
+	picture = GFX_report_event_generic_research_lab
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.10.a
+	}
+}
+
+country_event = { #Building factory
+	id = comecon.11
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.11" }
+	title = comecon.11.t
+	desc = comecon.11.d
+	picture = GFX_report_event_CAU_factory
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.11.a
+		trigger = {
+			num_of_factories < 7
+		}
+	}
+	option = {
+		name = comecon.11.b
+		TNO_improve_industrial_equipment_med = yes
+	}
+	option = {
+		name = comecon.11.c
+		TNO_improve_industrial_expertise_med = yes
+	}
+}
+
+
+country_event = { #God I hate myself 
+	id = comecon.1917
+	immediate = { log = "[GetDateText]: [Root.GetName]: event comecon.1917" }
+	title = comecon.1917.t
+	desc = comecon.1917.d
+	picture = GFX_report_event_generic_research_lab
+
+	is_triggered_only = yes
+
+	option = {
+		name = comecon.1917.a
+		ZZZ = {
+			clear_array = global.COMECON_MEMBERS
+			every_country = {
+				limit = {
+					has_idea = KOM_socintern_member
+					NOT = {
+						tag = ZZZ
+					}
+					exists = yes
+				}
+				add_to_array = { global.COMECON_MEMBERS = THIS }
+			}
+			clear_array = global.COMECON_MEMBERS_NO_LEADER
+			every_country = {
+				limit = {
+					has_idea = KOM_socintern_member
+					NOT = {
+						tag = ZZZ
+						has_country_flag = SOCINTERN_LEADER
+					}
+					exists = yes
+				}
+				add_to_array = { global.COMECON_MEMBERS_NO_LEADER = THIS }
+			}
+			clear_array = global.COMECON_ELIGIBLE
+			every_other_country = {
+				limit = {
+					NOT = {
+						has_idea = KOM_socintern_member
+					}
+					OR = {
+						has_government = communist
+						has_government = socialist
+					}
+					NOT = {
+						tag = ZZZ
+					}
+					exists = yes
+				}
+				add_to_array = { global.COMECON_ELIGIBLE = THIS }
+			}
+		}
+
+		every_country = {
+			clr_country_flag = COMECON_dev_withdrawal_made
+			clr_country_flag = COMECON_def_withdrawal_made
+			clr_country_flag = COMECON_dev_deposit_made
+			clr_country_flag = COMECON_def_deposit_made
+			clr_country_flag = COMECON_aid_sent
+		}
+	}
+}

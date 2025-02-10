@@ -1,0 +1,260 @@
+#List of the States and Other Handy Info -
+#State1 - 6, Flandern
+#State2 - 17, Freigrafschaft
+#State3 - 18, Kampen
+#State4 - 29, Kalen
+#State5 - 34, Wallonien
+#State6 - 15, Normandie
+#State7 - 16, Grossraum Paris
+#State8 - 788, Meau
+#State9 - 1625, Reimen
+#State10 - 1626, Pickardien
+#State11 - 1635, Burgund
+
+#
+#Purple - Himmler :)
+#Yellow - Walloon/Degrelle AAAAAAAAAAAA
+#Orange - Langemarck who?
+#Blue - Charlemagne hou hou
+
+BRG_Domestic_GUI_Initialize = {
+
+	every_owned_state = {
+		limit = {
+			NOT = {
+				state = 1733
+				state = 1734
+			}
+		}
+		BRG = { add_to_array = { BurgundyDomesticGUIStates = PREV } } 
+	}
+
+	for_each_scope_loop = {
+		array = BurgundyDomesticGUIStates
+
+		set_variable = { THIS.HimmlerSupport = 0 }
+		set_variable = { THIS.WalloonSupport = 0 }
+		set_variable = { THIS.LangemarckSupport = 0 }
+		set_variable = { THIS.CharlemagneSupport = 0 }
+		set_variable = { THIS.BRG_Skilled_Worker_Pop_Monthly_Change = 1000 }
+		set_variable = { THIS.BRG_Cop_To_Worker_Ratio = 2 }
+	}
+
+	every_owned_state = {
+		add_to_variable = { THIS.HimmlerSupport = 60 }
+		set_variable = { BRG_brutalist_city_level = 0 }
+	}
+
+	### Add specific values per state
+
+	6 = { #### Flanders
+		add_to_variable = { WalloonSupport = 29 }
+		add_to_variable = { LangemarckSupport = 47 }
+		add_to_variable = { CharlemagneSupport = 8 }
+	}
+
+	17 = { #### Friegshafdt
+		add_to_variable = { WalloonSupport = 17 }
+		add_to_variable = { LangemarckSupport = 0 }
+		add_to_variable = { CharlemagneSupport = 9 }
+	}
+
+	18 = { #### Kampen
+		add_to_variable = { WalloonSupport = 37 }
+		add_to_variable = { LangemarckSupport = 13 }
+		add_to_variable = { CharlemagneSupport = 24 }
+	}
+
+	29 = { #### Kalen
+		add_to_variable = { WalloonSupport = 4 }
+		add_to_variable = { LangemarckSupport = 31 }
+		add_to_variable = { CharlemagneSupport = 23 }
+	}
+
+	34 = { #### Wallonien
+		add_to_variable = { WalloonSupport = 65 }
+		add_to_variable = { LangemarckSupport = 28 }
+		add_to_variable = { CharlemagneSupport = 15 }
+	}
+
+	1733 = {
+		set_variable = { WalloonSupport = 0 }
+		set_variable = { LangemarckSupport = 0 }
+		set_variable = { CharlemagneSupport = 0 }
+		set_variable = { BRG_Skilled_Worker_Pop_Monthly_Change = 0 }
+		set_variable = { BRG_Cop_To_Worker_Ratio = 2 }
+	}
+
+	1734 = {
+		set_variable = { WalloonSupport = 0 }
+		set_variable = { LangemarckSupport = 0 }
+		set_variable = { CharlemagneSupport = 0 }
+		set_variable = { BRG_Skilled_Worker_Pop_Monthly_Change = 0 }
+		set_variable = { BRG_Cop_To_Worker_Ratio = 2 }
+	}
+
+	set_variable = { BRG_Normandy_Cap = 100000 }
+	set_variable = { BRG_Worker_Cap = 90000 }
+
+	add_to_variable = { Burgundy_Domestic_GUI_dirty_var = 1 }
+}
+
+BRG_Add_Resistance_To_GUI = {
+	set_country_flag = BRG_Resistance_On_GUI_Visible
+
+	set_variable = { 15.ResistanceSupport = 30 }
+	add_to_variable = { 15.HimmlerSupport = -15 }
+	add_to_variable = { 15.CharlemagneSupport = -20 }
+}
+
+BRG_Domestic_GUI_Clamp = {
+	if = {
+		limit = {
+			BRG = { has_country_flag = BRG_Resistance_On_GUI_Visible }
+		}
+		15 = {
+			clamp_variable = {
+				var = ResistanceSupport
+				min = 0
+				max = 100
+			}
+		}
+	}
+
+	BRG = {
+		clamp_variable = {
+			var = BRG_Degrelle_Sus
+			min = 5
+			max = 100
+		}
+
+		clamp_variable = {
+			var = BRG_Charla_Sus
+			min = 5
+			max = 100
+		}
+
+		clamp_variable = {
+			var = BRG_RPY_Sus
+			min = 5
+			max = 100
+		}
+
+		clamp_variable = {
+			var = BRG_WLN_Sus
+			min = 5
+			max = 100
+		}
+
+		clamp_variable = {
+			var = BRG_Gathered_Intelligence
+			min = 0
+			max = 100
+		}
+
+		every_owned_state = {
+			clamp_variable = {
+				var = THIS.HimmlerSupport
+				min = 0
+				max = 100
+			}
+			clamp_variable = {
+				var = THIS.WalloonSupport
+				min = 0
+				max = 100
+			}
+			clamp_variable = {
+				var = THIS.LangemarckSupport
+				min = 0
+				max = 100
+			}
+			clamp_variable = {
+				var = THIS.CharlemagneSupport
+				min = 0
+				max = 100
+			}
+
+			clamp_variable = {
+				var = THIS.BRG_Skilled_Worker_Pop
+				min = 0
+			}
+		}
+	}
+
+	add_to_variable = { Burgundy_Domestic_GUI_dirty_var = 1 }
+}
+
+BRG_Domestic_GUI_Add_France = {
+	15 = { #### Normandie
+		set_variable = { HimmlerSupport = 12 }
+		set_variable = { WalloonSupport = 3 }
+		set_variable = { LangemarckSupport = 9 }
+		set_variable = { CharlemagneSupport = 23 }
+		set_variable = { BRG_brutalist_city_level = 0 }
+		BRG = { add_to_array = { BurgundyDomesticGUIStates = PREV } }
+		set_variable = { THIS.BRG_Cop_To_Worker_Ratio = 2 }
+	}
+
+	16 = { #### Greater Paris
+		set_variable = { HimmlerSupport = 81 }
+		set_variable = { WalloonSupport = 1 }
+		set_variable = { LangemarckSupport = 1 }
+		set_variable = { CharlemagneSupport = 13 }
+		set_variable = { BRG_brutalist_city_level = 0 }
+		BRG = { add_to_array = { BurgundyDomesticGUIStates = PREV } }
+		set_variable = { THIS.BRG_Cop_To_Worker_Ratio = 2 }
+	}
+
+	788 = { #### Meua
+		set_variable = { HimmlerSupport = 63 }
+		set_variable = { WalloonSupport = 3 }
+		set_variable = { LangemarckSupport = 3 }
+		set_variable = { CharlemagneSupport = 29 }
+		set_variable = { BRG_brutalist_city_level = 0 }
+		BRG = { add_to_array = { BurgundyDomesticGUIStates = PREV } }
+		set_variable = { THIS.BRG_Cop_To_Worker_Ratio = 2 }
+	}
+
+	1625 = { #### Reimen
+		set_variable = { HimmlerSupport = 84 }
+		set_variable = { WalloonSupport = 0 }
+		set_variable = { LangemarckSupport = 0 }
+		set_variable = { CharlemagneSupport = 16 }
+		set_variable = { BRG_brutalist_city_level = 0 }
+		BRG = { add_to_array = { BurgundyDomesticGUIStates = PREV } }
+		set_variable = { THIS.BRG_Cop_To_Worker_Ratio = 2 }
+	}
+
+	1626 = { #### Pickardien
+		set_variable = { HimmlerSupport = 59 }
+		set_variable = { WalloonSupport = 5 }
+		set_variable = { LangemarckSupport = 3 }
+		set_variable = { CharlemagneSupport = 30 }
+		set_variable = { BRG_brutalist_city_level = 0 }
+		BRG = { add_to_array = { BurgundyDomesticGUIStates = PREV } }
+		set_variable = { THIS.BRG_Cop_To_Worker_Ratio = 2 }
+	}
+
+	1635 = { #### Burgund
+		set_variable = { HimmlerSupport = 92 }
+		set_variable = { WalloonSupport = 0 }
+		set_variable = { LangemarckSupport = 0 }
+		set_variable = { CharlemagneSupport = 9 }
+		set_variable = { BRG_brutalist_city_level = 0 }
+		BRG = { add_to_array = { BurgundyDomesticGUIStates = PREV } }
+		set_variable = { THIS.BRG_Cop_To_Worker_Ratio = 2 }
+	}
+
+	set_variable = { 15.BRG_Skilled_Worker_Pop_Monthly_Change = 500 }
+	set_variable = { 16.BRG_Skilled_Worker_Pop_Monthly_Change = 500 }
+	set_variable = { 788.BRG_Skilled_Worker_Pop_Monthly_Change = 500 }
+	set_variable = { 1625.BRG_Skilled_Worker_Pop_Monthly_Change = 500 }
+	set_variable = { 1626.BRG_Skilled_Worker_Pop_Monthly_Change = 500 }
+	set_variable = { 1635.BRG_Skilled_Worker_Pop_Monthly_Change = 500 }
+
+	BRG_Domestic_GUI_Clamp = yes
+}
+
+BRG_Domestic_GUI_Clear_Windows = {
+	add_to_variable = { Burgundy_Domestic_GUI_dirty_var = 1 }
+}

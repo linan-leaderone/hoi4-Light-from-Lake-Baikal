@@ -1,0 +1,447 @@
+Fiscal_crisis_response_category = {
+	slash_bureaucracy = {
+		icon = GFX_decision_generic_political_action
+		days_re_enable = 360
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+
+		}
+		days_remove = 14
+		ai_will_do = {
+			factor = 1
+		}
+		complete_effect = {
+			custom_effect_tooltip = FC_admin_cost_down
+			add_to_variable = { admin_program_cut_fc = -0.6 }
+			TNO_worsen_admin_efficiency_high = yes
+			set_country_flag = fc_worsen_admin_efficiency
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+		}
+	}
+
+	privatisation_programs = {
+		icon = GFX_decision_generic_seizure
+		days_re_enable = 360
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		ai_will_do = {
+			factor = 5
+		}
+		days_remove = 14
+		complete_effect = {
+			custom_effect_tooltip = FC_privatization
+			add_to_variable = { stability_weekly_fc = -0.01 }
+			add_to_variable = { sales_tax_fc = -0.1 }
+			set_temp_variable = { temp_gdp_gained = 0.2 }
+			econ_money_reserves_change_percent_gdp = yes
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+		}
+	}
+
+	negotiate_deferred_payment = {
+		icon = GFX_decision_generic_political_discourse
+		days_re_enable = 31
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		days_remove = 14
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 0
+				check_variable = { debt_servicing_expenditures_percent < 5 }
+			}
+			modifier = {
+				factor = 5
+				check_variable = { debt_servicing_expenditures_percent > 10 }
+			}
+			modifier = {
+				factor = 5
+				check_variable = { debt_servicing_expenditures_percent > 20 }
+			}
+			modifier = {
+				factor = 10
+				check_variable = { debt_servicing_expenditures_percent > 30 }
+			}
+		}
+
+		complete_effect = {
+			custom_effect_tooltip = FC_interest_rate_down
+			add_to_variable = { interest_rate_fc = -0.60 }
+			add_to_variable = { inflation_fc = 5 }
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+		}
+	}
+
+	print_emergency ={
+		icon = GFX_decision_generic_money
+		days_re_enable = 31
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		ai_will_do = {
+			base = 1
+		}
+		days_remove = 14
+		complete_effect = {
+			set_temp_variable = { debt_temp = -0.2 }
+			multiply_temp_variable = { debt_temp = national_debt }
+			econ_national_debt_change = yes
+			set_variable = { inflation_fc = 10 }
+			set_temp_variable = { inflation_temp = 3 }
+			econ_inflation_change = yes
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+		}
+	}
+
+	fiscal_crisis_default_overlord = {#renegotiate with overlord
+		icon = GFX_decision_generic_shake_hands
+		available = {
+			custom_trigger_tooltip = {
+				has_variable = ECON_SPHERE_LEADER
+				tooltip = FC_has_sphere_leader
+			}
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		ai_will_do = {
+			base = 20
+		}
+		days_remove = 14
+		days_re_enable = 45
+		complete_effect = {
+			custom_effect_tooltip = FC_overlord_cancel_debt
+			set_temp_variable = { debt_temp = -0.2 }
+			multiply_temp_variable = { debt_temp = national_debt }
+			econ_national_debt_change = yes
+			add_to_variable = { GDP_to_sphere_leader_fc = 0.05 }
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+		}
+	}
+
+
+	fiscal_crisis_default_1 = {#renegotiate the most egregious things
+		icon = GFX_decision_generic_document
+		visible = {
+			check_variable = { partial_default = 0 }
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		ai_will_do = {
+			factor = 50
+		}
+		cost = 10
+		days_remove = 14
+		complete_effect = {
+			set_temp_variable = { debt_temp = -0.02 }
+			multiply_temp_variable = { debt_temp = national_debt }
+			econ_national_debt_change = yes
+			set_variable = { partial_default = 1 }
+			add_to_variable = { deficit_pp_fc = 0 }
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+		}
+	}
+
+	fiscal_crisis_default_2 = {#Cut a deal with national banks
+		visible = {
+			check_variable = { partial_default = 1 }
+		}
+		cost = 15
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		ai_will_do = {
+			base = 5
+		}
+		days_remove = 14
+		complete_effect = {
+			set_temp_variable = { debt_temp = -0.05 }
+			multiply_temp_variable = { debt_temp = national_debt }
+			econ_national_debt_change = yes
+			set_variable = { partial_default = 2 }
+			add_to_variable = { deficit_pp_fc = 0.1 }
+			custom_effect_tooltip = default_2_tooltip
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+		}
+	}
+
+	fiscal_crisis_default_3 = {#Put pressure on foreign debtors
+		visible = {
+			check_variable = { partial_default = 2 }
+		}
+		ai_will_do = {
+			base = 5
+		}
+		cost = 15
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		days_remove = 14
+		complete_effect = {
+			set_temp_variable = { debt_temp = -0.1 }
+			multiply_temp_variable = { debt_temp = national_debt }
+			add_to_variable = { stability_weekly_fc = -0.01 }
+			econ_national_debt_change = yes
+			set_variable = { partial_default = 3 }
+			add_to_variable = { deficit_pp_fc = 0.2 }
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+			custom_effect_tooltip = default_3_tooltip
+		}
+	}
+
+	fiscal_crisis_default_4 = {#Renegotitate debts with foreign debtors
+		visible = {
+			check_variable = { partial_default = 3 }
+		}
+		cost = 20
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		ai_will_do = {
+			base = 5
+		}
+		days_remove = 14
+		complete_effect = {
+			set_temp_variable = { debt_temp = -0.2 }
+			multiply_temp_variable = { debt_temp = national_debt }
+			econ_national_debt_change = yes
+			add_to_variable = { stability_weekly_fc = -0.02 }
+			set_variable = { partial_default = 4 }
+			add_to_variable = { deficit_pp_fc = 0.4 }
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+			custom_effect_tooltip = default_4_tooltip
+		}
+	}
+
+	fiscal_crisis_default_5 = {#Partially default on debt
+		visible = {
+			check_variable = { partial_default = 4 }
+		}
+		ai_will_do = {
+			base = 1
+		}
+		cost = 40
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		days_remove = 14
+		complete_effect = {
+			set_temp_variable = { debt_temp = -0.4 }
+			multiply_temp_variable = { debt_temp = national_debt }
+			econ_national_debt_change = yes
+			set_variable = { partial_default = 5 }
+			add_to_variable = { stability_weekly_fc = -0.03 }
+			add_to_variable = { deficit_pp_fc = 0.8 }
+			custom_effect_tooltip = default_5
+			econ_lower_credit_rating = yes
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+			custom_effect_tooltip = default_5_tooltip
+		}
+	}
+
+	end_econ_investment = {
+		icon = GFX_decision_generic_break_treaty
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		ai_will_do = {
+			base = 5
+		}
+		days_remove = 14
+		days_re_enable = 360
+		complete_effect = {
+		custom_effect_tooltip = FC_civ_cost_down
+			add_to_variable = { civilian_fc = -0.6 }
+			set_temp_variable= { gdp_growth_temp = -0.1 }
+			multiply_temp_variable = { gdp_growth_temp = gdp_growth }
+			if = { limit = { check_variable = { gdp_growth_temp > -3 } }
+				set_temp_variable = { gdp_growth_temp = -3 }
+			}
+			econ_gdp_growth_change = yes
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+		}
+	}
+
+	slash_research = {
+		icon = GFX_decision_generic_research_decrease
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		ai_will_do = {
+			base = 1
+		}
+		days_remove = 14
+		days_re_enable = 360
+		complete_effect = {
+			custom_effect_tooltip = FC_research_freeze
+			set_country_flag = FC_frozen_research_funding
+			add_to_variable = { research_cut_fc = -0.6 }
+			research_funding_minimal_set_position_0 = yes
+			research_funding_maximal_set_position_0 = yes
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+
+			}
+		}
+	}
+
+	restore_trust_debtors = {
+		icon = GFX_decision_generic_point_reversed
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+		days_remove = 14
+		days_re_enable = 30
+		complete_effect = {
+			set_temp_variable = { temp_gdp_paid   = 0.2 }
+			set_temp_variable = { debt_temp = -0.1 }
+			multiply_temp_variable = { debt_temp = national_debt }
+			econ_spend_money_once_effect_GDP_percent = yes
+			econ_national_debt_change = yes
+			econ_raise_credit_rating = yes
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+		}
+	}
+
+	freeze_military = {
+		icon = GFX_decision_generic_military_hat
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = no_action_against_fc
+				not = { has_country_flag = FC_took_action }
+			}
+		}
+
+		ai_will_do = {
+			base = 10
+			modifier = {
+				factor = 2
+				check_variable = { military_expenditures_percent > 20 }
+			}
+			modifier = {
+				factor = 5
+				check_variable = { military_expenditures_percent > 50 }
+			}
+			modifier = {
+				factor = 2
+				check_variable = { military_expenditures_percent > 20 }
+			}
+			modifier = {
+				factor = 0
+				has_war = yes
+			}
+			modifier = {
+				factor = 0.1
+				check_variable = { military_expenditures_percent < 10 }
+			}
+		}
+
+		days_re_enable = 360
+		days_remove = 14
+		complete_effect = {
+			custom_effect_tooltip = FC_mil_freeze
+			add_to_variable = { manpower_fc = -0.03 }
+			add_to_variable = { military_fc = -0.8 }
+			army_funding_minimal_set_position_0 = yes
+			army_funding_maximal_set_position_0 = yes
+			naval_funding_minimal_set_position_0 = yes
+			naval_funding_maximal_set_position_0 = yes
+			set_country_flag = {
+				flag = FC_took_action
+				days = 14
+				value = 1
+			}
+			set_country_flag = FC_cut_military_spending
+		}
+	}
+}
