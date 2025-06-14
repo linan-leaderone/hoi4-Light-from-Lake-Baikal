@@ -4,8 +4,10 @@ on_actions = {
 	on_startup = {
 		effect = {
 			ZZZ = {
-				country_event = economy.0
-				country_event = { id = economy.2 days = 1 }
+				country_event = economy.0 #Sorts Econ Spheres, Calculated World GDP, Creates GDP Rankings
+				country_event = { id = economy.2 days = 1 } #Reruns World Trade Influence
+				country_event = { id = economy.3 hours = 25 } #AI Economy Start-Up
+				country_event = { id = economy.5 days = 364 }
 				# Set up month counter for economy graph
 				set_variable = { econ_graph_month = 25 }
 
@@ -13,6 +15,7 @@ on_actions = {
 				set_variable = { xcycling = 0 }
 				set_variable = { ycycling = 0.125 }
 
+				SA_initalize_south_american_cold_war = yes
 				Global_Conflicts_Initalize = yes
 				Espionage_Initialize_Global_Vars = yes
 
@@ -21,12 +24,15 @@ on_actions = {
 
 				TNO_active_endonyms = yes
 				TNO_universal_renamings = yes
+				TNO_admin_title_init = yes
 				# Renamings that occur after a certain date
-				country_event = { id = exo_endo.2195 days = 730 }
-				country_event = { id = exo_endo.2194 days = 2557 }
-				country_event = { id = exo_endo.701 days = 4018 }
+				country_event = { id = endo_exo.2195 days = 730 }
+				country_event = { id = endo_exo.2194 days = 2557 }
+				country_event = { id = endo_exo.701 days = 4018 }
 				
 				save_global_event_target_as = SOCINTERN_LEADER_NATION # Prevents errors prior to founding of ComIntern
+				#Misc Natural Resource Production
+				TNO_KD_Natural_Resource_Setup = yes
 			}
 
 			## Cold War GUI Stuff
@@ -114,7 +120,7 @@ on_actions = {
 				add_to_array = { CW_SeaZone_Status = 0 } # 3; North Atlantic
 				add_to_array = { CW_SeaZone_Status = 0 } # 4; North Sea
 				add_to_array = { CW_SeaZone_Status = 1 } # 5; Mediterranean
-				add_to_array = { CW_SeaZone_Status = 0 } # 6; Indian Ocean
+				add_to_array = { CW_SeaZone_Status = 1 } # 6; Indian Ocean
 
 				# This only exists because scripted loc is a fuck
 				add_to_array = { global.PowerProjection_Tags = THIS.id }
@@ -182,29 +188,6 @@ on_actions = {
 				calculate_strike_capability = yes
 			}
 
-			#every_country = {
-			#	if = {
-			#		limit = { check_variable = { modifier@research_speed_factor < 0 } }
-			#		adjust_research_modifier = yes
-			#	}
-			#	if = {
-			#		limit = { check_variable = { modifier@industrial_capacity_factory < 0 } }
-			#		adjust_factory_output_modifier = yes
-			#	}
-			#	if = {
-			#		limit = { check_variable = { modifier@industrial_capacity_dockyard < 0 } }
-			#		adjust_dockyard_output_modifier = yes
-			#	}
-			#	if = {
-			#		limit = { check_variable = { modifier@production_speed_buildings_factor < 0 } }
-			#		adjust_construction_speed_modifier = yes
-			#	}
-			#	if = {
-			#		limit = { check_variable = { modifier@production_factory_max_efficiency_factor < 0.05 } }
-			#		adjust_efficiency_cap_modifier = yes
-			#	}
-			#}
-
 			BUL = {
 				country_event = { id = BUL.1000 days = 2555 random_hours = 30 }
 			}
@@ -220,6 +203,9 @@ on_actions = {
 			ARG = {
 				country_event = { id = ARG.148 days = 178 }
 				country_event = { id = ARG.168 days = 1204 } #date > 1965.04.19
+				country_event = { id = LATAM_bolivia_crisis.3 days = 45 } 
+				country_event = { id = LATAM_bolivia_crisis.6 days = 55 } 
+				country_event = { id = LATAM_bolivia_crisis.9 days = 70 } 
 			}
 
 			URG = {
@@ -249,6 +235,9 @@ on_actions = {
 			SIK = {
 				country_event = { id = SIK.2 days = 700 }
 				country_event = { id = SIK.1 days = 1826 }
+			}
+			BHU = {
+				country_event = { id = BHU.1 days = 2557 }
 			}
 			# Faction embargoes
 			set_global_flag = ofn_cps_embargo
@@ -287,6 +276,13 @@ on_actions = {
 				news_event = { # TOKYO OLYMPICS
 					id = WORLD.581
 					days = 1027
+				}
+			}
+			every_country = {
+				limit = { is_ai = no }
+				news_event = { # 1970 WORLD CUP
+					id = WORLD.583
+					days = 3093
 				}
 			}
 
@@ -401,6 +397,9 @@ on_actions = {
 				add_dynamic_modifier = { modifier = GER_military_advisors_dynmod }
 				add_dynamic_modifier = { modifier = GER_technician_aid_dynmod }
 				add_dynamic_modifier = { modifier = GER_sabotage_effort_dynmod }
+
+				set_variable = { GER_Espionage_operation_Ouroboros_cost_var = 0.100 }
+				set_variable = { GER_Espionage_operation_Ouroboros_cost_var_loc = 100 }
 			}
 
 
@@ -448,23 +447,24 @@ on_actions = {
 				}
 				add_political_power = 70
 				country_event = { id = FIN_SKELETON.1 days = 551 }
-				country_event = { id = FIN_SKELETON.3 days = 1649 }
 				country_event = { id = FIN_SKELETON.4 days = 1841 }
-				country_event = { id = FIN_SKELETON.5 days = 2743 }
-				country_event = { id = FIN_SKELETON.6 days = 3841 }
 			}
 
 			# Brazil
 			BRA = {
+				BRA_SetEconomicGoals = yes
+				BRA_calc_military_expectations = yes
 				country_event = { id = brazil.20 days = 4 }		# Lott
 				country_event = { id = brazil.21 days = 22 }	# Japanese Tourists
 				country_event = { id = brazil.22 days = 40 random = 8 }	# de Barros
 				country_event = { id = brazil.23 days = 48 random = 8 }	# Goulart
 				country_event = { id = brazil.24 days = 78 random = 8 }	# Lacerda
+				
+				country_event = { id = BRA_military_elections.9 days = 1461 }	# Sorbonne Lacerda
 
 				country_event = { id = brazil.282 days = 116 random = 8 }	# Kubitschek Intro event
-
-
+				#country_event = { id = brazil.25 days = 145 random = 8 }	# Quadros Visits China
+				country_event = { id = brazil.19 days = 145 random = 8 } # Filinto Müller intro event
 				#country_event = { id = brazil.415 days = 158 random = 8 }	# Panda Diplomacy
 				country_event = { id = brazil.328 days = 170 random = 5 }	# Kubitschek Followup event
 				country_event = { id = brazil.421 days = 190 random = 5 }	#Brizola and Goulart meet
@@ -493,6 +493,7 @@ on_actions = {
 				country_event = { id = brazil.263 days = 656 random = 4 }	#Hitler's Death reaction
 				country_event = { id = brazil.265 days = 677 random = 3 }	#Adhemar vibing, what will he do
 				#country_event = { id = brazil.267 days = 677 random = 3 }	#Followup to Petrobras
+				country_event = { id = brazil.9999 days = 730 }
 				country_event = { id = brazil.33 days = 764 random = 3 }	# Quadros' Scheme Begins
 
 				country_event = { id = brazil.11 days = 1010 random = 4 }	# Ancora dies and Frota rises
@@ -500,10 +501,23 @@ on_actions = {
 				#country_event = { id = brazil.383 days = 1175 random = 3 }	#Dirty Hearts
 				country_event = { id = brazil.270 days = 1211 random = 3 }	#Rede Globo
 				country_event = { id = brazil.1201 days = 1455 random = 4 }	# Denys retires and Figueiredo rises
+				country_event = { id = brazil.610 days = 1170 random = 4 }	# Geisel intro event
+
+				country_event = { id = brazil.1202 days = 1899 } # Branco retires
+				country_event = { id = brazil.1203 days = 2907 } # Costa dies retires
+				country_event = { id = brazil.1204 days = 2373 random_days = 30 } # Ribeiro retires
+				country_event = { id = brazil.1205 days = 2647 random_days = 29 } # Bevilacqua retires
+				country_event = { id = brazil.1206 days = 3226 random_days = 29 } # Murici retires
+				country_event = { id = brazil.1206 days = 3652 random_days = 365 } # Newton promoted
+				country_event = { id = brazil_adhemar.78 days = 1848 } # Start of 1967 Adhemar Crisis, Vargas Death, Kruel Coup and Parana Crisis
+				country_event = { id = brazil_adhemar.117 days = 2251 } # Start of 1968 Edna Crisis (Adhemar)
 
 				country_event = { id = brazil.17 days = 31 }	# Begin '62 elections
 				country_event = { id = brazil.18 days = 280 }	# End '62 elections
 
+				country_event = { id = brazil.176 days = 1131 } # Begin '65 senate elections
+				country_event = { id = brazil.177 days = 1380 } # End '65 senate elections
+			
 				country_event = { id = brazil.237 days = 1091 }	# Begin '65 presidential election candidate selection
 				country_event = { id = brazil.231 days = 1378 }	# End '65 presidential elections
 
@@ -511,12 +525,78 @@ on_actions = {
 				country_event = { id = brazil.324 days = 1460 }
 
 				country_event = { id = brazil.443 days = 1155 } # Communist Attack
+				
+				country_event = { id = brazil.590 days = 1660 } # Brazil crashes out in World Cup group stages
 
 				# Antarctica Chain
 				country_event = { id = BRA_antarctica.1 days = 777 }
+
+				country_event = { id = brazil.520 days = 1461 } # Rio storm
+
+				country_event = { id = brazil.509 days = 2227 } # Begin '68 Elections
+				country_event = { id = brazil.510 days = 2476 } # End '68 Elections
+
+				country_event = { id = brazil.542 days = 2911 }  # Begin '70 presidential election
+				country_event = { id = brazil.534 days = 3204 }  # End '70 presidential election
+
+				country_event = { id = brazil.575 days = 3280 } # Adhemar Final Speech if President
+				country_event = { id = brazil.576 days = 3280 } # Pedro Aleixo Final Speech if President
+				country_event = { id = brazil.577 days = 3280 } # Edna Final speech as president and if she won
+				country_event = { id = brazil.578 days = 3280 } # Edna Final speech as president and if she lost
+				
+				#South Atlantic War election events
+				country_event = { id = LATAM_south_atlantic_war.20 days = 1380 } #65
+				country_event = { id = LATAM_south_atlantic_war.20 days = 2476 } #68
+				country_event = { id = LATAM_south_atlantic_war.20 days = 3204 } # 70
+				
+				#Disney events
+				country_event = { id = brazil.1400 days = 1658 } 
+				country_event = { id = brazil.1401 days = 1658 }
+				country_event = { id = brazil.1402 days = 1658 }
+				country_event = { id = brazil.1403 days = 1658 }
+				country_event = { id = brazil.1404 days = 1658 }
+				country_event = { id = brazil.1405 days = 1658 }
+
+				set_variable = { BRA_pl_bill_id = 0 }
+				clear_array = BRA_pl_bill_queue
+				set_variable = { BRA_pl_ptb_support_pct_max = 1 }
+				set_variable = { BRA_pl_psd_support_pct_max = 1 }
+				set_variable = { BRA_pl_udn_support_pct_max = 1 }
+				set_variable = { BRA_pl_psp_support_pct_max = 1 }
+				set_variable = { BRA_pl_prp_support_pct_max = 1 }
+				set_variable = { BRA_pl_ptb_modifier_lacerda = 1 }
+				set_variable = { BRA_pl_psd_modifier_lacerda = 1 }
+
+				country_event = { id = brazil_lacerda.203 days = 3022 } # Chiyoko is Taken In by the Seicho no Ie
+				country_event = { id = brazil_lacerda_samba.24 days = 2929 } # tavora thing
+				country_event = { id = brazil_lacerda_samba.81 days = 2929 } # party congress if lacerda is still president
+				country_event = { id = brazil_lacerda_samba.27 days = 2450 } # WLP impeachment attempt chain
+				country_event = { id = brazil_lacerda_samba.42 days = 1759 } # dam fund chain
+				country_event = { id = brazil_lacerda_samba.51 days = 1902 } # national security acts chain
+				country_event = { id = brazil_lacerda_samba.68 days = 2040 } # Constitutional reform
+
+				country_event = { id = LATAM_bolivia_crisis.1 days = 40 } 
+				country_event = { id = LATAM_bolivia_crisis.4 days = 55 } 
+				country_event = { id = LATAM_bolivia_crisis.7 days = 70 } 
+
+				country_event = { id = LATAM_cayenne.1 days = 1050 } 
+				country_event = { id = LATAM_cayenne.2 days = 1165 } 
+				country_event = { id = LATAM_cayenne.3 days = 1290 } 
+				country_event = { id = LATAM_cayenne.4 days = 1410 } 
+				country_event = { id = LATAM_cayenne.5 days = 1430 } 
+				country_event = { id = LATAM_cayenne.6 days = 1490 } 
+				
+				country_event = { id = brazil_adhemar.1012 days = 1675 } # Adhemar baseball chain
+				#country_event = { id = brazil_lacerda_imp.78 days = 2075 } # Imperial Lacerda Gordon kidnapping chain
+				country_event = { id = brazil_lacerda_imp.103 days = 2260 } # Imperial Lacerda election rigging
 			}
 			# Chile
-			CHL = { add_political_power = 69 }
+			CHL = {
+				add_political_power = 69
+				country_event = { id = LATAM_bolivia_crisis.2 days = 40 } 
+				country_event = { id = LATAM_bolivia_crisis.5 days = 55 } 
+				country_event = { id = LATAM_bolivia_crisis.8 days = 70 } 
+			}
 
 			# Malaya
 
@@ -603,22 +683,7 @@ on_actions = {
 				limit = { has_tech = modern_rubber_processing }
 				country_event = { id = misc.4 days = 7 }
 			}
-			every_country = {
-				limit = {
-					TNO_has_content = yes
-					NOT = { is_russian_nation = yes }
-					NOT = { tag = CHL }
-					NOT = { is_antarctic_nation = yes }
-				}
-				random_owned_controlled_state = {
-					add_extra_state_shared_building_slots = 1
-					add_building_construction = {
-						type = thermoelectric_plant
-						level = 1
-						instant_build = yes
-					}
-				}
-			}
+
 
 			for_each_scope_loop = {
 				array = global.countries
@@ -640,6 +705,10 @@ on_actions = {
 			}
 
 			ZZZ = { country_event = { id = misc.5 days = 180 } }
+			
+			ZZZ = {
+				TNO_Initialize_Tips_and_Tricks = yes
+			}
 		}
 	}
 }
