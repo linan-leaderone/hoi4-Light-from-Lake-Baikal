@@ -16,16 +16,77 @@ COX_landreform_startup = {
         set_variable = { COX_landreform_action_id = 0 }
 
         #arrays
-        # clear_array = COX_landreform_regions_array
-        # add_to_array = { COX_landreform_target_array = 617 } #中央
-        # add_to_array = { COX_landreform_target_array = 957 } #东疆
-        # add_to_array = { COX_landreform_target_array = 618 } #北疆
-        # add_to_array = { COX_landreform_target_array = 619 } #南疆
+        clear_array = COX_landreform_regions_array #土改地区数组
+        add_to_array = { COX_landreform_target_array = 617 } #中央
+        add_to_array = { COX_landreform_target_array = 957 } #东疆
+        add_to_array = { COX_landreform_target_array = 618 } #北疆
+        add_to_array = { COX_landreform_target_array = 619 } #南疆
 
-        clear_array = COX_landreform_
+
+        clear_array = COX_landreform_dec_all_array #土改决议后端数组，用来存储所有潜在决议
+        #101-117 中央决议
+        for_loop_effect = {
+            start = 101
+            end = 118
+            value = i
+
+            add_to_array = { 
+                  array = COX_landreform_dec_all_array
+                  value= i 
+            }
+        }
+        #201-227 东疆决议
+        for_loop_effect = {
+            start = 201
+            end = 228
+            value = i
+
+            add_to_array = { 
+                  array = COX_landreform_dec_all_array
+                  value= i 
+            }
+        }
+
+        #301-321 北疆决议
+        for_loop_effect = {
+            start = 301
+            end = 322
+            value = i
+
+            add_to_array = { 
+                  array = COX_landreform_dec_all_array
+                  value= i 
+            }
+        }
+
+        #401-426 南疆决议
+        for_loop_effect = {
+            start = 401
+            end = 427
+            value = i
+
+            add_to_array = { 
+                  array = COX_landreform_dec_all_array
+                  value= i 
+            }
+        }
+
+        clear_array = COX_landreform_dec_done_array #土改决议后端数组，用来存储所有已执行决议
         
     }
     #地区变量初始化
+    617 = {#中央
+        set_variable = { COX_landreform_local_progress = 0 }
+        set_variable = { COX_landreform_local_infrastructure = 40 }
+        set_variable = { COX_landreform_local_infrastructure_expectation = 75 }
+        set_variable = { COX_landreform_local_unrest = 15 }
+        set_variable = { COX_landreform_local_unrest_change = 0 }
+        set_variable = { COX_landreform_local_support = 20 }
+        set_variable = { COX_landreform_local_support_increase_factor = 0.1 }
+        set_variable = { COX_landreform_local_support_decrease_factor = 0.2 }
+        set_variable = { COX_landreform_local_militia_demand = 6000 }
+    }
+
     957 = {#东疆
         set_variable = { COX_landreform_local_progress = 0 }
         set_variable = { COX_landreform_local_infrastructure = 20 }
@@ -62,37 +123,172 @@ COX_landreform_startup = {
         set_variable = { COX_landreform_local_militia_demand = 15000 }
     }
 
-    617 = {#中央
-        set_variable = { COX_landreform_local_progress = 0 }
-        set_variable = { COX_landreform_local_infrastructure = 40 }
-        set_variable = { COX_landreform_local_infrastructure_expectation = 75 }
-        set_variable = { COX_landreform_local_unrest = 15 }
-        set_variable = { COX_landreform_local_unrest_change = 0 }
-        set_variable = { COX_landreform_local_support = 20 }
-        set_variable = { COX_landreform_local_support_increase_factor = 0.1 }
-        set_variable = { COX_landreform_local_support_decrease_factor = 0.2 }
-        set_variable = { COX_landreform_local_militia_demand = 6000 }
-    }
+    
 }
 
 COX_landreform_update = {
-    every_state = {
+    for_each_scope_loop = {
+        array = COX_landreform_regions_array
+        if = {
+            limit = { has_state_flag = COX_landreform_update_avaliable }
+            COX_landreform_update_calc = yes
+        }
+    }
+    
+}
 
+COX_landreform_update_calc = {
+    add_to_variable = {
+        COX_landreform_local_unrest = COX_landreform_local_unrest_change
+    }
+    if = {
+        limit = {
+            check_variable = { COX_landreform_local_infrastructure > COX_landreform_local_infrastructure_expectation }
+        }
+        set_temp_variable = {
+            temp_COX_landreform_local_support_change = COX_landreform_local_infrastructure_expectation
+        }
+        subtract_from_temp_variable= {
+            temp_COX_landreform_local_support_change = COX_landreform_local_infrastructure
+        }
+        multiply_temp_variable = {
+            temp_COX_landreform_local_support_change = COX_landreform_local_support_increase_factor
+        }
+        add_to_variable = {
+            COX_landreform_local_support = temp_COX_landreform_local_support_change
+        }
+    }
+    else_if = {
+        limit = {
+            check_variable = { COX_landreform_local_infrastructure < COX_landreform_local_infrastructure_expectation }
+        }
+        set_temp_variable = {
+            temp_COX_landreform_local_support_change = COX_landreform_local_infrastructure
+        }
+        subtract_from_temp_variable= {
+            temp_COX_landreform_local_support_change = COX_landreform_local_infrastructure_expectation
+        }
+        multiply_temp_variable = {
+            temp_COX_landreform_local_support_change = COX_landreform_local_support_decrease_factor
+        }
+        add_to_variable = {
+            COX_landreform_local_support = temp_COX_landreform_local_support_change
+        }
     }
 }
 
+###GUI相关###
+COX_landreform_GUI_get_decisions = {
+    clear_array = COX_landreform_GUI_dec_array #GUI用
+    if = {
+        limit = {
+            check_variable = {
+                COX_landreform_selected_region = 617
+            }
+        }
+        set_temp_variable = {
+            temp_loop_low = 101
+        }
 
+        set_temp_variable = {
+            temp_loop_up = 118
+        }
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                COX_landreform_selected_region = 957
+            }
+        }
+        set_temp_variable = {
+            temp_loop_low = 201
+        }
+
+        set_temp_variable = {
+            temp_loop_up = 228
+        }
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                COX_landreform_selected_region = 618
+            }
+        }
+        set_temp_variable = {
+            temp_loop_low = 301
+        }
+
+        set_temp_variable = {
+            temp_loop_up = 322
+        }
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                COX_landreform_selected_region = 619
+            }
+        }
+        set_temp_variable = {
+            temp_loop_low = 401
+        }
+
+        set_temp_variable = {
+            temp_loop_up = 427
+        }
+    }
+    for_loop_effect = {
+        start = temp_loop_low
+        end = temp_loop_up
+        value = i
+
+        meta_effect = {
+            text = {
+                if = {
+                    limit = { COX_landreform_dec_[TOKEN]_visible_trigger = yes }
+                    add_to_array = {COX_landreform_GUI_dec_array = i}
+                }
+            }
+            TOKEN = "[?COX.i]"
+        }
+    }
+}
 
 ####TEST###
 COX_landreform_test = {
-    COX = {
+    set_variable = {
+        COX_landreform_selected_region = 617
+    }
+    if = {
+        limit = {
+            check_variable = {
+                COX_landreform_selected_region = 617
+            }
+        }
+        set_temp_variable = {
+            temp_loop_low = 123
+        }
+
+        set_temp_variable = {
+            temp_loop_up = 126
+        }
+    }
+    for_loop_effect = {
+        start = temp_loop_low
+        end = temp_loop_up
+        value = i
+
+        log = "[?i]"
         meta_effect = {
             text = {
-                #add_political_power = [TOKEN]
-                COX_[TOKEN]_test_effect = yes
+                if = {
+                    limit = { COX_is_[TOKEN] = yes }
+                    COX_[TOKEN]_test_effect = yes
+                    log = "COX_[TOKEN]_test_effect"
+                }
+                
             }
-            TOKEN = "[?COX.test_var]"
-	    }
+            TOKEN = "[?i]"
+        }
     }
     
     
