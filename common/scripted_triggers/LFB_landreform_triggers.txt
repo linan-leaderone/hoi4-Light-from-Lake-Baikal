@@ -1,12 +1,74 @@
+#visibility
+#------------------------------------------------#
+    #在这里写每个决议各自的可见条件
+    #主要是检测前后文（互斥或必须决议是否已经执行）
+    #方法：引用
+    #is_in_array = {
+        #COX_landreform_dec_done_array
+        #value = [决议id]
+    #}
+    #来检测某个决议是否在“已执行”列表中
+    #起始决议应当用always = yes
+    #对不可执行决议，自身id一定不能在“已执行”列表中
+    #决议id为三位数字，其中第一位取[1,2,3,4]，代表地区
+    #101-117为中央决议，201-227为东疆决议，301-321为北疆决议，401-426为南疆决议
+    #示例:
 
+# COX_landreform_dec_111_visible_trigger = {
+#     AND = {
+#         is_in_array = {
+#             COX_landreform_dec_done_array
+#             value = [决议id]
+#         }
+#         is_in_array = {
+#             COX_landreform_dec_done_array
+#             value = [决议id]
+#         }
+#     }
+#     NOT = {
+#         OR = {
+#             is_in_array = {
+#                 COX_landreform_dec_done_array
+#                 value = [决议id]
+#             }
+#             is_in_array = {
+#                 COX_landreform_dec_done_array
+#                 value = [决议id]
+#             }
+#         }
+#     }
+# }
+
+#------------------------------------------------#
 #avaliability
-COX_landreform_action_avaliable_trigger = {
-    meta_effect = {
+COX_landreform_GUI_dec_click_trigger_w_tt = {
+    if = {
+		limit = {NOT = {COX_landreform_dec_avaliable_trigger = yes}}
+		COX_landreform_dec_avaliable_trigger = yes
+	}
+}
+#索引
+COX_landreform_dec_avaliable_trigger = {
+    #NOT = {
+        #has_country_flag = landreform_dec_in_cd
+    #}
+    meta_trigger = {
         text = {
-            COX_landreform_action_[TOKEN]_avaliable_trigger = yes
+            COX_landreform_dec_[TOKEN]_avaliable_trigger = yes
         }
-        TOKEN = "[landreform_GUI_action_id]"
+        TOKEN = "[?COX_landreform_GUI_action_id]"
     }
 }
+#------------------------------------------------#
+    #在这里写每个决议各自的可用前提条件
+    #基本就是检测消耗资源。
+    #决议id为三位数字，其中第一位取[1,2,3,4]，代表地区
+    #101-117为中央决议，201-227为东疆决议，301-321为北疆决议，401-426为南疆决议
+    #示例：
 
-#visibility
+# COX_landreform_dec_111_avaliable_trigger = {
+#     has_political_power > 19
+#     command_power > 39  
+# }
+
+#------------------------------------------------#

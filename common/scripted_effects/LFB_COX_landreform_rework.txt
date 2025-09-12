@@ -15,6 +15,8 @@ COX_landreform_startup = {
 
         set_variable = { COX_landreform_current_action_id = 0 }
 
+        set_variable = { COX_landreform_view_selected = 0 }
+
         #arrays
         clear_array = COX_landreform_regions_array #土改地区数组
         add_to_array = { COX_landreform_target_array = 617 } #中央
@@ -35,6 +37,7 @@ COX_landreform_startup = {
                   value= i 
             }
         }
+
         #201-227 东疆决议
         for_loop_effect = {
             start = 201
@@ -122,17 +125,82 @@ COX_landreform_startup = {
         set_variable = { COX_landreform_local_support_decrease_factor = 2 }
         set_variable = { COX_landreform_local_militia_demand = 15000 }
     }
-
-    
+    COX_landreform_refresh = yes
 }
 
 #笔记：
 #土改决议定义由三部分构成：
-#COX_landreform_action_[决议id]_effect，为执行效果
-#COX_landreform_action_[决议id]_avaliable_trigger，为可用条件
-#COX_landreform_action_[决议id]_visible_trigger，为可见条件
+#COX_landreform_dec_[决议id]_effect，为执行效果
+#位于下方
+#COX_landreform_dec_[决议id]_avaliable_trigger，为可用条件
+#COX_landreform_dec_[决议id]_visible_trigger，为可见条件
+#此二者位于common/scripted_triggers/LFB_landreform_triggers文件中，分别有示例
 #决议id为三位数字，其中第一位取[1,2,3,4]，代表地区
 #101-117为中央决议，201-227为东疆决议，301-321为北疆决议，401-426为南疆决议
+
+
+#--------------------------------------------------------------------#
+    #在这里写每个决议各自的效果
+    #参见设计案
+    #决议id为三位数字，其中第一位取[1,2,3,4]，代表地区
+    #101-117为中央决议，201-227为东疆决议，301-321为北疆决议，401-426为南疆决议
+    #对于不可重复执行的决议，要用add_to_array = { COX_landreform_dec_done_array = [决议id] } 来记录本决议的执行状态
+    #而对于可重复执行的决议，不要这样做
+    #示例：
+# COX_landreform_dec_111_effect = {
+#     #直接效果
+#     add_political_power = 22
+#     #事件
+#     country_event = {COX.114514}
+#     #变量增减
+#     add_to_variable = {
+#         COX_landreform_local_progress = 3
+#     }
+#     #可用性处理
+#     add_to_array = { COX_landreform_dec_done_array = [id] }
+# }
+#--------------------------------------------------------------------#
+
+
+COX_landreform_refresh = {
+    meta_effect = {
+        text = {
+            set_variable = {
+                var = COX_landreform_local_progress_display
+                value = [TOKEN].COX_landreform_local_progress
+            }
+            set_variable = {
+                var = COX_landreform_local_infrastructure_display
+                value = [TOKEN].COX_landreform_local_infrastructure
+            }
+            set_variable = {
+                var = COX_landreform_local_unrest_display
+                value = [TOKEN].COX_landreform_local_unrest
+            }
+            set_variable = {
+                var = COX_landreform_local_support_display
+                value = [TOKEN].COX_landreform_local_support
+            }
+        }
+        TOKEN = "[?COX.COX_landreform_selected_region]"
+    }
+
+    
+    
+    # set_variable = {
+    #     var = COX_landreform_local_infrastructure_display
+    #     value = COX_landreform_selected_region.COX_landreform_local_infrastructure
+    # }
+    # set_variable = {
+    #     var = COX_landreform_local_unrest_display
+    #     value = COX_landreform_selected_region.COX_landreform_local_unrest
+    # }
+    # set_variable = {
+    #     var = COX_landreform_local_support_display
+    #     value = COX_landreform_selected_region.COX_landreform_local_support
+    # }
+    COX_landreform_GUI_get_decisions = yes
+}
 
 COX_landreform_update = {
     for_each_scope_loop = {
@@ -142,6 +210,7 @@ COX_landreform_update = {
             COX_landreform_update_calc = yes
         }
     }
+    COX_landreform_refresh = yes
     
 }
 
@@ -182,15 +251,6 @@ COX_landreform_update_calc = {
         add_to_variable = {
             COX_landreform_local_support = temp_COX_landreform_local_support_change
         }
-    }
-}
-
-COX_landreform_action_effect = {
-    meta_effect = {
-        text = {
-            COX_landreform_action_[TOKEN]_effect = yes
-        }
-        TOKEN = "[?COX_landreform_current_action_id]"
     }
 }
 
@@ -261,13 +321,22 @@ COX_landreform_GUI_get_decisions = {
         meta_effect = {
             text = {
                 if = {
-                    #limit = { COX_landreform_dec_[TOKEN]_visible_trigger = yes }
-                    limit = {always = yes}
+                    limit = { COX_landreform_dec_[TOKEN]_visible_trigger = yes }
                     add_to_array = {COX_landreform_GUI_dec_array = i}
                 }
             }
             TOKEN = "[?i]"
         }
+    }
+}
+
+COX_landreform_dec_click_effect = {
+    COX_landreform_refresh = yes
+    meta_effect = {
+        text = {
+            COX_landreform_dec_[TOKEN]_effect = yes
+        }
+        TOKEN = "[?COX_landreform_GUI_action_id]"
     }
 }
 
@@ -277,6 +346,7 @@ COX_landreform_test = {
     set_variable = {
         COX_landreform_selected_region = 617
     }
+    clear_array = COX_landreform_GUI_dec_array #GUI用
     if = {
         limit = {
             check_variable = {
@@ -288,14 +358,23 @@ COX_landreform_test = {
         }
 
         set_temp_variable = {
-            temp_loop_up = 128
+            temp_loop_up = 105
         }
     }
     for_loop_effect = {
         start = temp_loop_low
         end = temp_loop_up
         value = i
-        add_to_array = {COX_landreform_GUI_dec_array = i}
+        meta_effect = {
+            text = {
+                if = {
+                    limit = { COX_landreform_dec_[TOKEN]_visible_trigger = yes }
+                    add_to_array = {COX_landreform_GUI_dec_array = i}
+                }
+            }
+            TOKEN = "[?i]"
+        }
+        # add_to_array = {COX_landreform_GUI_dec_array = i}
         log = "[?i]"
         # meta_effect = {
         #     text = {
