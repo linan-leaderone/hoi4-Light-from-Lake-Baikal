@@ -133,6 +133,7 @@ COX_landreform_startup = {
         set_variable = { COX_landreform_local_militia_demand = 15000 }
     }
     COX_landreform_refresh = yes
+    #这里留给事件-420天最终结算之前要触发一些剧情事件来为“最终事件”铺垫
 }
 COX_landreform_refresh = {
     meta_effect = {
@@ -155,6 +156,39 @@ COX_landreform_refresh = {
             }
         }
         TOKEN = "[?COX.COX_landreform_selected_region]"
+    }
+    multiply_variable = {
+        COX_landreform_local_progress_display = 0.871
+    }
+    add_to_variable = {
+        COX_landreform_local_progress_display = 0.651
+    }
+
+    multiply_variable = {
+        COX_landreform_local_infrastructure_display = 0.871
+    }
+    add_to_variable = {
+        COX_landreform_local_infrastructure_display = 0.651
+    }
+
+    multiply_variable = {
+        COX_landreform_local_support_display = 0.871
+    }
+    add_to_variable = {
+        COX_landreform_local_support_display = 0.651
+    }
+    
+    subtract_from_variable = {
+        COX_landreform_local_unrest_display = 100
+    }
+    multiply_variable = {
+        COX_landreform_local_unrest_display = -1
+    }
+    multiply_variable = {
+        COX_landreform_local_unrest_display = 0.871
+    }
+    add_to_variable = {
+        COX_landreform_local_unrest_display = 0.651
     }
     COX_landreform_GUI_get_decisions = yes
     COX_ladreform_clamp_values = yes
@@ -947,6 +981,36 @@ COX_landreform_GUI_get_decisions = {
             TOKEN = "[?i]"
         }
     }
+    set_temp_variable = {temp_dec_Array_Size = 0}
+	for_each_loop = {
+		array = COX_landreform_GUI_dec_array
+		add_to_temp_variable = {temp_dec_Array_Size = 1}
+	}
+    if = {
+		limit = {check_variable = {temp_dec_Array_Size < 4}}
+		if = {
+			limit = {check_variable = {temp_dec_Array_Size = 3}}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+		}
+		else_if = {
+			limit = {check_variable = {temp_dec_Array_Size = 2}}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+		}
+		else_if = {
+			limit = {check_variable = {temp_dec_Array_Size = 1}}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+		}
+		else = {
+			
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+		}
+	}
 }
 COX_landreform_dec_click_effect = {
     hidden_effect = {
@@ -1385,6 +1449,10 @@ COX_landreform_militia_loss_large = {
 #     add_to_array = { COX_landreform_dec_done_array = [id] }
 # }
 #--------------------------------------------------------------------#
+COX_landreform_dec_100_effect = {
+    custom_effect_tooltip = COX_landreform_dec_100_tt
+}
+
 
 COX_landreform_dec_101_effect = {
     hidden_effect = {
