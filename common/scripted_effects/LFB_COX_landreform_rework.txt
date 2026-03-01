@@ -3,6 +3,8 @@ COX_landreform_startup = {
     COX = {
         #country flags
         set_country_flag = COX_landreform_ongoing
+        set_country_flag = country_has_gui
+		set_country_flag = COX_land_reform_happened
 
         #full scope variables
         set_variable = { COX_landreform_progress = 0 }
@@ -78,7 +80,7 @@ COX_landreform_startup = {
         }
 
         clear_array = COX_landreform_dec_done_array #土改决议后端数组，用来存储所有已执行决议
-        activate_mission = cox_landreform_monthly_effect
+        activate_mission = COX_landreform_monthly_effect
         activate_mission = COX_landreform_deadline
         
     }
@@ -193,7 +195,6 @@ COX_landreform_update = {
     617 = {
         if = {
             limit = {
-                NOT = {has_state_flag = COX_landreform_local_failure}
                 check_variable = {COX_landreform_local_unrest = 100}
             }
             COX = {country_event = COX_landreform.321}
@@ -203,7 +204,6 @@ COX_landreform_update = {
     957 = {
         if = {
             limit = {
-                NOT = {has_state_flag = COX_landreform_local_failure}
                 check_variable = {COX_landreform_local_unrest = 100}
             }
             COX = {country_event = COX_landreform.322}
@@ -213,7 +213,6 @@ COX_landreform_update = {
     618 = {
         if = {
             limit = {
-                NOT = {has_state_flag = COX_landreform_local_failure}
                 check_variable = {COX_landreform_local_unrest = 100}
             }
             COX = {country_event = COX_landreform.323}
@@ -223,7 +222,6 @@ COX_landreform_update = {
     619 = {
         if = {
             limit = {
-                NOT = {has_state_flag = COX_landreform_local_failure}
                 check_variable = {COX_landreform_local_unrest = 100}
             }
             COX = {country_event = COX_landreform.324}
@@ -529,6 +527,277 @@ COX_landreform_update_calc = {
         }
     }
 }
+
+
+COX_landreform_cheat_effect = {
+    set_variable = {COX_landreform_militia = 40000}
+    617 = {#中央
+        set_variable = { COX_landreform_local_progress = 100 }
+        set_variable = { COX_landreform_local_infrastructure = 100 }
+        set_variable = { COX_landreform_local_unrest = 0 }
+        set_variable = { COX_landreform_local_support = 100 }
+    }
+
+    957 = {#东疆
+        set_variable = { COX_landreform_local_progress = 100 }
+        set_variable = { COX_landreform_local_infrastructure = 100 }
+        set_variable = { COX_landreform_local_unrest = 0 }
+        set_variable = { COX_landreform_local_support = 100 }
+    }
+
+    618 = {#北疆
+        set_variable = { COX_landreform_local_progress = 100 }
+        set_variable = { COX_landreform_local_infrastructure = 100 }
+        set_variable = { COX_landreform_local_unrest = 0 }
+        set_variable = { COX_landreform_local_support = 100 }
+    }
+
+    619 = {#南疆
+        set_variable = { COX_landreform_local_progress = 100 }
+        set_variable = { COX_landreform_local_infrastructure = 100 }
+        set_variable = { COX_landreform_local_unrest = 0 }
+        set_variable = { COX_landreform_local_support = 100 }
+    }
+    COX_landreform_refresh = yes
+}
+#GUI结束效果-打包变量，输出给事件链
+COX_landreform_end_effect = {
+    #终止！
+    remove_mission = COX_landreform_cooldown_timer_3
+    remove_mission = COX_landreform_cooldown_timer_7
+    remove_mission = COX_landreform_cooldown_timer_14
+    remove_mission = COX_landreform_repdec_112_cooldown_timer
+    remove_mission = COX_landreform_repdec_116_cooldown_timer
+    remove_mission = COX_landreform_repdec_117_cooldown_timer
+    remove_mission = COX_landreform_repdec_205_cooldown_timer
+    remove_mission = COX_landreform_repdec_211_cooldown_timer
+    remove_mission = COX_landreform_repdec_221_cooldown_timer
+    remove_mission = COX_landreform_repdec_222_cooldown_timer
+    remove_mission = COX_landreform_repdec_307_cooldown_timer
+    remove_mission = COX_landreform_repdec_308_cooldown_timer
+    remove_mission = COX_landreform_repdec_311_cooldown_timer
+    remove_mission = COX_landreform_repdec_320_cooldown_timer
+    remove_mission = COX_landreform_repdec_321_cooldown_timer
+    remove_mission = COX_landreform_repdec_423_cooldown_timer
+    remove_mission = COX_landreform_repdec_426_cooldown_timer
+    remove_mission = COX_landreform_monthly_effect
+    remove_mission = COX_landreform_deadline
+    #初始化变量
+    set_variable = {
+        COX_landreform_progress_export = 0
+    }
+    set_variable = {
+        COX_landreform_infrastructure_export = 0
+    }
+    set_variable = {
+        COX_landreform_militia_export = 0
+    }
+    
+    #进度
+    ##中央
+    set_temp_variable = {temp_COX_landreform_support_calc = 0}
+    add_to_temp_variable = {temp_COX_landreform_support_calc = 617.COX_landreform_local_progress}
+    multiply_temp_variable = {temp_COX_landreform_support_calc = 0.3} #系数
+    add_to_variable = {COX_landreform_progress_export = temp_COX_landreform_support_calc}
+    ##东疆
+    set_temp_variable = {temp_COX_landreform_support_calc = 0}
+    add_to_temp_variable = {temp_COX_landreform_support_calc = 957.COX_landreform_local_progress}
+    multiply_temp_variable = {temp_COX_landreform_support_calc = 0.25} #系数
+    add_to_variable = {COX_landreform_progress_export = temp_COX_landreform_support_calc}
+    ##北疆
+    set_temp_variable = {temp_COX_landreform_support_calc = 0}
+    add_to_temp_variable = {temp_COX_landreform_support_calc = 618.COX_landreform_local_progress}
+    multiply_temp_variable = {temp_COX_landreform_support_calc = 0.25} #系数
+    add_to_variable = {COX_landreform_progress_export = temp_COX_landreform_support_calc}
+    ##南疆
+    set_temp_variable = {temp_COX_landreform_support_calc = 0}
+    add_to_temp_variable = {temp_COX_landreform_support_calc = 619.COX_landreform_local_progress}
+    multiply_temp_variable = {temp_COX_landreform_support_calc = 0.2} #系数
+    add_to_variable = {COX_landreform_progress_export = temp_COX_landreform_support_calc}
+    #转换为等级
+    if = {
+        limit = {
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 0
+				compare = greater_than_or_equals
+            }
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 30
+				compare = less_than_or_equals
+            }
+        }
+        set_variable = {COX_landreform_progress_export = 1}
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 30
+				compare = greater_than
+            }
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 60
+				compare = less_than_or_equals
+            }
+        }
+        set_variable = {COX_landreform_progress_export = 2}
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 60
+				compare = greater_than
+            }
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 80
+				compare = less_than_or_equals
+            }
+        }
+        set_variable = {COX_landreform_progress_export = 3}
+    }
+    else = {
+        set_variable = {COX_landreform_progress_export = 4}
+    }
+    #基础设施
+    set_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 0}
+    set_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 0}
+    if = {
+        limit = {
+            check_variable = {
+                617.COX_landreform_local_infrastructure > 617.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                957.COX_landreform_local_infrastructure > 957.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                618.COX_landreform_local_infrastructure > 618.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                619.COX_landreform_local_infrastructure > 619.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                617.COX_landreform_local_infrastructure < 617.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                957.COX_landreform_local_infrastructure < 957.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                618.COX_landreform_local_infrastructure < 618.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                619.COX_landreform_local_infrastructure > 619.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 1}
+    }
+    
+    # for_each_scope_loop = {
+    #     array = COX_landreform_regions_array
+    #     if = {
+    #         limit = {
+    #             check_variable = {
+    #                 COX_landreform_local_infrastructure > COX_landreform_local_infrastructure_expectation
+    #             }
+    #         }
+    #         COX = {
+    #             add_to_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 1}
+    #         }
+    #     }
+    #     if = {
+    #         limit = {
+    #             check_variable = {
+    #                 COX_landreform_local_infrastructure < COX_landreform_local_infrastructure_expectation
+    #             }
+    #         }
+    #         COX = {
+    #             add_to_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 1}
+    #         }
+    #     }
+    # }
+    if = {
+        limit = {
+            check_variable = {
+                var = temp_COX_landreform_infrastructure_negative_score
+                value = 2
+                compare = greater_than_or_equals
+            }
+        }
+        set_variable = {COX_landreform_infrastructure_export = 1}
+        else = {
+            if = {
+                limit = {
+                    check_variable = {temp_COX_landreform_infrastructure_positive_score = 4}
+                }
+                set_variable = {COX_landreform_infrastructure_export = 4}
+            }
+            else_if = {
+                limit = {
+                    OR = {
+                            check_variable = {temp_COX_landreform_infrastructure_positive_score = 3}
+                            check_variable = {temp_COX_landreform_infrastructure_positive_score = 2}
+                    }
+                    set_variable = {COX_landreform_infrastructure_export = 3}
+                }
+            }
+            else = {
+                set_variable = {COX_landreform_infrastructure_export = 2}
+            }
+        }
+    }
+    #民兵
+    set_temp_variable = {temp_COX_landreform_militia_calc = COX_landreform_militia}
+    divide_temp_variable = {temp_COX_landreform_militia_calc = 3000}
+    round_temp_variable = temp_COX_landreform_militia_calc
+    set_variable = {COX_landreform_militia_export = temp_COX_landreform_militia_calc}
+
+    log = "[GetDateText]: [Root.GetName]: landreform export test[?COX.COX_landreform_progress_export][?COX_landreform_infrastructure_export][?COX_landreform_militia_export]"
+    
+    COX_landreform_roundup = yes
+    #事件
+    COX = {
+        country_event = COX_landreform.401
+    }
+}
 COX_landreform_roundup = {#清除有关变量
     COX = {
         clear_variable = COX_landreform_progress
@@ -541,6 +810,9 @@ COX_landreform_roundup = {#清除有关变量
         clear_variable = COX_landreform_local_infrastructure_display
         clear_variable = COX_landreform_local_support_display
         clear_variable = COX_landreform_local_unrest_display
+        clr_country_flag = COX_landreform_ongoing
+        clr_country_flag = country_has_gui
+        clr_country_flag = COX_land_reform_GUI_visible_flag
 
         #arrays
         clear_array = COX_landreform_regions_array #土改地区数组
@@ -558,7 +830,6 @@ COX_landreform_roundup = {#清除有关变量
         clear_variable = COX_landreform_local_support_decrease_factor
         clear_variable = COX_landreform_local_militia_demand
         clr_state_flag = COX_landreform_update_avaliable
-        clr_state_flag = COX_landreform_local_failure
     }
     957 = {#东疆
         clear_variable = COX_landreform_local_progress
@@ -571,7 +842,6 @@ COX_landreform_roundup = {#清除有关变量
         clear_variable = COX_landreform_local_support_decrease_factor
         clear_variable = COX_landreform_local_militia_demand
         clr_state_flag = COX_landreform_update_avaliable
-        clr_state_flag = COX_landreform_local_failure
     }
     618 = {#北疆
         clear_variable = COX_landreform_local_progress
@@ -584,7 +854,6 @@ COX_landreform_roundup = {#清除有关变量
         clear_variable = COX_landreform_local_support_decrease_factor
         clear_variable = COX_landreform_local_militia_demand
         clr_state_flag = COX_landreform_update_avaliable
-        clr_state_flag = COX_landreform_local_failure
     }
     619 = {#南疆
         clear_variable = COX_landreform_local_progress
@@ -597,8 +866,11 @@ COX_landreform_roundup = {#清除有关变量
         clear_variable = COX_landreform_local_support_decrease_factor
         clear_variable = COX_landreform_local_militia_demand
         clr_state_flag = COX_landreform_update_avaliable
-        clr_state_flag = COX_landreform_local_failure
     }
+}
+#真·结束效果，在事件链末尾触发
+COX_landreform_finish_effect = {
+
 }
 
 ###GUI相关###
