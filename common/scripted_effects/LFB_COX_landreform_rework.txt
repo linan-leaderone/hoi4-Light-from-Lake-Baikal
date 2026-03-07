@@ -28,10 +28,10 @@ COX_landreform_startup = {
         
         #arrays
         clear_array = COX_landreform_regions_array #土改地区数组
-        add_to_array = { COX_landreform_target_array = 617 } #中央
-        add_to_array = { COX_landreform_target_array = 957 } #东疆
-        add_to_array = { COX_landreform_target_array = 618 } #北疆
-        add_to_array = { COX_landreform_target_array = 619 } #南疆
+        add_to_array = { COX_landreform_regions_array = 617 } #中央
+        add_to_array = { COX_landreform_regions_array = 957 } #东疆
+        add_to_array = { COX_landreform_regions_array = 618 } #北疆
+        add_to_array = { COX_landreform_regions_array = 619 } #南疆
 
 
         clear_array = COX_landreform_dec_all_array #土改决议后端数组，用来存储所有潜在决议
@@ -140,6 +140,7 @@ COX_landreform_startup = {
     #这里留给事件-420天最终结算之前要触发一些剧情事件来为“最终事件”铺垫
 }
 COX_landreform_refresh = {
+    COX_ladreform_clamp_values = yes
     meta_effect = {
         text = {
             set_variable = {
@@ -168,7 +169,7 @@ COX_landreform_refresh = {
             }
              set_variable = {
                 var = COX_landreform_local_support_tt_value
-                value = [TOKEN].COX_landreform_local_unrest
+                value = [TOKEN].COX_landreform_local_support
             }
             set_variable = {
                 var = COX_landreform_local_support_display
@@ -178,24 +179,24 @@ COX_landreform_refresh = {
         TOKEN = "[?COX.COX_landreform_selected_region]"
     }
     multiply_variable = {
-        COX_landreform_local_progress_display = 0.871
+        COX_landreform_local_progress_display = 0.86
     }
     add_to_variable = {
-        COX_landreform_local_progress_display = 0.651
+        COX_landreform_local_progress_display = 7
     }
 
     multiply_variable = {
-        COX_landreform_local_infrastructure_display = 0.871
+        COX_landreform_local_infrastructure_display = 0.86
     }
     add_to_variable = {
-        COX_landreform_local_infrastructure_display = 0.651
+        COX_landreform_local_infrastructure_display = 7
     }
 
     multiply_variable = {
-        COX_landreform_local_support_display = 0.871
+        COX_landreform_local_support_display = 0.86
     }
     add_to_variable = {
-        COX_landreform_local_support_display = 0.651
+        COX_landreform_local_support_display = 7
     }
     
     subtract_from_variable = {
@@ -205,13 +206,12 @@ COX_landreform_refresh = {
         COX_landreform_local_unrest_display = -1
     }
     multiply_variable = {
-        COX_landreform_local_unrest_display = 0.871
+        COX_landreform_local_unrest_display = 0.86
     }
     add_to_variable = {
-        COX_landreform_local_unrest_display = 0.651
+        COX_landreform_local_unrest_display = 7
     }
     COX_landreform_GUI_get_decisions = yes
-    COX_ladreform_clamp_values = yes
 }
 COX_landreform_update = {
     #决议113的+2月度支持
@@ -1477,7 +1477,6 @@ COX_landreform_dec_100_effect = {
     custom_effect_tooltip = COX_landreform_dec_100_tt
 }
 
-
 COX_landreform_dec_101_effect = {
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 101 }
@@ -1666,6 +1665,7 @@ COX_landreform_dec_112_effect = {#可重复
     }
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 112 }
+        activate_mission = COX_landreform_repdec_112_cooldown_timer
     }
     
     
@@ -1726,10 +1726,11 @@ COX_landreform_dec_116_effect = {#可重复
     617 = {
         COX_landreform_local_infrastructure_increase_small = yes
         COX_landreform_local_support_increase_small = yes
-        COX_landreform_local_unrest_increase_medium = yes
+        COX_landreform_local_unrest_decrease_medium = yes
     }
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 116 }
+        activate_mission = COX_landreform_repdec_116_cooldown_timer
     }
 }
 
@@ -1738,6 +1739,7 @@ COX_landreform_dec_117_effect = {#可重复
     COX_landreform_militia_gain_small = yes
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 117 }
+        activate_mission = COX_landreform_repdec_117_cooldown_timer
     }
 }
 
@@ -1798,6 +1800,7 @@ COX_landreform_dec_205_effect = {#可重复
     }
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 205 }
+        activate_mission = COX_landreform_repdec_205_cooldown_timer
     }
 }
 
@@ -1890,6 +1893,7 @@ COX_landreform_dec_211_effect = {#可重复
             add_to_variable = { COX_landreform_local_unrest_change = -2 }
         }
         add_to_array = { COX_landreform_dec_done_array = 211 }
+        activate_mission = COX_landreform_repdec_211_cooldown_timer
     }
 }
 
@@ -2015,6 +2019,7 @@ COX_landreform_dec_221_effect = {#可重复
             add_to_variable = { COX_landreform_local_unrest_change = 1 }
         }
         add_to_array = { COX_landreform_dec_done_array = 221 }
+        activate_mission = COX_landreform_repdec_221_cooldown_timer
     }
 }
 
@@ -2028,8 +2033,10 @@ COX_landreform_dec_222_effect = {#可重复
     hidden_effect = {
         957 = {
             add_to_variable = { COX_landreform_local_unrest_change = 1 }
-            add_to_array = { COX_landreform_dec_done_array = 222 }
+            
         }
+        add_to_array = { COX_landreform_dec_done_array = 222 }
+        activate_mission = COX_landreform_repdec_222_cooldown_timer
     }
 }
 
@@ -2170,6 +2177,7 @@ COX_landreform_dec_307_effect = {#可重复
     }
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 307 }
+        activate_mission = COX_landreform_repdec_307_cooldown_timer
     }
 }
 
@@ -2181,6 +2189,7 @@ COX_landreform_dec_308_effect = {#可重复
     }
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 308 }
+        activate_mission = COX_landreform_repdec_308_cooldown_timer
     }
 }
 
@@ -2214,6 +2223,7 @@ COX_landreform_dec_311_effect = {#可重复
             add_to_variable = { COX_landreform_local_unrest_change = -1 }
         }
         add_to_array = { COX_landreform_dec_done_array = 311 }
+        activate_mission = COX_landreform_repdec_311_cooldown_timer
     }
 }
 
@@ -2306,6 +2316,7 @@ COX_landreform_dec_320_effect = {#可重复
     }
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 320 }
+        activate_mission = COX_landreform_repdec_320_cooldown_timer
     }
 }
 
@@ -2314,6 +2325,7 @@ COX_landreform_dec_321_effect = {#可重复
     COX_landreform_militia_gain_small = yes
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 321 }
+        activate_mission = COX_landreform_repdec_321_cooldown_timer
     }
 }
 
@@ -2570,6 +2582,7 @@ COX_landreform_dec_423_effect = {#可重复
     }
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 423 }
+        activate_mission = COX_landreform_repdec_423_cooldown_timer
     }
 }
 
@@ -2600,6 +2613,7 @@ COX_landreform_dec_426_effect = {#可重复
     }
     hidden_effect = {
         add_to_array = { COX_landreform_dec_done_array = 426 }
+        activate_mission = COX_landreform_repdec_426_cooldown_timer
     }
 }
 
@@ -2671,8 +2685,8 @@ COX_124_test_effect = {
 
 COX_125_test_effect = {
     COX = {
-        set_variable = { COX_landreform_militia = 999999 }
-        COX_landreform_refresh = yes
+        set_variable = { COX_landreform_local_progress_display = 7.5 }
+        #COX_landreform_refresh = yes
     }
 }
 
