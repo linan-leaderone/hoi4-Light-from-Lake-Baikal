@@ -3,26 +3,35 @@ COX_landreform_startup = {
     COX = {
         #country flags
         set_country_flag = COX_landreform_ongoing
+        set_country_flag = country_has_gui
+		set_country_flag = COX_land_reform_happened
 
         #full scope variables
         set_variable = { COX_landreform_progress = 0 }
-
         set_variable = { COX_landreform_militia = 0 }
-
         set_variable = { COX_landreform_militia_change = 0 }
-    
         set_variable = { COX_landreform_selected_region = 617 }
-
+        set_variable = { COX_landreform_monthly_pulse_region = 617 }
         set_variable = { COX_landreform_current_action_id = 0 }
 
         set_variable = { COX_landreform_view_selected = 0 }
 
+        set_variable = { COX_landreform_local_progress_display = 0 }
+        set_variable = { COX_landreform_local_infrastructure_display = 0 }
+        set_variable = { COX_landreform_local_support_display = 0 }
+        set_variable = { COX_landreform_local_unrest_display = 0 }
+
+        set_variable = { COX_landreform_local_progress_tt_value = 0 }
+        set_variable = { COX_landreform_local_infrastructure_tt_value = 0 }
+        set_variable = { COX_landreform_local_support_tt_value = 0 }
+        set_variable = { COX_landreform_local_unrest_tt_value = 0 }
+        
         #arrays
         clear_array = COX_landreform_regions_array #土改地区数组
-        add_to_array = { COX_landreform_target_array = 617 } #中央
-        add_to_array = { COX_landreform_target_array = 957 } #东疆
-        add_to_array = { COX_landreform_target_array = 618 } #北疆
-        add_to_array = { COX_landreform_target_array = 619 } #南疆
+        add_to_array = { COX_landreform_regions_array = 617 } #中央
+        add_to_array = { COX_landreform_regions_array = 957 } #东疆
+        add_to_array = { COX_landreform_regions_array = 618 } #北疆
+        add_to_array = { COX_landreform_regions_array = 619 } #南疆
 
 
         clear_array = COX_landreform_dec_all_array #土改决议后端数组，用来存储所有潜在决议
@@ -75,6 +84,8 @@ COX_landreform_startup = {
         }
 
         clear_array = COX_landreform_dec_done_array #土改决议后端数组，用来存储所有已执行决议
+        activate_mission = COX_landreform_monthly_effect
+        activate_mission = COX_landreform_deadline
         
     }
     #地区变量初始化
@@ -126,793 +137,10 @@ COX_landreform_startup = {
         set_variable = { COX_landreform_local_militia_demand = 15000 }
     }
     COX_landreform_refresh = yes
+    #这里留给事件-420天最终结算之前要触发一些剧情事件来为“最终事件”铺垫
 }
-
-#笔记：
-#土改决议定义由三部分构成：
-#COX_landreform_dec_[决议id]_effect，为执行效果
-#位于下方
-#COX_landreform_dec_[决议id]_avaliable_trigger，为可用条件
-#COX_landreform_dec_[决议id]_visible_trigger，为可见条件
-#此二者位于common/scripted_triggers/LFB_landreform_triggers文件中，分别有示例
-#决议id为三位数字，其中第一位取[1,2,3,4]，代表地区
-#101-117为中央决议，201-227为东疆决议，301-321为北疆决议，401-426为南疆决议
-
-
-#--------------------------------------------------------------------#
-    #在这里写每个决议各自的效果
-    #参见设计案
-    #决议id为三位数字，其中第一位取[1,2,3,4]，代表地区
-    #101-117为中央决议，201-227为东疆决议，301-321为北疆决议，401-426为南疆决议
-    #对于不可重复执行的决议，要用add_to_array = { COX_landreform_dec_done_array = [决议id] } 来记录本决议的执行状态
-    #而对于可重复执行的决议，不要这样做
-    #示例：
-# COX_landreform_dec_111_effect = {
-#     #直接效果
-#     add_political_power = 22
-#     #事件
-#     country_event = {COX.114514}
-#     #变量增减
-#     add_to_variable = {
-#         COX_landreform_local_progress = 3
-#     }
-#     #可用性处理
-#     add_to_array = { COX_landreform_dec_done_array = [id] }
-# }
-#--------------------------------------------------------------------#
-
-COX_landreform_dec_101_effect = {
-    add_to_array = { COX_landreform_dec_done_array = 101 }
-    custom_effect_tooltip = "现在，中央地区的支持度，不满度，城乡基础设施状况将可见。"
-}
-
-COX_landreform_dec_102_effect = {
-    add_political_power = -15
-
-    add_to_variable = {
-        COX_landreform_local_infrastructure = 5
-    }
-    add_to_array = { COX_landreform_dec_done_array = 102 }
-}
-
-COX_landreform_dec_103_effect = {
-    add_political_power = -15
-
-    TNO_improve_minimum_wage_policy_effectiveness_monthly_low = yes
-
-    add_to_variable = {
-        COX_landreform_local_infrastructure = 5
-    }
-    
-    add_to_variable = {
-        COX_landreform_local_support = 5
-    }
-
-    add_to_variable = {
-        COX_landreform_local_progress = 10
-    }
-
-    add_to_array = { COX_landreform_dec_done_array = 103 }
-}
-
-COX_landreform_dec_104_effect = {
-    TNO_improve_industrial_expertise_med = yes
-
-    add_political_power = -15
-
-    add_to_variable = {
-        COX_landreform_local_support = 10
-    }
-
-    add_to_variable = {
-        COX_landreform_local_progress = 10
-    }
-
-    set_temp_variable = { money_reserves_temp = -0.05 }
-    econ_money_reserves_change_raw_money = yes
-    update_economy_tab = yes
-
-    add_to_array = { COX_landreform_dec_done_array = 104 }
-}
-
-COX_landreform_dec_105_effect = {
-    add_to_variable = {
-        COX_landreform_local_progress = 10
-    }
-    add_to_variable = {
-        COX_landreform_local_support = 10
-    }
-    add_to_variable = {
-        COX_landreform_local_unrest = -5
-    }
-
-    add_political_power = -15
-
-    add_to_array = { COX_landreform_dec_done_array = 105 }
-}
-
-COX_landreform_dec_106_effect = {
-    add_political_power = -15
-
-    add_to_variable = {
-        COX_landreform_local_support = 10
-    }
-
-    set_temp_variable = { money_reserves_temp = 0.15 }
-    econ_money_reserves_change_raw_money = yes
-    update_economy_tab = yes
-
-    set_temp_variable = {
-			inflation_temp = 1
-		}
-	econ_inflation_change = yes
-
-    add_to_array = { COX_landreform_dec_done_array = 106 }
-}
-
-COX_landreform_dec_107_effect = {
-    add_political_power = -30
-
-    add_to_variable = {
-        COX_landreform_local_support = 10
-    }
-
-    add_to_variable = {
-        COX_landreform_local_progress = 10
-    }
-
-    add_to_variable = {
-        COX_landreform_local_infrastructure = 5
-    }
-
-    add_to_variable = {
-        COX_landreform_local_unrest = 5
-    }
-
-    add_to_variable = {
-        COX_landreform_local_unrest_change = 2
-    }
-
-    add_to_array = { COX_landreform_dec_done_array = 107 }
-
-
-}
-
-COX_landreform_dec_108_effect = {
-    TNO_improve_admin_efficiency_low = yes
-    TNO_improve_trade_laws_policy_effectiveness_high = yes
-    add_to_variable = {
-        COX_landreform_local_progress = 10
-    }
-    add_to_variable = {
-        COX_landreform_local_unrest = 5
-    }
-
-    add_political_power = -30
-
-    add_to_array = { COX_landreform_dec_done_array = 108 }
-
-}
-
-COX_landreform_dec_109_effect = {
-    TNO_improve_admin_efficiency_low = yes
-    TNO_improve_trade_laws_policy_effectiveness_high = yes
-
-    add_to_variable = {
-        COX_landreform_local_unrest = 5
-    }
-
-    set_temp_variable = { pus_temp = 2 }
-    econ_pus_change = yes
-    update_economy_tab = yes
-
-    add_political_power = -30
-
-    add_to_array = { COX_landreform_dec_done_array = 109 }
-
-}
-
-COX_landreform_dec_110_effect = {
-    add_to_variable = {
-        COX_landreform_local_infrastructure = 10
-    }
-    add_to_variable = {
-        COX_landreform_local_support = 5
-    }
-    add_political_power = -15
-
-    add_to_array = { COX_landreform_dec_done_array = 110 }
-}
-
-COX_landreform_dec_111_effect = {
-    add_to_variable = {
-        COX_landreform_local_support = 10
-    }
-    add_to_variable = {
-        COX_landreform_local_unrest = -5
-    }
-    add_to_variable = {
-        COX_landreform_local_unrest_change = -3
-    }
-    add_political_power = 50
-
-    add_to_array = { COX_landreform_dec_done_array = 111 }
-}
-
-COX_landreform_dec_112_effect = {
-    add_to_variable = {
-        COX_landreform_local_infrastructure = 10
-    }
-    add_political_power = -15
-    set_country_flag = COX_landreform_cooldown
-    activate_mission = COX_landreform_cooldown_timer_15
-}
-
-COX_landreform_dec_113_effect = {
-
-}
-COX_landreform_dec_114_effect = {
-
-}
-COX_landreform_dec_115_effect = {
-
-}
-COX_landreform_dec_116_effect = {
-
-}
-COX_landreform_dec_117_effect = {
-
-}
-
-COX_landreform_dec_301_effect = {
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_militia_demand = 3000 }
-    }
-}
-
-COX_landreform_dec_302_effect = {
-    add_political_power = -30
-    618 = {
-        add_to_variable = { COX_landreform_local_infrastructure = 10 }
-        add_to_variable = { COX_landreform_local_progress = 5 }
-    }
-}
-
-COX_landreform_dec_303_effect = {
-    add_political_power = -30
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-        add_to_variable = { COX_landreform_local_progress = 5 }
-    }
-}
-
-COX_landreform_dec_304_effect = {
-    add_political_power = -30
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-        add_to_variable = { COX_landreform_local_progress = 5 }
-    }
-}
-
-COX_landreform_dec_305_effect = {
-    618 = {
-        add_to_variable = { COX_landreform_local_militia_demand = 2000 }
-        add_to_variable = { COX_landreform_local_progress = 15 }
-    }
-}
-
-COX_landreform_dec_306_effect = {
-    add_political_power = -30
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-
-}
-
-COX_landreform_dec_307_effect = {
-    add_political_power = -30
-    618 = {
-        add_to_variable = { COX_landreform_local_infrastructure = 3 }
-    }
-}
-
-COX_landreform_dec_308_effect = {
-    add_political_power = -15
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-    }
-}
-
-COX_landreform_dec_309_effect = {
-    add_political_power = -45
-    add_command_power = -15
-    618 = {
-        add_to_variable = { COX_landreform_local_militia_demand = 12000 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-}
-
-COX_landreform_dec_310_effect = {
-    618 = {
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-    hidden_effect = {
-        set_country_flag = cox_reduce_negative_events
-    }
-}
-
-COX_landreform_dec_311_effect = {
-    618 = {
-        add_to_variable = { COX_landreform_local_militia_demand = -1000 }
-    }
-}
-
-COX_landreform_dec_312_effect = {
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-        add_to_variable = { COX_landreform_local_militia_demand = 5000 }
-    }
-}
-
-COX_landreform_dec_313_effect = {
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-    }
-}
-
-COX_landreform_dec_314_effect = {
-    add_political_power = -15
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_militia_demand = -1000 }
-    }
-}
-
-COX_landreform_dec_315_effect = {
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-    add_command_power = 60
-}
-
-COX_landreform_dec_316_effect = {
-    add_political_power = 25
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-    }
-}
-
-COX_landreform_dec_317_effect = {
-    add_political_power = 25
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-    }
-}
-
-COX_landreform_dec_318_effect = {
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_militia_demand = 3000 }
-        add_to_variable = { COX_landreform_local_progress = 20 }
-    }
-}
-
-COX_landreform_dec_319_effect = {
-    add_political_power = 120
-    618 = {
-        add_to_variable = { COX_landreform_local_militia_demand = 25000 }
-    }
-}
-
-COX_landreform_dec_320_effect = {
-    618 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-    }
-}
-
-COX_landreform_dec_321_effect = {
-    618 = {
-        add_to_variable = { COX_landreform_local_militia_demand = 3000 }
-    }
-}
-
-COX_landreform_dec_401_effect = {
-    add_political_power = -60
-    add_to_array = { COX_landreform_dec_done_array = [401] }
-}
-
-COX_landreform_dec_402_effect = {
-    add_political_power = -60
-    add_to_array = { COX_landreform_dec_done_array = [402] }
-}
-
-COX_landreform_dec_403_effect = {
-    add_political_power = -60
-    add_to_array = { COX_landreform_dec_done_array = [403] }
-}
-
-COX_landreform_dec_404_effect = {
-    add_to_array = { COX_landreform_dec_done_array = [404] }
-}
-
-COX_landreform_dec_405_effect = {
-    add_political_power = 25
-    add_to_array = { COX_landreform_dec_done_array = [405] }
-}
-
-COX_landreform_dec_406_effect = {
-    add_to_variable = { COX_landreform_local_support = 5 }
-    add_to_variable = { COX_landreform_local_unrest = 15 }
-    add_to_variable = { COX_landreform_local_unrest_change = 5 }
-    add_to_variable = { COX_landreform_local_progress = 10 }
-}
-
-COX_landreform_dec_407_effect = {
-    add_to_array = { COX_landreform_dec_done_array = [407] }
-}
-
-COX_landreform_dec_408_effect = {
-    add_to_array = { COX_landreform_dec_done_array = [408] }
-}
-
-COX_landreform_dec_409_effect = {
-    set_variable = { COX_landreform_local_unrest_change = 0 }
-    add_to_array = { COX_landreform_dec_done_array = [409] }
-}
-
-COX_landreform_dec_410_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_unrest = 10 }
-        add_to_variable = { COX_landreform_local_militia_demand = -6000 }
-    }
-}
-
-COX_landreform_dec_411_effect = {
-    add_political_power = -30
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-    }
-}
-
-COX_landreform_dec_412_effect = {
-    add_political_power = -30
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_unrest = 15 }
-    }
-}
-
-COX_landreform_dec_413_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_unrest_change = 5 }
-    }
-}
-
-COX_landreform_dec_414_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_unrest = -10 }
-        add_to_variable = { COX_landreform_local_unrest_change = -2 }
-    }
-}
-
-COX_landreform_dec_415_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_unrest = -20 }
-        add_to_variable = { COX_landreform_local_unrest_change = 5 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-        add_to_variable = { COX_landreform_local_militia_demand = -6000 }
-    }
-}
-
-COX_landreform_dec_416_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_unrest_change = -5 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-    #TODO 民族精神add_timed_idea = { idea = COX_kashgar_debate days = 730 }
-
-}
-
-COX_landreform_dec_417_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 15 }
-        add_to_variable = { COX_landreform_local_unrest = 20 }
-    }
-}
-
-COX_landreform_dec_418_effect = {
-    619 = {
-        set_variable = { COX_landreform_local_unrest_change = 0 }
-        add_to_variable = { COX_landreform_local_progress = 30 }
-        add_to_variable = { COX_landreform_local_militia_demand = -9000 }
-    }
-}
-
-COX_landreform_dec_419_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-        add_to_variable = { COX_landreform_local_unrest = -5 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-}
-
-COX_landreform_dec_420_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_unrest = 5 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-}
-
-COX_landreform_dec_421_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_progress = 20 }
-    }
-}
-
-COX_landreform_dec_422_effect = {
-    add_political_power = -30
-    619 = {
-        add_to_variable = { COX_landreform_local_infrastructure = 15 }
-    }
-}
-
-COX_landreform_dec_423_effect = {
-    add_political_power = -30
-    619 = {
-        add_to_variable = { COX_landreform_local_infrastructure = 3 }
-    }
-}
-
-COX_landreform_dec_424_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_infrastructure = 10 }
-    }
-    #这里应该有个tno原版通用事件，但我找不到在哪
-}
-
-COX_landreform_dec_425_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_militia_demand = 15000 }
-    }
-}
-
-COX_landreform_dec_426_effect = {
-    619 = {
-        add_to_variable = { COX_landreform_local_unrest = -10 }
-        add_to_variable = { COX_landreform_local_support = 5 }
-    }
-}
-
-COX_landreform_dec_201_effect = {
-    add_political_power = 50
-}
-
-COX_landreform_dec_202_effect = {
-    add_political_power = -15
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-    }
-}
-
-COX_landreform_dec_203_effect = {
-    add_political_power = -15
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-    }
-}
-
-COX_landreform_dec_204_effect = {
-    add_political_power = -30
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-        add_to_variable = { COX_landreform_local_unrest = 5 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-}
-
-COX_landreform_dec_205_effect = {
-    add_political_power = -30
-    957 = {
-        add_to_variable = { COX_landreform_local_infrastructure = 3 }
-    }
-}
-
-COX_landreform_dec_206_effect = {
-    add_political_power = -15
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_unrest = 10 }
-        add_to_variable = { COX_landreform_local_unrest_change = 1 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-}
-
-COX_landreform_dec_207_effect = {
-    add_political_power = -15
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_unrest = 20 }
-        add_to_variable = { COX_landreform_local_unrest_change = 3 }
-    }
-}
-
-COX_landreform_dec_208_effect = {
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 15 }
-        add_to_variable = { COX_landreform_local_unrest = 20 }
-        add_to_variable = { COX_landreform_local_unrest_change = 2 }
-    }
-}
-
-COX_landreform_dec_209_effect = {
-    957 = {
-        add_to_variable = { COX_landreform_local_infrastructure = 10 }
-        add_to_variable = { COX_landreform_local_progress = 5 }
-    }
-    #TODO 这里应该有个tno原版通用事件，但我找不到在哪
-}
-
-COX_landreform_dec_210_effect = {
-    add_political_power = -30
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-        add_to_variable = { COX_landreform_local_unrest = -10 }
-        add_to_variable = { COX_landreform_local_progress = 5 }
-    }
-}
-
-COX_landreform_dec_211_effect = {
-    add_political_power = -45
-    957 = {
-        add_to_variable = { COX_landreform_local_unrest = -20 }
-        add_to_variable = { COX_landreform_local_unrest_change = -2 }
-        add_to_variable = { COX_landreform_local_progress = 5 }
-        add_to_variable = { COX_landreform_local_militia_demand = -6000 }
-    }
-}
-
-COX_landreform_dec_212_effect = {
-    add_political_power = -45
-    add_command_power = -15
-    957 = {
-        add_to_variable = { COX_landreform_local_militia_demand = 15000 }
-    }
-}
-
-COX_landreform_dec_213_effect = {
-    add_political_power = -60
-    add_command_power = -30
-    957 = {
-        add_to_variable = { COX_landreform_local_militia_demand = 25000 }
-    }
-}
-
-COX_landreform_dec_214_effect = {
-    add_political_power = 25
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 15 }
-        add_to_variable = { COX_landreform_local_unrest = 20 }
-        add_to_variable = { COX_landreform_local_progress = 20 }
-        set_variable = { COX_landreform_local_unrest_change = 0}
-    }
-}
-
-COX_landreform_dec_215_effect = {
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 20 }
-        add_to_variable = { COX_landreform_local_unrest = 40 }
-        add_to_variable = { COX_landreform_local_progress = 20 }
-    }
-    #TODO 在线等事件
-}
-
-COX_landreform_dec_216_effect = {
-    add_political_power = -30
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-        add_to_variable = { COX_landreform_local_unrest = 10 }
-        add_to_variable = { COX_landreform_local_progress = 5 }
-    }
-}
-
-COX_landreform_dec_217_effect = {
-    add_political_power = -30
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 5 }
-        add_to_variable = { COX_landreform_local_unrest = 10 }
-        add_to_variable = { COX_landreform_local_progress = 5 }
-    }
-}
-
-COX_landreform_dec_218_effect = {
-    957 = {
-        add_to_variable = { COX_landreform_local_infrastructure = 10 }
-        add_to_variable = { COX_landreform_local_support = 5 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-}
-
-COX_landreform_dec_219_effect = {
-    add_political_power = 50
-    957 = {
-        add_to_variable = { COX_landreform_local_unrest = -5 }
-    }
-}
-
-COX_landreform_dec_220_effect = {
-    add_political_power = -30
-    957 = {
-        add_to_variable = { COX_landreform_local_infrastructure = 15 }
-    }
-    #TODO 这里应该有个tno原版通用事件，但我找不到在哪
-}
-
-COX_landreform_dec_221_effect = {
-    add_political_power = -15
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 3 }
-        add_to_variable = { COX_landreform_local_unrest_change = 1 }
-    }
-}
-
-COX_landreform_dec_222_effect = {
-    add_political_power = -15
-    957 = {
-        add_to_variable = { COX_landreform_local_unrest = -5 }
-        add_to_variable = { COX_landreform_local_unrest_change = 1 }
-    }
-}
-
-COX_landreform_dec_223_effect = {
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_unrest = -10 }
-    }
-}
-
-COX_landreform_dec_224_effect = {
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_progress = 10 }
-    }
-}
-
-COX_landreform_dec_225_effect = {
-    957 = {
-        add_to_variable = { COX_landreform_local_support = 10 }
-        add_to_variable = { COX_landreform_local_progress = 15 }
-        set_variable = { COX_landreform_local_unrest_change = 0 }
-    }
-}
-
-COX_landreform_dec_226_effect = {
-    add_political_power = -100
-    957 = {
-        add_to_variable = { COX_landreform_local_unrest = -30 }
-        set_variable = { COX_landreform_local_unrest_change = 0 }
-    }
-    
-}
-
-COX_landreform_dec_227_effect = {
-    957 = {
-        add_to_variable = { COX_landreform_local_unrest = -40 }
-        add_to_variable = { COX_landreform_local_progress = 5 }
-    }
-}
-
-
 COX_landreform_refresh = {
+    COX_ladreform_clamp_values = yes
     meta_effect = {
         text = {
             set_variable = {
@@ -920,12 +148,28 @@ COX_landreform_refresh = {
                 value = [TOKEN].COX_landreform_local_progress
             }
             set_variable = {
+                var = COX_landreform_local_progress_tt_value
+                value = [TOKEN].COX_landreform_local_progress
+            }
+            set_variable = {
                 var = COX_landreform_local_infrastructure_display
                 value = [TOKEN].COX_landreform_local_infrastructure
             }
             set_variable = {
+                var = COX_landreform_local_infrastructure_tt_value
+                value = [TOKEN].COX_landreform_local_infrastructure
+            }
+            set_variable = {
+                var = COX_landreform_local_unrest_tt_value
+                value = [TOKEN].COX_landreform_local_unrest
+            }
+            set_variable = {
                 var = COX_landreform_local_unrest_display
                 value = [TOKEN].COX_landreform_local_unrest
+            }
+             set_variable = {
+                var = COX_landreform_local_support_tt_value
+                value = [TOKEN].COX_landreform_local_support
             }
             set_variable = {
                 var = COX_landreform_local_support_display
@@ -934,25 +178,63 @@ COX_landreform_refresh = {
         }
         TOKEN = "[?COX.COX_landreform_selected_region]"
     }
+    multiply_variable = {
+        COX_landreform_local_progress_display = 0.86
+    }
+    add_to_variable = {
+        COX_landreform_local_progress_display = 7
+    }
 
+    multiply_variable = {
+        COX_landreform_local_infrastructure_display = 0.86
+    }
+    add_to_variable = {
+        COX_landreform_local_infrastructure_display = 7
+    }
+
+    multiply_variable = {
+        COX_landreform_local_support_display = 0.86
+    }
+    add_to_variable = {
+        COX_landreform_local_support_display = 7
+    }
     
-    
-    # set_variable = {
-    #     var = COX_landreform_local_infrastructure_display
-    #     value = COX_landreform_selected_region.COX_landreform_local_infrastructure
-    # }
-    # set_variable = {
-    #     var = COX_landreform_local_unrest_display
-    #     value = COX_landreform_selected_region.COX_landreform_local_unrest
-    # }
-    # set_variable = {
-    #     var = COX_landreform_local_support_display
-    #     value = COX_landreform_selected_region.COX_landreform_local_support
-    # }
+    subtract_from_variable = {
+        COX_landreform_local_unrest_display = 100
+    }
+    multiply_variable = {
+        COX_landreform_local_unrest_display = -1
+    }
+    multiply_variable = {
+        COX_landreform_local_unrest_display = 0.86
+    }
+    add_to_variable = {
+        COX_landreform_local_unrest_display = 7
+    }
     COX_landreform_GUI_get_decisions = yes
 }
-
 COX_landreform_update = {
+    #决议113的+2月度支持
+    if = {
+        limit = {
+            is_in_array = {
+                array = var:COX_landreform_dec_done_array
+                value = 113
+            }
+        }
+        617 = {
+            add_to_variable = {
+                var:COX_landreform_local_support = 2
+            }
+        }
+    }
+    #各地区的不满增长度锁定
+    COX_landreform_local_unrest_change_lock = yes
+    
+    #各类计算
+    add_to_variable = {
+        COX_landreform_militia = COX_landreform_militia_change
+    }
     for_each_scope_loop = {
         array = COX_landreform_regions_array
         if = {
@@ -960,10 +242,306 @@ COX_landreform_update = {
             COX_landreform_update_calc = yes
         }
     }
+    #月度事件
+    COX_landreform_monthly_pulse_event = yes
     COX_landreform_refresh = yes
+    #各个地区的 乱
+    617 = {
+        if = {
+            limit = {
+                check_variable = {COX_landreform_local_unrest = 100}
+            }
+            COX = {country_event = COX_landreform.321}
+        }
+    }
+
+    957 = {
+        if = {
+            limit = {
+                check_variable = {COX_landreform_local_unrest = 100}
+            }
+            COX = {country_event = COX_landreform.322}
+        }
+    }
+
+    618 = {
+        if = {
+            limit = {
+                check_variable = {COX_landreform_local_unrest = 100}
+            }
+            COX = {country_event = COX_landreform.323}
+        }
+    }
+
+    619 = {
+        if = {
+            limit = {
+                check_variable = {COX_landreform_local_unrest = 100}
+            }
+            COX = {country_event = COX_landreform.324}
+        }
+    }
     
 }
+COX_ladreform_clamp_values = {
+    clamp_variable = {
+        var = COX_landreform_militia
+        min = 0
+    }
+    for_each_scope_loop = {
+        array = COX_landreform_regions_array
+        clamp_variable = {
+            var = COX_landreform_local_progress
+            min = 0
+            max = 100
+        }
+        clamp_variable = {
+            var = var:COX_landreform_local_infrastructure
+            min = 0
+            max = 100
+        }
+        clamp_variable = {
+            var = COX_landreform_local_support
+            min = 0
+            max = 100
+        }
+        clamp_variable = {
+            var = COX_landreform_local_unrest
+            min = 0
+            max = 100
+        }
+    }
+}
 
+COX_landreform_local_unrest_change_lock = {
+    if = {
+        limit = {
+            or = {
+                is_in_array = {
+                    array = var:COX_landreform_dec_done_array
+                    value = 214
+                }
+                is_in_array = {
+                    array = var:COX_landreform_dec_done_array
+                    value = 225
+                }
+                is_in_array = {
+                    array = var:COX_landreform_dec_done_array
+                    value = 226
+                }
+            }
+            957 = {
+                check_variable = {
+                    COX_landreform_local_unrest_change > 0
+                }
+            }
+        }
+        957 = {
+            set_variable = {
+                COX_landreform_local_unrest_change = 0
+            }
+        }
+    }
+    if = {
+        limit = {
+            is_in_array = {
+                array = var:COX_landreform_dec_done_array
+                value = 313
+            }
+            618 = {
+                check_variable = {
+                    COX_landreform_local_unrest_change > 0
+                }
+            }
+        }
+        618 = {
+            set_variable = {
+                COX_landreform_local_unrest_change = 0
+            }
+        }
+    }
+    if = {
+        limit = {
+            or = {
+                is_in_array = {
+                    array = var:COX_landreform_dec_done_array
+                    value = 409
+                }
+                is_in_array = {
+                    array = var:COX_landreform_dec_done_array
+                    value = 418
+                }
+            }
+            619 = {
+                check_variable = {
+                    COX_landreform_local_unrest_change > 0
+                }
+            }
+        }
+        619 = {
+            set_variable = {
+                COX_landreform_local_unrest_change = 0
+            }
+        }
+    }
+}
+COX_landreform_monthly_pulse_event = {
+    random_list = {
+        25 = {set_variable = { COX_landreform_monthly_pulse_region = 617 }}
+        25 = {set_variable = { COX_landreform_monthly_pulse_region = 957 }}
+        25 = {set_variable = { COX_landreform_monthly_pulse_region = 618 }}
+        25 = {set_variable = { COX_landreform_monthly_pulse_region = 619 }}    
+    }
+    var:COX_landreform_monthly_pulse_region = {
+        if = {
+            limit = {
+                check_variable = {
+                    COX_landreform_local_unrest >40
+                }
+                check_variable = {
+                    COX_landreform_local_unrest <70
+                }
+            }
+            random_list = {
+                10 = {
+                    modifier = {
+						factor = 0
+						or = {
+                            check_variable = {
+                                   COX_landreform_monthly_pulse_region = 617
+                            }
+                            AND = {
+                                check_variable = {
+                                    COX_landreform_monthly_pulse_region = 618
+                                    
+                                }
+                                or = {
+                                    is_in_array = {
+                                        array = COX_landreform_dec_done_array
+                                        value = 209
+                                    }
+                                    is_in_array = {
+                                        array = COX_landreform_dec_done_array
+                                        value = 220
+                                    }
+                                }
+                                
+                            }
+                            AND = {
+                                check_variable = {
+                                    COX_landreform_monthly_pulse_region = 618
+                                    
+                                }
+                                is_in_array = {
+                                    array = COX_landreform_dec_done_array
+                                    value = 310
+                                }
+                            }
+                            AND = {
+                                check_variable = {
+                                    COX_landreform_monthly_pulse_region = 619
+                                    
+                                }
+                                is_in_array = {
+                                    array = COX_landreform_dec_done_array
+                                    value = 424
+                                }
+                            }
+                        }
+					}
+                    COX = {country_event = COX_landreform.301}
+                }
+                10 = {COX = {country_event = COX_landreform.302}}
+                10 = {COX = {country_event = COX_landreform.303}}
+                10 = {
+                    modifier = {
+                        factor = 0
+                        NOT = {
+                            check_variable = {
+                                   COX_landreform_monthly_pulse_region = 618
+                            }
+                        }
+                    }
+                    COX = {country_event = COX_landreform.304}
+                }
+            }
+        }
+        else_if = {
+            limit = {
+                check_variable = {
+                    COX_landreform_local_unrest >70
+                }
+                check_variable = {
+                    COX_landreform_local_unrest <100
+                }
+            }
+            random_list = {
+                10 = {
+                    modifier = {
+						factor = 0
+						or = {
+                            check_variable = {
+                                   COX_landreform_monthly_pulse_region = 617
+                            }
+                            AND = {
+                                check_variable = {
+                                    COX_landreform_monthly_pulse_region = 618
+                                    
+                                }
+                                or = {
+                                    is_in_array = {
+                                        array = COX_landreform_dec_done_array
+                                        value = 209
+                                    }
+                                    is_in_array = {
+                                        array = COX_landreform_dec_done_array
+                                        value = 220
+                                    }
+                                }
+                                
+                            }
+                            AND = {
+                                check_variable = {
+                                    COX_landreform_monthly_pulse_region = 618
+                                    
+                                }
+                                is_in_array = {
+                                    array = COX_landreform_dec_done_array
+                                    value = 310
+                                }
+                            }
+                            AND = {
+                                check_variable = {
+                                    COX_landreform_monthly_pulse_region = 619
+                                    
+                                }
+                                is_in_array = {
+                                    array = COX_landreform_dec_done_array
+                                    value = 424
+                                }
+                            }
+                        }
+					}
+                    COX = {country_event = COX_landreform.311}
+                }
+                10 = {COX = {country_event = COX_landreform.312}}
+                10 = {COX = {country_event = COX_landreform.313}}
+                10 = {COX = {country_event = COX_landreform.314}}
+                10 = {
+                    modifier = {
+                        factor = 0
+                        NOT = {
+                            check_variable = {
+                                   COX_landreform_monthly_pulse_region = 618
+                            }
+                        }
+                    }
+                    COX = {country_event = COX_landreform.315}
+                }
+            }
+        }
+    }
+}
 COX_landreform_update_calc = {
     add_to_variable = {
         COX_landreform_local_unrest = COX_landreform_local_unrest_change
@@ -1002,6 +580,355 @@ COX_landreform_update_calc = {
             COX_landreform_local_support = temp_COX_landreform_local_support_change
         }
     }
+}
+
+
+COX_landreform_cheat_effect = {
+    set_variable = {COX_landreform_militia = 40000}
+    617 = {#中央
+        set_variable = { COX_landreform_local_progress = 100 }
+        set_variable = { COX_landreform_local_infrastructure = 100 }
+        set_variable = { COX_landreform_local_unrest = 0 }
+        set_variable = { COX_landreform_local_support = 100 }
+    }
+
+    957 = {#东疆
+        set_variable = { COX_landreform_local_progress = 100 }
+        set_variable = { COX_landreform_local_infrastructure = 100 }
+        set_variable = { COX_landreform_local_unrest = 0 }
+        set_variable = { COX_landreform_local_support = 100 }
+    }
+
+    618 = {#北疆
+        set_variable = { COX_landreform_local_progress = 100 }
+        set_variable = { COX_landreform_local_infrastructure = 100 }
+        set_variable = { COX_landreform_local_unrest = 0 }
+        set_variable = { COX_landreform_local_support = 100 }
+    }
+
+    619 = {#南疆
+        set_variable = { COX_landreform_local_progress = 100 }
+        set_variable = { COX_landreform_local_infrastructure = 100 }
+        set_variable = { COX_landreform_local_unrest = 0 }
+        set_variable = { COX_landreform_local_support = 100 }
+    }
+    COX_landreform_refresh = yes
+}
+#GUI结束效果-打包变量，输出给事件链
+COX_landreform_end_effect = {
+    #终止！
+    remove_mission = COX_landreform_cooldown_timer_3
+    remove_mission = COX_landreform_cooldown_timer_7
+    remove_mission = COX_landreform_cooldown_timer_14
+    remove_mission = COX_landreform_repdec_112_cooldown_timer
+    remove_mission = COX_landreform_repdec_116_cooldown_timer
+    remove_mission = COX_landreform_repdec_117_cooldown_timer
+    remove_mission = COX_landreform_repdec_205_cooldown_timer
+    remove_mission = COX_landreform_repdec_211_cooldown_timer
+    remove_mission = COX_landreform_repdec_221_cooldown_timer
+    remove_mission = COX_landreform_repdec_222_cooldown_timer
+    remove_mission = COX_landreform_repdec_307_cooldown_timer
+    remove_mission = COX_landreform_repdec_308_cooldown_timer
+    remove_mission = COX_landreform_repdec_311_cooldown_timer
+    remove_mission = COX_landreform_repdec_320_cooldown_timer
+    remove_mission = COX_landreform_repdec_321_cooldown_timer
+    remove_mission = COX_landreform_repdec_423_cooldown_timer
+    remove_mission = COX_landreform_repdec_426_cooldown_timer
+    remove_mission = COX_landreform_monthly_effect
+    remove_mission = COX_landreform_deadline
+    #初始化变量
+    set_variable = {
+        COX_landreform_progress_export = 0
+    }
+    set_variable = {
+        COX_landreform_infrastructure_export = 0
+    }
+    set_variable = {
+        COX_landreform_militia_export = 0
+    }
+    
+    #进度
+    ##中央
+    set_temp_variable = {temp_COX_landreform_support_calc = 0}
+    add_to_temp_variable = {temp_COX_landreform_support_calc = 617.COX_landreform_local_progress}
+    multiply_temp_variable = {temp_COX_landreform_support_calc = 0.3} #系数
+    add_to_variable = {COX_landreform_progress_export = temp_COX_landreform_support_calc}
+    ##东疆
+    set_temp_variable = {temp_COX_landreform_support_calc = 0}
+    add_to_temp_variable = {temp_COX_landreform_support_calc = 957.COX_landreform_local_progress}
+    multiply_temp_variable = {temp_COX_landreform_support_calc = 0.25} #系数
+    add_to_variable = {COX_landreform_progress_export = temp_COX_landreform_support_calc}
+    ##北疆
+    set_temp_variable = {temp_COX_landreform_support_calc = 0}
+    add_to_temp_variable = {temp_COX_landreform_support_calc = 618.COX_landreform_local_progress}
+    multiply_temp_variable = {temp_COX_landreform_support_calc = 0.25} #系数
+    add_to_variable = {COX_landreform_progress_export = temp_COX_landreform_support_calc}
+    ##南疆
+    set_temp_variable = {temp_COX_landreform_support_calc = 0}
+    add_to_temp_variable = {temp_COX_landreform_support_calc = 619.COX_landreform_local_progress}
+    multiply_temp_variable = {temp_COX_landreform_support_calc = 0.2} #系数
+    add_to_variable = {COX_landreform_progress_export = temp_COX_landreform_support_calc}
+    #转换为等级
+    if = {
+        limit = {
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 0
+				compare = greater_than_or_equals
+            }
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 30
+				compare = less_than_or_equals
+            }
+        }
+        set_variable = {COX_landreform_progress_export = 1}
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 30
+				compare = greater_than
+            }
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 60
+				compare = less_than_or_equals
+            }
+        }
+        set_variable = {COX_landreform_progress_export = 2}
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 60
+				compare = greater_than
+            }
+            check_variable = {
+                var = COX_landreform_progress_export
+                value = 80
+				compare = less_than_or_equals
+            }
+        }
+        set_variable = {COX_landreform_progress_export = 3}
+    }
+    else = {
+        set_variable = {COX_landreform_progress_export = 4}
+    }
+    #基础设施
+    set_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 0}
+    set_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 0}
+    if = {
+        limit = {
+            check_variable = {
+                617.COX_landreform_local_infrastructure > 617.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                957.COX_landreform_local_infrastructure > 957.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                618.COX_landreform_local_infrastructure > 618.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                619.COX_landreform_local_infrastructure > 619.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                617.COX_landreform_local_infrastructure < 617.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                957.COX_landreform_local_infrastructure < 957.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                618.COX_landreform_local_infrastructure < 618.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 1}
+    }
+    if = {
+        limit = {
+            check_variable = {
+                619.COX_landreform_local_infrastructure > 619.COX_landreform_local_infrastructure_expectation
+            }
+        }
+        add_to_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 1}
+    }
+    
+    # for_each_scope_loop = {
+    #     array = COX_landreform_regions_array
+    #     if = {
+    #         limit = {
+    #             check_variable = {
+    #                 COX_landreform_local_infrastructure > COX_landreform_local_infrastructure_expectation
+    #             }
+    #         }
+    #         COX = {
+    #             add_to_temp_variable = {temp_COX_landreform_infrastructure_positive_score = 1}
+    #         }
+    #     }
+    #     if = {
+    #         limit = {
+    #             check_variable = {
+    #                 COX_landreform_local_infrastructure < COX_landreform_local_infrastructure_expectation
+    #             }
+    #         }
+    #         COX = {
+    #             add_to_temp_variable = {temp_COX_landreform_infrastructure_negative_score = 1}
+    #         }
+    #     }
+    # }
+    if = {
+        limit = {
+            check_variable = {
+                var = temp_COX_landreform_infrastructure_negative_score
+                value = 2
+                compare = greater_than_or_equals
+            }
+        }
+        set_variable = {COX_landreform_infrastructure_export = 1}
+        else = {
+            if = {
+                limit = {
+                    check_variable = {temp_COX_landreform_infrastructure_positive_score = 4}
+                }
+                set_variable = {COX_landreform_infrastructure_export = 4}
+            }
+            else_if = {
+                limit = {
+                    OR = {
+                            check_variable = {temp_COX_landreform_infrastructure_positive_score = 3}
+                            check_variable = {temp_COX_landreform_infrastructure_positive_score = 2}
+                    }
+                    set_variable = {COX_landreform_infrastructure_export = 3}
+                }
+            }
+            else = {
+                set_variable = {COX_landreform_infrastructure_export = 2}
+            }
+        }
+    }
+    #民兵
+    set_temp_variable = {temp_COX_landreform_militia_calc = COX_landreform_militia}
+    divide_temp_variable = {temp_COX_landreform_militia_calc = 3000}
+    round_temp_variable = temp_COX_landreform_militia_calc
+    set_variable = {COX_landreform_militia_export = temp_COX_landreform_militia_calc}
+
+    log = "[GetDateText]: [Root.GetName]: landreform export test[?COX.COX_landreform_progress_export][?COX_landreform_infrastructure_export][?COX_landreform_militia_export]"
+    
+    COX_landreform_roundup = yes
+    #事件
+    COX = {
+        country_event = COX_landreform.401
+    }
+}
+COX_landreform_roundup = {#清除有关变量
+    COX = {
+        clear_variable = COX_landreform_progress
+        clear_variable = COX_landreform_militia
+        clear_variable = COX_landreform_militia_change
+        clear_variable = COX_landreform_selected_region
+        clear_variable = COX_landreform_current_action_id
+        clear_variable = COX_landreform_view_selected
+        clear_variable = COX_landreform_local_progress_display
+        clear_variable = COX_landreform_local_infrastructure_display
+        clear_variable = COX_landreform_local_support_display
+        clear_variable = COX_landreform_local_unrest_display
+        clear_variable = COX_landreform_local_progress_tt_value
+        clear_variable = COX_landreform_local_infrastructure_tt_value
+        clear_variable = COX_landreform_local_support_tt_value
+        clear_variable = COX_landreform_local_unrest_tt_value
+        clr_country_flag = COX_landreform_ongoing
+        clr_country_flag = country_has_gui
+        clr_country_flag = COX_land_reform_GUI_visible_flag
+
+        #arrays
+        clear_array = COX_landreform_regions_array #土改地区数组
+        #clear_array = COX_landreform_dec_all_array#以防之后还要引用
+        clear_array = COX_landreform_dec_done_array #土改决议后端数组，用来存储所有已执行决议
+    }
+    617 = {#中央
+        clear_variable = COX_landreform_local_progress
+        clear_variable = COX_landreform_local_infrastructure
+        clear_variable = COX_landreform_local_infrastructure_expectation
+        clear_variable = COX_landreform_local_unrest
+        clear_variable = COX_landreform_local_unrest_change
+        clear_variable = COX_landreform_local_support
+        clear_variable = COX_landreform_local_support_increase_factor
+        clear_variable = COX_landreform_local_support_decrease_factor
+        clear_variable = COX_landreform_local_militia_demand
+        clr_state_flag = COX_landreform_update_avaliable
+    }
+    957 = {#东疆
+        clear_variable = COX_landreform_local_progress
+        clear_variable = COX_landreform_local_infrastructure
+        clear_variable = COX_landreform_local_infrastructure_expectation
+        clear_variable = COX_landreform_local_unrest
+        clear_variable = COX_landreform_local_unrest_change
+        clear_variable = COX_landreform_local_support
+        clear_variable = COX_landreform_local_support_increase_factor
+        clear_variable = COX_landreform_local_support_decrease_factor
+        clear_variable = COX_landreform_local_militia_demand
+        clr_state_flag = COX_landreform_update_avaliable
+    }
+    618 = {#北疆
+        clear_variable = COX_landreform_local_progress
+        clear_variable = COX_landreform_local_infrastructure
+        clear_variable = COX_landreform_local_infrastructure_expectation
+        clear_variable = COX_landreform_local_unrest
+        clear_variable = COX_landreform_local_unrest_change
+        clear_variable = COX_landreform_local_support
+        clear_variable = COX_landreform_local_support_increase_factor
+        clear_variable = COX_landreform_local_support_decrease_factor
+        clear_variable = COX_landreform_local_militia_demand
+        clr_state_flag = COX_landreform_update_avaliable
+    }
+    619 = {#南疆
+        clear_variable = COX_landreform_local_progress
+        clear_variable = COX_landreform_local_infrastructure
+        clear_variable = COX_landreform_local_infrastructure_expectation
+        clear_variable = COX_landreform_local_unrest
+        clear_variable = COX_landreform_local_unrest_change
+        clear_variable = COX_landreform_local_support
+        clear_variable = COX_landreform_local_support_increase_factor
+        clear_variable = COX_landreform_local_support_decrease_factor
+        clear_variable = COX_landreform_local_militia_demand
+        clr_state_flag = COX_landreform_update_avaliable
+    }
+}
+#真·结束效果，在事件链末尾触发
+COX_landreform_finish_effect = {
+    clear_array = COX_landreform_dec_all_array #死透了
 }
 
 ###GUI相关###
@@ -1078,18 +1005,1617 @@ COX_landreform_GUI_get_decisions = {
             TOKEN = "[?i]"
         }
     }
+    set_temp_variable = {temp_dec_Array_Size = 0}
+	for_each_loop = {
+		array = COX_landreform_GUI_dec_array
+		add_to_temp_variable = {temp_dec_Array_Size = 1}
+	}
+    if = {
+		limit = {check_variable = {temp_dec_Array_Size < 4}}
+		if = {
+			limit = {check_variable = {temp_dec_Array_Size = 3}}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+		}
+		else_if = {
+			limit = {check_variable = {temp_dec_Array_Size = 2}}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+		}
+		else_if = {
+			limit = {check_variable = {temp_dec_Array_Size = 1}}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+		}
+		else = {
+			
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+			add_to_array = {COX_landreform_GUI_dec_array = 100}
+		}
+	}
 }
-
 COX_landreform_dec_click_effect = {
-    COX_landreform_refresh = yes
+    hidden_effect = {
+        set_country_flag = COX_landreform_cooldown
+        COX_landreform_start_cooldown = yes
+    }
+    
     meta_effect = {
         text = {
             COX_landreform_dec_[TOKEN]_effect = yes
         }
         TOKEN = "[?COX.COX_landreform_GUI_action_id]"
     }
+    COX_landreform_refresh = yes
+}
+COX_landreform_start_cooldown = {
+    if = {
+        limit = {
+            has_country_flag = COX_landreform_cooldown_7
+        }
+        activate_mission = COX_landreform_cooldown_timer_7
+    }
+    else_if = {
+        limit = {
+            has_country_flag = COX_landreform_cooldown_14
+        }
+        activate_mission = COX_landreform_cooldown_timer_14
+    }
+    # else_if = {
+    #     limit = {
+    #         has_country_flag = COX_landreform_cooldown_30
+    #     }
+    #     activate_mission = COX_landreform_cooldown_timer_30
+    # }
+    else = {
+        activate_mission = COX_landreform_cooldown_timer_3
+    }
 }
 
+
+
+
+#土改特殊效果
+#反复使用的地区变量更改在这里
+##进度
+COX_landreform_local_progress_increase_small = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_progress = 5
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_progress_increase_small_tt
+}
+COX_landreform_local_progress_increase_medium = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_progress = 10
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_progress_increase_medium_tt
+}
+COX_landreform_local_progress_increase_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_progress = 15
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_progress_increase_large_tt
+}
+COX_landreform_local_progress_increase_extra_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_progress = 20
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_progress_increase_extra_large_tt
+}
+COX_landreform_local_progress_increase_ultra = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_progress = 30
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_progress_increase_ultra_tt
+}
+##基建
+COX_landreform_local_infrastructure_increase_minor = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_infrastructure = 3
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_infrastructure_increase_minor_tt
+}
+COX_landreform_local_infrastructure_increase_small = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_infrastructure = 5
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_infrastructure_increase_small_tt
+}
+COX_landreform_local_infrastructure_increase_medium = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_infrastructure = 10
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_infrastructure_increase_medium_tt
+}
+COX_landreform_local_infrastructure_increase_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_infrastructure = 15
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_infrastructure_increase_large_tt
+}
+COX_landreform_local_infrastructure_increase_extra_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_infrastructure = 20
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_infrastructure_increase_extra_large_tt
+}
+COX_landreform_local_infrastructure_decrease_small = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_infrastructure = -5
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_infrastructure_decrease_small_tt
+}
+COX_landreform_local_infrastructure_decrease_medium = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_infrastructure = -10
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_infrastructure_decrease_medium_tt
+}
+COX_landreform_local_infrastructure_decrease_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_infrastructure = -15
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_infrastructure_decrease_large_tt
+}
+##民意
+COX_landreform_local_support_increase_minor = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_support = 3
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_support_increase_minor_tt
+}
+COX_landreform_local_support_increase_small = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_support = 5
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_support_increase_small_tt
+}
+COX_landreform_local_support_increase_medium = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_support = 10
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_support_increase_medium_tt
+}
+COX_landreform_local_support_increase_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_support = 15
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_support_increase_large_tt
+}
+COX_landreform_local_support_increase_extra_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_support = 20
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_support_increase_extra_large_tt
+}
+COX_landreform_local_support_increase_ultra = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_support = 30
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_support_increase_ultra_tt
+}
+COX_landreform_local_support_decrease_small = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_support = -5
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_support_decrease_small_tt
+}
+COX_landreform_local_support_decrease_medium = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_support = -10
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_support_decrease_medium_tt
+}
+##动乱
+###增加
+COX_landreform_local_unrest_increase_small = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = 5
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_increase_small_tt
+}
+COX_landreform_local_unrest_increase_medium = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = 10
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_increase_medium_tt
+}
+COX_landreform_local_unrest_increase_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = 15
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_increase_large_tt
+}
+COX_landreform_local_unrest_increase_extra_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = 20
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_increase_extra_large_tt
+}
+COX_landreform_local_unrest_increase_ultra = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = 30
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_increase_ultra_tt
+}
+COX_landreform_local_unrest_increase_ultra_ultra = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = 40
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_increase_ultra_ultra_tt
+}
+###减少
+COX_landreform_local_unrest_decrease_small = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = -5
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_decrease_small_tt
+}
+COX_landreform_local_unrest_decrease_medium = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = -10
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_decrease_medium_tt
+}
+COX_landreform_local_unrest_decrease_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = -15
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_decrease_large_tt
+}
+COX_landreform_local_unrest_decrease_extra_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = -20
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_decrease_extra_large_tt
+}
+COX_landreform_local_unrest_decrease_ultra = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = -30
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_decrease_ultra_tt
+}
+COX_landreform_local_unrest_decrease_ultra_ultra = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_local_unrest = -40
+        }
+    }
+    custom_effect_tooltip = COX_landreform_local_unrest_decrease_ultra_ultra_tt
+}
+##pp花费
+COX_landreform_pp_cost_small = {
+    add_political_power = -15
+}
+COX_landreform_pp_cost_medium = {
+    add_political_power = -30
+}
+COX_landreform_pp_cost_large = {
+    add_political_power = -45
+}
+COX_landreform_pp_cost_extra_large = {
+    add_political_power = -60
+}
+##民兵
+###民兵获取
+COX_landreform_militia_gain_minor = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_militia = 2000
+        }
+    }
+    custom_effect_tooltip = COX_landreform_militia_gain_minor_tt
+}
+
+COX_landreform_militia_gain_small = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_militia = 3000
+        }
+    }
+    custom_effect_tooltip = COX_landreform_militia_gain_small_tt
+}
+
+COX_landreform_militia_gain_medium = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_militia = 5000
+        }
+    }
+    custom_effect_tooltip = COX_landreform_militia_gain_medium_tt
+}
+
+COX_landreform_militia_gain_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_militia = 15000
+        }
+    }
+    custom_effect_tooltip = COX_landreform_militia_gain_large_tt
+}
+
+COX_landreform_militia_gain_extra_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_militia = 25000
+        }
+    }
+    custom_effect_tooltip = COX_landreform_militia_gain_extra_large_tt
+}
+##民兵消耗
+COX_landreform_militia_loss_minor = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_militia = -1000
+        }
+    }
+    custom_effect_tooltip = COX_landreform_militia_loss_minor_tt
+}
+COX_landreform_militia_loss_small = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_militia = -2000
+        }
+    }
+    custom_effect_tooltip = COX_landreform_militia_loss_small_tt
+}
+COX_landreform_militia_loss_medium = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_militia = -6000
+        }
+    }
+    custom_effect_tooltip = COX_landreform_militia_loss_medium_tt
+}
+COX_landreform_militia_loss_large = {
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_militia = -9000
+        }
+    }
+    custom_effect_tooltip = COX_landreform_militia_loss_large_tt
+}
+#笔记：
+#土改决议定义由三部分构成：
+#COX_landreform_dec_[决议id]_effect，为执行效果
+#位于下方
+#COX_landreform_dec_[决议id]_avaliable_trigger，为可用条件
+#COX_landreform_dec_[决议id]_visible_trigger，为可见条件
+#此二者位于common/scripted_triggers/LFB_landreform_triggers文件中，分别有示例
+#决议id为三位数字，其中第一位取[1,2,3,4]，代表地区
+#101-117为中央决议，201-227为东疆决议，301-321为北疆决议，401-426为南疆决议
+
+
+#--------------------------------------------------------------------#
+    #在这里写每个决议各自的效果
+    #参见设计案
+    #决议id为三位数字，其中第一位取[1,2,3,4]，代表地区
+    #101-117为中央决议，201-227为东疆决议，301-321为北疆决议，401-426为南疆决议
+    #对于不可重复执行的决议，要用add_to_array = { COX_landreform_dec_done_array = [决议id] } 来记录本决议的执行状态
+    #而对于可重复执行的决议，不要这样做
+    #示例：
+# COX_landreform_dec_111_effect = {
+#     #直接效果
+#     add_political_power = 22
+#     #事件
+#     country_event = {COX.114514}
+#     #变量增减
+#     add_to_variable = {
+#         COX_landreform_local_progress = 3
+#     }
+#     #可用性处理
+#     add_to_array = { COX_landreform_dec_done_array = [id] }
+# }
+#--------------------------------------------------------------------#
+COX_landreform_dec_100_effect = {
+    custom_effect_tooltip = COX_landreform_dec_100_tt
+}
+
+COX_landreform_dec_101_effect = {
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 101 }
+        617 = {
+            set_state_flag = COX_landreform_update_avaliable
+        }
+    }
+    
+    custom_effect_tooltip = COX_landreform_region_avaliable_tt
+    add_political_power = -50
+}
+
+COX_landreform_dec_102_effect = {
+    COX_landreform_pp_cost_small = yes
+
+    617 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_infrastructure_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 102 }
+    }
+    
+}
+
+COX_landreform_dec_103_effect = {
+    COX_landreform_pp_cost_small = yes
+
+    TNO_improve_minimum_wage_policy_effectiveness_monthly_low = yes
+
+    617 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_infrastructure_increase_small = yes
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 103 }
+    }
+}
+
+COX_landreform_dec_104_effect = {
+    
+    COX_landreform_pp_cost_small = yes
+    set_temp_variable = { money_reserves_temp = -0.05 }
+    econ_money_reserves_change_raw_money = yes
+    update_economy_tab = yes
+
+    TNO_improve_industrial_expertise_med = yes
+    617 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_medium = yes
+    }
+
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 104 }
+    }
+}
+
+COX_landreform_dec_105_effect = {
+    COX_landreform_pp_cost_small = yes
+    617 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_decrease_small = yes
+    }
+
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 105 }
+    }
+}
+
+COX_landreform_dec_106_effect = {
+    COX_landreform_pp_cost_small = yes
+
+    set_temp_variable = { money_reserves_temp = 0.15 }
+    econ_money_reserves_change_raw_money = yes
+    update_economy_tab = yes
+
+    set_temp_variable = {
+        inflation_temp = 1
+    }
+	econ_inflation_change = yes
+
+    617 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_medium = yes
+    }
+
+    
+
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 106 }
+    }
+}
+
+COX_landreform_dec_107_effect = {
+    COX_landreform_pp_cost_medium = yes
+
+    617 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_infrastructure_increase_small = yes
+        COX_landreform_local_unrest_increase_small = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+    }
+    
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 107 }
+        617 = {
+            add_to_variable = {
+                COX_landreform_local_unrest_change = 2
+            }
+        }
+    }
+
+
+}
+
+COX_landreform_dec_108_effect = {
+    COX_landreform_pp_cost_medium = yes
+    TNO_improve_admin_efficiency_low = yes
+    TNO_improve_trade_laws_policy_effectiveness_high = yes
+    617 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_unrest_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 108 }
+    }
+
+}
+
+COX_landreform_dec_109_effect = {
+    COX_landreform_pp_cost_large = yes
+    TNO_improve_admin_efficiency_low = yes
+    TNO_improve_trade_laws_policy_effectiveness_high = yes
+    set_temp_variable = { pus_temp = 2 }
+    econ_pus_change = yes
+    update_economy_tab = yes
+    617 = {
+        COX_landreform_local_unrest_increase_small = yes
+    }
+
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 109 }
+    }
+}
+
+COX_landreform_dec_110_effect = {
+    COX_landreform_pp_cost_small = yes
+    617 = {
+        COX_landreform_local_infrastructure_increase_medium = yes
+        COX_landreform_local_support_increase_small = yes
+    }
+
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 110 }
+    }
+}
+
+COX_landreform_dec_111_effect = {
+    add_political_power = 50
+    617 = {
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_decrease_small = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_decrease_tt
+    }
+    
+    
+    hidden_effect = {
+        617 = {
+            add_to_variable = {
+                COX_landreform_local_unrest_change = -3
+            }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 111 }
+    }
+        
+}
+
+COX_landreform_dec_112_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_15_tt
+    COX_landreform_pp_cost_small = yes
+    617 = {
+        COX_landreform_local_infrastructure_increase_medium = yes
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 112 }
+        activate_mission = COX_landreform_repdec_112_cooldown_timer
+    }
+    
+    
+}
+
+COX_landreform_dec_113_effect = {
+    add_political_power = 50
+    617 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_small = yes
+        COX_landreform_local_unrest_increase_small = yes
+        custom_effect_tooltip = COX_landreform_local_support_change_increase_tt
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 113 }#在结算时+2支持
+        #TODO - 在结算时直接+2支持
+    }
+
+}
+
+COX_landreform_dec_114_effect = {
+    617 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_increase_medium = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+    }
+    hidden_effect = {
+        617 = {
+            add_to_variable = {
+                COX_landreform_local_unrest_change = 2
+            }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 114 }
+    }
+}
+
+COX_landreform_dec_115_effect = {
+    COX_landreform_pp_cost_medium = yes
+    617 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_infrastructure_increase_large = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_decrease_tt
+    }
+    hidden_effect = {
+        617 = {
+            add_to_variable = {
+                COX_landreform_local_unrest_change = -3
+            }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 115 }
+    }
+}
+
+COX_landreform_dec_116_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_15_tt
+    COX_landreform_pp_cost_medium = yes
+    617 = {
+        COX_landreform_local_infrastructure_increase_small = yes
+        COX_landreform_local_support_increase_small = yes
+        COX_landreform_local_unrest_decrease_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 116 }
+        activate_mission = COX_landreform_repdec_116_cooldown_timer
+    }
+}
+
+COX_landreform_dec_117_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_30_tt
+    COX_landreform_militia_gain_small = yes
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 117 }
+        activate_mission = COX_landreform_repdec_117_cooldown_timer
+    }
+}
+
+COX_landreform_dec_201_effect = {
+    add_political_power = 50
+    957 = {
+        COX_landreform_local_progress_increase_small = yes
+    }
+    custom_effect_tooltip = COX_landreform_region_avaliable_tt
+    hidden_effect = {
+        957 = {
+            set_state_flag = COX_landreform_update_avaliable
+        }
+        add_to_array = { COX_landreform_dec_done_array = 201 }
+    }
+}
+
+COX_landreform_dec_202_effect = {
+    
+    COX_landreform_pp_cost_small = yes
+    957 = {
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 202 }
+    }
+}
+
+COX_landreform_dec_203_effect = {
+    
+    COX_landreform_pp_cost_small = yes
+    957 = {
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 203 }
+    }
+}
+
+COX_landreform_dec_204_effect = {
+    
+    COX_landreform_pp_cost_medium = yes
+    957 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_small = yes
+        COX_landreform_local_unrest_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 204 }
+    }
+}
+
+COX_landreform_dec_205_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_30_tt
+    COX_landreform_pp_cost_medium = yes
+    957 = {
+        COX_landreform_local_infrastructure_increase_minor = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 205 }
+        activate_mission = COX_landreform_repdec_205_cooldown_timer
+    }
+}
+
+COX_landreform_dec_206_effect = {
+    
+    COX_landreform_pp_cost_small = yes
+    957 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_increase_medium = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+    }
+    hidden_effect = {
+        957 = {
+            add_to_variable = { COX_landreform_local_unrest_change = 1 }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 206 }
+    }
+}
+
+COX_landreform_dec_207_effect = {
+    
+    COX_landreform_pp_cost_small = yes
+    957 = {
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_increase_extra_large = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+    }
+    hidden_effect = {
+        957 = {
+            add_to_variable = { COX_landreform_local_unrest_change = 3 }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 207 }
+    }
+}
+
+COX_landreform_dec_208_effect = {
+    
+    957 = {
+        COX_landreform_local_support_increase_large = yes
+        COX_landreform_local_unrest_increase_extra_large = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+        
+    }
+    hidden_effect = {
+        957 = {
+            add_to_variable = { COX_landreform_local_unrest_change = 2 }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 208 }
+    }
+}
+
+COX_landreform_dec_209_effect = {
+    
+    957 = {
+        COX_landreform_local_progress_increase_small = yes
+        COX_landreform_local_infrastructure_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 209 }#预防水利下降
+
+    }
+}
+
+COX_landreform_dec_210_effect = {
+    
+    COX_landreform_pp_cost_medium = yes
+    957 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_small = yes
+        COX_landreform_local_unrest_decrease_medium = yes
+        
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 210 }
+    }
+}
+
+COX_landreform_dec_211_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_tt
+    COX_landreform_pp_cost_large = yes
+    COX_landreform_militia_loss_medium = yes
+    957 = {
+        COX_landreform_local_unrest_decrease_extra_large = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_decrease_tt
+    }
+    
+    hidden_effect = {
+        957 = {
+            add_to_variable = { COX_landreform_local_unrest_change = -2 }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 211 }
+        activate_mission = COX_landreform_repdec_211_cooldown_timer
+    }
+}
+
+COX_landreform_dec_212_effect = {
+    
+    COX_landreform_pp_cost_large = yes
+    add_command_power = -15
+    COX_landreform_militia_gain_large = yes
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 212 }
+    }
+}
+
+COX_landreform_dec_213_effect = {
+    
+    COX_landreform_pp_cost_extra_large = yes
+    add_command_power = -30
+    COX_landreform_militia_gain_extra_large = yes
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 213 }
+    }
+}
+
+COX_landreform_dec_214_effect = {
+    
+    add_political_power = 25
+    957 = {
+        COX_landreform_local_progress_increase_extra_large = yes
+        COX_landreform_local_support_increase_large = yes
+        COX_landreform_local_unrest_increase_extra_large = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 214 }#不满不再增加
+    }
+}
+
+COX_landreform_dec_215_effect = {
+    
+    957 = {
+        COX_landreform_local_progress_increase_extra_large = yes
+        COX_landreform_local_support_increase_extra_large = yes
+        COX_landreform_local_unrest_increase_ultra_ultra = yes
+    }
+    #custom_effect_tooltip = 
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 215 }
+        #触发事件
+
+    }
+}
+
+COX_landreform_dec_216_effect = {
+    
+    COX_landreform_pp_cost_medium = yes
+    957 = {
+        COX_landreform_local_progress_increase_small = yes
+        COX_landreform_local_support_increase_small = yes
+        COX_landreform_local_unrest_increase_large = yes
+        
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 216 }
+    }
+}
+
+COX_landreform_dec_217_effect = {
+    
+    COX_landreform_pp_cost_medium = yes
+    957 = {
+        COX_landreform_local_progress_increase_small = yes
+        COX_landreform_local_support_increase_small = yes
+        COX_landreform_local_unrest_increase_large = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 217 }
+    }
+}
+
+COX_landreform_dec_218_effect = {
+    
+    957 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_infrastructure_increase_medium = yes
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 218 }
+    }
+}
+
+COX_landreform_dec_219_effect = {
+    
+    add_political_power = 50
+    957 = {
+        COX_landreform_local_unrest_decrease_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 219 1}
+    }
+}
+
+COX_landreform_dec_220_effect = {
+    
+    COX_landreform_pp_cost_medium = yes
+    957 = {
+        COX_landreform_local_infrastructure_increase_large = yes
+    }
+
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 220 }#预防水利下降
+    }
+}
+
+COX_landreform_dec_221_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_tt
+    COX_landreform_pp_cost_small = yes
+    957 = {
+        COX_landreform_local_support_increase_minor = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+    }
+    hidden_effect = {
+        957 = {
+            add_to_variable = { COX_landreform_local_unrest_change = 1 }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 221 }
+        activate_mission = COX_landreform_repdec_221_cooldown_timer
+    }
+}
+
+COX_landreform_dec_222_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_tt
+    COX_landreform_pp_cost_small = yes
+    957 = {
+        COX_landreform_local_unrest_decrease_small = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+    }
+    hidden_effect = {
+        957 = {
+            add_to_variable = { COX_landreform_local_unrest_change = 1 }
+            
+        }
+        add_to_array = { COX_landreform_dec_done_array = 222 }
+        activate_mission = COX_landreform_repdec_222_cooldown_timer
+    }
+}
+
+COX_landreform_dec_223_effect = {
+    
+    957 = {
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_decrease_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 223 }
+    }
+}
+
+COX_landreform_dec_224_effect = {
+    
+    957 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 224 }
+    }
+}
+
+COX_landreform_dec_225_effect = {
+    
+    957 = {
+        COX_landreform_local_progress_increase_large = yes
+        COX_landreform_local_support_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 225 }#不满不再增加
+    }
+}
+
+COX_landreform_dec_226_effect = {
+    
+    add_political_power = -100
+    957 = {
+        COX_landreform_local_unrest_decrease_ultra = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 226 }#不满不再增加
+    }
+    
+}
+
+COX_landreform_dec_227_effect = {
+    
+    957 = {
+        COX_landreform_local_progress_increase_small = yes
+        COX_landreform_local_unrest_decrease_ultra_ultra = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 227 }
+    }
+}
+
+COX_landreform_dec_301_effect = {
+    COX_landreform_militia_gain_small = yes
+    618 = {
+        COX_landreform_local_support_increase_medium = yes
+    }
+    custom_effect_tooltip = COX_landreform_region_avaliable_tt
+    hidden_effect = {
+        618 = {
+            set_state_flag = COX_landreform_update_avaliable
+        }
+        add_to_array = { COX_landreform_dec_done_array = 301 }
+    }
+}
+
+COX_landreform_dec_302_effect = {
+    COX_landreform_pp_cost_medium = yes
+    618 = {
+        COX_landreform_local_progress_increase_small = yes
+        COX_landreform_local_infrastructure_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 302 }
+    }
+}
+
+COX_landreform_dec_303_effect = {
+    COX_landreform_pp_cost_medium = yes
+    618 = {
+        COX_landreform_local_progress_increase_small = yes
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 303 }
+    }
+}
+
+COX_landreform_dec_304_effect = {
+    COX_landreform_pp_cost_medium = yes
+    618 = {
+        COX_landreform_local_progress_increase_small = yes
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 304 }
+    }
+}
+
+COX_landreform_dec_305_effect = {
+    COX_landreform_militia_gain_minor = yes
+    custom_effect_tooltip = COX_landreform_militia_change_gain_tt
+    618 = {
+        COX_landreform_local_progress_increase_large = yes
+    }
+    hidden_effect = {
+        add_to_variable = {
+            COX_landreform_militia_change = 500
+        }
+        add_to_array = { COX_landreform_dec_done_array = 305 }
+    }
+}
+
+COX_landreform_dec_306_effect = {
+    COX_landreform_pp_cost_medium = yes
+    618 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 306 }
+    }
+
+}
+
+COX_landreform_dec_307_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_30_tt
+    COX_landreform_pp_cost_medium = yes
+    618 = {
+        COX_landreform_local_infrastructure_increase_minor = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 307 }
+        activate_mission = COX_landreform_repdec_307_cooldown_timer
+    }
+}
+
+COX_landreform_dec_308_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_30_tt
+    add_political_power = -15
+    618 = {
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 308 }
+        activate_mission = COX_landreform_repdec_308_cooldown_timer
+    }
+}
+
+COX_landreform_dec_309_effect = {
+    COX_landreform_pp_cost_large = yes
+    add_command_power = -15
+    COX_landreform_militia_gain_large = yes
+    618 = {
+        COX_landreform_local_progress_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 309 }
+    }
+}
+
+COX_landreform_dec_310_effect = {
+    618 = {
+        COX_landreform_local_progress_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 310 }#降低负面事件影响
+    }
+}
+
+COX_landreform_dec_311_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_tt
+    COX_landreform_militia_loss_minor = yes
+    custom_effect_tooltip = COX_landreform_local_unrest_change_decrease_tt
+    hidden_effect = {
+        618 = {
+            add_to_variable = { COX_landreform_local_unrest_change = -1 }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 311 }
+        activate_mission = COX_landreform_repdec_311_cooldown_timer
+    }
+}
+
+COX_landreform_dec_312_effect = {
+    COX_landreform_militia_gain_medium = yes
+    618 = {
+        COX_landreform_local_support_increase_small = yes        
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 312 }
+    }
+}
+
+COX_landreform_dec_313_effect = {
+    
+    618 = {
+        COX_landreform_local_support_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 313 }#不满不再增加
+    }
+}
+
+COX_landreform_dec_314_effect = {
+    COX_landreform_pp_cost_small = yes
+    COX_landreform_militia_loss_minor = yes
+    618 = {
+        COX_landreform_local_support_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 314 }
+    }
+}
+
+COX_landreform_dec_315_effect = {
+    add_command_power = 60
+    618 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_small = yes
+    }
+    
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 315 }
+    }
+}
+
+COX_landreform_dec_316_effect = {
+    add_political_power = 25
+    618 = {
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 316 }
+    }
+}
+
+COX_landreform_dec_317_effect = {
+    add_political_power = 25
+    618 = {
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 317 }
+    }
+}
+
+COX_landreform_dec_318_effect = {
+    COX_landreform_militia_gain_small = yes
+    618 = {
+        COX_landreform_local_progress_increase_extra_large = yes
+        COX_landreform_local_support_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 318 }
+    }
+}
+
+COX_landreform_dec_319_effect = {
+    add_political_power = 120
+    COX_landreform_militia_gain_extra_large = yes
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 319 }
+    }
+}
+
+COX_landreform_dec_320_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_30_tt
+    618 = {
+        COX_landreform_local_support_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 320 }
+        activate_mission = COX_landreform_repdec_320_cooldown_timer
+    }
+}
+
+COX_landreform_dec_321_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_30_tt
+    COX_landreform_militia_gain_small = yes
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 321 }
+        activate_mission = COX_landreform_repdec_321_cooldown_timer
+    }
+}
+
+COX_landreform_dec_401_effect = {
+    COX_landreform_pp_cost_large = yes
+    
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 401 }
+    }
+}
+
+COX_landreform_dec_402_effect = {
+    COX_landreform_pp_cost_large = yes
+    
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 402 }
+    }
+}
+
+COX_landreform_dec_403_effect = {
+    COX_landreform_pp_cost_large = yes
+    
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 403 }
+    }
+}
+
+COX_landreform_dec_404_effect = {
+    
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 404 }
+    }
+}
+
+COX_landreform_dec_405_effect = {
+    add_political_power = 25
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 405 }
+    }
+    
+}
+
+COX_landreform_dec_406_effect = {
+    
+    619 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_small = yes
+        COX_landreform_local_unrest_increase_large = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+    }
+    custom_effect_tooltip = COX_landreform_region_avaliable_tt
+    hidden_effect = {
+        957 = {
+            add_to_variable = { COX_landreform_local_unrest_change = 5 }
+            set_state_flag = COX_landreform_update_avaliable
+        }
+        add_to_array = { COX_landreform_dec_done_array = 406 }
+    }
+    
+}
+
+COX_landreform_dec_407_effect = {
+    
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 407 }
+    }
+    
+}
+
+COX_landreform_dec_408_effect = {
+    
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 408 }
+    }
+    
+}
+
+COX_landreform_dec_409_effect = {
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 409 }#不满不再增加
+    }
+}
+
+COX_landreform_dec_410_effect = {
+    COX_landreform_militia_loss_medium = yes
+    619 = {
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 410 }
+    }
+}
+
+COX_landreform_dec_411_effect = {
+    
+    COX_landreform_pp_cost_medium = yes
+    619 = {
+        COX_landreform_local_support_increase_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 411 }
+    }
+}
+
+COX_landreform_dec_412_effect = {
+    
+    COX_landreform_pp_cost_medium = yes
+    619 = {
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_increase_large = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 412 }
+    }
+}
+
+COX_landreform_dec_413_effect = {
+    
+    619 = {
+        COX_landreform_local_support_increase_medium = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+    }
+    hidden_effect = {
+        619 = {
+            add_to_variable = { COX_landreform_local_unrest_change = 5 }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 413 }
+    }
+}
+
+COX_landreform_dec_414_effect = {
+    
+    619 = {
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_decrease_medium = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_decrease_tt
+    }
+    hidden_effect = {
+        619 = {
+            add_to_variable = { COX_landreform_local_unrest_change = -2 }
+        }
+        add_to_array = { COX_landreform_dec_done_array = 414 }
+    }
+}
+
+COX_landreform_dec_415_effect = {
+    COX_landreform_militia_loss_medium = yes
+    619 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_decrease_extra_large = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+    }
+    hidden_effect = {
+        
+        set_country_flag = COX_landreform_cooldown_14
+        add_to_array = { COX_landreform_dec_done_array = 415 }
+    }
+}
+
+COX_landreform_dec_416_effect = {
+    
+    619 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_medium = yes
+        custom_effect_tooltip = COX_landreform_local_unrest_change_increase_tt
+    }
+    #TODO 民族精神add_timed_idea = { idea = COX_kashgar_debate days = 730 }
+    hidden_effect = {
+        619 = {
+            add_to_variable = { COX_landreform_local_unrest_change = -5 }
+        }
+        set_country_flag = COX_landreform_cooldown_7
+        add_to_array = { COX_landreform_dec_done_array = 416 }
+    }
+}
+
+COX_landreform_dec_417_effect = {
+    
+    619 = {
+        COX_landreform_local_support_increase_large = yes
+        COX_landreform_local_unrest_increase_extra_large = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 417 }
+    }
+}
+
+COX_landreform_dec_418_effect = {
+    COX_landreform_militia_loss_large = yes
+    619 = {
+        COX_landreform_local_progress_increase_ultra = yes
+    }
+    hidden_effect = {
+        set_country_flag = COX_landreform_cooldown_7
+        add_to_array = { COX_landreform_dec_done_array = 418 }#不满不再增加
+    }
+}
+
+COX_landreform_dec_419_effect = {
+    
+    619 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_small = yes
+        COX_landreform_local_unrest_decrease_small = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 419 }
+    }
+}
+
+COX_landreform_dec_420_effect = {
+    
+    619 = {
+        COX_landreform_local_progress_increase_medium = yes
+        COX_landreform_local_support_increase_medium = yes
+        COX_landreform_local_unrest_increase_small = yes
+        
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 420 }
+    }
+}
+
+COX_landreform_dec_421_effect = {
+    
+    619 = {
+        COX_landreform_local_progress_increase_extra_large = yes
+        COX_landreform_local_support_increase_medium = yes
+        
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 421 }
+    }
+}
+
+COX_landreform_dec_422_effect = {
+    
+    COX_landreform_pp_cost_medium = yes
+    619 = {
+        COX_landreform_local_infrastructure_increase_large = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 422 }
+    }
+}
+
+COX_landreform_dec_423_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_15_tt
+    COX_landreform_pp_cost_medium = yes
+    619 = {
+        COX_landreform_local_infrastructure_increase_minor = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 423 }
+        activate_mission = COX_landreform_repdec_423_cooldown_timer
+    }
+}
+
+COX_landreform_dec_424_effect = {
+    
+    619 = {
+        COX_landreform_local_infrastructure_increase_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 424 }#预防水利下降
+    }
+
+}
+
+COX_landreform_dec_425_effect = {
+    
+    COX_landreform_militia_gain_large = yes
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 425 }
+    }
+}
+
+COX_landreform_dec_426_effect = {#可重复
+    custom_effect_tooltip = COX_landreform_dec_repeatable_15_tt
+    619 = {
+        COX_landreform_local_support_increase_small = yes
+        COX_landreform_local_unrest_decrease_medium = yes
+    }
+    hidden_effect = {
+        add_to_array = { COX_landreform_dec_done_array = 426 }
+        activate_mission = COX_landreform_repdec_426_cooldown_timer
+    }
+}
 
 ####TEST###
 COX_landreform_test = {
@@ -1147,19 +2673,20 @@ COX_landreform_test = {
 
 COX_123_test_effect = {
     COX = {
-        add_political_power = 3
+        set_country_flag = COX_GAW_GUI_visible
     }
 }
 
 COX_124_test_effect = {
     COX = {
-        add_political_power = 4
+        set_country_flag = XBJ_Northwest_crisis_gui_visible
     }
 }
 
 COX_125_test_effect = {
     COX = {
-        add_political_power = 5
+        set_variable = { COX_landreform_local_progress_display = 7.5 }
+        #COX_landreform_refresh = yes
     }
 }
 
