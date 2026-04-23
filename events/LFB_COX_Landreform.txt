@@ -45,6 +45,7 @@ country_event = {#突袭，原COX4
 	id = COX_Landreform.001
 	title = COX_Landreform.001.t
 	desc = COX_Landreform.001.d
+	picture = GFX_event_COX_4
 	is_triggered_only = yes
 	fire_only_once = yes
 
@@ -57,11 +58,13 @@ country_event = {#会师,然后进军，原COX2
 	id = COX_Landreform.002
 	title = COX_Landreform.002.t
 	desc = COX_Landreform.002.d
+	picture = GFX_Time_To_March
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
 		name = COX_Landreform.002.a
+		add_stability = 0.05
 	}
 }
 
@@ -69,11 +72,43 @@ country_event = {#军阀，原COX11
 	id = COX_Landreform.003
 	title = COX_Landreform.003.t
 	desc = COX_Landreform.003.d
+	picture = GFX_report_event_chinese_army_training
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
 		name = COX_Landreform.003.a
+		country_event = {
+			id = COX.31
+		}
+		hidden_effect = {
+			annex_country = {
+				target = XIN
+				transfer_troops = no
+			}
+			set_country_flag = COX_watch_from_west_flag
+			hidden_effect = {
+				set_global_flag = show_peace_popup_alert
+				COX = {
+					save_global_event_target_as = winning_country
+				}
+				XIN = {
+					save_global_event_target_as = losing_country
+				}
+				#set_global_flag = losing_country_multiple
+				#set_global_flag = winning_country_multiple
+				COX = {
+					# winner simply gets GDP recalculated :
+					recalculate_GDP_and_PUs_on_demand = yes
+				}
+				log = "war_won"
+				set_global_flag = war_won
+				add_to_variable = {
+					global.peace_popup_dirty = 1
+				}
+				log = "[GetDateText]: winner/loser: FROM: [winning_country.GetName] ROOT: [losing_country.GetName] on_capitulation"
+			}
+		}
 	}
 }
 
@@ -82,11 +117,13 @@ country_event = {#万象更新，原COX1
 	id = COX_Landreform.004
 	title = COX_Landreform.004.t
 	desc = COX_Landreform.004.d
+	picture = GFX_Army_Deployed
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
 		name = COX_Landreform.004.a
+		custom_effect_tooltip = COX_Landreform_004_tt
 		hidden_effect = {
 			country_event = { 
 				id = COX_Landreform.009 
@@ -100,11 +137,25 @@ country_event = {#解放的先声，原COX3
 	id = COX_Landreform.005
 	title = COX_Landreform.005.t
 	desc = COX_Landreform.005.d
+	picture = GFX_Liberate_Xinjiang
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
 		name = COX_Landreform.005.a
+		swap_ideas = {
+			remove_idea = tno_conscription_service_by_requirement
+			add_idea = tno_conscription_limited_conscription
+		}
+		add_stability = 0.05
+		country_event = {
+			id = COX_Landreform.004
+		}
+		hidden_effect = {
+			COX = {#临时添加了隐藏杂项收入--需要在之后的版本改进
+				add_ideas = COX_fuck_TNO_economy
+			}
+		}
 	}
 }
 
@@ -113,11 +164,13 @@ country_event = {#抓耗子，原COX18
 	id = COX_Landreform.006
 	title = COX_Landreform.006.t
 	desc = COX_Landreform.006.d
+	picture = GFX_To_The_Countryside
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
 		name = COX_Landreform.006.a
+		custom_effect_tooltip = COX_Landreform_006_tt
 	}
 }
 
@@ -125,6 +178,7 @@ country_event = {#碰头会，原COX20
 	id = COX_Landreform.007
 	title = COX_Landreform.007.t
 	desc = COX_Landreform.007.d
+	picture = GFX_Di_Hua_Spoke
 	is_triggered_only = yes
 	fire_only_once = yes
 
@@ -138,11 +192,13 @@ country_event = {#不谋而合，原COX22
 	id = COX_Landreform.008
 	title = COX_Landreform.008.t
 	desc = COX_Landreform.008.d
+	picture = GFX_Report
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
 		name = COX_Landreform.008.a
+		custom_effect_tooltip = COX_Landreform_008_tt
 	}
 }
 
@@ -194,10 +250,23 @@ country_event = {# 接过烂摊子 - 决议“接过烂摊子”对应事件
 	option = {
 		name = COX_Landreform.101.a
 		# 杨志成担任物资委员
+		custom_effect_tooltip = COX_Landreform_101a_tt
+		hidden_effect = {
+			COX = {
+				set_country_flag = COX_landreform_yang_zhicheng
+			}
+		}
+		
 	}
 	option = {
 		name = COX_Landreform.101.b
 		# 陈云担任物资委员
+		custom_effect_tooltip = COX_Landreform_101b_tt
+		hidden_effect = {
+			COX = {
+				set_country_flag = COX_landreform_chen_yun
+			}
+		}
 	}
 }
 
@@ -211,6 +280,7 @@ country_event = {# 慢性死亡 - 决议“新疆之心”对应事件
 
 	option = {
 		name = COX_Landreform.102.a
+		custom_effect_tooltip = COX_Landreform_102_tt
 	}
 }
 
@@ -236,6 +306,7 @@ country_event = {# 一日劳碌 - 决议“生命线”对应事件
 
 	option = {
 		name = COX_Landreform.104.a
+		custom_effect_tooltip = COX_Landreform_104_tt
 	}
 }
 
@@ -249,6 +320,7 @@ country_event = {# 新“巴扎” - 决议“建立物资兑换所”对应事�
 
 	option = {
 		name = COX_Landreform.105.a
+		custom_effect_tooltip = COX_Landreform_105_tt
 	}
 }
 
@@ -475,7 +547,9 @@ country_event = {# “黯然离场” - 事件COX_Landreform.121中选择COX_Lan
 
 	option = {
 		name = COX_Landreform.123.a
-		#小幅度降低农民支持度
+		957 = {
+			COX_landreform_local_support_decrease_small = yes
+		}
 	}
 }
 
@@ -599,6 +673,7 @@ country_event = {# “求变” - 决议“承诺解决流民问题”对应事�
 
 	option = {
 		name = COX_Landreform.133.a
+		custom_effect_tooltip = COX_Landreform_133_tt
 	}
 }
 
@@ -612,6 +687,7 @@ country_event = {# “针尖对麦芒” - 决议“协商授予流民土地”�
 
 	option = {
 		name = COX_Landreform.134.a
+		custom_effect_tooltip = COX_Landreform_134_tt
 	}
 }
 
@@ -625,6 +701,7 @@ country_event = {# “无计可施” - 决议“流民再安置”对应事件
 
 	option = {
 		name = COX_Landreform.135.a
+		custom_effect_tooltip = COX_Landreform_135_tt
 	}
 }
 
@@ -773,6 +850,7 @@ country_event = {# “土村见闻” - 决议“驻村鼓动宣传队”对应�
 
 	option = {
 		name = COX_Landreform.206.a
+		custom_effect_tooltip = COX_Landreform_206_tt
 	}
 }
 
@@ -875,6 +953,7 @@ country_event = {#“孤星” - 决议“接触进步阿訇”对应事件
 
 	option = {
 		name = COX_Landreform.214.a
+		custom_effect_tooltip = COX_Landreform_214_tt
 	}
 }
 
@@ -924,6 +1003,7 @@ country_event = {#“炉中煤，火焰赤” - 决议“南疆大革命”对�
 
 	option = {
 		name = COX_Landreform.218.a
+		custom_effect_tooltip = COX_Landreform_218_tt
 	}
 }
 
@@ -939,17 +1019,6 @@ country_event = {#“一呼百应” - 决议“征召贫农赤卫队”对应�
 	}
 }
 
-country_event = {#“一呼百应” - 决议“征召贫农赤卫队”对应事件
-	id = COX_Landreform.219
-	title = COX_Landreform.219.t
-	desc = COX_Landreform.219.d
-	is_triggered_only = yes
-	fire_only_once = yes
-
-	option = {
-		name = COX_Landreform.219.a
-	}
-}
 
 country_event = {#“归还土地” - 决议“彻查清真寺份地”对应事件
 	id = COX_Landreform.220
@@ -985,6 +1054,7 @@ country_event = {#“耕者有其田” - 决议“耕者有其田，贫者得�
 
 	option = {
 		name = COX_Landreform.222.a
+		custom_effect_tooltip = COX_Landreform_222_tt
 	}
 }
 
@@ -998,6 +1068,10 @@ country_event = {#“恶有恶报” - 决议“痛击反对派”第一次点�
 
 	option = {
 		name = COX_Landreform.223.a
+		custom_effect_tooltip = COX_Landreform_223_tt
+		hidden_effect = {
+			COX = {set_country_flag = COX_landreform_223_fired}
+		}
 	}
 }
 
@@ -1011,6 +1085,10 @@ country_event = {#“审判” - 决议“痛击反对派”第二次点击时�
 
 	option = {
 		name = COX_Landreform.224.a
+		custom_effect_tooltip = COX_Landreform_224_tt
+		hidden_effect = {
+			COX = {set_country_flag = COX_landreform_224_fired}
+		}
 	}
 }
 
