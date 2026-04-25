@@ -86,6 +86,10 @@ COX_landreform_startup = {
         clear_array = COX_landreform_dec_done_array #土改决议后端数组，用来存储所有已执行决议
         activate_mission = COX_landreform_monthly_effect
         activate_mission = COX_landreform_deadline
+        country_event = {
+            id = COX_Landreform.400
+            days = 390
+        }
         
     }
     #地区变量初始化
@@ -848,9 +852,39 @@ COX_landreform_end_effect = {
     
     COX_landreform_roundup = yes
     #事件
-    COX = {
-        country_event = COX_landreform.401
+    if = {
+        limit = {
+            always = no #给失败预留的判定
+        }
+        COX = {
+            country_event = COX_landreform.401 #可以改成失败事件链的入口
+        }
     }
+    else = {
+        if = {
+            limit = {
+                OR = {
+                    is_in_array = {
+                        array = COX_landreform_dec_done_array
+            	        value = 215
+                    }
+                    is_in_array = {
+                        array = COX_landreform_dec_done_array
+            	        value = 226
+                    }
+                }
+            }
+            COX = {
+                country_event = COX_landreform.401
+            }
+        }
+        else = {
+            COX = {
+                country_event = COX_landreform.402
+            }
+        }
+    }
+    
 }
 COX_landreform_roundup = {#清除有关变量
     COX = {
@@ -871,11 +905,16 @@ COX_landreform_roundup = {#清除有关变量
         clr_country_flag = COX_landreform_ongoing
         clr_country_flag = country_has_gui
         clr_country_flag = COX_land_reform_GUI_visible_flag
+        clr_country_flag = COX_landreform_yang_zhicheng
+        clr_country_flag = COX_landreform_chen_yun
+        clr_country_flag = COX_landreform_zhang_wentian
+        clr_country_flag = COX_landreform_liu_shaoqi
+        clr_country_flag = COX_landreform_223_fired
+        clr_country_flag = COX_landreform_224_fired
 
         #arrays
-        clear_array = COX_landreform_regions_array #土改地区数组
-        #clear_array = COX_landreform_dec_all_array#以防之后还要引用
-        clear_array = COX_landreform_dec_done_array #土改决议后端数组，用来存储所有已执行决议
+        clear_array = COX_landreform_regions_array 
+        clear_array = COX_landreform_dec_all_array 
     }
     617 = {#中央
         clear_variable = COX_landreform_local_progress
@@ -928,7 +967,176 @@ COX_landreform_roundup = {#清除有关变量
 }
 #真·结束效果，在事件链末尾触发
 COX_landreform_finish_effect = {
-    clear_array = COX_landreform_dec_all_array #死透了
+    COX = {
+        set_country_flag = COX_land_reform_succeeded
+        every_state = {
+            limit = {
+                is_core_of = XIN
+            }
+            remove_core_of = XIN
+            add_core_of = COX
+        }
+        every_state = {
+            limit = {
+                is_claimed_by = XIN
+            }
+            remove_claim_by = XIN
+            add_claim_by = COX
+        }
+        #初始化变量
+        COX = {
+            set_variable = {
+                COX_landform_ended_effect_pp = 0.2
+            }
+            set_variable = {
+                COX_landform_ended_effect_stab = 0
+            } 
+            set_variable = {
+                COX_landform_ended_effect_support = 0
+            } 
+            set_variable = {
+                COX_landform_ended_effect_population = 0
+            } 
+        }
+        #土改进度效果
+        if = {
+            limit = {
+                check_variable = {
+                    COX_landreform_progress_export = 4
+                }
+            }
+            set_variable = {
+                COX_landform_ended_effect_stab = 0.15
+            } 
+            set_variable = {
+                COX_landform_ended_effect_support = 0.15
+            }
+            TNO_improve_poverty_high = yes
+            TNO_improve_agriculture_med = yes
+            TNO_improve_industrial_expertise_med = yes  
+            617 = {
+                set_temp_variable = { temp_state_value_addition = 0.2 }
+                econ_state_value_change_addition_specified_state = yes
+            }  
+            every_state = {
+                limit = {
+                    is_owned_by = COX
+                    NOT = {
+                        state = 617
+                    }
+                }
+                set_temp_variable = { temp_state_value_addition = 0.2 }
+                econ_state_value_change_addition_specified_state = yes
+            }
+            set_temp_variable = { gdp_growth_temp = 0.035 }
+            econ_gdp_growth_change = yes
+        }
+        else_if = {
+            limit = {
+                check_variable = {
+                    COX_landreform_progress_export = 3
+                }
+                
+            }
+            set_variable = {
+                COX_landform_ended_effect_stab = 0.1
+            } 
+            set_variable = {
+                COX_landform_ended_effect_support = 0.1
+            }
+            TNO_improve_poverty_high = yes
+            TNO_improve_agriculture_low = yes
+            TNO_improve_industrial_expertise_low = yes
+            617 = {
+                set_temp_variable = { temp_state_value_addition = 0.2 }
+                econ_state_value_change_addition_specified_state = yes
+            }  
+            every_state = {
+                limit = {
+                    is_owned_by = COX
+                    NOT = {
+                        state = 617
+                    }
+                }
+                set_temp_variable = { temp_state_value_addition = 0.1 }
+                econ_state_value_change_addition_specified_state = yes
+            }
+            set_temp_variable = { gdp_growth_temp = 0.025 }
+            econ_gdp_growth_change = yes
+        }
+        else_if = {
+            limit = {
+                check_variable = {
+                    COX_landreform_progress_export = 2
+                }
+            }
+            set_variable = {
+                COX_landform_ended_effect_stab = 0.05
+            } 
+            set_variable = {
+                COX_landform_ended_effect_support = 0.05
+            }
+            TNO_improve_poverty_med = yes
+            TNO_improve_industrial_expertise_low = yes
+            617 = {
+                set_temp_variable = { temp_state_value_addition = 0.1 }
+                econ_state_value_change_addition_specified_state = yes
+            }  
+            set_temp_variable = { gdp_growth_temp = 0.015 }
+            econ_gdp_growth_change = yes
+        }
+        else = {
+            TNO_improve_poverty_low = yes
+            TNO_improve_industrial_expertise_low = yes
+            set_temp_variable = { gdp_growth_temp = 0.01 }
+            econ_gdp_growth_change = yes
+        }
+        #水利设施效果
+        if = {
+            limit = {
+                check_variable = {
+                    COX_landreform_infrastructure_export = 4
+                }
+            }
+            set_variable = {
+                COX_landform_ended_effect_population = 0.2
+            } 
+            TNO_improve_agriculture_high = yes
+        }
+        else_if = {
+            limit = {
+                check_variable = {
+                    COX_landreform_infrastructure_export = 3
+                }
+            }
+            set_variable = {
+                COX_landform_ended_effect_population = 0.1
+            } 
+            TNO_improve_agriculture_med = yes
+        }
+        else_if = {
+            limit = {
+                check_variable = {
+                    COX_landreform_infrastructure_export = 2
+                }
+            }
+            TNO_improve_agriculture_low = yes
+            # set_variable = {
+            #     COX_landform_ended_effect_population = 0.2
+            # } 
+        }
+        else = {
+            set_variable = {
+                COX_landform_ended_effect_population = -0.1
+            } 
+            TNO_worsen_agriculture_low = yes
+        }
+        add_dynamic_modifier = { modifier = COX_landform_ended_modifier }
+        #最终清理变量
+        clear_array = COX_landreform_dec_done_array 
+        clear_variable = COX_landreform_progress_export
+        clear_variable = COX_landreform_infrastructure_export
+    }
 }
 
 ###GUI相关###
@@ -1798,6 +2006,7 @@ COX_landreform_dec_201_effect = {
             set_state_flag = COX_landreform_update_avaliable
         }
         country_event = { id = COX_Landreform.108 }
+        country_event = { id = COX_Landreform.100 }
         add_to_array = { COX_landreform_dec_done_array = 201 }
     }
 }
