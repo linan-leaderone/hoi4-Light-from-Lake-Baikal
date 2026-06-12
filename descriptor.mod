@@ -4,7 +4,8 @@ tags={
 }
 dependencies={
 	"The New Order: Last Days of Europe"
-            "The New Order: Last Days of Europe(CN.Ver)"
+	"The New Order: Last Days of Europe(CN.Ver)"
 }
-name="LFB_dev"
-supported_version="1.16.*"
+name="The New Order: Light from Lake Baikal"
+supported_version="1.19.*"
+remote_file_id="3350747146"
