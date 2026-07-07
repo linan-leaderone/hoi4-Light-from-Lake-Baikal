@@ -7,5 +7,5 @@ dependencies={
 	"The New Order: Last Days of Europe(CN.Ver)"
 }
 name="The New Order: Light from Lake Baikal"
-supported_version="1.19.*"
+supported_version="1.18.*"
 remote_file_id="3350747146"
